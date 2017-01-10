@@ -198,8 +198,8 @@ function M.area_template_to_map(label, filename, padding, legend)
 end
 
 function M.make_tunnel_oper(rng, floor, wall, wall_seethrough) 
-    wall_flags = {SourceMap.FLAG_SOLID, SourceMap.FLAG_TUNNEL, SourceMap.FLAG_PERIMETER}
-    remove_flags = {}
+    local wall_flags = {SourceMap.FLAG_SOLID, SourceMap.FLAG_TUNNEL, SourceMap.FLAG_PERIMETER}
+    local remove_flags = {}
     if wall_seethrough then
         append(wall_flags, SourceMap.FLAG_SEETHROUGH)
     else
@@ -234,8 +234,8 @@ function M.make_rectangle_criteria()
 end
 
 function M.make_rectangle_oper(floor, wall, wall_seethrough, --[[Optional]] area_query)
-    wall_flags = {SourceMap.FLAG_SOLID}
-    remove_wall_flags = {SourceMap.FLAG_SEETHROUGH}
+    local wall_flags = {SourceMap.FLAG_SOLID}
+    local remove_wall_flags = {SourceMap.FLAG_SEETHROUGH}
     if wall_seethrough then
         append(wall_flags, SourceMap.FLAG_SEETHROUGH)
         remove_wall_flags = {}

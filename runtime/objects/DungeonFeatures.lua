@@ -15,7 +15,7 @@ M.FEATURE_DEPTH = 100
 
 local DEACTIVATION_DISTANCE = 768
 
-function n_lanarts_picked_up()
+local function n_lanarts_picked_up()
     local n = 0
     for _, _ in pairs(GlobalData.lanarts_picked_up) do
         n = n + 1

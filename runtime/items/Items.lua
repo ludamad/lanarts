@@ -74,7 +74,7 @@ for _, entry in ipairs {
     {"Obliteration Lanart", "The Obliteration Lanart of legend, in your hands.", "spr_runes.rune_cerebov"},
     {"Dragon Lanart", "A legendary artifact. This Lanart can act as the replacement for a dragon's heart.", "spr_runes.rune_demonic_4"},
 } do
-    name, description, sprite = entry[1],entry[2],entry[3]
+    local name, description, sprite = entry[1],entry[2],entry[3]
     Data.item_create {
         name = name,
         description = description, use_message = description,

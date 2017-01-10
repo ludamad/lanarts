@@ -38,6 +38,7 @@ make_rooms_with_tunnels = (map, rng, conf, area) ->
             queryfn = () ->
                 query = make_rectangle_criteria()
                 return query(map, subgroup, bounds)
+            local oper
             oper = make_rectangle_oper(conf.floor2.id, conf.wall2.id, conf.wall2.seethrough, queryfn)
             if oper(map, subgroup, bounds)
                 append map.rectangle_rooms, bounds

@@ -83,10 +83,10 @@ function newtype(args)
     return type
 end
 
-print "Read core globals"
+print "Read core globals:"
 require "globals.CoreGlobals"
 
-print "Read modules that must be initialized"
+print "Read modules that must be initialized:"
 require "Logging"
 require "ErrorReporting"
 
@@ -103,12 +103,32 @@ require "globals.StringUtils"
 require "globals.TableUtils"
 require "globals.TextComponent"
 
-print "Preload external packages that set globals before eliminating that functionality"
+print "Preload external packages that set globals:"
 
 require "json"
 require "socket"
 require "ltn12"
 require "mime"
+
+print "Preload legacy internal modules that set globals (and need refactoring to not):"
+
+require "effects.Effects"
+require "spells.SpellEffects"
+
+print "Assigning, in effect declaring, global variables used by the engine:"
+items = {}
+spells = {}
+effects = {}
+enemies = {}
+sprites = {}
+projectiles = {}
+classes = {}
+
+-- TODO get rid of these:
+enemy_init = do_nothing
+enemy_step = do_nothing
+enemy_berserker_step = do_nothing
+enemy_berserker_init = do_nothing
 
 -- Now that global variable mutation has been done, protect globals even more strongly, prevent creation of new globals:
 setmetatable(_G, {__index = function(self, k)

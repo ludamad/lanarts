@@ -7,7 +7,7 @@ local M = {}
 
 function M.type_create(T)
     T = T or {}
-    base = T.base or GameObject.Base
+    local base = T.base or GameObject.Base
     T.base = nil
     tmerge(T, base)
 

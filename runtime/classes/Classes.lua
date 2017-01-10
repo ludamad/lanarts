@@ -44,7 +44,7 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      {item = "Scroll of Fear", amount = 10},
 } or {}
 
-function possibly_apply_levelling(data)
+local function possibly_apply_levelling(data)
     if os.getenv("LANARTS_LEVEL") then
         local level = tonumber(os.getenv("LANARTS_LEVEL"))
         for i=2,level do
