@@ -89,6 +89,7 @@ public:
 	Inventory& inventory();
 	EquipmentStats& equipment();
 
+	void gain_xp_from(GameState* gs, CombatGameInst* inst, float dx = -5, float dy = -5);
 	sprite_id get_sprite() const {
 		return sprite;
 	}

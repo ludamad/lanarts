@@ -208,7 +208,8 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
     methods["effective_stats"].bind_function(lapi_gameinst_effectivestats);
     LUAWRAP_GETTER(getters, weapon_range, OBJ->equipment().weapon().weapon_entry().range());
 
-	LUAWRAP_METHOD(methods, heal_fully, OBJ->stats().core.heal_fully());
+    LUAWRAP_METHOD(methods, heal_fully, OBJ->stats().core.heal_fully());
+    LUAWRAP_METHOD(methods, gain_xp_from, OBJ->gain_xp_from(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2)));
 	LUAWRAP_GETTER(getters, can_rest, OBJ->cooldowns().can_rest());
 	LUAWRAP_METHOD(methods, direct_damage, OBJ->damage(lua_api::gamestate(L), lua_tointeger(L, 2)));
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true)) );
@@ -222,6 +223,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
     LUAWRAP_METHOD(methods, die, OBJ->die(lua_api::gamestate(L)));
     LUAWRAP_GETTER(methods, has_effect, OBJ->effects().get(effect_from_lua(L, 2)) != NULL);
     LUAWRAP_GETTER(methods, get_effect, OBJ->effects().get(effect_from_lua(L, 2))->state);
+    LUAWRAP_GETTER(methods, is_local_player, false);
     LUAWRAP_GETTER(methods, has_effect_category, OBJ->effects().has_category(luawrap::get<const char*>(L, 2)));
 
 	methods["reset_rest_cooldown"].bind_function(lapi_do_nothing);

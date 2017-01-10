@@ -144,14 +144,14 @@ Pos CombatGameInst::direction_towards_object(GameState* gs, col_filterf filter) 
     if (min_dist == 10000) {//std::numeric_limits<float>::max()) {
         FOR_EACH_BBOX(paths_to_object().location(), x, y) {
             auto* node = paths_to_object().node_at({x, y});
-            if (node->solid) {
+            if (node->solid || node->open) {
                 continue;
             }
             float dist = node->distance;
             if (dist == 0 && (node->dx != 0 || node->dy != 0)) {
                 continue;
             }
-            bool is_item = (gs->object_radius_test(this, NULL, 0, filter, (x*32+16), (y*32+16), 8));
+            bool is_item = (gs->object_radius_test(this, NULL, 0, filter, (x*32+16), (y*32+16), 12));
             if (is_item && min_dist >= dist) {
                 closest = {x,y};
                 min_dist = dist;
@@ -395,7 +395,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     }
 
     signal_attacked_successfully();
-    if (isdead && dynamic_cast<EnemyInst*>(inst)) {
+    if (isdead && dynamic_cast<EnemyInst*>(inst) && inst->team == MONSTER_TEAM) {
             PlayerData& pc = gs->player_data();
             signal_killed_enemy();
 
@@ -663,3 +663,31 @@ simul_id& CombatGameInst::collision_simulation_id() {
     return simulation_id;
 }
 
+void CombatGameInst::gain_xp_from(GameState* gs, CombatGameInst* inst, float dx,
+        float dy) {
+    if (team == MONSTER_TEAM) {
+        return;
+    }
+    PlayerData& pc = gs->player_data();
+    signal_killed_enemy();
+    // Nothing for killing players yet:
+    if (!dynamic_cast<EnemyInst*>(inst)) {
+        return;
+    }
+
+    char buffstr[32];
+    double xpworth = ((EnemyInst*)inst)->xpworth();
+    double n_killed = (pc.n_enemy_killed(((EnemyInst*) inst)->enemy_type()) - 1) / pc.all_players().size();
+    xpworth *= pow(0.84, n_killed); // sum(0.84**i for i in range(25)) => ~6.17x the monsters xp value over time
+    if (n_killed > 25) {
+        xpworth = 0;
+    }
+    int amnt = round(xpworth / pc.all_players().size());
+
+    players_gain_xp(gs, amnt);
+    snprintf(buffstr, 32, "%d XP", amnt);
+    gs->add_instance(
+            new AnimatedInst(Pos(inst->x + dx, inst->y + dy), -1, 25,
+                    PosF(), PosF(), AnimatedInst::DEPTH, buffstr,
+                    Colour(255, 215, 11)));
+}

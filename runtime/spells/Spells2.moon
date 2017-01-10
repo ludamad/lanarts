@@ -271,7 +271,7 @@ Data.effect_create {
             if dist < @range
                 mon\add_effect("Sapped", 35)
                 mon.stats.mp = math.max(0, mon.stats.mp - 10)
-                if not mon.is_enemy and mon\is_local_player() 
+                if mon\is_local_player() 
                     EventLog.add("Your MP is drained!", {200,200,255})
                 elseif not mon.is_enemy
                     EventLog.add(mon.name .. "'s MP is drained!", {200,200,255})
@@ -305,12 +305,13 @@ Data.effect_create {
                 caster\add_effect("Pained", 50)
                 if mon\damage(random(4,15) * 2 + caster.stats.magic * 2, random(6,10) + caster.stats.magic * 0.2, 1.0, 2.0)
                     {:stats} = caster
-                    stats.mp = math.min(stats.max_mp, stats.mp + @mp_gain)
-                    -- Summon zombies by probability!?
-                    if not caster.is_enemy and caster\is_local_player() 
-                        EventLog.add("You drain the enemy's life force as MP!", {200,200,255})
-                    elseif not caster.is_enemy
-                        EventLog.add(caster.name .. " drains the enemy's life force as MP!", {200,200,255})
+                    caster\gain_xp_from(mon)
+                    --stats.mp = math.min(stats.max_mp, stats.mp + @mp_gain)
+                    ---- Summon zombies by probability!?
+                    --if caster\is_local_player() 
+                    --    EventLog.add("You drain the enemy's life force as MP!", {200,200,255})
+                    --elseif not caster.is_enemy
+                    --    EventLog.add(caster.name .. " drains the enemy's life force as MP!", {200,200,255})
     draw_func: (caster, top_left_x, top_left_y) =>
         @max_alpha = 0.35
         if not caster.is_enemy and not caster\has_effect "Pained"
@@ -431,7 +432,8 @@ Data.spell_create {
 Data.effect_create {
     name: "Spiky"
     on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
-        attacker\direct_damage(damage * 0.25)
+        if attacker\direct_damage(damage * 0.25)
+            defender\gain_xp_from(attacker)
         if defender.is_local_player and defender\is_local_player()
             EventLog.add("You strike back with spikes!", COL_PALE_BLUE)
         return damage
@@ -454,23 +456,71 @@ Data.effect_create {
             else
                 caster.summoned[mon] += 1
                 @n_summons += 1
-        amount = math.max 1, math.floor(caster.stats.level / 2)
-        visible_enemy = false
-        for obj in *Map.enemies_list(caster)
-            if Map.object_visible(obj)
-                visible_enemy = true
-                break
-        if visible_enemy and not (caster\has_effect "Summoning") and @n_summons < amount 
-            if #Map.allies_list(caster) == 0
-                return
-            if @n_steps > 30 + 70 / caster.stats.level
-                eff = caster\add_effect("Summoning", 20)
-                eff.monster = (if type(@monster) == "string" then @monster else random_choice(@monster))
-                eff.duration = 5 -- @duration / caster.stats.level
-                @n_steps = 0
-            else 
-                @n_steps += 1
+        --amount = math.max 1, math.floor(caster.stats.level / 2)
+        --visible_enemy = false
+        --for obj in *Map.enemies_list(caster)
+        --    if Map.object_visible(obj)
+        --        visible_enemy = true
+        --        break
+        --if visible_enemy and not (caster\has_effect "Summoning") and @n_summons < amount 
+        --    if #Map.allies_list(caster) == 0
+        --        return
+        --    if @n_steps > 30 + 70 / caster.stats.level
+        --        eff = caster\add_effect("Summoning", 20)
+        --        eff.monster = (if type(@monster) == "string" then @monster else random_choice(@monster))
+        --        eff.duration = 5 -- @duration / caster.stats.level
+        --        @n_steps = 0
+        --    else 
+        --        @n_steps += 1
 }
+
+Data.spell_create {
+    name: "Summon Dark Aspect",
+    spr_spell: "spr_spells.summon",
+    description: "You summon a dark companion, at the cost of health. Stronger companions are summoned if the caster has high willpower.",
+    mp_cost: 10,
+    cooldown: 35,
+    can_cast_with_held_key: false,
+    fallback_to_melee: false,
+    spell_cooldown: 100
+    prereq_func: (caster) ->
+        if caster.stats.hp < 25
+            if caster\is_local_player() 
+                EventLog.add("You do not have enough health!", {200,200,255})
+            return false
+        if not caster\has_effect "Necromancer"
+            if caster\is_local_player() 
+                EventLog.add("You must be a necromancer to cast this spell!", {200,200,255})
+            return false
+        amount = math.max 1, math.ceil(caster.stats.level / 2)
+        {:n_summons} = caster\get_effect("Summoner")
+        if n_summons >= amount
+            if caster\is_local_player() 
+                EventLog.add("You cannot currently control more than #{amount} aspects!", {200,200,255})
+            return false
+        return not caster\has_effect("Exhausted") and not (caster\has_effect "Summoning")
+    autotarget_func: (caster) -> caster.x, caster.y
+    action_func: (caster, x, y) ->
+        play_sound "sound/summon.ogg"
+        --visible_enemy = false
+        --for obj in *Map.enemies_list(caster)
+        --    if Map.object_visible(obj)
+        --        visible_enemy = true
+        {:willpower} = caster\effective_stats()
+        monster = if willpower >= 11
+            "Mummy"
+        elseif willpower >= 9
+            "Skeleton"
+        else
+            "Spectral Beast"
+        if not (caster\has_effect "Summoning")
+            caster\direct_damage(15)
+            eff = caster\add_effect("Summoning", 20)
+            eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
+            eff.duration = 5
+}
+
+mon_title = (mon) -> if mon.unique then mon.name else "the #{mon.name}"
 
 for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
     Data.effect_create {
@@ -481,8 +531,14 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
                     caster\add_effect "Summoner", 2 -- Keep effect from dying
                 else
                     eff = caster\add_effect "Summoner", 2
-                    eff.monster = "Spectral Beast"
                     eff.duration = 30
                     eff.kill_time = 300
+    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
+        if name == "Necromancer"
+            if attacker\direct_damage(damage * 0.33)
+                defender\gain_xp_from(attacker)
+            if defender\is_local_player()
+                EventLog.add("Your magic lashes back at #{mon_title attacker} as you are hit!", COL_PALE_BLUE)
+        return damage
     }
 

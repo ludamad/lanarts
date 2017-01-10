@@ -185,9 +185,26 @@ void MonsterController::set_monster_headings(GameState* gs,
 		}
 
 		if (!potentially_randomize_movement(gs, e)) {
-                    PosF heading = get_direction_towards(gs, e, p, movespeed);
-                    e->vx = heading.x;
-                    e->vy = heading.y;
+                    if (e->has_paths_data()) {
+                        // TODO break out allied monster code into its own thing:
+                        e->vx = 0, e->vy = 0;
+                        if (e->has_paths_data()) {
+                            Pos p = e->direction_towards_enemy(gs);
+                            e->vx = p.x, e->vy = p.y;
+                            float speed = e->effective_stats().movespeed;
+                            normalize(e->vx, e->vy, speed);
+                            if (e->vx == 0 && e->vy == 0) {
+                                Pos p = e->direction_towards_ally_player(gs);
+                                e->vx = p.x, e->vy = p.y;
+                                float speed = e->effective_stats().movespeed;
+                                normalize(e->vx, e->vy, speed);
+                            }
+                        }
+                    } else {
+                        PosF heading = get_direction_towards(gs, e, p, movespeed);
+                        e->vx = heading.x;
+                        e->vy = heading.y;
+                    }
 		}
 
 		//Compare position to player object

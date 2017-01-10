@@ -121,14 +121,14 @@ Data.enemy_create {
         attacks: {
             {weapon: "Basic Melee"}
         }
-        hp: 20
-        hpregen: 0
+        hp: 30
+        hpregen: 0.1
         movespeed: 4
         -- base stats:
-        strength: 1
-        defence: 0
-        magic: 1
-        willpower: 0
+        strength: 5
+        defence: 8
+        magic: 10
+        willpower: 8
     }
 }
 

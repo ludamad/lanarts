@@ -282,7 +282,9 @@ function Pain.action_func(caster, x, y, target)
     target:add_effect("Pained", 50)
     play_pained_sound()
     if target:damage(random(1,12) * 0.9 + stats.magic * 0.9, random(2,5) + stats.magic * 0.2, 1, 0.9) then
-        caster:heal_hp(10)
+        play_sound "sound/painkill.ogg"
+        caster:gain_xp_from(target)
+        caster:heal_hp(target:effective_stats().max_hp / 4)
     else
         caster:direct_damage(10)
     end
@@ -394,7 +396,7 @@ Data.spell_create(Luminos)
 
 local GreaterPain = {
     name = "Greater Pain",
-    description = "Instantly damage all nearby enemies, but hurting yourself in the process. Gains MP back per kill.",
+    description = "Instantly damage all nearby enemies, but hurting yourself in the process.",
     can_cast_with_held_key = true,
     spr_spell = "spr_spells.greaterpain",
     can_cast_with_cooldown = false,
@@ -409,7 +411,7 @@ function GreaterPain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
     caster:direct_damage(40)
     caster:add_effect("Pained", 50)
-    caster:add_effect("Pain Aura", 200).range = GreaterPain.range + caster.stats.level * 5
+    caster:add_effect("Pain Aura", 150).range = GreaterPain.range + caster.stats.level * 5
     if caster:is_local_player() then
         EventLog.add("You attack nearby enemies life force directly!", {200,200,255})
     else

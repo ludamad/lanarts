@@ -250,7 +250,7 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
             dy = 0;
         }
         if (abs(dx) > 0) dx /= abs(dx);
-        if (abs(dy) > 0) dx /= abs(dy);
+        if (abs(dy) > 0) dy /= abs(dy);
     }
     return {dx, dy};
 }
