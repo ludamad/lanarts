@@ -28,6 +28,10 @@ enum lstype_t {
 	LS_NOVALUE
 };
 
+
+#define abs_index(L, i) ((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
+                                        lua_gettop(L) + (i) + 1)
+
 /***************************************************************************************
  *                           Lua value encoding                                        *
  ***************************************************************************************/
@@ -50,6 +54,7 @@ void LuaSerializeContext::encode_table(int idx) {
 
 // On success, writes [LS_REF_ID, <ref id>] or [LS_REF_NAME, <ref name>]
 bool LuaSerializeContext::test_has_ref(int idx) {
+    idx = abs_index(L, idx);
 //	printf("0x%lX %s\n", lua_topointer(L, -1), lua_typename(L, lua_type(L, -1)));
 	lua_pushvalue(L, idx);
 	lua_rawget(L, this->obj_to_index);
@@ -58,6 +63,7 @@ bool LuaSerializeContext::test_has_ref(int idx) {
 	if (was_seen) {
 		if (lua_type(L, -1) == LUA_TNUMBER) {
 			buffer->write_byte(LS_REF_ID);
+	        buffer->write_byte(lua_type(L, idx));
 			buffer->write_int(lua_tointeger(L, -1));
 //			printf("Writing object with integer ID\n");
 		} else {
@@ -65,6 +71,7 @@ bool LuaSerializeContext::test_has_ref(int idx) {
 			const char* str = lua_tolstring(L, -1, &str_len);
 //			printf("Test: '%s', %d chars\n", str, (int)str_len);
 			buffer->write_byte(LS_REF_NAME);
+            buffer->write_byte(lua_type(L, idx));
 			buffer->write_int(str_len);
 			buffer->write_raw(str, str_len);
 		}
@@ -91,6 +98,7 @@ void LuaSerializeContext::store_ref_id(int idx) {
 
 // Writes [LS_FUNCTION, <number of upvalues>, <upvalue encodings>]
 void LuaSerializeContext::encode_function(int idx) {
+    idx = abs_index(L, idx);
         //printf("ENCODING FUNC %d\n", next_encode_index);
 	lua_pushvalue(L, idx); // push function
 
@@ -121,6 +129,7 @@ void LuaSerializeContext::encode_function(int idx) {
 }
 
 bool LuaSerializeContext::test_has_metamethod(int idx) {
+    idx = abs_index(L, idx);
 	lua_pushvalue(L, idx);
 	int old_top = lua_gettop(L);
 	if (luaL_getmetafield(L, idx, "__save")) {
@@ -146,6 +155,7 @@ bool LuaSerializeContext::test_has_metamethod(int idx) {
 }
 
 void LuaSerializeContext::encode_metatable(int idx) {
+    idx = abs_index(L, idx);
 	if (!lua_getmetatable(L, idx)) {
 		lua_pushnil(L);
 	}
@@ -154,6 +164,7 @@ void LuaSerializeContext::encode_metatable(int idx) {
 }
 
 void LuaSerializeContext::encode(int idx) {
+    idx = abs_index(L, idx);
 	int old_stack = lua_gettop(L);
 	switch (lua_type(L, idx)) {
 	case LUA_TNUMBER:
@@ -243,11 +254,16 @@ void LuaSerializeContext::_decode(int type) {
 		LCOMMON_ASSERT(old_stack == lua_gettop(L));
 		return;
 	case LS_REF_ID: {
+        int recorded_type = buffer->read_byte();
 		int id = buffer->read_int();
 		lua_rawgeti(L, this->index_to_obj, id);
 		if (lua_isnil(L, -1)) {
 			luaL_error(L, "LS_REF_ID resolved to nil loading id=%d (problem with serialized Lua value!)", id);
-		}
+		} else if (lua_type(L, -1) != recorded_type){
+	        const char* was = lua_typename(L, lua_type(L, -1));
+	        const char* expected = lua_typename(L, recorded_type);
+	        luaL_error(L, "Reference decoding for '%s' returned a value of wrong type. Got a '%s', expected a '%s'.", was, expected);
+	    }
 		LCOMMON_ASSERT(old_stack == lua_gettop(L));
 		return;
 	}
@@ -273,6 +289,7 @@ void LuaSerializeContext::_decode(int type) {
 }
 
 void LuaSerializeContext::decode_table(int idx) {
+    idx = abs_index(L, idx);
 	lua_pushvalue(L, idx);
 	int type;
 	while ((type = buffer->read_byte()) != LS_TABLE_END_SENTINEL) {
@@ -353,6 +370,7 @@ void LuaSerializeContext::decode(LuaValue& value) {
 }
 
 void LuaSerializeContext::decode_ref_name() {
+    int recorded_type = buffer->read_byte();
 	decode_string();
 	lua_pushvalue(L, -1);
 	lua_rawget(L, this->index_to_obj);
@@ -367,9 +385,12 @@ void LuaSerializeContext::decode_ref_name() {
 	}
 
 	if (lua_isnil(L, -1)) {
-		size_t n;
-		const char* str = lua_tolstring(L, -2, &n);
-		luaL_error(L, "Fallback function failed to return decoded value for '%s', n=%d.", str, n);
+		const char* str = lua_tostring(L, -2);
+		luaL_error(L, "Fallback function failed to return decoded value for '%s'.", str);
+	} else if (lua_type(L, -1) != recorded_type){
+	    const char* was = lua_typename(L, lua_type(L, -1));
+	    const char* expected = lua_typename(L, recorded_type);
+        luaL_error(L, "Reference decoding for '%s' returned a value of wrong type. Got a '%s', expected a '%s'.", was, expected);
 	}
 
 	lua_replace(L, -2); // Replace string with decoded value
@@ -479,6 +500,7 @@ static void lua_table_clear(lua_State* L, int table_idx) {
     }
     lua_pop(L, 1); // Pop extra table copy.
     assert(old_top == lua_gettop(L));
+    assert(lua_objlen(L, table_idx) == 0);
 }
 
 void LuaSerializeConfig::reset() {

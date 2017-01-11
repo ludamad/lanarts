@@ -423,11 +423,13 @@ namespace GameInstWrap {
 		if (lua_vars.empty()) {
 			lua_vars = LuaValue::newtable(L);
 		}
+                if (lua_vars["__objectref"].isnil()) {
+			make_object_ref(lua_vars, inst);
+                }
 		lua_vars.push();
 		if (!lua_getmetatable(L, -1)) {
 			lua_gameinst_push_metatable(L, inst);
 			lua_setmetatable(L, -2);
-			make_object_ref(lua_vars, inst);
 		} else {
 			lua_pop(L, 1);
 		}

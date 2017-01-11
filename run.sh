@@ -148,5 +148,7 @@ function run_lanarts(){
     fi
     cd ..
 }
+# TODO add gdb macro with this line:
+#print luaL_loadstring(L, "return debug.traceback()") || lua_pcall(L, 0, 1, 0) || printf(lua_tolstring(L, -1, 0))
 
 run_lanarts

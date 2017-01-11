@@ -40,7 +40,7 @@ local function game_loop_body(steponly)
         GameState.draw()
         perf.timing_end("**Draw**")
     end
-
+    
     perf.timing_begin("**Step**")
     if not M.loop_control.game_is_paused and not GameState.step() then 
         return false 

@@ -444,7 +444,6 @@ Data.enemy_create {
         ItemGroups = require "maps.ItemGroups"
         ObjectUtils.spawn_item_near(@, "Red Dragonplate", 1)
         ObjectUtils.spawn_item_near(@, "Dragon Lanart", 1)
-        ObjectUtils.spawn_item_near(@, "Amulet of Greater Fire", 1)
         -- Spawn a level 1 randart:
         ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(), 1)
 }
@@ -534,6 +533,7 @@ Data.enemy_create {
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
         ObjectUtils.spawn_item_near(@, "Obliteration Lanart", 1)
+        ObjectUtils.spawn_item_near(@, "Amulet of Greater Fire", 1)
         -- Spawn 1 level 2 randart:
         for i=1,2
             ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(2), 1)

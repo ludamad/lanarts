@@ -61,13 +61,20 @@ struct PlayerDataProxy {
 	}
 };
 
+// TODO obsolete the above
 static int world_players(lua_State* L) {
-	int nplayers = lua_api::gamestate(L)->player_data().all_players().size();
-	lua_newtable(L);
-	for (int i = 0; i < nplayers; i++) {
-		luawrap::push<PlayerDataProxy>(L, PlayerDataProxy(i));
-		lua_rawseti(L, -2, i + 1);
+        LuaValue value(L);
+	value.newtable();
+        int i = 1;
+	for (PlayerDataEntry& entry : lua_api::gamestate(L)->player_data().all_players()) {
+            value[i].newtable();
+            value[i]["name"] = entry.player_name;
+            LANARTS_ASSERT(entry.player() != NULL);
+            value[i]["instance"] = entry.player();
+            value[i]["class_name"] = game_class_data.at(entry.classtype).name;
+            i += 1;
 	}
+        value.push();
 	return 1;
 }
 static int world_player_amount(lua_State* L) {

@@ -573,12 +573,12 @@ Data.spell_create {
             caster\direct_damage(45)
             eff = caster\add_effect("Summoning", 20)
             eff.on_summon = (obj) ->
-                -- obj.stats.hp += caster\effective_stats().willpower * 5
-                -- obj.stats.max_hp += caster\effective_stats().willpower * 5
-                obj.stats.strength += caster\effective_stats().willpower / 2
-                obj.stats.magic += caster\effective_stats().willpower / 2
-                obj.stats.defence += caster\effective_stats().willpower / 2
-                obj.stats.willpower += caster\effective_stats().willpower /2 
+                obj.stats.hp += caster\effective_stats().willpower * 5
+                obj.stats.max_hp += caster\effective_stats().willpower * 5
+                obj.stats.strength += caster\effective_stats().willpower
+                obj.stats.magic += caster\effective_stats().willpower
+                obj.stats.defence += caster\effective_stats().willpower
+                obj.stats.willpower += caster\effective_stats().willpower
             eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
             eff.duration = 5
 }

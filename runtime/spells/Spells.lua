@@ -419,7 +419,7 @@ local GreaterPain = {
 
 function GreaterPain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
-    caster:direct_damage(40)
+    caster:direct_damage(50)
     caster:add_effect("Pained", 50)
     caster:add_effect("Pain Aura", 150).range = GreaterPain.range + caster.stats.level * 5
     if caster:is_local_player() then
@@ -430,7 +430,10 @@ function GreaterPain.action_func(caster, x, y, target)
 end
 
 function GreaterPain.prereq_func(caster)
-    if caster.stats.hp < 65 then
+    if caster.stats.hp < 75 then
+        if caster:is_local_player() then
+            EventLog.add("You do not have enough health!", {255,200,200})
+        end
         return false
     end
     for mon in values(Map.enemies_list(caster)) do
