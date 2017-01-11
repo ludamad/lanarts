@@ -62,6 +62,21 @@ struct GameStateInitData {
 	}
 };
 
+class GameStatePostSerializeData {
+public:
+    void clear();
+    void postpone_instance_deserialization(GameInst** holder, level_id current_floor, obj_id id);
+    void process(GameState* gs);
+private:
+    struct GameInstPostSerializeData {
+        GameInst** holder;
+        level_id current_floor;
+        obj_id id;
+    };
+    // Used to determine what to fix-up after serialization:
+    std::vector<GameInstPostSerializeData> postponed_insts;
+};
+
 class GameState {
 public:
 
@@ -263,7 +278,9 @@ public:
 	TeamData& team_data() {
 	    return game_world().team_data();
 	}
-
+	GameStatePostSerializeData& post_deserialize_data() {
+	    return _post_deserialize_data;
+	}
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
 
@@ -292,6 +309,7 @@ private:
 	int repeat_actions_counter;
 
 	LuaSerializeConfig config;
+	GameStatePostSerializeData _post_deserialize_data;
 };
 
 void play(const char* sound_path);

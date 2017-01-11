@@ -95,12 +95,12 @@ static GameState* init_gamestate(bool reinit) {
 	if (!load_settings_data(settings, "settings.yaml")) {
 		fatal_error("Fatal error: settings.yaml not found, the game is probably being loaded from the wrong place.\n");
 	}
-
+        // Override with remembered settings
+        load_settings_data(settings, "saves/saved_settings.yaml"); 
 	bool can_create_saves = ensure_directory("saves");
 	if (!can_create_saves) {
 		printf("Problem creating save directory, will not be able to create save files!\n");
 	}
-	load_settings_data(settings, "saves/saved_settings.yaml"); // Override with remembered settings
 
 	if (!reinit){
 		if (SDL_Init(SDL_INIT_VIDEO) < 0) {

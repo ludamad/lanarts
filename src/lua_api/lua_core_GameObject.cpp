@@ -369,27 +369,31 @@ namespace GameInstWrap {
 	void push_ref(lua_State* L, GameInst* inst);
 
 	static int __save(lua_State* L) {
+		GameState* gs = lua_api::gamestate(L);
 		GameInst** udata = (GameInst**) lua_touserdata(L, 1);
 		LANARTS_ASSERT((*udata)->id != 0);
+		GameInst* test_inst = gs->get_level((*udata)->current_floor)->game_inst_set().get_instance((*udata)->id);
+        if ((*udata) != test_inst) {
+            throw std::runtime_error(format("Attempt to save GameInst that cannot be found at level %d, id %d!", (*udata)->current_floor, (*udata)->id));
+        }
 		lua_pushinteger(L, (*udata)->id);
 		lua_pushinteger(L, (*udata)->current_floor);
 		return 2;
 	}
+
+    static LuaValue ref_metatable(lua_State* L);
+
 	static int __load(lua_State* L) {
-		GameState* gs = lua_api::gamestate(L);
-		int id = luaL_checkinteger(L, 2);
-		int current_floor = luaL_checkinteger(L, 3);
-		GameInst* inst = gs->get_level(current_floor)->game_inst_set().get_instance(id);
-                if (inst == NULL) {
-                    // Assume the objet has been destroyed.
-                    // TODO do this on serialization side if object->destroyed
-                    // along with its lua state?
-                    lua_newtable(L);
-                    lua_pushboolean(L, true);
-                    lua_setfield(L, -2, "destroyed");
-                } else {
-                    push_ref(L, inst);
-                }
+	    // Get our coordinates:
+        int id = luaL_checkinteger(L, 2);
+        int current_floor = luaL_checkinteger(L, 3);
+        // Create a dummy reference:
+        GameInst** lua_inst = (GameInst**) lua_newuserdata(L, sizeof(GameInst*));
+        luameta_push(L, &ref_metatable);
+        lua_setmetatable(L, -2);
+        // Postpone deserialization until the entire game structure is created:
+        lua_api::gamestate(L)->post_deserialize_data().postpone_instance_deserialization(lua_inst, current_floor, id);
+        // Return our dummy reference:
 		return 1;
 	}
 
@@ -423,9 +427,9 @@ namespace GameInstWrap {
 		if (lua_vars.empty()) {
 			lua_vars = LuaValue::newtable(L);
 		}
-                if (lua_vars["__objectref"].isnil()) {
+		if (lua_vars["__objectref"].isnil()) {
 			make_object_ref(lua_vars, inst);
-                }
+        }
 		lua_vars.push();
 		if (!lua_getmetatable(L, -1)) {
 			lua_gameinst_push_metatable(L, inst);

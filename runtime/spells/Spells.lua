@@ -269,7 +269,7 @@ function Pain.action_func(caster, x, y, target)
         local least_dist = math.huge
         for mon in values(Map.enemies_list(caster)) do
             local dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
-            if dist and dist < mon.target_radius + eff_range and least_dist > dist then
+            if dist < mon.target_radius + eff_range and least_dist > dist then
                 least_dist = dist
                 target = mon
             end
@@ -311,7 +311,7 @@ function Pain.prereq_func(caster)
         return false
     end
     for mon in values(Map.enemies_list(caster)) do
-        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + caster.weapon_range + Pain.range then
+        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + Pain.range then
             return true
         end
     end

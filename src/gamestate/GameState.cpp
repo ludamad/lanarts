@@ -212,6 +212,7 @@ void GameState::serialize(SerializeBuffer& serializer) {
 
 void GameState::deserialize(SerializeBuffer& serializer) {
 	LuaSerializeConfig& conf = luaserialize_config();
+    post_deserialize_data().clear();
         // Reset the serialization config:
         conf.reset();
 	luawrap::globals(L)["Engine"]["pre_deserialize"].push();
@@ -238,6 +239,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	_view.sharp_center_on(local_player()->ipos());
 
 	settings.class_type = local_player()->class_stats().classid;
+	post_deserialize_data().process(this);
 	luawrap::globals(L)["Engine"]["post_deserialize"].push();
 	luawrap::call<void>(L);
 }
@@ -617,4 +619,25 @@ void loop(lsound::Sound& sound, const char* path) {
 
 void loop(const char* sound_path) {
     loop(SOUND_MAP[sound_path], sound_path);
+}
+
+void GameStatePostSerializeData::clear() {
+    postponed_insts.clear();
+}
+
+void GameStatePostSerializeData::postpone_instance_deserialization(GameInst** holder, level_id current_floor, obj_id id) {
+    postponed_insts.push_back({holder, current_floor, id});
+}
+
+void GameStatePostSerializeData::process(GameState* gs) {
+    for (GameInstPostSerializeData& e : postponed_insts) {
+        GameInst* inst = gs->get_level(e.current_floor)->game_inst_set().get_instance(e.id);
+        if (inst == NULL) {
+            throw std::runtime_error(format("Attempt to load GameInst that cannot be found at level %d, id %d!", e.current_floor, e.id));
+        } else {
+            GameInst::retain_reference(inst);
+            *e.holder = inst;
+        }
+    }
+    clear();
 }

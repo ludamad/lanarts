@@ -179,14 +179,15 @@ static Pos follow(FloodFillPaths& paths, const Pos& from_xy) {
 }
 // TODO find appropriate place for this function
 static bool has_visible_monster(GameState* gs, PlayerInst* p = NULL) {
-    const std::vector<obj_id>& mids = gs->monster_controller().monster_ids();
-    for (int i = 0; i < mids.size(); i++) {
-        GameInst* inst = gs->get_instance(mids[i]);
-        if (inst && gs->object_visible_test(inst, p)) {
-            return true;
-        }
-    }
-    return false;
+    return get_nearest_visible_enemy(gs, p) != NULL; // TODO evaluate
+    //const std::vector<obj_id>& mids = gs->monster_controller().monster_ids();
+    //for (int i = 0; i < mids.size(); i++) {
+    //    GameInst* inst = gs->get_instance(mids[i]);
+    //    if (inst && gs->object_visible_test(inst, p)) {
+    //        return true;
+    //    }
+    //}
+    //return false;
 }
 
 Pos PlayerInst::direction_towards_unexplored(GameState* gs) {

@@ -369,9 +369,9 @@ Data.effect_create {
                     caster\gain_xp_from(mon)
                     {:max_hp} = mon\effective_stats()
                     if caster\has_effect("AmuletGreatPain")
-                        caster\heal_hp(max_hp * 2/ 8)
+                        caster\heal_hp(max_hp * 2/ 16)
                     else
-                        caster\heal_hp(max_hp / 8)
+                        caster\heal_hp(max_hp / 16)
                     --stats.mp = math.min(stats.max_mp, stats.mp + @mp_gain)
                     ---- Summon zombies by probability!?
                     --if caster\is_local_player() 
@@ -531,8 +531,11 @@ Data.effect_create {
         @summoned or= caster.summoned
         @n_summons = 0
         for mon, time in pairs caster.summoned
-            if not mon.destroyed and time > math.min(1600, 400 + caster\effective_stats().willpower * 50)
-                mon\direct_damage(mon.stats.hp + 1)
+            if not mon.destroyed
+                time_out = time > math.min(1600, 400 + caster\effective_stats().willpower * 50)
+                diff_floor = (caster.map ~= mon.map)
+                if time_out or diff_floor
+                    mon\direct_damage(mon.stats.hp + 1)
             if mon.destroyed
                 caster.summoned[mon] = nil
             else
@@ -575,10 +578,10 @@ Data.spell_create {
             eff.on_summon = (obj) ->
                 obj.stats.hp += caster\effective_stats().willpower * 5
                 obj.stats.max_hp += caster\effective_stats().willpower * 5
-                obj.stats.strength += caster\effective_stats().willpower
-                obj.stats.magic += caster\effective_stats().willpower
-                obj.stats.defence += caster\effective_stats().willpower
-                obj.stats.willpower += caster\effective_stats().willpower
+                obj.stats.strength += caster\effective_stats().willpower / 2
+                obj.stats.magic += caster\effective_stats().willpower / 2
+                obj.stats.defence += caster\effective_stats().willpower / 2
+                obj.stats.willpower += caster\effective_stats().willpower / 2
             eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
             eff.duration = 5
 }
