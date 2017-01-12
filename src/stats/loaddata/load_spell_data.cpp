@@ -79,13 +79,17 @@ static void lapi_data_create_effect(const LuaStackValue& table) {
 
 
 static ProjectileEntry* parse_projectile(const LuaStackValue& table) {
-    ProjectileEntry* entry;
+    ProjectileEntry* entry = new ProjectileEntry;
     entry->parse_lua_table(table);
     return entry;
 }
 
 static void lapi_data_create_projectile(const LuaStackValue& table) {
-    game_item_data.push_back(parse_projectile(table));
+    ProjectileEntry* entry = parse_projectile(table);
+    entry->name = table["name"].to_str();
+    LuaValue items = luawrap::globals(table.luastate())["items"];
+    items[entry->name] = table;
+    game_item_data.push_back(entry);
 }
 
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames) {

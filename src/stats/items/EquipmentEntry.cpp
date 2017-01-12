@@ -80,6 +80,8 @@ static EquipmentEntry::equip_type name2type(const char* name) {
         return EquipmentEntry::AMULET;
     } else if (strcmp(name, "belt") == 0) {
         return EquipmentEntry::BELT;
+    } else if (strcmp(name, "projectile") == 0) {
+        return EquipmentEntry::AMMO;
     } else if (strcmp(name, "legwear") == 0) {
         return EquipmentEntry::LEGWEAR;
 	} else if (strcmp(name, "gloves") == 0) {

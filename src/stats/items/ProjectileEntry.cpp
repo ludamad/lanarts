@@ -36,7 +36,7 @@ void ProjectileEntry::parse_lua_table(const LuaValue& table) {
     attack = parse_attack(table);
     attack.attack_sprite = item_sprite;
     if (!table["spr_attack"].isnil()) {
-        attack.attack_sprite = res::sprite_id(table["spr_attacked"].to_str());
+        attack.attack_sprite = res::sprite_id(table["spr_attack"].to_str());
     }
     drop_chance = defaulted(table, "drop_chance", 0);
     weapon_class = table["weapon_class"].to_str();

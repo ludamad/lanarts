@@ -175,6 +175,17 @@ void ProjectileInst::step(GameState* gs) {
                     atkstats, this, victim);
 
             int damage = damage_formula(atkstats, victim->effective_stats());
+
+            TODO find out why power is not correctly applied to projectiles
+            if (gs->game_settings().verbose_output) {
+                char buff[100];
+                snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
+                        atkstats.damage, atkstats.power, int(atkstats.magic_percentage * 100),
+                        damage);
+                gs->game_chat().add_message(buff);
+
+            }
+
             damage *= damage_mult;
 
             if ( dynamic_cast<PlayerInst*>(origin) && gs->local_player()->current_floor == dynamic_cast<PlayerInst*>(origin)->current_floor) {

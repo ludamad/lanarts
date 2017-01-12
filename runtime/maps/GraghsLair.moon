@@ -49,13 +49,15 @@ floor_plans = (rng) ->
             room_radius: () -> 25
         }
     }
-    raw_plans = {
+    plans = {
         [1]: {
             wandering_enabled: false
             n_subareas: 1
             size: {45, 45}
             n_items: 4
             n_enemies: 0
+            n_stores: 2
+            n_epic_stores: 2
             n_encounter_vaults: 3
             enemy_entries: {
                 {enemy: "Sheep", guaranteed_spawns: 5, chance: 100}
@@ -73,9 +75,9 @@ floor_plans = (rng) ->
             n_statues: 4
         }
     }
-    return for i, raw in ipairs raw_plans
-        base = table.merge NewDungeons.dungeon_defaults(rng), NewDungeons.create_dungeon_scheme(tileset)
-        table.merge(base, raw)
+    return for i, plan in ipairs plans
+        plan = table.merge NewDungeons.dungeon_defaults(rng), NewDungeons.create_dungeon_scheme(tileset)
+        table.merge(base, plan)
 
 M.N_FLOORS = 1
 M.TEMPLATE  = (rng, floor, connector) -> 
@@ -136,6 +138,9 @@ M.TEMPLATE  = (rng, floor, connector) ->
                 print("ABORT: stairs encounter")
                 return nil
             if not @_spawn_statues(map)
+                print("ABORT: statues")
+                return nil
+            if not @_spawn_stores(map)
                 print("ABORT: statues")
                 return nil
             if not @_spawn_items(map)

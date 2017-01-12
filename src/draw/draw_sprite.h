@@ -23,5 +23,7 @@ void draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
 void draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		float dx, float dy, float frame, const Colour& c = Colour(255, 255, 255));
+void draw_sprite_centered(const GameView& view, sprite_id sprite, int x, int y,
+        float dx, float dy, float frame, const Colour& c = Colour(255, 255, 255));
 
 #endif /* DRAWSPRITE_H_ */

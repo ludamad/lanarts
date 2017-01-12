@@ -207,7 +207,7 @@ overworld_spawns = (map) ->
             map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
             item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, sqr) 
-        -- for i=1,conf.n_shops
+        -- for i=1,conf.n_stores
         --     sqr = MapUtils.random_square(map, area, {matches_none: {SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
         --     if not sqr
         --         break
@@ -391,7 +391,7 @@ M.crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
                 -- nil is passed for the default open sprite
                 MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
             store_placer = (map, xy) ->
-                Region1.generate_store(map, xy)
+                Region1.generate_epic_store(map, xy)
             _items_placed = 0
             item_placer = (map, xy) ->
                 local item

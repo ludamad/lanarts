@@ -42,7 +42,7 @@ snake_pit_floor_plans = (rng) ->
     raw_plans = {
         [1]: {
             wandering_enabled: false
-            size: {30, 30}
+            size: {rng\random(25,45), rng\random(25,45)}
             n_subareas: 3
             n_enemies: 0
             n_encounter_vaults: 0
@@ -53,7 +53,7 @@ snake_pit_floor_plans = (rng) ->
             }
             item_groups: {{ItemGroups.basic_items, 8}}
             number_regions: 2
-            room_radius: () -> 11
+            room_radius: () ->  13
             rect_room_num_range: {0, 0}
             rect_room_size_range: {1, 1}
             n_statues: 4
@@ -92,8 +92,8 @@ M.TEMPLATE  = (rng, floor, connector) ->
         tileset: TileSets.snake
         :subtemplates
         :connector
-        w: plan.size[1] * 2.5 + 10
-        h: plan.size[2] * 2.5 + 10
+        w: plan.size[1] * 3.5 + 10
+        h: plan.size[2] * 3.5 + 10
         arc_chance: 1.0 -- Always use arcs in snake pit
         _enemy_entries: () =>
             return plan.enemy_entries

@@ -486,7 +486,7 @@ local function generate_stores(map)
         local items = {}
         for i=1,random(5,10) do
             local power_level, randart_chance = 1, 5
-            table.insert(items, ItemUtils.item_generate(ItemGroups.store_items, true, power_level, randart_chance))
+            table.insert(items, ItemUtils.item_generate(ItemGroups.store_items, power_level, randart_chance))
         end
         MapUtils.random_store(map, items)
     end

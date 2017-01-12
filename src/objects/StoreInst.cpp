@@ -41,8 +41,7 @@ void StoreInst::draw(GameState* gs) {
 		drawcolour = Colour(255, 255, 100, 255);
 	}
 	if (last_seen_spr > -1) {
-		draw_sprite(gs->view(), last_seen_spr, x - TILE_SIZE / 2,
-				y - TILE_SIZE / 2, 0,0, spr_frame, drawcolour);
+		draw_sprite_centered(gs->view(), last_seen_spr, x, y, 0,0, spr_frame, drawcolour);
 	}
 }
 

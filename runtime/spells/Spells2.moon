@@ -532,7 +532,7 @@ Data.effect_create {
         @n_summons = 0
         for mon, time in pairs caster.summoned
             if not mon.destroyed
-                time_out = time > math.min(1600, 400 + caster\effective_stats().willpower * 50)
+                time_out = time > 400 
                 diff_floor = (caster.map ~= mon.map)
                 if time_out or diff_floor
                     mon\direct_damage(mon.stats.hp + 1)
@@ -546,12 +546,12 @@ Data.effect_create {
 Data.spell_create {
     name: "Summon Dark Aspect",
     spr_spell: "spr_spells.summon",
-    description: "You summon a dark companion, at the cost of health. Multiple companions can be maintained at once only if the caster has high willpower.",
+    description: "You summon a dark companion, at the cost of health. The companion is stronger depending on the caster's willpower.",
     mp_cost: 15,
     cooldown: 55,
     can_cast_with_held_key: false,
     fallback_to_melee: false,
-    spell_cooldown: 800
+    spell_cooldown: 200
     prereq_func: (caster) ->
         if caster.stats.hp < 65
             if caster\is_local_player() 

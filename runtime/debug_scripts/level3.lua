@@ -6,7 +6,8 @@ local ItemUtils = require "maps.ItemUtils"
 local ItemGroups = require "maps.ItemGroups"
 local player = require("core.World").local_player
 for i=1,12 do
-    ObjectUtils.spawn_item_near(player, ItemGroups.pick_randart(), 1)
+    local item = ItemUtils.randart_generate(1)
+    ObjectUtils.spawn_item_near(player, item.type, item.amount)
 end
 
 for i=1,20 do

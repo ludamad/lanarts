@@ -235,21 +235,31 @@ define_randart = (rng, base, images, enchanter) ->
     table.insert(RANDARTS[power_level], data.name)
     return data
 
-apply_enchantment = (rng, data, enchantment) ->
-    enchantment = if data.cooldown then enchantment * 2 else 0
-    do return
+MAX_ENCHANTMENT = 20
+
+apply_enchantment = (rng, data, power_level) ->
+    enchantment = power_level
+    for i=power_level + 1,MAX_ENCHANTMENT
+        if rng\randomf() >= (if data.cooldown then 0.33 else 0.15)
+            break
+        enchantment += 1
     if enchantment > 0
         data.name = "+#{enchantment} #{data.name}"
         if data.cooldown
-            additive_core_bonus("damage", {enchantment, enchantment})(rng, data)
+            for i=1,enchantment,4
+                additive_core_bonus("damage", {1, 1})(rng, data)
             additive_core_bonus("power", {enchantment, enchantment})(rng, data)
+            data["resist_modifier"] or= 1
+            data["resist_modifier"] /= 1 + 0.05 * enchantment
         elseif rng\randomf() < 0.5
-            additive_core_bonus("magic_reduction", {enchantment, enchantment})(rng, data)
+            for i=1,enchantment,4
+                additive_core_bonus("magic_reduction", {1, 1})(rng, data)
             additive_core_bonus("magic_resistance", {enchantment, enchantment})(rng, data)
         else
-            additive_core_bonus("reduction", {enchantment, enchantment})(rng, data)
             additive_core_bonus("resistance", {enchantment, enchantment})(rng, data)
         for i=1,2
+            for i=1,enchantment,4
+                additive_core_bonus("magic_reduction", {1, 1})(rng, data)
             data.shop_cost[i] += math.floor((enchantment ^ 1.5) * 50)
 
 -- Define several randart amulets:
@@ -296,7 +306,33 @@ define_legwear_randarts = (rng) ->
         }
         Data.equipment_create(define_randart(rng, base, images))
 
-
+-- Define randart stones and arrows:
+define_ammo_randarts = (rng) ->
+    for e=1,MAX_ENCHANTMENT
+        data = table.merge items["Arrow"], {
+            name: "+#{e} Arrow"
+        }
+        data.damage_bonuses = {
+            damage: {base: math.floor(e /4) + 2}
+            power: {base: e + 2}
+        }
+        data.spr_item = rng\random_choice {"spr_weapons.steel_arrow1","spr_weapons.steel_arrow2"}
+        Data.projectile_create(data)
+        table.insert RANDARTS[math.max(1, math.min(3, math.floor(e / 3) + 1))], data.name
+    for e=1,MAX_ENCHANTMENT
+        data = table.merge items["Stone"], {
+            name: "+#{e} Stone"
+        }
+        data.damage = table.merge data.damage, {
+            base: {2 + math.floor(e/3),2 + math.floor(e/3)}
+        }
+        data.power = table.merge data.damage, {
+            base: {12 + e,12 + e}
+        }
+        data.spr_item = rng\random_choice {"spr_weapons.stone_randart","spr_weapons.stone_randart2", "spr_weapons.stone_randart3"}
+        data.spr_attack = rng\random_choice {"spr_weapons.stone_randart","spr_weapons.stone_randart2", "spr_weapons.stone_randart3"}
+        Data.projectile_create(data)
+        table.insert RANDARTS[math.max(1, math.min(3, math.floor(e / 3) + 1))], data.name
 
 define_equipment_randarts = (rng) ->
     -- RNG object just for generating randarts
@@ -309,6 +345,7 @@ define_equipment_randarts = (rng) ->
     define_belt_randarts(rng)
     define_legwear_randarts(rng)
     define_amulet_randarts(rng)
+    define_ammo_randarts(rng) 
     candidates = {}
     for name, item in pairs(items)
         -- Judge whether its equipment by a cooldown not being present

@@ -318,6 +318,15 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 
     int damage = damage_formula(atkstats, inst->effective_stats());
 
+    if (gs->game_settings().verbose_output) {
+        char buff[100];
+        snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
+                atkstats.damage, atkstats.power, int(atkstats.magic_percentage * 100),
+                damage);
+        gs->game_chat().add_message(buff);
+
+    }
+
     if (!dynamic_cast<PlayerInst*>(this)) {
         if (gs->local_player()->current_floor == current_floor) {
             play("sound/slash.ogg");

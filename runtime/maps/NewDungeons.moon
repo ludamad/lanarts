@@ -142,6 +142,22 @@ M.make_dungeon_template = (data) -> table.merge {
             inner_selector: {matches_all: {SourceMap.FLAG_PERIMETER, SourceMap.FLAG_SOLID}}
             operator: {add: FLAG_INNER_PERIMETER}
         }
+    _spawn_stores: (map) =>
+        for region in *map.regions
+            area = region\bbox()
+            for i=1,region.conf.n_stores or 0
+                sqr = MapUtils.random_square(map, area, {matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+                if not sqr
+                    break
+                map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
+                Region1.generate_store(map, sqr)
+            for i=1,region.conf.n_epic_stores or 0
+                sqr = MapUtils.random_square(map, area, {matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+                if not sqr
+                    break
+                map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
+                Region1.generate_epic_store(map, sqr)
+        return true
     _spawn_statues: (map) =>
         @_recalculate_perimeter(map)
         for region in *map.regions
@@ -161,7 +177,7 @@ M.make_dungeon_template = (data) -> table.merge {
             sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
             if not sqr
                 break
-            map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}, remove: SourceMap.FLAG_SEETHROUGH})
+            map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
             MapUtils.spawn_healing_square(map, sqr)
         return true
     _create_encounter_rooms: (map) =>

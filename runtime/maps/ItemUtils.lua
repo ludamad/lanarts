@@ -22,6 +22,15 @@ local function nested_chance(group, attribute)
     if group[attribute] then
         return group
     end
+    if group.randart_list then
+        local type = random_choice(group)
+        assert(type, "Got nil from random choice!")
+        local amount = 1
+        if items[type].type == "projectile" then
+            amount = random(5,13)
+        end
+        return {[attribute] = type, amount = amount}
+    end
     local total_chance = 0 
     for i=1,#group do
         if group[i] ~= nil then
@@ -48,34 +57,31 @@ local function nested_chance(group, attribute)
     return nil
 end
 
-local RANDART_CHANCE = 2
-local LANARTS_ONLY_RANDARTS = (os.getenv("LANARTS_RANDARTS") ~= nil)
-function M.item_generate(group, only_with_shop_cost, --[[Optional]] randart_power_level, --[[Optional]] randart_chance)
-    randart_chance = randart_chance or RANDART_CHANCE
-    randart_power_level = randart_power_level or 1
-    if LANARTS_ONLY_RANDARTS or randomf() <= randart_chance / 100 then
-        local ItemGroups = require "maps.ItemGroups"
-        return {type = ItemGroups.pick_randart(randart_power_level), amount = 1}
-       --  while randomf() < 0.2 and randart_power_level < 3 do
-       --      randart_power_level = randart_power_level + 1
-       --  end
-       --  local choice = nil
-       --  while true do
-       --      choice = random_choice(Randarts.RANDARTS[randart_power_level])
-       --      --if not GlobalData.randarts_generated[choice] then
-       --      --    GlobalData.randarts_generated[choice] = true
-       --      --    break
-       --      --end
-       --      break -- TODO reconsider randart generation
-       --  end
-       --  return {type = choice, amount = 1}
-    end
+-- Does not generate randarts (other than those provided in 'group'):
+function M.raw_item_generate(group)
     local entry = nested_chance(group, "item")
     if not entry then
         return nil
     end
     local amount = resolve_range(entry.amount)
     return { type = entry.item, amount = amount}
+end
+
+function M.randart_generate(randart_power_level) 
+    local ItemGroups = require "maps.ItemGroups"
+    local group = require("maps.ItemGroups").randart_items[randart_power_level]
+    return M.raw_item_generate(group)
+end
+
+local RANDART_CHANCE = 2
+local LANARTS_ONLY_RANDARTS = (os.getenv("LANARTS_RANDARTS") ~= nil)
+function M.item_generate(group, --[[Optional]] randart_power_level, --[[Optional]] randart_chance)
+    randart_chance = randart_chance or RANDART_CHANCE
+    randart_power_level = randart_power_level or 1
+    if LANARTS_ONLY_RANDARTS or randomf() <= randart_chance / 100 then
+        return M.randart_generate(randart_power_level)
+    end
+    return M.raw_item_generate(group)
 end
 
 function M.item_object_generate(map, group, --[[Optional]] randart_power_level)

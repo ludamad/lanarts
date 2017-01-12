@@ -29,7 +29,7 @@ projectiles:
     speed: 7
 
   - name: Stone
-    shop_cost: 2
+    shop_cost: [2,2]
     description: A fist sized stone, good for throwing.
     weapon_class: unarmed
     spr_item: stone
@@ -39,4 +39,4 @@ projectiles:
     speed: 6
     cooldown: 45
     damage: {base: [1,2], strength: .85}
-    power: {base: 0, strength: 0.2}
+    power: {base: [0,1], strength: 0.2}

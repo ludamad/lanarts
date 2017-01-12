@@ -57,8 +57,6 @@ consumables = (chance, args) -> _filter {
         chance: 99
         { item: "Arrow",              chance: 5,  amount: {5,10}  }
         { item: "Silver Arrow",       chance: 4,  amount: {2,6}   }
-    --  Ludamad: Remove stones for now. Part of: Try to reduce the projectile actions for non-archer a lot.
-    --    { item: "Stone",              chance: 15,  amount: {3,15}  }
         -- Scrolls
         { item: "Haste Scroll",       chance: 2                      }
         -- Potions
@@ -70,7 +68,7 @@ consumables = (chance, args) -> _filter {
     }
 
     -- Permanent enchantments
-    args.ignore_strong and { 
+    args.ignore_strong or { 
         chance: 1
         { item: "Strength Scroll",    chance: 1                      }
         { item: "Magic Scroll",       chance: 1                      }
@@ -221,7 +219,7 @@ weapons = (chance, args) -> _filter {
 }
 
 M.store_items = {
-    consumables(60, ignore_weak: true)
+    consumables(60, ignore_weak: false)
     rings(8, ignore_weak: true)
     helmets(3, ignore_weak: true)
     armour(5, ignore_weak: true)
@@ -237,7 +235,7 @@ M.store_items = {
 M.enchanted_items = {
     chance: 10 -- For basic_items entry
     { item: "Gold",                 chance: 85, amount: {15,45}  }
-    consumables(22, ignore_weak: true)
+    consumables(22, ignore_weak: true, ignore_strong: true)
     rings(8, ignore_weak: true)
     helmets(3, ignore_weak: true)
     armour(5, ignore_weak: true)
@@ -270,39 +268,35 @@ M.randart_items = {}
 -- For the randart levels:
 for i=1,Randarts.MAX_POWER_LEVEL
     item_table = {
-        ring: {chance: 12}
-        legwear: {chance: 1}
-        belt: {chance: 1}
-        amulet: {chance: 12}
-        boots: {chance: 1}
-        helmet: {chance: 3}
-        "short blades": {chance: 1}
-        "staves": {chance: 1}
-        "axes and maces": {chance: 1}
-        armour: {chance: 5}
-        bows: {chance: 5}
-        gloves: {chance: 5}
+        ring: {randart_list: true, chance: 12}
+        legwear: {randart_list: true, chance: 1}
+        belt: {randart_list: true, chance: 1}
+        amulet: {randart_list: true, chance: 12}
+        boots: {randart_list: true, chance: 1}
+        helmet: {randart_list: true, chance: 3}
+        "short blades": {randart_list: true, chance: 1}
+        "staves": {randart_list: true, chance: 1}
+        "axes and maces": {randart_list: true, chance: 1}
+        armour: {randart_list: true, chance: 5}
+        bows: {randart_list: true, chance: 5}
+        projectile: {randart_list: true, chance: 5}
+        gloves: {randart_list: true, chance: 5}
     }
     for name in *Randarts.RANDARTS[i]
-        {:type} = items[name]
+        {:type} = items[name] or projectiles[name]
         if not item_table[type]
             pretty(items[name])
             error("*** SHOULD HAVE '" .. type .. "' IN ITEM TABLE")
             -- continue
         append item_table[type], name
-    append M.randart_items, item_table
+    item_selection_list = (for k, v in pairs item_table do v)
+    append(M.randart_items, item_selection_list)
 
-M.pick_randart = (power_level = 1) ->
-    items = M.randart_items[power_level]
-    total_chance = 0
-    for _, entry in pairs items 
-        total_chance += entry.chance
-    num = random(0, total_chance)
-    for _, entry in pairs items
-        num -= entry.chance
-        if num <= 0
-            return random_choice(entry)
-    assert false
-
+M.epic_store_items = {
+    consumables(40, ignore_weak: true)
+    {chance: 40, M.randart_items[1]}
+    {chance: 20, M.randart_items[2]}
+    {chance: 10, M.randart_items[3]}
+}
 
 return M

@@ -52,6 +52,6 @@ Necrotank:
     + Strong aspect of hurt back enemies / turn them into zombies
     spells: summon zombie / pain / grapple (hold everyone nearby, thresholding how much damage you can take per X steps, and damaging everyone over time)
     
-
-
-    
+TODO:
+    EPIC SHOPS
+        -- Only hold randarts >= level 2, maybe 50% level 1

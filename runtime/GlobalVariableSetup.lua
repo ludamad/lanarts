@@ -116,14 +116,14 @@ require "effects.Effects"
 require "spells.SpellEffects"
 
 print "Assigning, in effect declaring, global variables used by the engine:"
-items = {}
-spells = {}
-effects = {}
-enemies = {}
-sprites = {}
-projectiles = {}
-classes = {}
-player = {}
+items = false
+spells = false
+effects = false
+enemies = false
+sprites = false
+projectiles = false
+classes = false
+player = false
 
 -- TODO get rid of these:
 enemy_init = do_nothing

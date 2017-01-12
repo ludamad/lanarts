@@ -35,6 +35,16 @@ function M.spawn_enemy(map, type, tile_xy)
 
 end
 
+function M.spawn_epic_store(map, items, tile_xy)
+    local object = GameObject.store_create {
+        xy = M.from_tile_xy(tile_xy),
+        items = items,
+        do_init = false,
+        sprite = "spr_gates.epic_store",
+    }
+    table.insert(map.instances, object)
+end
+
 function M.spawn_store(map, items, tile_xy)
     local object = GameObject.store_create {
         xy = M.from_tile_xy(tile_xy),

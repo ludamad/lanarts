@@ -598,13 +598,14 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
         int weaprange = pentry.range();
         float movespeed = pentry.speed;
         cooldown = pentry.cooldown();
-        AttackStats weaponattack {Weapon()};
+        AttackStats weaponattack {Weapon(), projectile};
 
         if (wentry.weapon_class == pentry.weapon_class && !pentry.is_standalone()) {
             // Take into account weapon (only) if it matches the projectile class and projectile is not standalone
             weaprange = wentry.range();
             cooldown = wentry.cooldown();
-            weaponattack = {weapon()};
+            weaponattack = {weapon(), projectile};
+        } else {
         }
 
         bool wallbounce = false;
@@ -614,6 +615,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 //            weaprange = TILE_SIZE * 2.3;
             cooldown *= 1.5;
         }
+
         GameInst* bullet = new ProjectileInst(projectile,
                 effective_atk_stats(mt, weaponattack), id, start, actpos,
                 movespeed, weaprange, NONE, wallbounce, nbounces);

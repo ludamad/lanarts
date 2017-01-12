@@ -270,7 +270,8 @@ Data.enemy_create summoner_base("Giant Bee", 7, 30, 400, 5) {
         -- Spawn 3 level 1 randarts:
         ObjectUtils.spawn_item_near(@, "Swarm Lanart", 1)
         for i=1,3
-            ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(), 1)
+            {:type, :amount} = ItemUtil.randart_generate(1)
+            ObjectUtils.spawn_item_near(@, type, amount)
         ObjectUtils.spawn_item_near(@, "Amulet of Great Pain", 1)
 }
  
@@ -445,7 +446,8 @@ Data.enemy_create {
         ObjectUtils.spawn_item_near(@, "Red Dragonplate", 1)
         ObjectUtils.spawn_item_near(@, "Dragon Lanart", 1)
         -- Spawn a level 1 randart:
-        ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(), 1)
+        {:type, :amount} = ItemUtil.randart_generate(1)
+        ObjectUtils.spawn_item_near(@, type, amount)
 }
 
 Data.enemy_create summoner_base("Imp", 5, 60, 600) {
@@ -475,7 +477,8 @@ Data.enemy_create summoner_base("Imp", 5, 60, 600) {
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
         -- Spawn a level 1 randart:
-        ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(), 1)
+        {:type, :amount} = ItemUtil.randart_generate(1)
+        ObjectUtils.spawn_item_near(@, type, amount)
 }
 
 Data.enemy_create {
@@ -501,7 +504,8 @@ Data.enemy_create {
         ItemGroups = require "maps.ItemGroups"
         -- Spawn 2 level 1 randarts:
         for i=1,2
-            ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(), 1)
+            {:type, :amount} = ItemUtil.randart_generate(1)
+            ObjectUtils.spawn_item_near(@, type, amount)
         ObjectUtils.spawn_item_near(@, "Gragh's Club", 1)
         ObjectUtils.spawn_item_near(@, "Rage Lanart", 1)
         ObjectUtils.spawn_item_near(@, "Amulet of the Berserker", 1)
@@ -536,7 +540,8 @@ Data.enemy_create {
         ObjectUtils.spawn_item_near(@, "Amulet of Greater Fire", 1)
         -- Spawn 1 level 2 randart:
         for i=1,2
-            ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(2), 1)
+            {:type, :amount} = ItemUtil.randart_generate(1)
+            ObjectUtils.spawn_item_near(@, type, amount)
     effects_active: {"Pain Aura"}
 }
 
