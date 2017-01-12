@@ -176,7 +176,6 @@ void ProjectileInst::step(GameState* gs) {
 
             int damage = damage_formula(atkstats, victim->effective_stats());
 
-            TODO find out why power is not correctly applied to projectiles
             if (gs->game_settings().verbose_output) {
                 char buff[100];
                 snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %d",

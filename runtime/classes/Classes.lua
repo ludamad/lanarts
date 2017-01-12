@@ -10,6 +10,8 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      {item = "Rage Lanart", amount = 1},
      {item = "Obliteration Lanart", amount = 1},
      {item = "Gragh's Club", amount = 1},
+     {item = "Stone", amount = 10},
+     {item = "+2 Stone", amount = 10},
      {item = "Crystalline Plate", amount = 1},
      {item = "Moonstone Ring", amount = 1},
      {item = "Abolishment Ring", amount = 1},

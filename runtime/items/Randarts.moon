@@ -327,10 +327,10 @@ define_ammo_randarts = (rng) ->
             base: {2 + math.floor(e/3),2 + math.floor(e/3)}
         }
         data.power = table.merge data.damage, {
-            base: {12 + e,12 + e}
+            base: {2 + e,2 + e}
         }
         data.spr_item = rng\random_choice {"spr_weapons.stone_randart","spr_weapons.stone_randart2", "spr_weapons.stone_randart3"}
-        data.spr_attack = rng\random_choice {"spr_weapons.stone_randart","spr_weapons.stone_randart2", "spr_weapons.stone_randart3"}
+        data.spr_attack = data.spr_item
         Data.projectile_create(data)
         table.insert RANDARTS[math.max(1, math.min(3, math.floor(e / 3) + 1))], data.name
 

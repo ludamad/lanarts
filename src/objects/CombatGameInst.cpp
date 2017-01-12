@@ -447,8 +447,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
         attack.weapon = weapon;
     }
     attack.projectile = projectile;
-    EffectiveAttackStats atkstats = effective_atk_stats(mt,
-            AttackStats(weapon, projectile));
+    EffectiveAttackStats atkstats = effective_atk_stats(mt, attack);
 
     Pos p(inst->x, inst->y);
     if (dynamic_cast<EnemyInst*>(this) && dynamic_cast<EnemyInst*>(this)->etype().name == "Ogre Mage") {
