@@ -66,11 +66,11 @@ const YAML::Node& operator >>(const YAML::Node& n, CoreStatMultiplier& sm) {
 CoreStats parse_core_stats(const YAML::Node& n) {
 	CoreStats core;
 	core.max_mp = parse_defaulted(n, "mp", 0);
-	core.max_hp = parse_defaulted(n, "hp", 0);
+        core.max_hp = parse_defaulted(n, "hp", 0);
 	core.hpregen = parse_defaulted(n, "hpregen", 0.0);
 	core.mpregen = parse_defaulted(n, "mpregen", 0.0);
 	core.hp = core.max_hp;
-	core.mp = core.max_hp;
+	core.mp = core.max_mp;
 
 	core.strength = parse_defaulted(n, "strength", 0);
 	core.spell_velocity_multiplier = parse_defaulted(n, "spell_velocity_multiplier", 1.0);

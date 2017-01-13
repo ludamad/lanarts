@@ -829,7 +829,7 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::gain_xp(GameState* gs, int xp) {
-	int levels_gained = stats().gain_xp(xp);
+	int levels_gained = stats().gain_xp(xp, this);
 	if (levels_gained > 0) {
 		char level_gain_str[128];
 		snprintf(level_gain_str, 128, "%s reached level %d!",

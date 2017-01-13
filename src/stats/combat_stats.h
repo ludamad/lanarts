@@ -61,8 +61,8 @@ struct CombatStats {
 
 	EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst) const;
 
-	void gain_level();
-	int gain_xp(int amnt);
+	void gain_level(CombatGameInst* inst);
+	int gain_xp(int amnt, CombatGameInst* inst);
 
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);

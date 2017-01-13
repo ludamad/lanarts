@@ -56,7 +56,8 @@ static void parse_gain_per_level(ClassEntry& entry,
 	entry.will_perlevel = defaulted(value, "willpower", 0);
 
 	entry.mpregen_perlevel = defaulted(value, "mpregen", 0.0f);
-	entry.hpregen_perlevel = defaulted(value, "hpregen", 0.0f);
+    entry.hpregen_perlevel = defaulted(value, "hpregen", 0.0f);
+    entry.on_gain_level = value["on_gain_level"];
 }
 
 void ClassEntry::parse_lua_table(const LuaValue& table) {

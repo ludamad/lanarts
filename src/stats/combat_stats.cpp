@@ -58,7 +58,7 @@ static void learn_class_spells(SpellsKnown& spells,
 	}
 }
 
-void CombatStats::gain_level() {
+void CombatStats::gain_level(CombatGameInst* inst) {
 	ClassEntry& ct = class_stats.class_entry();
 
 	core.hp += ct.hp_perlevel;
@@ -76,6 +76,10 @@ void CombatStats::gain_level() {
 	core.mpregen += ct.mpregen_perlevel;
 
 	class_stats.xplevel++;
+	if (!ct.on_gain_level.empty() && !ct.on_gain_level.isnil()) {
+	    ct.on_gain_level.push();
+	    luawrap::call<void>(ct.on_gain_level.luastate(), inst);
+	}
 
 	learn_class_spells(spells, ct.spell_progression, class_stats.xplevel);
 }
@@ -87,18 +91,18 @@ void CombatStats::init() {
 	}
 }
 
-int CombatStats::gain_xp(int amnt) {
+int CombatStats::gain_xp(int amnt, CombatGameInst* inst) {
 	int levels_gained = 0;
 	class_stats.xp += amnt;
 	while (class_stats.xp >= class_stats.xpneeded) {
-		gain_level();
+		gain_level(inst);
 		levels_gained++;
 		class_stats.xp -= class_stats.xpneeded;
 		class_stats.xpneeded = experience_needed_formula(class_stats.xplevel);
 	}
-        if (levels_gained > 0) {
-            play("sound/Jingle_Win_Synth/Jingle_Win_Synth_02.ogg");
-        }
+    if (levels_gained > 0) {
+        play("sound/Jingle_Win_Synth/Jingle_Win_Synth_02.ogg");
+    }
 	return levels_gained;
 }
 
