@@ -76,7 +76,7 @@ floor_plans = (rng) ->
         }
     }
     return for i, plan in ipairs plans
-        plan = table.merge NewDungeons.dungeon_defaults(rng), NewDungeons.create_dungeon_scheme(tileset)
+        base = table.merge NewDungeons.dungeon_defaults(rng), NewDungeons.create_dungeon_scheme(tileset)
         table.merge(base, plan)
 
 M.N_FLOORS = 1

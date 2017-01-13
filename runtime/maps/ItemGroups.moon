@@ -197,6 +197,7 @@ weapons = (chance, args) -> _filter {
             chance: 100
             { item: "Dagger",      chance: 1                      }
             { item: "Short Sword",      chance: 1                      }
+            { item: "Standard Sword",      chance: 1                      }
         } 
         args.ignore_medium or {
             chance: 20
@@ -207,7 +208,7 @@ weapons = (chance, args) -> _filter {
             chance: 5
             { item: "Iron Broadsword",                          chance: 4           }
             { item: "Gallanthor's Crutch",                 chance: 4     }
-            { item: "Samurai Sabre",      chance: 4                      }
+            { item: "Serated Sword",      chance: 4                      }
             { item: "Magic Sword",        chance: 4                     }
             { item: "Triple Sword",        chance: 4                      }
             { item: "Battle Axe",        chance: 4                      }
@@ -294,9 +295,9 @@ for i=1,Randarts.MAX_POWER_LEVEL
 
 M.epic_store_items = {
     consumables(40, ignore_weak: true)
-    {chance: 40, M.randart_items[1]}
-    {chance: 20, M.randart_items[2]}
-    {chance: 10, M.randart_items[3]}
+    table.merge M.randart_items[1], {chance: 40}
+    table.merge M.randart_items[2], {chance: 20}
+    table.merge M.randart_items[3], {chance: 10}
 }
 
 return M

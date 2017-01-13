@@ -1,9 +1,4 @@
 sprites: 
-  - name: dagger
-    file: items/weapons/sprites/dagger.png
-
-  - name: short sword
-    file: items/weapons/sprites/shortsword.png
     
   - name: samurai sabre
     file: items/weapons/sprites/samuri_sabre.png

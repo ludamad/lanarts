@@ -1,11 +1,10 @@
 -- Do everything to make kiting in the overworld a bad idea
     -- Every time you kill something, spawn something just out of view, appropriate for the area the player is in
     -- Spawn fast things.
+    -- Obsolete now that overworld is decidedly clearable?
 
--- Dont have enemies spawn into vault areas.
 -- smaller levels in last dungeon
     -- Maybe?
---- Knockback maul: Hits enemies back on hit
 -- Never go bare fisted if have weapon!!
     - Go weapon if unequip arrows
     - mp/hp regen rings unpowered -- add buff + diff bonuses?
@@ -17,11 +16,9 @@ RANDART PROPERTIES:
     + berserk duration
 
 TODO:
-    + spell where mage walks through enemies OBSOLETE?
     + Dance pants: Cursed, +1 speed, random walk on hit
     + Archer totem -- place totem, starting firing quickly towards it
     + Mage bomb -- place bomb, it explodes
-    + within_bounds() failure on ogre mage area when going back up the stairs
     -- scale overworld to # players
     + send sync data for all objects in view by all players every frame
         + have players send their set of objects in view, if ever objects are communicated that dont exist, do level-wide sync
@@ -47,11 +44,16 @@ Out there:
     Focus on good health regen, heal spells, summons?
 FOR MAGE/NECROMAGE?:
     + Slow down, do damage to all those around you, gain +2 magic / turn
+    + FIX EFFECT CODE ALREADY
 
 Necrotank:
     + Strong aspect of hurt back enemies / turn them into zombies
     spells: summon zombie / pain / grapple (hold everyone nearby, thresholding how much damage you can take per X steps, and damaging everyone over time)
-    
-TODO:
-    EPIC SHOPS
-        -- Only hold randarts >= level 2, maybe 50% level 1
+
+Necromancer:
+    + Give necromancer a souls resource!!!
+        -- Meh just make it MP
+    + Make sure the melee build is no where near as viable as it currently is? Maybe. They cant do crowd control or hard mobs, anyway.
+        + OK currently the regen provides them with wayy too much damage. TBH just ban them from using melee is fine.
+            + Take away the whole equipment slot? Suddenly we'd have a game. They can do small amounts of melee damage with their damage-back ability.
+            + Remove damage-back???? -- I like it, though. Maybe make it a long buff spell?

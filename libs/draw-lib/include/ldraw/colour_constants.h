@@ -27,6 +27,7 @@ const Colour COL_BABY_BLUE(37, 207, 240);
 const Colour COL_PALE_BLUE(180, 180, 255);
 
 const Colour COL_MEDIUM_PURPLE(123, 104, 238);
+const Colour COL_LIGHT_PURPLE(123+50, 104+50, 238);
 
 const Colour COL_BLACK(0, 0, 0);
 const Colour COL_DARKER_GRAY(20, 20, 20);

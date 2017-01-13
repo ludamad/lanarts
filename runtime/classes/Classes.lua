@@ -127,7 +127,7 @@ Data.class_create {
         willpower = 4,
         magic = 4,
         equipment = {
-          weapon = "Dagger",
+          weapon = "Short Sword",
           gold = 0,
           inventory = table.tconcat({
              {item = "Health Potion"},
@@ -212,7 +212,7 @@ Data.class_create {
     start_stats = {
         movespeed = 4,
         hp = 100,
-        mp = 120,
+        mp = 100,
         hpregen = 2 / 60, -- Per 60 frames
         mpregen = 4 / 60, -- Per 60 frames
         strength = 4,

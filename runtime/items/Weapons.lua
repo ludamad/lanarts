@@ -21,7 +21,7 @@ Data.weapon_create {
     type = "short blades",
 
     shop_cost = {0,0},
-    spr_item = "dagger",
+    spr_item = "spr_weapons.dagger",
     randart_sprites = {"spr_weapons.randart_dagger1", "spr_weapons.randart_dagger2"},
 
     resist_modifier = 0.875,
@@ -42,7 +42,7 @@ Data.weapon_create {
 
     shop_cost = {20, 35},
 
-    spr_item = "short sword",
+    spr_item = "spr_weapons.short_sword1",
     randart_sprites = {"spr_weapons.randart_short_sword1", "spr_weapons.randart_short_sword2"},
 
     damage = {base = {4, 8}, strength = 1.1},
@@ -54,6 +54,22 @@ Data.weapon_create {
 }
 
 Data.weapon_create {
+    name = "Standard Sword",
+    description = "A fairly easy-to-wield standard sword.",
+    type = "short blades",
+
+    shop_cost = {40, 55},
+
+    spr_item = "spr_weapons.sword",
+
+    damage = {base = {5, 11}, strength = 1.1},
+    power = {base = 2, strength = 0.2},
+
+    cooldown = 45,
+
+    range = 7
+}
+Data.weapon_create {
     name = "Wizard's Staff",
     description = "A magical staff that gives MP back for every kill.",
     type = "staves",
@@ -63,7 +79,7 @@ Data.weapon_create {
     spr_item = "spr_weapons.staff",
     randart_sprites = {"spr_weapons.staff_mummy"},
 
-    damage = {strength = 0.6, magic = 0.4, base = {5, 9}},
+    damage = {strength = 1, base = {5, 9}},
     power = {base = 1, strength = 0.2},
 
     cooldown = 40,
@@ -80,7 +96,7 @@ Data.weapon_create {
 
     spr_item = "epic staff",
 
-    damage = {strength = 0.6, magic = 0.6, base = {5, 9}},
+    damage = {strength = 1, base = {5, 9}},
     power = {base = 1, strength = 0.2},
     spell_cooldown_multiplier = 0.9,
 
@@ -92,16 +108,15 @@ Data.weapon_create {
 
 
 Data.weapon_create {
-    name = "Samurai Sabre",
-    description = "A swift blade once owned by a powerful warrior.",
+    name = "Serated Sword",
+    description = "A cruel jagged sword.",
     type = "short blades",
 
-    shop_cost = {70, 100},
+    shop_cost = {100, 160},
 
-    spr_item = "samurai sabre",
+    spr_item = "spr_weapons.double_sword",
 
-
-    damage = {base = {5, 11}, strength = 1.1},
+    damage = {base = {5, 11}, strength = 1.2},
     power = {base = 4, strength = 0.3},
 
     cooldown = 45,
@@ -356,7 +371,6 @@ Data.weapon_create {
 
     range = 300
 }
-
 
 Data.weapon_create {
     name = "Mars Bow",

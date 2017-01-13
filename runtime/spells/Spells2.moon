@@ -522,6 +522,17 @@ Data.effect_create {
 }
 
 Data.effect_create {
+    name: "DiesOutsideOfSummonerRange"
+    init_func: (summon) =>
+        @summoner = false -- TODO think about allowing initial state to be passed to effects!
+        -- TODO but OTOH I like the current system. 
+    step_func: (summon) =>
+        assert @summoner, "No summoner set on DiesOutsideOfSummonerRange!"
+        if not Map.object_visible summon, summon.xy, @summoner
+            summon\direct_damage(10)
+}
+
+Data.effect_create {
     name: "Summoner"
     init_func: (caster) =>
         @n_steps = 0
@@ -543,10 +554,14 @@ Data.effect_create {
                 @n_summons += 1
 }
 
+EFFECT_FOREVER = 2^30
+-- TODO -- the only way summon spells will ever really be good is if they recharge based on kills.
+-- OH, as necromancer, your shtick is you get a 'souls' bar.
+-- This bar is used for summons.
 Data.spell_create {
     name: "Summon Dark Aspect",
     spr_spell: "spr_spells.summon",
-    description: "You summon a dark companion, at the cost of health. The companion is stronger depending on the caster's willpower.",
+    description: "You summon a dark companion, at the cost of health. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
     mp_cost: 15,
     cooldown: 55,
     can_cast_with_held_key: false,
@@ -576,12 +591,16 @@ Data.spell_create {
             caster\direct_damage(45)
             eff = caster\add_effect("Summoning", 20)
             eff.on_summon = (obj) ->
-                obj.stats.hp += caster\effective_stats().willpower * 5
-                obj.stats.max_hp += caster\effective_stats().willpower * 5
-                obj.stats.strength += caster\effective_stats().willpower / 2
-                obj.stats.magic += caster\effective_stats().willpower / 2
-                obj.stats.defence += caster\effective_stats().willpower / 2
-                obj.stats.willpower += caster\effective_stats().willpower / 2
+                -- Make sure this monster cannot live outside its summoner's range for very long:
+                eff = obj\add_effect("DiesOutsideOfSummonerRange", EFFECT_FOREVER)
+                eff.summoner = caster
+                -- Buff this monster based on caster's willpower:
+                obj.stats.hp += math.floor(caster\effective_stats().willpower * 5)
+                obj.stats.max_hp += math.floor(caster\effective_stats().willpower * 5)
+                obj.stats.strength += math.floor(caster\effective_stats().willpower / 2)
+                obj.stats.magic += math.floor(caster\effective_stats().willpower / 2)
+                obj.stats.defence += math.floor(caster\effective_stats().willpower / 2)
+                obj.stats.willpower += math.floor(caster\effective_stats().willpower / 2)
             eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
             eff.duration = 5
 }
@@ -609,9 +628,12 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
                 eff = caster\add_effect "Summoner", 2
                 eff.duration = 30
             while caster.kills > @kill_tracker
-                if caster\is_local_player()
-                    EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
-                caster\heal_hp(5 + caster.stats.level)
+                if name == "Mage" 
+                    if caster\is_local_player()
+                        EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
+                    caster\heal_mp(5 + caster.stats.level)
+                elseif name == "Necromancer"
+                    caster.stats.souls = math.min(caster.stats.max_souls, caster.stats.souls + 25)
                 @kill_tracker += 1
         on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
             if name == "Necromancer"
