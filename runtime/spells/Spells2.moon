@@ -479,7 +479,7 @@ Data.effect_create {
 Data.spell_create {
     name: "Baleful Regeneration",
     spr_spell: "spr_spells.regeneration",
-    description: "You tap into necromancy to very quickly bind your wounds, until your are fully healed or 6 seconds pass. During such time your flesh is corrosive, doing 33% damage back to enemies who attack you.",
+    description: "You tap into necromancy to very quickly bind your wounds, until your are fully healed or 6 seconds pass.",
     mp_cost: 0,
     cooldown: 35,
     can_cast_with_held_key: false,
@@ -511,12 +511,6 @@ Data.effect_create {
             new.hpregen *= 15
         if caster.stats.hp >= new.max_hp
             caster\remove_effect("Baleful Regeneration")
-    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
-        if attacker\direct_damage(damage * 0.33)
-            defender\gain_xp_from(attacker)
-        if defender\is_local_player()
-            EventLog.add("Your corrosive flesh hurts #{mon_title attacker} as you are hit!", COL_PALE_BLUE)
-        return damage
 }
 
 Data.effect_create {
@@ -658,5 +652,12 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
                         EventLog.add("You gain mana for killing!", COL_PALE_BLUE)
                     caster\heal_mp(5)
                 @kill_tracker += 1
+        on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
+            if name == "Necromancer"
+                if attacker\direct_damage(damage * 0.33)
+                    defender\gain_xp_from(attacker)
+                if defender\is_local_player()
+                    EventLog.add("Your corrosive flesh hurts #{mon_title attacker} as you are hit!", COL_PALE_BLUE)
+            return damage
     }
 

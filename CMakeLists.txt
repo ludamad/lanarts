@@ -20,7 +20,7 @@ if ($ENV{BUILD_FLAGS})
     add_definitions ($ENV{BUILD_FLAGS})
 endif()
 
-add_definitions(-Wno-c++11-narrowing)
+add_definitions(-static-libstdc++)
 ## Compiler flags
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions("-mfpmath=sse -msse2 -ffp-contract=on")
