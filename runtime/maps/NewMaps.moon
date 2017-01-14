@@ -217,6 +217,7 @@ map_try_create = (template_f) ->
         instances: {}
         arc_chance: template.arc_chance or 0
         door_locations: {}
+        post_maps: {}
         rectangle_rooms: {}
         wandering_enabled: template.wandering_enabled
         -- For the overworld, created by dungeon features we add later:
@@ -259,6 +260,8 @@ map_try_create = (template_f) ->
     }
         print("ABORT: connection check failed")
         return nil
+    for _, map_gen_func in ipairs(map.post_maps)
+        map_gen_func()
 
     game_map = generate_game_map(map)
     template\on_create_game_map(game_map)

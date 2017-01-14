@@ -50,7 +50,9 @@ local function connect_map(args)
         local portal = MapUtils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
         append(t, MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback))
     end
-    for c in values(t) do c() end
+    for c in values(t) do 
+        append(map.post_maps, c)
+    end
 end
 
 -- Overworld to template map sequence (from overworld to deeper in the temple)
@@ -157,7 +159,7 @@ local function old_dungeon_placement_function(MapSeq, tileset, levels)
         local c = MapSeq:forward_portal_add(1, portal, 1, function() 
             return old_map_generate(MapSeq, tileset, levels[1]-1, levels[2]-levels[1]+1) 
         end)
-        c()
+        append(map.post_maps, c)
     end
 end
 

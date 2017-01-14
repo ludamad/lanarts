@@ -67,7 +67,9 @@ local function connect_map(args)
         append(t, MapSeq:forward_portal_add(seq_idx, forward_portals[i], i, args.next_floor_callback))
     end
     if World.player_amount > 1 then
-        for c in values(t) do c() end
+        for c in values(t) do 
+           append(map.post_maps, c)
+        end
     end
     return true
 end
@@ -234,7 +236,7 @@ function M.old_dungeon_placement_function(MapSeq, dungeon)
             return game_map
         end)
         if World.player_amount > 1 then
-           c()
+           append(map.post_maps, c)
         end
     end
 end
@@ -413,6 +415,9 @@ function M.overworld_create()
     World.players_spawn(game_map, find_player_positions(map, FLAG_PLAYERSPAWN))
     for p in values(portals) do p() end
     Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
+    for _, map_gen_func in ipairs(map.post_maps) do
+        map_gen_func()
+    end
     return game_map
 end
 return M

@@ -69,7 +69,6 @@ static int world_players(lua_State* L) {
 	for (PlayerDataEntry& entry : lua_api::gamestate(L)->player_data().all_players()) {
             value[i].newtable();
             value[i]["name"] = entry.player_name;
-            LANARTS_ASSERT(entry.player() != NULL);
             value[i]["instance"] = entry.player();
             value[i]["class_name"] = game_class_data.at(entry.classtype).name;
             i += 1;

@@ -580,6 +580,7 @@ function M.create_map(dungeon, floor)
         local template = random_choice(entry.templates)
         map = generate_from_template(label, template, tileset)
     end
+    map.post_maps = {}
     map.template = entry
     map.n_healing_squares = map.rng:randomf() < 0.2 and map.rng:random(1, 2) or 0 
     -- TODO consolidate what is actually expected of maps.
