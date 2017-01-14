@@ -149,6 +149,7 @@ bool GameState::start_game() {
 
 	printf("Seed used for RNG = 0x%X\n", init_data.seed);
 
+        initial_seed = init_data.seed;
 	base_rng_state.init_genrand(init_data.seed);
 	rng_state_stack.push_back(&base_rng_state);
 
@@ -193,6 +194,7 @@ void GameState::serialize(SerializeBuffer& serializer) {
 
 	serializer.write(base_rng_state); // Save RNG state
 	serializer.write_int(_game_timestamp);
+	serializer.write_int(initial_seed);
 
         luawrap::globals(L)["table"]["deep_clone"].push();
         luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
@@ -223,6 +225,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 
 	serializer.read(base_rng_state); // Load RNG state
 	serializer.read_int(_game_timestamp);
+	serializer.read_int(initial_seed);
 
         LuaValue global_data;
         conf.decode(serializer, global_data);
@@ -338,6 +341,7 @@ bool GameState::pre_step(bool update_iostate) {
 }
 
 bool GameState::step() {
+        rng().init_genrand(initial_seed + frame_n);
 	if (game_settings().network_debug_mode) {
 		connection.check_integrity(this);
 	}

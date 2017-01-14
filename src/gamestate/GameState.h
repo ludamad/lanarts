@@ -314,6 +314,7 @@ private:
 
 	LuaSerializeConfig config;
 	GameStatePostSerializeData _post_deserialize_data;
+        int initial_seed = 0;
 };
 
 void play(const char* sound_path);
