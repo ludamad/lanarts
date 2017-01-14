@@ -193,7 +193,7 @@ struct ClassStats {
 			int xpneeded = 0) :
 			classid(classtype), xp(xp), xpneeded(xpneeded), xplevel(xplevel) {
 	}
-	bool has_class() {
+	bool has_class() const {
 		return classid >= 0;
 	}
 	ClassEntry& class_entry() const;

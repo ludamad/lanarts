@@ -196,7 +196,7 @@ Data.class_create {
     available_spells = {
       { spell = "Pain",
         level_needed = 1 },
-      { spell = "Baneful Regeneration",
+      { spell = "Baleful Regeneration",
         level_needed = 1 },
       { spell = "Summon Dark Aspect",
         level_needed = 2 },
@@ -212,10 +212,10 @@ Data.class_create {
     start_stats = {
         movespeed = 4,
         hp = 100,
-        mp = 100,
+        mp = 80,
         hpregen = 2 / 60, -- Per 60 frames
-        mpregen = 4 / 60, -- Per 60 frames
-        strength = 4,
+        mpregen = 0 / 60, -- Per 60 frames
+        strength = 0,
         defence = 4,
         willpower = 7,
         magic = 7,
@@ -231,7 +231,7 @@ Data.class_create {
         hp = 10,
         mp = 20,
         hpregen = 0.5 / 60, -- Per 60 frames
-        mpregen = 0.65 / 60, -- Per 60 frames
+        mpregen = 0 / 60, -- Per 60 frames
         magic = 1,
         defence = 1,
         willpower = 1

@@ -5,6 +5,8 @@ Bresenham = require "core.Bresenham"
 Display = require "core.Display"
 SpellObjects = require "objects.SpellObjects"
 
+mon_title = (mon) -> if mon.unique then mon.name else "the #{mon.name}"
+
 Data.spell_create {
     name: "Ludaze"
     spr_spell: "spr_spells.ludaze"
@@ -474,12 +476,11 @@ Data.effect_create {
         new.speed -= 1
 }
 
-
 Data.spell_create {
-    name: "Baneful Regeneration",
+    name: "Baleful Regeneration",
     spr_spell: "spr_spells.regeneration",
-    description: "Your flesh ties together quickly.",
-    mp_cost: 25,
+    description: "You tap into necromancy to very quickly bind your wounds, until your are fully healed or 6 seconds pass. During such time your flesh is corrosive, doing 33% damage back to enemies who attack you.",
+    mp_cost: 0,
     cooldown: 35,
     can_cast_with_held_key: false,
     fallback_to_melee: false,
@@ -487,10 +488,10 @@ Data.spell_create {
     prereq_func: (caster) ->
         if caster.stats.hp == caster\effective_stats().max_hp
             return false
-        return not caster\has_effect("Regeneration") and not caster\has_effect("Exhausted")
+        return not caster\has_effect("Baleful Regeneration") and not caster\has_effect("Exhausted")
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        caster\add_effect("Regeneration", 60 * 6)
+        caster\add_effect("Baleful Regeneration", 60 * 6)
         if caster\is_local_player()
             EventLog.add("You start to regenerate quickly!", {200,200,255})
             --play_sound "sound/Jingle_Win_Synth/Jingle_Win_Synth_00.ogg"
@@ -498,6 +499,26 @@ Data.spell_create {
         else
             EventLog.add(caster.name .. " starts to regenerate quickly!", {200,200,255})
 }
+
+Data.effect_create {
+    name: "Baleful Regeneration",
+    effected_sprite: "spr_amulets.i-regeneration"
+    effected_colour: {200,255,200}
+    stat_func: (caster, old, new) =>
+        if caster\has_effect("AmuletGreatPain")
+            new.hpregen *= 30
+        else
+            new.hpregen *= 15
+        if caster.stats.hp >= new.max_hp
+            caster\remove_effect("Baleful Regeneration")
+    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
+        if attacker\direct_damage(damage * 0.33)
+            defender\gain_xp_from(attacker)
+        if defender\is_local_player()
+            EventLog.add("Your corrosive flesh hurts #{mon_title attacker} as you are hit!", COL_PALE_BLUE)
+        return damage
+}
+
 Data.effect_create {
     name: "Spiky"
     on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
@@ -561,8 +582,9 @@ EFFECT_FOREVER = 2^30
 Data.spell_create {
     name: "Summon Dark Aspect",
     spr_spell: "spr_spells.summon",
-    description: "You summon a dark companion, at the cost of health. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
-    mp_cost: 15,
+    description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower.",
+    --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
+    mp_cost: 20,
     cooldown: 55,
     can_cast_with_held_key: false,
     fallback_to_melee: false,
@@ -591,9 +613,9 @@ Data.spell_create {
             caster\direct_damage(45)
             eff = caster\add_effect("Summoning", 20)
             eff.on_summon = (obj) ->
-                -- Make sure this monster cannot live outside its summoner's range for very long:
-                eff = obj\add_effect("DiesOutsideOfSummonerRange", EFFECT_FOREVER)
-                eff.summoner = caster
+                -- -- Make sure this monster cannot live outside its summoner's range for very long:
+                --eff = obj\add_effect("DiesOutsideOfSummonerRange", EFFECT_FOREVER)
+                -- eff.summoner = caster
                 -- Buff this monster based on caster's willpower:
                 obj.stats.hp += math.floor(caster\effective_stats().willpower * 5)
                 obj.stats.max_hp += math.floor(caster\effective_stats().willpower * 5)
@@ -605,7 +627,6 @@ Data.spell_create {
             eff.duration = 5
 }
 
-mon_title = (mon) -> if mon.unique then mon.name else "the #{mon.name}"
 
 for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
     Data.effect_create {
@@ -631,16 +652,11 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
                 if name == "Mage" 
                     if caster\is_local_player()
                         EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
-                    caster\heal_mp(5 + caster.stats.level)
+                    caster\heal_mp(4 + caster.stats.level)
                 elseif name == "Necromancer"
-                    caster.stats.souls = math.min(caster.stats.max_souls, caster.stats.souls + 25)
+                    if caster\is_local_player()
+                        EventLog.add("You gain mana for killing!", COL_PALE_BLUE)
+                    caster\heal_mp(5)
                 @kill_tracker += 1
-        on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
-            if name == "Necromancer"
-                if attacker\direct_damage(damage * 0.33)
-                    defender\gain_xp_from(attacker)
-                if defender\is_local_player()
-                    EventLog.add("Your magic lashes back at #{mon_title attacker} as you are hit!", COL_PALE_BLUE)
-            return damage
     }
 

@@ -183,7 +183,8 @@ public:
 	}
 	/* A single mersenne twister state is used for all random number generation */
 	MTwist& rng() {
-		return mtwist;
+	    LANARTS_ASSERT(!rng_state_stack.empty());
+		return *rng_state_stack.back();
 	}
 
 	/* Instance global controllers */
@@ -299,7 +300,10 @@ private:
 	GameView _view;
 	GameWorld world;
 
-	MTwist mtwist;
+	// Maintain a LIFO stack of RNG states so that portions of game-play can isolate from each other.
+	std::vector<MTwist*> rng_state_stack;
+        MTwist base_rng_state;
+
 	// For dragging purposes:
 	GameView previous_view;
 	bool is_dragging_view;

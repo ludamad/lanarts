@@ -149,7 +149,8 @@ bool GameState::start_game() {
 
 	printf("Seed used for RNG = 0x%X\n", init_data.seed);
 
-	mtwist.init_genrand(init_data.seed);
+	base_rng_state.init_genrand(init_data.seed);
+	rng_state_stack.push_back(&base_rng_state);
 
 	/* If class was not set, we may be loading a game -- don't init level */
 	if (settings.class_type != -1) {
@@ -190,7 +191,7 @@ void GameState::serialize(SerializeBuffer& serializer) {
 
 	settings.serialize_gameplay_settings(serializer);
 
-	serializer.write(mtwist); // Save RNG state
+	serializer.write(base_rng_state); // Save RNG state
 	serializer.write_int(_game_timestamp);
 
         luawrap::globals(L)["table"]["deep_clone"].push();
@@ -220,7 +221,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 
 	settings.deserialize_gameplay_settings(serializer);
 
-	serializer.read(mtwist); // Load RNG state
+	serializer.read(base_rng_state); // Load RNG state
 	serializer.read_int(_game_timestamp);
 
         LuaValue global_data;

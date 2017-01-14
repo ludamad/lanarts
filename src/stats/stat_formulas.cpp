@@ -15,6 +15,7 @@
 
 #include "stat_formulas.h"
 #include "stats.h"
+#include "ClassEntry.h"
 
 /* What power, resistance difference causes damage to be raised by 100% */
 const int POWER_MULTIPLE_INTERVAL = 20;
@@ -135,6 +136,11 @@ EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
 	ret.cooldown_modifiers.apply(ret.cooldown_mult);
 	event_log("effective_stats: hp=%d, mp=%d, hpregen=%f, mpregen=%f\n",
 			ret.core.hp, ret.core.mp, ret.core.hpregen, ret.core.mpregen);
+	if (stats.class_stats.has_class()) {
+	    if (stats.class_stats.class_entry().name == "Necromancer") {
+	        ret.core.mpregen = 0;
+	    }
+	}
 	return ret;
 }
 

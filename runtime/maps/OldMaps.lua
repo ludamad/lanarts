@@ -8,12 +8,6 @@ local World = require "core.World"
 
 local M = nilprotect {} -- Submodule
 
-local easy_animals = {
-  {enemy = "Giant Rat",         chance = 100,  group_chance = 33, group_size = 2          },
-  {enemy = "Giant Bat",         chance = 100                                            },
-  {enemy = "Adder",         chance = 100                                            }
-}
-
 M.weak_undead = {
   {enemy = "Skeleton",          chance = 100                                            },
 }
@@ -40,7 +34,7 @@ M.medium_animals = {
   {enemy = "Giant Bat",         chance = 100, group_chance = 33, group_size = 3           },
   {enemy = "Giant Spider",      chance = 100,                                           },
   {enemy = "Hound",             chance = 100                                            },
-  {enemy = "Adder",         chance = 100                                            }
+--  {enemy = "Adder",         chance = 100                                            }
 }
 
 M.easy_enemies = {
@@ -48,7 +42,6 @@ M.easy_enemies = {
   {enemy = "Skeleton",          chance = 100                                            },
   {enemy = "Chicken",           chance = 100                                            },
   {enemy = "Cloud Elemental",   chance = 100, group_chance = 33, group_size = 2           },
-  {enemy = "Adder",         chance = 25                                            },
 }
   
 M.fast_enemies = {
