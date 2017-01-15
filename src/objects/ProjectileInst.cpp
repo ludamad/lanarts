@@ -210,7 +210,8 @@ void ProjectileInst::step(GameState* gs) {
                         if (n_killed > 25) {
                             xpworth = 0;
                         }
-                        int amnt = round(xpworth / pc.all_players().size());
+                        float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
+                        int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
 
                         players_gain_xp(gs, amnt);
 

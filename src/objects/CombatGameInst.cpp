@@ -418,7 +418,9 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
             if (n_killed > 25) {
                 xpworth = 0;
             }
-            int amnt = round(xpworth / pc.all_players().size());
+            // Compensates for enemy numbers not-quite scaling:
+            float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
+            int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
 
             players_gain_xp(gs, amnt);
             snprintf(buffstr, 32, "%d XP", amnt);
@@ -694,7 +696,8 @@ void CombatGameInst::gain_xp_from(GameState* gs, CombatGameInst* inst, float dx,
     if (n_killed > 25) {
         xpworth = 0;
     }
-    int amnt = round(xpworth / pc.all_players().size());
+    float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
+    int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
 
     players_gain_xp(gs, amnt);
     snprintf(buffstr, 32, "%d XP", amnt);

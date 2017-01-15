@@ -39,7 +39,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
           )
     endif()
 else()
-    add_definitions(-DNDEBUG)
+    add_definitions(-DNDEBUG -g)
     if ($ENV{BUILD_PROF_GEN})
         SET (CMAKE_EXE_LINKER_FLAGS
            -fprofile-generate
