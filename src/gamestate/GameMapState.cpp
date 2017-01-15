@@ -146,11 +146,15 @@ void GameMapState::draw(GameState* gs, bool reveal_all) {
 		safe_copy[i]->draw(gs);
 	}
 
+	for (size_t i = 0; i < safe_copy.size(); i++) {
+            printf("EhwahOIDHSAOIHDOISAH %d %d \n", i, i);
+		safe_copy[i]->post_draw(gs);
+	}
+
 	monster_controller().post_draw(gs);
 	if (!reveal_all) {
 		tiles().post_draw(gs);
 	}
-
 	gs->set_level(previous_level);
 
 	perf_timer_end(FUNCNAME);

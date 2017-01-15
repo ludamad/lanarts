@@ -436,6 +436,9 @@ void GameState::draw(bool drawhud) {
 
 	monster_controller().post_draw(this);
 	get_level()->tiles().post_draw(this);
+	for (size_t i = 0; i < safe_copy.size(); i++) {
+		safe_copy[i]->post_draw(this);
+	}
 	if (drawhud) {
 		hud.draw(this);
 	}

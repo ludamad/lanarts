@@ -279,18 +279,28 @@ void CombatGameInst::draw(GameState *gs, float frame) {
         float s = 1 - hurt_alpha_value(cooldowns().hurt_cooldown);
         draw_colour = draw_colour.multiply(Colour(255, 255 * s, 255 * s));
     }
-
+    
     int sx = x - spr.width() / 2, sy = y - spr.height() / 2;
     draw_sprite(view, sprite, sx, sy, vx, vy, frame, draw_colour);
 
     effects().draw_effect_sprites(gs, this, Pos(sx, sy));
-
     if (is_resting) {
         res::sprite("resting").draw(ldraw::DrawOptions(ldraw::CENTER),
                 on_screen(gs, ipos()));
     }
-    CoreStats& ecore = effective_stats().core;
+}
 
+void CombatGameInst::post_draw(GameState *gs) {
+    SpriteEntry& spr = game_sprite_data[sprite];
+    GameView& view = gs->view();
+    int w = spr.size().w, h = spr.size().h;
+    int xx = x - w / 2, yy = y - h / 2;
+
+    if (!view.within_view(xx, yy, w, h))
+            return;
+    if (!gs->object_visible_test(this))
+            return;
+    CoreStats& ecore = effective_stats().core;
     //Draw health bar
     int healthbar_offsety = 20;
     if (target_radius > 16)
@@ -299,6 +309,10 @@ void CombatGameInst::draw(GameState *gs, float frame) {
         const BBox statbox(x - 10, y - healthbar_offsety, x + 10,
                 y - healthbar_offsety + 5);
         draw_statbar(on_screen(gs, statbox), float(ecore.hp) / ecore.max_hp);
+    }
+    if (dynamic_cast<PlayerInst*>(this) && dynamic_cast<PlayerInst*>(this)->is_local_player()) {
+        res::sprite("spr_enemies.good_neutral").draw(on_screen(gs, PosF {x-16, y-16}));
+        res::sprite("spr_enemies.good_neutral").draw(on_screen(gs, PosF {x-16, y-16}));
     }
 }
 

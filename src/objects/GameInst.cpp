@@ -76,6 +76,10 @@ void GameInst::draw(GameState* gs) {
 	try_callback("on_draw");
 }
 
+void GameInst::post_draw(GameState* gs) {
+	try_callback("on_post_draw");
+}
+
 void GameInst::init(GameState* gs) {
 	current_floor = gs->game_world().get_current_level_id();
 	try_callback("on_map_init");

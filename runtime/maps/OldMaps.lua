@@ -54,7 +54,7 @@ M.fast_enemies = {
 
 M.medium_enemies = table.merge(M.medium_animals, {
   {enemy = "Skeleton",          chance = 50                                              },
-  {enemy = "Storm Elemental",   chance = 66,  group_chance = 33, group_size = 2           },
+  {enemy = "Storm Elemental",   chance = 36,  group_chance = 33, group_size = 2           },
   {enemy = "Chicken",           chance = 50                                             },
 --  {enemy = "Unseen Horror",     chance = 5                                             },
 --  {enemy = "Centaur Hunter",      chance = 10                                             }

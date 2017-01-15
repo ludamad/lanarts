@@ -41,6 +41,7 @@ public:
     virtual void deinit(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs, float frame = 0);
+	virtual void post_draw(GameState* gs);
 	virtual void update_field_of_view(GameState* gs);
 	virtual bool within_field_of_view(const Pos& pos) =0;
 
