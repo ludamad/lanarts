@@ -19,6 +19,6 @@ runtime/compiled/Resources.lua
 *.score
 stdout.txt
 stderr.txt
-build/
+build
 build_debug/
 build_release/
