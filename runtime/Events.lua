@@ -2,7 +2,6 @@ local Sounds = require "Sounds"
 local GameState = require "core.GameState"
 local DeathScreen = require "menus.DeathScreen"
 local PlayerFunctions = require "Players"
-local Relations = require "objects.Relations"
 local Network = require "core.Network"
 local World = require "core.World"
 
@@ -20,7 +19,6 @@ function events.PlayerDeath(player)
 end
 
 function events.MonsterInit(monster)
-    monster.team = Relations.TEAM_MONSTER_ROOT
 end
 
 function events.MonsterDeath(monster)

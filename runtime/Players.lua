@@ -1,4 +1,3 @@
-local Relations = require "objects.Relations"
 local Keys = require "core.Keyboard"
 local DungeonFeatures = require "objects.DungeonFeatures"
 local Network = require "core.Network"
@@ -12,7 +11,6 @@ end
 -- Return submodule
 return {
     player_init = function(player)
-        player.team = Relations.TEAM_PLAYER_DEFAULT
         player.on_step = player_on_step
         player.traits = {PLAYER_TRAIT}
     end,

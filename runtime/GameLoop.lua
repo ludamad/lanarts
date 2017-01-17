@@ -64,7 +64,6 @@ local function game_loop_body(steponly)
     return true
 end
 
-
 function M.post_draw()
     local player = World.local_player
     for pdata in values(World.players) do
@@ -103,6 +102,10 @@ function M.run_loop()
     GameState.input_capture()
     if require("tests.main").testcase then
         require("tests.main").testcase:game_start()
+    end
+
+    if not GameState.input_handle() then 
+        return false 
     end
 
     while true do 

@@ -33,16 +33,6 @@ function file_exists(name)
     return f ~= nil
 end
 
--- Data is defined on a per-submodule basis
-function data_load(key, default, --[[Optional]] vpath)
-    local val = GlobalData[key]
-    if not val then 
-        GlobalData[key] = default
-        return default
-    end
-    return val
-end
-
 --- Wraps a function around a memoizing weak table.
 -- Function results will be stored until they are no longer referenced.
 -- 
