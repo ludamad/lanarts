@@ -199,7 +199,9 @@ generate_door_candidates = (map, rng, regions) ->
         filter_random_third(x1+1,y1+1,x2-1,y2-1)
 
 map_try_create = (template_f) ->
-    rng = require("mtwist").create(random(0, 2 ^ 31))
+    seed = random(0, 2 ^ 31)
+    rng = require("mtwist").create(seed)
+    event_log("(RNG #%d) Attempting map_try_create with seed %d\n", rng\amount_generated(), seed)
     template = template_f(rng)
     {PW,PH} = LEVEL_PADDING
     mw,mh = template.w, template.h
@@ -208,6 +210,7 @@ map_try_create = (template_f) ->
     rect = {{1+PW, 1+PH}, {mw-PW, 1+PH}, {mw-PW, mh-PH}, {1+PW, mh-PH}}
     rect2 = {{1+PW, mh-PH}, {mw-PW, mh-PH}, {mw-PW, 1+PH}, {1+PW, 1+PH}}
     major_regions = RVORegionPlacer.create {rect2}
+    event_log("(RNG #%d) before SourceMap.map_create\n", rng\amount_generated())
     map = SourceMap.map_create { 
         rng: rng
         size: {mw, mh}
@@ -223,6 +226,7 @@ map_try_create = (template_f) ->
         -- For the overworld, created by dungeon features we add later:
         player_candidate_squares: {}
     }
+    event_log("(RNG #%d) after SourceMap.map_create\n", rng\amount_generated())
 
     for subconf in *assert(template.subtemplates, "Must have subtemplates!")
         {w,h} = subconf.size
@@ -230,6 +234,8 @@ map_try_create = (template_f) ->
         assert(w and h, "Subconf must have size")
         r = random_region_add rng, w, h, 20, center_region_delta_func(map, rng, outer), 0,
             major_regions, outer\bbox()
+        {rx1,ry1,rx2,ry2} = r\bbox()
+        event_log("(RNG #%d) created region at (%d,%d,%d,%d)\n", rng\amount_generated(), rx1, ry1, rx2, ry2)
         if r == nil
             print("ABORT: region could not be added")
             return nil
@@ -241,6 +247,8 @@ map_try_create = (template_f) ->
 
     -- Apply the regions:
     for r in *major_regions.regions
+        {rx1,ry1,rx2,ry2} = r\bbox()
+        event_log("(RNG #%d) after RVO, have region at (%d,%d,%d,%d)\n", rng\amount_generated(), rx1, ry1, rx2, ry2)
         r._points = false
         r\apply {:map, operator: (tile_operator r.conf.wall1)}
 

@@ -25,6 +25,7 @@ end
 
 function M.simple_tunnels(map, width_range, tunnels_per_room, wall_tile, floor_tile, --[[Optional]] area, --[[Optional]] padding) 
     area = area or bbox_create({0,0}, map.size)
+    event_log("(RNG #%d) pre simple tunnels\n", map.rng:amount_generated())
     local oper = SourceMap.tunnel_operator {
         rng = map.rng,
         validity_selector = { 
@@ -46,10 +47,12 @@ function M.simple_tunnels(map, width_range, tunnels_per_room, wall_tile, floor_t
         size_range = width_range,
         tunnels_per_room_range = tunnels_per_room
     }
+    event_log("(RNG #%d) post simple tunnels\n", map.rng:amount_generated())
     oper(map, SourceMap.ROOT_GROUP, area)
 end
 
 function M.simple_random_placement_operator(map, tileset) 
+    event_log("(RNG #%d) pre random placement oper\n", map.rng:amount_generated())
     return SourceMap.random_placement_operator {
         rng = map.rng,
         child_operator = M.room_carve_operator(tileset.wall, tileset.floor),

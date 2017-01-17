@@ -66,6 +66,7 @@ public:
 	}
 
 	level_id id() const {
+                LANARTS_ASSERT(_levelid >= 0 && _levelid < (1<<22));
 		return _levelid;
 	}
 

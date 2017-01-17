@@ -94,10 +94,9 @@ obj_id GameMapState::add_instance(GameState* gs, GameInst* inst) {
 	gs->game_world().set_current_level(this);
 	obj_id id = game_inst_set().add_instance(inst);
 	inst->init(gs);
-	gs->game_world().set_current_level(current_level);
-
-	event_log("Adding instance id: %d x: %d y: %d target_radius: %d depth %d\n",
+	event_log("Adding instance id: %d x: %f y: %f target_radius: %f depth %d\n",
 			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
+	gs->game_world().set_current_level(current_level);
 
 	return id;
 }
@@ -147,7 +146,6 @@ void GameMapState::draw(GameState* gs, bool reveal_all) {
 	}
 
 	for (size_t i = 0; i < safe_copy.size(); i++) {
-            printf("EhwahOIDHSAOIHDOISAH %d %d \n", i, i);
 		safe_copy[i]->post_draw(gs);
 	}
 

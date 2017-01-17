@@ -43,7 +43,7 @@ public:
 
 	GameMapState* map_create(const Size& size, ldungeon_gen::MapPtr source_map, bool wandering_enabled = true);
 
-	void reset(int keep = 0);
+	void reset();
 	GameMapState* get_current_level() {
 		return lvl;
 	}

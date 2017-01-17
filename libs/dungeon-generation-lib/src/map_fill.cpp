@@ -10,6 +10,7 @@
 #include "map_fill.h"
 #include "bsp.hpp"
 
+void event_log(const char* fmt, ...);
 namespace ldungeon_gen {
 
 	RectangleApplyOperator::RectangleApplyOperator(
@@ -173,14 +174,20 @@ namespace ldungeon_gen {
     }
 
     BBox random_place(BBox area, MTwist& randomizer, Size size) {
+            event_log("(RNG #%d) Generating random place in (%d,%d,%d,%d) of size {%d,%d}\n", 
+                randomizer.amount_generated(), area.x1, area.y1, area.x2, area.y2, size.w, size.h);
             int rx = randomizer.rand(area.x1, area.x2 - size.w);
             int ry = randomizer.rand(area.y1, area.y2 - size.h);
+            event_log("(RNG #%d) Generated random place at {%d,%d}\n", 
+                randomizer.amount_generated(), rx, ry);
             return BBox(rx, ry, rx + size.w, ry + size.h);
     }
 
     bool RandomPlacementApplyOperator::place_random(MapPtr map, group_t parent_group_id, const BBox& rect, Size size) {
         const int MAX_ATTEMPTS = 10;
         for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++) {
+            event_log("(RNG #%d) Attempting random placement %d\n", 
+                    randomizer.amount_generated(), attempts);
         	BBox room = random_place(rect, randomizer, size);
             if (area_oper->apply(map, parent_group_id, room)) {
                 return true;
@@ -191,24 +198,34 @@ namespace ldungeon_gen {
 
     bool RandomPlacementApplyOperator::apply(MapPtr map, group_t parent_group_id, const BBox& rect) {
         const int TOO_MANY_FAILURES = 25;
-		if (create_subgroup) {
-			parent_group_id = map->make_group(rect, parent_group_id);
-		}
+        if (create_subgroup) {
+                parent_group_id = map->make_group(rect, parent_group_id);
+        }
 
         int nrooms = randomizer.rand(amount_of_regions);
         Range sizerange(size.min, size.max);
+        event_log("(RNG #%d) RandomPlacementApplyOperator generating #%d regions (picked from range %d to %d) with size range %d-%d\n", 
+                randomizer.amount_generated(), nrooms, 
+                amount_of_regions.min, amount_of_regions.max, 
+                size.min, size.max);
 
         int failures = 0;
         for (int i = 0; i < nrooms; i++) {
             for (;; failures++) {
-
+                event_log("(RNG #%d) RandomPlacementApplyOperator apply attempt %d\n", 
+                        randomizer.amount_generated(), failures);
                 int rw = randomizer.rand(sizerange), rh = randomizer.rand(sizerange);
 
                 if (place_random(map, parent_group_id, rect, Size(rw, rh))) {
+                    event_log("(RNG #%d) RandomPlacementApplyOperator apply attempt %d FAILED\n", 
+                            randomizer.amount_generated(), failures);
                     break;
                 }
-                if (failures > TOO_MANY_FAILURES)
+                if (failures > TOO_MANY_FAILURES) {
+                    event_log("(RNG #%d) RandomPlacementApplyOperator TOO MANY FAILURES -- exitting \n", 
+                            randomizer.amount_generated(), failures);
                     goto NoMoreRooms;
+                }
                 // Goto below
             }
         }

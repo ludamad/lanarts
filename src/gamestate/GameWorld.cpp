@@ -193,6 +193,8 @@ bool GameWorld::step() {
 	if (next_room_id == -2) {
 		gs->restart();
 		next_room_id = -1;
+                // Don't increment frame number because we're doing a new game:
+                return true;
 	}
         if (gs->local_player()->current_floor != get_current_level_id()) {
                 current_level = get_level(gs->local_player()->current_floor);
@@ -208,6 +210,7 @@ bool GameWorld::step() {
         }
         last_player_pos = gs->local_player()->ipos();
 
+	gs->frame()++;
 	return true;
 }
 
@@ -256,24 +259,22 @@ void GameWorld::set_current_level_lazy(int roomid) {
 	next_room_id = roomid;
 }
 
-void GameWorld::reset(int keep) {
+void GameWorld::reset() {
 	if (midstep) {
 		next_room_id = -2;
                 return;
 	}
-	std::vector<GameMapState*> delete_list;
-        for (int i = keep; i < level_states.size(); i++) {
-                delete_list.push_back(level_states[i]);
-        }
+	std::vector<GameMapState*> delete_list = level_states;
         player_data().remove_all_players(gs);
-        level_states.resize(keep);
+        level_states.clear();
         gs->game_hud().override_sidebar_contents(NULL);
         gs->game_chat().clear();
-        gs->renew_game_timestamp();
-	for (int i = 0; i < delete_list.size(); i++) {
-		delete delete_list[i];
-	}
+        last_player_pos = {0,0};
+        for (GameMapState* map : delete_list) {
+            delete map;
+        }
         _team_data = TeamData();
+        lvl = NULL;
         // _should_sync_states = true;
 }
 

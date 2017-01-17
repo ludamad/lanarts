@@ -20,6 +20,8 @@ public:
 	~GameLogger();
 	void event_log(const char* fmt, va_list ap);
 	void event_log(const char* fmt, ...);
+        // If we call event_log, will output be printed anywhere?
+        bool is_active();
 private:
 	GameState* gs;
 	std::ifstream input_log_file;
@@ -27,6 +29,8 @@ private:
 	std::string line;
 };
 
+// If we call event_log, will output be printed anywhere?
+bool event_log_is_active();
 void event_log(const char* fmt, ...);
 void event_log_initialize(GameState* gs, const char* input_file,
 		const char* output_file);

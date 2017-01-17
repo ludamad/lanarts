@@ -16,15 +16,24 @@ end
 function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] operator, --[[Optional]] max_attempts) 
     assert(map)
     assert(not area or #area > 0)
-    return SourceMap.find_random_square { 
+    local sqr = SourceMap.find_random_square { 
         rng = map.rng, map = map, area = area, 
         selector = selector or { matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT} },
         operator = operator or { add = SourceMap.FLAG_HAS_OBJECT },
         max_attempts = max_attempts
     }
+    if area then
+        event_log("(RNG #%d) Finding random square in x:%d-%d, y:%d-%d => {%d, %d}\n", 
+            map.rng:amount_generated(), area[1], area[3], area[2], area[4], sqr[1], sqr[2])
+    else
+        event_log("Finding random square in whole level => {%d, %d}\n", sqr[1], sqr[2])
+    end
+    return sqr
 end
 
 function M.spawn_enemy(map, type, tile_xy)
+    event_log("Spawning enemy %s at {%d, %d}\n", 
+        type, tile_xy[1], tile_xy[2])
     local object = GameObject.enemy_create {
         do_init = false,
         xy = M.from_tile_xy(tile_xy),
@@ -36,6 +45,8 @@ function M.spawn_enemy(map, type, tile_xy)
 end
 
 function M.spawn_epic_store(map, items, tile_xy)
+    event_log("Spawning EPIC store with %d items at {%d, %d}\n", 
+        #items, tile_xy[1], tile_xy[2])
     local object = GameObject.store_create {
         xy = M.from_tile_xy(tile_xy),
         items = items,
@@ -46,6 +57,8 @@ function M.spawn_epic_store(map, items, tile_xy)
 end
 
 function M.spawn_store(map, items, tile_xy)
+    event_log("Spawning store with %d items at {%d, %d}\n", 
+        #items, tile_xy[1], tile_xy[2])
     local object = GameObject.store_create {
         xy = M.from_tile_xy(tile_xy),
         items = items,
@@ -57,6 +70,10 @@ function M.spawn_store(map, items, tile_xy)
 end
 
 function M.spawn_item(map, type, amount, tile_xy)
+    -- Default to 1:
+    amount = amount or 1
+    event_log("Spawning item %s (amount=%s) at {%d, %d}\n", 
+        type, amount, tile_xy[1], tile_xy[2])
     local object = GameObject.item_create {
         do_init = false,
         xy = M.from_tile_xy(tile_xy),
@@ -120,6 +137,7 @@ function M.spawn_decoration(map, sprite, sqr, frame, solid)
 end
 
 function M.spawn_portal(map, sqr, sprite, --[[Optional]] callback, --[[Optional]] frame)
+    event_log("Spawning portal at {%d, %d}\n", sqr[1], sqr[2])
     local object = GameObject.feature_create {
         do_init = false,
         xy = M.from_tile_xy(sqr),
@@ -258,7 +276,5 @@ function M.make_rectangle_oper(floor, wall, wall_seethrough, --[[Optional]] area
         perimeter_operator = { add = {SourceMap.FLAG_PERIMETER}, remove = remove_wall_flags, content = wall },
     }
 end
-
-
 
 return M

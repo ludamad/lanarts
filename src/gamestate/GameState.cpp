@@ -126,9 +126,6 @@ static void _event_log_initialize(GameState* gs, GameSettings& settings) {
 }
 
 bool GameState::start_game() {
-	renew_game_timestamp();
-	_event_log_initialize(this, settings);
-
 	if (settings.conntype == GameSettings::SERVER) {
 		init_data.frame_action_repeat = settings.frame_action_repeat;
 		init_data.network_debug_mode = settings.network_debug_mode;
@@ -154,12 +151,7 @@ bool GameState::start_game() {
 		settings.time_per_step = init_data.time_per_step;
 	}
 
-	printf("Seed used for RNG = 0x%X\n", init_data.seed);
-
-        initial_seed = init_data.seed;
-	base_rng_state.init_genrand(init_data.seed);
-
-	/* If class was not set, we may be loading a game -- don't init level */
+        /* If class was not set, we may be loading a game -- don't init level */
 	if (settings.class_type != -1) {
 		restart();
 	}
@@ -285,23 +277,27 @@ void GameState::renew_game_timestamp() {
 }
 
 void GameState::restart() {
-
+        frame_n = 0;
         // Restart RNG:
         const char* FIXED_SEED = getenv("LANARTS_SEED");
         if (FIXED_SEED == NULL) {
-            init_data.seed = atoi(FIXED_SEED);
-        } else {
             init_data.seed += 1;
+        } else {
+            init_data.seed = atoi(FIXED_SEED);
         }
+	printf("Seed used for RNG = 0x%X\n", init_data.seed);
         initial_seed = init_data.seed;
 	base_rng_state.init_genrand(init_data.seed);
         // Reset game world state:
         loop("sound/overworld.ogg");
 	if (game_world().number_of_levels() > 0) {
-		game_world().reset(0);
+		game_world().reset();
 	}
         // Reset player data state:
         player_data().reset();
+        // Initialize event log for first_map_create:
+	renew_game_timestamp();
+	_event_log_initialize(this, settings);
 	luawrap::globals(L)["Engine"]["first_map_create"].push();
 	int levelid = luawrap::call<LuaValue>(L)["_id"].to_int();
         luawrap::globals(L)["table"]["copy"].push();
@@ -367,11 +363,13 @@ bool GameState::step() {
         connection.poll_messages();
 
 	hud.step(this);
+        // Handles frame_n incrementing and restarting:
 	if (!world.step()) {
 		return false;
 	}
-
-	frame_n++;
+        // ROBUSTNESS:
+        // Do not place logic here -- place in world.step()
+        // before restart code.
         return true;
 }
 
@@ -478,7 +476,7 @@ void GameState::remove_instance(GameInst* inst) {
 		return;
 	}
 	event_log(
-			"Removing instance id: %f x: %f y: %f target_radius: %f depth %d\n",
+			"Removing instance id: %d x: %f y: %f target_radius: %f depth %d\n",
 			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
 	GameMapState* level = world.get_level(inst->current_floor);
 	level->game_inst_set().remove_instance(inst);

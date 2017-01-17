@@ -60,6 +60,12 @@ static int game_step(lua_State* L) {
 	return 1;
 }
 
+// Log events directly, without doing a formatting pass. 
+// Used with event_log_is_active in Lua.
+static void game_raw_event_log(const char* str) {
+    event_log("%s", str);
+}
+
 static int game_draw(lua_State* L) {
 	lua_api::gamestate(L)->draw();
 	return 0;
@@ -242,7 +248,10 @@ namespace lua_api {
 
 		game["step"].bind_function(game_step);
 		game["draw"].bind_function(game_draw);
-        game["wait"].bind_function(lapi_wait);
+		game["raw_event_log"].bind_function(game_raw_event_log);
+                // Can directly bind event_log_is_active:
+		game["event_log_is_active"].bind_function(event_log_is_active);
+                game["wait"].bind_function(lapi_wait);
 
 		game["input_capture"].bind_function(game_input_capture);
 		game["input_handle"].bind_function(game_input_handle);

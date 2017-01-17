@@ -252,7 +252,7 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e) {
 	simul_id simid = e->collision_simulation_id();
 	PosF pos = coll_avoid.get_position(simid);
 
-	PosF new_xy = e->attempt_move_to_position(gs, PosF(round(pos.x), round(pos.y)));
+	PosF new_xy = e->attempt_move_to_position(gs, pos);
 	coll_avoid.set_position(simid, new_xy.x, new_xy.y);
 	coll_avoid.set_maxspeed(simid, e->effective_stats().movespeed);
 }
@@ -273,4 +273,5 @@ void MonsterController::post_draw(GameState* gs) {
 
 void MonsterController::clear() {
 	mids.clear();
+        astarcontext = AStarPath();
 }

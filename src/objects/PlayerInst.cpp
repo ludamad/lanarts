@@ -216,7 +216,8 @@ void PlayerInst::step(GameState* gs) {
 			stats().core.heal_fully();
 			spawn_in_overworld(gs, this);
 		} else {
-			gs->game_world().reset(0);
+                        // Queue a restart:
+			gs->game_world().reset();
 		}
 		perf_timer_end(FUNCNAME);
 		return;

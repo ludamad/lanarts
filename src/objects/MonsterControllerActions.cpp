@@ -373,7 +373,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	eb.path_start = Pos(e->x, e->y);
 
 	event_log(
-			"Path for instance id: %d, (%d path steps), x: %d y: %d target_radius: %d depth %d\n",
-			e->id, eb.path.size(), e->x, e->y, e->target_radius, e->depth);
+			"Path for instance id: %d, (%d path steps), x: %f y: %f target_radius: %f depth %d\n",
+			e->id, (int)eb.path.size(), e->x, e->y, e->target_radius, e->depth);
 	perf_timer_end(FUNCNAME);
 }

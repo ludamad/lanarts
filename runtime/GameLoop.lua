@@ -47,6 +47,9 @@ local function game_loop_body(steponly)
     end
     perf.timing_end("**Step**")
 
+    -- ROBUSTNESS
+    -- Will be called after a game restarts during step event, but for a newly generated game world.
+    -- See robustness note below which assures that each run has the same ordering of input_handle's.
     if not GameState.input_handle() then 
         return false 
     end
@@ -104,6 +107,9 @@ function M.run_loop()
         require("tests.main").testcase:game_start()
     end
 
+    -- ROBUSTNESS
+    -- Since when a game restarts, an input_handle is called during game_loop_body after step(),
+    -- we call input_handle here for reproducibility.
     if not GameState.input_handle() then 
         return false 
     end

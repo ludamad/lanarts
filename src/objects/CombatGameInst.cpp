@@ -535,8 +535,6 @@ void CombatGameInst::deinit(GameState* gs) {
     GameInst::deinit(gs);
 }
 
-const float ROUNDING_MULTIPLE = 256.0f;
-
 PosF CombatGameInst::attempt_move_to_position(GameState* gs,
         const PosF& newxy) {
 
@@ -544,9 +542,8 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
             newxy.x, newxy.y);
     float dx = newxy.x - rx, dy = newxy.y - ry;
     float dist = sqrt(dx * dx + dy * dy);
-    dist = round(dist * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 
-    bool collided = gs->tile_radius_test(round(newxy.x), round(newxy.y), 20);
+    bool collided = gs->tile_radius_test(iround(newxy.x), iround(newxy.y), 20);
 
     if (!collided) {
         rx = newxy.x, ry = newxy.y;
@@ -571,8 +568,6 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
             }
         }
 
-        vx = round(vx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-        vy = round(vy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
         rx += vx;
         ry += vy;
     }
@@ -585,12 +580,10 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
 void CombatGameInst::update_position() {
     x = iround(rx); //update based on rounding of true float
     y = iround(ry);
-    event_log("Instance id %d integer positions set to (%d,%d)\n", id, x, y);
+    event_log("Instance id %d integer positions set to (%f,%f) from (%f,%f)\n", id, x, y, rx, ry);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
-    rx = round(newx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-    ry = round(newy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
     rx = newx, ry = newy;
     event_log("Instance id %d float positions set to (%f,%f)\n", id, rx, ry);
     update_position();

@@ -14,8 +14,8 @@ mkdir saves
 echo "# See settings.yaml for details
 ip: localhost
 username: TestBot
-steps_per_draw: 10
-time_per_step: 1
+steps_per_draw: 60
+time_per_step: 0
 frame_action_repeat: 0
 port: 6112
 regen_level_on_death: no
@@ -36,7 +36,7 @@ font: fonts/Gudea-Regular.ttf
 menu_font: fonts/alagard_by_pix3m-d6awiwp.ttf
 
 #Performance settings
-steps_per_draw: 10 #More is almost guaranteed to make the game faster, 1 is ideal
+steps_per_draw: 60 #More is almost guaranteed to make the game faster, 1 is ideal
 free_memory_while_idle: no
 
 #Debug settings
@@ -44,7 +44,7 @@ network_debug_mode: no
 invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
-keep_event_log: no" > settings.yaml
+keep_event_log: yes" > settings.yaml
 
 export LANARTS_TESTCASE=tests.ShortRunTest
 export LANARTS_SEED=12345673242

@@ -219,6 +219,7 @@ local function combine_cpp_traceback_with_lua(lua_stacktrace)
 end
 
 local debug_traceback = debug.traceback -- Stash & wrap the current debug.traceback
+
 -- Improve the traceback in various ways, including adding color and reducing noise:
 function M.traceback(--[[Optional]] str)
     local traceback = debug_traceback()

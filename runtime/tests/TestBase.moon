@@ -50,7 +50,7 @@ M = nilprotect {
                 sim 'TAB'
             when 5 -- Necro
                 sim 'TAB'
-            when 6
+            else
                 sim 'ENTER'
         @_n_inputs += 1
     menu_start: () =>
@@ -163,6 +163,13 @@ M = nilprotect {
             @_past_item_stage = false
             World.local_player\gain_xp(10000)
         @_ai_state\step()
+        if os.getenv("LANARTS_TEST_LOAD_MIDWAY") and GameState.frame == 6000
+            require("core.GlobalData")._ai_state = @_ai_state
+            require("core.GlobalData")._last_object = @_last_object
+            GameState.save("saves/test-save.save")
+            GameState.load("saves/test-save.save")
+            @_ai_state = require("core.GlobalData")._ai_state 
+            @_last_object = require("core.GlobalData")._last_object 
         World = require "core.World"
         GameObject = require "core.GameObject"
         player = World.local_player

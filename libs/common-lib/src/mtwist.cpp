@@ -66,6 +66,7 @@ void MTwist::init_genrand(unsigned int s)
         mt[mti] &= 0xffffffffUL;
         /* for >32 bit machines */
     }
+    _amount_generated = 0;
 }
 
 /* initialize by an array with array-length */
