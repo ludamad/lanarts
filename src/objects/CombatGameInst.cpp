@@ -214,11 +214,6 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
 
     }
 
-//    event_log(
-//            "CombatGameInst::damage id=%d, attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
-//            id, attack.damage, attack.power, int(attack.magic_percentage * 100),
-//            dmg);
-
     gs->add_instance(
             new AnimatedInst(ipos(), -1, 25, PosF(-1,-1), PosF(), AnimatedInst::DEPTH,
                     format("%d", dmg), Colour(255, 148, 120)));

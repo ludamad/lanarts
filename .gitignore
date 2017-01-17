@@ -2,6 +2,8 @@ CMakeFiles/*
 logs/*
 replays/*
 saves/
+runtime/saves/
+runtime/logs/
 resources/saves
 CMakeCache.txt
 Makefile

@@ -2,6 +2,7 @@
 if not os.getenv("LANARTS_TESTCASE")
     return nilprotect {testcase: false}
 testcase = require os.getenv("LANARTS_TESTCASE")
+testcase\menu_start()
 GameState = require("core.GameState")
 -- Monkey patching:
 --user_input_capture = GameState.input_capture

@@ -11,6 +11,7 @@
 #include <SDL_opengl.h>
 #include <cstring>
 #include <ctime>
+#include <cstdlib>
 #include <vector>
 
 #include <lcommon/SerializeBuffer.h>
@@ -73,7 +74,13 @@ GameState::GameState(const GameSettings& settings, lua_State* L) :
 
 	_game_timestamp = 0;
 
-	init_data.seed = generate_seed();
+        const char* FIXED_SEED = getenv("LANARTS_SEED");
+        if (FIXED_SEED == NULL) {
+	    init_data.seed = generate_seed();
+        } else {
+            init_data.seed = atoi(FIXED_SEED);
+        }
+	rng_state_stack.push_back(&base_rng_state);
 }
 
 GameState::~GameState() {
@@ -151,7 +158,6 @@ bool GameState::start_game() {
 
         initial_seed = init_data.seed;
 	base_rng_state.init_genrand(init_data.seed);
-	rng_state_stack.push_back(&base_rng_state);
 
 	/* If class was not set, we may be loading a game -- don't init level */
 	if (settings.class_type != -1) {
@@ -279,10 +285,22 @@ void GameState::renew_game_timestamp() {
 }
 
 void GameState::restart() {
+
+        // Restart RNG:
+        const char* FIXED_SEED = getenv("LANARTS_SEED");
+        if (FIXED_SEED == NULL) {
+            init_data.seed = atoi(FIXED_SEED);
+        } else {
+            init_data.seed += 1;
+        }
+        initial_seed = init_data.seed;
+	base_rng_state.init_genrand(init_data.seed);
+        // Reset game world state:
         loop("sound/overworld.ogg");
 	if (game_world().number_of_levels() > 0) {
 		game_world().reset(0);
 	}
+        // Reset player data state:
         player_data().reset();
 	luawrap::globals(L)["Engine"]["first_map_create"].push();
 	int levelid = luawrap::call<LuaValue>(L)["_id"].to_int();
@@ -460,7 +478,7 @@ void GameState::remove_instance(GameInst* inst) {
 		return;
 	}
 	event_log(
-			"Removing instance id: %d x: %d y: %d target_radius: %d depth %d\n",
+			"Removing instance id: %f x: %f y: %f target_radius: %f depth %d\n",
 			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
 	GameMapState* level = world.get_level(inst->current_floor);
 	level->game_inst_set().remove_instance(inst);

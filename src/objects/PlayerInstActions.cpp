@@ -690,28 +690,21 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
-	if (!effective_stats().allowed_actions.can_use_rest) {
-		return;
-	}
-	CoreStats& ecore = effective_stats().core;
-	int emax_hp = ecore.max_hp, emax_mp = ecore.max_mp;
-	bool atfull = (core_stats().hp >= emax_hp || ecore.hpregen == 0) && (core_stats().mp >= emax_mp || ecore.mpregen == 0);
-        if (atfull) {
-            // Since spell cooldowns: Keep resting if a spell cooldown is active.
-            for (auto& e : cooldowns().spell_cooldowns) {
-                if (e.second > 0) {
-                    atfull = false;
-                    break;
-                }
-            }
+        // Includes whether rest is currently legal (due to effects, not 'can rest' cooldown):
+        if (!can_benefit_from_rest()) {
+            return;
         }
-	if (cooldowns().can_rest() && !atfull && effects().can_rest()) {
-		core_stats().heal_hp(ecore.hpregen * 8, emax_hp);
-		core_stats().heal_mp(ecore.mpregen * 8, emax_mp);
-		ecore.hp = core_stats().hp;
-		ecore.mp = core_stats().mp;
-		is_resting = true;
-	}
+        // Have we seen an enemy too recently?
+        if (!cooldowns().can_rest()) {
+            return;
+        }
+        CoreStats& ecore = effective_stats().core;
+        int emax_hp = ecore.max_hp, emax_mp = ecore.max_mp;
+        core_stats().heal_hp(ecore.hpregen * 8, emax_hp);
+        core_stats().heal_mp(ecore.mpregen * 8, emax_mp);
+        ecore.hp = core_stats().hp;
+        ecore.mp = core_stats().mp;
+        is_resting = true;
 }
 void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	perf_timer_begin(FUNCNAME);

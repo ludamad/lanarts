@@ -114,6 +114,7 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	LuaValue getters = luameta_getters(meta);
 	LUAWRAP_GETTER(getters, xy, OBJ->pos());
 	LUAWRAP_GETTER(getters, xy_previous, Pos(OBJ->last_x, OBJ->last_y));
+	LUAWRAP_GETTER(getters, tile_xy, Pos(OBJ->x / TILE_SIZE, OBJ->y / TILE_SIZE));
 	luawrap::bind_getter(getters["x"], &GameInst::x);
 	luawrap::bind_getter(getters["y"], &GameInst::y);
 	luawrap::bind_getter(getters["__table"], &GameInst::lua_variables);
@@ -231,6 +232,16 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	return meta;
 }
 
+static LuaValue lua_iteminst_metatable(lua_State* L) {
+	LUAWRAP_SET_TYPE(ItemInst*);
+
+	LuaValue meta = lua_gameinst_base_metatable(L);
+        LuaValue getters = luameta_getters(meta);
+	LUAWRAP_GETTER(getters, type, OBJ->item_type().item_entry().name);
+	LUAWRAP_GETTER(getters, amount, OBJ->item_quantity());
+	return meta;
+}
+
 static LuaValue lua_enemyinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(EnemyInst*);
 
@@ -303,6 +314,7 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->weapon().weapon_entry().uses_projectile);
 	LUAWRAP_GETTER(methods, has_ranged_weapon, OBJ->weapon().weapon_entry().uses_projectile);
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_local_player());
+	LUAWRAP_GETTER(methods, can_benefit_from_rest, OBJ->can_benefit_from_rest());
 	LUAWRAP_METHOD(methods, gain_xp, players_gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
 
@@ -320,6 +332,8 @@ static void lua_gameinst_push_metatable(lua_State* L, GameInst* inst) {
 		luameta_push(L, &lua_enemyinst_metatable);
 	} else if (dynamic_cast<CombatGameInst*>(inst)) {
 		luameta_push(L, &lua_combatgameinst_metatable);
+	} else if (dynamic_cast<ItemInst*>(inst)) {
+		luameta_push(L, &lua_iteminst_metatable);
 	} else {
 		luameta_push(L, &lua_gameinst_base_metatable);
 	}
@@ -685,6 +699,8 @@ namespace lua_api {
 		submodule["EnemyType"].pop();
 		luameta_push(L, &lua_combatgameinst_metatable);
 		submodule["CombatType"].pop();
+		luameta_push(L, &lua_iteminst_metatable);
+		submodule["ItemType"].pop();
 		luameta_push(L, &lua_gameinst_base_metatable);
 		submodule["Base"].pop();
 		luameta_push(L, &GameInstWrap::ref_metatable);
@@ -695,6 +711,7 @@ namespace lua_api {
 		luawrap::install_dynamic_casted_type<CombatGameInst*, GameInst*>();
 		luawrap::install_dynamic_casted_type<PlayerInst*, GameInst*>();
 		luawrap::install_dynamic_casted_type<EnemyInst*, GameInst*>();
+		luawrap::install_dynamic_casted_type<ItemInst*, GameInst*>();
 		luawrap::install_dynamic_casted_type<FeatureInst*, GameInst*>();
 
 		LuaValue globals = luawrap::globals(L);

@@ -167,15 +167,28 @@ static GameInst* gmap_lookup(LuaStackValue map_obj, obj_id object) {
 
 static int gmap_objects_list(lua_State* L) {
     GameState* gs = lua_api::gamestate(L);
-    GameInstSet& insts = mapstate(LuaStackValue(L, 1), true)->game_inst_set();
+    level_id id = -1;
+    if (lua_gettop(L) == 0) {
+        id = gs->get_level_id();
+    } else {
+        id = LuaStackValue(L, 1)["_id"].to_int();
+    }
+    auto* level = gs->game_world().get_level(id);
+    GameInstSet& insts = level->game_inst_set();
     luawrap::push(L, insts.to_vector());
     return 1;
 }
 
-static int gmap_objects(lua_State* L) {
-    lua_pushcfunction(L, lua_api::l_itervalues);
-    gmap_objects_list(L);
-    lua_call(L, 1, 1);
+static int gmap_map_label(lua_State* L) {
+    GameState* gs = lua_api::gamestate(L);
+    level_id id = -1;
+    if (lua_gettop(L) == 0) {
+        id = gs->get_level_id();
+    } else {
+        id = LuaStackValue(L, 1)["_id"].to_int();
+    }
+    auto* level = gs->game_world().get_level(id);
+    luawrap::push(L, level->label());
     return 1;
 }
 
@@ -485,7 +498,6 @@ namespace lua_api {
         gmap["lookup"].bind_function(gmap_lookup);
 
         gmap["objects_list"].bind_function(gmap_objects_list);
-        gmap["objects"].bind_function(gmap_objects);
 
         gmap["tile_is_solid"].bind_function(gmap_tile_is_solid);
         gmap["tile_is_seethrough"].bind_function(gmap_tile_is_seethrough);
@@ -508,6 +520,7 @@ namespace lua_api {
         gmap["monsters"].bind_function(gmap_monsters);
 
         gmap["map_step"].bind_function(gmap_map_step);
+        gmap["map_label"].bind_function(gmap_map_label);
         gmap["map_draw"].bind_function(gmap_map_draw);
 
         gmap["distance_to_player"].bind_function(gmap_distance_to_player);

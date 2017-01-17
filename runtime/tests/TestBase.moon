@@ -1,17 +1,23 @@
 GameState = require "core.GameState"
 GlobalData = require "core.GlobalData"
+World = require "core.World"
+GameObject = require "core.GameObject"
+PathFinding = require "core.PathFinding"
 Map = require "core.Map"
+ExploreUtils = require "tests.ExploreUtils"
+
+HARDCODED_AI_SEED = 1234567800
+
 sim = (k) ->
     Keyboard = require "core.Keyboard"
     print "SIMULATING ", k
     GameState._simulate_key_press(Keyboard[k])
 user_input_capture = GameState.input_capture
 user_input_handle = GameState.input_handle
+ASTAR_BUFFER = PathFinding.astar_buffer_create()
 M = nilprotect {
+    simulate: (k) => sim k
     _n_inputs: 0
-    _past_item_stage: false
-    _created_items: false
-    _used_portals: {}
     -- Forwarding to handle events from a variety of modules, acts as a pseudo-require:
     intercept: (str) => 
         print(str)
@@ -31,7 +37,6 @@ M = nilprotect {
     -- END EVENTS --
     -- Default is to always want to simulate:
     should_simulate_input: () => not @_past_item_stage
-    game_start: do_nothing
     simulate_menu_input: () =>
         Keyboard = require "core.Keyboard"
         switch @_n_inputs
@@ -48,6 +53,15 @@ M = nilprotect {
             when 6
                 sim 'ENTER'
         @_n_inputs += 1
+    menu_start: () =>
+        GameState.input_capture = () ->
+            if @should_simulate_input()
+                GameState._input_clear()
+                @simulate_menu_input()
+                GameState._trigger_events()
+                return true
+            else 
+                return user_input_capture()
     game_start: () =>
         GameState.input_handle = () ->
             if @should_simulate_input()
@@ -56,80 +70,115 @@ M = nilprotect {
                 GameState._trigger_events()
                 return user_input_handle(false)
             return user_input_handle(true)
+    _try_move_action: (dx, dy) =>
+        if dx < 0
+            @simulate 'a'
+        elseif dx > 0
+            @simulate 'd'
+        if dy < 0
+            @simulate 'w'
+        elseif dy > 0
+            @simulate 's'
+        return (dx ~= 0 or dy ~= 0)
+    _attack_action: () =>
+        -- Necromancer:
+        player = World.local_player
+        enemies = Map.enemies_list(World.local_player)
+        for enemy in *enemies
+            -- Cannot rest if an enemy is visible:
+            if Map.object_visible(enemy, enemy.xy, World.local_player)
+                -- Necromancer:
+                if player.stats.hp < player.stats.max_hp * 0.3 and not player\has_effect("Baleful Regeneration") 
+                    @simulate 'u'
+                else
+                    @simulate 'y'
+                    @simulate 'i'
+                return
+    _try_collect_items: () =>
+        player = World.local_player
+        -- If we did not hold still last frame and are on an item, try to pick it up:
+        if (@_lpx ~= player.x or @_lpy ~= player.y)
+            collisions = Map.rectangle_collision_check(player.map, {player.x - 8, player.y - 8, player.x+8, player.y+8}, player)
+            for col in *collisions
+                if col == @_last_object
+                    @_last_object = false
+                obj_type = GameObject.get_type(col) 
+                if obj_type == "item"
+                    @_attack_action() -- No reason not to auto-attack while collecting
+                    return true -- Hold still
+                elseif obj_type == "feature" and not @_used_portals[col.id]
+                    @_used_portals[col.id] = 0
+                    return true -- Hold still
+        -- If we did not have an item to pick up, try to path towards an object:
+        closest = {false, math.huge}
+        {dx, dy} = player\direction_towards_object (_, obj) ->
+            obj_type = GameObject.get_type(obj)
+            local matches
+            if @_last_object
+                matches = (obj == @_last_object)
+            else
+                matches = (obj_type == "item" or obj_type == "feature" and not @_used_portals[obj.id])
+            if matches
+                -- Allow in filter:
+                dist = vector_distance(obj.xy, player.xy)
+                if dist < closest[2]
+                    closest[1],closest[2] = obj, dist
+                return true
+            -- Disallow in filter:
+            return false
+        @_last_object = closest[1]
+        if @_try_move_action(dx, dy)
+            @_attack_action() -- Handle attack action wherever we resolved move action 
+            return true
+        return false
+    _try_rest_if_needed: () =>
+        player = World.local_player
+        if not player\can_benefit_from_rest()
+            return false
+        enemies = Map.enemies_list(player)
+        for enemy in *enemies
+            -- Cannot rest if an enemy is visible:
+            if Map.object_visible(enemy, enemy.xy, player)
+                return false
+        -- Simply don't do any actions and return that we have resolved this step:
+        return true
+    _try_explore: () =>
+        player = World.local_player
+        {dx, dy} = player\direction_towards_unexplored()
+        if @_try_move_action(dx, dy)
+            @_attack_action() -- Handle attack action wherever we resolved move action 
+            return true
+        return false
     simulate_game_input: () =>
         if not GlobalData.__test_initialized
             GlobalData.__test_initialized = true
+            random_seed(HARDCODED_AI_SEED)
             @_past_item_stage = false
-            @_n_inputs = 0
-            @_created_items = false
             @_lpx = 0
             @_lpy = 0
-            @_key_spam = 'i' --random_choice {'y', 'i', 'o'}
+            @_ai_state = ExploreUtils.ai_state()
+            @_last_object = false
+            @_rng = require("mtwist").create(HARDCODED_AI_SEED)
             @_used_portals = {}
-        World = require "core.World"
-        if not @_created_items
-            --dofile "debug_scripts/level3.lua"
+            @_past_item_stage = false
             World.local_player\gain_xp(10000)
-            @_created_items = true
+        @_ai_state\step()
+        World = require "core.World"
         GameObject = require "core.GameObject"
-        press_keys = true
-        for k,v in pairs @_used_portals
-            if v > 1600
-                @_used_portals[k] = nil
-            else
-                @_used_portals[k] += 1
-        if @_created_items
-            player = World.local_player
-            if #Map.enemies_list(player) == 0
-                player\direct_damage(player.stats.hp + 1)
-            local dx, dy
-            --if @_n_inputs % 8 ~= 1
-            --    dx, dy = player.x - @_lpx, player.y - @_lpy
-            --else
-            if true
-                seen_some = {false}
-                {dx, dy} = player\direction_towards_object (_, obj) -> 
-                    obj_type = GameObject.get_type(obj) 
-                    if obj_type == "item" or obj_type == "feature" and not @_used_portals[obj.id]
-                        seen_some[1] = true
-                        return true
-                    return false
-                if not seen_some[1]
-                    {dx, dy} = player\direction_towards_unexplored()
-                    -- @_past_item_stage = true
-            if (@_lpx ~= player.x or @_lpy ~= player.y)
-                collisions = Map.rectangle_collision_check(player.map, {player.x - 8, player.y - 8, player.x+8, player.y+8}, player)
-                for col in *collisions
-                    obj_type = GameObject.get_type(col) 
-                    if obj_type == "item" or obj_type == "feature" and not @_used_portals[col.id]
-                        if obj_type == "feature"
-                            @_used_portals[col.id] = 0
-                        dx, dy = 0,0
-                        press_keys = false
-            if dx < 0
-                sim 'a'
-            elseif dx > 0
-                sim 'd'
-            if dy < 0
-                sim 'w'
-            elseif dy > 0
-                sim 's'
-            if (@_lpx == player.x and @_lpy == player.y) and (dx == 0 and dy == 0)
-                sim random_choice({'a', 'd', 'w', 's'})
-            if chance(.1)
-                sim random_choice({'a', 'w'})
-            @_lpx, @_lpy = player.x, player.y
-        if press_keys
-            sim @_key_spam
-        @_n_inputs += 1
+        player = World.local_player
+        --if #Map.enemies_list(player) == 0
+        --    player\direct_damage(player.stats.hp + 1)
+        dir = @_ai_state\get_next_direction() or {0,0}
+        if not @_try_move_action(dir[1], dir[2])
+            if not @_try_collect_items()
+                if not @_try_rest_if_needed()
+                    if not @_try_explore()
+                        dir = @_ai_state\get_next_wander_direction() or {0,0}
+                        if @_try_move_action(dir[1], dir[2])
+                            @_attack_action()
+        else
+            @_attack_action()
+        @_lpx, @_lpy = player.x, player.y
 }
 
-GameState.input_capture = () ->
-    if M\should_simulate_input()
-        GameState._input_clear()
-        M\simulate_menu_input()
-        GameState._trigger_events()
-        return true
-    else 
-        return user_input_capture()
 return M

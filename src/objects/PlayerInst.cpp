@@ -243,6 +243,26 @@ void PlayerInst::copy_to(GameInst *inst) const {
 	*(PlayerInst*) inst = *this;
 }
 
+bool PlayerInst::can_benefit_from_rest() {
+    // If we are not allowed to rest, we therefore cannot benefit.
+    if (!effective_stats().allowed_actions.can_use_rest || !effects().can_rest()) {
+        return false;
+    }
+    CoreStats& ecore = effective_stats().core;
+    int emax_hp = ecore.max_hp, emax_mp = ecore.max_mp;
+    bool atfull = (core_stats().hp >= emax_hp || ecore.hpregen == 0) && (core_stats().mp >= emax_mp || ecore.mpregen == 0);
+    if (!atfull) {
+        return true;
+    }
+    // Since spell cooldowns: Keep resting if a spell cooldown is active.
+    for (auto& e : cooldowns().spell_cooldowns) {
+        if (e.second > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::serialize(gs, serializer);
 	serializer.write(_score_stats);

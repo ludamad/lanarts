@@ -447,7 +447,7 @@ int GameNetConnection::poll_messages(int timeout) {
         }
         perf_timer_begin("*** NETWORK POLLING ***");
         int polln = _connection->poll(gamenetconnection_consume_message, (void*) this,
-                1);
+                timeout);
         perf_timer_end("*** NETWORK POLLING ***");
         return polln;
     }

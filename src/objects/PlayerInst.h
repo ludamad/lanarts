@@ -128,6 +128,8 @@ public:
         return _last_moved_direction;
     }
 
+    // Are we allowed to rest, and can we regenerate mp, hp, or spell cooldown?
+    bool can_benefit_from_rest();
     Pos direction_towards_unexplored(GameState* gs);
 private:
     ///////////////////////////

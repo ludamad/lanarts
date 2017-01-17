@@ -61,4 +61,5 @@ Necromancer:
 -- Poison everyone in LOS spell
 -- Make enemy go mad, attacking anyone spell (Mage? Mage branch?)
 --  
-
+    -- Curse type: Lethargic. When this player CAN rest it MUST rest.
+        - Deep sleep -- only wake on hit?
