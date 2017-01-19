@@ -48,8 +48,8 @@ public:
 			GameStateInitData& init_data);
 	~GameNetConnection();
 
-	void initialize_as_client(const char* host, int port);
-	void initialize_as_server(int port);
+	bool initialize_as_client(std::function<bool()> callback, const char* host, int port);
+	void initialize_as_server(std::function<bool()> callback, int port);
 
 	bool is_connected() {
 		return _connection != NULL;

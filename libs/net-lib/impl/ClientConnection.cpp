@@ -3,6 +3,7 @@
  *  Represents a client connected to a server
  */
 
+#include <functional>
 #include "ClientConnection.h"
 
 #include "enet_util.h"
@@ -21,24 +22,37 @@ ClientConnection::~ClientConnection() {
 	enet_host_destroy(_client_socket);
 }
 
-static void wait_for_connect(ENetHost* host) {
+/*!
+ * Try to connect to a given host with a given timeout
+ * @param host
+ * @param callback should return a bool indicating desire to continue trying
+ * @param timeout in milliseconds
+ * @return true if connection, false otherwise
+ */
+static bool wait_for_connect(ENetHost* host, std::function<bool()> callback, int timeout) {
 	ENetEvent event;
-	while (true) {
-		if (enet_host_service(host, &event, 1000) > 0) {
+	while(callback()) {
+		if (enet_host_service(host, &event, timeout) > 0) {
 			switch (event.type) {
-			case ENET_EVENT_TYPE_RECEIVE:
-				printf("RECV\n"); break;
-			case ENET_EVENT_TYPE_DISCONNECT:
-				printf("DISC\n"); break;
-			case ENET_EVENT_TYPE_CONNECT:
-				printf("CONN\n"); break;
+				case ENET_EVENT_TYPE_RECEIVE:
+					printf("RECV\n"); break;
+				case ENET_EVENT_TYPE_DISCONNECT:
+					printf("DISC\n"); break;
+				case ENET_EVENT_TYPE_CONNECT:
+					printf("CONN\n");
+					return true;
 			}
-			return;
 		}
 	}
+	return false;
 }
 
-void ClientConnection::initialize_connection() {
+/*!
+ * Try to initialize connection
+ * @param callback on every connection timeout
+ * @param timeout in ms
+ */
+void ClientConnection::initialize_connection(std::function<bool()> callback, int timeout) {
 	_client_socket = enet_host_create(NULL,
 			32 /* allow up to 32 clients and/or outgoing connections */,
 			1 /* one channel, channel 0 */,
@@ -61,8 +75,9 @@ void ClientConnection::initialize_connection() {
 	}
 	printf("ClientSocket waiting for %s:%d\n", _hostname.c_str(), _port);
 
-	wait_for_connect(_client_socket);
-	printf("ClientSocket connected\n");
+    if ( !wait_for_connect(_client_socket, callback, timeout)) {
+        __lnet_throw_connection_error("Connection attempt was cancelled.");
+    }
 }
 
 int ClientConnection::poll(packet_recv_callback message_handler, void* context,
@@ -71,7 +86,7 @@ int ClientConnection::poll(packet_recv_callback message_handler, void* context,
 
 	int polled = 0;
 	while (poll_adapter(_client_socket, &event, timeout) > 0) {
-		timeout = 0; // Don't wait for timeout a second time
+		timeout = 0; // Don't wait for timeout a second time -- consume remaining events in buffer
 		switch (event.type) {
 		case ENET_EVENT_TYPE_RECEIVE: {
 			ENetPacket* epacket = event.packet;

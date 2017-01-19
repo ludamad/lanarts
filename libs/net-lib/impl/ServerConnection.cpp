@@ -9,6 +9,7 @@
 #include <SDL_mutex.h>
 
 #include <lcommon/Timer.h>
+#include <functional>
 
 #include "../lanarts_net.h"
 
@@ -163,7 +164,7 @@ ServerConnection::~ServerConnection() {
 	}
 }
 
-void ServerConnection::initialize_connection() {
+void ServerConnection::initialize_connection(std::function<bool()> callback, int timeout) {
 	ENetAddress address;
 	address.host = ENET_HOST_ANY;
 	address.port = _port;

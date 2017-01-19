@@ -13,6 +13,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <vector>
+#include <functional>
 
 #include <lcommon/SerializeBuffer.h>
 #include <lcommon/directory.h>
@@ -87,11 +88,25 @@ GameState::~GameState() {
 }
 
 void GameState::start_connection() {
+    int count = 0;
+    auto callback = [&]() {
+        count++;
+        if (count > 100) {
+            count = 0;
+            update_iostate(true, false);
+            if(io_controller().user_has_requested_exit()){
+                printf("User cancelled connection\n");
+                return false;
+            }
+        }
+        return true;
+    };
+
 	if (settings.conntype == GameSettings::SERVER) {
 		printf("server connected\n");
-		connection.initialize_as_server(settings.port);
+		connection.initialize_as_server(callback, settings.port);
 	} else if (settings.conntype == GameSettings::CLIENT) {
-		connection.initialize_as_client(settings.ip.c_str(), settings.port);
+		connection.initialize_as_client(callback, settings.ip.c_str(), settings.port);
 		printf("client connected\n");
 		net_send_connection_affirm(connection, settings.username,
 				settings.class_type);
@@ -142,8 +157,11 @@ bool GameState::start_game() {
 	}
 
 	if (settings.conntype == GameSettings::CLIENT) {
-		while (!init_data.received_init_data) {
+		while (!init_data.received_init_data && !io_controller().user_has_requested_exit()) {
 			connection.poll_messages(1 /* milliseconds */);
+			if(!update_iostate(false)){
+                break;
+            }
 		}
 		settings.frame_action_repeat = init_data.frame_action_repeat;
 		settings.network_debug_mode = init_data.network_debug_mode;

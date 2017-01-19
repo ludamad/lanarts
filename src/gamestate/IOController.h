@@ -142,6 +142,7 @@ public:
 	bool query_event(IOEvent::event_t event, bool* triggered_already = NULL);
 
 	bool user_has_exit() const;
+	bool user_has_requested_exit();
 	void clear();
 
 private:

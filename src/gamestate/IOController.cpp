@@ -312,6 +312,10 @@ bool IOController::user_has_exit() const {
 	return false;
 }
 
+bool IOController::user_has_requested_exit() {
+	return shift_held() && key_down_state(SDLK_ESCAPE);
+}
+
 void IOController::set_key_down_state(int keyval) {
     iostate.key_down_states[keyval] = true;
 }

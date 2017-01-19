@@ -5,6 +5,8 @@
  *     Provides useful behaviour on top of the src_net library.
  */
 
+#include <functional>
+
 #include <lcommon/SerializeBuffer.h>
 
 #include <net-lib/lanarts_net.h>
@@ -104,16 +106,16 @@ bool GameNetConnection::check_integrity(GameState* gs) {
     return true;
 }
 
-void GameNetConnection::initialize_as_client(const char* host, int port) {
+bool GameNetConnection::initialize_as_client(std::function<bool()> callback, const char* host, int port) {
     LANARTS_ASSERT(!_connection);
     _connection = create_client_connection(host, port);
-    _connection->initialize_connection();
+    _connection->initialize_connection(callback, 1); //1ms timeout for connection attempts
 }
 
-void GameNetConnection::initialize_as_server(int port) {
+void GameNetConnection::initialize_as_server(std::function<bool()> callback, int port) {
     LANARTS_ASSERT(!_connection);
     _connection = create_server_connection(port);
-    _connection->initialize_connection();
+    _connection->initialize_connection(callback, 1); //1ms timeout for connection attempts
 }
 
 void GameNetConnection::set_accepting_connections(bool accept) {

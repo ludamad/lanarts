@@ -40,14 +40,16 @@ static void message_received(receiver_t sender, void* context, const char* msg,
 NetConnection* create_server() {
 	NetConnection* server = create_server_connection(TEST_PORT);
 	CHECK(dynamic_cast<ServerConnection*>(server));
-	server->initialize_connection();
+	auto dummy_callback = [](){bool continue_connecting = true; return continue_connecting;};
+	server->initialize_connection(dummy_callback, 1);
 	return server;
 }
 
 NetConnection* create_client(const char* host) {
 	NetConnection* client = create_client_connection(host, TEST_PORT);
 	CHECK(dynamic_cast<ClientConnection*>(client));
-	client->initialize_connection();
+	auto dummy_callback = [](){bool continue_connecting = true; return continue_connecting;};
+	client->initialize_connection(dummy_callback, 1);
 	return client;
 }
 

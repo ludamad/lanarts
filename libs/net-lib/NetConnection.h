@@ -7,6 +7,7 @@
 #define NETCONNECTION_H_
 
 #include <cstdlib>
+#include <functional>
 
 typedef int receiver_t;
 typedef void (*packet_recv_callback)(receiver_t sender, void* context,
@@ -23,7 +24,7 @@ public:
 	/*
 	 * Start the connection. Necessary before any polling/sending.
 	 */
-	virtual void initialize_connection() = 0;
+	virtual void initialize_connection(std::function<bool()> callback, int timeout) = 0;
 
 	/*
 	 * Poll for new messages/connections.

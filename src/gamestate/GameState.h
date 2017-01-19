@@ -11,6 +11,7 @@
 #include <vector>
 #include <SDL.h>
 #include <cstdio>
+#include <functional>
 
 #include <lcommon/smartptr.h>
 #include <lcommon/mtwist.h>

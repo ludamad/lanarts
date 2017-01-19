@@ -78,11 +78,13 @@ SUITE(adv_net_unit_tests) {
 		const char* clientname1 = "client1";
 		const char* clientname2 = "client2";
 
-		serverstate.conn.initialize_as_server(TEST_PORT);
+		auto callback = [](){return true;};
+
+		serverstate.conn.initialize_as_server(callback, TEST_PORT);
 		serverstate.pd.register_player("server", NULL, 0, 0);
 
-		client1state.conn.initialize_as_client("localhost", TEST_PORT);
-		client2state.conn.initialize_as_client("localhost", TEST_PORT);
+		client1state.conn.initialize_as_client(callback, "localhost", TEST_PORT);
+		client2state.conn.initialize_as_client(callback, "localhost", TEST_PORT);
 
 		serverstate.conn.poll_messages(TEST_POLL_TIMEOUT);
 		client1state.conn.poll_messages(TEST_POLL_TIMEOUT);

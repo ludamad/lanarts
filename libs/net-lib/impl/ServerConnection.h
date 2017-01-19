@@ -7,6 +7,7 @@
 #define SERVERCONNECTION_H_
 
 #include <vector>
+#include <functional>
 
 #include <SDL.h>
 #include <SDL_mutex.h>
@@ -44,7 +45,7 @@ public:
 	ServerConnection(int port, int maximum_connections = 32);
 	virtual ~ServerConnection();
 
-	virtual void initialize_connection();
+	virtual void initialize_connection(std::function<bool()> callback, int timeout);
 
 	virtual int poll(packet_recv_callback message_handler,
 			void* context = NULL, int timeout = 0);

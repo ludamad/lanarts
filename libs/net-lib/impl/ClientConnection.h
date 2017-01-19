@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 #include "../NetConnection.h"
 
@@ -18,7 +19,7 @@ public:
 	ClientConnection(const char* addr, int port);
 	virtual ~ClientConnection();
 
-	virtual void initialize_connection();
+	virtual void initialize_connection(std::function<bool()> callback, int timeout);
 
 	virtual int poll(packet_recv_callback message_handler, void* context = NULL, int timeout = 0);
 	virtual void set_accepting_connections(bool accept) {

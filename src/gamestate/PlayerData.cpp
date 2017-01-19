@@ -161,7 +161,7 @@ int player_get_playernumber(GameState* gs, PlayerInst* p) {
 static bool player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 	const int POLL_MS_TIMEOUT = 1 /*millsecond*/;
 	GameNetConnection& net = gs->net_connection();
-	while (!net.has_incoming_sync()) {
+	while (!net.has_incoming_sync() && !gs->io_controller().user_has_requested_exit()) {
 		if (pde.player()->is_local_player()) {
 			pde.player()->enqueue_io_actions(gs);
 			break;
@@ -177,6 +177,7 @@ static bool player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 			pde.player()->enqueue_actions(actions);
 			break;
 		}
+		gs->update_iostate(false);
 	}
 	return true;
 }
