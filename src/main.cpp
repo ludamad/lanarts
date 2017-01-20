@@ -35,7 +35,7 @@
 #include "lua_api/lua_api.h"
 
 extern "C" {
-// From dependency lpeg:
+// From dependency lpeg, lpeg bindings for moonscript:
 int luaopen_lpeg(lua_State* L);
 }
 
@@ -88,6 +88,7 @@ static GameState* init_gamestate(bool reinit) {
 	lua_State* L = lua_api::create_configured_luastate();
 	lua_vm_configure(L);
 	lua_api::add_search_path(L, "?.lua");
+        // Open lpeg first as the moonscript library depends on lpeg, and the moonscript library is called during error reporting.
         luaopen_lpeg(L);
 
 	GameSettings settings; // Initialized with defaults
@@ -154,7 +155,14 @@ static void run_engine(int argc, char** argv) {
 		goto label_Quit;
 	}
 
-	gs->start_connection();
+        try {
+            gs->start_connection();
+        } catch (const LNetConnectionError& err) {
+                fprintf(stderr, "The connection attempt was aborted%s\n",
+                                err.what());
+                goto label_StartOver;
+        }
+
 
 	engine["resources_load"].push();
 	luawrap::call<void>(gs->luastate());
