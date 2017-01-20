@@ -4,6 +4,7 @@
  */
 
 #include <cmath>
+#include <algorithm>
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameLogger.h"
@@ -18,7 +19,7 @@
 #include "ClassEntry.h"
 
 /* What power, resistance difference causes damage to be raised by 100% */
-const int POWER_MULTIPLE_INTERVAL = 20;
+const float POWER_MULTIPLE_INTERVAL = 20.0f;
 
 static float damage_multiplier(float power, float resistance) {
 	float powdiff = power - resistance;
@@ -32,24 +33,26 @@ static float damage_multiplier(float power, float resistance) {
 	}
 }
 
-static int basic_damage_formula(const EffectiveAttackStats& attacker,
+static float basic_damage_formula(const EffectiveAttackStats& attacker,
 		const DerivedStats& defender) {
+        // TODO evaluate new change:
+        // only apply multiplier to damage -- not defence. 
+        // This will hopefully allow power/resistance to be more meaningful, 
+        // as the multiplier will be applied to the larger number.
 	float mult = damage_multiplier(attacker.power, defender.resistance);
-	float base = attacker.damage
+	float result = attacker.damage * mult
 			- defender.reduction * attacker.resist_modifier;
-	event_log("basic_damage_formula: mult=%f, base=%f result=%f rounded=%d\n",
-			mult, base, mult * base, int(round(mult * base)));
-	if (base < 0)
-		return 0;
-	return round(mult * base);
+	event_log("basic_damage_formula: mult=%f, damage=%f reduction=%f result=%f\n",
+			mult, (float)attacker.damage, (float)defender.reduction, result);
+        return std::max(0.0f, result);
 }
 
-static int physical_damage_formula(const EffectiveAttackStats& attacker,
+static float physical_damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender) {
 	return basic_damage_formula(attacker, defender.physical);
 }
 
-static int magic_damage_formula(const EffectiveAttackStats& attacker,
+static float magic_damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender) {
 	return basic_damage_formula(attacker, defender.magic);
 }

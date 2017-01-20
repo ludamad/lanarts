@@ -67,19 +67,19 @@ Data.spell_create {
         return not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
 }
 
--- TODO flip effect of fortification
+-- TODO flip effect of fortification -- TODO whut?
 Data.effect_create {
     name: "Fortification"
     init_func: (caster) =>
         @active_bonuses = {}
-        @duration = 120
+        @duration = 320
     stat_func: (obj, old, new) =>
         for k, v in pairs @active_bonuses -- Abuse that stat_func is called every frame
             if v == 0 
                 EventLog.add("Your defence falls back down...", COL_PALE_BLUE)
                 @active_bonuses[k] = nil
             else 
-                new.defence += 1
+                new.defence += 2
                 @active_bonuses[k] -= 1
     on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
         if not @active_bonuses[attacker.id]
@@ -504,15 +504,13 @@ Data.effect_create {
     name: "Baleful Regeneration",
     effected_sprite: "spr_amulets.i-regeneration"
     effected_colour: {200,255,200}
-    stat_func: (caster, old, new) =>
-        if caster\has_effect("AmuletGreatPain")
-            new.hpregen *= 30
-        else
-            new.hpregen *= 15
     step_func: (caster) =>
-        {:hp, :max_hp} = caster\effective_stats()
+        {:hp, :max_hp, :hpregen} = caster\effective_stats()
         if hp >= max_hp
             caster\remove_effect("Baleful Regeneration")
+        else
+            regen_rate = hpregen * (if caster\has_effect("AmuletGreatPain") then 30 else 15)
+            caster\heal_hp(regen_rate)
 }
 
 Data.effect_create {
@@ -572,9 +570,7 @@ Data.effect_create {
 }
 
 EFFECT_FOREVER = 2^30
--- TODO -- the only way summon spells will ever really be good is if they recharge based on kills.
--- OH, as necromancer, your shtick is you get a 'souls' bar.
--- This bar is used for summons.
+-- Requires kills from the necromancer, in the form of mana.
 Data.spell_create {
     name: "Summon Dark Aspect",
     spr_spell: "spr_spells.summon",
