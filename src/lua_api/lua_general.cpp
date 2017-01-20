@@ -366,11 +366,7 @@ namespace lua_api {
 		luawrap::globals(L)["package"]["loaded"][vpath] = module;
 	}
 
-	void register_lua_submodule_loader(lua_State* L, const char* vpath, LuaValue loader) {
-		luawrap::globals(L)["package"]["preload"][vpath] = loader;
-	}
-
-	void pretty_print(LuaField field) {
+        void pretty_print(LuaField field) {
 		lua_State* L = field.luastate();
 		luawrap::globals(L)["pretty_print"].push();
 		field.push();

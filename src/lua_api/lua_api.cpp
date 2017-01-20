@@ -22,14 +22,15 @@
 extern "C" {
 #include "luasocket/luasocket.h"
 #include "luasocket/mime.h"
-// From dependency lua-yaml:
+// yaml bindings so that lua can work with yaml files:
 int luayaml_module(lua_State *L);
+// Box2D bindings for future map generation work:
+int luaopen_b2_vendor(lua_State* L);
+// From dependency lua_enet, enet bindings for future net code refactoring:
+int luaopen_enet(lua_State* L);
 }
 
 #include "lua_api.h"
-
-// Box2D bindings:
-extern "C" int luaopen_b2_vendor(lua_State* L);
 
 // NB: the -address- of this key is used, not the actual string.
 static char GAMESTATE_KEY[] = "";
@@ -132,18 +133,11 @@ namespace lua_api {
 	}
 
 	void register_lua_libraries(lua_State* L) {
-		LuaValue preload = luawrap::globals(L)["package"]["preload"];
-		lua_pushcfunction(L, luaopen_b2_vendor);
-		lua_api::register_lua_submodule_loader(L, "b2", LuaValue::pop_value(L));
-		lua_pushcfunction(L, luaopen_socket_core);
-		lua_api::register_lua_submodule_loader(L, "socket.core", LuaValue::pop_value(L));
-		lua_pushcfunction(L, luaopen_mime_core);
-		lua_api::register_lua_submodule_loader(L, "mime.core", LuaValue::pop_value(L));
-		lua_pushcfunction(L, luayaml_module);
-		lua_call(L, 0, 1);
-		lua_api::register_lua_submodule(L, "yaml", LuaValue::pop_value(L));
-
 		lua_register_lcommon(L);
+		LuaValue preload = luawrap::globals(L)["package"]["preload"];
+		preload["yaml"].bind_function(luayaml_module);
+		preload["enet"].bind_function(luaopen_enet);
+		preload["b2"].bind_function(luaopen_b2_vendor);
 		preload["socket.core"].bind_function(luaopen_socket_core);
 		preload["mime.core"].bind_function(luaopen_mime_core);
 	}

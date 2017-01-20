@@ -42,7 +42,6 @@ namespace lua_api {
 	void register_lua_submodule(lua_State* L, const char* vpath, LuaValue module);
 	LuaValue register_lua_submodule(lua_State* L, const char* vpath);
 	LuaModule register_lua_submodule_as_luamodule(lua_State* L, const char* vpath);
-	void register_lua_submodule_loader(lua_State* L, const char* vpath, LuaValue loader);
 
 	/* Register general utility functions */
 	void register_general_api(lua_State* L) ;
