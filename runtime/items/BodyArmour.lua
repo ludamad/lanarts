@@ -131,6 +131,18 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Robe of Vitality",
+    description = "A robe that magically grants prolonged life to the user.",
+    type = "armour",
+
+    shop_cost = {125,155},
+
+    spr_item = "spr_armour.robe_of_health",
+
+    stat_bonuses = {hp = 35}
+}
+
+Data.equipment_create {
     name = "Red Dragonplate",
     description = "A great armour crafted from dragon scales. Grants mana on every kill.",
     type = "armour",

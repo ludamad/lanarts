@@ -142,6 +142,7 @@ armour = (chance, args) -> _filter {
     args.ignore_medium or{ item: "Chainmail",          chance: 4                      }
     args.ignore_medium or { item: "Magician's Robe",    chance: 2                      }
     args.ignore_medium or { item: "Robe of Mana",       chance: 4                      }
+    args.ignore_medium or { item: "Robe of Vitality",       chance: 2                      }
 
     args.ignore_strong or { item: "Platemail",          chance: 2                      }
     args.ignore_strong or { item: "Crystalline Plate",          chance: 1                      }
