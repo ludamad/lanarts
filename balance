@@ -63,3 +63,7 @@ Necromancer:
 --  
     -- Curse type: Lethargic. When this player CAN rest it MUST rest.
         - Deep sleep -- only wake on hit?
+    Item traits:
+        + Spawn enemies around you
+            + only in big encounters
+        + XP bonus on kill  

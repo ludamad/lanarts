@@ -114,6 +114,7 @@ set (libraries
 	lanarts_net
         lpeg
         enet
+        lua_enet
 #        ws2_32
 #        mingw32
 #        winmm

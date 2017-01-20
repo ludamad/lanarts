@@ -14,7 +14,7 @@ mkdir saves
 echo "# See settings.yaml for details
 ip: localhost
 username: TestBot
-steps_per_draw: 60
+steps_per_draw: 1
 time_per_step: 0
 frame_action_repeat: 0
 port: 6112
@@ -36,7 +36,7 @@ font: fonts/Gudea-Regular.ttf
 menu_font: fonts/alagard_by_pix3m-d6awiwp.ttf
 
 #Performance settings
-steps_per_draw: 60 #More is almost guaranteed to make the game faster, 1 is ideal
+steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
 free_memory_while_idle: no
 
 #Debug settings
