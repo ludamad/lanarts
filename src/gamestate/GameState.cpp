@@ -295,7 +295,6 @@ void GameState::renew_game_timestamp() {
 }
 
 void GameState::restart() {
-        frame_n = 0;
         // Restart RNG:
         const char* FIXED_SEED = getenv("LANARTS_SEED");
         if (FIXED_SEED == NULL) {
