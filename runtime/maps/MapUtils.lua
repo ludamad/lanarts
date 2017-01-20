@@ -22,7 +22,9 @@ function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] oper
         operator = operator or { add = SourceMap.FLAG_HAS_OBJECT },
         max_attempts = max_attempts
     }
-    if area then
+    if not sqr then
+        return nil
+    elseif area then
         event_log("(RNG #%d) Finding random square in x:%d-%d, y:%d-%d => {%d, %d}\n", 
             map.rng:amount_generated(), area[1], area[3], area[2], area[4], sqr[1], sqr[2])
     else

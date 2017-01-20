@@ -29,6 +29,7 @@ struct EffectStats {
 	LuaValue add(GameState* gs, CombatGameInst* inst, effect_id effect,
 			int length);
     Effect* get(effect_id effect);
+        void remove(GameState* gs, CombatGameInst* inst, Effect* effect);
     bool has_category(const char* category);
     void ensure_effects_active(GameState* gs, CombatGameInst* inst, const std::vector<effect_id>& effects, const char* name = NULL);
 	void step(GameState* gs, CombatGameInst* inst);

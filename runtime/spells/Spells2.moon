@@ -510,8 +510,8 @@ Data.effect_create {
         else
             new.hpregen *= 15
     step_func: (caster) =>
-        {:max_hp} = caster\effective_stats()
-        if caster.stats.hp >= max_hp
+        {:hp, :max_hp} = caster\effective_stats()
+        if hp >= max_hp
             caster\remove_effect("Baleful Regeneration")
 }
 

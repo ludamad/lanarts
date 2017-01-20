@@ -450,7 +450,7 @@ Data.enemy_create {
         ObjectUtils.spawn_item_near(@, type, amount)
 }
 
-Data.enemy_create summoner_base("Imp", 5, 60, 600) {
+Data.enemy_create summoner_base("Imp", 1, 100, 100) {
     name: "Hell Warrior"
     appear_message: "A Hell Warrior commands you to die!"
     defeat_message: "You have rebuked the Hell Warrior!"

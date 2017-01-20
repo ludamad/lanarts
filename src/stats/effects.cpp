@@ -143,6 +143,17 @@ static void lua_effect_func_callback(lua_State* L, LuaValue& value,
 	lua_call(L, 2 + (name != NULL), 0);
 }
 
+void EffectStats::remove(GameState* gs, CombatGameInst* inst, Effect* effect) {
+    if (effect == NULL) {
+        LANARTS_ASSERT(false);// TODO check if needed
+        return;
+    }
+    EffectEntry& eentry = game_effect_data.at(effect->effectid);
+    lua_State* L = gs->luastate();
+    effect->t_remaining = 0;
+    lua_effect_func_callback(L, eentry.finish_func.get(L), effect->state, inst);
+}
+
 void EffectStats::ensure_effects_active(GameState* gs, CombatGameInst* inst, const std::vector<effect_id>& effects, const char* name) {
     for (effect_id id : effects) {
          Effect* eff = get(id);
@@ -172,16 +183,16 @@ void EffectStats::step(GameState* gs, CombatGameInst* inst) {
 		Effect& e = effects[i];
 		if (e.t_remaining > 0) {
 			e.t_remaining--;
-
-			EffectEntry& eentry = game_effect_data.at(e.effectid);
-
-			e.state["time_left"] = e.t_remaining;
-			lua_effect_func_callback(L, eentry.step_func.get(L), e.state, inst);
-			e.t_remaining = e.state["time_left"].to_int();
-
 			if (e.t_remaining == 0) {
-				lua_effect_func_callback(L, eentry.finish_func.get(L), e.state, inst);
-			}
+                            remove(gs, inst, &e);
+			} else {
+                            EffectEntry& eentry = game_effect_data.at(e.effectid);
+
+                            e.state["time_left"] = e.t_remaining;
+                            e.t_remaining = e.state["time_left"].to_int();
+
+                            lua_effect_func_callback(L, eentry.step_func.get(L), e.state, inst);
+                        }
 		}
 	}
 }

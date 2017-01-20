@@ -181,12 +181,11 @@ static int lapi_do_nothing(lua_State *L) {
     return 0;
 }
 
-static void lapi_combatgameinst_remove_effect(CombatGameInst* inst, const char* name) {
-    auto* eff = inst->effects().get(get_effect_by_name(name));
-    if (!eff) {
-        return;
-    }
-    eff->t_remaining = 1; // Let finish functions trigger
+static void lapi_combatgameinst_remove_effect(CombatGameInst* inst, LuaStackValue name) {
+    Effect* eff = inst->effects().get(get_effect_by_name(name.to_str()));
+    // Trigger finish functions and set t_remaining to 0.
+    // (Does nothing if eff is NULL.)
+    inst->effects().remove(lua_api::gamestate(name), inst, eff); 
 }
 
 static LuaValue lua_combatgameinst_metatable(lua_State* L) {
