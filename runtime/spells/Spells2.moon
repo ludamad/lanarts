@@ -616,8 +616,8 @@ Data.spell_create {
                 -- Buff this monster based on caster's willpower:
                 obj.stats.hp += math.floor(caster\effective_stats().willpower * 5)
                 obj.stats.max_hp += math.floor(caster\effective_stats().willpower * 5)
-                obj.stats.strength += math.floor(caster\effective_stats().willpower / 2) + 2
-                obj.stats.magic += math.floor(caster\effective_stats().willpower / 2) + 2
+                obj.stats.strength += math.floor(caster\effective_stats().willpower / 2)
+                obj.stats.magic += math.floor(caster\effective_stats().willpower / 2)
                 obj.stats.defence += math.floor(caster\effective_stats().willpower / 2)
                 obj.stats.willpower += math.floor(caster\effective_stats().willpower / 2)
             eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
