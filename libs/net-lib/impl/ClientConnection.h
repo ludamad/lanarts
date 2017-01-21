@@ -19,7 +19,7 @@ public:
 	ClientConnection(const char* addr, int port);
 	virtual ~ClientConnection();
 
-	virtual void initialize_connection(std::function<bool()> callback, int timeout);
+	virtual void initialize_connection(const conn_callback &callback, int timeout);
 
 	virtual int poll(packet_recv_callback message_handler, void* context = NULL, int timeout = 0);
 	virtual void set_accepting_connections(bool accept) {

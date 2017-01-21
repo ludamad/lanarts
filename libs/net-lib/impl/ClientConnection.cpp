@@ -29,7 +29,7 @@ ClientConnection::~ClientConnection() {
  * @param timeout in milliseconds
  * @return true if connection, false otherwise
  */
-static bool wait_for_connect(ENetHost* host, std::function<bool()> callback, int timeout) {
+static bool wait_for_connect(ENetHost *host, const conn_callback &callback, int timeout) {
 	ENetEvent event;
 	while(callback()) {
 		if (enet_host_service(host, &event, timeout) > 0) {
@@ -52,7 +52,7 @@ static bool wait_for_connect(ENetHost* host, std::function<bool()> callback, int
  * @param callback on every connection timeout
  * @param timeout in ms
  */
-void ClientConnection::initialize_connection(std::function<bool()> callback, int timeout) {
+void ClientConnection::initialize_connection(const conn_callback &callback, int timeout) {
 	_client_socket = enet_host_create(NULL,
 			32 /* allow up to 32 clients and/or outgoing connections */,
 			1 /* one channel, channel 0 */,

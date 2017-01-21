@@ -32,6 +32,7 @@
 #include "lua_api/lua_api.h"
 
 #include "net/GameNetConnection.h"
+#include "net-lib/lanarts_net.h"
 
 #include "objects/EnemyInst.h"
 

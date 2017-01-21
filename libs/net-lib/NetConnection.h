@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <functional>
 
+typedef std::function<bool()> conn_callback;
 typedef int receiver_t;
 typedef void (*packet_recv_callback)(receiver_t sender, void* context,
 		const char* msg, size_t len);
@@ -24,7 +25,7 @@ public:
 	/*
 	 * Start the connection. Necessary before any polling/sending.
 	 */
-	virtual void initialize_connection(std::function<bool()> callback, int timeout) = 0;
+	virtual void initialize_connection(const conn_callback &callback, int timeout) = 0;
 
 	/*
 	 * Poll for new messages/connections.

@@ -45,7 +45,7 @@ public:
 	ServerConnection(int port, int maximum_connections = 32);
 	virtual ~ServerConnection();
 
-	virtual void initialize_connection(std::function<bool()> callback, int timeout);
+	virtual void initialize_connection(const conn_callback &callback, int timeout);
 
 	virtual int poll(packet_recv_callback message_handler,
 			void* context = NULL, int timeout = 0);

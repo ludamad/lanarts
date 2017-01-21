@@ -12,6 +12,7 @@
 
 #include "gamestate/ActionQueue.h"
 #include "lanarts_defines.h"
+#include "net-lib/lanarts_net.h"
 
 
 class GameState;
@@ -48,8 +49,8 @@ public:
 			GameStateInitData& init_data);
 	~GameNetConnection();
 
-	bool initialize_as_client(std::function<bool()> callback, const char* host, int port);
-	void initialize_as_server(std::function<bool()> callback, int port);
+	bool initialize_as_client(const conn_callback &callback, const char* host, int port);
+	void initialize_as_server(const conn_callback &callback, int port);
 
 	bool is_connected() {
 		return _connection != NULL;

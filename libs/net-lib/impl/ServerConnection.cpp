@@ -164,7 +164,7 @@ ServerConnection::~ServerConnection() {
 	}
 }
 
-void ServerConnection::initialize_connection(std::function<bool()> callback, int timeout) {
+void ServerConnection::initialize_connection(const conn_callback &callback, int timeout) {
 	ENetAddress address;
 	address.host = ENET_HOST_ANY;
 	address.port = _port;
