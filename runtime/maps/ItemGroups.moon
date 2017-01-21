@@ -98,6 +98,7 @@ belts = (chance, args) -> _filter {
     { item: "Belt of Slaying",        chance: 20                      }
     { item: "Lifesteal Belt",        chance: 10                      }
     args.ignore_strong or { item: "Warped Belt",        chance: 1                      }
+    args.ignore_strong or { item: "Wishful Belt",        chance: 1                      }
     args.ignore_strong or { item: "Spiked Belt",        chance: 1                      }
     args.ignore_medium or { item: "Dank Belt",        chance: 2                      }
 }

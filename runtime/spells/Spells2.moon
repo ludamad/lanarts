@@ -479,7 +479,9 @@ Data.effect_create {
 Data.spell_create {
     name: "Baleful Regeneration",
     spr_spell: "spr_spells.regeneration",
-    description: "You tap into necromancy to very quickly bind your wounds, until your are fully healed or 6 seconds pass.",
+    description: "You tap into necromancy to very quickly bind your wounds, until your are fully healed or its power runs out. Takes longer to run out the more willpower you have.",
+    -- TODO have an interface for displaying custom stats, -- description_draw_func ?? Maybe directly call the draw API, but have positioning handled.
+    -- TODO then have an easy mechanism for telling if the text is hovered over and letting the formula be displayed if so.
     mp_cost: 0,
     cooldown: 35,
     can_cast_with_held_key: false,
@@ -491,7 +493,10 @@ Data.spell_create {
         return not caster\has_effect("Baleful Regeneration") and not caster\has_effect("Exhausted")
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        caster\add_effect("Baleful Regeneration", 60 * 6)
+        {:willpower} = caster\effective_stats()
+        -- Level 1 willpower is expected to be 7, and any additional willpower grants half a second of cooldown time.
+        -- At level 7, this is an extra 3 seconds of cooldown, plus items, leading to ~double expected time.
+        caster\add_effect("Baleful Regeneration", 60 * 6 + (willpower - 7) * 30)
         if caster\is_local_player()
             EventLog.add("You start to regenerate quickly!", {200,200,255})
             --play_sound "sound/Jingle_Win_Synth/Jingle_Win_Synth_00.ogg"
@@ -509,7 +514,7 @@ Data.effect_create {
         if hp >= max_hp
             caster\remove_effect("Baleful Regeneration")
         else
-            regen_rate = hpregen * (if caster\has_effect("AmuletGreatPain") then 30 else 15)
+            regen_rate = hpregen * (if caster\has_effect("AmuletGreatPain") then 29 else 14)
             caster\heal_hp(regen_rate)
 }
 
@@ -611,8 +616,8 @@ Data.spell_create {
                 -- Buff this monster based on caster's willpower:
                 obj.stats.hp += math.floor(caster\effective_stats().willpower * 5)
                 obj.stats.max_hp += math.floor(caster\effective_stats().willpower * 5)
-                obj.stats.strength += math.floor(caster\effective_stats().willpower / 2)
-                obj.stats.magic += math.floor(caster\effective_stats().willpower / 2)
+                obj.stats.strength += math.floor(caster\effective_stats().willpower / 2) + 2
+                obj.stats.magic += math.floor(caster\effective_stats().willpower / 2) + 2
                 obj.stats.defence += math.floor(caster\effective_stats().willpower / 2)
                 obj.stats.willpower += math.floor(caster\effective_stats().willpower / 2)
             eff.monster = (if type(monster) == "string" then monster else random_choice(monster))

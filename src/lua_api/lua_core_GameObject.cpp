@@ -163,14 +163,14 @@ static int lapi_combatgameinst_damage(lua_State* L) {
 	return 1;
 }
 
-static void lapi_combatgameinst_heal_hp(CombatGameInst* inst, int hp) {
+static void lapi_combatgameinst_heal_hp(CombatGameInst* inst, float hp) {
 	CoreStats& core = inst->core_stats();
 	CoreStats& ecore = inst->effective_stats().core;
 	core.heal_hp(hp, ecore.max_hp);
 	ecore.hp = core.hp;
 }
 
-static void lapi_combatgameinst_heal_mp(CombatGameInst* inst, int mp) {
+static void lapi_combatgameinst_heal_mp(CombatGameInst* inst, float mp) {
 	CoreStats& core = inst->core_stats();
 	CoreStats& ecore = inst->effective_stats().core;
 	core.heal_mp(mp, ecore.max_mp);

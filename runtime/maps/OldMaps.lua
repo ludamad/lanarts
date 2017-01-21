@@ -212,9 +212,9 @@ M.Dungeon1 = {
       items = { amount = 6,  group = ItemGroups.enchanted_items   },
       enemies = {
         wandering = false,
-        amount = 10,
+        amount = 4,
         generated = {
-          {enemy = "Hound",         chance = 100 },
+          {enemy = "Hound",         guaranteed_spawns = 2 },
           {enemy = "Elephant",         guaranteed_spawns = 2 },
           {enemy = "Cloud Elemental",   guaranteed_spawns = 2 },
           {enemy = "Mouther",   chance = 100 },

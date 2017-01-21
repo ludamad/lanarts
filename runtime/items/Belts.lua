@@ -74,3 +74,16 @@ Data.equipment_create {
     stat_bonuses = {magic = 4, mp = -40, hp = -50}
 }
 
+Data.equipment_create {
+    name = "Wishful Belt",
+    description = "A belt that significantly increases the users willpower.",
+    type = "belt",
+
+    shop_cost = { 250, 350 },
+
+    spr_item = "spr_belts.wishful",
+
+    stat_bonuses = {willpower = 3}
+}
+
+
