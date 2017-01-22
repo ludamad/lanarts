@@ -170,6 +170,8 @@ bool GameState::start_game() {
 		settings.time_per_step = init_data.time_per_step;
 	}
 
+        initial_seed = init_data.seed;
+	base_rng_state.init_genrand(init_data.seed);
         /* If class was not set, we may be loading a game -- don't init level */
 	if (settings.class_type != -1) {
 		restart();
@@ -304,8 +306,6 @@ void GameState::restart() {
         //    init_data.seed = atoi(FIXED_SEED);
         //}
 	//printf("Seed used for RNG = 0x%X\n", init_data.seed);
-        initial_seed = init_data.seed;
-	base_rng_state.init_genrand(init_data.seed);
         // Reset game world state:
         loop("sound/overworld.ogg");
 	if (game_world().number_of_levels() > 0) {
