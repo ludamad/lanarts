@@ -296,16 +296,16 @@ void GameState::renew_game_timestamp() {
 }
 
 void GameState::restart() {
-        // Restart RNG:
-        const char* FIXED_SEED = getenv("LANARTS_SEED");
-        if (FIXED_SEED == NULL) {
-            init_data.seed += 1;
-        } else {
-            init_data.seed = atoi(FIXED_SEED);
-        }
-	printf("Seed used for RNG = 0x%X\n", init_data.seed);
-        initial_seed = init_data.seed;
-	base_rng_state.init_genrand(init_data.seed);
+        //// Restart RNG:
+        //const char* FIXED_SEED = getenv("LANARTS_SEED");
+        //if (FIXED_SEED == NULL) {
+        //    init_data.seed += 1;
+        //} else {
+        //    init_data.seed = atoi(FIXED_SEED);
+        //}
+	//printf("Seed used for RNG = 0x%X\n", init_data.seed);
+        //initial_seed = init_data.seed;
+	//base_rng_state.init_genrand(init_data.seed);
         // Reset game world state:
         loop("sound/overworld.ogg");
 	if (game_world().number_of_levels() > 0) {
@@ -373,7 +373,7 @@ bool GameState::pre_step(bool update_iostate) {
 }
 
 bool GameState::step() {
-        rng().init_genrand(initial_seed + frame_n);
+        //rng().init_genrand(initial_seed + frame_n);
 	if (game_settings().network_debug_mode) {
 		connection.check_integrity(this);
 	}

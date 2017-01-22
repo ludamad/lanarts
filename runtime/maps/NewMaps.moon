@@ -234,11 +234,11 @@ map_try_create = (template_f) ->
         assert(w and h, "Subconf must have size")
         r = random_region_add rng, w, h, 20, center_region_delta_func(map, rng, outer), 0,
             major_regions, outer\bbox()
-        {rx1,ry1,rx2,ry2} = r\bbox()
-        event_log("(RNG #%d) created region at (%d,%d,%d,%d)\n", rng\amount_generated(), rx1, ry1, rx2, ry2)
         if r == nil
             print("ABORT: region could not be added")
             return nil
+        {rx1,ry1,rx2,ry2} = r\bbox()
+        event_log("(RNG #%d) created region at (%d,%d,%d,%d)\n", rng\amount_generated(), rx1, ry1, rx2, ry2)
         r.max_speed = 8
         r.conf = subconf
     starting_edges = {}

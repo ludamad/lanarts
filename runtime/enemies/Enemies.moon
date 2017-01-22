@@ -318,7 +318,30 @@ Data.enemy_create {
     }
     effects_active: {"PoisonedWeapon"}
 }
- 
+
+Data.enemy_create {
+    name: "Clown Mage" 
+    sprite: "spr_enemies.humanoid.killer_klown_purple"
+    radius: 11
+    xpaward: 30
+    appear_message: "A clown mage appears!"
+    defeat_message: "The clown mage is defeated."
+    stats: {
+        attacks: {
+            {projectile: "Magic Blast"}
+        }
+        hp: 65
+        hpregen: 0.03
+        movespeed: 3
+        -- base stats:
+        strength: 0
+        defence: 0
+        magic: 25
+        willpower: 0
+    }
+    effects_active: {"StopOnceInRange", "Enraging"}
+}
+
 Data.enemy_create {
     name: "Mouther" 
     sprite: "spr_enemies.animals.tyrant_leech"

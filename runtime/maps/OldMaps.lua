@@ -5,7 +5,7 @@ local Dungeons = require "maps.Dungeons"
 local MapUtils = require "maps.MapUtils"
 local SourceMap = require "core.SourceMap"
 local World = require "core.World"
-
+local GlobalData = require "core.GlobalData"
 local M = nilprotect {} -- Submodule
 
 M.weak_undead = {
@@ -375,7 +375,11 @@ function M.enemy_generate(chances)
     for entry in values(chances) do
         rand = rand - (entry.chance or 0)
         if rand <= 0 then
-            return entry.enemy
+            if entry.enemy == "Ciribot" then
+                return GlobalData.midrange_bastard_enemy 
+            else
+                return entry.enemy
+            end
         end
     end
 end
