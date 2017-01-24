@@ -206,16 +206,20 @@ void ProjectileInst::step(GameState* gs) {
                         p->signal_killed_enemy();
                         double xpworth = dynamic_cast<EnemyInst*>(victim)->xpworth();
                         double n_killed = (pc.n_enemy_killed(dynamic_cast<EnemyInst*>(victim)->enemy_type()) - 1) / pc.all_players().size();
-                        xpworth *= pow(0.84, n_killed); // sum(0.84**i for i in range(25)) => ~6.17x the monsters xp value over time
+                        xpworth *= pow(0.9, n_killed); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
                         if (n_killed > 25) {
                             xpworth = 0;
                         }
                         float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
+
                         int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
 
                         players_gain_xp(gs, amnt);
-
-                        snprintf(buffstr, 32, "%d XP", amnt);
+                        if (xpworth == 0) {
+                            snprintf(buffstr, 32, "STALE", amnt);
+                        } else {
+                            snprintf(buffstr, 32, "%d XP", amnt);
+                        }
                         gs->add_instance(
                                         new AnimatedInst(victim->ipos(), -1, 25, PosF(), PosF(),
                                                         AnimatedInst::DEPTH, buffstr, COL_GOLD));

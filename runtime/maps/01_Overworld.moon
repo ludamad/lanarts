@@ -639,11 +639,11 @@ overworld_features = (map) ->
             if floor == #templates
                 ---------------------------------------------------------------------
                 -- Place key vault, along with a gold vault and 2 regular items.   --
-                for type in *{"Azurite Key", false, false} 
+                for type in *{"Azurite Key", "Scroll of Experience", false} 
                     item_placer = (map, xy) -> 
                         amount = 1
                         if not type
-                            {:type, :amount} = ItemUtils.item_generate ItemGroups.basic_items
+                            {:type, :amount} = ItemUtils.item_generate ItemGroups.enchanted_items
                         MapUtils.spawn_item(map, type, amount, xy)
                     tileset = TileSets.snake
                     vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})

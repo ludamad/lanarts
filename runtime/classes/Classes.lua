@@ -165,9 +165,9 @@ Data.class_create {
         mp = 85,
         hpregen = 4 / 60, -- Per 60 frames
         mpregen = 2 / 60, -- Per 60 frames
-        strength = 4,
+        strength = 7,
         defence = 4,
-        willpower = 7,
+        willpower = 4,
         magic = 7,
         equipment = {
           weapon = "Short Bow",
@@ -211,7 +211,7 @@ Data.class_create {
     },
     start_stats = {
         movespeed = 4,
-        hp = 100,
+        hp = 115,
         mp = 80,
         hpregen = 2 / 60, -- Per 60 frames
         mpregen = 0 / 60, -- Per 60 frames

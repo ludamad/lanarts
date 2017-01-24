@@ -423,7 +423,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
             char buffstr[32];
             double xpworth = ((EnemyInst*)inst)->xpworth();
             double n_killed = (pc.n_enemy_killed(((EnemyInst*) inst)->enemy_type()) - 1) / pc.all_players().size();
-            xpworth *= pow(0.84, n_killed); // sum(0.84**i for i in range(25)) => ~6.17x the monsters xp value over time
+            xpworth *= pow(0.9, n_killed); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
             if (n_killed > 25) {
                 xpworth = 0;
             }
@@ -432,7 +432,11 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
             int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
 
             players_gain_xp(gs, amnt);
-            snprintf(buffstr, 32, "%d XP", amnt);
+            if (xpworth == 0) {
+                snprintf(buffstr, 32, "STALE", amnt);
+            } else {
+                snprintf(buffstr, 32, "%d XP", amnt);
+            }
             gs->add_instance(
                     new AnimatedInst(Pos(inst->x - 5, inst->y - 5), -1, 25,
                             PosF(), PosF(), AnimatedInst::DEPTH, buffstr,
@@ -701,15 +705,20 @@ void CombatGameInst::gain_xp_from(GameState* gs, CombatGameInst* inst, float dx,
     char buffstr[32];
     double xpworth = ((EnemyInst*)inst)->xpworth();
     double n_killed = (pc.n_enemy_killed(((EnemyInst*) inst)->enemy_type()) - 1) / pc.all_players().size();
-    xpworth *= pow(0.84, n_killed); // sum(0.84**i for i in range(25)) => ~6.17x the monsters xp value over time
+    xpworth *= pow(0.9, n_killed); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
     if (n_killed > 25) {
         xpworth = 0;
     }
     float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
+
     int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
 
     players_gain_xp(gs, amnt);
-    snprintf(buffstr, 32, "%d XP", amnt);
+    if (xpworth == 0) {
+        snprintf(buffstr, 32, "STALE", amnt);
+    } else {
+        snprintf(buffstr, 32, "%d XP", amnt);
+    }
     gs->add_instance(
             new AnimatedInst(Pos(inst->x + dx, inst->y + dy), -1, 25,
                     PosF(), PosF(), AnimatedInst::DEPTH, buffstr,

@@ -469,7 +469,7 @@ Data.enemy_create {
         ObjectUtils.spawn_item_near(@, "Red Dragonplate", 1)
         ObjectUtils.spawn_item_near(@, "Dragon Lanart", 1)
         -- Spawn a level 1 randart:
-        {:type, :amount} = ItemUtil.randart_generate(1)
+        {:type, :amount} = ItemUtils.randart_generate(1)
         ObjectUtils.spawn_item_near(@, type, amount)
 }
 
