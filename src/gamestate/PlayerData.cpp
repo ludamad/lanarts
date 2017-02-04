@@ -162,10 +162,13 @@ static bool player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 	const int POLL_MS_TIMEOUT = 1 /*millsecond*/;
 	GameNetConnection& net = gs->net_connection();
 	while (!net.has_incoming_sync() && !gs->io_controller().user_has_requested_exit()) {
-		if (pde.player()->is_local_player()) {
-			pde.player()->enqueue_io_actions(gs);
-			break;
-		} else if (!pde.action_queue.has_actions_for_frame(gs->frame())) {
+		//if (pde.player()->is_local_player()) {
+		//	pde.player()->enqueue_io_actions(gs);
+		//	break;
+
+		//} else 
+                if (!pde.action_queue.has_actions_for_frame(gs->frame())) {
+                        LANARTS_ASSERT(!pde.player()->is_local_player());
 			if (gs->game_settings().verbose_output) {
 				printf("Polling for player %d\n", pde.net_id);
 			}
@@ -183,7 +186,7 @@ static bool player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 }
 
 bool players_poll_for_actions(GameState* gs) {
-	perf_timer_begin("*** NETWORK WAIT ***");
+        PERF_TIMER();
 
 	PlayerData& pd = gs->player_data();
 	std::vector<PlayerDataEntry> &players = pd.all_players();
@@ -194,12 +197,10 @@ bool players_poll_for_actions(GameState* gs) {
 
 	for (int i = 0; i < players.size(); i++) {
 		if (!player_poll_for_actions(gs, players[i])) {
-			perf_timer_end("*** NETWORK WAIT ***");
 			return false;
 		}
 	}
 
-	perf_timer_end("*** NETWORK WAIT ***");
 	return true;
 }
 
