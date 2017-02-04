@@ -129,8 +129,11 @@ with M.SummonAbility = LuaGameObject.type_create()
         if @n_steps >= @duration
             GameObject.destroy(@)
             mon = GameObject.enemy_create {type: @monster, xy: @xy, team: (if @caster.is_enemy then 1 else 0)}
-            pretty @.on_summon
-            @.on_summon(mon)
+            if type(@.on_summon) == "function"
+                @.on_summon(mon)
+            else
+                print "***** WARNING: on_summon was not function:"
+                pretty @.on_summon
             @caster.summoned[mon] = 1
     .on_draw = () =>
         if Map.object_visible(@)

@@ -68,4 +68,7 @@ Necromancer:
             + only in big encounters
         + XP bonus on kill  
 + Move the dragon out of that dungeon?? -- behind skull door to dragon lair?
-+ Make snakes/first dungeon give more XP? -- XP scroll?
++ Per-enemy # of enemies cap!?
+    + Per-room!?
+    + Consider what to do about high HP regen acting as another damage threshold already. Currently have two redundant thresholding effects.
+    + Biggest cause of runaway imbalance? nah

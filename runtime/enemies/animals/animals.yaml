@@ -118,6 +118,7 @@ enemies:
     death_sprite: blood
     radius: 9
     xpaward: 10
+    kills_before_stale: 100
     appear_message: An adder slithers onto the scene! 
     defeat_message: The adder is dead. 
     stats:

@@ -46,8 +46,8 @@ enemies:
         hpregen: 0.06
         movespeed: 5
         strength: 30
-        defence: 10  
-        willpower: 10
+        defence: 25  
+        willpower: 25
   
   - name: Golem
     sprite: golem

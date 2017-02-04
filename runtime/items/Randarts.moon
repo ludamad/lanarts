@@ -53,6 +53,12 @@ get_name_and_description = (rng, artifact, power_level) ->
         "Undoing"
         "Blessing"
         "Curse"
+        --"Perseverance"
+        --"Prevention"
+        --"Preparation"
+        --"Appropriation"
+        --"Fluidity"
+        --"Formidity"
         "Frustration"
         "Cunning"
         "Silence"
@@ -71,7 +77,7 @@ get_name_and_description = (rng, artifact, power_level) ->
     }
     return "#{artifact} of #{person[1]}'s #{trait}", person[2] .. " " .. power_adjective
 
-add_random_effect = () -> (rng, data) ->
+add_random_effect = (rng, data) ->
     if data.effects_granted
         return -- For now, dont have double effects.
     data.effects_granted or= {}
@@ -86,7 +92,7 @@ add_random_effect = () -> (rng, data) ->
     data.description ..= " #{description}"
     append data.effects_granted, effect
 
-add_random_spell = () -> (rng, data) ->
+add_random_spell = (rng, data) ->
     if data.spells_granted
         return -- For now, dont have double spell items.
     data.spells_granted or= {}
@@ -141,39 +147,65 @@ mult_stat_bonus = (attr, range) -> (rng, data) ->
     mult = rng\randomf(range[1], range[2])
     data.stat_bonuses[attr] = (data.stat_bonuses[attr] or 1) * mult
 
-local MINOR_ENCHANTS, MAJOR_ENCHANTS, MINOR_DEBUFFS, MAJOR_DEBUFFS
--- Minor enchantments:
-MINOR_ENCHANTS = {
-    mult_stat_bonus("spell_velocity_multiplier", {1.10, 1.25})
-    --add_random_spell()
-    add_random_effect()
-    additive_stat_bonus("mp", {10, 25})
-    additive_stat_bonus("hp", {10, 25})
-    additive_stat_bonus("hpregen", {0.02, 0.03})
-    additive_stat_bonus("mpregen", {0.02, 0.03})
-    additive_stat_bonus("strength", {1, 2})
-    additive_stat_bonus("defence", {1, 2})
-    additive_stat_bonus("willpower", {1, 2})
-    additive_stat_bonus("magic", {1, 2})
-    additive_core_bonus("reduction", {1, 2})
-    additive_core_bonus("resistance", {1, 2})
-    additive_core_bonus("magic_reduction", {1, 2})
-    additive_core_bonus("magic_resistance", {1, 2})
-    mult_core_bonus("magic_cooldown_multiplier", {0.89, 0.95})
-    mult_core_bonus("melee_cooldown_multiplier", {0.89, 0.95})
-    mult_core_bonus("ranged_cooldown_multiplier", {0.89, 0.95})
-}
+--        ring: {randart_list: true, chance: 12}
+--        legwear: {randart_list: true, chance: 1}
+--        belt: {randart_list: true, chance: 1}
+--        amulet: {randart_list: true, chance: 12}
+--        boots: {randart_list: true, chance: 1}
+--        helmet: {randart_list: true, chance: 3}
+--        "short blades": {randart_list: true, chance: 1}
+--        "staves": {randart_list: true, chance: 1}
+--        "axes and maces": {randart_list: true, chance: 1}
+--        armour: {randart_list: true, chance: 5}
+--        bows: {randart_list: true, chance: 5}
+--        projectile: {randart_list: true, chance: 5}
+--        gloves: {randart_list: true, chance: 5}
 
--- Minor debuffs:
--- Major enchantments:
-MAJOR_ENCHANTS = {
-    (rng, data) -> -- TODO
-        for i=1,2
-            f = rng\random_choice(MINOR_ENCHANTS)
-            f(rng, data)
-}
+-- Enchantments:
+add_buff = (rng, data, major = false) ->
+    -- Amulet profile: 
+    local effect_chance, misc_buff_chance
+    switch data.type
+        when 'amulet'
+            effect_chance, misc_buff_chance = 0.2, 0.9
+        when 'ring'
+            effect_chance, misc_buff_chance = 0.2, 0.5
+        when 'belt'
+            effect_chance, misc_buff_chance = 0.7, 0.4
+        else
+            effect_chance, misc_buff_chance = 0.1, 0.5
+    if rng\randomf() < 0.5 and not data.effects_granted
+        add_random_effect(rng, data)
+    elseif rng\randomf() < 0.9
+        buff = rng\random_choice {
+            mult_stat_bonus("spell_velocity_multiplier", {1.10, 1.25})
+            additive_stat_bonus("mp", {10, 25})
+            additive_stat_bonus("hp", {10, 25})
+            additive_stat_bonus("hpregen", {0.02, 0.03})
+            additive_stat_bonus("mpregen", {0.02, 0.03})
+            mult_core_bonus("magic_cooldown_multiplier", {0.89, 0.95})
+            mult_core_bonus("melee_cooldown_multiplier", {0.89, 0.95})
+            mult_core_bonus("ranged_cooldown_multiplier", {0.89, 0.95})
+        }
+        buff(rng, data)
+        if major then buff(rng, data)
+    else
+        buff = rng\random_choice {
+            additive_stat_bonus("strength", {1, 1})
+            additive_stat_bonus("defence", {1, 1})
+            additive_stat_bonus("willpower", {1, 1})
+            additive_stat_bonus("magic", {1, 1})
+            additive_core_bonus("reduction", {1, 1})
+            additive_core_bonus("resistance", {1, 1})
+            additive_core_bonus("magic_reduction", {1, 1})
+            additive_core_bonus("magic_resistance", {1, 1})
+        }
+        buff(rng, data)
+        if rng\randomf() < 0.1
+            buff(rng, data)
+        if major then buff(rng, data)
 
--- Major debuffs:
+-- debuffs:
 MINOR_DEBUFFS = {
     mult_stat_bonus("spell_velocity_multiplier", {0.8, 0.9})
     additive_stat_bonus("mp", {-20, -15})
@@ -218,17 +250,17 @@ define_randart = (rng, base, images, enchanter) ->
     n_enchants = power_level * 2
     while n_enchants > 0 
         if rng\random(4) == 0
-            rng\random_choice(MAJOR_ENCHANTS)(rng, data)
+            add_buff(rng, data, true) -- Major
             n_enchants -= 1
         elseif rng\random(4) == 0
-            rng\random_choice(MAJOR_ENCHANTS)(rng, data)
+            add_buff(rng, data, true) -- Major
             rng\random_choice(MINOR_DEBUFFS)(rng, data)
         elseif rng\random(8) == 0
-            rng\random_choice(MINOR_ENCHANTS)(rng, data)
+            add_buff(rng, data, false) -- Minor
             rng\random_choice(MINOR_DEBUFFS)(rng, data)
             n_enchants += 1
         else
-            rng\random_choice(MINOR_ENCHANTS)(rng, data)
+            add_buff(rng, data, false) -- Minor
         n_enchants -= 1
     if enchanter
        enchanter(rng, data, power_level)

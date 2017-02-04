@@ -119,7 +119,7 @@ M.TEMPLATE  = (rng, floor, connector) ->
                 if floor == M.N_FLOORS and n_items_placed == 0
                     item = {type: "Azurite Key", amount: 1}
                 else
-                    item = ItemUtils.item_generate ItemGroups.enchanted_items, false, 1 --Randart power level
+                    item = ItemUtils.randart_generate(1) -- Power level 1 
                 MapUtils.spawn_item(map, item.type, item.amount, xy)
                 n_items_placed += 1
             return config

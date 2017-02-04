@@ -516,6 +516,7 @@ void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
 		inventory().add(slot.item);
 		gold(gs) -= slot.cost;
 		slot.item.clear();
+                play("sound/inventory_sound_effects/sellbuy.ogg");
 	}
 }
 

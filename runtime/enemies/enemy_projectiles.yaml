@@ -24,6 +24,7 @@ projectiles:
   - name: Rapid Poison Arrows
     weapon_class: bows
     damage_type: {physical: 1.0}
+    resist_modifier: 0.5 # Piercing
     damage: { strength: 1.0 }    # 100% physical
     power:  { strength: 0.2 }   
     range: 300
@@ -46,6 +47,7 @@ projectiles:
   - name: Dark Arrows
     weapon_class: bows
     damage_type: {physical: 1.0}
+    resist_modifier: 0.5 # Piercing
     damage: { strength: 1.0 }    # 100% physical
     power:  { strength: 0.2 }   
     range: 300

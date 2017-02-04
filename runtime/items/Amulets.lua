@@ -48,14 +48,15 @@ Data.equipment_create {
 -- name = "Amulet of Festivity",
 Data.equipment_create {
     name = "Amulet of Fear",
-    description = "Grants a 10% chance to scare enemies on every melee strike.",
+    description = "Grants +1 strength, and 10% chance to scare enemies on every melee strike.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
 
     spr_item = "spr_amulets.fear_strike",
     --spells_granted = {"Fear Strike"},
-    effects_granted = {"FearWeapon"}
+    effects_granted = {"FearWeapon"},
+    stat_bonuses = {strength = 1}
 }
 
 Data.equipment_create {
@@ -134,7 +135,7 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of the Berserker",
-    description = "Berserked user has 5% chance of summoning a centaur when killing.",
+    description = "Berserked user regenerates 4HP a second, and has 5% chance of summoning a centaur on kill.",
     type = "amulet",
 
     shop_cost = { 120, 140 },

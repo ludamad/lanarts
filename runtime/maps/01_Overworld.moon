@@ -200,7 +200,7 @@ overworld_spawns = (map) ->
                 break
             map\square_apply(sqr, {add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT}, remove: SourceMap.FLAG_SEETHROUGH})
             MapUtils.spawn_decoration(map, OldMaps.statue, sqr, random(0,17))
-        for i=1,10 do
+        for i=1,OldMaps.adjusted_item_amount(10) do
             sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
             if not sqr
                 break
@@ -312,13 +312,21 @@ hell_create = (MapSeq, seq_idx, number_entrances = 1) ->
                     map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
                     item = ItemUtils.item_generate group[1]
                     MapUtils.spawn_item(map, item.type, item.amount, sqr) 
-            -- 8 randarts:
-            for i=1,8 do
+            -- ~8 level 1 randarts:
+            for i=1,OldMaps.adjusted_item_amount(8) do
                 sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
                 if not sqr
                     break
                 map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
-                item = ItemUtils.item_generate ItemGroups.enchanted_items, false, 1, 100 --Randart power level and chance
+                item = ItemUtils.randart_generate(1) -- power level 1
+                MapUtils.spawn_item(map, item.type, item.amount, sqr) 
+            -- ~2 level 2 randarts:
+            for i=1,OldMaps.adjusted_item_amount(2) do
+                sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
+                if not sqr
+                    break
+                map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
+                item = ItemUtils.randart_generate(2) -- power level 1
                 MapUtils.spawn_item(map, item.type, item.amount, sqr) 
             return true
         on_create_source_map: (map) =>
@@ -850,7 +858,11 @@ overworld_features = (map) ->
             enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
             MapUtils.spawn_enemy(map, enemy, xy)
         boss_placer = (map, xy) ->
-            MapUtils.spawn_enemy(map, "Centaur Hunter", xy)
+            if map.rng\randomf() < .5
+                enemy = OldMaps.enemy_generate(OldMaps.strong_hell)
+                MapUtils.spawn_enemy(map, enemy, xy)
+            else
+                MapUtils.spawn_enemy(map, "Centaur Hunter", xy)
         n_items_placed = 0
         item_placer = (map, xy) ->
             item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, (if n_items_placed == 0 then 100 else 2)

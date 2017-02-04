@@ -284,7 +284,7 @@ function Pain.action_func(caster, x, y, target)
     aura.animation_only = true
     aura.range = eff_range
     play_pained_sound()
-    if target:damage(random(1,12) * 0.9 + stats.magic * 0.9, random(2,5) + stats.magic * 0.2, 1, 0.9) then
+    if target:damage(random(1,5) + stats.magic, random(2,5) + stats.magic * 0.3, 1, 0.9) then
         play_sound "sound/painkill.ogg"
         caster:gain_xp_from(target)
         if caster:has_effect("AmuletGreatPain") then
@@ -410,7 +410,7 @@ local GreaterPain = {
     can_cast_with_held_key = true,
     spr_spell = "spr_spells.greaterpain",
     can_cast_with_cooldown = false,
-    mp_cost = 15,
+    mp_cost = 35,
     cooldown = 25,
     spell_cooldown = 800,
     fallback_to_melee = true,
@@ -421,7 +421,7 @@ function GreaterPain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
     caster:direct_damage(50)
     caster:add_effect("Pained", 50)
-    caster:add_effect("Pain Aura", 150).range = GreaterPain.range + caster.stats.level * 5
+    caster:add_effect("Pain Aura", 50).range = GreaterPain.range + caster.stats.level * 5
     if caster:is_local_player() then
         EventLog.add("You attack nearby enemies life force directly!", {200,200,255})
     else

@@ -80,13 +80,13 @@ M.hard_enemies = {
 }
 
 M.harder_enemies = {
-  {enemy = "Super Chicken",     chance = 50,  group_chance = 33, group_size = {2,4}       },
   {enemy = "Hell Storm",        chance = 20,  group_chance = 33, group_size = 3           },
   {enemy = "Golem",             guaranteed_spawns = 1, group_chance = 100, group_size = 2 },
   {enemy = "Jester",            chance = 20                                             },
+  {enemy = "Centaur Marksman",      chance = 30,                                              },
+  {enemy = "Executioner",           chance = 30,                                           },
   {enemy = "Mana Sapper",            chance =5                                             },
   {enemy = "Hydra",             chance = 20                                             },
-  {enemy = "Ogre Mage",         chance = 10, group_chance = 33, group_size = 2          }
 --  {enemy = "Unseen Horror",     chance = 10,  group_chance = 33, group_size = 2           }
 }
 
@@ -318,7 +318,7 @@ M.Dungeon4 = {
     content = {
       items = { amount = 10, group = ItemGroups.enchanted_items   },
       enemies = {
-        amount = 22,
+        amount = 30,
         generated = M.harder_enemies
       }
     }
@@ -330,7 +330,7 @@ M.Dungeon4 = {
     content = {
       items = { amount = 12,  group = ItemGroups.enchanted_items   },
       enemies = {
-        amount = 25,
+        amount = 30,
         generated = M.harder_enemies
       }
     }
@@ -411,6 +411,14 @@ function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area
 end
 function M.enemy_bonus()
     return (World.player_amount - 1) / 2
+end
+
+function M.adjusted_enemy_amount(amount)
+    return math.ceil(amount + amount * (World.player_amount - 1) / 2)
+end
+
+function M.adjusted_item_amount(amount)
+    return math.ceil(amount + amount * (World.player_amount - 1) / 2)
 end
 
 local function generate_enemies(map, enemies)

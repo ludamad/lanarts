@@ -77,10 +77,10 @@ Data.enemy_create {
         hpregen: 0.03
         movespeed: 1
         -- base stats:
-        magic: 25
-        defence: 5
-        magic: 30
-        willpower: 8
+        magic: 45
+        defence: 25
+        strength: 45
+        willpower: 25
     }
     effects_active: {"Sap Aura"}
 }
@@ -215,12 +215,13 @@ Data.enemy_create {
     xpaward: 100
     appear_message: "A queen bee appears!"
     defeat_message: "The queen bee has buzzed its last buzz."
+    kills_before_stale: 50
     stats: {
         attacks: {{weapon: "Fast Melee"}}
         hp: 80
         hpregen: 0.1
         movespeed: 3.5
-        strength: 15
+        strength: 20
         defence: 0
         willpower: 12
     }
@@ -235,19 +236,20 @@ Data.enemy_create {
     xpaward: 25
     appear_message: "A giant killer bee appears!"
     defeat_message: "The giant bee has buzzed its last buzz."
+    kills_before_stale: 100
     stats: {
         attacks: {{weapon: "Fast Melee"}}
         hp: 40
         hpregen: 0.1
         movespeed: 3.5
-        strength: 15
+        strength: 20
         defence: 0
         willpower: 12
     }
     effects_active: {"PoisonedWeapon", "Spiky"}
 }
  
-Data.enemy_create summoner_base("Giant Bee", 7, 30, 400, 5) {
+Data.enemy_create {
     name: "Ramitawil"
     sprite: "spr_enemies.bosses.boss_bee"
     radius: 20
@@ -258,7 +260,7 @@ Data.enemy_create summoner_base("Giant Bee", 7, 30, 400, 5) {
         attacks: {{weapon: "Fast Melee"}}
         hp: 200
         hpregen: 0.2
-        movespeed: 3.5
+        movespeed: 5
         strength: 25
         defence: 15
         willpower: 20
@@ -267,10 +269,14 @@ Data.enemy_create summoner_base("Giant Bee", 7, 30, 400, 5) {
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
-        -- Spawn 3 level 1 randarts:
         ObjectUtils.spawn_item_near(@, "Swarm Lanart", 1)
-        for i=1,3
-            {:type, :amount} = ItemUtil.randart_generate(1)
+        -- Spawn 2 level 1 randarts:
+        for i=1,1
+            {:type, :amount} = ItemUtils.randart_generate(1)
+            ObjectUtils.spawn_item_near(@, type, amount)
+        -- Spawn 1 level 2 randarts:
+        for i=1,1
+            {:type, :amount} = ItemUtils.randart_generate(2)
             ObjectUtils.spawn_item_near(@, type, amount)
         ObjectUtils.spawn_item_near(@, "Amulet of Great Pain", 1)
 }
@@ -282,6 +288,7 @@ Data.enemy_create {
     xpaward: 15
     appear_message: "You hear a mouther start screeching!"
     defeat_message: "The mouther has been shut."
+    kills_before_stale: 100
     stats: {
         attacks: {
             {weapon: "Basic Melee"}
@@ -293,7 +300,7 @@ Data.enemy_create {
         -- base stats:
         strength: 5
         defence: 0
-        magic: 2
+        magic: 10
         willpower: 0
     }
     effects_active: {"PoisonedWeapon"}
@@ -341,31 +348,6 @@ Data.enemy_create {
     }
     effects_active: {"StopOnceInRange", "Enraging"}
 }
-
-Data.enemy_create {
-    name: "Mouther" 
-    sprite: "spr_enemies.animals.tyrant_leech"
-    radius: 11
-    xpaward: 15
-    appear_message: "You hear a mouther start screeching!"
-    defeat_message: "The mouther has been shut."
-    stats: {
-        attacks: {
-            {weapon: "Basic Melee"}
-            {projectile: "Mephitize"}
-        }
-        hp: 40
-        hpregen: 0.03
-        movespeed: 1
-        -- base stats:
-        strength: 5
-        defence: 0
-        magic: 2
-        willpower: 0
-    }
-    effects_active: {"PoisonedWeapon"}
-}
-
 
 -- enemy_charge = (caster) ->
 --     for target in *Map.enemies_list(caster)
@@ -500,7 +482,7 @@ Data.enemy_create summoner_base("Imp", 1, 100, 100) {
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
         -- Spawn a level 1 randart:
-        {:type, :amount} = ItemUtil.randart_generate(1)
+        {:type, :amount} = ItemUtils.randart_generate(1)
         ObjectUtils.spawn_item_near(@, type, amount)
 }
 
@@ -514,10 +496,10 @@ Data.enemy_create {
     unique: true
     stats: {
         attacks: {{weapon: "Basic Melee"}}
-        hp: 200
+        hp: 150
         hpregen: 0.25
-        movespeed: 3
-        strength: 25
+        movespeed: 3.5
+        strength: 45
         magic: 10
         defence: 8
         willpower: 8
@@ -527,7 +509,7 @@ Data.enemy_create {
         ItemGroups = require "maps.ItemGroups"
         -- Spawn 2 level 1 randarts:
         for i=1,2
-            {:type, :amount} = ItemUtil.randart_generate(1)
+            {:type, :amount} = ItemUtils.randart_generate(1)
             ObjectUtils.spawn_item_near(@, type, amount)
         ObjectUtils.spawn_item_near(@, "Gragh's Club", 1)
         ObjectUtils.spawn_item_near(@, "Rage Lanart", 1)
@@ -563,7 +545,7 @@ Data.enemy_create {
         ObjectUtils.spawn_item_near(@, "Amulet of Greater Fire", 1)
         -- Spawn 1 level 2 randart:
         for i=1,2
-            {:type, :amount} = ItemUtil.randart_generate(1)
+            {:type, :amount} = ItemUtils.randart_generate(1)
             ObjectUtils.spawn_item_near(@, type, amount)
     effects_active: {"Pain Aura"}
 }
@@ -579,7 +561,7 @@ Data.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 3, 1
     stats: {
         attacks: {{ weapon: "Basic Melee"}, { projectile: "Longer Range Blue Blast"}}
         movespeed: 3.5
-        hp: 400
+        hp: 500
         hpregen: 0.15
         strength: 25
         magic: 30

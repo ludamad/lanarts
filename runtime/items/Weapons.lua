@@ -280,9 +280,9 @@ Data.weapon_create {
 
     spr_item = "iron scimitar",
 
-    resist_modifier = 0.9,
+    resist_modifier = 1.0,
 
-    damage = {base = {1, 5}, strength = 1.1},
+    damage = {base = {1, 5}, strength = 0.5},
     power = {base = 5, strength = 0.3},
 
     cooldown = 25,

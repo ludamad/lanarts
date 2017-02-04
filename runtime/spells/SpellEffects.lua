@@ -63,8 +63,9 @@ function berserk_effect.step(effect, obj)
                     eff.monster = "Centaur Hunter"
                     eff.duration = 5
                 end
+                local stats = obj:effective_stats()
 		killdiff = killdiff -1
-                obj:heal_hp(20)
+                obj:heal_hp(10 + stats.defence * 2)
 		effect.extensions = effect.extensions + 1
 	end
 
@@ -82,6 +83,9 @@ function berserk_effect.stat(effect, obj, old, new)
 	new.defence = math.max(0, new.defence + 2)
 	new.willpower = math.max(0, new.willpower + 5)
 	new.melee_cooldown_multiplier = new.melee_cooldown_multiplier / 1.6
+        if obj:has_effect("AmuletBerserker") then
+            new.hpregen = new.hpregen + 4 / 60 -- 4 per second
+        end
         if new.speed < 6 then
             new.speed = math.max(new.speed * 1.25, 6)
         end

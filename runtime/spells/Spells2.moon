@@ -366,7 +366,7 @@ Data.effect_create {
                 mon\add_effect("Pained", 50)
                 play_pained_sound()
                 caster\add_effect("Pained", 50)
-                if mon\damage(random(4,15) * 2 + caster.stats.magic * 2, random(6,10) + caster.stats.magic * 0.2, 1.0, 2.0)
+                if mon\damage(random(4,15) * 2 + caster.stats.magic * 2, random(2,5) + caster.stats.magic * 0.2, 1.0, 2.0)
                     {:stats} = caster
                     caster\gain_xp_from(mon)
                     {:max_hp} = mon\effective_stats()
@@ -563,7 +563,7 @@ Data.effect_create {
         @n_summons = 0
         for mon, time in pairs caster.summoned
             if not mon.destroyed
-                time_out = time > 400 
+                time_out = (if mon.name == "Dark Aspect" then (time > 400) else (time > 4800)) -- Latter are permanents
                 diff_floor = (caster.map ~= mon.map)
                 if time_out or diff_floor
                     mon\direct_damage(mon.stats.hp + 1)

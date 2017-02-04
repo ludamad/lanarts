@@ -19,7 +19,7 @@
 #include "ClassEntry.h"
 
 /* What power, resistance difference causes damage to be raised by 100% */
-const float POWER_MULTIPLE_INTERVAL = 20.0f;
+const float POWER_MULTIPLE_INTERVAL = 30.0f;
 
 static float damage_multiplier(float power, float resistance) {
 	float powdiff = power - resistance;
@@ -40,9 +40,10 @@ static float basic_damage_formula(const EffectiveAttackStats& attacker,
         // This will hopefully allow power/resistance to be more meaningful, 
         // as the multiplier will be applied to the larger number.
 	float mult = damage_multiplier(attacker.power, defender.resistance);
-	float result = attacker.damage * mult
-			- defender.reduction * attacker.resist_modifier;
-	event_log("basic_damage_formula: mult=%f, damage=%f reduction=%f result=%f\n",
+	float adjusted_damage = attacker.damage * mult;
+        float adjusted_reduction = defender.reduction * attacker.resist_modifier;
+        float result = std::max(adjusted_damage - adjusted_reduction, adjusted_damage * 0.5f);
+	event_log("basic_damage_formula: mult=%f, damage=%f reduction=%f defence=%f result=%f\n",
 			mult, (float)attacker.damage, (float)defender.reduction, result);
         return std::max(0.0f, result);
 }

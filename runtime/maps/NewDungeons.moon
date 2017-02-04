@@ -111,7 +111,7 @@ M.make_dungeon_template = (data) -> table.merge {
         store_placer = (map, xy) ->
             Region1.generate_store(map, xy)
         item_placer = (map, xy) ->
-            item = ItemUtils.item_generate ItemGroups.enchanted_items, false, 1 --Randart power level
+            item = ItemUtils.randart_generate(1) -- Power level 1 
             MapUtils.spawn_item(map, item.type, item.amount, xy)
         return  {:enemy_placer, :door_placer, :store_placer, :item_placer, tileset: @tileset}
     _default_vault_config: (args = {}) =>
@@ -123,12 +123,12 @@ M.make_dungeon_template = (data) -> table.merge {
     _spawn_items: (map) =>
         area = {0,0,map.size[1],map.size[2]}
         for group in *@_item_groups()
-            for i=1,group[2] do
+            for i=1,OldMaps.adjusted_item_amount(group[2]) do
                 sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
                 if not sqr
                     break
                 map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
-                item = ItemUtils.item_generate group[1], false, 1, (group[3] or 2) --Randart power level and chance
+                item = ItemUtils.item_generate group[1], 1, (group[3] or 2) --Randart power level and chance
                 MapUtils.spawn_item(map, item.type, item.amount, sqr) 
         return true
     _recalculate_perimeter: (map) =>

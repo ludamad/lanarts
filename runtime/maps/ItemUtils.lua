@@ -27,7 +27,7 @@ local function nested_chance(group, attribute)
         assert(type, "Got nil from random choice!")
         local amount = 1
         if items[type].type == "projectile" then
-            amount = random(5,13)
+            amount = random(15,33)
         end
         return {[attribute] = type, amount = amount}
     end

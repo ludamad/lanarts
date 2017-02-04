@@ -423,8 +423,9 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
             char buffstr[32];
             double xpworth = ((EnemyInst*)inst)->xpworth();
             double n_killed = (pc.n_enemy_killed(((EnemyInst*) inst)->enemy_type()) - 1) / pc.all_players().size();
-            xpworth *= pow(0.9, n_killed); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
-            if (n_killed > 25) {
+            int kills_before_stale = ((EnemyInst*) inst)->etype().kills_before_stale;
+            xpworth *= pow(0.9, n_killed * 25 / kills_before_stale); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
+            if (n_killed > kills_before_stale) {
                 xpworth = 0;
             }
             // Compensates for enemy numbers not-quite scaling:
@@ -705,8 +706,9 @@ void CombatGameInst::gain_xp_from(GameState* gs, CombatGameInst* inst, float dx,
     char buffstr[32];
     double xpworth = ((EnemyInst*)inst)->xpworth();
     double n_killed = (pc.n_enemy_killed(((EnemyInst*) inst)->enemy_type()) - 1) / pc.all_players().size();
-    xpworth *= pow(0.9, n_killed); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
-    if (n_killed > 25) {
+    int kills_before_stale = ((EnemyInst*) inst)->etype().kills_before_stale;
+    xpworth *= pow(0.9, n_killed * 25 / kills_before_stale); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
+    if (n_killed > kills_before_stale) {
         xpworth = 0;
     }
     float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
