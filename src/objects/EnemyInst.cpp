@@ -278,26 +278,26 @@ void EnemyInst::die(GameState *gs) {
 		}
 
 	        MTwist& mt = gs->rng();
-                if (should_respawn) {
-                        printf("SHOULD\n");
-                    auto* level = gs->get_level();
-                    for (int i = 0; i < 100; i++) {
-                        double direction = mt.rand(360) * deg2rad;
-                        double magnitude = mt.rand(3100) + 100;
-                        double vx = cos(direction) * magnitude, vy = sin(direction) * magnitude;
-                        int nx = round(rx + vx), ny = round(ry + vy);
-                        bool solid = gs->tile_radius_test(nx, ny, TILE_SIZE) || gs->object_radius_test(nx, ny, TILE_SIZE);
-                        if (solid || gs->radius_visible_test(nx, ny, TILE_SIZE * 2)) {
-                            continue;
-                        }
-                        if (nx < 0 || ny < 0 || nx > level->width() || ny > level->height()) { 
-                            continue;
-                        }
-                        printf("SPAWNING %i \n", i);
-                        gs->add_instance(new EnemyInst(enemytype, nx, ny));
-                        break;
-                    }
-                }
+                //if (should_respawn) {
+                //        printf("SHOULD\n");
+                //    auto* level = gs->get_level();
+                //    for (int i = 0; i < 100; i++) {
+                //        double direction = mt.rand(360) * deg2rad;
+                //        double magnitude = mt.rand(3100) + 100;
+                //        double vx = cos(direction) * magnitude, vy = sin(direction) * magnitude;
+                //        int nx = round(rx + vx), ny = round(ry + vy);
+                //        bool solid = gs->tile_radius_test(nx, ny, TILE_SIZE) || gs->object_radius_test(nx, ny, TILE_SIZE);
+                //        if (solid || gs->radius_visible_test(nx, ny, TILE_SIZE * 2)) {
+                //            continue;
+                //        }
+                //        if (nx < 0 || ny < 0 || nx > level->width() || ny > level->height()) { 
+                //            continue;
+                //        }
+                //        printf("SPAWNING %i \n", i);
+                //        gs->add_instance(new EnemyInst(enemytype, nx, ny));
+                //        break;
+                //    }
+                //}
 		CollisionAvoidance& coll_avoid = gs->collision_avoidance();
 		coll_avoid.remove_object(collision_simulation_id());
 

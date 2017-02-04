@@ -229,8 +229,11 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
         }
     }
     if (LAST_WAS_STOP) {
-        dx = gs->rng().rand(Range {-1, +1});
-        dy = gs->rng().rand(Range {-1, +1});
+        dx = rand() % 3 - 1;
+        dy = rand() % 3 - 1;
+        // FIXED SYNC BUG: Do not use rng().rand() here.
+        // dx = gs->rng().rand(Range {-1, +1});
+        // dy = gs->rng().rand(Range {-1, +1});
     } else if (gs->object_radius_test(this, NULL, 0, &autopickup_colfilter)) {
         dx = 0, dy = 0;
     } else if (min_dist != 10000) {//std::numeric_limits<float>::max()) {
