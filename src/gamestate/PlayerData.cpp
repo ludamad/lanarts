@@ -162,13 +162,11 @@ static bool player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 	const int POLL_MS_TIMEOUT = 1 /*millsecond*/;
 	GameNetConnection& net = gs->net_connection();
 	while (!net.has_incoming_sync() && !gs->io_controller().user_has_requested_exit()) {
-		//if (pde.player()->is_local_player()) {
-		//	pde.player()->enqueue_io_actions(gs);
-		//	break;
+		if (pde.player()->is_local_player()) {
+                        LANARTS_ASSERT(pde.player()->actions_set());
+			break;
 
-		//} else 
-                if (!pde.action_queue.has_actions_for_frame(gs->frame())) {
-                        LANARTS_ASSERT(!pde.player()->is_local_player());
+                } else if (!pde.action_queue.has_actions_for_frame(gs->frame())) {
 			if (gs->game_settings().verbose_output) {
 				printf("Polling for player %d\n", pde.net_id);
 			}

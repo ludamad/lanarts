@@ -269,6 +269,8 @@ void GameWorld::reset() {
         level_states.clear();
         gs->game_hud().override_sidebar_contents(NULL);
         gs->game_chat().clear();
+        gs->frame() += 128; // Ensure we don't have any hold-over frames sent.
+        // TODO find a better solution than just ensuring unique frame number.
         last_player_pos = {0,0};
         for (GameMapState* map : delete_list) {
             delete map;
