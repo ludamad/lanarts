@@ -3,9 +3,9 @@ username: User
 lobby_server_url: http://putterson.homedns.org:8080
 
 #Window settings
-fullscreen: no
-view_width: 640
-view_height: 480
+fullscreen: yes
+view_width: 1600
+view_height: 900
 #Font settings
 font: fonts/Gudea-Regular.ttf
 menu_font: fonts/alagard_by_pix3m-d6awiwp.ttf
@@ -19,4 +19,4 @@ network_debug_mode: no
 invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
-keep_event_log: yes
+keep_event_log: no
