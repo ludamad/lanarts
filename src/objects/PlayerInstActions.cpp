@@ -447,9 +447,9 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
                 // Do nothing, as commanded by Lua
         } else if (type.id == get_item_by_name("Gold")) {
 		gold(gs) += amnt;
-                if (gs->local_player() == this) {
+                //if (gs->local_player() == this) {
                     play("sound/gold.ogg");
-                }
+                //}
 	} else {
 		itemslot_t slot = inventory().add(type);
 		if (slot == -1) {
@@ -458,9 +458,9 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 				this->last_chosen_weaponclass)) {
 			projectile_smart_equip(inventory(), slot);
 		}
-                if (gs->local_player() == this) {
+                //if (gs->local_player() == this) {
                     play("sound/item.ogg");
-                }
+                //}
 	}
 
 	if (!inventory_full) {
@@ -683,7 +683,7 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
             auto message = format("Transaction: %s x %d for %d GP.", type.name.c_str(), sell_amount, gold_gained);
             item.remove_copies(sell_amount);
             gs->game_chat().add_message(message, COL_PALE_YELLOW);
-            gs->local_player()->gold(gs) += gold_gained;
+            gold(gs) += gold_gained;
             play("sound/inventory_sound_effects/sellbuy.ogg");
         } else {
             gs->game_chat().add_message("Cannot sell this item!", COL_RED);

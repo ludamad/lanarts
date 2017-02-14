@@ -106,8 +106,8 @@ void FeatureInst::player_interact(GameState* gs, GameInst* inst) {
 	luawrap::push(L, inst);
 	lua_call(L, 2, 0);
 	GameInst* post_inst = NULL;
-	PlayerInst* p = gs->local_player();
-	inst->get_map(gs)->object_radius_test(p, &post_inst, 1, feature_colfilter, p->x, p->y, p->radius);
+        // Remove the star that indicates unused staircase on the staircase after the level change:
+	inst->get_map(gs)->object_radius_test(inst, &post_inst, 1, feature_colfilter, inst->x, inst->y, inst->radius);
 	if (post_inst) {
 	    dynamic_cast<FeatureInst*>(post_inst)->used_yet = true;
 	}

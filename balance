@@ -72,3 +72,7 @@ Necromancer:
     + Per-room!?
     + Consider what to do about high HP regen acting as another damage threshold already. Currently have two redundant thresholding effects.
     + Biggest cause of runaway imbalance? nah
+    -- Spawn fast thingss
++TODO doors always open in dungeon
++-- bouncing lightning attack
++-- Ooze enemy that has combined HP and splits into parts.
