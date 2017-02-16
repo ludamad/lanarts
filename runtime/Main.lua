@@ -89,6 +89,10 @@ local function main(_argv)
         local finished = false ; function _G.start_lanarts() finished = true end
         while not finished do __read_eval_print() end
     end
+    if has_arg "--load" then
+        local file = (get_param "--load")
+        argv_configuration.load_file = file
+    end
 
     return start_lanarts()
 end

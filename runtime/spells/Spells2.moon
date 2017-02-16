@@ -174,7 +174,7 @@ for equip_slot in *{"", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
             @kill_tracker = caster.kills
         step_func: (caster) =>
             while caster.kills > @kill_tracker
-                if chance(0.01)
+                if chance(0.05)
                     EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
                     play_sound "sound/summon.ogg"
                     monster = "Centaur Hunter"
@@ -211,7 +211,7 @@ for equip_slot in *{"", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
             @kill_tracker = caster.kills
         step_func: (caster) =>
             while caster.kills > @kill_tracker
-                if chance(0.02)
+                if chance(0.05)
                     EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
                     play_sound "sound/summon.ogg"
                     monster = "Golem"
@@ -563,7 +563,7 @@ Data.effect_create {
         @n_summons = 0
         for mon, time in pairs caster.summoned
             if not mon.destroyed
-                time_out = (if mon.name == "Dark Aspect" then (time > 400) else (time > 4800)) -- Latter are permanents
+                time_out = (if mon.name == "Spectral Beast" then (time > 600) else (time > 4800)) -- All others are permanents
                 diff_floor = (caster.map ~= mon.map)
                 if time_out or diff_floor
                     mon\direct_damage(mon.stats.hp + 1)
@@ -587,7 +587,7 @@ Data.spell_create {
     fallback_to_melee: false,
     spell_cooldown: 200
     prereq_func: (caster) ->
-        if caster.stats.hp < 65
+        if caster.stats.hp < 55
             if caster\is_local_player() 
                 EventLog.add("You do not have enough health!", {200,200,255})
             return false
@@ -607,7 +607,7 @@ Data.spell_create {
         play_sound "sound/summon.ogg"
         monster = "Spectral Beast"
         if not (caster\has_effect "Summoning")
-            caster\direct_damage(45)
+            caster\direct_damage(35)
             eff = caster\add_effect("Summoning", 20)
             eff.on_summon = (obj) ->
                 -- -- Make sure this monster cannot live outside its summoner's range for very long:

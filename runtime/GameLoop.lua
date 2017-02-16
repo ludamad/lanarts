@@ -106,6 +106,15 @@ function M.run_loop()
     if require("tests.main").testcase then
         require("tests.main").testcase:game_start()
     end
+    if argv_configuration.load_file then -- Global from GlobalVariableSetup.lua
+        if file_exists(argv_configuration.load_file) then
+            GameState.load(argv_configuration.load_file)
+            -- Ensure we don't reload the game on quit:
+            argv_configuration.load_file = false 
+        else
+            error("'" .. argv_configuration.load_file .. "' does not exist!")
+        end
+    end
 
     -- ROBUSTNESS
     -- Since when a game restarts, an input_handle is called during game_loop_body after step(),

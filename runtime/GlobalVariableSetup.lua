@@ -25,7 +25,6 @@ require "ErrorReporting"
 print "Read other globals"
 
 require "globals.Debug"
-require "globals.Deprecated"
 require "globals.Draw"
 require "globals.FileUtils"
 require "globals.GameUtils"
@@ -62,6 +61,10 @@ enemy_init = do_nothing
 enemy_step = do_nothing
 enemy_berserker_step = do_nothing
 enemy_berserker_init = do_nothing
+
+argv_configuration = nilprotect {
+    load_file = false
+}
 
 -- Now that global variable mutation has been done, protect globals even more strongly, prevent creation of new globals:
 setmetatable(_G, {__index = function(self, k)

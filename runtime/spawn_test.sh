@@ -14,7 +14,7 @@ mkdir saves
 echo "# See settings.yaml for details
 ip: localhost
 username: TestBot
-steps_per_draw: 1
+steps_per_draw: 10
 time_per_step: 0
 frame_action_repeat: 0
 port: 6112
@@ -28,9 +28,9 @@ username: TestBot
 lobby_server_url: http://putterson.homedns.org:8080
 
 #Window settings
-fullscreen: yes
-view_width: 1600
-view_height: 900
+fullscreen: no
+view_width: 640
+view_height: 480
 #Font settings
 font: fonts/Gudea-Regular.ttf
 menu_font: fonts/alagard_by_pix3m-d6awiwp.ttf
@@ -44,8 +44,8 @@ network_debug_mode: no
 invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
-keep_event_log: yes" > settings.yaml
+keep_event_log: no" > settings.yaml
 
 export LANARTS_TESTCASE=tests.ShortRunTest
-export LANARTS_SEED=12345673242
+export LANARTS_SEED=123456732
 gdb -silent -ex="break lua_error" -ex="break exit" -ex="break _exit" -ex="break abort" -ex="catch throw" -ex=r --args "$RUNTIME_FOLDER/../build/src/lanarts" $args

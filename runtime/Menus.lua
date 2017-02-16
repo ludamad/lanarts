@@ -124,6 +124,9 @@ function setup_start_menu()
         settings.class_type = 1
         exit_menu()
         return
+    elseif argv_configuration.load_file then -- Global from GlobalVariableSetup.lua
+        exit_menu()
+        return
     end
     menu_state.menu = InstanceBox.create( { size = Display.display_size } )
 

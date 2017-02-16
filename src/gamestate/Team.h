@@ -49,7 +49,7 @@ struct TeamPlayerData {
 // Facilitates deciding things such as:
 //   - What's the nearest enemy/ally a certain object can see?
 //   - How to path towards a certain enemy/ally?
-typedef std::set<CombatGameInst*> TeamLevelData;
+typedef std::vector<CombatGameInst*> TeamLevelData;
 struct Team {
     std::vector<TeamLevelData> per_level_data;
     // If the team has players:

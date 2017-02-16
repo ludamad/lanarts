@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <algorithm>
 #include <lcommon/SerializeBuffer.h>
 #include <limits>
 #include "Team.h"
@@ -155,12 +156,16 @@ bool is_visible(GameState* gs, CombatGameInst* viewer,
 
 void TeamData::remove(CombatGameInst* obj) {
 //    _ensure(obj->current_floor, obj->team); // Should already exist
-    teams.at(obj->team).per_level_data.at(obj->current_floor).erase(obj);
+    auto& vec = teams.at(obj->team).per_level_data.at(obj->current_floor);
+    auto pos = std::find(vec.begin(), vec.end(), obj);
+    if (pos != vec.end()) {
+        vec.erase(pos);
+    }
 }
 
 void TeamData::add(CombatGameInst* obj) {
     _ensure(obj->current_floor, obj->team);
-    teams.at(obj->team).per_level_data.at(obj->current_floor).insert(obj);
+    teams.at(obj->team).per_level_data.at(obj->current_floor).push_back(obj);
 }
 
 void TeamData::_ensure(level_id level, team_id team) {
@@ -235,7 +240,7 @@ void Team::deserialize(GameState* gs, SerializeBuffer& buffer) {
         for (int i = 0; i < data_size; i++) {
             CombatGameInst* ref = NULL;
             read_inst_ref(ref, gs, buffer);
-            data.insert(ref);
+            data.push_back(ref);
         }
     }
     this->player_data.deserialize(gs, buffer);
