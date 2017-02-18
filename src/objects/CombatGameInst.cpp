@@ -261,7 +261,7 @@ static float hurt_alpha_value(int hurt_cooldown) {
         return (HURT_COOLDOWN - hurt_cooldown) / 10 * 0.7f + 0.3f;
 }
 
-void CombatGameInst::draw(GameState *gs, float frame) {
+void CombatGameInst::draw(GameState *gs, float frame, float alpha) {
     GameInst::draw(gs);
     if (sprite == -1) {
         return;
@@ -274,6 +274,7 @@ void CombatGameInst::draw(GameState *gs, float frame) {
         float s = 1 - hurt_alpha_value(cooldowns().hurt_cooldown);
         draw_colour = draw_colour.multiply(Colour(255, 255 * s, 255 * s));
     }
+    draw_colour.a *= alpha;
     
     int sx = x - spr.width() / 2, sy = y - spr.height() / 2;
     draw_sprite(view, sprite, sx, sy, vx, vy, frame, draw_colour);

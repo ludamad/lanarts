@@ -63,7 +63,8 @@ enemy_berserker_step = do_nothing
 enemy_berserker_init = do_nothing
 
 argv_configuration = nilprotect {
-    load_file = false
+    save_file = false,
+    load_file = false,
 }
 
 -- Now that global variable mutation has been done, protect globals even more strongly, prevent creation of new globals:

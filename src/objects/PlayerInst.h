@@ -122,6 +122,9 @@ public:
         return actions_set_for_turn;
     }
 
+    // Ghosts are players that have died. They may move around the current level, 
+    // but do not otherwise interact with the game.
+    // They respawn when a player (included the player that had died) uses a revive elixir near them.
     bool melee_attack(GameState* gs, CombatGameInst* inst,
                     const Item& weapon, bool ignore_cooldowns);
     PosF& last_moved_direction() {

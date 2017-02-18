@@ -244,6 +244,18 @@ Data.effect_create {
 }
 
 Data.effect_create {
+    name: "Reviving"
+    init_func: (player) =>
+        -- No op for now
+    finish_func: (player) =>
+        player.is_ghost = false
+        player.stats.hp = 1
+    draw_func: (player, top_left_x, top_left_y) =>
+        xy = Display.to_screen_xy player.xy
+        Fonts.small\draw({origin: Display.CENTER}, xy, "#{math.ceil @time_left / 60}")
+}
+
+Data.effect_create {
     name: "Fear Aura"
     category: "Aura"
     effected_colour: {200, 200, 255}

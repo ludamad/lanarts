@@ -291,7 +291,6 @@ Data.enemy_create {
     kills_before_stale: 100
     stats: {
         attacks: {
-            {weapon: "Basic Melee"}
             {projectile: "Mephitize"}
         }
         hp: 40
@@ -631,3 +630,21 @@ Data.enemy_create {
     effects_active: {"StopOnceInRange"}
 }
 
+Data.enemy_create {
+   name: "Hell Forged"
+   sprite: "hell forged"
+   radius: 12
+   xpaward: 50
+   appear_message: "A hell-forged creature appears before you!"
+   defeat_message: "The hell-forged is destroyed."
+   stats: {
+       attacks: {{projectile: "Large Fire Ball"}}
+       movespeed: 3.5
+       hp: 125
+       hpregen: 0.01
+       strength: 45
+       magic: 45
+       defence: 25
+       willpower: 25
+    }
+}

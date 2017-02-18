@@ -36,7 +36,11 @@ static void draw_player_statbars(GameState* gs, PlayerInst* player, int x,
 	CoreStats& core = player->effective_stats().core;
 
 	BBox bbox(x, y, x + 100, y + 10);
-	draw_statbar_with_text(gs, bbox, core.hp, core.max_hp, COL_GREEN, COL_RED);
+	if (player->is_ghost()) {
+            gs->font().draw(COL_WHITE, Pos(bbox.x1 + 32, bbox.y1 + 2), "GHOST");
+        } else {
+            draw_statbar_with_text(gs, bbox, core.hp, core.max_hp, COL_GREEN, COL_RED);
+	}
 
 	bbox = bbox.translated(0, 15);
 	draw_statbar_with_text(gs, bbox, core.mp, core.max_mp, COL_BLUE,

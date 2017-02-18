@@ -306,8 +306,12 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
     LUAWRAP_GETTER(getters, target, lua_api::gamestate(L)->get_instance(OBJ->target()));
 	LUAWRAP_GETTER(getters, deepest_floor, OBJ->score_stats().deepest_floor);
 	LUAWRAP_GETTER(getters, deaths, OBJ->score_stats().deaths);
-    LUAWRAP_GETTER(getters, spells, OBJ->stats().spells.spell_id_list());
-    LUAWRAP_GETTER(getters, last_moved_direction, OBJ->last_moved_direction());
+        LUAWRAP_GETTER(getters, spells, OBJ->stats().spells.spell_id_list());
+        LUAWRAP_GETTER(getters, last_moved_direction, OBJ->last_moved_direction());
+        LUAWRAP_GETTER(getters, is_ghost, OBJ->is_ghost());
+
+	LuaValue setters = luameta_setters(meta);
+	LUAWRAP_SETTER(setters, is_ghost, bool, OBJ->is_ghost() = VAL);
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true)) );
     
 	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->weapon().weapon_entry().uses_projectile);

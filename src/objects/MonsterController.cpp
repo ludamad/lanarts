@@ -226,10 +226,10 @@ void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {
     if (e->cooldowns().is_hurting()) {
         // Ogre mages in specific don't slow movement, and neither do fleeing enemies:
         if (e->etype().name == "Ogre Mage" || has_fear) {
-        // Hell forged's move faster, dissuading kiting:
-        } else if (e->etype().name == "Hell Forged") {
-            e->vx *= 2, e->vy *= 2;
-            movespeed *= 2;
+        //// Hell forged's move faster, dissuading kiting:
+        //} else if (e->etype().name == "Hell Forged") {
+        //    e->vx *= 2, e->vy *= 2;
+        //    movespeed *= 2;
         } else {
             e->vx /= 2, e->vy /= 2;
             movespeed /= 2;

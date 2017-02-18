@@ -568,6 +568,10 @@ static void exhaust_projectile_autoequip(PlayerInst* player,
 }
 
 void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
+    // Dead players can't attack:
+    if (is_ghost()) {
+        return;
+    }
     if (!effective_stats().allowed_actions.can_use_weapons) {
         return;
     }
@@ -673,6 +677,10 @@ bool PlayerInst::melee_attack(GameState* gs, CombatGameInst* e,
 }
 
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
+    // Dead players can't use spells:
+    if (is_ghost()) {
+        return;
+    }
     if (!effective_stats().allowed_actions.can_use_spells) {
         return;
     }

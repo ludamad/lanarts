@@ -147,7 +147,7 @@ local function respawn_toggle_create()
         local x,y = unpack(xy)
         local w, h = unpack(self.size)
 
-        local text = settings.regen_on_death and "Respawn on Death" or "Hardcore (No respawn!)"
+        local text = settings.regen_on_death and "Revive on Death" or "Hardcore (No respawn!)"
         local text_color = settings.regen_on_death and TEXT_COLOR or COL_LIGHT_RED
         local sprite_color = settings.regen_on_death and TEXT_COLOR or COL_LIGHT_RED
         local box_color = sprite_color

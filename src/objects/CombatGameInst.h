@@ -40,7 +40,7 @@ public:
     virtual void init(GameState* gs);
     virtual void deinit(GameState* gs);
 	virtual void step(GameState* gs);
-	virtual void draw(GameState* gs, float frame = 0);
+	virtual void draw(GameState* gs, float frame = 0, float alpha = 1);
 	virtual void post_draw(GameState* gs);
 	virtual void update_field_of_view(GameState* gs);
 	virtual bool within_field_of_view(const Pos& pos) =0;
@@ -95,6 +95,9 @@ public:
 		return sprite;
 	}
 
+        bool& is_ghost() {
+            return _is_ghost;
+        }
 	simul_id& collision_simulation_id();
 
 	obj_id& target() {
@@ -118,6 +121,7 @@ public:
 protected:
 	sprite_id sprite = NONE;
 	simul_id simulation_id = NONE;
+        bool _is_ghost = false;
 	obj_id current_target = NONE;
 // </PURE DATA REGION see (de)serialize>
 public:

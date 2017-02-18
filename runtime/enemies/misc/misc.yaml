@@ -8,7 +8,7 @@ enemies:
     appear_message: A strange blue metallic creature appears!
     defeat_message: The blue metallic creature is broken into scrap.
     stats:
-        attacks: [ {weapon: Slow Melee}, {projectile: Magic Bolt} ]
+        attacks: [ {projectile: Magic Bolt} ]
         movespeed: 3
         hp: 65
         hpregen: 0.05

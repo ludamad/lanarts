@@ -201,6 +201,7 @@ static void run_engine(int argc, char** argv) {
 						"saves/saved_settings.yaml"); // Save settings from in-game
 			}
 			delete gs;
+                        
 			goto label_StartOver;
 		}
 	}

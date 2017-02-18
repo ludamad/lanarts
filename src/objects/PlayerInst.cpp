@@ -79,7 +79,7 @@ money_t& PlayerInst::gold(GameState* gs) {
 void PlayerInst::update_field_of_view(GameState* gs) {
 	int sx = last_x / TILE_SIZE;
 	int sy = last_y / TILE_SIZE;
-	field_of_view->calculate(gs, gs->game_world().get_current_level()->vision_radius(), sx, sy);
+	field_of_view->calculate(gs, (is_ghost() ? 3 : gs->game_world().get_current_level()->vision_radius()), sx, sy);
 }
 
 bool PlayerInst::within_field_of_view(const Pos& pos) {
@@ -173,7 +173,7 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 }
 
 void PlayerInst::step(GameState* gs) {
-	perf_timer_begin(FUNCNAME);
+    PERF_TIMER();
     std::vector<int> effects_active = {get_effect_by_name(class_stats().class_entry().name.c_str())};
     effects().ensure_effects_active(gs, this, effects_active);
     paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
@@ -192,7 +192,6 @@ void PlayerInst::step(GameState* gs) {
 
 	if (!actions_set_for_turn) {
 		GameInst::step(gs); // For callback
-		perf_timer_end(FUNCNAME);
 		return;
 	}
 
@@ -205,22 +204,18 @@ void PlayerInst::step(GameState* gs) {
 	if (cooldowns().is_hurting())
 		reset_rest_cooldown();
 
-	if (stats().has_died()) {
-		lua_api::event_player_death(gs->luastate(), this);
-
+	if (stats().has_died() && !is_ghost()) {
+		bool game_should_end = lua_api::event_player_death(gs->luastate(), this);
 		_score_stats.deaths++;
-		queued_actions.clear();
-		actions_set_for_turn = false;
-		if (gs->game_settings().regen_on_death) {
-			stats().effects.clear();
-			stats().core.heal_fully();
-			spawn_in_overworld(gs, this);
-		} else {
-                        // Queue a restart:
-			gs->game_world().reset();
-		}
-		perf_timer_end(FUNCNAME);
-		return;
+                if (game_should_end) {
+                    // End the game:
+                    queued_actions.clear();
+                    actions_set_for_turn = false;
+                    // Queue a restart:
+                    gs->game_world().reset();
+                    // Exit, game's over, nothing more to see here folks:
+                    return;
+                }
 	}
 
 	is_resting = false;
@@ -232,11 +227,17 @@ void PlayerInst::step(GameState* gs) {
 		view.center_on(last_x, last_y);
 
 	update_position(rx + vx, ry + vy);
-	perf_timer_end(FUNCNAME);
+        if (is_ghost()) {
+            stats().core.hp = 0;
+            stats().core.mp = 0;
+            effective_stats().core.hp = 0;
+            effective_stats().core.mp = 0;
+            reset_rest_cooldown();
+        }
 }
 
 void PlayerInst::draw(GameState* gs) {
-	CombatGameInst::draw(gs);
+	CombatGameInst::draw(gs, 0.0f, is_ghost() ? 0.4 : 1.0);
 }
 
 void PlayerInst::copy_to(GameInst *inst) const {

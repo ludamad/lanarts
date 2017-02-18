@@ -11,11 +11,33 @@ function events.PlayerInit(player)
 end
 
 function events.PlayerDeath(player)
-    if #World.players == 1 then
-        GameState.wait(100)
-        DeathScreen.show()
+    if settings.regen_on_death then
+        -- On soft-core, turn players into ghosts when they die:
+        player.is_ghost = true
+        player:add_effect("Reviving", 20 * 60) -- 20 'seconds'
+        if #World.players == 1 then
+            return false -- On soft-core single-player, never die.
+        end
+        local are_all_ghosts = true
+        for _, player in ipairs(World.players) do
+            if not player.instance.is_ghost then
+                are_all_ghosts = false
+                break
+            end
+        end
+        -- On soft-core multiplayer, die if everyone is a ghost:
+        if are_all_ghosts then
+            GameState.score_board_store()
+        end
+        return are_all_ghosts
+    else
+        if #World.players == 1 then
+            GameState.wait(100)
+            DeathScreen.show()
+        end
+        GameState.score_board_store()
+        return true
     end
-    GameState.score_board_store()
 end
 
 function events.MonsterInit(monster)

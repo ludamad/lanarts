@@ -74,7 +74,8 @@ namespace lua_api {
 	void luacall_hitsound(lua_State* L);
 
 	void event_player_init(lua_State* L, PlayerInst* player);
-	void event_player_death(lua_State* L, PlayerInst* player);
+        // Returns whether the game should end:
+	bool event_player_death(lua_State* L, PlayerInst* player);
 	void event_monster_init(lua_State* L, EnemyInst* enemy);
 	void event_monster_death(lua_State* L, EnemyInst* enemy);
 	void event_projectile_hit(lua_State* L, ProjectileInst* projectile, GameInst* target);

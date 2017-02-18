@@ -109,8 +109,6 @@ function M.run_loop()
     if argv_configuration.load_file then -- Global from GlobalVariableSetup.lua
         if file_exists(argv_configuration.load_file) then
             GameState.load(argv_configuration.load_file)
-            -- Ensure we don't reload the game on quit:
-            argv_configuration.load_file = false 
         else
             error("'" .. argv_configuration.load_file .. "' does not exist!")
         end
@@ -144,7 +142,7 @@ function M.run_loop()
         if not game_loop_body(steponly) then
             if single_player then
                 GameState.score_board_store()
-                GameState.save("saves/savefile.save")
+                GameState.save(argv_configuration.save_file or "saves/savefile.save")
             end
             break
         end
@@ -163,6 +161,10 @@ function M.run_loop()
 
     print( "Step time: " .. string.format("%f", perf.get_timing("**Step**")) )
     print( "Draw time: " .. string.format("%f", perf.get_timing("**Draw**")) )
+
+    if argv_configuration.load_file then
+        os.exit()
+    end
 end
 
 return M

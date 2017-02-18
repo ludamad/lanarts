@@ -3,6 +3,7 @@
 
 #include "Team.h"
 #include "objects/CombatGameInst.h"
+#include "objects/PlayerInst.h"
 
 // Helper functions for iterating through TeamData:
 template <typename Function>
@@ -16,6 +17,9 @@ inline void for_all_enemies(TeamData& td, level_id level, team_id team, Function
         LANARTS_ASSERT(level >= 0 && level < td.teams[i].per_level_data.size());
         auto& objs = td.teams[i].per_level_data[level];
         for (CombatGameInst* e : objs) {
+            if (e->is_ghost()) {
+                continue; // Skip ghosts
+            }
             f(e);
         }
     }
@@ -35,6 +39,9 @@ inline void for_all_on_team(TeamData& td, level_id level, team_id team, Function
     LANARTS_ASSERT(team >= 0 && team < td.teams.size());
     auto& objs = td.teams[team].per_level_data[level];
     for (CombatGameInst* e : objs) {
+        if (e->is_ghost()) {
+            continue; // Skip ghosts
+        }
         f(e);
     }
 }
@@ -54,6 +61,9 @@ inline void for_players_on_team(TeamData& td, team_id team, Function&& f) {
     LANARTS_ASSERT(team >= 0 && team < td.teams.size());
     auto& objs = td.teams[team].player_data.players;
     for (PlayerInst* e : objs) {
+        if (e->is_ghost()) {
+            continue; // Skip ghosts
+        }
         f(e);
     }
 }

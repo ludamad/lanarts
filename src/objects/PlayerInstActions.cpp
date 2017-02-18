@@ -219,6 +219,10 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
             //   Dashing into a dungeon and quickly picking up items around should be a conscious effort by the player."
             // Ludamad: OK, let's try with just stackable items.
             bool is_item = (gs->object_radius_test(this, NULL, 0, &autopickup_colfilter, (x*32+16), (y*32+16), 1));
+            // Ghosts can't pickup items, ignore them:
+            if (is_ghost()) {
+                is_item = false;
+            }
             if (near_unseen || is_item) {
                 if (dist != 0 && (min_dist >= dist || (is_item > found_item)) && (is_item >= found_item)) {
                     closest = {x,y};
@@ -234,7 +238,7 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
         // FIXED SYNC BUG: Do not use rng().rand() here.
         // dx = gs->rng().rand(Range {-1, +1});
         // dy = gs->rng().rand(Range {-1, +1});
-    } else if (gs->object_radius_test(this, NULL, 0, &autopickup_colfilter)) {
+    } else if (!is_ghost() && gs->object_radius_test(this, NULL, 0, &autopickup_colfilter)) {
         dx = 0, dy = 0;
     } else if (min_dist != 10000) {//std::numeric_limits<float>::max()) {
         Pos iter = closest;
@@ -283,7 +287,7 @@ void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 	}
         bool explore_used = false;
         if (dx == 0 && dy == 0) {
-            if (gs->key_down_state(SDLK_e) && !has_visible_monster(gs, this)) {
+            if (gs->key_down_state(SDLK_e) && (is_ghost() || !has_visible_monster(gs, this))) {
                 explore_used = true;
                 Pos towards = direction_towards_unexplored(gs);
                 if (towards != Pos{0,0}) {
@@ -431,6 +435,10 @@ static bool item_do_lua_pickup(lua_State* L, ItemEntry& type, GameInst* user, in
 }
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
+        // Dead players can't pickup items:
+        if (is_ghost()) {
+            return;
+        }
 	const int PICKUP_RATE = 5;
 	GameInst* inst = gs->get_instance(action.use_id);
 	if (!inst) {
@@ -486,6 +494,10 @@ void PlayerInst::perform_queued_actions(GameState* gs) {
 }
 
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
+        // Dead players can't drop items:
+        if (is_ghost()) {
+            return;
+        }
 	ItemSlot& itemslot = inventory().get(action.use_id);
 	// use_id2 == 0 means drop all, use_id2 == 1 means drop half
 	LANARTS_ASSERT(action.use_id2 == 0 || action.use_id2 == 1);
@@ -508,6 +520,10 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
+        // Dead players can't shop:
+        if (is_ghost()) {
+            return;
+        }
 	StoreInst* store = (StoreInst*)gs->get_instance(action.use_id);
 	if (!store) {
 		return;
@@ -608,6 +624,10 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_items) {
 		return;
 	}
+        // Dead players can't use items:
+        if (is_ghost()) {
+            return;
+        }
 	itemslot_t slot = action.use_id;
 	ItemSlot& itemslot = inventory().get(slot);
 	Item& item = itemslot.item;
@@ -668,6 +688,10 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
+    // Dead players can't sell items:
+    if (is_ghost()) {
+        return;
+    }
     if (!effective_stats().allowed_actions.can_use_items) {
         return;
     }
@@ -700,6 +724,10 @@ void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
         }
         // Have we seen an enemy too recently?
         if (!cooldowns().can_rest()) {
+            return;
+        }
+        // Dead players can't rest:
+        if (is_ghost()) {
             return;
         }
         CoreStats& ecore = effective_stats().core;
@@ -779,6 +807,10 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
+        // Dead players can't leave the level:
+        if (is_ghost()) {
+            return;
+        }
 	if (!effective_stats().allowed_actions.can_use_stairs) {
 		if (is_local_player()) {
 			gs->game_chat().add_message(

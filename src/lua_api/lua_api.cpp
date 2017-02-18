@@ -42,9 +42,10 @@ namespace lua_api {
 		luawrap::call<void>(L);
 	}
 
-	void event_player_death(lua_State* L, PlayerInst* player) {
+	bool event_player_death(lua_State* L, PlayerInst* player) {
 		luawrap::globals(L)["Engine"]["event_occurred"].push();
-		luawrap::call<void>(L, "PlayerDeath", (GameInst*) player);
+                // Should the game end?
+		return luawrap::call<bool>(L, "PlayerDeath", (GameInst*) player);
 	}
 
 	void event_player_init(lua_State* L, PlayerInst* player) {
