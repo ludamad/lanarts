@@ -6,21 +6,21 @@ enemies:
     appear_message: A cloud elemental floats onto the scene.
     defeat_message: The cloud elemental dissolves.
     radius: 12
-    xpaward: 10
+    xpaward: 5
     stats:
         attacks: [ {projectile: Storm Bolt} ]
-        movespeed: 1.5
-        hp: 45
+        movespeed: 2
+        hp: 15
         hpregen: 0.02
         strength: 5
-        magic: 15
+        magic: 25
         defence: 4
         willpower: 5
 
   - name: Storm Elemental
     sprite: storm elemental
     radius: 14
-    xpaward: 15
+    xpaward: 20
     appear_message: A storm elemental floats onto the scene.
     defeat_message: The storm elemental dissolves.
     stats:
@@ -29,7 +29,7 @@ enemies:
         hp: 50
         hpregen: 0.05
         strength: 5
-        magic: 25
+        magic: 30
         defence: 6  
         willpower: 8
        
@@ -45,6 +45,6 @@ enemies:
         hp: 75
         hpregen: 0.05
         strength: 5
-        magic: 35
+        magic: 45
         defence: 8
         willpower: 10

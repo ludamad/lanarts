@@ -858,11 +858,11 @@ overworld_features = (map) ->
             enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
             MapUtils.spawn_enemy(map, enemy, xy)
         boss_placer = (map, xy) ->
-            if map.rng\randomf() < .5
-                enemy = OldMaps.enemy_generate(OldMaps.strong_hell)
-                MapUtils.spawn_enemy(map, enemy, xy)
-            else
-                MapUtils.spawn_enemy(map, "Centaur Hunter", xy)
+            --if map.rng\randomf() < .5
+            --    enemy = OldMaps.enemy_generate(OldMaps.strong_hell)
+            --    MapUtils.spawn_enemy(map, enemy, xy)
+            --else
+            MapUtils.spawn_enemy(map, "Centaur Hunter", xy)
         n_items_placed = 0
         item_placer = (map, xy) ->
             item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, (if n_items_placed == 0 then 100 else 2)

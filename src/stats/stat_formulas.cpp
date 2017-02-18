@@ -19,7 +19,7 @@
 #include "ClassEntry.h"
 
 /* What power, resistance difference causes damage to be raised by 100% */
-const float POWER_MULTIPLE_INTERVAL = 30.0f;
+const float POWER_MULTIPLE_INTERVAL = 20.0f;
 
 static float damage_multiplier(float power, float resistance) {
 	float powdiff = power - resistance;
