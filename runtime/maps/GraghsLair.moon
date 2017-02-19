@@ -61,7 +61,7 @@ floor_plans = (rng) ->
             n_encounter_vaults: 3
             enemy_entries: {
                 {enemy: "Sheep", guaranteed_spawns: 5, chance: 100}
-                {enemy: "Mouther", guaranteed_spawns: 12}
+                {enemy: "Mouther", guaranteed_spawns: 5}
                 {enemy: "Black Mamba", guaranteed_spawns: 5}
                 {enemy: "Centaur Hunter", guaranteed_spawns: 3}
                 {enemy: "Gragh", guaranteed_spawns: 1}
@@ -95,7 +95,7 @@ M.TEMPLATE  = (rng, floor, connector) ->
         _enemy_entries: () =>
             return plan.enemy_entries
         _n_enemies: () =>
-            return math.ceil(plan.n_enemies * OldMaps.enemy_bonus())
+            return math.ceil(plan.n_enemies) -- * OldMaps.enemy_bonus())
         _n_encounter_vaults: () =>
             return plan.n_encounter_vaults
         _encounter_vault: () =>

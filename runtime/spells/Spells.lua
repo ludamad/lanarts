@@ -410,7 +410,7 @@ local GreaterPain = {
     can_cast_with_held_key = true,
     spr_spell = "spr_spells.greaterpain",
     can_cast_with_cooldown = false,
-    mp_cost = 35,
+    mp_cost = 0,
     cooldown = 25,
     spell_cooldown = 800,
     fallback_to_melee = true,
@@ -419,7 +419,7 @@ local GreaterPain = {
 
 function GreaterPain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
-    caster:direct_damage(50)
+    caster:direct_damage(25)
     caster:add_effect("Pained", 50)
     caster:add_effect("Pain Aura", 50).range = GreaterPain.range + caster.stats.level * 5
     if caster:is_local_player() then
@@ -430,7 +430,7 @@ function GreaterPain.action_func(caster, x, y, target)
 end
 
 function GreaterPain.prereq_func(caster)
-    if caster.stats.hp < 75 then
+    if caster.stats.hp < 35 then
         if caster:is_local_player() then
             EventLog.add("You do not have enough health!", {255,200,200})
         end

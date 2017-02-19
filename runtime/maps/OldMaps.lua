@@ -262,6 +262,7 @@ M.Dungeon2 = {
 
 M.Dungeon3 = {
   { layout = medium_layouts,
+    dont_scale_enemies = true,
     content = {
       items = { amount = 5,  group = ItemGroups.basic_items   },
       enemies = {

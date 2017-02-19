@@ -75,8 +75,8 @@ Data.class_create {
         level_needed = 2 },
       { spell = "Fire Bolt",
         level_needed = 1 },
-      { spell = "Ludaze",
-        level_needed = 3 }
+      --{ spell = "Ludaze",
+      --  level_needed = 3 }
     },
     start_stats = {
         movespeed = 4,
@@ -102,7 +102,7 @@ Data.class_create {
         mpregen = 0.65 / 60, -- Per 60 frames
         magic = 1,
   --    strength = 1,
-  --      defence = 1,
+        defence = 1,
         willpower = 1
     }
 }
@@ -142,7 +142,7 @@ Data.class_create {
  --       magic = 1,
         strength = 1,
         defence = 1,
- --     willpower = 1
+        willpower = 1
     }
 }
 
@@ -211,9 +211,9 @@ Data.class_create {
     },
     start_stats = {
         movespeed = 4,
-        hp = 100,
-        mp = 45,
-        hpregen = 2 / 60, -- Per 60 frames
+        hp = 115,
+        mp = 50,
+        hpregen = 3 / 60, -- Per 60 frames
         mpregen = 0 / 60, -- Per 60 frames
         strength = 0,
         defence = 4,
@@ -228,12 +228,13 @@ Data.class_create {
         }
     },
     gain_per_level = {
-        hp = 10,
+        hp = 15,
         mp = 5,
-        hpregen = 0.5 / 60, -- Per 60 frames
+        hpregen = 0.9 / 60, -- Per 60 frames
         mpregen = 0 / 60, -- Per 60 frames
         magic = 1,
-        willpower = 1
+        willpower = 1,
+        defence = 1
     }
 }
 

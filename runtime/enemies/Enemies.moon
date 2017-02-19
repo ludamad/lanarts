@@ -218,10 +218,10 @@ Data.enemy_create {
     kills_before_stale: 50
     stats: {
         attacks: {{weapon: "Fast Melee"}}
-        hp: 80
+        hp: 60
         hpregen: 0.1
-        movespeed: 3.5
-        strength: 20
+        movespeed: 3
+        strength: 16
         defence: 0
         willpower: 12
     }

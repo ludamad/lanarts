@@ -102,7 +102,7 @@ M.TEMPLATE  = (rng, floor, connector) ->
         _enemy_entries: () =>
             return plan.enemy_entries
         _n_enemies: () =>
-            return math.ceil(plan.n_enemies * OldMaps.enemy_bonus())
+            return math.ceil(plan.n_enemies)-- * OldMaps.enemy_bonus())
         _n_encounter_vaults: () =>
             return plan.n_encounter_vaults
         _encounter_vault: () =>

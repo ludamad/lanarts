@@ -297,7 +297,7 @@ apply_enchantment = (rng, data, power_level) ->
 -- Define several randart amulets:
 define_amulet_randarts = (rng) ->
     images = get_resource_names("spr_amulets.randarts")
-    for i=1,50
+    for i=1,100
         base = {
             name: "Amulet"
             type: "amulet"
@@ -308,7 +308,7 @@ define_amulet_randarts = (rng) ->
 -- Define several randart rings:
 define_ring_randarts = (rng) ->
     images = get_resource_names("spr_rings.randarts")
-    for i=1,100 * 2
+    for i=1,100 * 4
         base = {
             name: "Ring"
             type: "ring"
@@ -319,7 +319,7 @@ define_ring_randarts = (rng) ->
 -- Define several randart belts:
 define_belt_randarts = (rng) ->
     images = get_resource_names("spr_belts.randarts")
-    for i=1,50
+    for i=1,100
         base = {
             name: "Belt"
             type: "belt"
@@ -330,7 +330,7 @@ define_belt_randarts = (rng) ->
 -- Define several randart legwear:
 define_legwear_randarts = (rng) ->
     images = get_resource_names("spr_legwear.randarts")
-    for i=1,50
+    for i=1,100
         base = {
             name: "Pants"
             type: "legwear"
@@ -384,7 +384,7 @@ define_equipment_randarts = (rng) ->
         if item.randart_sprites ~= nil and item.cooldown == nil
             append candidates, item
     for item in *candidates
-        for i=1,(item.randart_weight or 20) * 2
+        for i=1,(item.randart_weight or 20) * 4
             Data.equipment_create(define_randart(rng, item, item.randart_sprites, apply_enchantment))
 
 define_weapon_randarts = () ->
@@ -404,7 +404,7 @@ define_weapon_randarts = () ->
         if item.randart_sprites ~= nil and item.cooldown ~= nil
             append candidates, item
     for item in *candidates
-        for i=1,(item.randart_weight or 20) * 2
+        for i=1,(item.randart_weight or 20) * 4
             template = define_randart(rng, item, item.randart_sprites, apply_enchantment)
             Data.weapon_create(template)
 

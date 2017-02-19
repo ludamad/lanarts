@@ -594,7 +594,7 @@ Data.spell_create {
     spr_spell: "spr_spells.summon",
     description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower.",
     --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
-    mp_cost: 20,
+    mp_cost: 10,
     cooldown: 55,
     can_cast_with_held_key: false,
     fallback_to_melee: false,

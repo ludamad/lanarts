@@ -72,7 +72,7 @@ projectiles:
   - name: Mephitize
     weapon_class: magic
     damage_type: { magic: 1.0}
-    damage: { base: [3,4], magic: 1.4 }
+    damage: { base: [3,4], magic: 1.0 }
     power: { base: 1, magic: 0.2 }
     resist_modifier: 1
     range: 300
