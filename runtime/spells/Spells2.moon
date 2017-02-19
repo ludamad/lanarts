@@ -1,6 +1,7 @@
 EventLog = require "ui.EventLog"
 GameObject = require "core.GameObject"
 Map = require "core.Map"
+World = require "core.World"
 Bresenham = require "core.Bresenham"
 Display = require "core.Display"
 SpellObjects = require "objects.SpellObjects"
@@ -658,14 +659,15 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
                 eff = caster\add_effect "Summoner", 2
                 eff.duration = 30
             while caster.kills > @kill_tracker
-                if name == "Mage" 
-                    if caster\is_local_player()
-                        EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
-                    caster\heal_mp(4 + caster.stats.level)
-                elseif name == "Necromancer"
+                if name == "Necromancer"
                     if caster\is_local_player()
                         EventLog.add("You gain mana for killing!", COL_PALE_BLUE)
                     caster\heal_mp(5)
+                for {:instance, :class_name} in *World.players
+                    if instance ~= caster and class_name == "Necromancer"
+                        if instance\is_local_player()
+                            EventLog.add("You gain mana from the carnage!", COL_PALE_BLUE)
+                        instance\heal_mp(2)
                 @kill_tracker += 1
         on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
             if name == "Necromancer"

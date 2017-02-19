@@ -51,7 +51,7 @@ float monster_difficulty_multiplier(GameState* gs, EnemyEntry& etype) {
 	if (size > 6) {
 		size = 6; // A group larger than 6 will probably be split up considerably
 	}
-	float mult = log(size); //NB: natural log, base e ~ 2.718...
+	float mult = log(size) * 0.75f; //NB: natural log, base e ~ 2.718...
 	if (etype.unique) {
 		return 1 + mult / 2; // Can reasonably expect all players to be part of a boss fight
 	}

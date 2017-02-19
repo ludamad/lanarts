@@ -75,7 +75,7 @@ Data.class_create {
         level_needed = 2 },
       { spell = "Fire Bolt",
         level_needed = 1 },
-      { spell = "Mephitize",
+      { spell = "Ludaze",
         level_needed = 3 }
     },
     start_stats = {

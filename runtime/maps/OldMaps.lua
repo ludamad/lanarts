@@ -410,11 +410,11 @@ function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area
     return ret
 end
 function M.enemy_bonus()
-    return (World.player_amount - 1) / 2
+    return (World.player_amount - 1) / 4
 end
 
 function M.adjusted_enemy_amount(amount)
-    return math.ceil(amount + amount * (World.player_amount - 1) / 2)
+    return math.ceil(amount + amount * (World.player_amount - 1) / 4)
 end
 
 function M.adjusted_item_amount(amount)
