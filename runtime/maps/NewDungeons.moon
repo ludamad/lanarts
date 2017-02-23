@@ -204,7 +204,7 @@ M.make_connector = (types) ->
     types.on_generate = nil
     types.on_finish = nil
     for k,type in pairs(types)
-        pretty(k, type)
+        --pretty(k, type)
         assert(type.n_portals and type.sprite and type.connect, "Malformed connector type!")
         placed_portals[k] = {} -- list
     return {

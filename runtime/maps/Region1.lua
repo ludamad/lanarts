@@ -149,7 +149,6 @@ function M.generate_epic_store(map, xy)
     for i=1,random(5,10) do
         -- Dont consider randarts (use raw_item_generate), as they are already baked in:
         table.insert(items, ItemUtils.raw_item_generate(ItemGroups.epic_store_items))
-        pretty(items[#items])
         assert(items[#items].type)
     end
     MapUtils.spawn_epic_store(map, items, xy)
@@ -161,7 +160,6 @@ function M.generate_store(map, xy)
         local power_level = 1 + random(0, 2)
         local randart_chance = 5 -- Of 100
         table.insert(items, ItemUtils.item_generate(ItemGroups.store_items, power_level, randart_chance))
-        pretty(items[#items])
         assert(items[#items].type)
     end
     MapUtils.spawn_store(map, items, xy)

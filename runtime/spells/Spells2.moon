@@ -175,7 +175,7 @@ for equip_slot in *{"", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
             @kill_tracker = caster.kills
         step_func: (caster) =>
             while caster.kills > @kill_tracker
-                if chance(0.05)
+                if chance(0.04)
                     EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
                     play_sound "sound/summon.ogg"
                     monster = "Centaur Hunter"
@@ -212,7 +212,7 @@ for equip_slot in *{"", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
             @kill_tracker = caster.kills
         step_func: (caster) =>
             while caster.kills > @kill_tracker
-                if chance(0.05)
+                if chance(0.04)
                     EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
                     play_sound "sound/summon.ogg"
                     monster = "Golem"
@@ -576,7 +576,7 @@ Data.effect_create {
         @n_summons = 0
         for mon, time in pairs caster.summoned
             if not mon.destroyed
-                time_out = (if mon.name == "Spectral Beast" then (time > 600) else (time > 4800)) -- All others are permanents
+                time_out = (if mon.name == "Spectral Beast" then (time > 600) else (time > 1200)) -- All others are permanents
                 diff_floor = (caster.map ~= mon.map)
                 if time_out or diff_floor
                     mon\direct_damage(mon.stats.hp + 1)
@@ -706,7 +706,7 @@ Data.effect_create {
         -- Attack nearby monsters:
         for mon in *Map.enemies_list(caster)
             dist = vector_distance(mon.xy, caster.xy)
-            if dist < caster.target_radius + mon.target_radius + caster.weapon_range
+            if dist < caster.target_radius + mon.target_radius --+ caster.weapon_range
                 if @attacked[mon.id]
                     continue
                 @attacked[mon.id] = true
@@ -724,24 +724,24 @@ Data.effect_create {
     stat_func: (caster, old, new) =>
         new.speed = 0
         caster.stats.attack_cooldown = 2
-        new.strength += 2
-        new.defence += 5
-        new.willpower += 5
+        -- new.strength += 2
+        -- new.defence += 5
+        -- new.willpower += 5
 }
 
 -- Dash Attack
 Data.spell_create {
     name: "Dash Attack",
     spr_spell: "expedite",
-    description: "Dash in a straight line, hitting all enemies in your path. Stops if you hit a wall. Can still perform normal attacks and spells while dashing.",
+    description: "Dash in a straight line, hitting all enemies in your path. Stops if you hit a wall." -- Can still perform abilities while dashing.",
     --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
-    mp_cost: 0
+    mp_cost: 40
     cooldown: 0
     can_cast_with_held_key: true
     fallback_to_melee: true
-    spell_cooldown: 800
+    spell_cooldown: 1600
     action_func: (x, y) =>
-        effect = @add_effect "Dash Attack", 15
+        effect = @add_effect "Dash Attack", 12
         effect.angle = vector_direction(@xy, {x,y})
         if @is_local_player()
             EventLog.add("You dash valiantly forward!", {200,200,255})

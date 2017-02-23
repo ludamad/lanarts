@@ -114,16 +114,16 @@ Data.class_create {
       { spell = "Berserk",
         level_needed = 1 },
       { spell = "Dash Attack",
-        level_needed = 2 },
-      { spell = "Power Strike",
         level_needed = 3 },
+      { spell = "Power Strike",
+        level_needed = 2 },
       --{ spell = "Slam",
       --  level_needed = 3 },
     },
     start_stats = {
         movespeed = 4,
         hp = 135,
-        mp = 80,
+        mp = 60,
         hpregen = 4 / 60, -- Per 60 frames
         mpregen = 2 / 60, -- Per 60 frames
         strength = 7,
@@ -139,9 +139,9 @@ Data.class_create {
         }
     },
     gain_per_level = {
-        hp = 25,
+        hp = 20,
         mp = 15,
-        hpregen = 0,--0.65 / 60, -- Per 60 frames
+        hpregen = 0.65 / 60, -- Per 60 frames
         mpregen = 0.65 / 60, -- Per 60 frames
  --       magic = 1,
         strength = 1,
@@ -183,8 +183,8 @@ Data.class_create {
         }
     },
     gain_per_level = {
-        hp = 25,
-        mp = 10,
+        hp = 20,
+        mp = 15,
         hpregen = 0.65 / 60, -- Per 60 frames
         mpregen = 0.5 / 60, -- Per 60 frames
         magic = 1,

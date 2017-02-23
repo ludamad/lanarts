@@ -212,45 +212,45 @@ Data.weapon_create {
       
 }
 
-Data.weapon_create {
-    name = "Triple Sword",
-    description = "A very slow huge sword of great power.",
-    type = "axes and maces",
-
-    shop_cost = {125, 165},
-
-    spr_item = "spr_weapons.triple_sword",
-    randart_weight = 5,
-    randart_sprites = {"spr_weapons.randart_triple_sword1", "spr_weapons.randart_triple_sword2"},
-
-    resist_modifier = 1.5,
-
-    damage = {base = {10, 15}, strength = 1.6},
-    power = {base = 12, strength = 1.0},
-
-    cooldown = 85,
-
-    range = 7
-}
-
-Data.weapon_create {
-    name = "Battle Axe",
-    description = "A slow powerful axe that decimates the weak.",
-    type = "axes and maces",
-
-    shop_cost = {85, 105},
-
-    spr_item = "battle axe",
-
-    resist_modifier = 1.4,
-
-    damage = {base = {9, 13}, strength = 1.4},
-    power = {base = 6, strength = 0.3},
-
-    cooldown = 65,
-
-    range = 7
-}
+--Data.weapon_create {
+--    name = "Triple Sword",
+--    description = "A very slow huge sword of great power.",
+--    type = "axes and maces",
+--
+--    shop_cost = {125, 165},
+--
+--    spr_item = "spr_weapons.triple_sword",
+--    randart_weight = 5,
+--    randart_sprites = {"spr_weapons.randart_triple_sword1", "spr_weapons.randart_triple_sword2"},
+--
+--    resist_modifier = 1.5,
+--
+--    damage = {base = {10, 15}, strength = 1.6},
+--    power = {base = 12, strength = 1.0},
+--
+--    cooldown = 85,
+--
+--    range = 7
+--}
+--
+--Data.weapon_create {
+--    name = "Battle Axe",
+--    description = "A slow powerful axe that decimates the weak.",
+--    type = "axes and maces",
+--
+--    shop_cost = {85, 105},
+--
+--    spr_item = "battle axe",
+--
+--    resist_modifier = 1.4,
+--
+--    damage = {base = {9, 13}, strength = 1.4},
+--    power = {base = 6, strength = 0.3},
+--
+--    cooldown = 65,
+--
+--    range = 7
+--}
 
 Data.weapon_create {
     name = "Orc Axe",

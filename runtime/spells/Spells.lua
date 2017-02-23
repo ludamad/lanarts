@@ -119,7 +119,7 @@ function Berserk.autotarget_func(caster)
 end
 
 function Berserk.action_func(caster, x, y)
-    caster:add_effect("Berserk", 170)
+    caster:add_effect("Berserk", 140 + caster.stats.level * 30)
     if caster:is_local_player() then
         play_sound "sound/berserk.ogg"
         EventLog.add("You enter a powerful rage!", {200,200,255})
@@ -193,7 +193,7 @@ local PowerStrike = {
     spr_spell = "chargestrike",
     can_cast_with_cooldown = false,
     mp_cost = 40,
-    spell_cooldown = 40,
+    spell_cooldown = 800,
     cooldown = 0, -- Uses cooldown of weapon, favours 40 cooldown weapons
     fallback_to_melee = true,
 }

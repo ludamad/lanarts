@@ -10,10 +10,10 @@ for i=1,12 do
     ObjectUtils.spawn_item_near(player, item.type, item.amount)
 end
 
-for i=1,20 do
-    local item = ItemUtils.item_generate(ItemGroups.basic_items)
-    ObjectUtils.spawn_item_near(player, item.type, item.amount)
-end
+--for i=1,20 do
+--    local item = ItemUtils.item_generate(ItemGroups.basic_items)
+--    ObjectUtils.spawn_item_near(player, item.type, item.amount)
+--end
 
 player:gain_xp(1000)
 

@@ -81,14 +81,24 @@ add_random_effect = (rng, data) ->
     if data.effects_granted
         return -- For now, dont have double effects.
     data.effects_granted or= {}
-    {effect, description} = rng\random_choice {
-        {"VampiricWeapon", "You gain the power to steal life with your melee blows."}
-        {"ConfusingWeapon", "You gain the power to daze foes in melee."}
-        {"PoisonedWeapon", "You gain the power to poison foes in melee."}
-        {"PossiblySummonStormElementalOnKill", "You gain the power to summon storm elementals as you kill things."}
-        {"PossiblySummonGolemOnKill", "You gain the power to summon golems as you kill things."}
-        {"PossiblySummonCentaurOnKill", "You gain the power to summon centaurs as you kill things."}
-    }
+    local effect, description
+    if rng\randomf() < 0.01 
+        {effect, description} = {"Fortification", "Fortification: You gain defence as enemies hit you in melee."}
+    elseif rng\randomf() < 0.05 
+        {effect, description} = {"Spiky", "Spiky: You damage back enemies who hit you in melee."}
+    elseif rng\randomf() < 0.05 
+        {effect, description} = {"PossiblySummonCentaurOnKill", "Centaur Blessing: You gain the power to summon centaurs as you kill things."}
+    elseif rng\randomf() < 0.05 
+        {effect, description} = {"PossiblySummonGolemOnKill", "Golem Blessing: You gain the power to summon golems as you kill things."}
+    elseif rng\randomf() < 0.1
+        {effect, description} = {"PossiblySummonStormElementalOnKill", "Elemental Blessing: You gain the power to summon storm elementals as you kill things."}
+    else 
+        {effect, description} = rng\random_choice {
+            {"VampiricWeapon", "Weapon Vampirism: You gain the power to steal life with your melee blows."}
+            {"ConfusingWeapon", "Weapon Befuddlement: You gain the power to daze foes in melee."}
+            {"PoisonedWeapon", "Weapon Poison: You gain the power to poison foes in melee."}
+            {"KnockbackWeapon", "Weapon Knockback: You gain the power to knock back foes in melee."}
+        }
     data.description ..= " #{description}"
     append data.effects_granted, effect
 
@@ -174,9 +184,9 @@ add_buff = (rng, data, major = false) ->
             effect_chance, misc_buff_chance = 0.7, 0.4
         else
             effect_chance, misc_buff_chance = 0.1, 0.5
-    if rng\randomf() < 0.5 and not data.effects_granted
+    if rng\randomf() < effect_chance and not data.effects_granted
         add_random_effect(rng, data)
-    elseif rng\randomf() < 0.9
+    elseif rng\randomf() < misc_buff_chance
         buff = rng\random_choice {
             mult_stat_bonus("spell_velocity_multiplier", {1.10, 1.25})
             additive_stat_bonus("mp", {10, 25})
@@ -249,13 +259,13 @@ define_randart = (rng, base, images, enchanter) ->
     data.stat_bonuses or= {}
     n_enchants = power_level * 2
     while n_enchants > 0 
-        if rng\random(4) == 0
-            add_buff(rng, data, true) -- Major
-            n_enchants -= 1
-        elseif rng\random(4) == 0
-            add_buff(rng, data, true) -- Major
-            rng\random_choice(MINOR_DEBUFFS)(rng, data)
-        elseif rng\random(8) == 0
+        --if rng\random(4) == 0
+        --    add_buff(rng, data, true) -- Major
+        --    n_enchants -= 1
+        --if rng\random(4) == 0
+        --    add_buff(rng, data, true) -- Major
+        --    rng\random_choice(MINOR_DEBUFFS)(rng, data)
+        if rng\random(8) == 0
             add_buff(rng, data, false) -- Minor
             rng\random_choice(MINOR_DEBUFFS)(rng, data)
             n_enchants += 1
@@ -288,10 +298,10 @@ apply_enchantment = (rng, data, power_level) ->
                 additive_core_bonus("magic_reduction", {1, 1})(rng, data)
             additive_core_bonus("magic_resistance", {enchantment, enchantment})(rng, data)
         else
+            for i=1,enchantment,4
+                additive_core_bonus("reduction", {1, 1})(rng, data)
             additive_core_bonus("resistance", {enchantment, enchantment})(rng, data)
         for i=1,2
-            for i=1,enchantment,4
-                additive_core_bonus("magic_reduction", {1, 1})(rng, data)
             data.shop_cost[i] += math.floor((enchantment ^ 1.5) * 50)
 
 -- Define several randart amulets:

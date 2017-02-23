@@ -212,8 +212,8 @@ weapons = (chance, args) -> _filter {
             { item: "Gallanthor's Crutch",                 chance: 4     }
             { item: "Serated Sword",      chance: 4                      }
             { item: "Magic Sword",        chance: 4                     }
-            { item: "Triple Sword",        chance: 4                      }
-            { item: "Battle Axe",        chance: 4                      }
+--            { item: "Triple Sword",        chance: 4                      }
+--            { item: "Battle Axe",        chance: 4                      }
             { item: "Iron Scimitar",        chance: 1                      }
             { item: "Orc Axe",        chance: 4                      }
         }
@@ -274,13 +274,13 @@ for i=1,Randarts.MAX_POWER_LEVEL
         ring: {randart_list: true, chance: 8}
         legwear: {randart_list: true, chance: 1}
         belt: {randart_list: true, chance: 1}
-        amulet: {randart_list: true, chance: 8}
+        amulet: {randart_list: true, chance: 5}
         boots: {randart_list: true, chance: 1}
         helmet: {randart_list: true, chance: 3}
-        "short blades": {randart_list: true, chance: 8}
-        "staves": {randart_list: true, chance: 8}
-        "axes and maces": {randart_list: true, chance: 8}
-        armour: {randart_list: true, chance: 15}
+        "short blades": {randart_list: true, chance: 5}
+        "staves": {randart_list: true, chance: 5}
+        "axes and maces": {randart_list: true, chance: 5}
+        armour: {randart_list: true, chance: 8}
         bows: {randart_list: true, chance: 5}
         projectile: {randart_list: true, chance: 5}
         gloves: {randart_list: true, chance: 5}
@@ -291,6 +291,8 @@ for i=1,Randarts.MAX_POWER_LEVEL
             pretty(items[name])
             error("*** SHOULD HAVE '" .. type .. "' IN ITEM TABLE")
             -- continue
+        if type == "armour"
+            print(name)
         append item_table[type], name
     item_selection_list = (for k, v in pairs item_table do v)
     append(M.randart_items, item_selection_list)
