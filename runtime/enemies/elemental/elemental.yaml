@@ -29,7 +29,7 @@ enemies:
         hp: 50
         hpregen: 0.05
         strength: 5
-        magic: 30
+        magic: 25
         defence: 6  
         willpower: 8
        

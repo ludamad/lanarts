@@ -678,3 +678,76 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
             return damage
     }
 
+-- Move in a direction, attacking everyone along the way
+Data.effect_create {
+    name: "Dash Attack"
+    effected_sprite: "spr_effects.pain_mirror"
+    can_use_rest: false
+    effected_colour: {200, 200, 255, 255}
+    fade_out: 10
+    init_func: (caster) =>
+        play_sound "sound/equip.ogg"
+        @steps = 0
+        @attacked = {} -- No one attacked at first
+    step_func: (caster) =>
+        @steps += 1
+        -- Move forward: 
+        xy = {
+            caster.x + math.cos(@angle) * 16
+            caster.y + math.sin(@angle) * 16
+        }
+        if Map.object_tile_check(caster, xy)
+            play_sound "sound/door.ogg"
+            caster\remove_effect "Dash Attack"
+            return
+        caster.xy = xy
+        if caster\has_ranged_weapon()
+            return
+        -- Attack nearby monsters:
+        for mon in *Map.enemies_list(caster)
+            dist = vector_distance(mon.xy, caster.xy)
+            if dist < caster.target_radius + mon.target_radius + caster.weapon_range
+                if @attacked[mon.id]
+                    continue
+                @attacked[mon.id] = true
+                if caster\is_local_player()
+                    EventLog.add("You strike as you pass!", {200,200,255})
+                caster\melee(mon)
+    draw_func: (caster) =>
+        for i=1,math.min(@steps, 12)
+            xy = {
+                caster.x - math.cos(@angle) * 16 * i
+                caster.y - math.sin(@angle) * 16 * i
+            }
+            screen_xy = Display.to_screen_xy(xy)
+            caster.sprite\draw({color: {255,255,255, 200 - 30 * i}, origin: Display.CENTER}, screen_xy)
+    stat_func: (caster, old, new) =>
+        new.speed = 0
+        caster.stats.attack_cooldown = 2
+        new.strength += 2
+        new.defence += 5
+        new.willpower += 5
+}
+
+-- Dash Attack
+Data.spell_create {
+    name: "Dash Attack",
+    spr_spell: "expedite",
+    description: "Dash in a straight line, hitting all enemies in your path. Stops if you hit a wall. Can still perform normal attacks and spells while dashing.",
+    --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
+    mp_cost: 0
+    cooldown: 0
+    can_cast_with_held_key: true
+    fallback_to_melee: true
+    spell_cooldown: 800
+    action_func: (x, y) =>
+        effect = @add_effect "Dash Attack", 15
+        effect.angle = vector_direction(@xy, {x,y})
+        if @is_local_player()
+            EventLog.add("You dash valiantly forward!", {200,200,255})
+    prereq_func: () =>
+        return not @has_ranged_weapon()
+    autotarget_func: () =>
+        {dx, dy} = @last_moved_direction
+        return @x + dx * 32, @y + dy * 32
+}

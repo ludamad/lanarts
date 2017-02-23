@@ -104,7 +104,7 @@ local Berserk = {
     name = "Berserk",
     spr_spell = "berserk",
     description = "Initiate frenzy, gaining +2 defence, +5 willpower, +{Level} strength, +60% melee speed, +25% move speed. Killing enemies grants you longer frenzy, and heals a bit every kill. Afterwards, become exhausted with -3 defence, -3 willpower, -25% action speed, -50% move speed.",
-    mp_cost = 50,
+    mp_cost = 40,
     cooldown = 30,
     can_cast_with_held_key = false,
     fallback_to_melee = false
@@ -193,8 +193,8 @@ local PowerStrike = {
     spr_spell = "chargestrike",
     can_cast_with_cooldown = false,
     mp_cost = 40,
-    spell_cooldown = 80,
-    cooldown = 0, -- Uses cooldown of weapon
+    spell_cooldown = 40,
+    cooldown = 0, -- Uses cooldown of weapon, favours 40 cooldown weapons
     fallback_to_melee = true,
 }
 
@@ -208,7 +208,7 @@ local function ChargeCallback(_, caster)
             --if rand_range(0, 100) < chance then -- decreasing chance of knockback
             local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)
                 local thrown = mon:add_effect("Thrown", 10 + 10 * str_diff)
-                thrown.angle = vector_direction({caster.x, caster.y}, {mon.x, mon.y})
+                thrown.angle = vector_direction(caster.xy, mon.xy)
                 if caster:is_local_player() then
                     EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
                 end
@@ -414,14 +414,14 @@ local GreaterPain = {
     cooldown = 25,
     spell_cooldown = 800,
     fallback_to_melee = true,
-    range = 60
+    range = 65
 }
 
 function GreaterPain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
-    caster:direct_damage(25)
+    caster:direct_damage(40)
     caster:add_effect("Pained", 50)
-    caster:add_effect("Pain Aura", 50).range = GreaterPain.range + caster.stats.level * 5
+    caster:add_effect("Pain Aura", 100).range = GreaterPain.range + caster.stats.level * 5
     if caster:is_local_player() then
         EventLog.add("You attack nearby enemies life force directly!", {200,200,255})
     else
@@ -430,7 +430,7 @@ function GreaterPain.action_func(caster, x, y, target)
 end
 
 function GreaterPain.prereq_func(caster)
-    if caster.stats.hp < 35 then
+    if caster.stats.hp < 55 then
         if caster:is_local_player() then
             EventLog.add("You do not have enough health!", {255,200,200})
         end

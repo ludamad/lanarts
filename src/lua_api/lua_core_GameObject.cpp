@@ -197,6 +197,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
     LuaValue setters = luameta_getters(meta);
 	luawrap::bind_getter(getters["vx"], &CombatGameInst::vx);
 	luawrap::bind_getter(getters["is_resting"], &CombatGameInst::is_resting);
+    LUAWRAP_GETTER(getters, sprite, game_sprite_data[OBJ->get_sprite()].sprite);
     luawrap::bind_getter(getters["vy"], &CombatGameInst::vy);
     luawrap::bind_getter(getters["team"], &CombatGameInst::team);
     luawrap::bind_getter(getters["vision_radius"], &CombatGameInst::vision_radius);
@@ -251,7 +252,6 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
     LUAWRAP_GETTER(getters, unique, OBJ->etype().unique);
     LUAWRAP_GETTER(getters, is_enemy, true);
 	LUAWRAP_GETTER(getters, kills, 0);
-	LUAWRAP_GETTER(getters, sprite, game_sprite_data[OBJ->get_sprite()].sprite);
     LUAWRAP_GETTER(getters, xpworth, OBJ->xpworth());
     LUAWRAP_SETTER(setters, xpworth, double, OBJ->xpworth() = VAL);
 	return meta;

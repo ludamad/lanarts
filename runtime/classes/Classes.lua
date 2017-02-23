@@ -69,14 +69,14 @@ Data.class_create {
     name = "Mage",
     sprites = {"wizard", "wizard2"},
     available_spells = {
-      { spell = "Minor Missile",
-    	level_needed = 1 },
+   --   { spell = "Minor Missile",
+   -- 	level_needed = 1 },
       { spell = "Magic Blast",
         level_needed = 2 },
       { spell = "Fire Bolt",
         level_needed = 1 },
-      --{ spell = "Ludaze",
-      --  level_needed = 3 }
+      { spell = "Mephitize",
+        level_needed = 3 }
     },
     start_stats = {
         movespeed = 4,
@@ -113,13 +113,17 @@ Data.class_create {
     available_spells = {
       { spell = "Berserk",
         level_needed = 1 },
-      { spell = "Power Strike",
+      { spell = "Dash Attack",
         level_needed = 2 },
+      { spell = "Power Strike",
+        level_needed = 3 },
+      --{ spell = "Slam",
+      --  level_needed = 3 },
     },
     start_stats = {
         movespeed = 4,
         hp = 135,
-        mp = 50,
+        mp = 80,
         hpregen = 4 / 60, -- Per 60 frames
         mpregen = 2 / 60, -- Per 60 frames
         strength = 7,
@@ -136,7 +140,7 @@ Data.class_create {
     },
     gain_per_level = {
         hp = 25,
-        mp = 10,
+        mp = 15,
         hpregen = 0,--0.65 / 60, -- Per 60 frames
         mpregen = 0.65 / 60, -- Per 60 frames
  --       magic = 1,
@@ -156,8 +160,8 @@ Data.class_create {
         level_needed = 2 },
       { spell = "Ludaze",
         level_needed = 3 },
-      { spell = "Call Spikes",
-        level_needed = 4 },
+      --{ spell = "Call Spikes",
+      --  level_needed = 4 },
     },
     start_stats = {
         movespeed = 4,

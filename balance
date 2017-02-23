@@ -76,4 +76,4 @@ Necromancer:
 +TODO doors always open in dungeon
 +-- bouncing lightning attack
 +-- Ooze enemy that has combined HP and splits into parts.
-
+"They may not solve all your problems or even any of them (hard to tell knowing nothing about your game, after all), but I was absolutely dumbfounded when I played around with them at how cheaply you can get some rather complex (seeming) behaviors (e.g. put the player and some enemies in a maze, give the players a scent that strongly attracts the enemies, but also give them a slight scent that makes them repulse each other, and they'll automagically split up and surround the player)."
