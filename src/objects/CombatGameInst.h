@@ -58,7 +58,8 @@ public:
 	virtual bool damage(GameState* gs, int dmg);
 	bool damage(GameState* gs, const EffectiveAttackStats& attack);
 	virtual bool melee_attack(GameState* gs, CombatGameInst* inst,
-			const Weapon& weapon, bool ignore_cooldowns = false);
+			const Weapon& weapon, bool ignore_cooldowns = false, 
+                        float damage_multiplier = 1.0f);
 	bool projectile_attack(GameState* gs, CombatGameInst* inst,
 			const Weapon& weapon, const Projectile& projectile);
 	bool attack(GameState* gs, CombatGameInst* inst, const AttackStats& attack);

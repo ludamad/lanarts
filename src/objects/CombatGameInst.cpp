@@ -313,7 +313,7 @@ void CombatGameInst::post_draw(GameState *gs) {
 }
 
 bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
-        const Item& weapon, bool ignore_cooldowns) {
+        const Item& weapon, bool ignore_cooldowns, float damage_multiplier) {
     event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d\n", id, inst->id,     weapon.id);
 
     bool isdead = false;
@@ -326,11 +326,11 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     EffectiveAttackStats atkstats = effective_atk_stats(mt,
             AttackStats(weapon));
 
-    int damage = damage_formula(atkstats, inst->effective_stats());
+    float damage = damage_formula(atkstats, inst->effective_stats()) * damage_multiplier;
 
     if (gs->game_settings().verbose_output) {
         char buff[100];
-        snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
+        snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %f",
                 atkstats.damage, atkstats.power, int(atkstats.magic_percentage * 100),
                 damage);
         gs->game_chat().add_message(buff);
@@ -390,11 +390,11 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 
     // Don't damage players during invincibility:
     if (dynamic_cast<PlayerInst*>(this) || !gs->game_settings().invincible) {
-        isdead = inst->damage(gs, damage);
+        isdead = inst->damage(gs, int(damage));
     }
 
     char dmgstr[32];
-    snprintf(dmgstr, 32, "%d", damage);
+    snprintf(dmgstr, 32, "%d", int(damage));
     float rx, ry;
     ::direction_towards(Pos(x, y), Pos(inst->x, inst->y), rx, ry, 0.5);
     rx = round(rx * 256.0f) / 256.0f;

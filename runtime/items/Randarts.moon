@@ -235,6 +235,9 @@ MINOR_DEBUFFS = {
     mult_core_bonus("ranged_cooldown_multiplier", {1.1, 1.2})
 }
 
+randart_pickup = (item, user) ->
+    play_sound "sound/randart.ogg"
+
 NAMES_USED = {}
 -- Define a single randart:
 define_randart = (rng, base, images, enchanter) ->
@@ -256,6 +259,7 @@ define_randart = (rng, base, images, enchanter) ->
     -- Make sure we don't see this as a randart-derivable item:
     data.randart_sprites = nil
     data.randart_weight = 0
+    data.pickup_func = randart_pickup
     data.stat_bonuses or= {}
     n_enchants = power_level * 2
     while n_enchants > 0 
@@ -288,18 +292,18 @@ apply_enchantment = (rng, data, power_level) ->
     if enchantment > 0
         data.name = "+#{enchantment} #{data.name}"
         if data.cooldown
-            for i=1,enchantment,4
-                additive_core_bonus("damage", {1, 1})(rng, data)
+            --for i=1,enchantment,4
+            --    additive_core_bonus("damage", {1, 1})(rng, data)
             additive_core_bonus("power", {enchantment, enchantment})(rng, data)
-            data["resist_modifier"] or= 1
-            data["resist_modifier"] /= 1 + 0.05 * enchantment
+            --data["resist_modifier"] or= 1
+            --data["resist_modifier"] /= 1 + 0.05 * enchantment
         elseif rng\randomf() < 0.5
-            for i=1,enchantment,4
-                additive_core_bonus("magic_reduction", {1, 1})(rng, data)
+            --for i=1,enchantment,4
+            --    additive_core_bonus("magic_reduction", {1, 1})(rng, data)
             additive_core_bonus("magic_resistance", {enchantment, enchantment})(rng, data)
         else
-            for i=1,enchantment,4
-                additive_core_bonus("reduction", {1, 1})(rng, data)
+            --for i=1,enchantment,4
+            --    additive_core_bonus("reduction", {1, 1})(rng, data)
             additive_core_bonus("resistance", {enchantment, enchantment})(rng, data)
         for i=1,2
             data.shop_cost[i] += math.floor((enchantment ^ 1.5) * 50)

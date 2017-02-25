@@ -104,7 +104,7 @@ Data.enemy_create {
         -- base stats:
         strength: 15
         defence: 5
-        magic: 30
+        magic: 25
         willpower: 8
     }
     effects_active: {"PoisonedWeapon"}
@@ -435,12 +435,12 @@ Data.enemy_create {
     xpaward: 150
     unique: true
     stats: {
-        attacks: { {weapon: "Basic Melee"}, { projectile: "Large Fire Ball"} }
+        attacks: { { projectile: "Large Fire Ball"} }
         hp: 220
         hpregen: 0.1
         movespeed: 2.5
         strength: 35
-        magic: 35
+        magic: 30
         defence: 15
         willpower: 15
     }

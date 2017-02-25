@@ -317,9 +317,6 @@ static void draw_attack_description_overlay(GameState* gs,
 //                }
 	}
         int cooldown = attack.cooldown;
-        if (p->class_stats().class_entry().name != "Ranger" && weapon_class == "bows") {
-            cooldown *= 1.5;
-        }
 	draw_value(gs, dbh, "Cooldown: ", cooldown, COL_PALE_YELLOW,
 			COL_PALE_RED);
 }

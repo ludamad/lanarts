@@ -271,11 +271,11 @@ M.randart_items = {}
 -- For the randart levels:
 for i=1,Randarts.MAX_POWER_LEVEL
     item_table = {
-        ring: {randart_list: true, chance: 8}
-        legwear: {randart_list: true, chance: 1}
-        belt: {randart_list: true, chance: 1}
-        amulet: {randart_list: true, chance: 5}
-        boots: {randart_list: true, chance: 1}
+        ring: {randart_list: true, chance: 12}
+        legwear: {randart_list: true, chance: 3}
+        belt: {randart_list: true, chance: 3}
+        amulet: {randart_list: true, chance: 8}
+        boots: {randart_list: true, chance: 3}
         helmet: {randart_list: true, chance: 3}
         "short blades": {randart_list: true, chance: 5}
         "staves": {randart_list: true, chance: 5}

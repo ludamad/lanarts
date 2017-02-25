@@ -32,7 +32,7 @@ Data.equipment_create {
     shop_cost = { 95, 125 },
 
     spr_item = "spr_armour.gloves_confusion",
-    randart_sprites = {"spr_armour.gloves_confusion_randart"},
+    --randart_sprites = {"spr_armour.gloves_confusion_randart"},
     effects_granted = {"ConfusingWeapon"}
 }
 
@@ -44,7 +44,7 @@ Data.equipment_create {
     shop_cost = { 95, 125 },
 
     spr_item = "spr_armour.gloves_fear",
-    randart_sprites = {"spr_armour.gloves_fear_randart"},
+    --randart_sprites = {"spr_armour.gloves_fear_randart"},
     effects_granted = {"FearWeapon"}
 }
 

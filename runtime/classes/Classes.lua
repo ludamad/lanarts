@@ -150,49 +150,49 @@ Data.class_create {
     }
 }
 
-Data.class_create {
-    name = "Ranger",
-    sprites = {"archer", "spr_enemies.humanoid.deep_elf_archer"},
-    available_spells = {
-      { spell = "Magic Arrow",
-        level_needed = 1 },
-      { spell = "Expedite",
-        level_needed = 2 },
-      { spell = "Ludaze",
-        level_needed = 3 },
-      --{ spell = "Call Spikes",
-      --  level_needed = 4 },
-    },
-    start_stats = {
-        movespeed = 4,
-        hp = 115,
-        mp = 85,
-        hpregen = 4 / 60, -- Per 60 frames
-        mpregen = 2 / 60, -- Per 60 frames
-        strength = 7,
-        defence = 4,
-        willpower = 4,
-        magic = 7,
-        equipment = {
-          weapon = "Short Bow",
-          projectile = {item = "Arrow", amount = 50},
-          gold = 0,
-          inventory = table.tconcat({
-             {item = "Health Potion", amount = 1},
-          }, TEST_INVENTORY)
-        }
-    },
-    gain_per_level = {
-        hp = 20,
-        mp = 15,
-        hpregen = 0.65 / 60, -- Per 60 frames
-        mpregen = 0.5 / 60, -- Per 60 frames
-        magic = 1,
-        strength = 1,
---        defence = 1,
---        willpower = 1
-    }
-}
+--Data.class_create {
+--    name = "Ranger",
+--    sprites = {"archer", "spr_enemies.humanoid.deep_elf_archer"},
+--    available_spells = {
+--      { spell = "Magic Arrow",
+--        level_needed = 1 },
+--      { spell = "Expedite",
+--        level_needed = 2 },
+--      { spell = "Ludaze",
+--        level_needed = 3 },
+--      --{ spell = "Call Spikes",
+--      --  level_needed = 4 },
+--    },
+--    start_stats = {
+--        movespeed = 4,
+--        hp = 115,
+--        mp = 85,
+--        hpregen = 4 / 60, -- Per 60 frames
+--        mpregen = 2 / 60, -- Per 60 frames
+--        strength = 7,
+--        defence = 4,
+--        willpower = 4,
+--        magic = 7,
+--        equipment = {
+--          weapon = "Short Bow",
+--          projectile = {item = "Arrow", amount = 50},
+--          gold = 0,
+--          inventory = table.tconcat({
+--             {item = "Health Potion", amount = 1},
+--          }, TEST_INVENTORY)
+--        }
+--    },
+--    gain_per_level = {
+--        hp = 20,
+--        mp = 15,
+--        hpregen = 0.65 / 60, -- Per 60 frames
+--        mpregen = 0.5 / 60, -- Per 60 frames
+--        magic = 1,
+--        strength = 1,
+----        defence = 1,
+----        willpower = 1
+--    }
+--}
 
 Data.class_create {
     name = "Necromancer",
@@ -242,4 +242,49 @@ Data.class_create {
     }
 }
 
-
+--Data.class_create {
+--    name = "Lifelinker",
+--    sprites = {"spr_enemies.humanoid.deep_elf_demonologist", "spr_enemies.humanoid.servant_of_whispers"},
+--    available_spells = {
+--      { spell = "Link of Loyalty",
+--        level_needed = 1 },
+--      --{ spell = "Baleful Link",
+--      --  level_needed = 1 },
+--      { spell = "Unlink",
+--        level_needed = 1 },
+--      --{ spell = "Healing Aura",
+--      --  level_needed = 2 },
+--      --{ spell = "Call Spikes",
+--      --  level_needed = 4 },
+--    },
+--    start_stats = {
+--        movespeed = 4,
+--        hp = 115,
+--        mp = 85,
+--        hpregen = 4 / 60, -- Per 60 frames
+--        mpregen = 4 / 60, -- Per 60 frames
+--        strength = 4,
+--        defence = 7,
+--        willpower = 7,
+--        magic = 4,
+--        equipment = {
+--          weapon = "Dagger",
+--          gold = 0,
+--          inventory = table.tconcat({
+--             {item = "Health Potion", amount = 1},
+--          }, TEST_INVENTORY)
+--        }
+--    },
+--    gain_per_level = {
+--        hp = 20,
+--        mp = 15,
+--        hpregen = 0.5 / 60, -- Per 60 frames
+--        mpregen = 0.65 / 60, -- Per 60 frames
+--        magic = 1,
+----        strength = 1,
+--        defence = 1,
+--        willpower = 1
+--    }
+--}
+--
+--

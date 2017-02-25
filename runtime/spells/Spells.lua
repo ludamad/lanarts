@@ -106,6 +106,7 @@ local Berserk = {
     description = "Initiate frenzy, gaining +2 defence, +5 willpower, +{Level} strength, +60% melee speed, +25% move speed. Killing enemies grants you longer frenzy, and heals a bit every kill. Afterwards, become exhausted with -3 defence, -3 willpower, -25% action speed, -50% move speed.",
     mp_cost = 40,
     cooldown = 30,
+    spell_cooldown = 400,
     can_cast_with_held_key = false,
     fallback_to_melee = false
 }
@@ -119,7 +120,7 @@ function Berserk.autotarget_func(caster)
 end
 
 function Berserk.action_func(caster, x, y)
-    caster:add_effect("Berserk", 140 + caster.stats.level * 30)
+    caster:add_effect("Berserk", 140 + math.min(3, caster.stats.level) * 30)
     if caster:is_local_player() then
         play_sound "sound/berserk.ogg"
         EventLog.add("You enter a powerful rage!", {200,200,255})

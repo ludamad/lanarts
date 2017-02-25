@@ -126,7 +126,8 @@ public:
     // but do not otherwise interact with the game.
     // They respawn when a player (included the player that had died) uses a revive elixir near them.
     bool melee_attack(GameState* gs, CombatGameInst* inst,
-                    const Item& weapon, bool ignore_cooldowns);
+                    const Item& weapon, bool ignore_cooldowns = false, 
+                    float damage_multiplier = 1.0f);
     PosF& last_moved_direction() {
         return _last_moved_direction;
     }

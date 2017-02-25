@@ -154,7 +154,7 @@ Data.weapon_create {
 
     resist_modifier = 1.1,
 
-    damage = {base = {8, 13}, strength = 1.25},
+    damage = {base = {8, 13}, strength = 1.2},
     power = {base = {3, 6}, strength = 0.35},
 
     cooldown = 55,
@@ -176,7 +176,7 @@ Data.weapon_create {
 
     resist_modifier = 1.1,
 
-    damage = {base = {7, 12}, strength = 1.25},
+    damage = {base = {7, 12}, strength = 1.2},
     power = {base = {2, 5}, strength = 0.35},
 
     cooldown = 55,

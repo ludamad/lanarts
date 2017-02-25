@@ -615,11 +615,6 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
         bool wallbounce = false;
         int nbounces = 0;
 
-        if (class_stats().class_entry().name != "Ranger" && wentry.weapon_class == "bows") {
-//            weaprange = TILE_SIZE * 2.3;
-            cooldown *= 1.5;
-        }
-
         GameInst* bullet = new ProjectileInst(projectile,
                 effective_atk_stats(mt, weaponattack), id, start, actpos,
                 movespeed, weaprange, NONE, wallbounce, nbounces);
@@ -668,7 +663,8 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 }
 
 bool PlayerInst::melee_attack(GameState* gs, CombatGameInst* e,
-        const Item& weapon, bool ignore_cooldowns) {
+        const Item& weapon, bool ignore_cooldowns,
+        float damage_multiplier) {
     if (gs->local_player()->current_floor == current_floor) {
         play(attack_sound, "sound/melee.ogg");
     }

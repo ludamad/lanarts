@@ -77,3 +77,27 @@ Necromancer:
 +-- bouncing lightning attack
 +-- Ooze enemy that has combined HP and splits into parts.
 "They may not solve all your problems or even any of them (hard to tell knowing nothing about your game, after all), but I was absolutely dumbfounded when I played around with them at how cheaply you can get some rather complex (seeming) behaviors (e.g. put the player and some enemies in a maze, give the players a scent that strongly attracts the enemies, but also give them a slight scent that makes them repulse each other, and they'll automagically split up and surround the player)."
+
+" Dungeon layout idea "
+    Hmm what about each dungeon piece has portals that activate when you clear its tiny 2nd floor that acts like one giant encounter
+    These are 'left' and 'right' portals and work one way if you dont have the other side activated
+    they are located near the entrance so you can gtfo from the dungeon piece if you arent expecting how hard it was
+    clear all the encounter rooms and maybe you get an 'up' portal
+    Maybe one gives you one artifact headgear / player
+    another one artifact armour, etc
+
+"Ranger"
+    - manual aiming in direction of movement
+    - arrows dont mulch for ranger (RANGER ONLY!?)
+    - use mana to make arrows pass through
+    - use mana to go hyper ranger mode
+
+"Summoner"
+    - can sacrifice hp to heal summons
+    - penalty if summons die
+    - micro by unsummoning
+
+"Shaman"
+    - totems are initially inert
+    - support spells make them do things
+
