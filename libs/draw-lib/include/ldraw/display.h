@@ -20,9 +20,10 @@ void display_set_drawing_region(const BBoxF& bbox);
 void display_draw_finish();
 void display_draw_start();
 
+Size screen_size();
 Size display_size();
 Size window_size();
 
 }
-
+        
 #endif /* DISPLAY_H_ */

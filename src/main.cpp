@@ -109,6 +109,15 @@ static GameState* init_gamestate(bool reinit) {
 			exit(1);
 		}
 	}
+        // Width 0 resolves to monitor width:
+        Size screen_size = ldraw::screen_size();
+        if (settings.view_width == 0) {
+            settings.view_width = screen_size.w;
+        }
+        // Height 0 resolves to monitor height:
+        if (settings.view_height == 0) {
+            settings.view_height = screen_size.h;
+        }
 
 	lanarts_net_init(true);
 	lsound::init();
