@@ -14,7 +14,9 @@ function events.PlayerDeath(player)
     if settings.regen_on_death then
         -- On soft-core, turn players into ghosts when they die:
         player.is_ghost = true
-        player:add_effect("Reviving", 20 * 60) -- 20 'seconds'
+        if not player:has_effect("Reviving") then
+            player:add_effect("Reviving", 20 * 60) -- 20 'seconds'
+        end
         if #World.players == 1 then
             return false -- On soft-core single-player, never die.
         end

@@ -174,8 +174,6 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 
 void PlayerInst::step(GameState* gs) {
     PERF_TIMER();
-    std::vector<int> effects_active = {get_effect_by_name(class_stats().class_entry().name.c_str())};
-    effects().ensure_effects_active(gs, this, effects_active);
     paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
     //if (cooldowns().action_cooldown > 0)
     //printf("MELEE COOLDOWN %d\n", cooldowns().action_cooldown);
@@ -247,7 +245,7 @@ void PlayerInst::copy_to(GameInst *inst) const {
 
 bool PlayerInst::can_benefit_from_rest() {
     // If we are not allowed to rest, we therefore cannot benefit.
-    if (!effective_stats().allowed_actions.can_use_rest || !effects().can_rest()) {
+    if (!effective_stats().allowed_actions.can_use_rest || !effects.can_rest()) {
         return false;
     }
     CoreStats& ecore = effective_stats().core;
@@ -299,3 +297,7 @@ PlayerInst *PlayerInst::clone() const {
 	return new PlayerInst(*this);
 }
 
+std::vector<StatusEffect> PlayerInst::base_status_effects(GameState* gs) {
+    effect_id id = get_effect_by_name(class_stats().class_entry().name.c_str());
+    return {{id, LuaValue(gs->luastate())}};
+}

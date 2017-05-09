@@ -40,14 +40,8 @@ public:
 	CoreStatMultiplier& resistance() {
 		return armour_modifier().resistance;
 	}
-	CoreStatMultiplier& damage_reduction() {
-		return armour_modifier().damage_reduction;
-	}
 	CoreStatMultiplier& magic_resistance() {
 		return armour_modifier().magic_resistance;
-	}
-	CoreStatMultiplier& magic_reduction() {
-		return armour_modifier().magic_reduction;
 	}
 
 	int number_of_equip_slots() {

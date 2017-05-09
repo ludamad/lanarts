@@ -63,20 +63,20 @@ size_t Inventory::last_filled_slot() const {
 	return 0;
 }
 
-void Inventory::serialize(SerializeBuffer& serializer) {
+void Inventory::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_int(items.size());
 	for (int i = 0; i < items.size(); i++) {
-		items[i].item.serialize(serializer);
+		items[i].item.serialize(gs, serializer);
 		serializer.write_byte(items[i].equipped);
 	}
 }
 
-void Inventory::deserialize(SerializeBuffer& serializer) {
+void Inventory::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	int size;
 	serializer.read_int(size);
 	items.resize(size);
 	for (int i = 0; i < items.size(); i++) {
-		items[i].item.deserialize(serializer);
+		items[i].item.deserialize(gs, serializer);
 		items[i].equipped = serializer.read_byte();
 	}
 }

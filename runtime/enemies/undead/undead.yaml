@@ -19,19 +19,19 @@ enemies:
         
   - name: Skeleton Fighter
     sprite: skeleton fighter
-    radius: 14
-    xpaward: 10
+    radius: 11
+    xpaward: 30
     appear_message: A re-animated skeleton appears!
     defeat_message: The skeleton is broken unto a pile of bones.
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 50
-        hpregen: 0.03
+        hp: 75
+        hpregen: 0.05
         movespeed: 2
         #base stats:
-        strength: 10
-        defence: 2
-        willpower: 2
+        strength: 15
+        defence: 5
+        willpower: 5  
         
   - name: Zombie
     sprite: zombie

@@ -39,9 +39,6 @@ public:
 		return attack.physical_percentage();
 	}
 
-	float resistability() {
-		return attack.resistability();
-	}
 	int range() {
 		return attack.range;
 	}

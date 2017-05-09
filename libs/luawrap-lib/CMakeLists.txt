@@ -23,11 +23,11 @@ add_library( luawrap
 # Test runner target
 aux_source_directory(tests luawrap_testsrc) 
 
-add_executable( luawrap_tests ${luawrap_testsrc} )
-
-target_link_libraries(luawrap_tests luawrap lua UnitTest++)
-
-# Enable tests
-enable_testing()
-
-add_test(NAME luawrap_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/luawrap_tests )
+#add_executable( luawrap_tests ${luawrap_testsrc} )
+#
+#target_link_libraries(luawrap_tests luawrap lua UnitTest++)
+#
+## Enable tests
+#enable_testing()
+#
+#add_test(NAME luawrap_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/luawrap_tests )

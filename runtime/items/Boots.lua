@@ -8,7 +8,9 @@ Data.equipment_create {
     spr_item = "spr_boots.boots1_brown",
     randart_sprites = {"spr_boots.randart_leather_boots"},
 
-    resistance = { base = 1 }
+    stat_bonuses = {
+        defence = 1,
+    },
 }
 
 Data.equipment_create {
@@ -20,21 +22,25 @@ Data.equipment_create {
 
     spr_item = "iron boots",
 
-    resistance = { base = 2 }
+    stat_bonuses = {
+        defence = 2,
+    },
 }
 
-Data.equipment_create {
-    name = "Iron Boots",
-    description = "Heavy boots suitable for war.",
-    type = "boots",
-
-    shop_cost = { 60, 90 },
-
-    spr_item = "spr_boots.boots_iron2",
-
-    reduction = { base = 1 },
-    resistance = { base = 1 }
-}
+--Data.equipment_create {
+--    name = "Iron Boots",
+--    description = "Heavy boots suitable for war.",
+--    type = "boots",
+--
+--    shop_cost = { 60, 90 },
+--
+--    spr_item = "spr_boots.boots_iron2",
+--
+--    stat_bonuses = {
+--        willpower = 2,
+--        defence = 3
+--    }
+--}
 
 Data.equipment_create {
     name = "Troll Boots",
@@ -45,9 +51,11 @@ Data.equipment_create {
 
     spr_item = "spr_boots.boots4_green",
 
-    reduction = { base = 1 },
-    resistance = { base = 1 },
-    stat_bonuses = { hpregen = 2 / 60, strength = 1},
+    stat_bonuses = {
+        hpregen = 2 / 60,
+        strength = 1,
+        defence = 3,
+    },
     effects_granted = {"Encumbered"}
 }
 
@@ -60,9 +68,10 @@ Data.equipment_create {
 
     spr_item = "spr_boots.boots2_jackboots",
 
-    reduction = { base = 1 },
-    resistance = { base = 1 },
-    stat_bonuses = { hp = 30 }
+    stat_bonuses = {
+        hp = 30,
+        defence = 2,
+    },
 }
 Data.equipment_create {
     name = "Stripe Boots",
@@ -73,7 +82,8 @@ Data.equipment_create {
 
     spr_item = "spr_boots.boots3_stripe",
 
-    reduction = { base = 1 },
-    resistance = { base = 1 },
-    stat_bonuses = { spell_velocity_multiplier = 1.35 }
+    stat_bonuses = {
+        defence = 2,
+        spell_velocity_multiplier = 1.50
+    }
 }

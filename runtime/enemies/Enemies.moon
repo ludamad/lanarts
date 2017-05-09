@@ -7,36 +7,6 @@ Map = require "core.Map"
 ObjectUtils = require "objects.ObjectUtils"
 EventLog = require "ui.EventLog"
 
-enemy_init = (enemy) -> nil
-
-enemy_step = (enemy) -> nil
-
-enemy_berserker_init = (enemy) ->
-    enemy.berserk_time = 500
-
-enemy_berserker_step = (enemy) ->
-    enemy.berserk_time = enemy.berserk_time - 1
-    if enemy.berserk_time <= 0 and Map.object_visible(enemy)
-        enemy\add_effect("Berserk", 300)
-        enemy.berserk_time = 500
-
-Data.effect_create {
-    name: "Enraging"
-    init_func: (mon) =>
-        @damage_tracker = 0
-        @damage_interval = mon.stats.max_hp / 3
-        @next_hp_threshold = mon.stats.max_hp - @damage_interval
-    on_damage_func: (mon, dmg) =>
-        @damage_tracker += dmg
-        new_hp = mon.stats.hp - dmg
-        if new_hp < @next_hp_threshold
-            EventLog.add((if mon.unique then "" else "The ") .. mon.name .. " gets mad!", {255,255,255})
-            mon\add_effect("Charging", 100)
-            @next_hp_threshold -= @damage_interval
-        return dmg
-}
-
-
 -- UNDEAD ENEMIES --
 
 Data.enemy_create {
@@ -246,7 +216,10 @@ Data.enemy_create {
         defence: 0
         willpower: 12
     }
-    effects_active: {"PoisonedWeapon", "Spiky"}
+    effects_active: {
+        "PoisonedWeapon", 
+        {"Spiky", {recoil_percentage: 0.25}}
+    }
 }
  
 Data.enemy_create {
@@ -265,7 +238,11 @@ Data.enemy_create {
         defence: 15
         willpower: 20
     }
-    effects_active: {"PoisonedWeapon", "Spiky", "Enraging"}
+    effects_active: {
+        "PoisonedWeapon", 
+        {"Spiky", {recoil_percentage: 0.25}}
+        "Enraging"
+    }
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
@@ -299,7 +276,7 @@ Data.enemy_create {
         -- base stats:
         strength: 5
         defence: 0
-        magic: 10
+        magic: 17
         willpower: 0
     }
     effects_active: {"PoisonedWeapon"}
@@ -359,33 +336,6 @@ Data.enemy_create {
 --             elseif not target.is_enemy and target\is_local_player()
 --                 EventLog.add("You are thrown back!", {200,200,255})
 
-Data.effect_create {
-    name: "Charging"
-    stat_func: (mon, old, new) =>
-        new.speed *= 4
-        if @n_steps > @n_ramp
-            new.melee_cooldown_multiplier *= 0.5
-        new.hpregen *= 2
-    effected_sprite: "spr_effects.i-loudness"
-    effected_colour: {255,0,0}
-    fade_out: 15
-    init_func: (mon) =>
-        @n_steps = 0
-        @n_ramp = 10
-    step_func: () =>
-        if @n_steps % 60 == 0
-            play_sound "sound/wavy.ogg"
-        @n_steps += 1
-    on_melee_func: (mon, defender, damage, attack_stats) =>
-        if @n_steps > @n_ramp
-            thrown = defender\add_effect("Thrown", 10)
-            thrown.angle = vector_direction({mon.x, mon.y}, {defender.x, defender.y})
-            if not mon.is_enemy and mon\is_local_player() 
-                EventLog.add("The " .. defender.name .." is thrown back!", {200,200,255})
-            elseif not defender.is_enemy and defender\is_local_player()
-                EventLog.add("You are thrown back!", {200,200,255})
-            -- mon\remove_effect("Charging")
-}
 Data.enemy_create {
     name: "Elephant"
     sprite: "spr_enemies.animals.elephant"

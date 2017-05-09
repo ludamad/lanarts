@@ -79,6 +79,7 @@ public:
         return true;
     }
 
+    virtual std::vector<StatusEffect> base_status_effects(GameState* gs);
     virtual void signal_killed_enemy() {
         _score_stats.kills++;
     }

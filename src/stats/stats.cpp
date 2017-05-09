@@ -103,7 +103,6 @@ EffectiveAttackStats EffectiveStats::with_attack(MTwist& mt,
 	ret.damage = attack.atk_damage(mt, *this);
 	ret.power = attack.atk_power(mt, *this);
 	ret.magic_percentage = attack.atk_percentage_magic();
-	ret.resist_modifier = attack.atk_resist_modifier();
 	return ret;
 }
 
@@ -141,7 +140,6 @@ void CooldownStats::reset_stopaction_timeout(int cooldown) {
 
 bool DerivedStats::operator ==(const DerivedStats & derived) const {
 	return damage == derived.damage && power == derived.power
-			&& reduction == derived.reduction
 			&& resistance == derived.resistance;
 }
 

@@ -78,10 +78,6 @@ CoreStats parse_core_stats(const YAML::Node& n) {
 
 	core.magic = parse_defaulted(n, "magic", 0);
 	core.willpower = parse_defaulted(n, "willpower", 0);
-//	core.physical_reduction = parse_defaulted(n, "reduction", 0);
-//	LANARTS_ASSERT(core.physical_reduction == 0);
-//	core.magic_reduction = parse_defaulted(n, "magic_reduction", 0);
-//	LANARTS_ASSERT(core.magic_reduction == 0);
 	return core;
 }
 
@@ -121,19 +117,13 @@ DamageStats parse_damage_modifier(const YAML::Node& n) {
 	dmg.power_stats = parse_defaulted(n, "power", CoreStatMultiplier());
 	parse_magic_percentage(dmg, n, "damage_type");
 
-	dmg.resistability = parse_defaulted(n, "resist_modifier", 1.0f);
-
 	return dmg;
 }
 
 ArmourStats parse_defence_modifiers(const YAML::Node& n) {
 	ArmourStats def;
 
-	def.damage_reduction = parse_defaulted(n, "reduction",
-			CoreStatMultiplier());
 	def.resistance = parse_defaulted(n, "resistance", CoreStatMultiplier());
-	def.magic_reduction = parse_defaulted(n, "magic_reduction",
-			CoreStatMultiplier());
 	def.magic_resistance = parse_defaulted(n, "magic_resistance",
 			CoreStatMultiplier());
 

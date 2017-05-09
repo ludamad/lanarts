@@ -25,7 +25,7 @@ struct EnemyEntry: public ResourceEntryBase {
 	sprite_id enemy_sprite = -1, death_sprite = -1;
 	CombatStats basestats;
 	bool unique = false;
-	std::vector<effect_id> active_effects;
+	std::vector<StatusEffect> active_effects;
         int kills_before_stale = 25;
 	int vision_radius = 7; // TODO, use
 

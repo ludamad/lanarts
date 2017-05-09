@@ -97,7 +97,7 @@ ProjectileInst* ProjectileInst::clone() const {
 static void lua_hit_callback(lua_State* L, LuaValue& callback,
 		const EffectiveAttackStats& atkstats, GameInst* projectile,
 		GameInst* target) {
-	if (!callback.empty()) {
+	if (!callback.empty() && !callback.isnil()) {
 		callback.push();
 		luawrap::push(L, projectile);
 		luawrap::push(L, target);
@@ -281,14 +281,14 @@ sprite_id ProjectileInst::sprite() const {
 void ProjectileInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	GameInst::serialize(gs, serializer);
 	SERIALIZE_POD_REGION(serializer, this, rx, sole_target);
-	projectile.serialize(serializer);
+	projectile.serialize(gs, serializer);
 	SERIALIZE_POD_REGION(serializer, this, atkstats, damage_mult);
 }
 
 void ProjectileInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	GameInst::deserialize(gs, serializer);
 	DESERIALIZE_POD_REGION(serializer, this, rx, sole_target);
-	projectile.deserialize(serializer);
+	projectile.deserialize(gs, serializer);
 	DESERIALIZE_POD_REGION(serializer, this, atkstats, damage_mult);
 }
 

@@ -94,7 +94,7 @@ CombatGameInst* MonsterController::find_actor_to_target(GameState* gs, EnemyInst
         view.sharp_center_on(actor->x, actor->y);
         bool chasing = e->behaviour().chase_timeout > 0
                 && actor->id == e->behaviour().chasing_actor;
-        bool forced_wander = (e->effects().get(get_effect_by_name("Dazed")));
+        bool forced_wander = e->effects.has("Dazed");
         event_log("View %d %d\n", view.x, view.y);
         if (view.within_view(ebox) && (chasing || isvisible) && !forced_wander) {
             e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
@@ -137,7 +137,7 @@ void MonsterController::pre_step(GameState* gs) {
         CombatGameInst* actor = find_actor_to_target(gs, e);
 
         // Part of: Implement status effects.
-        bool forced_wander = (e->effects().get(get_effect_by_name("Dazed")));
+        bool forced_wander = e->effects.has("Dazed");
         if (forced_wander) {
             if (eb.current_action == EnemyBehaviour::CHASING_PLAYER) {
                 eb.current_action = EnemyBehaviour::INACTIVE;
@@ -222,7 +222,7 @@ void MonsterController::pre_step(GameState* gs) {
 void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {
     float movespeed = e->effective_stats().movespeed;
 
-    bool has_fear = (e->effects().get(get_effect_by_name("Fear")));
+    bool has_fear = e->effects.has("Fear");
     if (e->cooldowns().is_hurting()) {
         // Ogre mages in specific don't slow movement, and neither do fleeing enemies:
         if (e->etype().name == "Ogre Mage" || has_fear) {

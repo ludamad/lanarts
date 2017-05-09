@@ -13,7 +13,7 @@ projectiles:
     on_hit_func: 
       function(projectile, target, atkstats) 
         if chance(.25) then
-            local effect = target:add_effect(effects.Poison.name, 100, atkstats) 
+            local effect = target:add_effect("Poison", 100, atkstats) 
             effect.damage = atkstats.damage 
             effect.power = atkstats.power
             effect.magic_percentage = atkstats.magic_percentage
@@ -35,7 +35,7 @@ projectiles:
     on_hit_func: 
       function(projectile, target, atkstats) 
         if chance(.25) then
-            local effect = target:add_effect(effects.Poison.name, 100, atkstats) 
+            local effect = target:add_effect("Poison", 100, atkstats) 
             effect.damage = atkstats.damage 
             effect.power = atkstats.power
             effect.magic_percentage = atkstats.magic_percentage

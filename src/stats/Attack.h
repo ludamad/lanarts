@@ -32,10 +32,6 @@ public:
 		return damage_modifiers.physical_percentage;
 	}
 
-	float resistability() {
-		return damage_modifiers.resistability;
-	}
-
 	void init(lua_State* L) {
 		attack_action.init(L);
 	}

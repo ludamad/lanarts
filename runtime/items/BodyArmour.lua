@@ -11,8 +11,9 @@ Data.equipment_create {
 
     spell_cooldown_multiplier = 1.1,
 
-    --reduction = {base = 1},
-    resistance = {base = 2}
+    stat_bonuses = { 
+        defence = 2,
+    },
 }
 
 Data.equipment_create {
@@ -30,8 +31,9 @@ Data.equipment_create {
 
     ranged_cooldown_multiplier = 1.15,
 
-    reduction = {base = 1},
-    resistance = {base = 2}
+    stat_bonuses = { 
+        defence = 3,
+    },
 }
 
 Data.equipment_create {
@@ -45,10 +47,10 @@ Data.equipment_create {
 
     spr_item = "spr_armour.crystal_plate2",
 
-    reduction = {base = 3},
-    resistance = {base = 3},
-    magic_reduction = {base = 1},
-    magic_resistance = {base = 1},
+    stat_bonuses = { 
+        defence = 3,
+        willpower = 3,
+    },
     effects_granted = {"Encumbered"}
 }
 
@@ -67,8 +69,9 @@ Data.equipment_create {
 
     ranged_cooldown_multiplier = 1.35,
 
-    reduction = {base = 2},
-    resistance = {base = 2}
+    stat_bonuses = { 
+        defence = 3,
+    },
 }
 
 Data.equipment_create {
@@ -82,11 +85,9 @@ Data.equipment_create {
 
     spr_item = "robe",
 
-    --reduction = {base = 1},
-    magic_reduction = {base = 1},
-
-    --resistance = {base = 1},
-    magic_resistance = {base = 1}
+    stat_bonuses = { 
+        willpower = 1,
+    },
 }
 
 Data.equipment_create {
@@ -98,13 +99,11 @@ Data.equipment_create {
 
     spr_item = "enchanted robe",
 
-    reduction = {base = 1},
-    magic_reduction = {base = 1},
-
-    resistance = {base = 1},
-    magic_resistance = {base = 1},
-
-    stat_bonuses = {magic = 1}
+    stat_bonuses = {
+        magic = 1,
+        willpower = 1,
+        defence = 1
+    }
 }
 
 Data.equipment_create {
@@ -116,13 +115,11 @@ Data.equipment_create {
 
     spr_item = "runed robe",
 
-    reduction = {base = 1},
-    magic_reduction = {base = 2},
-
-    resistance = {base = 1},
-    magic_resistance = {base = 2},
-
-    stat_bonuses = {defence = 1, magic = 1}
+    stat_bonuses = {
+        defence = 2, 
+        willpower = 2, 
+        magic = 1,
+    }
 }
 
 Data.equipment_create {
@@ -130,11 +127,14 @@ Data.equipment_create {
     description = "A robe of great magical capacity.",
     type = "armour",
 
-    shop_cost = {95,105},
+    shop_cost = {95,155},
 
     spr_item = "robe of mana",
 
-    stat_bonuses = {mp = 35}
+    stat_bonuses = {
+        mp = 35, 
+        willpower = 2, 
+    }
 }
 
 Data.equipment_create {
@@ -146,7 +146,10 @@ Data.equipment_create {
 
     spr_item = "spr_armour.robe_of_health",
 
-    stat_bonuses = {hp = 35}
+    stat_bonuses = {
+        hp = 35, 
+        willpower = 2, 
+    }
 }
 
 Data.equipment_create {
@@ -161,8 +164,11 @@ Data.equipment_create {
     spell_cooldown_multiplier = 1.05,
     ranged_cooldown_multiplier = 1.05,
 
-    stat_bonuses = {mp = 10, hp = 10},
-    reduction = {base = 2},
-    resistance = {base = 2},
-    effects_granted = {"ManaGainOnKill"}
+    stat_bonuses = {
+        hp = 10,
+        mp = 10,
+        defence = 3,
+        willpower = 3 
+    },
+    effects_granted = {"ArmourManaGainOnKill"}
 }

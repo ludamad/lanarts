@@ -33,8 +33,8 @@ public:
 		return inventory.get(i);
 	}
 
-	void serialize(SerializeBuffer& serializer);
-	void deserialize(SerializeBuffer& serializer);
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+	void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 	ItemSlot& weapon_slot();
 	ItemSlot& projectile_slot();

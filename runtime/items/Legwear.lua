@@ -11,8 +11,9 @@ Data.equipment_create {
 
     ranged_cooldown_multiplier = 1.35,
 
-    reduction = {base = 1},
-    resistance = {base = 1}
+    stat_bonuses = { 
+        defence = 2,
+    },
 }
 
 Data.equipment_create {

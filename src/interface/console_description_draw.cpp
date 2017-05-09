@@ -7,6 +7,8 @@
 #include <ldraw/Font.h>
 #include <ldraw/DrawOptions.h>
 
+#include <luawrap/luawrap.h>
+
 #include "draw/colour_constants.h"
 #include "draw/draw_sprite.h"
 #include "draw/SpriteEntry.h"
@@ -22,6 +24,7 @@
 
 #include "stats/ClassEntry.h"
 #include "stats/SpellEntry.h"
+#include "stats/effect_data.h"
 
 #include "console_description_draw.h"
 
@@ -64,6 +67,11 @@ public:
 			this->bbox.x2 = this->bbox.x1 + MAX_WIDTH;
 		}
 	}
+	void draw_sprite_prefix(GameState* gs, sprite_id sprite) {
+		Pos pos = get_next_draw_position();
+                draw_sprite(sprite, pos.x, pos.y - TILE_SIZE/2);
+		value_draw_pos = Pos(pos.x + TILE_SIZE + 4, pos.y);
+	}
 	void draw_prefix(GameState* gs, const Colour& col, const char* fmt, ...) {
 		Pos pos = get_next_draw_position();
 		char buff[512];
@@ -91,12 +99,11 @@ public:
 	int height() const {
 		return bbox.height();
 	}
-private:
 	static const int SX = TILE_SIZE / 2, SY = TILE_SIZE * 3 / 2 + 4;
 
 	Pos get_next_draw_position() {
 		int xinterval = bbox.width() / cols_per_row;
-		int yinterval = bbox.height() / 6;
+		int yinterval = TILE_SIZE / 2;
 
 		int col = draw_index % cols_per_row;
 		int row = draw_index / cols_per_row;
@@ -104,6 +111,7 @@ private:
 
 		return Pos(SX + xinterval * col, SY + yinterval * row);
 	}
+private:
 	int cols_per_row;
 	/* Members */
 	int draw_index;
@@ -216,6 +224,10 @@ static void draw_percentage_modifier(GameState* gs, DescriptionBoxHelper& dbh,
 
 static void draw_stat_bonuses_overlay(GameState* gs, DescriptionBoxHelper& dbh,
 		CoreStats& core) {
+	draw_bonus(gs, dbh, "Strength: ", core.strength);
+	draw_bonus(gs, dbh, "Defence: ", core.defence);
+	draw_bonus(gs, dbh, "Magic: ", core.magic);
+	draw_bonus(gs, dbh, "Will: ", core.willpower);
 	draw_bonus(gs, dbh, "HP: ", core.max_hp);
 	draw_bonus(gs, dbh, "MP: ", core.max_mp);
 	if (core.hpregen > 0) {
@@ -236,10 +248,6 @@ static void draw_stat_bonuses_overlay(GameState* gs, DescriptionBoxHelper& dbh,
                         "Spell Velocity: ");
 
 	draw_bonus(gs, dbh, "MP+: ", core.hpregen);
-	draw_bonus(gs, dbh, "Strength: ", core.strength);
-	draw_bonus(gs, dbh, "Defence: ", core.defence);
-	draw_bonus(gs, dbh, "Magic: ", core.magic);
-	draw_bonus(gs, dbh, "Will: ", core.willpower);
 }
 
 static void draw_cooldown_modifiers_overlay(GameState* gs,
@@ -258,20 +266,13 @@ static void draw_defence_bonuses_overlay(GameState* gs,
 		DescriptionBoxHelper& dbh, ArmourStats& armour) {
 	PlayerInst* p = gs->local_player();
 	CoreStats& core = p->effective_stats().core;
-	const char* dmgreduct = "+Physical Reduction: ";
-	const char* dmgresist = "+Physical Resistance: ";
-	const char* mdmgreduct = "+Magic Reduction: ";
-	const char* mdmgresist = "+Magic Resistance: ";
+	const char* dmgresist = "+Defence: ";
+	const char* mdmgresist = "+Willpower: ";
 	if (dbh.width() < WIDTH_THRESHOLD) {
-		dmgreduct = "+Reduction: ";
-		dmgresist = "+Resist: ";
-		mdmgreduct = "+MReduction: ";
-		mdmgresist = "+MResist: ";
+		dmgresist = "+Def: ";
+		mdmgresist = "+Will: ";
 	}
-	draw_statmult(gs, dbh, dmgreduct, armour.damage_reduction, core, COL_GOLD);
 	draw_statmult(gs, dbh, dmgresist, armour.resistance, core, COL_GOLD);
-	draw_statmult(gs, dbh, mdmgreduct, armour.magic_reduction, core,
-			COL_BABY_BLUE);
 	draw_statmult(gs, dbh, mdmgresist, armour.magic_resistance, core,
 			COL_BABY_BLUE);
 }
@@ -282,6 +283,29 @@ static void draw_damage_bonuses_overlay(GameState* gs,
 	draw_statmult(gs, dbh, "+Damage: ", damage.damage_stats, core);
 	draw_statmult(gs, dbh, "+Power: ", damage.power_stats, core);
 }
+
+static void draw_spells_granted_overlay(GameState* gs,
+		DescriptionBoxHelper& dbh, SpellsKnown& spells_granted) {
+        for (int i = 0; i < spells_granted.amount(); i++) {
+            SpellEntry& entry = spells_granted.get_entry(i);
+            dbh.draw_sprite_prefix(gs, entry.sprite);
+            dbh.draw_value(gs, COL_PALE_YELLOW, "Grants \"%s\"", entry.name.c_str());
+        }
+}
+
+static void draw_effect_modifiers_overlay(GameState* gs,
+		DescriptionBoxHelper& dbh, StatusEffectModifiers& status_effects) {
+        for (StatusEffect status_effect : status_effects.status_effects) {
+            EffectEntry& entry = game_effect_data.at(status_effect.id);
+            if (entry.console_draw_func.isnil())  {
+                continue;
+            }
+            Pos draw_pos = dbh.get_next_draw_position();
+            entry.console_draw_func.push(); // Function to call
+            luawrap::call<void>(gs->luastate(), status_effect.args, gs->local_player(), draw_pos);
+        }
+}
+
 static void draw_equipment_description_overlay(GameState* gs,
 		DescriptionBoxHelper& dbh, const Item& item) {
 	EquipmentEntry& entry = item.equipment_entry();
@@ -289,6 +313,8 @@ static void draw_equipment_description_overlay(GameState* gs,
 	draw_defence_bonuses_overlay(gs, dbh, entry.armour_modifier());
 	draw_damage_bonuses_overlay(gs, dbh, entry.damage_modifier());
 	draw_cooldown_modifiers_overlay(gs, dbh, entry.cooldown_modifiers);
+	draw_spells_granted_overlay(gs, dbh, entry.spells_granted);
+	draw_effect_modifiers_overlay(gs, dbh, entry.effect_modifiers);
 }
 
 static void draw_attack_description_overlay(GameState* gs,
@@ -299,13 +325,6 @@ static void draw_attack_description_overlay(GameState* gs,
 			COL_PALE_YELLOW, COL_PALE_GREEN, false);
 	draw_statmult(gs, dbh, "Power: ", attack.power_stats(), core,
 			COL_PALE_YELLOW, COL_PALE_GREEN, false);
-
-	// Damage penetration
-
-	dbh.draw_prefix(gs, COL_PALE_YELLOW, "Piercing: ");
-	int piercing = round(100 - attack.resistability() * 100);
-	Colour statcol = piercing < 0 ? COL_PALE_RED : COL_PALE_GREEN;
-	dbh.draw_value(gs, statcol, "%d%%", piercing);
 
 	if (attack.range >= 15) {
 		dbh.draw_prefix(gs, COL_PALE_YELLOW, "Range: ");

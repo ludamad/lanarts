@@ -8,25 +8,26 @@
 
 #include <vector>
 
+#include "luawrap/LuaValue.h"
 #include "lanarts_defines.h"
 
 #include "stats.h"
 
 class LuaField;
+class GameState;
+class SerializeBuffer;
 
 struct DamageStats {
 	CoreStatMultiplier power_stats, damage_stats;
 	float magic_percentage, physical_percentage;
-	float resistability; // How much resistance can resist this attack, lower for fast attacks
 	DamageStats() :
-			magic_percentage(0.0f), physical_percentage(0.0f), resistability(
-					1.0f) {
+			magic_percentage(0.0f), physical_percentage(0.0f) {
 	}
 };
 
 struct ArmourStats {
-	CoreStatMultiplier resistance, damage_reduction;
-	CoreStatMultiplier magic_resistance, magic_reduction;
+	CoreStatMultiplier resistance;
+	CoreStatMultiplier magic_resistance;
 };
 
 //Stat modifiers that trivially stack
@@ -43,8 +44,17 @@ DamageStats parse_damage_modifiers(const LuaField& value);
 ArmourStats parse_defence_modifiers(const LuaField& value);
 StatModifiers parse_stat_modifiers(const LuaField& value);
 
+struct StatusEffect {
+    effect_id id;
+    LuaValue args; // What arguments do we apply to this effect?
+    void serialize(GameState* gs, SerializeBuffer& serializer);
+    void deserialize(GameState* gs, SerializeBuffer& serializer);
+};
+
 struct StatusEffectModifiers {
-	std::vector<effect_id> status_effects;
+	std::vector<StatusEffect> status_effects;
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+    void deserialize(GameState* gs, SerializeBuffer& serializer);
 };
 
 #endif /* STAT_MODIFIERS_H_ */

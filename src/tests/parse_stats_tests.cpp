@@ -45,30 +45,24 @@ TEST(parse_damage_modifiers) {
 	const char* program =
 			"{ damage = { base = {1,2}, strength = 3, magic = 4, defence = 5, willpower = 6 },"
 					" power = { base = {7,8}, strength = 9, magic = 10, defence = 11, willpower = 12 },"
-					" damage_type = { magic = 0.5, physical = 0.5 },"
-					" resist_modifier = 13 }";
+					" damage_type = { magic = 0.5, physical = 0.5 }}";
 	TestLuaState L;
 	DamageStats dmg = parse_damage_modifiers(luawrap::eval(L, program));
 	check_stat_multiplier(dmg.damage_stats, 0);
 	check_stat_multiplier(dmg.power_stats, 6);
 	CHECK(0.5 == dmg.magic_percentage);
 	CHECK(0.5 == dmg.physical_percentage);
-	CHECK(13 == dmg.resistability);
 
 	L.finish_check();
 }
 
 TEST(parse_defence_modifiers) {
 	const char* program =
-			"{ reduction = { base = {1,2}, strength = 3, magic = 4, defence = 5, willpower = 6 },"
 					" resistance = { base = {7,8}, strength = 9, magic = 10, defence = 11, willpower = 12 },"
-					" magic_reduction = { base = {13,14}, strength = 15, magic = 16, defence = 17, willpower = 18 },"
 					" magic_resistance = { base = {19,20}, strength = 21, magic = 22, defence = 23, willpower = 24 } }";
 	TestLuaState L;
 	ArmourStats def = parse_defence_modifiers(luawrap::eval(L, program));
-	check_stat_multiplier(def.damage_reduction, 0);
 	check_stat_multiplier(def.resistance, 6);
-	check_stat_multiplier(def.magic_reduction, 12);
 	check_stat_multiplier(def.magic_resistance, 18);
 
 	L.finish_check();
@@ -76,12 +70,11 @@ TEST(parse_defence_modifiers) {
 
 TEST(parse_stat_modifiers) {
 	const char* program =
-			"{ damage_bonuses = { damage = {base = {1,2} } }, reduction = { base = {4,5} }, stat_bonuses = { hp = 3  } }";
+			"{ damage_bonuses = { damage = {base = {1,2} } }, stat_bonuses = { hp = 3  } }";
 	TestLuaState L;
 	StatModifiers modifiers = parse_stat_modifiers(luawrap::eval(L, program));
 	CHECK(Range(1,2) == modifiers.damage_mod.damage_stats.base);
 	CHECK(3 == modifiers.core_mod.hp);
-	CHECK(Range(4,5) == modifiers.armour_mod.damage_reduction.base);
 
 	L.finish_check();
 }

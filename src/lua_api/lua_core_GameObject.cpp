@@ -98,6 +98,15 @@ static int lapi_gameinst_map(lua_State* L) {
 	return 1;
 }
 
+static void lapi_gameinst_remove_effect(GameInst* inst, LuaStackValue name) {
+    Effect* eff = inst->effects.get_active(name.to_str());
+    // Trigger finish functions and set t_remaining to 0.
+    // (Does nothing if eff is NULL.)
+    if (eff) {
+        inst->effects.remove(lua_api::gamestate(name), inst, eff);
+    }
+}
+
 static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(GameInst*);
 
@@ -139,6 +148,13 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	LUAWRAP_SETTER(setters, y, double, OBJ->update_position(OBJ->x, VAL));
 	LUAWRAP_SETTER(setters, xy, PosF, OBJ->update_position(VAL.x, VAL.y));
 
+    methods["remove_effect"].bind_function( lapi_gameinst_remove_effect);
+
+    LUAWRAP_GETTER(methods, add_effect, OBJ->effects.add(lua_api::gamestate(L), OBJ, StatusEffect {effect_from_lua(L, 2), LuaValue(L, 3)}) );
+    LUAWRAP_GETTER(methods, has_effect, OBJ->effects.get_active(lua_tostring(L, 2)) != NULL);
+    LUAWRAP_GETTER(methods, get_effect, OBJ->effects.get(lua_api::gamestate(L), OBJ, lua_tostring(L, 2)).state);
+    LUAWRAP_GETTER(methods, has_effect_category, OBJ->effects.has_category(luawrap::get<const char*>(L, 2)));
+
 	// Use table as fallback for setting values
 	lua_pushcfunction(L, &lapi_gameinst_setter_fallback);
 	luameta_defaultsetter(meta, LuaStackValue(L, -1));
@@ -156,7 +172,6 @@ static int lapi_combatgameinst_damage(lua_State* L) {
 	attack.damage = round(lua_tonumber(L, 2));
 	attack.power = round(lua_tonumber(L, 3));
 	attack.magic_percentage = nargs >= 4 ? lua_tonumber(L, 4) : 1.0f;
-	attack.resist_modifier = nargs >= 5 ? lua_tonumber(L, 5) : 1.0f;
 
 	bool died = (luawrap::get<CombatGameInst*>(L, 1)->damage(lua_api::gamestate(L), attack));
 	lua_pushboolean(L, died);
@@ -179,13 +194,6 @@ static void lapi_combatgameinst_heal_mp(CombatGameInst* inst, float mp) {
 
 static int lapi_do_nothing(lua_State *L) {
     return 0;
-}
-
-static void lapi_combatgameinst_remove_effect(CombatGameInst* inst, LuaStackValue name) {
-    Effect* eff = inst->effects().get(get_effect_by_name(name.to_str()));
-    // Trigger finish functions and set t_remaining to 0.
-    // (Does nothing if eff is NULL.)
-    inst->effects().remove(lua_api::gamestate(name), inst, eff); 
 }
 
 static LuaValue lua_combatgameinst_metatable(lua_State* L) {
@@ -220,14 +228,9 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
     methods["damage"].bind_function(lapi_combatgameinst_damage);
 	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);
     methods["heal_mp"].bind_function(lapi_combatgameinst_heal_mp);
-    methods["remove_effect"].bind_function( lapi_combatgameinst_remove_effect);
 
-    LUAWRAP_METHOD(methods, add_effect, OBJ->effects().add(lua_api::gamestate(L), OBJ, effect_from_lua(L, 2), lua_tointeger(L, 3)).push() );
     LUAWRAP_METHOD(methods, die, OBJ->die(lua_api::gamestate(L)));
-    LUAWRAP_GETTER(methods, has_effect, OBJ->effects().get(effect_from_lua(L, 2)) != NULL);
-    LUAWRAP_GETTER(methods, get_effect, OBJ->effects().get(effect_from_lua(L, 2))->state);
     LUAWRAP_GETTER(methods, is_local_player, false);
-    LUAWRAP_GETTER(methods, has_effect_category, OBJ->effects().has_category(luawrap::get<const char*>(L, 2)));
 
 	methods["reset_rest_cooldown"].bind_function(lapi_do_nothing);
 
@@ -314,6 +317,7 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 
 	LuaValue setters = luameta_setters(meta);
 	LUAWRAP_SETTER(setters, is_ghost, bool, OBJ->is_ghost() = VAL);
+	LUAWRAP_GETTER(getters, weapon_sprite, res::sprite(OBJ->weapon().weapon_entry().item_sprite));
     
 	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->weapon().weapon_entry().uses_projectile);
 	LUAWRAP_GETTER(methods, has_ranged_weapon, OBJ->weapon().weapon_entry().uses_projectile);

@@ -11,6 +11,7 @@
 
 #include "items/EquipmentEntry.h"
 #include "items/WeaponEntry.h"
+#include "objects/CombatGameInst.h"
 
 #include "combat_stats.h"
 
@@ -40,11 +41,9 @@ static float basic_damage_formula(const EffectiveAttackStats& attacker,
         // This will hopefully allow power/resistance to be more meaningful, 
         // as the multiplier will be applied to the larger number.
 	float mult = damage_multiplier(attacker.power, defender.resistance);
-	float adjusted_damage = attacker.damage * mult;
-        float adjusted_reduction = defender.reduction * attacker.resist_modifier;
-        float result = std::max(adjusted_damage - adjusted_reduction, adjusted_damage * 0.5f);
-	event_log("basic_damage_formula: mult=%f, damage=%f reduction=%f defence=%f result=%f\n",
-			mult, (float)attacker.damage, (float)defender.reduction, result);
+	float result = attacker.damage * mult;
+	event_log("basic_damage_formula: mult=%f, damage=%f defence=%f result=%f\n",
+			mult, (float)attacker.damage, (float)defender.resistance, result);
         return std::max(0.0f, result);
 }
 
@@ -63,12 +62,12 @@ float damage_formula(const EffectiveAttackStats& attacker,
 	float mdmg = magic_damage_formula(attacker, defender);
 	float pdmg = physical_damage_formula(attacker, defender);
 
-	event_log("damage_formula attacker damage=%d power=%d cooldown=%d magic_percentage=%f resist_modifier=%f\n",
+	event_log("damage_formula attacker damage=%d power=%d cooldown=%d magic_percentage=%f\n",
 			attacker.damage, attacker.power, attacker.cooldown,
-			attacker.magic_percentage, attacker.resist_modifier);
-	event_log("damage_formula defender physical.resistance=%f physical.reduction=%d magic.resistance=%f magic.reduction=%d \n",
-			defender.physical.resistance, defender.physical.reduction,
-			defender.magic.resistance, defender.magic.reduction);
+			attacker.magic_percentage);
+	event_log("damage_formula defender physical.resistance=%f magic.resistance=%f\n",
+			defender.physical.resistance,
+			defender.magic.resistance);
 	event_log("damage_formula: mdmg=%f, pdmg=%f\n", mdmg, pdmg);
 
 	return mdmg * attacker.magic_percentage
@@ -92,9 +91,6 @@ static void factor_in_equipment_derived_stats(MTwist& mt,
 
 	effective.physical.resistance += entry.resistance().calculate(mt, core);
 	effective.magic.resistance += entry.magic_resistance().calculate(mt, core);
-	effective.physical.reduction += entry.damage_reduction().calculate(mt,
-			core);
-	effective.magic.reduction += entry.magic_reduction().calculate(mt, core);
 
 	// Factor in spells granted from equipment:
 	for (int i = 0; i < entry.spells_granted.amount(); i++) {
@@ -121,10 +117,8 @@ static void factor_in_equipment_stats(MTwist& mt, EffectiveStats& effective,
 }
 static void derive_secondary_stats(MTwist& mt, EffectiveStats& effective) {
 	CoreStats& core = effective.core;
-	effective.physical.resistance += core.defence / 2.5f;
-	effective.magic.resistance += core.willpower / 2.5f;
-	effective.physical.reduction += core.defence / 2.0f;
-	effective.magic.reduction += core.willpower / 2.0f;
+	effective.physical.resistance += core.defence;
+	effective.magic.resistance += core.willpower;
 }
 
 EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
@@ -132,9 +126,9 @@ EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
 	EffectiveStats ret;
 	ret.core = stats.core;
 	ret.movespeed = stats.movespeed;
-	ret.allowed_actions = stats.effects.allowed_actions(gs);
+	ret.allowed_actions = inst->effects.allowed_actions(gs);
 	ret.spells = stats.spells;
-	stats.effects.process(gs, inst, ret);
+	inst->effects.process(gs, inst, ret);
 	factor_in_equipment_stats(gs->rng(), ret, stats.equipment);
 	derive_secondary_stats(gs->rng(), ret);
 	ret.cooldown_modifiers.apply(ret.cooldown_mult);

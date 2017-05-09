@@ -253,7 +253,7 @@ static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
     int nbounces = pentry.number_of_target_bounces;
     float speed = pentry.speed * p->effective_stats().core.spell_velocity_multiplier;
 
-    bool has_greater_fire = p->effects().get(get_effect_by_name("AmuletGreaterFire"));
+    bool has_greater_fire = p->effects.has("AmuletGreaterFire");
     if (pentry.name == "Mephitize" || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt")) {
         float vx = 0, vy = 0;
         ::direction_towards(Pos {p->x, p->y}, target, vx, vy, 10000);
@@ -546,7 +546,7 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 
 static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
         GameInst* target) {
-    if (!callback.empty()) {
+    if (!callback.empty() && !callback.isnil()) {
         callback.push();
         luawrap::push(L, user);
         luawrap::push(L, target);

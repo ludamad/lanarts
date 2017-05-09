@@ -43,8 +43,6 @@ function Engine.resources_load(...)
     --TODO: Find a better place for these helper functions
 
     require "effects.Effects"
-
-    require "spells.SpellEffects"
 end
 
 function Engine.resources_post_load(...)

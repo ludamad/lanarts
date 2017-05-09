@@ -30,9 +30,9 @@ ProjectileEntry& get_projectile_entry(projectile_id id) {
 
 void ProjectileEntry::parse_lua_table(const LuaValue& table) {
     using namespace luawrap;
+    type = EquipmentEntry::AMMO;
     EquipmentEntry::parse_lua_table(table);
     stackable = true;
-    type = EquipmentEntry::AMMO;
     attack = parse_attack(table);
     attack.attack_sprite = item_sprite;
     if (!table["spr_attack"].isnil()) {

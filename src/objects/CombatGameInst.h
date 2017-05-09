@@ -87,7 +87,6 @@ public:
 
 	CooldownStats& cooldowns();
 	SpellsKnown& spells_known();
-	EffectStats& effects();
 	Inventory& inventory();
 	EquipmentStats& equipment();
 
@@ -141,5 +140,4 @@ private:
 	CombatStats base_stats;
 	EffectiveStats estats;
 };
-
 #endif /* COMBATGAMEINST_H_ */

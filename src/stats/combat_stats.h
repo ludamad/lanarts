@@ -35,7 +35,6 @@ struct AttackStats {
 	int atk_power(MTwist& mt, const EffectiveStats& stats) const;
 	float atk_percentage_magic() const;
 	float atk_percentage_physical() const;
-	float atk_resist_modifier() const;
 
 	/* members */
 	Weapon weapon;
@@ -72,7 +71,6 @@ struct CombatStats {
 	CooldownStats cooldowns;
 	ClassStats class_stats;
 	EquipmentStats equipment;
-	EffectStats effects;
 	SpellsKnown spells;
 
 	std::vector<AttackStats> attacks;

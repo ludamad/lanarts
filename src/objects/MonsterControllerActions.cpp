@@ -224,7 +224,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 		bool hasproj = attack.projectile.id != NO_ITEM;
 
 		// Part of: Implement a bunch of new status effects.
-                bool has_fear = (e->effects().get(get_effect_by_name("Fear")));
+        bool has_fear = e->effects.has("Fear");
 		if (pdist < e->target_radius + p->target_radius && !has_fear) {
 			e->vx = 0, e->vy = 0;
 		}
@@ -241,7 +241,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 				e->vx = 0, e->vy = 0;
 			} else {
 				int close = 40;
-                                bool stop_once_in_range = (e->effects().get(get_effect_by_name("StopOnceInRange")));
+                bool stop_once_in_range = e->effects.has("StopOnceInRange");
 				if (stop_once_in_range) {
 					close = 150;
 				}
@@ -333,7 +333,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	e->vx = 0, e->vy = 0;
 
         // Part of: Implement status effects.
-    bool forced_wander = (e->effects().get(get_effect_by_name("Dazed")));
+    bool forced_wander = e->effects.has("Dazed");
 
 	if (!forced_wander && !monsters_wandering_flag) {
 		return;

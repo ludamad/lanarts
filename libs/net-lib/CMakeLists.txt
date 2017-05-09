@@ -22,15 +22,15 @@ add_library( lanarts_net
              ${lanarts_net_src})
 
 	
-add_executable( lanarts_net_tests
-             ${lanarts_net_tests_src})
-
-target_link_libraries(
-	lanarts_net_tests
-	lanarts_net
-	pthread
-	enet
-        SDL2-static
-	lcommon
-	UnitTest++
-)
+#add_executable( lanarts_net_tests
+#             ${lanarts_net_tests_src})
+#
+#target_link_libraries(
+#	lanarts_net_tests
+#	lanarts_net
+#	pthread
+#	enet
+#        SDL2-static
+#	lcommon
+#	UnitTest++
+#)

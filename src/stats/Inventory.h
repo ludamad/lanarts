@@ -106,8 +106,8 @@ public:
 	int find_slot(item_id item);
 	size_t last_filled_slot() const;
 
-	void serialize(SerializeBuffer& serializer);
-	void deserialize(SerializeBuffer& serializer);
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+	void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 	void equip(itemslot_t i);
 	void deequip(itemslot_t i);

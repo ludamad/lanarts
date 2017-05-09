@@ -7,10 +7,10 @@ Data.equipment_create {
 
     spr_item = "spr_belts.protection",
 
-    reduction = { base = 1 },
-    resistance = { base = 1 },
-    magic_reduction = { base = 1 },
-    magic_resistance = { base = 1 }
+    stat_bonuses = {
+        willpower = 2,
+        defence = 2
+    }
 }
 
 Data.equipment_create {
@@ -36,7 +36,9 @@ Data.equipment_create {
     spr_item = "spr_belts.spike",
 
     stat_bonuses = {defence = 1},
-    effects_granted = {"Spiky"}
+    effects_granted = {
+        {"Spiky", {recoil_percentage = 0.25}}
+    }
 }
 
 Data.equipment_create {

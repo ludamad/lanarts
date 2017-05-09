@@ -39,10 +39,10 @@ set(LINKEDLIBS
         SDL2-mixer
 )
 
-add_executable( lsound_tests main.cpp)
-
-target_link_libraries(lsound_tests ${LINKEDLIBS})
-
+#add_executable( lsound_tests main.cpp)
+#
+#target_link_libraries(lsound_tests ${LINKEDLIBS})
+#
 # Enable tests
 #enable_testing()
 

@@ -12,7 +12,7 @@ projectiles:
     spr_item: arrow_item
     spr_attack: arrow_projectile
     #Stats
-    drop_chance: 90 # % chance
+    drop_chance: 100 # AD: Basic arrows no longer break. # % chance
     speed: 6.75
 
   - name: Silver Arrow

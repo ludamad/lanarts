@@ -32,41 +32,41 @@ SUITE(stat_serialize_tests) {
 		assert_equal(e1.inventory, e2.inventory);
 	}
 
-	TEST(serialize_inventory) {
-		const int TEST_N = 10;
-		ItemEntry mock_item;
-		//mock up some item data
-		game_item_data.resize(TEST_N, &mock_item);
+//	TEST(serialize_inventory) {
+//		const int TEST_N = 10;
+//		ItemEntry mock_item;
+//		//mock up some item data
+//		game_item_data.resize(TEST_N, &mock_item);
+//
+//		SerializeBuffer serializer;
+//		Inventory inv1, inv2;
+//		for (int i = 0; i < TEST_N; i++) {
+//			inv1.add(Item(i));
+//		}
+//
+//		inv1.serialize(serializer);
+//		inv2.deserialize(serializer);
+//
+//		assert_equal(inv1, inv2);
+//
+//		game_item_data.clear();
+//	}
 
-		SerializeBuffer serializer;
-		Inventory inv1, inv2;
-		for (int i = 0; i < TEST_N; i++) {
-			inv1.add(Item(i));
-		}
-
-		inv1.serialize(serializer);
-		inv2.deserialize(serializer);
-
-		assert_equal(inv1, inv2);
-
-		game_item_data.clear();
-	}
-
-	TEST(serialize_equipment) {
-		const int TEST_N = 10;
-		ItemEntry mock_item;
-		//mock up some item data
-		game_item_data.resize(TEST_N, &mock_item);
-
-		SerializeBuffer serializer;
-		EquipmentStats e1, e2;
-		e1.inventory.add(Item(1));
-		e1.serialize(serializer);
-
-		e2.deserialize(serializer);
-
-		assert_equal(e1, e2);
-
-		game_item_data.clear();
-	}
+//	TEST(serialize_equipment) {
+//		const int TEST_N = 10;
+//		ItemEntry mock_item;
+//		//mock up some item data
+//		game_item_data.resize(TEST_N, &mock_item);
+//
+//		SerializeBuffer serializer;
+//		EquipmentStats e1, e2;
+//		e1.inventory.add(Item(1));
+//		e1.serialize(serializer);
+//
+//		e2.deserialize(serializer);
+//
+//		assert_equal(e1, e2);
+//
+//		game_item_data.clear();
+//	}
 }

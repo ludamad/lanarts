@@ -84,14 +84,14 @@ ItemInst* ItemInst::clone() const {
 
 void ItemInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	GameInst::serialize(gs, serializer);
-	item.serialize(serializer);
+	item.serialize(gs, serializer);
 	serializer.write(dropped_by);
 	serializer.write(pickup_by_dropper);
 }
 
 void ItemInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	GameInst::deserialize(gs, serializer);
-	item.deserialize(serializer);
+	item.deserialize(gs, serializer);
 	serializer.read(dropped_by);
 	serializer.read(pickup_by_dropper);
 }

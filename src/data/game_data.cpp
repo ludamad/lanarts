@@ -39,10 +39,9 @@ LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemstable = NULL);
 
-LuaValue load_spell_data(lua_State* L, const FilenameList& filenames);
+LuaValue load_spell_and_effect_data(lua_State* L, const FilenameList& filenames);
 
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames);
-LuaValue load_effect_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames);
 
 /* Definition of game data */
@@ -173,7 +172,7 @@ tileset_id tileset_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_tileset_data, lua_tostring(L, idx));
 }
 
-LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
+LuaValue lua_sprites, lua_armours, lua_enemies, lua_weapons,
 		lua_projectiles, lua_items, lua_classes, lua_spells;
 
 LuaValue lua_settings;
@@ -213,6 +212,8 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	// --- ITEM DATA ---
 	// TODO: Go to new system
 	lua_items = load_item_data(L, FilenameList());
+        // Ensure we have access to the items table for purposes of equipment/spell definition: 
+	globals["items"] = lua_items;
 	update_loading_screen(L, 10, "Loading Projectiles");
 
 	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
@@ -221,12 +222,9 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 
 	// Effects MUST be before spells, as effects are also loaded in spells currently
 	// TODO move effects completely to Lua
-    lua_effects = load_effect_data(L, dfiles.effect_files);
-	lua_spells = load_spell_data(L, dfiles.spell_files);
+	lua_spells = load_spell_and_effect_data(L, dfiles.spell_files);
 	update_loading_screen(L, 30, "Loading Weapons");
 
-        // Ensure we have access to the items table for purposes of equipment definition: 
-	globals["items"] = lua_items;
 	load_weapon_data(L, dfiles.weapon_files, &lua_items);
 	update_loading_screen(L, 40, "Loading Equipment");
 
@@ -276,13 +274,11 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 		}
 	}
 	globals["enemies"] = lua_enemies;
-	globals["effects"] = lua_effects;
 	globals["projectiles"] = lua_projectiles;
 	globals["spells"] = lua_spells;
 	globals["classes"] = lua_classes;
 
 	__lua_init(L, game_enemy_data);
-	__lua_init(L, game_effect_data);
 
 	for (int i = 0; i < game_item_data.size(); i++) {
 		game_item_data[i]->initialize(L);

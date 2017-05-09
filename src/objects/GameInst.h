@@ -18,6 +18,16 @@
 #include <lcommon/geometry.h>
 #include <lcommon/math_util.h>
 
+// Effects were originally just for CombatGameInst's, but their benefit
+// as a means to add more granular customization to objects was noted.
+// Now every GameInst holds them.
+// This allows much more clean interaction with, e.g., modifying a projectile object
+// from a spell. Spells already heavily use the effect system, so the idea of dynamically
+// modifying, say, a store in the same manner is enticing.
+
+#include "stats/effects.h"
+#include "stats/stat_modifiers.h"
+
 #include "lanarts_defines.h"
 
 struct lua_State;
@@ -59,6 +69,7 @@ public:
 	//Used for integrity checking
 	virtual unsigned int integrity_hash();
 	virtual void update_position(float newx, float newy);
+	virtual std::vector<StatusEffect> base_status_effects(GameState* gs);
 
 	bool try_callback(const char* callback);
 	void lua_lookup(lua_State* L, const char* key);
@@ -86,7 +97,9 @@ public:
 	int depth;
 	bool solid, destroyed;
 	level_id current_floor;
+	// Serialized / deserialized in a separate pass because they have Lua references to objects throughout the system:
 	LuaValue lua_variables;
+	EffectStats effects;
 };
 
 typedef bool (*col_filterf)(GameInst* o1, GameInst* o2);

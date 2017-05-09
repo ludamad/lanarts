@@ -72,7 +72,7 @@ Data.equipment_create {
     description = "An enchanted ring of hydra skin; grants the user greater healing over time.",
     type = "ring",
 
-    shop_cost = { 95, 125 },
+    shop_cost = { 45, 65 },
     stat_bonuses = { hpregen = 0.0333333 },
     spr_item = "hydra ring",
 }

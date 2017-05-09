@@ -38,9 +38,20 @@ static EffectEntry parse_effect(const LuaStackValue& table) {
     EffectEntry entry;
     entry.name = table["name"].to_str();
     entry.category = defaulted(table, "category", std::string());
-    entry.init_func.initialize(table["init_func"]);
-    entry.draw_func.initialize(table["draw_func"]);
-    entry.stat_func.initialize(table["stat_func"]);
+
+    entry.raw_lua_object = table;
+
+    entry.init_func = table["init_func"];
+    entry.draw_func = table["draw_func"];
+    entry.stat_func = table["stat_func"];
+    entry.attack_stat_func = table["attack_stat_func"];
+    entry.step_func = table["step_func"];
+
+    entry.console_draw_func = table["console_draw_func"];
+    entry.remove_func = table["remove_func"];
+    entry.remove_derived_func = table["remove_derived_func"];
+    entry.apply_derived_func = table["apply_derived_func"];
+    entry.apply_buff_func = table["apply_buff_func"];
 
     // Configurability options for equipment / spell granted effects:
     entry.on_melee_func = table["on_melee_func"];
@@ -51,9 +62,8 @@ static EffectEntry parse_effect(const LuaStackValue& table) {
     entry.on_uncurse_func = table["on_uncurse_func"];
     entry.on_gain_spell_func = table["on_gain_spell_func"];
 
-    entry.finish_func.initialize(table["finish_func"]);
-    entry.attack_stat_func.initialize(table["attack_stat_func"]);
-    entry.step_func.initialize(table["step_func"]);
+    entry.attack_stat_func = table["attack_stat_func"];
+    entry.step_func = table["step_func"];
 
     entry.allowed_actions.can_use_stairs = defaulted(table, "can_use_stairs", true);
     entry.allowed_actions.can_use_rest = defaulted(table, "can_use_rest",
@@ -67,9 +77,9 @@ static EffectEntry parse_effect(const LuaStackValue& table) {
     if (!table["effected_sprite"].isnil()) {
         entry.effected_sprite = res::sprite_id(table["effected_sprite"].to_str());
     }
+
     entry.additive_duration = defaulted(table, "additive_duration", false);
     entry.fade_out = defaulted(table, "fade_out", 5);
-    entry.init(L);
     return entry;
 }
 
@@ -92,16 +102,17 @@ static void lapi_data_create_projectile(const LuaStackValue& table) {
     game_item_data.push_back(entry);
 }
 
-LuaValue load_spell_data(lua_State* L, const FilenameList& filenames) {
+LuaValue load_spell_and_effect_data(lua_State* L, const FilenameList& filenames) {
+	game_effect_data.clear();
 	game_spell_data.clear();
 
 	spell_table = LuaValue(L);
 	spell_table.newtable();
 
 	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
-    data["spell_create"].bind_function(lapi_data_create_spell);
-    data["effect_create"].bind_function(lapi_data_create_effect);
-    data["projectile_create"].bind_function(lapi_data_create_projectile);
+        data["spell_create"].bind_function(lapi_data_create_spell);
+        data["effect_create"].bind_function(lapi_data_create_effect);
+        data["projectile_create"].bind_function(lapi_data_create_projectile);
 	luawrap::dofile(L, "spells/Spells.lua");
 
 	return spell_table;

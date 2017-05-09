@@ -1,6 +1,6 @@
 Data.equipment_create {
     name = "Amulet of the Wall",
-    description = "Grants the user the spell 'Wallanthor', and +1 defence.",
+    description = "An amulet that enables the user to create walls temporarily.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
@@ -8,7 +8,7 @@ Data.equipment_create {
     spr_item = "spr_amulets.blue",
     spells_granted = {"Wallanthor"},
 
-    stat_bonuses = { defence = 1 }
+    stat_bonuses = { defence = 2 }
 }
 
 -- Data.equipment_create {
@@ -24,7 +24,7 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Fortification",
-    description = "Grants the user Fortification: Melee hits from enemies increase defence temporarily.",
+    description = "The wearer becomes sturdier when hit in melee.",
     type = "amulet",
 
     shop_cost = { 220, 440 },
@@ -48,7 +48,7 @@ Data.equipment_create {
 -- name = "Amulet of Festivity",
 Data.equipment_create {
     name = "Amulet of Fear",
-    description = "Grants +1 strength, and 10% chance to scare enemies on every melee strike.",
+    description = "A fearsome symbol.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
@@ -73,7 +73,7 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Trepidation",
-    description = "Grants the user the spell 'Trepidize', and +1 magic.",
+    description = "A terrible amulet that causes permanent goosebumps.",
     type = "amulet",
 
     shop_cost = { 120, 140},
@@ -85,7 +85,7 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Mephitization",
-    description = "Grants the user the spell 'Mephitize', and 10% chance of poison on melee attacks.",
+    description = "A noxious amulet of great power.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
@@ -169,7 +169,7 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Light",
-    description = "Grants the user the potent crowd control spell 'Luminos'.",
+    description = "Grants the wearer potent crowd dispersal powers.",
     type = "amulet",
 
     shop_cost = { 320, 440 },

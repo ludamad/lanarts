@@ -181,7 +181,6 @@ void EnemyInst::step(GameState* gs) {
 // XXX: Make the monster health absorbing way less hackish and more general
 	int hp_before = stats().core.hp;
 
-    effects().ensure_effects_active(gs, this, etype().effect_modifiers.status_effects, etype().name.c_str());
 	CombatGameInst::step(gs);
 
     // Regenerate much quicker if the player left the level:
@@ -315,4 +314,9 @@ void EnemyInst::die(GameState *gs) {
 void EnemyInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
 	*(EnemyInst*) inst = *this;
+}
+
+std::vector<StatusEffect> EnemyInst::base_status_effects(
+        GameState* gs) {
+    return etype().effect_modifiers.status_effects;
 }

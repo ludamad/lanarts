@@ -38,6 +38,8 @@ public:
 	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
 
+        virtual std::vector<StatusEffect> base_status_effects(GameState* gs);
+
 	EnemyBehaviour& behaviour() { return eb; }
 	EnemyEntry& etype();
 	int enemy_type() {

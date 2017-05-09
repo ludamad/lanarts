@@ -86,11 +86,9 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("spell_cooldown_multiplier",
 			stats->cooldown_modifiers.spell_cooldown_multiplier)
 	else IFLUA_NUM_MEMB_LOOKUP("power", stats->physical.power)
-	else IFLUA_NUM_MEMB_LOOKUP("reduction", stats->physical.reduction)
 	else IFLUA_NUM_MEMB_LOOKUP("resistance", stats->physical.resistance)
 	else IFLUA_NUM_MEMB_LOOKUP("magic_damage", stats->magic.damage)
 	else IFLUA_NUM_MEMB_LOOKUP("magic_power", stats->magic.power)
-	else IFLUA_NUM_MEMB_LOOKUP("magic_reduction", stats->magic.reduction)
 	else IFLUA_NUM_MEMB_LOOKUP("magic_resistance", stats->magic.resistance)
 	else {
 		lua_getglobal(L, bind_t::className);
@@ -132,11 +130,9 @@ static int lua_member_update(lua_State* L) {
 			stats->cooldown_modifiers.spell_cooldown_multiplier)
 	else IFLUA_NUM_MEMB_UPDATE("damage", stats->physical.damage)
 	else IFLUA_NUM_MEMB_UPDATE("power", stats->physical.power)
-	else IFLUA_NUM_MEMB_UPDATE("reduction", stats->physical.reduction)
 	else IFLUA_NUM_MEMB_UPDATE("resistance", stats->physical.resistance)
 	else IFLUA_NUM_MEMB_UPDATE("magic_damage", stats->magic.damage)
 	else IFLUA_NUM_MEMB_UPDATE("magic_power", stats->magic.power)
-	else IFLUA_NUM_MEMB_UPDATE("magic_reduction", stats->magic.reduction)
 	else IFLUA_NUM_MEMB_UPDATE("magic_resistance", stats->magic.resistance)
 	else {
 		lua_getglobal(L, bind_t::className);

@@ -26,32 +26,32 @@ bool ItemProperties::operator ==(const ItemProperties& properties) const {
 	if (memcmp(&properties.damage, &this->damage, sizeof(DamageStats) != 0)) {
 		return false;
 	}
-	if (properties.effect_modifiers.status_effects
-			!= effect_modifiers.status_effects) {
-		return false;
-	}
+//	if (properties.effect_modifiers.status_effects
+//			!= effect_modifiers.status_effects) {
+//		return false;
+//	}
 	if (properties.flags != flags || properties.unknownness != unknownness) {
 		return false;
 	}
 	return true;
 }
 
-void ItemProperties::serialize(SerializeBuffer& serializer) {
+void ItemProperties::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write(this->cooldown_modifiers);
 	serializer.write(this->stat_modifiers);
 	serializer.write(this->damage);
 	serializer.write_int(this->flags);
 	serializer.write(this->unknownness);
-	serializer.write_container(this->effect_modifiers.status_effects);
+    this->effect_modifiers.serialize(gs, serializer);
 }
 
-void ItemProperties::deserialize(SerializeBuffer& serializer) {
+void ItemProperties::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(this->cooldown_modifiers);
 	serializer.read(this->stat_modifiers);
 	serializer.read(this->damage);
 	serializer.read_int(this->flags);
 	serializer.read(this->unknownness);
-	serializer.read_container(this->effect_modifiers.status_effects);
+	this->effect_modifiers.deserialize(gs, serializer);
 }
 
 ItemEntry& Item::item_entry() const {
@@ -94,19 +94,19 @@ bool Item::is_same_item(const Item & item) const {
 	return id == item.id && properties == item.properties;
 }
 
-void Item::serialize(SerializeBuffer & serializer) {
+void Item::serialize(GameState* gs, SerializeBuffer & serializer) {
 	serializer.write_int(id);
 	serializer.write_int(amount);
-	properties.serialize(serializer);
+	properties.serialize(gs, serializer);
 }
 
 bool Item::operator ==(const Item & item) const {
 	return is_same_item(item) && amount == item.amount;
 }
 
-void Item::deserialize(SerializeBuffer & serializer) {
+void Item::deserialize(GameState* gs, SerializeBuffer & serializer) {
 	serializer.read_int(id);
 	serializer.read_int(amount);
-	properties.deserialize(serializer);
+	properties.deserialize(gs, serializer);
 }
 

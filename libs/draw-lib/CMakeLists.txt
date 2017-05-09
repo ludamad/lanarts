@@ -52,11 +52,11 @@ set(LINKEDDEPS
 	${FREETYPE_LIBRARIES}
 )
 
-add_executable( ldraw_ex ${ldraw_examples} )
-add_executable( ldraw_tests ${ldraw_tests} )
-
-target_link_libraries( ldraw_ex ${LINKEDDEPS} )
-target_link_libraries( ldraw_tests ${LINKEDDEPS} UnitTest++ )
-
-enable_testing()
-add_test(NAME ldraw_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/ldraw_tests )
+#add_executable( ldraw_ex ${ldraw_examples} )
+#add_executable( ldraw_tests ${ldraw_tests} )
+#
+#target_link_libraries( ldraw_ex ${LINKEDDEPS} )
+#target_link_libraries( ldraw_tests ${LINKEDDEPS} UnitTest++ )
+#
+#enable_testing()
+#add_test(NAME ldraw_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/ldraw_tests )

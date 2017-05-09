@@ -49,8 +49,8 @@ struct ItemProperties {
 
 	bool operator==(const ItemProperties& properties) const;
 
-	void serialize(SerializeBuffer& serializer);
-	void deserialize(SerializeBuffer& serializer);
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+	void deserialize(GameState* gs, SerializeBuffer& serializer);
 };
 
 // Defined in terms of a base item, applied properties, and a quantity.
@@ -111,8 +111,8 @@ struct Item {
 
 	bool is_same_item(const Item& item) const;
 
-	void serialize(SerializeBuffer& serializer);
-	void deserialize(SerializeBuffer& serializer);
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+	void deserialize(GameState* gs, SerializeBuffer& serializer);
 };
 
 typedef Item Weapon;

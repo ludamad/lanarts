@@ -25,19 +25,19 @@ add_library( lcommon
 
 AUX_SOURCE_DIRECTORY(tests lcommon_tests) 
 
-add_executable( lcommon_tests
-             ${lcommon_tests}
-              )
-
-target_link_libraries( 
-			lcommon_tests
-			lcommon
-			UnitTest++
-			luawrap
-			lua
-)
-
-# Enable tests
-enable_testing()
-
-add_test(NAME lcommon_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/lcommon_tests )
+#add_executable( lcommon_tests
+#             ${lcommon_tests}
+#              )
+#
+#target_link_libraries( 
+#			lcommon_tests
+#			lcommon
+#			UnitTest++
+#			luawrap
+#			lua
+#)
+#
+## Enable tests
+#enable_testing()
+#
+#add_test(NAME lcommon_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/lcommon_tests )

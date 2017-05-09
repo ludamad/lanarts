@@ -83,23 +83,24 @@ add_random_effect = (rng, data) ->
     data.effects_granted or= {}
     local effect, description
     if rng\randomf() < 0.01 
-        {effect, description} = {"Fortification", "Fortification: You gain defence as enemies hit you in melee."}
+        {effect, description} = {"Fortification", "You gain defence as enemies hit you in melee."}
     elseif rng\randomf() < 0.05 
-        {effect, description} = {"Spiky", "Spiky: You damage back enemies who hit you in melee."}
+        recoil_percentage = rng\randomf(0.05,0.10)
+        {effect, description} = {{"Spiky", {:recoil_percentage}}, "You damage back enemies who hit you in melee."}
     elseif rng\randomf() < 0.05 
-        {effect, description} = {"PossiblySummonCentaurOnKill", "Centaur Blessing: You gain the power to summon centaurs as you kill things."}
+        {effect, description} = {"PossiblySummonCentaurOnKill", "You gain the power to summon centaurs as you kill things."}
     elseif rng\randomf() < 0.05 
-        {effect, description} = {"PossiblySummonGolemOnKill", "Golem Blessing: You gain the power to summon golems as you kill things."}
+        {effect, description} = {"PossiblySummonGolemOnKill", "You gain the power to summon golems as you kill things."}
     elseif rng\randomf() < 0.1
-        {effect, description} = {"PossiblySummonStormElementalOnKill", "Elemental Blessing: You gain the power to summon storm elementals as you kill things."}
+        {effect, description} = {"PossiblySummonStormElementalOnKill", "You gain the power to summon storm elementals as you kill things."}
     else 
         {effect, description} = rng\random_choice {
-            {"VampiricWeapon", "Weapon Vampirism: You gain the power to steal life with your melee blows."}
-            {"ConfusingWeapon", "Weapon Befuddlement: You gain the power to daze foes in melee."}
-            {"PoisonedWeapon", "Weapon Poison: You gain the power to poison foes in melee."}
-            {"KnockbackWeapon", "Weapon Knockback: You gain the power to knock back foes in melee."}
+            {"VampiricWeapon", "You gain the power to steal life with your melee blows."}
+            {"ConfusingWeapon", "You gain the power to daze foes in melee."}
+            {"PoisonedWeapon", "You gain the power to poison foes in melee."}
+            {"KnockbackWeapon", "You gain the power to knock back foes in melee."}
         }
-    data.description ..= " #{description}"
+    --data.description ..= " #{description}"
     append data.effects_granted, effect
 
 add_random_spell = (rng, data) ->
@@ -130,7 +131,6 @@ add_random_spell = (rng, data) ->
     }
     if table.contains(data.spells_granted, spell) 
         return
-    data.description ..= " Grants the user the ability to use '#{spell}'"
     append data.spells_granted, spell
 
 additive_stat_bonus = (attr, range) -> (rng, data) ->
@@ -177,13 +177,13 @@ add_buff = (rng, data, major = false) ->
     local effect_chance, misc_buff_chance
     switch data.type
         when 'amulet'
-            effect_chance, misc_buff_chance = 0.2, 0.9
+            effect_chance, misc_buff_chance = 0.5, 0.9
         when 'ring'
-            effect_chance, misc_buff_chance = 0.2, 0.5
+            effect_chance, misc_buff_chance = 0.5, 0.5
         when 'belt'
             effect_chance, misc_buff_chance = 0.7, 0.4
         else
-            effect_chance, misc_buff_chance = 0.1, 0.5
+            effect_chance, misc_buff_chance = 0.3, 0.5
     if rng\randomf() < effect_chance and not data.effects_granted
         add_random_effect(rng, data)
     elseif rng\randomf() < misc_buff_chance
@@ -193,10 +193,13 @@ add_buff = (rng, data, major = false) ->
             additive_stat_bonus("hp", {10, 25})
             additive_stat_bonus("hpregen", {0.02, 0.03})
             additive_stat_bonus("mpregen", {0.02, 0.03})
-            mult_core_bonus("magic_cooldown_multiplier", {0.89, 0.95})
-            mult_core_bonus("melee_cooldown_multiplier", {0.89, 0.95})
-            mult_core_bonus("ranged_cooldown_multiplier", {0.89, 0.95})
         }
+        if rng\randomf() < 0.1 
+            buff = rng\random_choice {
+                mult_core_bonus("magic_cooldown_multiplier", {0.89, 0.95})
+                mult_core_bonus("melee_cooldown_multiplier", {0.89, 0.95})
+                mult_core_bonus("ranged_cooldown_multiplier", {0.89, 0.95})
+            }
         buff(rng, data)
         if major then buff(rng, data)
     else
@@ -205,10 +208,6 @@ add_buff = (rng, data, major = false) ->
             additive_stat_bonus("defence", {1, 1})
             additive_stat_bonus("willpower", {1, 1})
             additive_stat_bonus("magic", {1, 1})
-            additive_core_bonus("reduction", {1, 1})
-            additive_core_bonus("resistance", {1, 1})
-            additive_core_bonus("magic_reduction", {1, 1})
-            additive_core_bonus("magic_resistance", {1, 1})
         }
         buff(rng, data)
         if rng\randomf() < 0.1
@@ -226,10 +225,6 @@ MINOR_DEBUFFS = {
     additive_stat_bonus("defence", {-3, -1})
     additive_stat_bonus("willpower", {-3, -1})
     additive_stat_bonus("magic", {-3, -1})
-    additive_core_bonus("reduction", {-3, -1})
-    additive_core_bonus("resistance", {-3, -1})
-    additive_core_bonus("magic_reduction", {-3, -1})
-    additive_core_bonus("magic_resistance", {-3, -1})
     mult_core_bonus("magic_cooldown_multiplier", {1.10, 1.20})
     mult_core_bonus("melee_cooldown_multiplier", {1.1, 1.2})
     mult_core_bonus("ranged_cooldown_multiplier", {1.1, 1.2})
@@ -261,7 +256,7 @@ define_randart = (rng, base, images, enchanter) ->
     data.randart_weight = 0
     data.pickup_func = randart_pickup
     data.stat_bonuses or= {}
-    n_enchants = power_level * 2
+    n_enchants = power_level * 3
     while n_enchants > 0 
         --if rng\random(4) == 0
         --    add_buff(rng, data, true) -- Major
@@ -284,6 +279,8 @@ define_randart = (rng, base, images, enchanter) ->
 MAX_ENCHANTMENT = 20
 
 apply_enchantment = (rng, data, power_level) ->
+    if not data.cooldown
+        return -- TODO: For now, only buff weapons.
     enchantment = power_level
     for i=power_level + 1,MAX_ENCHANTMENT
         if rng\randomf() >= (if data.cooldown then 0.33 else 0.15)
@@ -292,19 +289,13 @@ apply_enchantment = (rng, data, power_level) ->
     if enchantment > 0
         data.name = "+#{enchantment} #{data.name}"
         if data.cooldown
-            --for i=1,enchantment,4
-            --    additive_core_bonus("damage", {1, 1})(rng, data)
-            additive_core_bonus("power", {enchantment, enchantment})(rng, data)
-            --data["resist_modifier"] or= 1
-            --data["resist_modifier"] /= 1 + 0.05 * enchantment
-        elseif rng\randomf() < 0.5
-            --for i=1,enchantment,4
-            --    additive_core_bonus("magic_reduction", {1, 1})(rng, data)
-            additive_core_bonus("magic_resistance", {enchantment, enchantment})(rng, data)
-        else
-            --for i=1,enchantment,4
-            --    additive_core_bonus("reduction", {1, 1})(rng, data)
-            additive_core_bonus("resistance", {enchantment, enchantment})(rng, data)
+            for i=1,enchantment --,4
+                additive_core_bonus("damage", {1, 1})(rng, data)
+            --additive_core_bonus("strength", {enchantment, enchantment})(rng, data)
+        --elseif rng\randomf() < 0.5
+        --    additive_core_bonus("willpower", {enchantment, enchantment})(rng, data)
+        --else
+        --    additive_core_bonus("defence", {enchantment, enchantment})(rng, data)
         for i=1,2
             data.shop_cost[i] += math.floor((enchantment ^ 1.5) * 50)
 

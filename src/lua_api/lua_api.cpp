@@ -138,7 +138,7 @@ namespace lua_api {
 		LuaValue preload = luawrap::globals(L)["package"]["preload"];
 		preload["yaml"].bind_function(luayaml_module);
 		preload["enet"].bind_function(luaopen_enet);
-		preload["b2"].bind_function(luaopen_b2_vendor);
+//		preload["b2"].bind_function(luaopen_b2_vendor);
 		preload["socket.core"].bind_function(luaopen_socket_core);
 		preload["mime.core"].bind_function(luaopen_mime_core);
 	}

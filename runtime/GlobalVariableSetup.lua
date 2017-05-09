@@ -44,7 +44,6 @@ require "mime"
 print "Preload legacy internal modules that set globals (and need refactoring to not):"
 
 require "effects.Effects"
-require "spells.SpellEffects"
 
 print "Assigning, in effect declaring, global variables used by the engine:"
 items = false

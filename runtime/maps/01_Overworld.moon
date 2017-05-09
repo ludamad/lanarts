@@ -968,7 +968,7 @@ test_vault_create = (template) ->
 overworld_create = () ->
     MapSeq = MapSequence.create {preallocate: 1}
     --test_create = (offset = 1) ->
-    --    dungeon = require("maps.Hive")
+    --    dungeon = require("maps.Arena")
     --    return NewDungeons.make_linear_dungeon {
     --        :MapSeq
     --        :offset

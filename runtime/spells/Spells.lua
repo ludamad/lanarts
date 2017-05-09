@@ -4,66 +4,15 @@ local Map = require "core.Map"
 local Bresenham = require "core.Bresenham"
 local SpellObjects = require "objects.SpellObjects"
 
+-- Effects:
+require("spells.Effects")
+
+-- Projectiles:
+require("spells.Projectiles")
+
 -- New spells coded in more convenient syntax:
 -- TODO figure out long term plan
 require("spells.Spells2")
-
--- MINOR MISSILE
-
-Data.spell_create {
-    name = "Minor Missile",
-    spr_spell = "minor missile",
-    description = "A low cost, fast bolt of energy. Hits a single target. The bolt can bounce off walls safely.",
-    projectile = "Minor Missile",
-    mp_cost = 4,
-    cooldown = 35
-}
-
--- FIRE BOLT
-
-Data.spell_create {
-    name = "Fireball",
-    spr_spell = "fire ball",
-    description = "A great, strong bolt of fire. Hits a single target.",
-    projectile = "Fireball",
-    mp_cost = 30,
-    cooldown = 35
-}
-
--- FIRE BOLT
-
-Data.spell_create {
-    name = "Fire Bolt",
-    spr_spell = "fire bolt",
-    description = "A fast bolt of fire. Hits a single target.",
-    projectile = "Fire Bolt",
-    mp_cost = 10,
-    cooldown = 35
-}
-
--- POISON CLOUD
-
-Data.spell_create {
-    name = "Mephitize",
-    spr_spell = "spr_spells.cloud",
-    description = "A debilitating ring of clouds that cause damage as well as reduced defenses and speed over time.",
-    projectile = "Mephitize",
-    mp_cost = 20,
-    cooldown = 35,
-    spell_cooldown = 800
-}
-
--- FEAR CLOUD
-
-Data.spell_create {
-    name = "Trepidize",
-    spr_spell = "spr_spells.cause_fear",
-    description = "An insidious apparition that instills the fear of death in enemies it hits.",
-    projectile = "Trepidize",
-    mp_cost = 0,
-    cooldown = 35,
-    spell_cooldown = 1600
-}
 
 -- REGENERATION
 
@@ -120,7 +69,7 @@ function Berserk.autotarget_func(caster)
 end
 
 function Berserk.action_func(caster, x, y)
-    caster:add_effect("Berserk", 140 + math.min(3, caster.stats.level) * 30)
+    caster:add_effect("Berserk", 130 + math.min(3, caster.stats.level) * 30)
     if caster:is_local_player() then
         play_sound "sound/berserk.ogg"
         EventLog.add("You enter a powerful rage!", {200,200,255})
@@ -173,17 +122,6 @@ function MagicArrow.prereq_func(caster)
 end
 
 Data.spell_create(MagicArrow)
-
--- MAGIC BLAST
-
-Data.spell_create {
-    name = "Magic Blast",
-    description = "A slow, powerful magic blast of energy. The blast can bounce off an enemy twice before dissipating.",
-    spr_spell = "magic blast",
-    projectile = "Magic Blast",
-    mp_cost = 20,
-    cooldown = 65
-}
 
 -- POWER STRIKE
 

@@ -10,7 +10,9 @@ Data.equipment_create {
 
     spell_cooldown_multiplier = 1.05,
 
-    reduction = { base = 1 }
+    stat_bonuses = {
+        defence = 1,
+    },
 }
 
 Data.equipment_create {
@@ -24,10 +26,10 @@ Data.equipment_create {
 
     spell_cooldown_multiplier = 1.05,
 
-    reduction = { base = 1 },
-    magic_reduction = { base = 1 },
-
-    resistance = { base = 1 }
+    stat_bonuses = {
+        defence = 1,
+        willpower = 1,
+    },
 }
 
 Data.equipment_create {
@@ -40,8 +42,10 @@ Data.equipment_create {
     spr_item = "wizard hat",
     randart_sprites = {"spr_armour.randart_hat"},
 
-    magic_reduction = { base = 1 }
-
+    stat_bonuses = {
+        defence = 0,
+        willpower = 1,
+    },
 }
 
 Data.equipment_create {
@@ -53,8 +57,12 @@ Data.equipment_create {
 
     spr_item = "mars crown",
 
-    reduction = { base = 1 },
-    stat_bonuses = { magic = 1, strength = 1 }
+    stat_bonuses = {
+        magic = 1,
+        strength = 1,
+        defence = 1,
+        willpower = 1,
+    },
 }
 
 Data.equipment_create {
@@ -66,11 +74,10 @@ Data.equipment_create {
 
     spr_item = "dianas crown",
 
-    reduction = { base = 1 },
-    magic_reduction = { base = 1 },
-
-    resistance = { base = 1 },
-    magic_resistance = { base = 1 }
+    stat_bonuses = {
+        defence = 2,
+        willpower = 2,
+    },
 }
 
 Data.equipment_create {
@@ -82,7 +89,9 @@ Data.equipment_create {
 
     spr_item = "orcus crown",
 
-    reduction = { base = 1 },
-    resistance = { base = 1 },
-    stat_bonuses = { hpregen = 0.01666 }
+    stat_bonuses = {
+        defence = 1,
+        willpower = 1,
+        hpregen = 2 / 60
+    },
 }

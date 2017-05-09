@@ -41,7 +41,7 @@ EnemyEntry parse_enemy_type(lua_State* L, const YAML::Node& n) {
         auto effects_granted = parse_defaulted(n, "effects_active", vector<string>());
         entry.effect_modifiers.status_effects.clear();
         for (string& str : effects_granted) {
-             entry.effect_modifiers.status_effects.push_back( get_effect_by_name(str.c_str()) );
+             entry.effect_modifiers.status_effects.push_back({get_effect_by_name(str.c_str()), LuaValue(L)});
         }
 
 	return entry;
@@ -56,6 +56,24 @@ void load_enemy_callbackf(const YAML::Node& node, lua_State* L,
 	(*value)[entry.name] = node;
 }
 
+
+std::vector<StatusEffect> load_statuses(const LuaValue& effects) {
+    if (effects.isnil()) {
+        return {};
+    }
+    std::vector<StatusEffect> ret;
+    for (int i = 1; i <= effects.objlen(); i++) {
+        if (effects[i].is<const char*>()) {
+            effect_id id = get_effect_by_name(effects[i].to_str());
+            ret.push_back({id, LuaValue(effects.luastate())});
+        } else {
+            effect_id id = get_effect_by_name(effects[i][1].to_str());
+            LuaValue args = effects[i][2];
+            ret.push_back({id, args});
+        }
+    }
+    return ret;
+}
 
 static EnemyEntry parse_enemy_type(const LuaStackValue& table) {
     using namespace luawrap;
@@ -87,12 +105,7 @@ static EnemyEntry parse_enemy_type(const LuaStackValue& table) {
     entry.draw_event.initialize(table["draw_func"]);
     entry.death_event.initialize(table["death_func"]);
 
-    auto effects_granted = luawrap::defaulted(table["effects_active"], vector<string>());
-    entry.effect_modifiers.status_effects.clear();
-    for (string& str : effects_granted) {
-         entry.effect_modifiers.status_effects.push_back( get_effect_by_name(str.c_str()) );
-    }
-
+    entry.effect_modifiers.status_effects = load_statuses(table["effects_active"]);
     return entry;
 }
 

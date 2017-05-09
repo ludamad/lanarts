@@ -98,12 +98,12 @@ Data.class_create {
     gain_per_level = {
         hp = 15,
         mp = 20,
-        hpregen = 0, -- 0.5 / 60, -- Per 60 frames
-        mpregen = 0.65 / 60, -- Per 60 frames
-        magic = 1,
-  --    strength = 1,
+        hpregen = 0.5 / 60, -- Per 60 frames
+        mpregen = 1 / 60, -- Per 60 frames
+        magic = 2,
+        strength = 1,
         defence = 1,
-        willpower = 1
+        willpower = 2
     }
 }
 
@@ -141,12 +141,12 @@ Data.class_create {
     gain_per_level = {
         hp = 20,
         mp = 15,
-        hpregen = 0.65 / 60, -- Per 60 frames
-        mpregen = 0.65 / 60, -- Per 60 frames
- --       magic = 1,
-        strength = 1,
-        defence = 1,
-        willpower = 1
+        hpregen = 1 / 60, -- Per 60 frames
+        mpregen = 0.5 / 60, -- Per 60 frames
+        magic = 1,
+        willpower = 1,
+        defence = 2,
+        strength = 2
     }
 }
 
@@ -234,11 +234,12 @@ Data.class_create {
     gain_per_level = {
         hp = 15,
         mp = 5,
-        hpregen = 0.9 / 60, -- Per 60 frames
+        hpregen = 1 / 60, -- Per 60 frames
         mpregen = 0 / 60, -- Per 60 frames
-        magic = 1,
+        magic = 2,
         willpower = 1,
-        defence = 1
+        defence = 2,
+        strength = 1
     }
 }
 

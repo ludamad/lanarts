@@ -101,3 +101,7 @@ Necromancer:
     - totems are initially inert
     - support spells make them do things
 
+"Chaos mage"
+    - gain meter for abilities doing certain things
+    - meter automatically spent when conditions are met
+        - e.g. heal when see an injured ally

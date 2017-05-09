@@ -30,6 +30,7 @@ bool filenames_from_pattern(FilenameList & filenames, const std::string& str) {
 		fatal_error();
 	}
 
+
 	std::string prestring(str.begin(), str.begin() + pos1);
 	size_t post_pos = pos2 + pos1 + 1; // adjust pos2 for whole string
 

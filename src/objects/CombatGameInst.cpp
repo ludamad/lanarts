@@ -42,27 +42,25 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
     if (current_floor == -1) {
         return false; // Don't die twice.
     }
+    lua_State* L = gs->luastate();
     auto* prev_level = gs->get_level();
     gs->set_level(gs->get_level(current_floor));
     event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);
 
-    for (Effect& e : effects().effects) {
-        if (e.t_remaining == 0) {
+    for (Effect& eff : effects.effects) {
+        EffectEntry& entry = game_effect_data[eff.id];
+        if (!eff.is_active() || entry.on_damage_func.isnil()) {
             continue;
         }
-        EffectEntry& entry = game_effect_data[e.effectid];
-        if (!entry.on_damage_func.empty() && !entry.on_damage_func.isnil()) {
-            entry.on_damage_func.push();
-            lua_State* L = gs->luastate();
-            luawrap::push(L, e.state);
-            luawrap::push(L, this);
-            luawrap::push(L, dmg);
-            lua_call(L, 3, 1);
-            if (!lua_isnil(L, -1)) {
-                dmg = lua_tonumber(L, -1);
-            }
-            lua_pop(L, 1);
+        entry.on_damage_func.push();
+        luawrap::push(L, eff.state);
+        luawrap::push(L, this);
+        luawrap::push(L, dmg);
+        lua_call(L, 3, 1);
+        if (!lua_isnil(L, -1)) {
+            dmg = lua_tonumber(L, -1);
         }
+        lua_pop(L, 1);
     }
 
     if (core_stats().hurt(dmg)) {
@@ -194,9 +192,9 @@ Pos CombatGameInst::direction_towards_object(GameState* gs, col_filterf filter) 
 
 bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
     event_log("CombatGameInst::damage: id %d getting hit by {cooldown = %d, "
-            "damage=%d, power=%d, magic_percentage=%f, resist_modifier=%f, physical_percentage=%f}",
+            "damage=%d, power=%d, magic_percentage=%f, physical_percentage=%f}",
             id, attack.cooldown, attack.damage, attack.power,
-            attack.magic_percentage, attack.resist_modifier,
+            attack.magic_percentage, 
             attack.physical_percentage());
 
     float fdmg = damage_formula(attack, effective_stats());
@@ -268,7 +266,7 @@ void CombatGameInst::draw(GameState *gs, float frame, float alpha) {
     }
     GameView& view = gs->view();
     SpriteEntry& spr = game_sprite_data[sprite];
-    Colour draw_colour = effects().effected_colour();
+    Colour draw_colour = effects.effected_colour();
 
     if (cooldowns().is_hurting()) {
         float s = 1 - hurt_alpha_value(cooldowns().hurt_cooldown);
@@ -279,7 +277,7 @@ void CombatGameInst::draw(GameState *gs, float frame, float alpha) {
     int sx = x - spr.width() / 2, sy = y - spr.height() / 2;
     draw_sprite(view, sprite, sx, sy, vx, vy, frame, draw_colour);
 
-    effects().draw_effect_sprites(gs, this, Pos(sx, sy));
+    effects.draw_effect_sprites(gs, this, Pos(sx, sy));
     if (is_resting) {
         res::sprite("resting").draw(ldraw::DrawOptions(ldraw::CENTER),
                 on_screen(gs, ipos()));
@@ -344,15 +342,15 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     }
 
     // Callbacks on attacker object:
-    for (Effect& e : effects().effects) {
-        if (e.t_remaining == 0) {
+    for (Effect& eff : effects.effects) {
+        if (!eff.is_active()) {
             continue;
         }
-        auto& entry = game_effect_data[e.effectid];
-        if (!entry.on_melee_func.empty() && !entry.on_melee_func.isnil()) {
+        auto& entry = game_effect_data[eff.id];
+        if (!entry.on_melee_func.isnil()) {
             entry.on_melee_func.push();
             lua_State* L = gs->luastate();
-            luawrap::push(L, e.state);
+            luawrap::push(L, eff.state);
             luawrap::push(L, this);
             luawrap::push(L, inst);
             luawrap::push(L, damage);
@@ -366,15 +364,15 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     }
     
     // Callbacks on attacked object:
-    for (Effect& e : inst->effects().effects) {
-        if (e.t_remaining == 0) {
+    for (Effect& eff : inst->effects.effects) {
+        if (!eff.is_active()) {
             continue;
         }
-        auto& entry = game_effect_data[e.effectid];
-        if (!entry.on_receive_melee_func.empty() && !entry.on_receive_melee_func.isnil()) {
+        auto& entry = game_effect_data[eff.id];
+        if (!entry.on_receive_melee_func.isnil()) {
             entry.on_receive_melee_func.push();
             lua_State* L = gs->luastate();
-            luawrap::push(L, e.state);
+            luawrap::push(L, eff.state);
             luawrap::push(L, this);
             luawrap::push(L, inst);
             luawrap::push(L, damage);
@@ -485,7 +483,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 
     int range = pentry.range();
 
-    bool has_greater_fire = effects().get(get_effect_by_name("AmuletGreaterFire"));
+    bool has_greater_fire = (effects.get_active("AmuletGreaterFire") != NULL);
     if (pentry.name == "Mephitize" || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt")) {
           float vx = 0, vy = 0;
           ::direction_towards(Pos {x, y}, p, vx, vy, 10000);
@@ -670,10 +668,6 @@ ClassStats& CombatGameInst::class_stats() {
 
 CooldownStats& CombatGameInst::cooldowns() {
     return stats().cooldowns;
-}
-
-EffectStats& CombatGameInst::effects() {
-    return stats().effects;
 }
 
 CoreStats& CombatGameInst::core_stats() {

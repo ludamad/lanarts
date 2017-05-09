@@ -103,7 +103,6 @@ set (libraries
 #        mingw32
 	ldraw
 	lcommon
-        lua_box2d
 	lanarts_dungeon_gen
 	lsound
 	${lua_libraries}

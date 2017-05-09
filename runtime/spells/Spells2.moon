@@ -5,11 +5,125 @@ World = require "core.World"
 Bresenham = require "core.Bresenham"
 Display = require "core.Display"
 SpellObjects = require "objects.SpellObjects"
+DataW = require "DataWrapped"
 
 INFINITE_DURATION = 2^30 -- For all intents and purposes
 mon_title = (mon) -> if mon.unique then mon.name else "the #{mon.name}"
 
-Data.spell_create {
+-- MINOR MISSILE
+
+DataW.spell_create {
+    name: "Minor Missile"
+    spr_spell: "minor missile"
+    description: "A low cost, fast bolt of energy. Hits a single target. The bolt can bounce off walls safely."
+    projectile: {
+        speed: 7.25
+        damage_multiplier: 0.75
+        can_wall_bounce: true
+    }
+    mp_cost: 4,
+    cooldown: 35
+}
+
+-- FIRE BOLT
+
+DataW.spell_create {
+    name: "Fireball",
+    spr_spell: "fire ball",
+    description: "A great, strong bolt of fire. Hits a single target.",
+    projectile: {
+        speed: 5
+        damage_multiplier: 2.00
+    }
+    mp_cost: 30,
+    cooldown: 35
+}
+
+-- POISON CLOUD
+
+DataW.spell_create {
+    name: "Mephitize",
+    spr_spell: "spr_spells.cloud",
+    description: "A debilitating ring of clouds that cause damage as well as reduced defenses and speed over time.",
+    projectile: {
+        speed: 2
+        cooldown: 105
+        on_hit_func: (target, atkstats) =>
+            effect = target\add_effect("Poison", 100) 
+            effect.damage = atkstats.damage 
+            effect.power = atkstats.power
+            effect.magic_percentage = atkstats.magic_percentage
+            effect.physical = atkstats.physical
+    }
+    mp_cost: 20
+    cooldown: 35
+    spell_cooldown: 800
+}
+
+-- FEAR CLOUD
+
+DataW.spell_create {
+    name: "Trepidize"
+    spr_spell: "spr_spells.cause_fear"
+    description: "An insidious apparition that instills the fear of death in enemies it hits."
+    projectile: {
+        speed: 8
+        on_hit_func: (target, atkstats) =>
+            target\add_effect("Fear", 100) 
+    }
+    mp_cost: 0
+    cooldown: 35
+    spell_cooldown: 1600
+}
+
+-- FIRE BOLT
+
+DataW.spell_create {
+    name: "Fire Bolt",
+    spr_spell: "fire bolt",
+    description: "A fast bolt of fire. Hits a single target.",
+    projectile: {
+        speed: 7
+        damage_multiplier: 1.25
+        spr_attack: "fire bolt"
+    }
+    mp_cost: 10,
+    cooldown: 35
+}
+
+-- MAGIC BLAST
+
+DataW.spell_create {
+    name: "Magic Blast",
+    description: "A slow, powerful magic blast of energy. The blast can bounce off an enemy twice before dissipating.",
+    spr_spell: "magic blast",
+    projectile: {
+        speed: 4
+        number_of_target_bounces: 3
+    }
+    mp_cost: 20,
+    cooldown: 65
+}
+
+DataW.projectile_create {
+    name: "Skullthrow"
+    weapon_class: "magic"
+    spr_spell: "spr_spells.skullthrow"
+    range: 300
+    damage_type: {magic: 0.5, physical: 0.5}
+    speed: 7.25
+    can_wall_bounce: true
+    mp_cost: 4
+
+    cooldown: 35
+    on_hit_func: (target, atkstats) =>
+        eff = target\add_effect("Poison", 100)
+        eff.damage = atkstats.damage
+        eff.power = atkstats.power
+        eff.magic_percentage = atkstats.magic_percentage
+}
+
+DataW.spell_create {
     name: "Ludaze"
     spr_spell: "spr_spells.ludaze"
     description: "Dazes and poisons all enemies in sight." 
@@ -46,7 +160,7 @@ Data.spell_create {
 }
 
 
-Data.spell_create {
+DataW.spell_create {
     name: "Ice Form"
     spr_spell: "spr_spells.iceform"
     description: "Initiates Ice Form, a powerful ability for safe dungeoneering, preventing attacks and spells, and lowering speed drastically, but providing near immunity for 10 seconds." 
@@ -69,429 +183,7 @@ Data.spell_create {
         return not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
 }
 
--- TODO flip effect of fortification -- TODO whut?
-Data.effect_create {
-    name: "Fortification"
-    init_func: (caster) =>
-        @active_bonuses = {}
-        @duration = 320
-    stat_func: (obj, old, new) =>
-        for k, v in pairs @active_bonuses -- Abuse that stat_func is called every frame
-            if v == 0 
-                EventLog.add("Your defence falls back down...", COL_PALE_BLUE)
-                @active_bonuses[k] = nil
-            else 
-                new.defence += 2
-                @active_bonuses[k] -= 1
-    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
-        if not @active_bonuses[attacker.id]
-            EventLog.add("Your defence rises due to getting hit!", COL_PALE_BLUE)
-            @active_bonuses[attacker.id] = @duration
-        elseif @active_bonuses[attacker.id] < @duration
-            @active_bonuses[attacker.id] = @duration
-        return damage
-
-}
-
-Data.effect_create {
-    name: "Ludaze"
-    effected_sprite: "spr_spells.ludaze"
-    can_use_rest: false
-    effected_colour: {200, 200, 255, 200}
-    fade_out: 10
-}
-
-Data.effect_create {
-    name: "Ice Form"
-    effected_sprite: "spr_spells.iceform"
-    can_use_rest: false
-    can_use_spells: false
-    can_use_stairs: true -- Important!!
-    can_use_weapons: false
-    effected_colour: {200, 200, 255}
-    stat_func: (effect, obj, old, new) ->
-        new.reduction += 20
-        new.magic_reduction += 20
-        new.resistance += 20
-        new.magic_resistance += 20
-        new.speed = math.min(new.speed, 0.5)
-    fade_out: 55
-}
-
--- Methods for implementing Aura's.
--- No extension mechanism, just called explicitly.
-AuraBase = {
-    init: () =>
-        @n_steps = 0
-        @total_time = @time_left
-        @max_alpha = 0.15
-        @n_ramp = 25
-    step: () =>
-        assert @range ~= nil, "'range' must be assigned to Aura effects."
-    draw: (inner_col, outer_col, x, y) =>
-        @n_steps += 1
-        min = math.min(@n_ramp, if @n_steps > @total_time / 2 then math.abs(@n_steps - @total_time) else @n_steps)
-        alpha = (min / @n_ramp)
-        alpha = math.max(0.2, math.min(alpha, 1))
-        alpha *= @max_alpha
-        xy = Display.to_screen_xy {x, y}
-        Display.draw_circle(with_alpha(inner_col, alpha), xy, @range)
-        Display.draw_circle_outline(with_alpha(outer_col, alpha), xy, @range, 2)
-}
-
--- Effects:
-
--------  START EQUIPMENT SLOT STACKED EFFECTS --------
--- Hack because effects are not currently easily stacked otherwise:
-for equip_slot in *{"", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
-    Data.effect_create {
-        name: "#{equip_slot}HealthGainOnKill"
-        category: "EquipEffect"
-        init_func: (caster) =>
-            @kill_tracker = caster.kills
-        step_func: (caster) =>
-            while caster.kills > @kill_tracker
-                if caster\is_local_player()
-                    EventLog.add("You regain health for killing!", COL_PALE_BLUE)
-                caster\heal_hp(3 + caster.stats.level)
-                @kill_tracker += 1
-    }
-    Data.effect_create {
-        name: "#{equip_slot}ManaGainOnKill"
-        category: "EquipEffect"
-        init_func: (caster) =>
-            @kill_tracker = caster.kills
-        step_func: (caster) =>
-            while caster.kills > @kill_tracker
-                if caster\is_local_player()
-                    EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
-                caster\heal_mp(3 + caster.stats.level)
-                @kill_tracker += 1
-    }
-
-Data.effect_create {
-    name: "PossiblySummonCentaurOnKill"
-    category: "EquipEffect"
-    init_func: (caster) =>
-        @kill_tracker = caster.kills
-    step_func: (caster) =>
-        while caster.kills > @kill_tracker
-            if chance(0.03)
-                EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
-                play_sound "sound/summon.ogg"
-                monster = "Centaur Hunter"
-                if not (caster\has_effect "Summoning")
-                    eff = caster\add_effect("Summoning", 20)
-                    eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
-                    eff.duration = 5
-            @kill_tracker += 1
-}
-
-Data.effect_create {
-    name: "PossiblySummonStormElementalOnKill"
-    category: "EquipEffect"
-    init_func: (caster) =>
-        @kill_tracker = caster.kills
-    step_func: (caster) =>
-        while caster.kills > @kill_tracker
-            if chance(0.05)
-                EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
-                play_sound "sound/summon.ogg"
-                monster = "Storm Elemental"
-                if not (caster\has_effect "Summoning")
-                    eff = caster\add_effect("Summoning", 20)
-                    eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
-                    eff.duration = 5
-            @kill_tracker += 1
-}
-
-
-Data.effect_create {
-    name: "PossiblySummonGolemOnKill"
-    category: "EquipEffect"
-    init_func: (caster) =>
-        @kill_tracker = caster.kills
-    step_func: (caster) =>
-        while caster.kills > @kill_tracker
-            if chance(0.03)
-                EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
-                play_sound "sound/summon.ogg"
-                monster = "Golem"
-                if not (caster\has_effect "Summoning")
-                    eff = caster\add_effect("Summoning", 20)
-                    eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
-                    eff.duration = 5
-            @kill_tracker += 1
-}
--------  STOP EQUIPMENT SLOT STACKED EFFECTS --------
-
-Data.effect_create {
-    name: "Summoning"
-    category: "Summon"
-    effected_colour: COL_PALE_RED
-    fade_out: 10
-    --stat_func: (effect, obj, old, new) ->
-    --    new.speed *= 2
-    init_func: (caster) =>
-        @n_steps = 0
-        @delay = 1
-        @duration = @time_left
-        @on_summon = do_nothing
-        @summon_xy = caster.xy
-        caster.summoned or= {}
-    step_func: (caster) =>
-        @n_steps += 1
-        if @n_steps == @delay
-            ability = SpellObjects.SummonAbility.create {monster: @monster, :caster, xy: @summon_xy, duration: @duration, on_summon: @on_summon}
-            GameObject.add_to_level(ability)
-}
-
-Data.effect_create {
-    name: "Reviving"
-    init_func: (player) =>
-        -- No op for now
-    finish_func: (player) =>
-        player.is_ghost = false
-        player.stats.hp = 1
-    draw_func: (player, top_left_x, top_left_y) =>
-        xy = Display.to_screen_xy player.xy
-        Fonts.small\draw({origin: Display.CENTER}, xy, "#{math.ceil @time_left / 60}")
-}
-
-Data.effect_create {
-    name: "Fear Aura"
-    category: "Aura"
-    effected_colour: {200, 200, 255}
-    fade_out: 100
-    effected_sprite: "spr_spells.cause_fear"
-    init_func: (caster) =>
-        AuraBase.init(@, caster)
-        @max_alpha = 0.4
-    step_func: (caster) =>
-        AuraBase.step(@, caster)
-        for mon in *(Map.enemies_list caster)
-            if mon\has_effect("Fear")
-                continue
-            dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
-            if dist < @range
-                mon\add_effect("Fear", 300)
-    draw_func: (caster, top_left_x, top_left_y) =>
-        AuraBase.draw(@, COL_GRAY, COL_BLACK, caster.x, caster.y)
-}
-
-Data.effect_create {
-    name: "Healing"
-    category: "Aura"
-    effected_sprite: "spr_amulets.healing"
-    fade_out: 25
-    step_func: (obj) =>
-        {:hpregen} = obj\effective_stats()
-        obj\heal_hp(hpregen * 20)
-}
-
-Data.effect_create {
-    name: "Healing Aura"
-    category: "Aura"
-    effected_sprite: "spr_amulets.healing"
-    fade_out: 100
-    init_func: (caster) =>
-        AuraBase.init(@, caster)
-        @max_alpha = 0.4
-    step_func: (caster) =>
-        AuraBase.step(@, caster)
-        for ally in *Map.allies_list(caster)
-            if ally\has_effect("Healing")
-                continue
-            dist = vector_distance({ally.x, ally.y}, {caster.x, caster.y})
-            if dist < @range
-                ally\add_effect("Healing", 200)
-    draw_func: (caster, top_left_x, top_left_y) =>
-        AuraBase.draw(@, COL_GRAY, COL_WHITE, caster.x, caster.y)
-}
-
-Data.effect_create {
-    name: "Daze Aura"
-    category: "Aura"
-    effected_sprite: "spr_amulets.light"
-    fade_out: 100
-    init_func: (caster) =>
-        AuraBase.init(@, caster)
-    step_func: (caster) =>
-        AuraBase.step(@, caster)
-        for mon in *(Map.enemies_list caster)
-            if mon\has_effect("Dazed")
-                continue
-            dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
-            if dist < @range
-                mon\add_effect("Dazed", 100)
-    draw_func: (caster, top_left_x, top_left_y) =>
-        AuraBase.draw(@, COL_PALE_YELLOW, COL_YELLOW, caster.x, caster.y)
-}
-
-Data.effect_create {
-    name: "Sap Aura"
-    category: "Aura"
-    fade_out: 100
-    init_func: (caster) =>
-        AuraBase.init(@, caster)
-        if caster.is_enemy
-            @range = 90
-    step_func: (caster) =>
-        AuraBase.step(@, caster)
-        if caster.is_enemy and not Map.object_visible(caster)
-            return
-        for mon in *(Map.enemies_list caster)
-            if mon\has_effect("Sapped")
-                continue
-            dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
-            if dist < @range
-                mon\add_effect("Sapped", 35)
-                mon.stats.mp = math.max(0, mon.stats.mp - 10)
-                if mon\is_local_player() 
-                    EventLog.add("Your MP is drained!", {200,200,255})
-                elseif not mon.is_enemy
-                    EventLog.add(mon.name .. "'s MP is drained!", {200,200,255})
-    draw_func: (caster, top_left_x, top_left_y) =>
-        @max_alpha = 0.35
-        AuraBase.draw(@, COL_PALE_BLUE, COL_BLUE, caster.x, caster.y)
-}
-
-
-Data.effect_create {
-    name: "Pain Aura"
-    category: "Aura"
-    effected_sprite: "spr_spells.greaterpain"
-    fade_out: 50
-    init_func: (caster) =>
-        AuraBase.init(@, caster)
-        @mp_gain = 10
-        if caster.is_enemy
-            @range = 90
-    step_func: (caster) =>
-        AuraBase.step(@, caster)
-        if @animation_only
-            return
-        if caster.is_enemy and not Map.object_visible(caster)
-            return
-        for mon in *(Map.enemies_list caster)
-            if mon\has_effect("Pained")
-                continue
-            dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
-            if dist < @range
-                mon\add_effect("Pained", 50)
-                play_pained_sound()
-                caster\add_effect("Pained", 50)
-                if mon\damage(random(4,15) * 2 + caster.stats.magic * 2, random(2,5) + caster.stats.magic * 0.2, 1.0, 2.0)
-                    {:stats} = caster
-                    caster\gain_xp_from(mon)
-                    {:max_hp} = mon\effective_stats()
-                    if caster\has_effect("AmuletGreatPain")
-                        caster\heal_hp(max_hp * 2/ 16)
-                    else
-                        caster\heal_hp(max_hp / 16)
-                    --stats.mp = math.min(stats.max_mp, stats.mp + @mp_gain)
-                    ---- Summon zombies by probability!?
-                    --if caster\is_local_player() 
-                    --    EventLog.add("You drain the enemy's life force as MP!", {200,200,255})
-                    --elseif not caster.is_enemy
-                    --    EventLog.add(caster.name .. " drains the enemy's life force as MP!", {200,200,255})
-    draw_func: (caster, top_left_x, top_left_y) =>
-        @max_alpha = 0.35
-        if @animation_only 
-            @max_alpha /= 4
-        elseif not caster.is_enemy and not caster\has_effect "Pained"
-            @max_alpha /= 2
-        AuraBase.draw(@, COL_PALE_RED, COL_RED, caster.x, caster.y)
-}
-
--- TODO separate into ItemEffects.moon
-
-Data.effect_create {
-    name: "VampiricWeapon"
-    on_melee_func: (attacker, defender, damage, attack_stats) =>
-        if attacker\is_local_player() 
-            EventLog.add("You steal the enemy's life!", {200,200,255})
-        attacker\heal_hp(damage / 4)
-        return damage
-}
-
-
-Data.effect_create {
-    name: "Abolishment"
-    stat_func: (effect, obj, old, new) ->
-        new.strength += math.ceil(new.magic / 3)
-        new.magic = 0
-}
-
-Data.effect_create {
-    name: "EnemyHyperProjectile"
-    stat_func: (effect, obj, old, new) ->
-        new.ranged_cooldown_multiplier *= 0.1
-}
-
-Data.effect_create {
-    name: "KnockbackWeapon"
-    on_melee_func: (attacker, defender, damage, attack_stats) =>
-        if defender\has_effect("Thrown")
-            return
-        if chance(.1)
-            thrown = defender\add_effect("Thrown", 20)
-            thrown.angle = vector_direction({attacker.x, attacker.y}, {defender.x, defender.y})
-        return damage
-}
-
-Data.effect_create {
-    name: "PoisonedWeapon"
-    on_melee_func: (attacker, defender, damage, attack_stats) =>
-        if defender\has_effect("Poison")
-            return
-        if (if attacker.is_enemy then chance(.25) else chance(.1))
-            eff = defender\add_effect("Poison", 100)
-            eff.poison_rate = 25
-            eff.damage = attack_stats.damage
-            eff.power = attack_stats.power
-            eff.magic_percentage = attack_stats.magic_percentage
-        return damage
-}
-
-Data.effect_create {
-    name: "FearWeapon"
-    on_melee_func: (attacker, defender, damage, attack_stats) =>
-        if defender\has_effect("Fear")
-            return
-        if chance(.1)
-            eff = defender\add_effect("Fear", 150)
-        return damage
-}
-
-Data.effect_create {
-    name: "ConfusingWeapon"
-    on_melee_func: (attacker, defender, damage, attack_stats) =>
-        if defender\has_effect("Dazed")
-            return
-        if chance(.1)
-            eff = defender\add_effect("Dazed", 70)
-        return damage
-}
-
-Data.effect_create {
-    name: "StopOnceInRange"
-    -- For centaurs predominantly, coded in C++
-}
-
-Data.effect_create {
-    name: "Encumbered"
-    stat_func: (obj, old, new) =>
-        new.speed -= 1
-}
-
-Data.effect_create {
-    name: "Encumbered"
-    stat_func: (obj, old, new) =>
-        new.speed -= 1
-}
-
-Data.spell_create {
+DataW.spell_create {
     name: "Baleful Regeneration",
     spr_spell: "spr_spells.regeneration",
     description: "You tap into necromancy to very quickly bind your wounds, until your are fully healed or its power runs out. Takes longer to run out the more willpower you have.",
@@ -520,77 +212,8 @@ Data.spell_create {
             EventLog.add(caster.name .. " starts to regenerate quickly!", {200,200,255})
 }
 
-Data.effect_create {
-    name: "Baleful Regeneration",
-    effected_sprite: "spr_amulets.i-regeneration"
-    effected_colour: {200,255,200}
-    step_func: (caster) =>
-        {:hp, :max_hp, :hpregen} = caster\effective_stats()
-        if hp >= max_hp
-            caster\remove_effect("Baleful Regeneration")
-        else
-            regen_rate = hpregen * (if caster\has_effect("AmuletGreatPain") then 29 else 14)
-            caster\heal_hp(regen_rate)
-}
-
-Data.effect_create {
-    name: "Spiky"
-    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
-        if attacker\direct_damage(damage * 0.25)
-            defender\gain_xp_from(attacker)
-        if defender.is_local_player and defender\is_local_player()
-            EventLog.add("You strike back with spikes!", COL_PALE_BLUE)
-        return damage
-}
-
--- These all are implemented by checks in the code:
-Data.effect_create {
-    name: "AmuletBerserker"
-}
-
-Data.effect_create {
-    name: "AmuletGreatPain"
-}
-
-Data.effect_create {
-    name: "AmuletGreaterFire"
-}
-
-Data.effect_create {
-    name: "DiesOutsideOfSummonerRange"
-    init_func: (summon) =>
-        @summoner = false -- TODO think about allowing initial state to be passed to effects!
-        -- TODO but OTOH I like the current system. 
-    step_func: (summon) =>
-        assert @summoner, "No summoner set on DiesOutsideOfSummonerRange!"
-        if not Map.object_visible summon, summon.xy, @summoner
-            summon\direct_damage(10)
-}
-
-Data.effect_create {
-    name: "Summoner"
-    init_func: (caster) =>
-        @n_steps = 0
-        @n_summons = 0
-    step_func: (caster) =>
-        caster.summoned or= @summoned or {}
-        @summoned or= caster.summoned
-        @n_summons = 0
-        for mon, time in pairs caster.summoned
-            if not mon.destroyed
-                time_out = (if mon.name == "Spectral Beast" then (time > 600) else (time > 1200)) -- All others are permanents
-                diff_floor = (caster.map ~= mon.map)
-                if time_out or diff_floor
-                    mon\direct_damage(mon.stats.hp + 1)
-            if mon.destroyed
-                caster.summoned[mon] = nil
-            else
-                caster.summoned[mon] += 1
-                @n_summons += 1
-}
-
 -- Requires kills from the necromancer, in the form of mana.
-Data.spell_create {
+DataW.spell_create {
     name: "Summon Dark Aspect",
     spr_spell: "spr_spells.summon",
     description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower.",
@@ -638,122 +261,8 @@ Data.spell_create {
             eff.duration = 5
 }
 
-
-share_damage = (target, damage, min_health) ->
-    -- TODO 
-    min_health = 0
-    if target.stats.hp - damage < min_health
-        damage = math.max(0, target.stats.hp - min_health)
-    target.stats.hp -= damage
-
-for name in *{"Ranger", "Fighter", "Necromancer", "Mage", "Lifelinker"}
-    Data.effect_create {
-        :name
-        stat_func: (obj, old, new) =>
-            if name == "Mage" and obj.stats.level == 1
-                new.spell_cooldown_multiplier *= 1.1
-            if name == "Mage" and obj.stats.level == 2
-                new.spell_cooldown_multiplier *= 1.05
-            if name ~= "Fighter"
-                new.melee_cooldown_multiplier *= 1.25
-            if name ~= "Ranger"
-                new.ranged_cooldown_multiplier *= 1.25
-
-        init_func: (caster) =>
-            @kill_tracker = caster.kills
-            @links = {}
-        step_func: (caster) =>
-            -- Keep state for doing summons in a stateful effect:
-            if caster\has_effect "Summoner"
-                caster\add_effect "Summoner", 2 -- Keep effect from dying
-            else
-                eff = caster\add_effect "Summoner", 2
-                eff.duration = 30
-            while caster.kills > @kill_tracker
-                if name == "Necromancer"
-                    if caster\is_local_player()
-                        EventLog.add("You gain mana for killing!", COL_PALE_BLUE)
-                    caster\heal_mp(5)
-                for {:instance, :class_name} in *World.players
-                    if instance ~= caster and class_name == "Necromancer"
-                        if instance\is_local_player()
-                            EventLog.add("You gain mana from the carnage!", COL_PALE_BLUE)
-                        instance\heal_mp(2)
-                @kill_tracker += 1
-        on_damage_func: (caster, damage) =>
-            new_links = {}
-            for link in *@links
-                if link.destroyed
-                    continue
-                append new_links, link
-                share_damage(link, damage, 5)
-                if caster\is_local_player()
-                    EventLog.add("Your link feels your pain!", COL_PALE_RED)
-            @links = new_links
-        on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
-            if name == "Necromancer"
-                if attacker\direct_damage(damage * 0.33)
-                    defender\gain_xp_from(attacker)
-                if defender\is_local_player()
-                    EventLog.add("Your corrosive flesh hurts #{mon_title attacker} as you are hit!", COL_PALE_BLUE)
-            return damage
-    }
-
--- Move in a direction, attacking everyone along the way
-Data.effect_create {
-    name: "Dash Attack"
-    effected_sprite: "spr_effects.pain_mirror"
-    can_use_rest: false
-    effected_colour: {200, 200, 255, 255}
-    fade_out: 10
-    init_func: (caster) =>
-        play_sound "sound/equip.ogg"
-        @steps = 0
-        @n_hits = 0
-        @attacked = {} -- No one attacked at first
-    step_func: (caster) =>
-        @steps += 1
-        -- Move forward: 
-        xy = {
-            caster.x + math.cos(@angle) * 16
-            caster.y + math.sin(@angle) * 16
-        }
-        if Map.object_tile_check(caster, xy)
-            play_sound "sound/door.ogg"
-            caster\remove_effect "Dash Attack"
-            return
-        caster.xy = xy
-        if caster\has_ranged_weapon()
-            return
-        -- Attack nearby monsters:
-        for mon in *Map.enemies_list(caster)
-            dist = vector_distance(mon.xy, caster.xy)
-            if dist < caster.target_radius + mon.target_radius --+ caster.weapon_range
-                if @attacked[mon.id]
-                    continue
-                @attacked[mon.id] = true
-                if caster\is_local_player()
-                    EventLog.add("You strike as you pass!", {200,200,255})
-                @n_hits += 1
-                caster\melee(mon, math.max(0.1, 1.0 / @n_hits))
-    draw_func: (caster) =>
-        for i=1,math.min(@steps, 12)
-            xy = {
-                caster.x - math.cos(@angle) * 16 * i
-                caster.y - math.sin(@angle) * 16 * i
-            }
-            screen_xy = Display.to_screen_xy(xy)
-            caster.sprite\draw({color: {255,255,255, 200 - 30 * i}, origin: Display.CENTER}, screen_xy)
-    stat_func: (caster, old, new) =>
-        new.speed = 0
-        caster.stats.attack_cooldown = 2
-        -- new.strength += 2
-        -- new.defence += 5
-        -- new.willpower += 5
-}
-
 -- Dash Attack
-Data.spell_create {
+DataW.spell_create {
     name: "Dash Attack",
     spr_spell: "expedite",
     description: "Dash in a straight line, hitting all enemies in your path. Stops if you hit a wall." -- Can still perform abilities while dashing.",
@@ -775,22 +284,8 @@ Data.spell_create {
         return @x + dx * 32, @y + dy * 32
 }
 
-Data.effect_create {
-    name: "Lifelink"
-    init_func: (summon) =>
-        @linker = false
-    on_damage_func: (summon, damage) =>
-        assert @linker, "No linker set in lifelink!"
-        {:links} = @linker\get_effect("Lifelinker")
-        share_damage(@linker, damage, 15) -- Cannot bring below 15HP
-        if @linker\is_local_player()
-            EventLog.add("You feel your links pain!", COL_PALE_RED)
-        for link in *links do if link ~= summon
-            share_damage(link, damage, 5) -- Cannot bring below 5HP
-}
-
 -- Link of Loyalty
-Data.spell_create {
+DataW.spell_create {
     name: "Link of Loyalty",
     spr_spell: "spr_spells.forgelink",
     description: "You summon a linked companion near an enemy, sending them to immediate combat but taking damage whenever they take damage. The type of companion depends on your amulet's summoning aspect.",
@@ -827,7 +322,7 @@ Data.spell_create {
 
 -- Unlink
 -- TODO AOE link all enemies?
-Data.spell_create {
+DataW.spell_create {
     name: "Unlink",
     spr_spell: "spr_spells.unlink",
     description: "You break the link with all life-linked monsters. Monsters you have summoned are returned to their domain. Heals a small amount of health per monster."

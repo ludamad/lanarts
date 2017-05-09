@@ -37,12 +37,12 @@ bool EquipmentStats::use_ammo(int amnt) {
 	return projectile_slot().remove_copies(amnt);
 }
 
-void EquipmentStats::serialize(SerializeBuffer& serializer) {
-	inventory.serialize(serializer);
+void EquipmentStats::serialize(GameState* gs, SerializeBuffer& serializer) {
+	inventory.serialize(gs, serializer);
 }
 
-void EquipmentStats::deserialize(SerializeBuffer& serializer) {
-	inventory.deserialize(serializer);
+void EquipmentStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	inventory.deserialize(gs, serializer);
 }
 
 bool EquipmentStats::has_weapon() {

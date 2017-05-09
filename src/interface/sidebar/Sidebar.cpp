@@ -68,7 +68,7 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	DerivedStats& magical = player_inst->effective_stats().magic;
 
 	int x_interval = width / 2;
-	int y_interval = 15;
+	int y_interval = 16;
 
 	gs->font().drawf(ldraw::DrawOptions(COL_WHITE).origin(ldraw::CENTER), Pos(x - 10 + x_interval, 15), "%s",
 			gs->get_level()->label().c_str());
@@ -96,20 +96,17 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	p1.y += y_interval;
 	p2.y += y_interval;
 
-	gs->font().drawf(COL_PALE_YELLOW, p1, "Strength %d", core.strength);
+	gs->font().drawf(COL_PALE_GREEN, p1, "Strength %d", core.strength);
 	gs->font().drawf(COL_PALE_BLUE, p2, "Magic %d", core.magic);
 
 	p1.y += y_interval;
 	p2.y += y_interval;
 
-	gs->font().drawf(COL_PALE_YELLOW, p1, "Defence %d", core.defence);
-	gs->font().drawf(COL_PALE_BLUE, p2, "Will %d", core.willpower);
+	gs->font().drawf(COL_PALE_GREEN, p1, "Defence %d", (int)round(physical.resistance));
+	gs->font().drawf(COL_PALE_BLUE, p2, "Will %d", (int)round(magical.resistance));
 
 	p1.y += y_interval;
-	p2.y += y_interval;
-
-	gs->font().drawf(COL_PALE_YELLOW, p1, "PR %+d/%+2.f", physical.reduction, physical.resistance);
-	gs->font().drawf(COL_PALE_BLUE, p2, "MR %+d/%+2.f", magical.reduction, magical.resistance);
+	p2.y += y_interval; ;
 
 	p1.y += y_interval;
 	p2.y += y_interval;

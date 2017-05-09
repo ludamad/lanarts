@@ -27,22 +27,22 @@ add_library( lanarts_dungeon_gen
              ${lanarts_dungeon_gen_include}
 )
 
-add_executable( lanarts_dungeon_gen_tests
-             ${lanarts_dungeon_gen_tests_src})
-
-target_link_libraries(
-	lanarts_dungeon_gen_tests
-	lanarts_dungeon_gen
-	libxmi
-	lcommon
-	luawrap
-	lua
-	ldraw
-	UnitTest++
-)
-
-enable_testing()
-add_test(NAME lanarts_dungeon_gen_tests COMMAND
-    cd ${CMAKE_CURRENT_SOURCE_DIR} ;
-    ${EXECUTABLE_OUTPUT_PATH}/lanarts_dungeon_gen_tests )
-
+#add_executable( lanarts_dungeon_gen_tests
+#             ${lanarts_dungeon_gen_tests_src})
+#
+#target_link_libraries(
+#	lanarts_dungeon_gen_tests
+#	lanarts_dungeon_gen
+#	libxmi
+#	lcommon
+#	luawrap
+#	lua
+#	ldraw
+#	UnitTest++
+#)
+#
+#enable_testing()
+#add_test(NAME lanarts_dungeon_gen_tests COMMAND
+#    cd ${CMAKE_CURRENT_SOURCE_DIR} ;
+#    ${EXECUTABLE_OUTPUT_PATH}/lanarts_dungeon_gen_tests )
+#

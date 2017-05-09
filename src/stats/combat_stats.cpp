@@ -34,7 +34,7 @@ void CombatStats::step(GameState* gs, CombatGameInst* inst,
 
 	core.step(effective_stats.core);
 	cooldowns.step(inst->is_resting);
-	effects.step(gs, inst);
+	inst->effects.step(gs, inst);
 }
 
 bool CombatStats::has_died() {
@@ -204,26 +204,16 @@ float AttackStats::atk_percentage_physical() const {
 	return projectile.projectile_entry().physical_percentage();
 }
 
-float AttackStats::atk_resist_modifier() const {
-	if (weapon.id > 0 || projectile.empty()) {
-		WeaponEntry& wentry = weapon.weapon_entry();
-		DamageStats& dmgmod = wentry.attack.damage_modifiers;
-		return dmgmod.resistability;
-	}
-	return projectile.projectile_entry().resistability();
-}
-
 void CombatStats::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write(core);
 	cooldowns.serialize(gs, serializer);
 	serializer.write(class_stats);
-	equipment.serialize(serializer);
-	effects.serialize(gs, serializer);
+	equipment.serialize(gs, serializer);
 	spells.serialize(serializer);
 	serializer.write_int(attacks.size());
 	for (int i = 0; i < attacks.size(); i++) {
-		attacks[i].projectile.serialize(serializer);
-		attacks[i].weapon.serialize(serializer);
+		attacks[i].projectile.serialize(gs, serializer);
+		attacks[i].weapon.serialize(gs, serializer);
 	}
 	serializer.write(movespeed);
 }
@@ -232,15 +222,14 @@ void CombatStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(core);
     cooldowns.deserialize(gs, serializer);
 	serializer.read(class_stats);
-	equipment.deserialize(serializer);
-	effects.deserialize(gs, serializer);
+	equipment.deserialize(gs, serializer);
 	spells.deserialize(serializer);
 	int size;
 	serializer.read_int(size);
 	attacks.resize(size);
 	for (int i = 0; i < size; i++) {
-		attacks[i].projectile.deserialize(serializer);
-		attacks[i].weapon.deserialize(serializer);
+		attacks[i].projectile.deserialize(gs, serializer);
+		attacks[i].weapon.deserialize(gs, serializer);
 	}
 	serializer.read(movespeed);
 }

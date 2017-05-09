@@ -70,11 +70,9 @@ CoreStatMultiplier parse_core_stat_multiplier(const LuaField& value);
  * They are not fully determined until EffectiveAttackStats is created */
 struct DerivedStats {
 	float power, resistance;
-	int damage, reduction;
-	DerivedStats(float power = 0, float resistance = 0, int damage = 0,
-			int reduction = 0) :
-			power(power), resistance(resistance), damage(damage), reduction(
-					reduction) {
+	int damage;
+	DerivedStats(float power = 0, float resistance = 0, int damage = 0) :
+			power(power), resistance(resistance), damage(damage) {
 	}
 
 	bool operator==(const DerivedStats& derived) const;
@@ -84,10 +82,8 @@ struct DerivedStats {
 struct EffectiveAttackStats {
 	int damage, power, cooldown;
 	float magic_percentage;
-	float resist_modifier;
 	EffectiveAttackStats() :
-			damage(0), power(0), cooldown(0), magic_percentage(0.0f), resist_modifier(
-					1.0f) {
+			damage(0), power(0), cooldown(0), magic_percentage(0.0f) {
 	}
 	float physical_percentage() const {
 		return 1.0f - magic_percentage;

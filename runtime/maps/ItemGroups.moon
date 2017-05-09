@@ -158,10 +158,10 @@ boots = (chance, args) -> _filter {
             chance: 100
             { item: "Leather Boots",      chance: 1                      }
         } 
-        args.ignore_medium or {
-            chance: 20
-            { item: "Iron Boots",           chance: 2                      }
-        }
+        --args.ignore_medium or {
+        --    chance: 20
+        --    { item: "Iron Boots",           chance: 2                      }
+        --}
         args.ignore_strong or {
             chance: 5
             { item: "Troll Boots",           chance: 90                      }
@@ -199,7 +199,7 @@ weapons = (chance, args) -> _filter {
             chance: 100
             { item: "Dagger",      chance: 1                      }
             { item: "Short Sword",      chance: 1                      }
-            { item: "Standard Sword",      chance: 1                      }
+--            { item: "Standard Sword",      chance: 1                      }
         } 
         args.ignore_medium or {
             chance: 20
