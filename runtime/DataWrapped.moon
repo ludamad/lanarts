@@ -98,7 +98,12 @@ weapon_create = (args) ->
     dps = if args.type == "bows" then STANDARD_RANGED_DPS else STANDARD_WEAPON_DPS
     damage = damage_multiplier * (args.cooldown / 60 * dps)
     power = 0
-    args.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
+    -- For enemy_create made weapons, directly set base damage:
+    if type(args.damage) == 'number'
+        damage = args.damage
+        args.damage = {base: {math.floor(damage *0.9), math.ceil(damage * 1.1)}, strength: 0}
+    else 
+        args.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
     args.power or= {base: {power, power}, strength: 1}
     args.range or= 7
     Data.weapon_create(args)
@@ -130,4 +135,21 @@ projectile_create = (args) ->
     args.range or= 300
     Data.projectile_create(args)
 
-return {:additive_effect_create, :effect_create, :weapon_create, :spell_create, :projectile_create}
+enemy_create = (args) ->
+    args.stats.attacks or= {}
+    w = args.weapon
+    if w ~= nil
+        w.name or= args.name .. " Melee"
+        w.type or= "unarmed"
+        w.spr_item or= "none"
+        append args.stats.attacks, {weapon: w.name}
+        weapon_create(w)
+    p = args.projectile
+    if p ~= nil
+        p.name or= args.name .. " Projectile"
+        p.spr_item or= "none"
+        append args.stats.attacks, {projectile: p.name}
+        projectile_create(p)
+    Data.enemy_create(args)
+
+return {:additive_effect_create, :effect_create, :weapon_create, :spell_create, :projectile_create, :enemy_create}

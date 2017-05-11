@@ -197,7 +197,13 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
     bool found_item = false;
     int dx = 0, dy = 0;
     if (min_dist == 10000) {//std::numeric_limits<float>::max()) {
-        FOR_EACH_BBOX(paths_to_object().location(), x, y) {
+        auto bbox = paths_to_object().location();
+        // Make sure not touching borders:
+        bbox.x1 = std::max(bbox.x1, 1);
+        bbox.x2 = std::min(bbox.x2, gs->tiles().tile_width() - 1);
+        bbox.y1 = std::max(bbox.y1, 1);
+        bbox.y2 = std::min(bbox.y2, gs->tiles().tile_height() - 1);
+        FOR_EACH_BBOX(bbox, x, y) {
             auto* node = paths_to_object().node_at({x, y});
             if (node->solid) {
                 continue;

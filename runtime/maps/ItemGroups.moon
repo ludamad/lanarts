@@ -291,8 +291,8 @@ for i=1,Randarts.MAX_POWER_LEVEL
             pretty(items[name])
             error("*** SHOULD HAVE '" .. type .. "' IN ITEM TABLE")
             -- continue
-        if type == "armour"
-            print(name)
+        --if type == "armour"
+        --    print(name)
         append item_table[type], name
     item_selection_list = (for k, v in pairs item_table do v)
     append(M.randart_items, item_selection_list)

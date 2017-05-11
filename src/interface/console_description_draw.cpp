@@ -318,9 +318,7 @@ static void draw_equipment_description_overlay(GameState* gs,
 }
 
 static void draw_attack_description_overlay(GameState* gs,
-		DescriptionBoxHelper& dbh, Attack& attack, std::string weapon_class = std::string()) {
-	PlayerInst* p = gs->local_player();
-	CoreStats& core = p->effective_stats().core;
+		DescriptionBoxHelper& dbh, CoreStats& core, Attack& attack) {
 	draw_statmult(gs, dbh, "Damage: ", attack.damage_stats(), core,
 			COL_PALE_YELLOW, COL_PALE_GREEN, false);
 	draw_statmult(gs, dbh, "Power: ", attack.power_stats(), core,
@@ -343,19 +341,19 @@ static void draw_attack_description_overlay(GameState* gs,
 static void draw_weapon_description_overlay(GameState* gs,
 		DescriptionBoxHelper& dbh, const Weapon& weapon) {
 	WeaponEntry& entry = weapon.weapon_entry();
-	PlayerInst* p = gs->local_player();
-	EffectiveStats& estats = p->effective_stats();
-	draw_attack_description_overlay(gs, dbh, entry.attack, entry.weapon_class);
+    PlayerInst* p = gs->local_player();
+    CoreStats& core = p->effective_stats().core;
+	draw_attack_description_overlay(gs, dbh, core, entry.attack);
 	draw_equipment_description_overlay(gs, dbh, weapon);
 }
 
 static void draw_projectile_description_overlay(GameState* gs,
 		DescriptionBoxHelper& dbh, const Projectile& projectile) {
 	ProjectileEntry& entry = projectile.projectile_entry();
-	PlayerInst* p = gs->local_player();
-	EffectiveStats& estats = p->effective_stats();
 	if (entry.is_standalone()) {
-		draw_attack_description_overlay(gs, dbh, entry.attack);
+	    PlayerInst* p = gs->local_player();
+	    CoreStats& core = p->effective_stats().core;
+		draw_attack_description_overlay(gs, dbh, core, entry.attack);
 	}
 	draw_equipment_description_overlay(gs, dbh, projectile);
 }
@@ -399,6 +397,10 @@ void draw_console_enemy_description(GameState* gs, EnemyEntry& entry) {
 			COL_PALE_RED);
 	draw_value(gs, dbh, "Will: ", ecore.willpower, COL_PALE_YELLOW,
 			COL_PALE_RED);
+
+	auto core = entry.basestats.effective_stats(gs, NULL).core;
+	WeaponEntry& weap = entry.basestats.attacks[0].weapon.weapon_entry();
+    draw_attack_description_overlay(gs, dbh, core, weap.attack);
 }
 
 void draw_console_item_description(GameState* gs, const Item& item,

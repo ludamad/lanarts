@@ -17,6 +17,7 @@ static LuaValue* weapon_table;
 static void lapi_data_create_weapon(const LuaStackValue& table) {
 	WeaponEntry* entry = new WeaponEntry;
 	game_item_data.push_back(entry);
+	printf("Creating weapoon entry %s\n", entry->name.c_str());
 
 	int idx = game_item_data.size();
 	entry->init(idx, table);

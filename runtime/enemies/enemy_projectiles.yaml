@@ -115,7 +115,7 @@ projectiles:
     weapon_class: physical
     damage_type: {physical: 1.0}
     damage: { strength: 1.0 }    # 100% strength
-    power:  { strength: 0.2 }    
+    power:  { strength: 1.0 }    
     range: 300
     cooldown: 100
     speed: 9

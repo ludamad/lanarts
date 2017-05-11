@@ -17,14 +17,14 @@ effect_files:
   - effects/effects.yaml
   - spells/spell_effects.yaml
 
-enemy_files: 
-  - enemies/animals/animals.yaml
-  - enemies/bosses/bosses.yaml
-  - enemies/demonic/demonic.yaml
-  - enemies/elemental/elemental.yaml
-  - enemies/humanoid/humanoid.yaml
-  - enemies/misc/misc.yaml
-  - enemies/undead/undead.yaml
+enemy_files: []
+    #  - enemies/animals/animals.yaml
+    #  - enemies/bosses/bosses.yaml
+    #  - enemies/demonic/demonic.yaml
+    #  - enemies/elemental/elemental.yaml
+    #  - enemies/humanoid/humanoid.yaml
+    #  - enemies/misc/misc.yaml
+    #  - enemies/undead/undead.yaml
   
 room_template_files:
   - maps/templates/templates.yaml
@@ -77,4 +77,4 @@ tileset_files:
 
 weapon_files: 
   - items/weapons/weapons.yaml
-  - enemies/enemy_weapons.yaml
+#- enemies/enemy_weapons.yaml

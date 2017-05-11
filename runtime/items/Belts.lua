@@ -8,8 +8,8 @@ Data.equipment_create {
     spr_item = "spr_belts.protection",
 
     stat_bonuses = {
-        willpower = 2,
-        defence = 2
+        willpower = 1,
+        defence = 1
     }
 }
 

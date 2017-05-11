@@ -126,9 +126,11 @@ EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
 	EffectiveStats ret;
 	ret.core = stats.core;
 	ret.movespeed = stats.movespeed;
-	ret.allowed_actions = inst->effects.allowed_actions(gs);
 	ret.spells = stats.spells;
-	inst->effects.process(gs, inst, ret);
+    if (inst != NULL) {
+        ret.allowed_actions = inst->effects.allowed_actions(gs);
+        inst->effects.process(gs, inst, ret);
+    }
 	factor_in_equipment_stats(gs->rng(), ret, stats.equipment);
 	derive_secondary_stats(gs->rng(), ret);
 	ret.cooldown_modifiers.apply(ret.cooldown_mult);

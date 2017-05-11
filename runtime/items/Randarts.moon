@@ -256,7 +256,7 @@ define_randart = (rng, base, images, enchanter) ->
     data.randart_weight = 0
     data.pickup_func = randart_pickup
     data.stat_bonuses or= {}
-    n_enchants = power_level * 3
+    n_enchants = power_level * 2
     while n_enchants > 0 
         --if rng\random(4) == 0
         --    add_buff(rng, data, true) -- Major
