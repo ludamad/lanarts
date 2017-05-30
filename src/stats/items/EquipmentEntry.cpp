@@ -92,7 +92,7 @@ static EquipmentEntry::equip_type name2type(const char* name) {
 	}
 }
 
-// Defined in objects/loaddata/load_enemy_data.cpp
+// Defined in objects/load_enemy_data.cpp
 std::vector<StatusEffect> load_statuses(const LuaValue& effects);
 
 void EquipmentEntry::parse_lua_table(const LuaValue& table) {

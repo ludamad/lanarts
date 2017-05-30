@@ -45,25 +45,20 @@ file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     collision_avoidance/*
  
     data/*
-    data/loaddata/*
  
     display/*
-    display/loaddata/*
  
     draw/*
-    draw/loaddata/*
  
     fov/*
     fov/impl/*
  
     gamestate/*
-    gamestate/loaddata/*
  
     interface/*
     interface/sidebar/*
  
     dungeon_generation/*
-    dungeon_generation/loaddata/*
  
     lua/*
     lua_api/*
@@ -72,13 +67,11 @@ file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     net/*
 
     objects/*
-    objects/loaddata/*
 
     pathfind/*
 
     stats/*
     stats/items/*
-    stats/loaddata/*
 
     util/*
 

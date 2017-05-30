@@ -38,7 +38,7 @@ LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemstable);
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemstable = NULL);
-
+void lapi_data_create_enemy(const LuaStackValue& table);
 LuaValue load_spell_and_effect_data(lua_State* L, const FilenameList& filenames);
 
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames);
@@ -196,98 +196,102 @@ static void __lua_init(lua_State* L, T& t) {
 }
 
 void init_game_data(GameSettings& settings, lua_State* L) {
-	LuaSpecialValue globals = luawrap::globals(L);
 
-	DataFiles dfiles = load_datafilenames("datafiles.yaml");
-
-//NB: Do not re-order the way resources are loaded unless you know what you're doing!
-//For example, all item data types must be loaded before room generation data
-
-	load_tile_data(dfiles.tile_files);
-	lua_sprites = load_sprite_data(L, dfiles.sprite_files);
-	lua_sprites.clear();
-	load_tileset_data(dfiles.tileset_files);
-
-	update_loading_screen(L, 0, "Loading Items");
-	// --- ITEM DATA ---
-	// TODO: Go to new system
-	lua_items = load_item_data(L, FilenameList());
-        // Ensure we have access to the items table for purposes of equipment/spell definition: 
-	globals["items"] = lua_items;
-	update_loading_screen(L, 10, "Loading Projectiles");
-
-	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
-			lua_items);
-	update_loading_screen(L, 20, "Loading Spells");
-
-	// Effects MUST be before spells, as effects are also loaded in spells currently
-	// TODO move effects completely to Lua
-	lua_spells = load_spell_and_effect_data(L, dfiles.spell_files);
-	update_loading_screen(L, 30, "Loading Weapons");
-
-	load_weapon_data(L, dfiles.weapon_files, &lua_items);
-	update_loading_screen(L, 40, "Loading Equipment");
-
-	// TODO clean this up
-
-	load_equipment_data(L, dfiles.equipment_files, &lua_items);
-	update_loading_screen(L, 50, "Loading Enemies");
-	// --- ITEM DATA ---
-
-	lua_enemies = load_enemy_data(L, dfiles.enemy_files);
-	update_loading_screen(L, 60, "Loading Item Generation Templates");
-
-	update_loading_screen(L, 90, "Loading Classes");
-	lua_classes = load_class_data(L, FilenameList());
-	update_loading_screen(L, 100, "Complete!");
-
-	LuaValue weapons = luawrap::ensure_table(globals["weapons"]);
-	int ind = 0;
-	for (int i = 0; i < game_item_data.size(); i++) {
-		ItemEntry& ientry = get_item_entry(i);
-		if (dynamic_cast<WeaponEntry*>(&ientry)) {
-			WeaponEntry& entry = get_weapon_entry(i);
-
-			weapons[++ind] = lua_items[entry.name];
-		}
-	}
-	LuaValue armour = luawrap::ensure_table(globals["armour"]);
-	ind = 0;
-	for (int i = 0; i < game_item_data.size(); i++) {
-		ItemEntry& ientry = get_item_entry(i);
-		if (dynamic_cast<EquipmentEntry*>(&ientry)) {
-			if (dynamic_cast<WeaponEntry*>(&ientry) || dynamic_cast<ProjectileEntry*>(&ientry)) {
-				continue;
-			}
-			ItemEntry& entry = get_item_entry(i);
-
-			armour[++ind] = lua_items[entry.name];
-		}
-	}
-	LuaValue consumables = luawrap::ensure_table(globals["consumable"]);
-	for (int i = 0; i < game_item_data.size(); i++) {
-		ItemEntry& ientry = get_item_entry(i);
-		if (!dynamic_cast<EquipmentEntry*>(&ientry)) {
-			ItemEntry& entry = get_item_entry(i);
-
-			consumables[entry.name] = lua_items[entry.name];
-		}
-	}
-	globals["enemies"] = lua_enemies;
-	globals["projectiles"] = lua_projectiles;
-	globals["spells"] = lua_spells;
-	globals["classes"] = lua_classes;
-
-	__lua_init(L, game_enemy_data);
-
-	for (int i = 0; i < game_item_data.size(); i++) {
-		game_item_data[i]->initialize(L);
-	}
-
-	for (int i = 0; i < game_spell_data.size(); i++) {
-		game_spell_data[i].initialize(L);
-	}
 }
+
+//void init_game_data(GameSettings& settings, lua_State* L) {
+//	LuaSpecialValue globals = luawrap::globals(L);
+//
+//	DataFiles dfiles = load_datafilenames("datafiles.yaml");
+//
+////NB: Do not re-order the way resources are loaded unless you know what you're doing!
+////For example, all item data types must be loaded before room generation data
+//
+//	load_tile_data(dfiles.tile_files);
+//	lua_sprites = load_sprite_data(L, dfiles.sprite_files);
+//	lua_sprites.clear();
+//	load_tileset_data(dfiles.tileset_files);
+//
+//	update_loading_screen(L, 0, "Loading Items");
+//	// --- ITEM DATA ---
+//	// TODO: Go to new system
+//	lua_items = load_item_data(L, FilenameList());
+//        // Ensure we have access to the items table for purposes of equipment/spell definition: 
+//	globals["items"] = lua_items;
+//	update_loading_screen(L, 10, "Loading Projectiles");
+//
+//	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
+//			lua_items);
+//	update_loading_screen(L, 20, "Loading Spells");
+//
+//	// Effects MUST be before spells, as effects are also loaded in spells currently
+//	// TODO move effects completely to Lua
+//	lua_spells = load_spell_and_effect_data(L, dfiles.spell_files);
+//	update_loading_screen(L, 30, "Loading Weapons");
+//
+//	load_weapon_data(L, dfiles.weapon_files, &lua_items);
+//	update_loading_screen(L, 40, "Loading Equipment");
+//
+//	// TODO clean this up
+//
+//	load_equipment_data(L, dfiles.equipment_files, &lua_items);
+//	update_loading_screen(L, 50, "Loading Enemies");
+//	// --- ITEM DATA ---
+//
+//	lua_enemies = load_enemy_data(L, dfiles.enemy_files);
+//	update_loading_screen(L, 60, "Loading Item Generation Templates");
+//
+//	update_loading_screen(L, 90, "Loading Classes");
+//	lua_classes = load_class_data(L, FilenameList());
+//	update_loading_screen(L, 100, "Complete!");
+//
+//	LuaValue weapons = luawrap::ensure_table(globals["weapons"]);
+//	int ind = 0;
+//	for (int i = 0; i < game_item_data.size(); i++) {
+//		ItemEntry& ientry = get_item_entry(i);
+//		if (dynamic_cast<WeaponEntry*>(&ientry)) {
+//			WeaponEntry& entry = get_weapon_entry(i);
+//
+//			weapons[++ind] = lua_items[entry.name];
+//		}
+//	}
+//	LuaValue armour = luawrap::ensure_table(globals["armour"]);
+//	ind = 0;
+//	for (int i = 0; i < game_item_data.size(); i++) {
+//		ItemEntry& ientry = get_item_entry(i);
+//		if (dynamic_cast<EquipmentEntry*>(&ientry)) {
+//			if (dynamic_cast<WeaponEntry*>(&ientry) || dynamic_cast<ProjectileEntry*>(&ientry)) {
+//				continue;
+//			}
+//			ItemEntry& entry = get_item_entry(i);
+//
+//			armour[++ind] = lua_items[entry.name];
+//		}
+//	}
+//	LuaValue consumables = luawrap::ensure_table(globals["consumable"]);
+//	for (int i = 0; i < game_item_data.size(); i++) {
+//		ItemEntry& ientry = get_item_entry(i);
+//		if (!dynamic_cast<EquipmentEntry*>(&ientry)) {
+//			ItemEntry& entry = get_item_entry(i);
+//
+//			consumables[entry.name] = lua_items[entry.name];
+//		}
+//	}
+//	globals["enemies"] = lua_enemies;
+//	globals["projectiles"] = lua_projectiles;
+//	globals["spells"] = lua_spells;
+//	globals["classes"] = lua_classes;
+//
+//	__lua_init(L, game_enemy_data);
+//
+//	for (int i = 0; i < game_item_data.size(); i++) {
+//		game_item_data[i]->initialize(L);
+//	}
+//
+//	for (int i = 0; i < game_spell_data.size(); i++) {
+//		game_spell_data[i].initialize(L);
+//	}
+//}
 
 static void luayaml_push(LuaValue& value, lua_State* L, const char* name) {
 	value.push();
