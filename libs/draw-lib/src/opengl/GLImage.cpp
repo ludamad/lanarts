@@ -81,16 +81,12 @@ GLImage::~GLImage() {
 }
 
 void GLImage::initialize(const std::string& filename) {
-
-	SDL_Surface* image;
-	GLfloat texcoord[4];
-
 	if (filename.empty() || texture != 0) {
 		return;
 	}
 
 	/* Load the image using SDL_image library */
-	image = IMG_Load(filename.c_str());
+	SDL_Surface* image = IMG_Load(filename.c_str());
 	if (image == NULL) {
 		printf("Image '%s' could not be loaded\n", filename.c_str());
 		printf("SDL reported: '%s'\n", IMG_GetError());
@@ -101,16 +97,19 @@ void GLImage::initialize(const std::string& filename) {
 	height = image->h;
 
 	/* Convert the image into an OpenGL texture */
+	GLfloat texcoord[4];
 	texture = SDL_GL_LoadTexture(image, texcoord);
 
-	if (!texture) {
-		printf("Texture from image '%s' could not be loaded\n",
-				filename.c_str());
-		fatal_error();
-	}
-
-	texw = texcoord[2];
-	texh = texcoord[3];
+        texw = texh = 0;
+	if (texture != NULL) {
+                texw = texcoord[2];
+                texh = texcoord[3];
+        // If images cannot be loaded by OpenGL, error, except if in headless mode:
+	} else if (getenv("LANARTS_HEADLESS") == NULL) {
+		printf("Texture from image '%s' (%dx%d) could not be loaded\n",
+				filename.c_str(), width, height);
+		fatal_error(); // Don't fatal error for now! TODO conditional on environment variable?
+        }
 
 	/* We don't need the original image anymore */
 	SDL_FreeSurface(image);

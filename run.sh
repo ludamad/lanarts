@@ -120,7 +120,7 @@ function build_lanarts(){
     if handle_flag "--clean" ; then
         make clean
     fi
-    time make -j$((cores+1)) lanarts
+    make -j$((cores+1)) lanarts
     cd ../runtime && python2 compile_images.py > compiled/Resources.lua
     cd ..
 }

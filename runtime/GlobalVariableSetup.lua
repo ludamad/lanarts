@@ -11,18 +11,21 @@ function nilprotect(t)
     return setmetatable(t, nilprotect_meta)
 end
 
+
+-- Initial global protection phase, only protect against undefined lookups:
 setmetatable(_G, {__index = function(self, k)
     error( ("Global variable '%s' does not exist!"):format(k) )
 end})
 
-print "Read core globals:"
+require "Logging"
+
+log "Read core globals."
 require "globals.CoreGlobals"
 
-print "Read modules that must be initialized:"
-require "Logging"
+log "Read modules that must be initialized."
 require "ErrorReporting"
 
-print "Read other globals"
+log "Read other globals."
 
 require "globals.Debug"
 require "globals.Draw"
@@ -34,18 +37,18 @@ require "globals.StringUtils"
 require "globals.TableUtils"
 require "globals.TextComponent"
 
-print "Preload external packages that set globals:"
+log "Preload external packages that set globals:"
 
 require "json"
 require "socket"
 require "ltn12"
 require "mime"
 
-print "Preload legacy internal modules that set globals (and need refactoring to not):"
+log "Preload legacy internal modules that set globals (and need refactoring to not):"
 
 require "effects.Effects"
 
-print "Assigning, in effect declaring, global variables used by the engine:"
+log "Assigning, in effect declaring, global variables used by the engine."
 items = false
 spells = false
 effects = false
@@ -70,7 +73,7 @@ argv_configuration = nilprotect {
 setmetatable(_G, {__index = function(self, k)
     error( ("Global variable '%s' does not exist!"):format(k) )
 end, __newindex = function(self, k)
-    if k ~= 'player' then  -- Hacks for engine
+    if k ~= 'player' and k ~= "start_lanarts" then  -- Hacks for engine
         error( ("Not in file called by GlobalVariableSetup, cannot set global variable '%s'!"):format(k) )
     end
 end})

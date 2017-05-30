@@ -22,13 +22,18 @@ function M.set_log_level(log)
             }
             local reset = '\27[0m'
             local prefix = colors[k] .. '[' .. k:lower() .. '] ' .. reset
-            _G['log_' .. k:lower()] = (l < level) and do_nothing or function(...) 
+            _G['log_' .. k:lower()] = (l < level) and function() end or function(...) 
             	iowrite(prefix, ..., reset, '\n')
             end
 		end
 	end
+        _G.log = _G.log_info
 end
 
-M.set_log_level "VERBOSE"
+if os.getenv("LANARTS_HEADLESS") then
+    M.set_log_level "WARN"
+else
+    M.set_log_level "VERBOSE"
+end
 
 return M

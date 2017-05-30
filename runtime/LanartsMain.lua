@@ -21,25 +21,25 @@ if os.getenv("LANARTS_HEADLESS") then
 end
 
 function Engine.menu_start(...)
-    print "function Engine.menu_start(...)"
+    log "function Engine.menu_start(...)"
     local menus = require "Menus"
     return menus.start_menu_show(...)
 end
 
 function Engine.pregame_menu_start(...)
-    print "function Engine.pregame_menu_show(...)"
+    log "function Engine.pregame_menu_show(...)"
     local menus = require "Menus"
     return menus.pregame_menu_show(...)
 end
 
 function Engine.loading_screen_draw(...)
-    print "function Engine.loading_screen_draw(...)"
+    log "function Engine.loading_screen_draw(...)"
     local LoadingScreen = drawsystem_require "menus.LoadingScreen"
     return LoadingScreen.draw(...)
 end
 
 function Engine.resources_load(...)
-    print "function Engine.resources_load(...)"
+    log "function Engine.resources_load(...)"
     --TODO: Find a better place for these helper functions
 
     require "effects.Effects"
@@ -93,7 +93,7 @@ function Engine.pre_serialize()
     local timer = timer_create()
     SerializationUtils.name_global_data()
     SerializationUtils.install_require_fallback()
-    print("Naming globals took " .. timer:get_milliseconds() .. "ms.")
+    log_verbose("Naming globals took " .. timer:get_milliseconds() .. "ms.")
 end
 
 function Engine.post_serialize()

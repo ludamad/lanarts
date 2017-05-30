@@ -278,6 +278,9 @@ static int lapi_random(lua_State* L) {
 		min = lua_tointeger(L, 1);
 		max = lua_tointeger(L, 2);
 	}
+        if (max - min < 0) {
+            return luaL_error(L, "random() cannot take %d to %d (net negative)", min, max);
+        }
 
 	lua_pushnumber(L, gs->rng().rand(min, max + 1));
 	return 1;

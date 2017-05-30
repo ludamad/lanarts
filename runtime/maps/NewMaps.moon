@@ -199,7 +199,7 @@ generate_door_candidates = (map, rng, regions) ->
         filter_random_third(x1+1,y1+1,x2-1,y2-1)
 
 map_try_create = (template_f) ->
-    seed = random(0, 2 ^ 31)
+    seed = random(0, 2 ^ 30)
     rng = require("mtwist").create(seed)
     event_log("(RNG #%d) Attempting map_try_create with seed %d\n", rng\amount_generated(), seed)
     template = template_f(rng)
