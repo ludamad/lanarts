@@ -39,6 +39,13 @@ LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemstable = NULL);
 void lapi_data_create_enemy(const LuaStackValue& table);
+void lapi_data_create_item(const LuaStackValue& table);
+void lapi_data_create_class(const LuaStackValue& table);
+void lapi_data_create_spell(const LuaStackValue& table);
+void lapi_data_create_effect(const LuaStackValue& table);
+void lapi_data_create_projectile(const LuaStackValue& table);
+void lapi_data_create_equipment(const LuaStackValue& table);
+void lapi_data_create_weapon(const LuaStackValue& table);
 LuaValue load_spell_and_effect_data(lua_State* L, const FilenameList& filenames);
 
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames);
@@ -195,8 +202,24 @@ static void __lua_init(lua_State* L, T& t) {
 		t[i].init(L);
 }
 
-void init_game_data(GameSettings& settings, lua_State* L) {
+void init_game_data(lua_State* L) {
+	LuaSpecialValue globals = luawrap::globals(L);
+        // D: The table that holds all the resource data
+	LuaValue D = luawrap::ensure_table(globals["Data"]);
 
+        // Compatibility
+	DataFiles dfiles = load_datafilenames("datafiles.yaml");
+	load_tile_data(dfiles.tile_files);
+        load_sprite_data(L, dfiles.sprite_files);
+
+        D["enemy_create"].bind_function(lapi_data_create_enemy);
+        D["class_create"].bind_function(lapi_data_create_class);
+        D["item_create"].bind_function(lapi_data_create_item);
+        D["spell_create"].bind_function(lapi_data_create_spell);
+        D["effect_create"].bind_function(lapi_data_create_effect);
+        D["projectile_create"].bind_function(lapi_data_create_projectile);
+        D["equipment_create"].bind_function(lapi_data_create_equipment);
+        D["weapon_create"].bind_function(lapi_data_create_weapon);
 }
 
 //void init_game_data(GameSettings& settings, lua_State* L) {

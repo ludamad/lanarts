@@ -25,6 +25,26 @@ DataW.spell_create {
     cooldown: 35
 }
 
+-- MAGIC ARROW
+
+DataW.spell_create {
+    name: "Magic Arrow"
+    description: "Allows you to create an arrow of pure energy, requires a bow. Does well against strudy opponents."
+    spr_spell: "magic arrow"
+    mp_cost: 20
+    projectile: {
+        speed: 7.25
+        spr_attack: "crystal spear"
+        range: 150
+        speed: 9
+        power: {base: {0, 0}, magic: 0.5, strength: 0.5}
+    }
+    cooldown: 30
+    resist_modifier: 0.5
+    prereq_func: () => 
+        return @stats.weapon_type == "bows" 
+}
+
 -- FIRE BOLT
 
 DataW.spell_create {

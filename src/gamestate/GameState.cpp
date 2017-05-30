@@ -31,6 +31,11 @@
 #include "lua_api/lua_api.h"
 #include "lua_api/lua_api.h"
 
+#include <luawrap/luawrap.h>
+#include <luawrap/members.h>
+
+#include <luawrap/macros.h>
+
 #include "net/GameNetConnection.h"
 #include "net-lib/lanarts_net.h"
 

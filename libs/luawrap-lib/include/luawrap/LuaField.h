@@ -60,6 +60,7 @@ public:
 	void raw_pop() const;
 
 	/** Container methods **/
+	LuaField operator[](const std::string& key) const;
 	LuaField operator[](const char* key) const;
 	LuaField operator[](int index) const;
 

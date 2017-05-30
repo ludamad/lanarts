@@ -1,5 +1,56 @@
 local DataW = require "DataWrapped"
 
+-- Projectiles:
+-- This entry is used as the basic 'nothing' equipment slot.
+Data.projectile_create {
+    name = "Nothing", -- This must be named nothing.
+    weapon_class = "none",
+    spr_item = "none"
+}
+
+Data.projectile_create {
+    name = "Arrow",
+    shop_cost = {2,3},
+    description = "A trusty arrow, for use with a bow.",
+    weapon_class = "bows",
+    spr_item = "arrow_item",
+    spr_attack = "arrow_projectile",
+    -- Stats
+    drop_chance = 90, -- % chance 
+    speed = 6.75
+}
+
+Data.projectile_create {
+    name = "Silver Arrow",
+    shop_cost = {3,4},
+    description = "A deadly silver arrow.",
+    weapon_class = "bows",
+    spr_item = "stone_arrow_item",
+    spr_attack = "stone_arrow_projectile",
+    -- Stats
+    damage_bonuses = {
+      damage = {base = {4,6}},
+      power = {base = 2}
+    },
+    drop_chance = 95, -- % chance
+    speed = 7
+}
+
+Data.projectile_create {
+    name = "Stone",
+    shop_cost = {2,2},
+    description = "A fist sized stone, good for throwing.",
+    weapon_class = "unarmed",
+    spr_item = "stone",
+    drop_chance = 90, -- % chance
+    -- Stats
+    range = 300,
+    speed = 6,
+    cooldown = 45,
+    damage = {base = {3,4}},
+    power = {base = {0,1}, strength = 1.0}
+}
+
 DataW.weapon_create {
     name = "Unarmed",
     description = "You are currently fighting with your fists.",
@@ -413,7 +464,4 @@ DataW.weapon_create {
 }
 
 -- END MONSTER ATTACK TYPES --
-
--- Start the game with 1000 'randarts' -- for now, preconfigured item generations.
-require("items.Randarts").define_weapon_randarts()
 

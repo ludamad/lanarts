@@ -282,6 +282,9 @@ void LuaField::raw_pop() const {
  *                         Container methods                                 *
  *****************************************************************************/
 
+LuaField LuaField::operator[](const std::string& key) const {
+	return LuaField(this, key.c_str());
+}
 LuaField LuaField::operator [](const char* key) const {
 	return LuaField(this, key);
 }

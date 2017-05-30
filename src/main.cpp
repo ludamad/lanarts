@@ -174,17 +174,8 @@ static void run_engine(int argc, char** argv) {
 
 
 	engine["resources_load"].push();
+	init_game_data(gs->luastate());
 	luawrap::call<void>(gs->luastate());
-
-	try {
-		init_game_data(gs->game_settings(), gs->luastate());
-		engine["resources_post_load"].push();
-		luawrap::call<void>(gs->luastate());
-	} catch (const std::exception& err) {
-		fprintf(stderr, "%s\n", err.what());
-		fflush(stderr);
-		goto label_Quit;
-	}
 
 	if (gs->game_settings().conntype == GameSettings::SERVER) {
 		engine["pregame_menu_start"].push();

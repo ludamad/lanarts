@@ -287,14 +287,18 @@ for i=1,Randarts.MAX_POWER_LEVEL
     }
     for name in *Randarts.RANDARTS[i]
         {:type} = items[name] or projectiles[name]
+        if not type
+            type = "projectile"
         if not item_table[type]
             pretty(items[name])
-            error("*** SHOULD HAVE '" .. type .. "' IN ITEM TABLE")
+            error("*** SHOULD HAVE '" .. type.. "' IN ITEM TABLE")
             -- continue
         --if type == "armour"
         --    print(name)
         append item_table[type], name
     item_selection_list = (for k, v in pairs item_table do v)
+    for k,v in pairs item_table
+        assert(#v > 0, "Not enough " .. k)
     append(M.randart_items, item_selection_list)
 
 M.epic_store_items = {

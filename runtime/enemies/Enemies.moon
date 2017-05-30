@@ -382,7 +382,8 @@ DataW.enemy_create {
     xpaward: 150
     unique: true
     stats: {
-        attacks: { { projectile: "Large Fire Ball"} }
+        projectile: {
+        }
         hp: 220
         hpregen: 0.1
         movespeed: 2.5
@@ -505,7 +506,15 @@ DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 3, 
     xpaward: 300
     unique: true
     stats: {
-        attacks: {{ weapon: "Basic Melee"}, { projectile: "Longer Range Blue Blast"}}
+        attacks: {{ weapon: "Basic Melee"}}
+        projectile: { -- Adds to 'attacks'
+            weapon_class: "magic"
+            damage_type: {magic: 0.5, physical: 0.5}
+            range: 300
+            cooldown: 70
+            speed: 8
+            spr_attack: "blue blast"
+        }
         movespeed: 3.5
         hp: 500
         hpregen: 0.15
@@ -525,7 +534,20 @@ DataW.enemy_create {
     appear_message: "A centaur hunter readies his bow."
     defeat_message: "The centaur hunter has been defeated."
     stats: {
-        attacks: {{projectile: "Dark Arrows"}}
+        projectile: {
+            weapon_class: 'bows'
+            damage_type: {physical: 1.0}
+            cooldown: 30
+            speed: 9
+            spr_attack: 'nessos arrows'
+            on_hit_func: (target, atkstats) =>
+                if chance(.25) -- TODO poison resistance
+                    effect = target\add_effect("Poison", 100, atkstats)
+                    effect.damage = atkstats.damage
+                    effect.power = atkstats.power
+                    effect.magic_percentage = atkstats.magic_percentage
+                    effect.physical = atkstats.physical
+        }
         hp: 80
         hpregen: 0.01
         movespeed: 4
@@ -545,7 +567,20 @@ DataW.enemy_create {
     appear_message: "A centaur marksman readies his bow."
     defeat_message: "The centaur marksman has been defeated."
     stats: {
-        attacks: {{projectile: "Poison Arrows"}}
+        projectile: {
+            weapon_class: 'bows'
+            damage_type: {physical: 1.0}
+            cooldown: 30
+            speed: 9
+            spr_attack: 'nessos arrows'
+            on_hit_func: (target, atkstats) =>
+                if chance(.25) -- TODO poison resistance
+                    effect = target\add_effect("Poison", 100, atkstats)
+                    effect.damage = atkstats.damage
+                    effect.power = atkstats.power
+                    effect.magic_percentage = atkstats.magic_percentage
+                    effect.physical = atkstats.physical
+        }
         hp: 120
         hpregen: 0.02
         movespeed: 4
@@ -566,11 +601,24 @@ DataW.enemy_create {
     appear_message: "Nesso readies his bow."
     defeat_message: "Nesso has been defeated."
     stats: {
-        attacks: {{projectile: "Rapid Poison Arrows"}}
+        projectile: {
+            weapon_class: 'bows'
+            damage_type: {physical: 1.0}
+            cooldown: 20
+            speed: 9
+            spr_attack: 'nessos arrows'
+            on_hit_func: (target, atkstats) =>
+                if chance(.25) -- TODO poison resistance
+                    effect = target\add_effect("Poison", 100, atkstats)
+                    effect.damage = atkstats.damage
+                    effect.power = atkstats.power
+                    effect.magic_percentage = atkstats.magic_percentage
+                    effect.physical = atkstats.physical
+        }
         hp: 200
         hpregen: 0.02
         movespeed: 4
-        strength: 40
+        strength: 60
         defence: 16
         willpower: 16
     }
@@ -585,7 +633,15 @@ DataW.enemy_create {
    appear_message: "A hell-forged creature appears before you!"
    defeat_message: "The hell-forged is destroyed."
    stats: {
-       attacks: {{projectile: "Large Fire Ball"}}
+       projectile: {
+           weapon_class: "magic"
+           damage_type: {magic: 0.5, physical: 0.5}
+           range: 250
+           radius: 11
+           cooldown: 40
+           speed: 8
+           spr_attack: "large fire"
+       }
        movespeed: 3.5
        hp: 125
        hpregen: 0.01
@@ -606,7 +662,14 @@ DataW.enemy_create {
     radius: 12
     xpaward: 5
     stats: {
-        attacks: { {projectile: "Storm Bolt"} }
+        projectile: {
+            weapon_class: "magic"
+            damage_type: {magic: 1.0}
+            range: 130
+            cooldown: 45
+            speed: 7
+            spr_attack: "storm bolt"
+        }
         movespeed: 2
         hp: 15
         hpregen: 0.02
@@ -625,7 +688,14 @@ DataW.enemy_create {
     appear_message: "A storm elemental floats onto the scene."
     defeat_message: "The storm elemental dissolves."
     stats: {
-        attacks: { {projectile: "Storm Bolt"} }
+        projectile: {
+            weapon_class: "magic"
+            damage_type: {magic: 1.0}
+            range: 130
+            cooldown: 45
+            speed: 7
+            spr_attack: "storm bolt"
+        }
         movespeed: 1
         hp: 50
         hpregen: 0.05
@@ -644,7 +714,14 @@ DataW.enemy_create {
     appear_message: "A raging storm elemental appears!"
     defeat_message: "The raging storm elemental dissipates."
     stats: {
-        attacks: { {projectile: "Storm Bolt"} }
+        projectile: {
+            weapon_class: "magic"
+            damage_type: {magic: 1.0}
+            range: 130
+            cooldown: 45
+            speed: 7
+            spr_attack: "storm bolt"
+        }
         movespeed: 2
         hp: 75
         hpregen: 0.05
@@ -1057,7 +1134,15 @@ DataW.enemy_create {
     radius: 12
     xpaward: 50
     stats: {
-        attacks: {{ projectile: "Large Fire Ball"} }
+        projectile: {
+            weapon_class: "magic"
+            damage_type: {magic: 0.5, physical: 0.5}
+            range: 250
+            radius: 11
+            cooldown: 40
+            speed: 8
+            spr_attack: "large fire"
+        }
         hp: 80
         hpregen: 0.1
         movespeed: 2.5
@@ -1104,7 +1189,7 @@ DataW.enemy_create {
     xpaward: 150
     unique: true
     stats: {
-        attacks: { {weapon: "Basic Melee"}, { projectile: "Large Fire Ball"} }
+        attacks: { {weapon: "Basic Melee"}}
         hp: 250
         hpregen: 0.1
         movespeed: 2.5
@@ -1125,7 +1210,14 @@ DataW.enemy_create {
     appear_message: "A strange blue metallic creature appears!"
     defeat_message: "The blue metallic creature is broken into scrap."
     stats: {
-        attacks: { {projectile: "Magic Bolt"} }
+        projectile: {
+            weapon_class: "magic"
+            damage_type: {magic: 1.0}
+            range: 65
+            cooldown: 35
+            speed: 7
+            spr_attack: "magic bolt"
+        }
         movespeed: 3
         hp: 65
         hpregen: 0.05
@@ -1181,7 +1273,15 @@ DataW.enemy_create {
     radius: 14
     xpaward: 55
     stats: {
-        attacks: { {weapon: "Fast Melee"}, {projectile: "Big Stone"} }
+        attacks: { {weapon: "Fast Melee"}}
+        projectile: {
+            weapon_class: "physical"
+            damage_type: {physical: 1.0}
+            range: 300
+            cooldown: 100
+            speed: 9
+            spr_attack: "big stone"
+        }
         hp: 200
         hpregen: 0
         movespeed: 1

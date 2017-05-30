@@ -353,7 +353,7 @@ M.hive_create = (MapSeq) ->
         dungeon_template: dungeon.TEMPLATE
         on_generate: (floor) ->
             assert(floor)
-            print "on_generate", floor
+            log_verbose  "on_generate", floor
         sprite_up: (floor) ->
             return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
         sprite_down: (floor) ->
@@ -682,7 +682,7 @@ overworld_features = (map) ->
                 dungeon_template: SnakePit.TEMPLATE
                 on_generate: (floor) ->
                     assert(floor)
-                    print "on_generate", floor
+                    log_verbose "on_generate", floor
                 sprite_up: (floor) ->
                     return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
                 sprite_down: (floor) ->
@@ -954,7 +954,7 @@ test_vault_create = (template) ->
                 return true
             on_create_source_map: (map) =>
                 if not @_create_vault(map)
-                    print "*** ABORT: create_vault"
+                    log_warn "*** ABORT: create_vault"
                     return nil
                 @player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
                 if not @player_spawn_points
@@ -974,7 +974,7 @@ test_create = (offset = 1) ->
         dungeon_template: dungeon.TEMPLATE
         on_generate: (floor) ->
             assert(floor)
-            print "on_generate", floor
+            log_verbose "on_generate", floor
         sprite_up: (floor) ->
             return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
         sprite_down: (floor) ->

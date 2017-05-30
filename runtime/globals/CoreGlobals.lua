@@ -305,5 +305,3 @@ function newtype(args)
 
     return type
 end
-
-

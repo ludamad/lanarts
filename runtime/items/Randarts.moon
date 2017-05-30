@@ -372,12 +372,12 @@ define_ammo_randarts = (rng) ->
         table.insert RANDARTS[math.max(1, math.min(3, math.floor(e / 3) + 1))], data.name
 
 define_equipment_randarts = (rng) ->
+    log_verbose "Defining equipment randarts."
     -- RNG object just for generating randarts
     -- ATM the following MUST be a deterministic process, because of limitations
     -- in the Lanarts engine. Once we move to a better serialization library
     -- and have a more flexible object system we can move this into the code proper
     -- and not in a phase beforehand.
-    rng = require("mtwist").create(HARDCODED_RANDARTS_SEED)
     define_ring_randarts(rng)
     define_belt_randarts(rng)
     define_legwear_randarts(rng)
@@ -392,25 +392,32 @@ define_equipment_randarts = (rng) ->
         for i=1,(item.randart_weight or 20) * 4
             Data.equipment_create(define_randart(rng, item, item.randart_sprites, apply_enchantment))
 
-define_weapon_randarts = () ->
-    table.clear(NAMES_USED)
-    table.clear(RANDARTS)
-    for power=1,MAX_POWER_LEVEL
-        RANDARTS[power] = {}
+define_weapon_randarts = (rng) ->
+    log_verbose "Defining weapon randarts."
     -- RNG object just for generating randarts
     -- ATM the following MUST be a deterministic process, because of limitations
     -- in the Lanarts engine. Once we move to a better serialization library
     -- and have a more flexible object system we can move this into the code proper
     -- and not in a phase beforehand.
-    rng = require("mtwist").create(HARDCODED_RANDARTS_SEED)
     candidates = {}
     for name, item in pairs(items)
         -- Judge whether its a weapon by a cooldown being present
         if item.randart_sprites ~= nil and item.cooldown ~= nil
             append candidates, item
+        print name, item
     for item in *candidates
         for i=1,(item.randart_weight or 20) * 4
             template = define_randart(rng, item, item.randart_sprites, apply_enchantment)
             Data.weapon_create(template)
+            items[template.name] = template
 
-return {:RANDARTS, :MAX_POWER_LEVEL, :define_equipment_randarts, :define_weapon_randarts}
+define_randarts = () ->
+    rng = require("mtwist").create(HARDCODED_RANDARTS_SEED)
+    table.clear(NAMES_USED)
+    table.clear(RANDARTS)
+    for power=1,MAX_POWER_LEVEL
+        RANDARTS[power] = {}
+    define_weapon_randarts(rng)
+    define_equipment_randarts(rng)
+
+return {:RANDARTS, :MAX_POWER_LEVEL, :define_randarts}

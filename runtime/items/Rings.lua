@@ -149,6 +149,3 @@ Data.equipment_create {
     stat_bonuses = { magic = 2, willpower = -1, mp = 10}
 }
 
--- Start the game with 1000 'randarts' -- for now, preconfigured item generations.
-require("items.Randarts").define_equipment_randarts()
-

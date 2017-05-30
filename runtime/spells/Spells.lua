@@ -105,24 +105,6 @@ end
 
 Data.spell_create(Blink)
 
--- MAGIC ARROW
-
-local MagicArrow = {
-    name = "Magic Arrow",
-    description = "Allows you to create an arrow of pure energy, requires a bow. Does well against strudy opponents.",
-    spr_spell = "magic arrow",
-    projectile = "Magic Arrow",
-    mp_cost = 20,
-    cooldown = 30,
-    resist_modifier = 0.5
-}
-
-function MagicArrow.prereq_func(caster)
-    return caster.stats.weapon_type == "bows"
-end
-
-Data.spell_create(MagicArrow)
-
 -- POWER STRIKE
 
 local PowerStrike = {

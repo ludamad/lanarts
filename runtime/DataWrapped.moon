@@ -93,7 +93,7 @@ additive_effect_create = (args) ->
 STANDARD_WEAPON_DPS = 10
 STANDARD_RANGED_DPS = 5
 
-weapon_create = (args) -> 
+weapon_create = (args, for_enemy = false) -> 
     damage_multiplier = args.damage_multiplier or 1.0
     dps = if args.type == "bows" then STANDARD_RANGED_DPS else STANDARD_WEAPON_DPS
     damage = damage_multiplier * (args.cooldown / 60 * dps)
@@ -106,6 +106,7 @@ weapon_create = (args) ->
         args.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
     args.power or= {base: {power, power}, strength: 1}
     args.range or= 7
+    items[args.name] = args -- HACK
     Data.weapon_create(args)
 
 spell_create = (args) ->
@@ -126,11 +127,18 @@ spell_create = (args) ->
         args.projectile = proj.name
     Data.spell_create(args)
 
-projectile_create = (args) -> 
+projectile_create = (args, for_enemy = false) -> 
     damage_multiplier = args.damage_multiplier or 1.0
     damage = damage_multiplier * (args.cooldown / 60 * STANDARD_WEAPON_DPS)
-    args.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
-    args.power or= {base: {0, 0}, strength: args.damage_type.physical, magic: args.damage_type.magic}
+    if for_enemy
+        -- For enemies, we want all damage to come from 'damage'.
+        -- The strength and magic stats work differently for enemies thusly.
+        args.power or= {base: {0, 0}}
+        damage = damage_multiplier * (args.cooldown / 60 * args.damage)
+        args.damage or= {base: {0, 0}, strength: args.damage_type.physical, magic: args.damage_type.magic}
+    else
+        args.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
+        args.power or= {base: {0, 0}, strength: args.damage_type.physical, magic: args.damage_type.magic}
     args.spr_item or= "none"
     args.range or= 300
     Data.projectile_create(args)
@@ -143,13 +151,13 @@ enemy_create = (args) ->
         w.type or= "unarmed"
         w.spr_item or= "none"
         append args.stats.attacks, {weapon: w.name}
-        weapon_create(w)
+        weapon_create(w, true)
     p = args.projectile
     if p ~= nil
         p.name or= args.name .. " Projectile"
         p.spr_item or= "none"
         append args.stats.attacks, {projectile: p.name}
-        projectile_create(p)
+        projectile_create(p, true)
     Data.enemy_create(args)
 
 return {:additive_effect_create, :effect_create, :weapon_create, :spell_create, :projectile_create, :enemy_create}
