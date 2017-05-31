@@ -17,3 +17,10 @@ function string:trimsplit(s)
     for i,p in ipairs(parts) do parts[i] = p:trim() end
     return parts
 end
+
+function string:startswith(s)
+    return self:sub(1, #s) == s
+end
+function string:endswith(s)
+    return s == '' or self:sub(-#s) == s
+end

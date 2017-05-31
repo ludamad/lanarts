@@ -1,3 +1,4 @@
 file=`readlink -f $1`
 cd .. ; 
-./run.sh bare -L $file 
+file=$(realpath "--relative-to=`pwd`" "$file")
+./run.sh bare -L "$file"

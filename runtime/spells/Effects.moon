@@ -803,7 +803,7 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage", "Lifelinker"}
                 if attacker\direct_damage(damage * 0.33)
                     defender\gain_xp_from(attacker)
                 if defender\is_local_player()
-                    EventLog.add("Your corrosive flesh hurts #{mon_title attacker} as you are hit!", COL_PALE_BLUE)
+                    EventLog.add("Your corrosive flesh hurts #{attacker.name} as you are hit!", COL_PALE_BLUE)
             return damage
     }
 

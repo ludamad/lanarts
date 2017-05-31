@@ -14,10 +14,15 @@ local argparse = require "argparse"
 local function main(raw_args)
     local parser = argparse("lanarts", "Lanarts shell. By default, starts lanarts.")
     parser:option("-L --lua", "Run lua files."):count("*")
+    parser:option("-R --require", "Require lua modules."):count("*")
     -- Parse arguments
     local args = parser:parse(raw_args)
     for _, filename in ipairs(args.lua) do
-        dofile(filename)
+        local modulename = filename:gsub(".moon", ""):gsub(".lua", ""):gsub("/", ".")
+        require(modulename)
+    end
+    for _, modulename in ipairs(args.require) do
+        require(modulename)
     end
 end
 
