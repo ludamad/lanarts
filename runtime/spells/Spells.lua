@@ -121,7 +121,7 @@ local PowerStrike = {
 
 local function ChargeCallback(_, caster)
     local num = 0
-    for mon in values(Map.enemies_list(caster)) do
+    for _, mon in ipairs(Map.enemies_list(caster)) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 30 + caster.stats.strength then
             num = num + 1
             caster:melee(mon)
@@ -155,7 +155,7 @@ function PowerStrike.prereq_func(caster)
     if caster:has_ranged_weapon() then
         return false
     end
-    for mon in values(Map.enemies_list(caster)) do
+    for _, mon in ipairs(Map.enemies_list(caster)) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 30 then
             return true
         end
@@ -188,7 +188,7 @@ function Pain.action_func(caster, x, y, target)
     local eff_range = Pain.range
     if not target or vector_distance({target.x, target.y}, {caster.x, caster.y}) > target.target_radius + eff_range then
         local least_dist = math.huge
-        for mon in values(Map.enemies_list(caster)) do
+        for _, mon in ipairs(Map.enemies_list(caster)) do
             local dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
             if dist < mon.target_radius + eff_range and least_dist > dist then
                 least_dist = dist
@@ -231,7 +231,7 @@ function Pain.prereq_func(caster)
         end
         return false
     end
-    for mon in values(Map.enemies_list(caster)) do
+    for _, mon in ipairs(Map.enemies_list(caster)) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + Pain.range then
             return true
         end
@@ -271,7 +271,7 @@ function HealAura.action_func(caster, x, y, target)
 end
 
 function HealAura.prereq_func(caster)
-    for mon in values(Map.allies_list(caster)) do
+    for _, mon in ipairs(Map.allies_list(caster)) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + HealAura.range then
             return true
         end
@@ -310,7 +310,7 @@ function Luminos.action_func(caster, x, y, target)
 end
 
 function Luminos.prereq_func(caster)
-    for mon in values(Map.enemies_list(caster)) do
+    for _, mon in ipairs(Map.enemies_list(caster)) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + Luminos.range then
             return true
         end
@@ -357,7 +357,7 @@ function GreaterPain.prereq_func(caster)
         end
         return false
     end
-    for mon in values(Map.enemies_list(caster)) do
+    for _, mon in ipairs(Map.enemies_list(caster)) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + Pain.range then
             return true
         end
@@ -387,7 +387,7 @@ function FearStrike.action_func(caster, x, y)
     caster:apply_melee_cooldown()
     local num = 0
     local closest_mon, least_dist = nil, math.huge
-    for mon in values(Map.enemies_list(caster)) do
+    for _, mon in ipairs(Map.enemies_list(caster)) do
         local dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
         if dist < mon.target_radius + caster.target_radius + caster.weapon_range + 8 and least_dist > dist then
             least_dist = dist
@@ -410,7 +410,7 @@ function FearStrike.prereq_func(caster)
     if caster:has_ranged_weapon() then
         return false
     end
-    for mon in values(Map.enemies_list(caster)) do
+    for _, mon in ipairs(Map.enemies_list(caster)) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + caster.weapon_range + 8 then
             return true
         end

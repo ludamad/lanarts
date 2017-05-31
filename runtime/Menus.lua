@@ -25,12 +25,12 @@ local text_button_params = {
 
 local function start_menu_create(on_start_click, on_join_click, on_load_click, on_score_click)
     local menu = InstanceBox.create( { size = Display.display_size } )
-    local transparent_sprite =  Sprite.image_create(path_resolve "LANARTS-transparent.png")
+    local transparent_sprite =  Sprite.image_create("LANARTS-transparent.png")
     transparent_sprite.options.color= {255, 255, 255, 50}
     menu:add_instance(transparent_sprite, Display.CENTER_TOP, {-15, 45})
 
     menu:add_instance(
-        Sprite.image_create(path_resolve "LANARTS.png"),
+        Sprite.image_create("LANARTS.png"),
         Display.CENTER_TOP,
         --[[Down 10 pixels]]
         {0, 30}

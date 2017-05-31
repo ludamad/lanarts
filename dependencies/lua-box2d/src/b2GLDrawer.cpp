@@ -27,9 +27,12 @@
   ==============================================================================
 */
 #include "b2GLDrawer.h"
+#include <cstdio>
 
 #ifdef __MACOSX_CORE__
 #include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
 #endif
 
 void
@@ -37,7 +40,7 @@ b2GLDrawer::DrawPolygon(const b2Vec2* vertices,
                     int32 vertexCount,
                     const b2Color& color)
 {
-/*	glColor3f(color.r, color.g, color.b);
+	glColor3f(color.r, color.g, color.b);
 
 	glBegin(GL_LINE_LOOP);
 	{
@@ -46,7 +49,7 @@ b2GLDrawer::DrawPolygon(const b2Vec2* vertices,
 			glVertex2f(vertices[i].x, vertices[i].y);
 		}
 	}
-	glEnd();*/
+	glEnd();
 }
 
 void
@@ -54,7 +57,7 @@ b2GLDrawer::DrawSolidPolygon(const b2Vec2* vertices,
                          int32 vertexCount,
                          const b2Color& color)
 {
-/*	glEnable(GL_BLEND);
+	glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glColor4f(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f);
@@ -79,7 +82,7 @@ b2GLDrawer::DrawSolidPolygon(const b2Vec2* vertices,
 			glVertex2f(vertices[i].x, vertices[i].y);
 		}
 	}
-	glEnd(); */
+	glEnd(); 
 
 }
 
@@ -88,7 +91,7 @@ b2GLDrawer::DrawCircle(const b2Vec2& center,
                    float32 radius,
                    const b2Color& color)
 {
-/*	const float32 k_segments = 16.0f;
+	const float32 k_segments = 16.0f;
 	const float32 k_increment = 2.0f * b2_pi / k_segments;
 
 	float32 theta = 0.0f;
@@ -103,7 +106,7 @@ b2GLDrawer::DrawCircle(const b2Vec2& center,
 			theta += k_increment;
 		}
 	}
-	glEnd(); */
+	glEnd(); 
 
 }
 
@@ -113,7 +116,7 @@ b2GLDrawer::DrawSolidCircle(const b2Vec2& center,
                         const b2Vec2& axis,
                         const b2Color& color)
 {
-/*	const float32 k_segments = 16.0f;
+	const float32 k_segments = 16.0f;
 	const float32 k_increment = 2.0f * b2_pi / k_segments;
 
 	float32 theta = 0.0f;
@@ -156,7 +159,7 @@ b2GLDrawer::DrawSolidCircle(const b2Vec2& center,
 		glVertex2f(center.x, center.y);
 		glVertex2f(p.x, p.y);
 	}
-	glEnd(); */
+	glEnd();
 
 }
 
@@ -165,20 +168,20 @@ b2GLDrawer::DrawSegment(const b2Vec2& p1,
                     const b2Vec2& p2,
                     const b2Color& color)
 {
-/*	glColor3f(color.r, color.g, color.b);
+	glColor3f(color.r, color.g, color.b);
 
 	glBegin(GL_LINES);
 	{
 		glVertex2f(p1.x, p1.y);
 		glVertex2f(p2.x, p2.y);
 	}
-	glEnd(); */
+	glEnd(); 
 }
 
 void
 b2GLDrawer::DrawTransform(const b2Transform& xf)
 {
-/*	b2Vec2 p1 = xf.p, p2;
+	b2Vec2 p1 = xf.p, p2;
 	const float32 k_axisScale = 0.4f;
 	glBegin(GL_LINES);
 
@@ -192,6 +195,6 @@ b2GLDrawer::DrawTransform(const b2Transform& xf)
 	p2 = p1 + k_axisScale * xf.q.GetYAxis();
 	glVertex2f(p2.x, p2.y);
 
-	glEnd(); */
+	glEnd(); 
 }
 

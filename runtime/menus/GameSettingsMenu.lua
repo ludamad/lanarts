@@ -38,7 +38,7 @@ local function is_valid_ip_string(text)
     if #parts ~= 4 then return false end
 
     -- Assert all components are numbers <= 255
-    for part in values(parts) do 
+    for _, part in ipairs(parts) do 
         local number = tonumber(part)
         if number == nil then return false end
         if number < 0 or number > 255 then return false end

@@ -67,7 +67,7 @@ local function connect_map(args)
         append(t, MapSeq:forward_portal_add(seq_idx, forward_portals[i], i, args.next_floor_callback))
     end
     if World.player_amount > 1 then
-        for c in values(t) do 
+        for _, c in ipairs(t) do 
            append(map.post_maps, c)
         end
     end
@@ -95,7 +95,7 @@ local function temple_level_create(label, floor, sequences, tileset, enemy_candi
 
     local done_once = false
     local sequence_ids = {}
-    for MapSeq in values(sequences) do
+    for _, MapSeq in ipairs(sequences) do
         local seq_idx = MapSeq:slot_create()
         table.insert(sequence_ids, seq_idx)
         local no_forward = (floor >= TEMPLE_DEPTH or (done_once and floor == 1))
@@ -285,7 +285,7 @@ function M.overworld_create()
     local portals = {}
     local UNDECIDED_FLAG, UNDECIDED_TILE = SourceMap.FLAG_SOLID, tileset.wall
     local map = MapUtils.area_template_to_map("Overworld", 
-    		--[[file path]] path_resolve "region1.txt", 
+    		--[[file path]] "maps/region1.txt", 
     		--[[padding]] 4, {
     	   --Player spawn candidate square
            [':'] = { add = {SourceMap.FLAG_SEETHROUGH, FLAG_PLAYERSPAWN}, content = tileset.floor } ,
@@ -394,7 +394,7 @@ function M.overworld_create()
     })
 
     -- For all undecided squares, copy over the square from the left
-    for xy in values(undecided_squares) do
+    for _, xy in ipairs(undecided_squares) do
         copy_close_unsolid_tile(map, xy)
     end
 
@@ -403,15 +403,15 @@ function M.overworld_create()
     local game_map = MapUtils.game_map_create(map)
     OldMapSeq1:slot_resolve(1, game_map)
     OldMapSeq2:slot_resolve(1, game_map)
-    for MapSeq in values(temple_sequences) do
+    for _, MapSeq in ipairs(temple_sequences) do
         MapSeq:slot_resolve(1, game_map)
     end
-    for MapSeq in values(dirthole_sequences) do
+    for _, MapSeq in ipairs(dirthole_sequences) do
         MapSeq:slot_resolve(1, game_map)
     end
 
     World.players_spawn(game_map, find_player_positions(map, FLAG_PLAYERSPAWN))
-    for p in values(portals) do p() end
+    for _, p in ipairs(portals) do p() end
     Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
     for _, map_gen_func in ipairs(map.post_maps) do
         map_gen_func()

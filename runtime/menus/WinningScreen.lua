@@ -11,7 +11,7 @@ local winning_screen_font = "fonts/MateSC-Regular.ttf"
 
 local function winning_screen_create()
     local box = InstanceBox.create( { size = Display.display_size} )
-    local sprite = Sprite.image_create(path_resolve "winning_screen.png")
+    local sprite = Sprite.image_create("menus/winning_screen.png")
 
     box:add_instance(
         sprite,

@@ -12,7 +12,7 @@ local function resolve_col_and_params(colspec)
     -- Split comma-separated traits
     local traits = colspec:upper():split("_")
     local col,params = "RESET",""
-    for t in values(traits) do
+    for _, t in ipairs(traits) do
         if PARAM_SPECS[t] then params = params .. PARAM_SPECS[t] 
         elseif t ~= '' then col = t end
     end

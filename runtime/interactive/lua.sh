@@ -1,2 +1,3 @@
+file=`readlink -f $1`
 cd .. ; 
-LANARTS_HEADLESS=1 ./run.sh -f --lua interactive/$@
+./run.sh bare -L $file 

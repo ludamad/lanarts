@@ -2,7 +2,7 @@
 
 local iowrite = io.write --performance
 
-local M = nilprotect {}
+local M = {}
 
 local levels = {}
 for i,v in ipairs {"VERBOSE", "INFO", "WARN", "NONE"} do M[v] = v ; levels[v] = i end

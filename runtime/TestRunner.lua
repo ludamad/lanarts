@@ -22,8 +22,8 @@ local function run_tests(suitelist)
 
     local test_n,fails = 0,0
     local summary = {"{bold_white:Summary:} {white:|}"}
-    for suite in values(suitelist) do
-        for test in values(suite) do
+    for _, suite in ipairs(suitelist) do
+        for _, test in ipairs(suite) do
             test_n = test_n + 1
             local name,f = unpack(test)
             local ok,err = xpcall(f, debug.traceback)
@@ -84,7 +84,7 @@ function M.main(args)
     for module in module_iter() do
         if module:match(module_filter) then
             import_dofile_if_file(module ..'._Tests')
-            for test in values(find_submodules(module .. ".tests", true)) do 
+            for _, test in ipairs(find_submodules(module .. ".tests", true)) do 
                 import_dofile(test)
             end
         end

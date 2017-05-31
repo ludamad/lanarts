@@ -3,6 +3,11 @@
  *  Bindings for the ldraw library in lua.
  */
 
+#include <lua.hpp>
+
+#include <lcommon/Timer.h>
+#include <lcommon/math_util.h>
+
 #include <luawrap/LuaValue.h>
 #include <luawrap/functions.h>
 
@@ -29,8 +34,49 @@ static int lua_draw_rectangle_outline(lua_State* L) {
 	return 0;
 }
 
-namespace ldraw {
+static bool handle_event(SDL_Event* event) {
+	SDL_Keycode keycode = event->key.keysym.sym;
+	SDL_Keymod keymod = (SDL_Keymod) event->key.keysym.mod;
 
+	switch (event->type) {
+	case SDL_MOUSEBUTTONDOWN: {
+		break;
+	}
+	case SDL_QUIT: {
+		return false;
+	}
+	case SDL_KEYDOWN: {
+		if (keycode == SDLK_RETURN || keycode == SDLK_ESCAPE) {
+			return false;
+		}
+		if (keycode == SDLK_F1) {
+			ldraw::display_set_fullscreen(!ldraw::display_is_fullscreen());
+		}
+	}
+		break;
+	}
+	return true;
+}
+
+static void draw_loop(LuaValue draw_func) {
+	int frames = 0;
+	while (1) {
+		frames += 1;
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) {
+			if (!handle_event(&event)) {
+				return; // Exit draw loop
+			}
+		}
+		ldraw::display_draw_start();
+                draw_func.push();
+                luawrap::call<void>(draw_func.luastate(), frames); 
+		ldraw::display_draw_finish();
+		SDL_Delay(5);
+	}
+}
+
+namespace ldraw {
 void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcommon) {
 	using namespace ldraw;
 
@@ -43,6 +89,8 @@ void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcom
 	module["draw_circle_outline"].bind_function(draw_circle_outline);
 	module["draw_rectangle_outline"].bind_function(lua_draw_rectangle_outline);
 	module["draw_line"].bind_function(draw_line);
+	module["initialize"].bind_function(display_initialize);
+	module["draw_loop"].bind_function(draw_loop);
 
 	lua_register_font(L, module);
 	lua_register_image(L, module);

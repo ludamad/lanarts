@@ -107,6 +107,7 @@ set (libraries
         lpeg
         enet
         lua_enet
+        lua_box2d
 #        ws2_32
 #        mingw32
 #        winmm

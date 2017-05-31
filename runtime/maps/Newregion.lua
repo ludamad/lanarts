@@ -50,7 +50,7 @@ local function connect_map(args)
         local portal = MapUtils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
         append(t, MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback))
     end
-    for c in values(t) do 
+    for _, c in ipairs(t) do 
         append(map.post_maps, c)
     end
 end
@@ -76,7 +76,7 @@ local function temple_level_create(label, floor, sequences, tileset, enemy_candi
 
     local done_once = false
     local sequence_ids = {}
-    for MapSeq in values(sequences) do
+    for _, MapSeq in ipairs(sequences) do
         local seq_idx = MapSeq:slot_create()
         table.insert(sequence_ids, seq_idx)
         local no_forward = (floor >= TEMPLE_DEPTH or (done_once and floor == 1))
@@ -265,7 +265,7 @@ local function place_content(map, --[[Optional]] dont_spawn_content)
         old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5})(map, xy)
         xy = MapUtils.random_square(map, area)
         old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10})(map, xy)
-        for dxy in values{{1,0}, {-1,0}, {0,1}, {0,-1}} do
+        for _, dxy in ipairs{{1,0}, {-1,0}, {0,1}, {0,-1}} do
             local nxy = vector_add(xy, dxy)
             if map:square_query(nxy, {matches_none = SourceMap.FLAG_SOLID}) then
                 MapUtils.spawn_decoration(map, M._warning_skull, nxy)
@@ -304,10 +304,10 @@ local function place_content(map, --[[Optional]] dont_spawn_content)
     if not dont_spawn_content then
         OldMapSeq1:slot_resolve(1, map_id)
         OldMapSeq2:slot_resolve(1, map_id)
-        for MapSeq in values(temple_sequences) do
+        for _, MapSeq in ipairs(temple_sequences) do
             MapSeq:slot_resolve(1, map_id)
         end
-        for MapSeq in values(dirthole_sequences) do
+        for _, MapSeq in ipairs(dirthole_sequences) do
             MapSeq:slot_resolve(1, map_id)
         end
     end

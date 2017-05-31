@@ -61,6 +61,7 @@ namespace lua_api {
 	// Register the lanarts networking API
 	void register_net_api(lua_State* L);
 
+	void register_lua_libraries(lua_State* L);
 	// Register all the lanarts API functions and types
 	void register_api(GameState* gs, lua_State* L);
 

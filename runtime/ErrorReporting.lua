@@ -3,6 +3,7 @@
 --------------------------------------------------------------------------------
 
 local AnsiColors -- Lazy imported
+local MoonscriptErrors = require("moonscript.errors")
 
 -- **Hack:
 local function real_path_to_virtual(s) return s end
@@ -19,7 +20,7 @@ local function resolve_col_and_params(colspec)
     -- Split comma-separated traits
     local traits = colspec:upper():split("_")
     local col,params = "RESET",""
-    for t in values(traits) do
+    for _, t in ipairs(traits) do
         if PARAM_SPECS[t] then params = params .. PARAM_SPECS[t] 
         elseif t ~= '' then col = t end
     end
@@ -200,12 +201,12 @@ local function combine_cpp_traceback_with_lua(lua_stacktrace)
     end
     local next_cpp_section = 1
     append(lua_stacktrace, "[C]") -- Hack to get the bottom of the trace to resolve as the setup CPP calls
-    for lua_part in values(lua_stacktrace) do
+    for _, lua_part in ipairs(lua_stacktrace) do
         -- Expand out the other-wise mysterious "[C]" sections:
         if lua_part:find("%[C%]") and not lua_part:find("%[C%]: ?") and not lua_part:find("'assert'") then
             local cpp_section = cpp_sections[next_cpp_section]
             if cpp_section ~= nil then
-                for cpp_part in values(cpp_section) do
+                for _, cpp_part in ipairs(cpp_section) do
                     append(combined, cpp_part)
                 end
                 next_cpp_section = next_cpp_section + 1
@@ -223,7 +224,7 @@ local debug_traceback = debug.traceback -- Stash & wrap the current debug.traceb
 -- Improve the traceback in various ways, including adding color and reducing noise:
 function M.traceback(--[[Optional]] str)
     local traceback = debug_traceback()
-    traceback = require("moonscript.errors").rewrite_traceback(traceback, "")
+    traceback = MoonscriptErrors.rewrite_traceback(traceback, "")
     local stacktrace = traceback:split('\n')
     local i = 1
     while i <= #stacktrace do

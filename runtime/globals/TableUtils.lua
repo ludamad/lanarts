@@ -214,8 +214,8 @@ end
 
 function table.tconcat(t1, t2)
     local t = {}
-    for v in values(t1) do t[#t+1] = v end
-    for v in values(t2) do t[#t+1] = v end
+    for _, v in ipairs(t1) do t[#t+1] = v end
+    for _, v in ipairs(t2) do t[#t+1] = v end
     return t
 end
 

@@ -988,6 +988,8 @@ test_create = (offset = 1) ->
 overworld_create = () ->
     MapSeq = MapSequence.create {preallocate: 1}
     local conf, schema
+    if os.getenv("ARENA_ENEMIES")
+        return test_create(0)
     NewMaps.map_create (rng) -> 
         event_log("(RNG #%d) Attempting overworld generation\n", rng\amount_generated())
         conf or= OVERWORLD_CONF(rng)

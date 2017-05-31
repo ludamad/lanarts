@@ -12,7 +12,7 @@ local death_screen_font = "fonts/MateSC-Regular.ttf"
 
 local function death_screen_create()
     local box = InstanceBox.create( { size = Display.display_size} )
-    local sprite = Sprite.image_create(path_resolve "death_screen.png")
+    local sprite = Sprite.image_create("menus/death_screen.png")
 
     box:add_instance(
         sprite,

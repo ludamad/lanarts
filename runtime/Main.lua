@@ -5,7 +5,7 @@
 require_path_add('dependencies/?.lua')
 require_path_add('dependencies/socket/?.lua')
 
-require("GlobalVariableSetup")
+require("GlobalVariableSetup")(--[[Load draw-related globals]] false)
 require("moonscript.base").insert_loader()
 
 local argv -- Placeholder, set in main()
@@ -99,7 +99,6 @@ local function main(_argv)
 
     return start_lanarts()
 end
-
 
 -- The bootstrap module (ie, this file, core/Main.lua) returns a function that 
 -- takes the command-line arguments for Lanarts

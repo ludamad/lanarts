@@ -48,43 +48,6 @@ static int lapi_values_aux(lua_State* L) {
 	return 1;
 }
 
-static int lapi_string_split(lua_State* L) {
-	size_t str_size;
-	const char* tail = luaL_checklstring(L, 1, &str_size);
-	const char* end = tail + str_size;
-
-	size_t sep_size = 0;
-	const char* sep = luaL_checklstring(L, 2, &sep_size);
-	int i = 1;
-
-	/* push result table */
-	lua_newtable(L);
-
-	/* repeat for each separator */
-	while (tail < end) {
-		const char* head = tail;
-		/* find separator */
-		while (strncmp(head, sep, sep_size) != 0) {
-			head++;
-			if (head >= end) {
-				goto label_LeaveLoop;
-			}
-		}
-
-		lua_pushlstring(L, tail, head - tail); /* push substring */
-		lua_rawseti(L, -2, i++);
-		tail = head + sep_size; /* skip separator */
-	}
-
-	label_LeaveLoop:
-
-	/* push last substring */
-	lua_pushstring(L, tail);
-	lua_rawseti(L, -2, i);
-
-	return 1; /* return the table */
-}
-
 /*
  * Joins array elements with a given string, eg (" "):join( {"hello", "world"} ) => "hello world"
  */
@@ -465,7 +428,6 @@ namespace lua_api {
 		LuaValue math_table = luawrap::ensure_table(globals["math"]);
                 math_table["round"].bind_function(round);
 		LuaValue string_table = luawrap::ensure_table(globals["string"]);
-		string_table["split"].bind_function(lapi_string_split);
 		string_table["join"].bind_function(lapi_string_join);
 		string_table["pack"].bind_function(str_pack);
 

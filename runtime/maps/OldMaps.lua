@@ -281,7 +281,7 @@ M.Dungeon3 = {
       }
     }
   },
-  { templates = {path_resolve "dungeon1room1a.txt", path_resolve "dungeon1room1b.txt", path_resolve "dungeon1room1c.txt"},
+  { templates = {"maps/dungeon1room1a.txt", "maps/dungeon1room1b.txt", "maps/dungeon1room1c.txt"},
     content = {
       items = { amount = 4,  group = ItemGroups.enchanted_items   },
       enemies = {
@@ -370,11 +370,11 @@ M.size_multiplier = size_multiplier
 
 function M.enemy_generate(chances)
     local total_chance = 0
-    for entry in values(chances) do
+    for _, entry in ipairs(chances) do
         total_chance = total_chance + (entry.chance or 0)
     end
     local rand = random(1, total_chance)
-    for entry in values(chances) do
+    for _, entry in ipairs(chances) do
         rand = rand - (entry.chance or 0)
         if rand <= 0 then
             if entry.enemy == "Ciribot" then
@@ -389,7 +389,7 @@ end
 function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area, --[[Optional]] selector)
     local ret = {}
     local total_chance = 0
-    for entry in values(chances) do
+    for _, entry in ipairs(chances) do
         total_chance = total_chance + (entry.chance or 0)
         local spawns = range_resolve(entry.guaranteed_spawns or 0)
         if spawns > 1 then
@@ -401,7 +401,7 @@ function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area
     end
     for i=1,amount do
         local rand = random(1, total_chance)
-        for entry in values(chances) do
+        for _, entry in ipairs(chances) do
             rand = rand - (entry.chance or 0)
             if rand <= 0 then 
                 append(ret, MapUtils.random_enemy(map, entry.enemy, area, selector))
@@ -443,7 +443,7 @@ end
 
 local function leaf_group_areas(map)
     local ret = {}
-    for group in values(map.groups) do
+    for _, group in ipairs(map.groups) do
         if #group.children == 0 then
             ret[#ret + 1] = group.area
         end
@@ -502,7 +502,7 @@ end
 local function generate_doors(map) 
     local Vaults = require "maps.Vaults"
     local areas = leaf_group_areas(map)
-    for area in values(areas) do
+    for _, area in ipairs(areas) do
         if chance(0.05) then
             local selector = {matches_none = {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT}}
             local x1,y1,x2,y2 = unpack(area)

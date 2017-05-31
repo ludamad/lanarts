@@ -133,17 +133,7 @@ namespace lua_api {
 		return gamestate(val.luastate());
 	}
 
-	void register_lua_libraries(lua_State* L) {
-		lua_register_lcommon(L);
-		LuaValue preload = luawrap::globals(L)["package"]["preload"];
-		preload["yaml"].bind_function(luayaml_module);
-		preload["enet"].bind_function(luaopen_enet);
-//		preload["b2"].bind_function(luaopen_b2_vendor);
-		preload["socket.core"].bind_function(luaopen_socket_core);
-		preload["mime.core"].bind_function(luaopen_mime_core);
-	}
-
-	void register_lua_core_Display(lua_State* L);
+        void register_lua_core_Display(lua_State* L);
 	void register_lua_core_GameObject(lua_State* L);
 	void register_lua_core_GameMap(lua_State* L);
 	void register_lua_core_GameState(lua_State* L);
@@ -162,18 +152,21 @@ namespace lua_api {
 		return 0;
 	}
 
-	// Register all the lanarts API functions and types
-	void register_api(GameState* gs, lua_State* L) {
-		// May be required by loading that follows:
-		register_lua_libraries(L);
+	void register_lua_libraries(lua_State* L) {
+		lua_register_lcommon(L);
+		LuaValue preload = luawrap::globals(L)["package"]["preload"];
+		preload["yaml"].bind_function(luayaml_module);
+		preload["enet"].bind_function(luaopen_enet);
+		preload["b2"].bind_function(luaopen_b2_vendor);
+		preload["socket.core"].bind_function(luaopen_socket_core);
+		preload["mime.core"].bind_function(luaopen_mime_core);
+
+                // Include libraries not tied to the GameState here:
 
 		LuaValue globals = luawrap::globals(L);
 		LuaValue game = lua_ensure_protected_table(globals["Game"]);
 		// Holds engine hooks
 		LuaValue engine = luawrap::ensure_table(globals["Engine"]);
-
-		register_gamestate(gs, L);
-		register_general_api(L);
 
 		LuaValue map_gen = register_lua_submodule(L, "core.SourceMap");
 		ldungeon_gen::lua_register_ldungeon(map_gen, false);
@@ -187,22 +180,31 @@ namespace lua_api {
 		register_tiles_api(L);
 
 		lua_spelltarget_bindings(L);
-		lua_effectivestats_bindings(gs, L);
-		lua_combatstats_bindings(gs, L);
 
 		// New-style API
-		register_lua_core_Display(L);
-		register_lua_core_GameObject(L);
-		register_lua_core_GameMap(L);
-		register_lua_core_GameState(L);
-		register_lua_core_GameWorld(L);
+                if (std::getenv("LANARTS_HEADLESS") == NULL) {
+                    register_lua_core_Display(L);
+                }
 		register_lua_core_RVOWorld(L);
 		register_lua_core_Bresenham(L);
 		register_lua_core_PathFinding(L);
+		register_lua_core_GameObject(L);
+		register_lua_core_GameMap(L);
+		register_lua_core_GameWorld(L);
 		register_lua_core_Keyboard(L);
-        register_lua_core_MiscSpellAndItemEffects(L);
-        register_lua_core_Mouse(L);
+                register_lua_core_MiscSpellAndItemEffects(L);
+                register_lua_core_Mouse(L);
+	}
+
+	// Register all the lanarts API functions and types
+        // TODO properly rename after gutting
+	void register_api(GameState* gs, lua_State* L) {
+		register_gamestate(gs, L);
+		register_general_api(L);
+		lua_effectivestats_bindings(gs, L);
+		lua_combatstats_bindings(gs, L);
 		register_lua_core_Serialization(L);
+		register_lua_core_GameState(L);
 	}
 
 	void luacall_post_draw(lua_State* L) {

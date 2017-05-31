@@ -9,7 +9,7 @@ local GlobalData = require "core.GlobalData"
 
 local M = nilprotect {} -- Submodule
 
-M._door_closed, M._door_open = unpack(Display.images_load (path_resolve "plain_door.png%32x32"))
+M._door_closed, M._door_open = unpack(Display.images_load ("objects/plain_door.png%32x32"))
 M.FEATURE_TRAIT = "feature"
 M.FEATURE_DEPTH = 100
 

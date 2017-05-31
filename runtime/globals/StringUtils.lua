@@ -4,6 +4,14 @@ end
 function string:trim()
   return self:gsub("^%s*(.-)%s*$", "%1")
 end
+function string:split(delim)
+    local ret = {}
+    for m in self:gmatch("([^"..delim.."]+)") do
+        ret[#ret + 1] = m
+    end
+    return ret
+end
+
 function string:trimsplit(s)
     local parts = self:split(s)
     for i,p in ipairs(parts) do parts[i] = p:trim() end

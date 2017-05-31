@@ -14,7 +14,7 @@ local function gmap_create(size, --[[Optional]] solid_tiles)
             }
         }
     }
-    for xy in values(solid_tiles or {}) do
+    for _, xy in ipairs(solid_tiles or {}) do
         Map.tile_set_solid(gmap, xy, true)
     end
     return gmap
