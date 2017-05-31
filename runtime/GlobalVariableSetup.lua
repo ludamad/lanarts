@@ -32,7 +32,9 @@ return function(--[[Optional]] dont_load_draw_globals)
     if not dont_load_draw_globals then
         log "Read globals that involve core.Display or similar"
         require "globals.Draw"
-        require "globals.GameUtils"
+        if package.loaded["core.GameState"] then
+            require "globals.GameUtils"
+        end
         require "globals.TextComponent"
     end
 

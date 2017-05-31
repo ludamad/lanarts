@@ -8,7 +8,7 @@
  */
 #include "dub/dub.h"
 #include "Box2D/Collision/Shapes/b2PolygonShape.h"
-
+#include <vector>
 
 /** ~b2PolygonShape()
  * 
@@ -243,9 +243,19 @@ static int b2PolygonShape_GetChildCount(lua_State *L) {
 static int b2PolygonShape_Set(lua_State *L) {
   try {
     b2PolygonShape *self = *((b2PolygonShape **)dub_checksdata(L, 1, "b2.PolygonShape"));
-    b2Vec2 *points = *((b2Vec2 **)dub_checksdata(L, 2, "b2.Vec2"));
-    int32 count = dub_checkint(L, 3);
-    self->Set(points, count);
+    //b2Vec2 *points = *((b2Vec2 **)dub_checksdata(L, 2, "b2.Vec2"));\
+    // <LUDAMAD ANGRY FIX>
+    std::vector<b2Vec2> points; 
+    int n = lua_objlen(L, 2);
+    for (int i = 1; i <= n; i++) {
+        lua_rawgeti(L, 2, i);
+        lua_rawgeti(L, -1, 1);
+        lua_rawgeti(L, -2, 2);
+        points.push_back({lua_tonumber(L, -2), lua_tonumber(L, -1)});
+        lua_pop(L, 3);
+    }
+    // </>
+    self->Set(&points[0], points.size());
     return 0;
   } catch (std::exception &e) {
     lua_pushfstring(L, "Set: %s", e.what());
