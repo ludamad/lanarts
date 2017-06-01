@@ -18,6 +18,7 @@
 #include "draw.h"
 #include "display.h"
 #include "Image.h"
+#include <SDL_opengl.h>
 
 #include "lua_image.h"
 #include "lua_font.h"
@@ -91,6 +92,7 @@ void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcom
 	module["draw_line"].bind_function(draw_line);
 	module["initialize"].bind_function(display_initialize);
 	module["draw_loop"].bind_function(draw_loop);
+	module["set_drawing_region"].bind_function(display_set_drawing_region);
 
 	lua_register_font(L, module);
 	lua_register_image(L, module);

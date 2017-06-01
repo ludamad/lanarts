@@ -144,6 +144,13 @@ static GameState* init_gamestate(bool reinit) {
 
 static void run_bare_lua_state(int argc, char** argv) {
         lua_State* L = init_luastate();
+
+        if (std::getenv("LANARTS_HEADLESS") == NULL) {
+            if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+                    printf("SDL_Init failed: %s\n", SDL_GetError());
+                    exit(1);
+            }
+        }
 	LuaValue main_func = luawrap::dofile(L, "Main2.lua");
         main_func.push();
         luawrap::call<void>(L, std::vector<std::string>(argv + 1, argv + argc));

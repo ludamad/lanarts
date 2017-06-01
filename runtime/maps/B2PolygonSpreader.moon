@@ -3,28 +3,86 @@ Display = require "core.Display"
 GenerateUtils = require "maps.GenerateUtils"
 WIDTH, HEIGHT = 640, 480
 
-math.randomseed(os.time())
+B2Utils = require "maps.B2Utils"
 
-_body_distance = () ->
-    input = b2.DistanceInput()
-    proxyA = b2.DistanceProxy()
-    proxyB = b2.DistanceProxy()
-    cache = b2.SimplexCache()
-    output = b2.DistanceOutput()
+Area = newtype {
+    -- shapes: Expressed as lists of points of a polygon:
+    -- xy: Relative to root area center
+    init: (@parent_area, @shapes, @outer_shape = false) =>
+        @subareas = {}
+        @x = 0
+        @y = 0
+    b2Body: (world, density = 0.0) => 
+        -- TODO 
+        body = world\CreateBody with b2.BodyDef()
+            .type = b2.dynamicBody
+            .position\Set(@x, @y)
+        fixtures = for shape in *@shapes
+            body\CreateFixture with b2.PolygonShape()
+                \Set(shape),
+                density
+        outer_shape = if @outer_shape
+            body\CreateFixture with b2.PolygonShape()
+                \Set(outer_shape),
+                density
+        else nil
+        return body, outer_fixture, fixtures
+}
 
-    return (body1, body2) ->
-        proxyA\Set(body1\GetFixtureList()\GetShape(),1)
-        proxyB\Set(body2\GetFixtureList()\GetShape(),1)
-        input.transformA = body1\GetTransform()
-        input.transformB = body2\GetTransform()
-        input.proxyA = proxyA
-        input.proxyB = proxyB
-        input.useRadii = true
-        cache.count = 0
-        b2.b2Distance(output, cache, input)
-        return output.pointA, output.pointB, output.distance
 
-body_distance = _body_distance()
+B2AreaSpreader = newtype {
+    init: (@subareas) =>
+        @area_to_polygons = {}
+        @world = b2.World(b2.Vec2(0.0,0.0)) -- No gravity
+        -- Initialize the body+fixtures / area association
+        @area_body = {}
+        @_make_bodies()
+
+    _make_bodies: () =>
+        for area in *@subareas
+            body, outer_fixture, fixtures = area\b2Body(@world, 1.0)
+            @area_body[area] = {body, outer_fixture, fixtures}
+
+    visualize: () =>
+        math.randomseed(os.time())
+        Display.initialize("Demo", {WIDTH, HEIGHT}, false)
+        Display.set_drawing_region({-
+        Display.draw_loop () -> 
+            @step(world)
+            @draw(world)
+    step: (world) =>
+        for i=1,60
+            for body in *polygons
+                pos = body\GetPosition()
+                if pos.x < 1 or pos.x > WIDTH - 1 or pos.y < 1 or pos.y > HEIGHT - 1
+                    position = {math.random() * WIDTH, math.random() * HEIGHT}
+                    body\SetTransform(b2.Vec2(position[1], position[2]), body\GetAngle())
+                dx, dy = WIDTH/2 - pos.x, HEIGHT/2 - pos.y
+                mag = math.sqrt(dx*dx + dy*dy) 
+                dx = dx / mag --* body\GetMass()
+                dy = dy / mag --* body\GetMass()
+                -- Move towards centre
+                body\SetLinearVelocity(b2.Vec2(dx, dy))
+            world\Step(TIME_STEP, ITERS, ITERS)
+    draw: (world) =>
+        font = font_cached_load("fonts/Gudea-Regular.ttf", 14))
+        world\DrawDebugData()
+        for body in *polygons
+            pos = body\GetPosition()
+            min_body, min_d = min_dist(body)
+            color = COL_WHITE
+            text = "#{min_d}"
+            Display.reset_opengl_state()
+            font\draw({color: color, origin: Display.CENTER}, {pos.x, pos.y}, text)
+}
+
+-- Centered around a 0x0 point:
+make_packed_polygons = () ->
+    areas = for i=1,10
+        points = GenerateUtils.skewed_ellipse_points(-size[1]/2,-size[2]/2,size[1],size[2], math.floor(math.random()*8 + 4))
+        Area.create(false, {points})
+    
+
 
 make_polygon = (world, bd, points, density = 0.0) ->
     shape = b2.PolygonShape()
@@ -53,7 +111,6 @@ make_enclosure = (world, outer_area) ->
 make_dynamic_shape = (world, size, xy) ->
     -- Define the dynamic body. We set its position and call the body factory.
     {x, y} = xy
-    points = GenerateUtils.skewed_ellipse_points(-size[1]/2,-size[2]/2,size[1],size[2], math.floor(math.random()*8 + 4))
     body = make_polygon world,
         with b2.BodyDef()
             .type = b2.dynamicBody
@@ -95,7 +152,7 @@ make_simulation = (outer_area) ->
         for b in *polygons
             if b == body
                 continue
-            _, _, dist = body_distance(b, body)
+            _, _, dist = B2Utils.body_distance(b, body)
             if dist < min_d
                 min_d = dist
                 min_body = b
@@ -125,8 +182,7 @@ make_simulation = (outer_area) ->
                 min_body, min_d = min_dist(body)
                 color = COL_WHITE
                 text = "#{min_d}"
-                -- Hack for dealing with box2d clobbering:
-                Display.set_drawing_region({0, 0, WIDTH, HEIGHT})
+                Display.reset_opengl_state()
                 FONT\draw({color: color, origin: Display.CENTER}, {pos.x, pos.y}, text)
     }
     
@@ -138,8 +194,8 @@ main = () ->
         {0, HEIGHT}
     }
     sim = make_simulation(enclosure)
-    Display.initialize("Demo", {WIDTH, HEIGHT}, false)
-    rawset(_G, "FONT", Display.font_load("fonts/Gudea-Regular.ttf", 14))
-    Display.draw_loop () -> sim\step()
+
+                -- Hack for dealing with box2d clobbering:
+                Display.set_drawing_region({0, 0, WIDTH, HEIGHT})
 
 main()
