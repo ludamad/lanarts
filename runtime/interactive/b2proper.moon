@@ -80,10 +80,12 @@ spread_shapes = (shapes, visualize = true) ->
         drawer = b2.GLDrawer()
         world\SetDebugDraw(drawer)
         Display.initialize("Demo", {VIS_W, VIS_H}, false)
-        Display.set_drawing_region({-VIS_W/2, -VIS_H/2, VIS_W/2, VIS_H/2})
+        --Display.set_world_region({0, 0, VIS_W, VIS_H})
+        Display.set_world_region({-VIS_W/2, -VIS_H/2, VIS_W/2, VIS_H/2})
         drawer\SetFlags(b2.Draw.e_shapeBit + b2.Draw.e_jointBit)
         require("core.GameState").game_loop () ->
             world\DrawDebugData()
+            Display.draw_rectangle(COL_WHITE, {-5,-5,5,5})
 
 -- return {:Shape, :spread_shapes}
 

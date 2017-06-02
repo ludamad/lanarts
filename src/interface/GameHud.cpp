@@ -81,7 +81,7 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 
 void GameHud::draw(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
-	ldraw::display_set_drawing_region(
+	ldraw::display_set_window_region(
 			BBoxF(0, 0, sidebar_box.x2, sidebar_box.y2));
 	ldraw::draw_rectangle(bg_colour, sidebar_box);
 

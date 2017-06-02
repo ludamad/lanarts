@@ -18,10 +18,21 @@ static SDL_Window* MAIN_WINDOW = NULL;
 static Size RENDER_SIZE;
 static SDL_Renderer* MAIN_RENDERER = NULL;
 
-static void gl_set_drawing_area(int x, int y, int wa, int ha) {
+static void gl_set_window_region(int x, int y, int wa, int ha) {
     int w = 0, h = 0;
     SDL_GetWindowSize(MAIN_WINDOW, &w, &h);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
     glViewport(x, y, w, h);
+}
+
+//Set up the coordinate system x1 -> x2, y2 -> y1
+static void gl_set_world_region(double x1, double y1, double x2, double y2) {
+    //Set projection
+    glMatrixMode(GL_PROJECTION);
+    //glPushMatrix();
+    glLoadIdentity();
+    glOrtho(x1, x2, y2, y1, 0.0, 1.0);
 }
 
 // Set up sane 2D drawing defaults
@@ -67,12 +78,7 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
         printf("Disabling vsync not supported, please do this in graphics card settings for best performance.\n");
     }
 
-    gl_set_drawing_area(0, 0, w, h);
-
-    //Set projection
-    glMatrixMode(GL_PROJECTION);
-    //glPushMatrix();
-    glLoadIdentity();
+    gl_set_window_region(0, 0, w, h);
 
     /* This allows alpha blending of 2D textures with the scene */
     glEnable(GL_BLEND);
@@ -82,10 +88,7 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //Set up the coordinate system 0 -> w, 0 -> h
-    glOrtho(0.0, (GLdouble)RENDER_SIZE.w, (GLdouble)RENDER_SIZE.h, 0.0, 0.0, 1.0);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    gl_set_world_region(0.0, 0.0, (GLdouble)RENDER_SIZE.w, (GLdouble)RENDER_SIZE.h);
 }
 
 static void gl_set_fullscreen(bool fullscreen) {
@@ -110,8 +113,12 @@ void ldraw::display_set_fullscreen(bool fullscreen) {
     gl_set_fullscreen(fullscreen);
 }
 
-void ldraw::display_set_drawing_region(const BBoxF & bbox) {
-    gl_set_drawing_area(bbox.x1, bbox.y1, bbox.width(), bbox.height());
+void ldraw::display_set_window_region(const BBoxF & bbox) {
+    gl_set_window_region(bbox.x1, bbox.y1, bbox.width(), bbox.height());
+}
+
+void ldraw::display_set_world_region(const BBoxF & bbox) {
+    gl_set_world_region(bbox.x1, bbox.y1, bbox.x2, bbox.y2);
 }
 
 bool ldraw::display_is_fullscreen() {

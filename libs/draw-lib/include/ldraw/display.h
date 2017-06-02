@@ -15,7 +15,8 @@ void display_initialize(const char* window_name, const Size& draw_area_size,
 		bool fullscreen = false);
 void display_set_fullscreen(bool fullscreen);
 bool display_is_fullscreen();
-void display_set_drawing_region(const BBoxF& bbox);
+void display_set_window_region(const BBoxF& bbox);
+void display_set_world_region(const BBoxF& bbox);
 
 void display_draw_finish();
 void display_draw_start();

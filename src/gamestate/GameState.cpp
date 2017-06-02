@@ -451,10 +451,10 @@ void GameState::draw(bool drawhud) {
 	adjust_view_to_dragging();
 
 	if (drawhud) {
-		ldraw::display_set_drawing_region(
+		ldraw::display_set_window_region(
 				BBoxF(0, 0, _view.width, _view.height));
 	} else {
-		ldraw::display_set_drawing_region(
+		ldraw::display_set_window_region(
 				BBoxF(0, 0, _view.width + hud.width(), _view.height));
 	}
 
