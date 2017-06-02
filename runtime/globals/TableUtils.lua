@@ -274,3 +274,14 @@ function table.add(a,b)
         else a[k] = (a[k] or 0) + bval end
     end
 end
+
+-- Global
+function values(table)
+    local idx = 1
+    return function()
+        local val = table[idx]
+        idx = idx + 1
+        return val
+    end
+end
+

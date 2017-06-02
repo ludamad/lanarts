@@ -20,28 +20,9 @@ static SDL_Renderer* MAIN_RENDERER = NULL;
 
 static void gl_set_drawing_area(int x, int y, int wa, int ha) {
     int w = 0, h = 0;
-        SDL_GetWindowSize(MAIN_WINDOW, &w, &h);
+    SDL_GetWindowSize(MAIN_WINDOW, &w, &h);
     glViewport(x, y, w, h);
-
-    //Set projection
-    glMatrixMode(GL_PROJECTION);
-    //glPushMatrix();
-    glLoadIdentity();
-
-    /* This allows alpha blending of 2D textures with the scene */
-    glEnable(GL_BLEND);
-    //glEnable(GL_TEXTURE_2D);
-    glDisable(GL_DEPTH_TEST);
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    //Set up the coordinate system 0 -> w, 0 -> h
-    glOrtho(0.0, (GLdouble)RENDER_SIZE.w, (GLdouble)RENDER_SIZE.h, 0.0, 0.0, 1.0);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
 }
-
 
 // Set up sane 2D drawing defaults
 static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullscreen) {
@@ -87,6 +68,24 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
     }
 
     gl_set_drawing_area(0, 0, w, h);
+
+    //Set projection
+    glMatrixMode(GL_PROJECTION);
+    //glPushMatrix();
+    glLoadIdentity();
+
+    /* This allows alpha blending of 2D textures with the scene */
+    glEnable(GL_BLEND);
+    //glEnable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    //Set up the coordinate system 0 -> w, 0 -> h
+    glOrtho(0.0, (GLdouble)RENDER_SIZE.w, (GLdouble)RENDER_SIZE.h, 0.0, 0.0, 1.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 }
 
 static void gl_set_fullscreen(bool fullscreen) {

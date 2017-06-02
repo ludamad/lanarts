@@ -151,9 +151,19 @@ static void run_bare_lua_state(int argc, char** argv) {
                     exit(1);
             }
         }
+
+        // When running a bare state, pass an empty GameSettings object:
+	GameState* gs = new GameState(GameSettings(), L);
+        // Create a game state, mainly for the IO state manipulation functions:
+	lua_api::register_api(gs, L);
+
 	LuaValue main_func = luawrap::dofile(L, "Main2.lua");
-        main_func.push();
-        luawrap::call<void>(L, std::vector<std::string>(argv + 1, argv + argc));
+        if (!main_func.isnil()) {
+            main_func.push();
+            luawrap::call<void>(L, std::vector<std::string>(argv + 1, argv + argc));
+        }
+        // Cleanup
+        delete gs;
 }
 
 static void run_engine(int argc, char** argv) {

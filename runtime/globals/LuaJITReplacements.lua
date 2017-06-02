@@ -29,12 +29,3 @@ function profile(f)
     return unpack(ret)
 end
 
-function values(table)
-    local idx = 1
-    return function()
-        local val = table[idx]
-        idx = idx + 1
-        return val
-    end
-end
-

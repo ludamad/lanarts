@@ -162,7 +162,7 @@ end
 
 function M.map_create(label, size, content, --[[Optional]] flags)
     return SourceMap.map_create { 
-        rng = mtwist.create(random(0, 2 ^ 31)),
+        rng = mtwist.create(random(0, 2 ^ 30)),
     	label = label, 
     	size = size, 
         post_maps = {}, 

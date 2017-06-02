@@ -4,6 +4,7 @@
  */
 
 #include <ldraw/lua_ldraw.h>
+#include <ldraw/display.h>
 
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
@@ -77,6 +78,23 @@ static int game_input_capture(lua_State* L) {
 	bool status = lua_api::gamestate(L)->update_iostate(reset_previous, trigger_events);
 	lua_pushboolean(L, status); // should quit on false
 	return 1;
+}
+
+static void game_loop(LuaValue draw_func) {
+	int frames = 0;
+        lua_State* L = draw_func.luastate();
+	while (1) {
+		frames += 1;
+		SDL_Event event;
+	        if (!lua_api::gamestate(L)->update_iostate(true, false)) {
+                    return; // Exit game loop
+                }
+		ldraw::display_draw_start();
+                draw_func.push();
+                luawrap::call<void>(draw_func.luastate(), frames); 
+		ldraw::display_draw_finish();
+		SDL_Delay(5);
+	}
 }
 
 static int game_input_clear(lua_State* L) {
@@ -255,10 +273,11 @@ namespace lua_api {
 
 		game["input_capture"].bind_function(game_input_capture);
 		game["input_handle"].bind_function(game_input_handle);
+		game["game_loop"].bind_function(game_loop);
 
 		game["_input_clear"].bind_function(game_input_clear);
-        game["_simulate_key_press"].bind_function(game_simulate_key_press);
-        game["_trigger_events"].bind_function(game_trigger_events);
+                game["_simulate_key_press"].bind_function(game_simulate_key_press);
+                game["_trigger_events"].bind_function(game_trigger_events);
 
 		game["score_board_fetch"].bind_function(score_board_fetch);
 		game["score_board_store"].bind_function(game_score_board_store);

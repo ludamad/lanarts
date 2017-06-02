@@ -1,6 +1,10 @@
 b2 = require 'b2'
 Display = require "core.Display"
 GenerateUtils = require "maps.GenerateUtils"
+-- TODO separate out IOState
+GameState = require "core.GameState"
+Keys = require "core.Keyboard"
+
 WIDTH, HEIGHT = 640, 480
 
 math.randomseed(os.time())
@@ -50,10 +54,10 @@ make_enclosure = (world, outer_area) ->
                 \Set(points),
                 1.0
 
-make_dynamic_shape = (world, size, xy) ->
+make_dynamic_shape = (world, size, xy, point_span = 8) ->
     -- Define the dynamic body. We set its position and call the body factory.
     {x, y} = xy
-    points = GenerateUtils.skewed_ellipse_points(-size[1]/2,-size[2]/2,size[1],size[2], math.floor(math.random()*8 + 4))
+    points = GenerateUtils.skewed_ellipse_points(-size[1]/2,-size[2]/2,size[1],size[2], math.floor(math.random()*point_span + 3))
     body = make_polygon world,
         with b2.BodyDef()
             .type = b2.dynamicBody
@@ -70,12 +74,13 @@ make_dynamic_shape = (world, size, xy) ->
 
 create_polygons = (world) ->
     -- Return list:
-    return for i=1,10
+    point_span = math.random() * math.random() * math.random() * 16
+    return for i=1,5
         size = {math.random() * WIDTH / 5  + 15, math.random() *HEIGHT / 5 + 15}
-        if i > 5
+        if i > 3
             size[1] *= 2
             size[2] *= 2
-        position = {math.random() * WIDTH, math.random() * HEIGHT}
+        position = {WIDTH/2 + math.random() * 50, HEIGHT/2 + math.random() * 50}
         make_dynamic_shape(world, size, position)
 
 TIME_STEP = 1.0 / 60
@@ -100,27 +105,39 @@ make_simulation = (outer_area) ->
                 min_d = dist
                 min_body = b
         return min_body, min_d
+    frame = 0
     return {
         step: () =>
-            t = timer_create()
-            for i=1,1--0--60
-                for body in *polygons
-                    pos = body\GetPosition()
-                    if pos.x < 1 or pos.x > WIDTH - 1 or pos.y < 1 or pos.y > HEIGHT - 1
-                        position = {math.random() * WIDTH, math.random() * HEIGHT}
-                        body\SetTransform(b2.Vec2(position[1], position[2]), body\GetAngle())
-                    dx, dy = WIDTH/2 - pos.x, HEIGHT/2 - pos.y
-                    --angle = math.atan2(dy, dx)
-                    --tx, ty = math.cos(angle) * 10 + WIDTH/2, math.sin(angle) * 10 + HEIGHT/2
-                    --dx, dy = tx - pos.x, ty - pos.y
-                    mag = math.sqrt(dx*dx + dy*dy) 
-                    --if mag > 20
-                    dx = dx / mag * 1024 --* body\GetMass()
-                    dy = dy / mag * 1024 --* body\GetMass()
-                    -- TODO test for lingering objects to teleport them
-                    body\SetLinearVelocity(b2.Vec2(dx, dy))
-                world\Step(TIME_STEP, ITERS, ITERS)
-            print(t\get_microseconds() / 1000)
+            --if Keys.key_pressed 'M'
+            --    for body in *polygons
+            --        t = body\GetTransform()
+            --        shape = body\GetFixtureList()\GetShape()
+            --        points = for i=0,shape\GetVertexCount()-1
+            --            point = shape\GetVertex(i)
+            --            point = b2.b2Mul(t, point)
+            --        shape\Set(points)
+
+            frame += 1
+            if frame == 1
+                t = timer_create()
+                for i=1,60
+                    for body in *polygons
+                        pos = body\GetPosition()
+                        if pos.x < 1 or pos.x > WIDTH - 1 or pos.y < 1 or pos.y > HEIGHT - 1
+                            position = {math.random() * WIDTH, math.random() * HEIGHT}
+                            body\SetTransform(b2.Vec2(position[1], position[2]), body\GetAngle())
+                        dx, dy = (WIDTH/2 - pos.x), (HEIGHT/2 - pos.y) 
+                        --angle = math.atan2(dy, dx)
+                        --tx, ty = math.cos(angle) * 10 + WIDTH/2, math.sin(angle) * 10 + HEIGHT/2
+                        --dx, dy = tx - pos.x, ty - pos.y
+                        --mag = math.sqrt(dx*dx + dy*dy) 
+                        --if mag > 20
+                        --dx = dx / mag * 1024 --* body\GetMass()
+                        --dy = dy / mag * 1024 --* body\GetMass()
+                        -- TODO test for lingering objects to teleport them
+                        --body\SetLinearVelocity(b2.Vec2(dx, dy))
+                    world\Step(TIME_STEP, 10, 100)
+                print(t\get_microseconds() / 1000)
             world\DrawDebugData()
             for body in *polygons
                 pos = body\GetPosition()
@@ -129,7 +146,7 @@ make_simulation = (outer_area) ->
                 text = "#{min_d}"
                 -- Hack for dealing with box2d clobbering:
                 Display.set_drawing_region({0, 0, WIDTH, HEIGHT})
-                FONT\draw({color: color, origin: Display.CENTER}, {pos.x, pos.y}, text)
+                --FONT\draw({color: color, origin: Display.CENTER}, {pos.x, pos.y}, text)
     }
     
 main = () ->
@@ -139,9 +156,14 @@ main = () ->
         {WIDTH, HEIGHT},
         {0, HEIGHT}
     }
-    sim = make_simulation(enclosure)
     Display.initialize("Demo", {WIDTH, HEIGHT}, false)
     rawset(_G, "FONT", Display.font_load("fonts/Gudea-Regular.ttf", 14))
-    Display.draw_loop () -> sim\step()
+    sim = nil
+    GameState.game_loop () ->
+        if sim == nil
+            sim = make_simulation(enclosure)
+        sim\step()
+        if Keys.key_pressed 'N'
+            sim = nil
 
 main()
