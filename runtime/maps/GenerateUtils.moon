@@ -16,13 +16,15 @@ ellipse_points = (x, y, w, h, n_points = 16, start_angle = 0) ->
         angle += step
     return points
 
-skewed_ellipse_points = (x, y, w, h, n_points = 16, start_angle = 0) ->
+skewed_ellipse_points = (rng, xy, wh, n_points = 16, start_angle = 0) ->
+    {x, y} = xy
+    {w, h} = wh
     points = {}
     angle,step = start_angle,(1/n_points* 2 * math.pi)
     cx, cy = x+w/2, y+h/2
     for i=1,n_points
-        append points, {(math.sin(angle) + 1)/2 * w + x, (math.cos(angle)+1)/2 * h + y}
-        angle += math.random() * step / 2 + step / 2
+        append points, {math.sin(angle) * w / 2 + x, math.cos(angle) * h / 2 + y}
+        angle += rng\randomf(0, step) + step / 2
     return points
 
 Region = newtype {

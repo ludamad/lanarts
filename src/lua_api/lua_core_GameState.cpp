@@ -91,8 +91,14 @@ static void game_loop(LuaValue draw_func) {
                 }
 		ldraw::display_draw_start();
                 draw_func.push();
-                luawrap::call<void>(draw_func.luastate(), frames); 
+                lua_pushnumber(L, frames);
+                lua_call(L, 1, 1);
+                bool should_exit = lua_toboolean(L, -1);
+                lua_pop(L, 1);
 		ldraw::display_draw_finish();
+                if (should_exit) {
+                    return; // Exit game loop
+                }
 		SDL_Delay(5);
 	}
 }

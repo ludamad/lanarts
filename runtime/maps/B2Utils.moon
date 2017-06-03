@@ -19,26 +19,30 @@ _shape_distance = () ->
         return output.pointA, output.pointB, output.distance
 shape_distance = _shape_distance()
 
-body_distance = () ->
-    return (body1, body2) ->
-        mp1,mp2,mdist = nil,nil, math.huge
-        b1F,b2F = body1\GetFixtureList(), body2\GetFixtureList()
-        t1,t2 = body1\GetTransform(), body2\GetTransform()
-        while b1F ~= nil
-            s1 = b1F\GetShape()
-            b2FIter = b2F
-            while b2FIter ~= nil
-                s2 = b2FIter\GetShape()
-                p1, p1, dist = shape_distance(s1, t1, s2, t2)
-                if dist < mdist
-                    mp1 = p1
-                    mp2 = p2
-                    mdist = dist
-                b2F = b2FIter\GetNext()
-            b1F = b1F\GetNext()
-        return mp1,mp2,mdist
+_ray_cast = () ->
+    input = b2.RayCastInput()
+    input.maxFraction = 1
+    output = b2.RayCastOutput()
+    return (fixs, p1, p2) ->
+        input.p1 = p1
+        input.p2 = p2
+        for fix in *fixs
+            if fix\RayCast(input, output)
+                return true
+ray_cast = _ray_cast()
+
+shape_set_distance = (t1, fixs1, t2, fixs2) ->
+    mp1,mp2,mdist = nil,nil, math.huge
+    for fix1 in *fixs1
+        s1 = fix1\GetShape()
+        for fix2 in *fixs2
+            s2 = fix2\GetShape()
+            p1, p2, dist = shape_distance(s1, t1, s2, t2)
+            if dist < mdist
+                mp1, mp2, mdist = p1, p2, dist
+    return mp1,mp2,mdist
 
 return {
-    :body_distance, :shape_distance
+    :shape_distance, :shape_set_distance, :ray_cast
 }
 
