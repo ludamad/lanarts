@@ -23,6 +23,7 @@ void display_draw_start();
 
 Size screen_size();
 Size display_size();
+void reset_blend_func();
 Size window_size();
 
 }

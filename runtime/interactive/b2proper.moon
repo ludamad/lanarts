@@ -17,7 +17,7 @@ transform_polygon = (t, polygon) ->
         vec = b2.b2Mul(t, b2.Vec2(x, y))
         {vec.x, vec.y}
 
--- A renderable shape. Defined using a collection of polygons.
+-- A SourceMap renderable shape. Defined using a collection of polygons.
 Shape = newtype {
     -- polygons: Expressed as lists of points of a polygon:
     -- xy: Relative to root area center
@@ -43,7 +43,6 @@ Shape = newtype {
             @outer_polygon = transform_polygon(t, @outer_polygon)
         t.p\Set(x, y) -- Restore
 
-    -- For B2Shape:
     b2Body: (world, density = 0.0) => 
         -- TODO 
         body = world\CreateBody with b2.BodyDef()
@@ -82,6 +81,11 @@ B2ShapeSet = newtype {
         for shape in *@shapes
             shape.x *= scale_x
             shape.y *= scale_y
+    drift_bodies: (scale_x, scale_y) =>
+        for {:body} in *@b2shapes
+            p = body\GetPosition()
+            p.x *= scale_x
+            p.y *= scale_y
     to_shape: () =>
         old_shapes = table.deep_clone(@shapes) 
         -- Shift the polygons so everything is defined in terms of the origin
@@ -124,17 +128,21 @@ B2ShapeSet = newtype {
                 if dist < 100
                     p1, p2, dist = @distance(o, @b2shapes)
             dx, dy = (p2.x - p1.x), (p2.y - p1.y)
-            if dist < 5
-                dx, dy = 0, 0
             o.body\SetLinearVelocity(b2.Vec2(dx, dy))
 
+    has_overlaps: () =>
+        for {:body} in *@b2shapes
+            if body\OverlapsOtherBody()
+                return true
+        return false
     set_velocities_to_point: (x, y) =>
         for {:body} in *@b2shapes
             pos = body\GetPosition()
             dx, dy = (x - pos.x), (y - pos.y)
-            if math.abs(dx) < 5 then dx = 0
-            if math.abs(dy) < 5 then dy = 0
             body\SetLinearVelocity(b2.Vec2(dx, dy))
+    set_velocities_to_zero: () =>
+        for {:body} in *@b2shapes
+            body\SetLinearVelocity(b2.Vec2(0, 0))
 }
 
 VIS_W, VIS_H = 800, 600
@@ -178,6 +186,14 @@ visualize_spread_shapes = (args) ->
             if Keys.key_pressed "M"
                 for i=1,100
                     step_world()
+            if Keys.key_pressed "C"
+                print 'C'
+                for {:body} in *b2shapes.b2shapes
+                    --contacts = body\GetContactList()
+                    pretty(body, body\OverlapsOtherBody())
+                    --while contacts
+                    --    print body, contacts
+                    --    contacts = contacts\GetNext()
             for k in *{'M', 'R', 'J', 'Q'} 
                 if Keys.key_pressed(k)
                     return true
@@ -190,18 +206,35 @@ visualize_spread_shapes = (args) ->
             break
     return b2shapes\to_shape()
 
+visualize_world = (world) -> (title) ->
+    require("core.GameState").game_loop () ->
+        font = font_cached_load "fonts/Gudea-Regular.ttf", 14
+        world\DrawDebugData()
+        if Keys.key_pressed "N"
+            return true
+        -- Hack for dealing with box2d clobbering:
+        Display.reset_blend_func()
+        font\draw({color: COL_WHITE, origin: Display.CENTER}, {100, 100}, title)
+        return false
 spread_shapes = (args) ->
     -- Arguments
     shapes = assert args.shapes
     fixed_shapes = assert args.fixed_shapes
     n_iterations = args.n_iterations or 100 -- Default 100 iterations
-    scale = args.scale or {0,0}
+    scale = args.scale or {1,1}
+    -- Attempt to jiggle until there is no overlap
+    jiggle_iterations = args.jiggle_iterations or 0
     -- Do shapes from clumps once they become near?
     clump_once_near = args.clump_once_near or false
     mode = args.mode or 'towards_fixed_shapes'
     -- State
     world = b2.World(b2.Vec2(0.0,0.0)) -- No gravity
+    visualize = if args.visualize then visualize_world(world) else do_nothing
     b2shapes = B2ShapeSet.create(world, shapes, fixed_shapes)
+    if args.visualize
+        world\SetDebugDraw with b2.GLDrawer()
+            \SetFlags(b2.Draw.e_shapeBit + b2.Draw.e_jointBit)
+    visualize("Starting point")
     -- Iteration loop
     for i=1,n_iterations
         if mode == 'towards_fixed_shapes'
@@ -210,7 +243,20 @@ spread_shapes = (args) ->
             b2shapes\set_velocities_to_point(0, 0)
         else
             error("Unrecognized mode '#{mode}'!")
-        world\Step(0.1, 10, 10)
+        world\Step(0.1, 1000, 1000)
+        visualize("Iteration #{i}")
+    for i=1,jiggle_iterations
+        if not b2shapes\has_overlaps()
+            break
+        b2shapes\drift_bodies(1.1, 1.1)
+        if mode == 'towards_fixed_shapes'
+            b2shapes\set_velocities_to_fixed_set(clump_once_near)
+        elseif mode == 'towards_center'
+            b2shapes\set_velocities_to_point(0, 0)
+        else
+            error("Unrecognized mode '#{mode}'!")
+        world\Step(0.1, 1000, 1000)
+        visualize("Jiggle #{i}")
     b2shapes\update_shapes()
     b2shapes\drift_shapes(scale[1], scale[2])
     -- Return a compound shape
@@ -218,26 +264,32 @@ spread_shapes = (args) ->
 
 -- return {:Shape, :spread_shapes}
 
+
+Display.initialize("Demo", {VIS_W, VIS_H}, false)
+Display.set_world_region({-VIS_W/2, -VIS_H/2, VIS_W/2, VIS_H/2})
 while true
     make_shapes = (n) ->
         polygons = for i=4,3 + n do make_polygon(i * 10, i * 10, i * math.random() + 3)
         return for poly in *polygons 
             shape = Shape.create {poly}
-            shape.x, shape.y = rng\randomf(-300, 300), rng\randomf(-300, 300)
+            shape.x, shape.y = rng\randomf(-100, 100), rng\randomf(-100, 100)
             shape
 
     shapes = {}
-    for i=1,3
+    for i=1,1
         compound_shape = spread_shapes {
             shapes: make_shapes(4)
-            mode: 'towards_center'
-            fixed_shapes: {}
-            scale: {1.1, 1.1}
+            visualize: true
+            fixed_shapes: {Shape.create({make_polygon(8, 8)})}
+            mode: 'towards_fixed_shapes'
+            clump_once_near: true
+            --scale: {1.1, 1.1}
         }
         compound_shape.x, compound_shape.y = rng\randomf(-200, 200), rng\randomf(-200, 200)
         append shapes, compound_shape
-    visualize_spread_shapes {
-        :shapes
+    spread_shapes {
+        shapes: {shape}
+        visualize: true
         fixed_shapes: {Shape.create({make_polygon(8, 8)})}
         mode: 'towards_center'
     }

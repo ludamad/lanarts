@@ -94,6 +94,7 @@ void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcom
 	module["draw_loop"].bind_function(draw_loop);
 	module["set_window_region"].bind_function(display_set_window_region);
 	module["set_world_region"].bind_function(display_set_world_region);
+	module["reset_blend_func"].bind_function(reset_blend_func);
 
 	lua_register_font(L, module);
 	lua_register_image(L, module);

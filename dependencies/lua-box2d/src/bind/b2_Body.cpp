@@ -8,7 +8,7 @@
  */
 #include "dub/dub.h"
 #include "Box2D/Dynamics/b2Body.h"
-
+#include "Box2D/Dynamics/Contacts/b2Contact.h"
 
 /** b2Fixture * b2Body::CreateFixture(const b2FixtureDef *def)
  * vendor/Box2D/Box2D/Dynamics/b2Body.h:136
@@ -830,9 +830,16 @@ static int b2Body_GetJointList(lua_State *L) {
 static int b2Body_GetContactList(lua_State *L) {
   try {
     b2Body *self = *((b2Body **)dub_checksdata(L, 1, "b2.Body"));
-    b2ContactEdge *retval__ = self->GetContactList();
-    if (!retval__) return 0;
-    dub_pushudata(L, retval__, "ContactEdge", false);
+    lua_newtable(L);
+    int table_idx = lua_gettop(L);
+    b2ContactEdge *list = self->GetContactList();
+    for (int i = 1; list != NULL;) {
+        if (!list->contact->IsTouching()) {
+            dub_pushudata(L, list->other, "b2.Body", false);
+            lua_rawseti(L, table_idx, i++);
+        }
+        list = list->next;
+    }
     return 1;
   } catch (std::exception &e) {
     lua_pushfstring(L, "GetContactList: %s", e.what());
@@ -841,6 +848,28 @@ static int b2Body_GetContactList(lua_State *L) {
   }
   return dub_error(L);
 }
+
+static int b2Body_OverlapsOtherBody(lua_State *L) {
+  try {
+    b2Body *self = *((b2Body **)dub_checksdata(L, 1, "b2.Body"));
+    b2ContactEdge *list = self->GetContactList();
+    bool overlaps = false;
+    for (; list != NULL; list = list->next) {
+        if (!list->contact->IsTouching()) {
+            overlaps = true;
+            break;
+        }
+    }
+    lua_pushboolean(L, overlaps);
+    return 1;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "GetContactList: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "GetContactList: Unknown exception");
+  }
+  return dub_error(L);
+}
+
 
 /** b2Body * b2Body::GetNext()
  * vendor/Box2D/Box2D/Dynamics/b2Body.h:365
@@ -989,6 +1018,7 @@ static const struct luaL_Reg b2Body_member_methods[] = {
   { "GetFixtureList", b2Body_GetFixtureList },
   { "GetJointList" , b2Body_GetJointList  },
   { "GetContactList", b2Body_GetContactList },
+  { "OverlapsOtherBody", b2Body_OverlapsOtherBody },
   { "GetNext"      , b2Body_GetNext       },
   { "GetUserData"  , b2Body_GetUserData   },
   { "SetUserData"  , b2Body_SetUserData   },

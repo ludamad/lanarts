@@ -146,6 +146,14 @@ Size ldraw::display_size() {
     return RENDER_SIZE;
 }
 
+// Solely for when box2d clobbers it
+void ldraw::reset_blend_func() {
+    /* This allows alpha blending of 2D textures with the scene */
+    glEnable(GL_BLEND);
+    //glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
 Size ldraw::window_size() {
     int w = 0, h = 0;
     SDL_GetWindowSize(MAIN_WINDOW, &w, &h);
