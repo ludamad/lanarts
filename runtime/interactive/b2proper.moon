@@ -68,34 +68,39 @@ B2ShapeSet = newtype {
         @fixed_shapes = assert fixed_shapes
         @b2shapes = for shape in *shapes
             body, outer_fixture, fixtures = shape\b2Body(world, 1.0)
-            {:body, :outer_fixture, :fixtures}
+            {:body, :outer_fixture, :fixtures, :shape}
         @b2fixed_shapes = for shape in *fixed_shapes
             body, outer_fixture, fixtures = shape\b2Body(world, 0.0)
-            {:body, :outer_fixture, :fixtures}
-    update_shapes: (shift_polygons = false) =>
-        for i=1,#@shapes
-            shape = @shapes[i]
-            {:body} = @b2shapes[i]
-            shape\b2Update(body, shift_polygons)
+            {:body, :outer_fixture, :fixtures, :shape}
     drift_shapes: (scale_x, scale_y) =>
         for shape in *@shapes
             shape.x *= scale_x
             shape.y *= scale_y
+            p.y *= scale_y
+        return nil
     drift_bodies: (scale_x, scale_y) =>
         for {:body} in *@b2shapes
             p = body\GetPosition()
             p.x *= scale_x
             p.y *= scale_y
+        return nil
+    update_shapes: () =>
+        for {:body, :shape} in *@b2shapes
+            -- Offset to the center:
+            shape.polygons = for polygon in *shape.polygons 
+                for {px, py} in *polygon
+                    {:x, :y} = body\GetWorldPoint(b2.Vec2(px, py))
+                    {x, y}
+        return nil
     to_shape: () =>
-        old_shapes = table.deep_clone(@shapes) 
-        -- Shift the polygons so everything is defined in terms of the origin
-        @update_shapes(true)
         -- Collect all the polygons into our new shape
         polygons = {}
-        for shape in *@shapes
+        for {:body, :shape} in *@b2shapes
+            -- Offset to the center:
             for polygon in *shape.polygons
-                append polygons, polygon
-        @shapes = old_shapes
+                append polygons, for {px, py} in *polygon
+                    {:x, :y} = body\GetWorldPoint(b2.Vec2(px, py))
+                    {x, y}
         -- New shape situated at 0,0
         return Shape.create(polygons)
     _distance: (o1, others) =>
@@ -129,7 +134,7 @@ B2ShapeSet = newtype {
                     p1, p2, dist = @distance(o, @b2shapes)
             dx, dy = (p2.x - p1.x), (p2.y - p1.y)
             o.body\SetLinearVelocity(b2.Vec2(dx, dy))
-
+        return nil
     has_overlaps: () =>
         for {:body} in *@b2shapes
             if body\OverlapsOtherBody()
@@ -140,9 +145,27 @@ B2ShapeSet = newtype {
             pos = body\GetPosition()
             dx, dy = (x - pos.x), (y - pos.y)
             body\SetLinearVelocity(b2.Vec2(dx, dy))
+        return nil
     set_velocities_to_zero: () =>
         for {:body} in *@b2shapes
             body\SetLinearVelocity(b2.Vec2(0, 0))
+        return nil
+}
+
+-- Performs a connectivity pass on a B2ShapeSet
+B2ShapeGraph = newtype {
+    init: (b2shape_set) =>
+        -- Bodies you do not want tunnels to overlap 
+        @bad_bodies = {}
+        @tunnels = {}
+        @connection_sets = {}
+        @_init(b2shape_set.b2shapes, b2shape_set.fixed_shapes)
+    _init: (b2shapes, fixed_shapes) =>
+        for o in *b2shapes
+            append @bad_bodies, o
+        for o in *fixed_shapes
+            append @bad_bodies, o
+        return nil
 }
 
 VIS_W, VIS_H = 800, 600
@@ -224,9 +247,11 @@ spread_shapes = (args) ->
     shapes = assert args.shapes
     fixed_shapes = assert args.fixed_shapes
     n_iterations = args.n_iterations or 100 -- Default 100 iterations
+    n_subiterations = args.n_subiterations or 10 -- Default 100 iterations
     scale = args.scale or {1,1}
     -- Do shapes from clumps once they become near?
     clump_once_near = args.clump_once_near or false
+    return_compound_shape = args.return_compound_shape or false
     mode = args.mode or 'towards_fixed_shapes'
     -- State
     world = b2.World(b2.Vec2(0.0,0.0)) -- No gravity
@@ -244,12 +269,13 @@ spread_shapes = (args) ->
             b2shapes\set_velocities_to_point(0, 0)
         else
             error("Unrecognized mode '#{mode}'!")
-        world\Step(0.1, 10, 10)
-        visualize("Iteration #{i}")
-    b2shapes\update_shapes()
-    b2shapes\drift_shapes(scale[1], scale[2])
+        world\Step(0.1, n_subiterations, n_subiterations)
+        if i % 10 == 0
+            visualize("Iteration #{i}")
     -- Return a compound shape
-    return b2shapes\to_shape()
+    compound_shape = if return_compound_shape then b2shapes\to_shape() else nil
+    b2shapes\update_shapes()
+    return compound_shape
 
 -- return {:Shape, :spread_shapes}
 
@@ -263,23 +289,41 @@ while true
             shape.x, shape.y = rng\randomf(-100, 100), rng\randomf(-100, 100)
             shape
 
+    timer = timer_create()
     shapes = {}
-    for i=1,3
+    for i=1,4
         compound_shape = spread_shapes {
             shapes: make_shapes(4)
-            visualize: true
             fixed_shapes: {Shape.create({make_polygon(8, 8)})}
+            n_iterations: 50
+            --visualize: true
             mode: 'towards_fixed_shapes'
             clump_once_near: true
+            return_compound_shape: true
             --scale: {1.1, 1.1}
         }
-        compound_shape.x, compound_shape.y = rng\randomf(-200, 200), rng\randomf(-200, 200)
+        compound_shape.x, compound_shape.y = rng\randomf(-500, 500), rng\randomf(-500, 500)
         append shapes, compound_shape
-    spread_shapes {
+    compound = spread_shapes {
         :shapes
+        --visualize: true
+        fixed_shapes: {Shape.create({make_polygon(8, 8)})}
+        n_iterations: 300
+        n_subiterations: 10
+        mode: 'towards_fixed_shapes'
+        return_compound_shape: true
+        clump_once_near: true
+    }
+    print "Running took", timer\get_milliseconds()
+    spread_shapes {
+        shapes: {compound}
         visualize: true
         fixed_shapes: {Shape.create({make_polygon(8, 8)})}
+        n_iterations: 200
+        n_subiterations: 10
         mode: 'towards_fixed_shapes'
+        return_compound_shape: true
+        clump_once_near: true
     }
     if not Keys.key_pressed "R"
         break

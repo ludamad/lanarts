@@ -72,8 +72,8 @@ fi
 # These are used to communicate with CMake
 # Each flag has an optional shortform, use whichever is preferred.
 
-if handle_flag "--vanilla-lua" || handle_flag "-vl" ; then
-    export BUILD_NO_LUAJIT=1
+if handle_flag "--luajit" || handle_flag "-lj" ; then
+    export BUILD_LUAJIT=1
 fi
 if handle_flag "--optimize" || handle_flag "-O" ; then
     export BUILD_OPTIMIZE=1
@@ -107,6 +107,9 @@ function build_lanarts(){
     BUILD_DIR="build_debug"
     if [ $BUILD_OPTIMIZE ] ; then
         BUILD_DIR="build_release"
+    fi
+    if [ $BUILD_LUAJIT ] ; then
+        BUILD_DIR="${BUILD_DIR}_luajit"
     fi
     rm_if_link build
     if [ -d build ] ; then
