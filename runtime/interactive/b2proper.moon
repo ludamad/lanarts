@@ -146,65 +146,67 @@ B2ShapeSet = newtype {
 }
 
 VIS_W, VIS_H = 800, 600
-visualize_spread_shapes = (args) ->
-    -- Arguments
-    shapes = assert args.shapes
-    fixed_shapes = assert args.fixed_shapes
-    -- unused 'n_iterations' 
-    -- Do shapes from clumps once they become near in towards_fixed_shapes mode?
-    clump_once_near = args.clump_once_near or false
-    mode = args.mode or 'towards_fixed_shapes'
 
-    -- Helpers
-    local world, b2shapes
-    new_world = () ->
-        world = b2.World(b2.Vec2(0.0,0.0)) -- No gravity
-        b2shapes = B2ShapeSet.create(world, shapes, fixed_shapes)
-        world\SetDebugDraw with b2.GLDrawer()
-            \SetFlags(b2.Draw.e_shapeBit + b2.Draw.e_jointBit)
-    connect = (shape1, shape2) ->
-
-    step_world = () ->
-        if mode == 'towards_fixed_shapes'
-            b2shapes\set_velocities_to_fixed_set(clump_once_near)
-        elseif mode == 'towards_center'
-            b2shapes\set_velocities_to_point(0, 0)
-        else
-            error("Unrecognized mode '#{mode}'!")
-        world\Step(0.1, 10, 10)
-    Display.initialize("Demo", {VIS_W, VIS_H}, false)
-    Display.set_world_region({-VIS_W/2, -VIS_H/2, VIS_W/2, VIS_H/2})
-    while true
-        new_world()
-        require("core.GameState").game_loop () ->
-            world\DrawDebugData()
-            if Keys.key_pressed "B"
-                step_world()
-            if Keys.key_pressed "N"
-                for i=1,10
-                    step_world()
-            if Keys.key_pressed "M"
-                for i=1,100
-                    step_world()
-            if Keys.key_pressed "C"
-                print 'C'
-                for {:body} in *b2shapes.b2shapes
-                    --contacts = body\GetContactList()
-                    pretty(body, body\OverlapsOtherBody())
-                    --while contacts
-                    --    print body, contacts
-                    --    contacts = contacts\GetNext()
-            for k in *{'M', 'R', 'J', 'Q'} 
-                if Keys.key_pressed(k)
-                    return true
-        if Keys.key_pressed "M"
-            b2shapes\update_shapes()
-        elseif Keys.key_pressed "J"
-            b2shapes\update_shapes()
-            b2shapes\drift_shapes(1.1,1.1)
-        else
-            break
-    return b2shapes\to_shape()
+-- Old visualize routine, more interactive however:
+--visualize_spread_shapes = (args) ->
+--    -- Arguments
+--    shapes = assert args.shapes
+--    fixed_shapes = assert args.fixed_shapes
+--    -- unused 'n_iterations' 
+--    -- Do shapes from clumps once they become near in towards_fixed_shapes mode?
+--    clump_once_near = args.clump_once_near or false
+--    mode = args.mode or 'towards_fixed_shapes'
+--
+--    -- Helpers
+--    local world, b2shapes
+--    new_world = () ->
+--        world = b2.World(b2.Vec2(0.0,0.0)) -- No gravity
+--        b2shapes = B2ShapeSet.create(world, shapes, fixed_shapes)
+--        world\SetDebugDraw with b2.GLDrawer()
+--            \SetFlags(b2.Draw.e_shapeBit + b2.Draw.e_jointBit)
+--    connect = (shape1, shape2) ->
+--
+--    step_world = () ->
+--        if mode == 'towards_fixed_shapes'
+--            b2shapes\set_velocities_to_fixed_set(clump_once_near)
+--        elseif mode == 'towards_center'
+--            b2shapes\set_velocities_to_point(0, 0)
+--        else
+--            error("Unrecognized mode '#{mode}'!")
+--        world\Step(0.1, 10, 10)
+--    Display.initialize("Demo", {VIS_W, VIS_H}, false)
+--    Display.set_world_region({-VIS_W/2, -VIS_H/2, VIS_W/2, VIS_H/2})
+--    while true
+--        new_world()
+--        require("core.GameState").game_loop () ->
+--            world\DrawDebugData()
+--            if Keys.key_pressed "B"
+--                step_world()
+--            if Keys.key_pressed "N"
+--                for i=1,10
+--                    step_world()
+--            if Keys.key_pressed "M"
+--                for i=1,100
+--                    step_world()
+--            if Keys.key_pressed "C"
+--                print 'C'
+--                for {:body} in *b2shapes.b2shapes
+--                    --contacts = body\GetContactList()
+--                    pretty(body, body\OverlapsOtherBody())
+--                    --while contacts
+--                    --    print body, contacts
+--                    --    contacts = contacts\GetNext()
+--            for k in *{'M', 'R', 'J', 'Q'} 
+--                if Keys.key_pressed(k)
+--                    return true
+--        if Keys.key_pressed "M"
+--            b2shapes\update_shapes()
+--        elseif Keys.key_pressed "J"
+--            b2shapes\update_shapes()
+--            b2shapes\drift_shapes(1.1,1.1)
+--        else
+--            break
+--    return b2shapes\to_shape()
 
 visualize_world = (world) -> (title) ->
     require("core.GameState").game_loop () ->
@@ -216,14 +218,13 @@ visualize_world = (world) -> (title) ->
         Display.reset_blend_func()
         font\draw({color: COL_WHITE, origin: Display.CENTER}, {100, 100}, title)
         return false
+
 spread_shapes = (args) ->
     -- Arguments
     shapes = assert args.shapes
     fixed_shapes = assert args.fixed_shapes
     n_iterations = args.n_iterations or 100 -- Default 100 iterations
     scale = args.scale or {1,1}
-    -- Attempt to jiggle until there is no overlap
-    jiggle_iterations = args.jiggle_iterations or 0
     -- Do shapes from clumps once they become near?
     clump_once_near = args.clump_once_near or false
     mode = args.mode or 'towards_fixed_shapes'
@@ -243,27 +244,14 @@ spread_shapes = (args) ->
             b2shapes\set_velocities_to_point(0, 0)
         else
             error("Unrecognized mode '#{mode}'!")
-        world\Step(0.1, 1000, 1000)
+        world\Step(0.1, 10, 10)
         visualize("Iteration #{i}")
-    for i=1,jiggle_iterations
-        if not b2shapes\has_overlaps()
-            break
-        b2shapes\drift_bodies(1.1, 1.1)
-        if mode == 'towards_fixed_shapes'
-            b2shapes\set_velocities_to_fixed_set(clump_once_near)
-        elseif mode == 'towards_center'
-            b2shapes\set_velocities_to_point(0, 0)
-        else
-            error("Unrecognized mode '#{mode}'!")
-        world\Step(0.1, 1000, 1000)
-        visualize("Jiggle #{i}")
     b2shapes\update_shapes()
     b2shapes\drift_shapes(scale[1], scale[2])
     -- Return a compound shape
     return b2shapes\to_shape()
 
 -- return {:Shape, :spread_shapes}
-
 
 Display.initialize("Demo", {VIS_W, VIS_H}, false)
 Display.set_world_region({-VIS_W/2, -VIS_H/2, VIS_W/2, VIS_H/2})
@@ -276,7 +264,7 @@ while true
             shape
 
     shapes = {}
-    for i=1,1
+    for i=1,3
         compound_shape = spread_shapes {
             shapes: make_shapes(4)
             visualize: true
@@ -288,10 +276,10 @@ while true
         compound_shape.x, compound_shape.y = rng\randomf(-200, 200), rng\randomf(-200, 200)
         append shapes, compound_shape
     spread_shapes {
-        shapes: {shape}
+        :shapes
         visualize: true
         fixed_shapes: {Shape.create({make_polygon(8, 8)})}
-        mode: 'towards_center'
+        mode: 'towards_fixed_shapes'
     }
     if not Keys.key_pressed "R"
         break
