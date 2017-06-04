@@ -70,6 +70,7 @@ namespace ldungeon_gen {
 		uint16_t flip_bits;
 		uint16_t content_value;
 		bool use_content_value;
+		uint16_t group_value;
 
 		Operator(uint16_t turn_on_bits, uint16_t turn_off_bits, uint16_t flip_bits,
 				uint16_t content_value) :
@@ -77,7 +78,8 @@ namespace ldungeon_gen {
 						turn_off_bits(turn_off_bits),
 						flip_bits(flip_bits),
 						content_value(content_value),
-						use_content_value(true) {
+						use_content_value(true), 
+                                                group_value(0) {
 		}
 
 		Operator(uint16_t turn_on_bits = 0, uint16_t turn_off_bits = 0, uint16_t flip_bits = 0) :
@@ -85,14 +87,16 @@ namespace ldungeon_gen {
 						turn_off_bits(turn_off_bits),
 						flip_bits(flip_bits),
 						content_value(0),
-						use_content_value(false) {
+						use_content_value(false),
+                                                group_value(0) {
 		}
 		bool operator==(const Operator& o) {
 			return turn_on_bits == o.turn_on_bits
 					&& turn_off_bits == o.turn_off_bits
 					&& flip_bits == o.flip_bits
 					&& content_value == o.content_value
-					&& use_content_value == o.use_content_value;
+					&& use_content_value == o.use_content_value
+					&& group_value == o.group_value;
 		}
 	};
 
@@ -140,6 +144,9 @@ namespace ldungeon_gen {
 			if (oper.use_content_value) {
 				content = oper.content_value;
 			}
+			if (oper.group_value != -1) {
+				group = oper.group_value;
+                        }
 		}
 		inline void apply(ConditionalOperator oper) {
 			if (matches(oper.selector)) {

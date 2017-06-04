@@ -26,13 +26,16 @@ _ray_cast = () ->
     return (fixs, p1, p2) ->
         input.p1 = p1
         input.p2 = p2
+        ind = 0
         for fix in *fixs
-            if fix\RayCast(input, output)
+            if fix\RayCast(output, input, ind)
                 return true
+            ind += 1
 ray_cast = _ray_cast()
 
 shape_set_distance = (t1, fixs1, t2, fixs2) ->
     mp1,mp2,mdist = nil,nil, math.huge
+    mf1,mf2 = nil,nil
     for fix1 in *fixs1
         s1 = fix1\GetShape()
         for fix2 in *fixs2
@@ -40,7 +43,8 @@ shape_set_distance = (t1, fixs1, t2, fixs2) ->
             p1, p2, dist = shape_distance(s1, t1, s2, t2)
             if dist < mdist
                 mp1, mp2, mdist = p1, p2, dist
-    return mp1,mp2,mdist
+                mf1, mf2 = fix1, fix2
+    return mp1,mp2,mdist,mf1,mf2
 
 return {
     :shape_distance, :shape_set_distance, :ray_cast

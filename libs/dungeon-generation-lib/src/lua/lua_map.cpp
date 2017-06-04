@@ -413,7 +413,7 @@ namespace ldungeon_gen {
         int x2 = luaL_checkinteger(L, 4);
         int y = luaL_checkinteger(L, 5) - 1;
         // What to use outside of map bounds?
-        double fill = luaL_checknumber(L, 6);
+        int fill = lua_gettop(L) >= 6 ? luaL_checknumber(L, 6) : 0;
         int w = map->width(), h = map->height();
         Pos pos(x1, y);
         int i = 1;

@@ -1,14 +1,11 @@
 -- Shape.moon
 -- Introduces a Shape type
 b2 = require 'b2'
-Display = require "core.Display"
 GenerateUtils = require "maps.GenerateUtils"
 Keys = require "core.Keyboard"
 WIDTH, HEIGHT = 640, 480
-
 B2Utils = require "maps.B2Utils"
 
-rng = require("mtwist").create(os.time())
 make_polygon = (w, h, points) ->
     return GenerateUtils.skewed_ellipse_points(rng, {0,0}, {w, h}, points)
 --shape_distance = () ->
@@ -310,8 +307,8 @@ VIS_W, VIS_H = 800, 600
 _FIRST_VISUALIZE = true
 visualize_world = (world) -> (title) ->
     if _FIRST_VISUALIZE
-        Display.initialize("Demo", {VIS_W, VIS_H}, false)
-        Display.set_world_region({-VIS_W/2, -VIS_H/2, VIS_W/2, VIS_H/2})
+        require("core.Display").initialize("Demo", {VIS_W, VIS_H}, false)
+        require("core.Display").set_world_region({-VIS_W/2, -VIS_H/2, VIS_W/2, VIS_H/2})
         _FIRST_VISUALIZE = false
     require("core.GameState").game_loop () ->
         font = font_cached_load "fonts/Gudea-Regular.ttf", 14
@@ -319,8 +316,8 @@ visualize_world = (world) -> (title) ->
         if Keys.key_pressed "N"
             return true
         -- Hack for dealing with box2d clobbering:
-        Display.reset_blend_func()
-        font\draw({color: COL_WHITE, origin: Display.CENTER}, {100, 100}, title)
+        require("core.Display").reset_blend_func()
+        font\draw({color: COL_WHITE, origin: require("core.Display").CENTER}, {100, 100}, title)
         return false
 
 spread_shapes = (args) ->
@@ -391,53 +388,7 @@ sample_shape = () ->
         --scale: {1.1, 1.1}
     }
 
-spread_vis = () ->
-    make_shapes = (n) ->
-        polygons = for i=4,3 + n do make_polygon(i * 10, i * 10, i * math.random() + 3)
-        return for poly in *polygons 
-            shape = Shape.create {poly}
-            shape.x, shape.y = rng\randomf(-100, 100), rng\randomf(-100, 100)
-            shape
-
-    timer = timer_create()
-    shapes = {}
-    for i=1,4
-        compound_shape = spread_shapes {
-            :rng
-            shapes: make_shapes(4)
-            fixed_shapes: {Shape.create({make_polygon(8, 8)})}
-            n_iterations: 50
-            --visualize: true
-            mode: 'towards_fixed_shapes'
-            clump_once_near: true
-            connect_after: true
-            return_compound_shape: true
-            --scale: {1.1, 1.1}
-        }
-        compound_shape.x, compound_shape.y = rng\randomf(-500, 500), rng\randomf(-500, 500)
-        append shapes, compound_shape
-    compound = spread_shapes {
-        :shapes
-        :rng
-        visualize: true
-        fixed_shapes: {Shape.create({make_polygon(8, 8)})}
-        n_iterations: 300
-        n_subiterations: 10
-        mode: 'towards_fixed_shapes'
-        return_compound_shape: true
-        clump_once_near: true
-        connect_after: true
-    }
-    print "Running took", timer\get_milliseconds()
-
-COLORS = {
-    COL_BLACK
-    COL_WHITE
-    COL_BABY_BLUE, COL_PALE_YELLOW, COL_PALE_RED,
-    COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY 
-}
-
-while true
+__visualize = () ->
     SourceMap = require "core.SourceMap"
     shape = sample_shape()
     bbox = shape\bbox()
@@ -446,8 +397,8 @@ while true
     shape\translate(-bbox[1], -bbox[2])
     assert w > 0 and h > 0, "w, h should be > 0, #{w}, #{h}"
     tw, th = 8,8
-    Display.initialize("Demo", {800, 600} , false)
-    Display.set_world_region({0, 0, w * tw, h * th})
+    require("core.Display").initialize("Demo", {800, 600} , false)
+    require("core.Display").set_world_region({0, 0, w * tw, h * th})
     map = SourceMap.map_create {
         :rng
         label: "Test"
@@ -478,8 +429,9 @@ while true
                 color = COLORS[(row[x] % #COLORS) + 1]
                 if color == COL_BLACK and row[x] ~= 0
                     color = COL_GOLD
-                Display.draw_rectangle(color, {(x-1)*tw, (y-1)*th, x*tw, y*th})
+                require("core.Display").draw_rectangle(color, {(x-1)*tw, (y-1)*th, x*tw, y*th})
         if Keys.key_pressed 'R'
             return true
         return nil
 
+return {:sample_shape}
