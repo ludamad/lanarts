@@ -111,7 +111,7 @@ namespace ldungeon_gen {
 		Operator oper(flags_get(args["add"]), flags_get(args["remove"]),
 				flags_get(args["toggle"]),
 				luawrap::defaulted(args["content"], 0));
-		oper.use_content_value = has_content;
+                oper.group_value = luawrap::defaulted(args["group"], -1);
 		return oper;
 	}
 

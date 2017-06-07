@@ -131,7 +131,7 @@ make_simulation = (outer_area) ->
                 Display.set_drawing_region({0, 0, WIDTH, HEIGHT})
                 FONT\draw({color: color, origin: Display.CENTER}, {pos.x, pos.y}, text)
     }
-    
+
 main = () ->
     enclosure = {
         {0,0},

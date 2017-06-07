@@ -46,7 +46,62 @@ shape_set_distance = (t1, fixs1, t2, fixs2) ->
                 mf1, mf2 = fix1, fix2
     return mp1,mp2,mdist,mf1,mf2
 
-return {
-    :shape_distance, :shape_set_distance, :ray_cast
-}
+-- create_body:
+--   Create a body in `world`. If density == 0.0 then the object is static.
+create_body = (world, polygons, density = 0.0, x = 0.0, y = 0.0) ->
+    body = world\CreateBody with b2.BodyDef()
+        .type = b2.dynamicBody if density > 0.0
+        .position\Set(x, y)
+    fixtures = for shape in *polygons
+        body\CreateFixture with b2.PolygonShape()
+            \Set(shape),
+            density
+    else nil
+    return {:body, :fixtures, is_dynamic: density > 0.0}
 
+
+local body_distance
+_body_distance = (o1, others) ->
+    mp1,mp2,mdist = nil,nil, math.huge
+    for o2 in *others
+        if o1 == o2
+            continue
+        p1,p2,dist = body_distance(o1, o2)
+        if dist < mdist
+            mp1,mp2,mdist=p1,p2,dist
+    return mp1,mp2,mdist
+
+body_distance = (o1, o2) ->
+    if o2.body == nil -- Is it possibly an object list?
+        return _body_distance(o1, o2)
+    t1, fixs1 = o1.body\GetTransform(), o1.fixtures
+    t2, fixs2 = o2.body\GetTransform(), o2.fixtures
+    return shape_set_distance(t1, fixs1, t2, fixs2)
+
+set_velocities_to_fixed_set = (bodies, fixed_bodies, clump_once_near = false) =>
+    for o in *bodies
+        pos = o.body\GetPosition()
+        p1, p2, dist = body_distance(o, fixed_bodies)
+        if clump_once_near and #bodies > 1
+            if dist < 100
+                p1, p2, dist = body_distance(o, bodies)
+        dx, dy = (p2.x - p1.x), (p2.y - p1.y)
+        o.body\SetLinearVelocity(b2.Vec2(dx, dy))
+    return nil
+
+set_velocities_to_point = (bodies, x, y) ->
+    for {:body} in *bodies
+        pos = body\GetPosition()
+        dx, dy = (x - pos.x), (y - pos.y)
+        body\SetLinearVelocity(b2.Vec2(dx, dy))
+    return nil
+
+transform_polygon = (t, polygon) ->
+    return for {x, y} in *polygon
+        vec = b2.b2Mul(t, b2.Vec2(x, y))
+        {vec.x, vec.y}
+
+return {
+    :shape_distance, :shape_set_distance, :ray_cast, :create_body
+    :body_distance, :set_velocities_to_fixed_set, :set_velocities_to_point, :transform_polygon
+}

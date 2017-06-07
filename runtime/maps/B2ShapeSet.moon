@@ -17,7 +17,7 @@ transform_polygon = (t, polygon) ->
 -- A SourceMap renderable shape. Defined using a collection of polygons.
 Shape = newtype {
     -- polygons: Expressed as lists of points of a polygon:
-    -- xy: Relative to root area center
+    -- x, y: Relative to root area center
     init: (polygons, outer_polygon = false) =>
         @polygons = polygons
         @outer_polygon = outer_polygon
@@ -434,4 +434,4 @@ __visualize = () ->
             return true
         return nil
 
-return {:sample_shape}
+return {:Shape, :spread_shapes, :sample_shape, :__visualize}

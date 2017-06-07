@@ -4,21 +4,25 @@ _node = (handler_map) ->
     handlers = {}
     for k,v in pairs handler_map
         append handlers, v(k)
-    ret = setmetatable {}, {
+    local ret
+    ret = setmetatable {
+    }, {
         __call: (args) =>
-            obj = {_type: ret}
+            obj = {}
             for handler in *handlers
                 handler(obj, args)
             for k,v in pairs(args)
                 if obj[k] == nil
                     error("Unexpected argument #{k}")
-            return obj
-        __tostring:
+            return setmetatable(obj, ret)
     }
     return ret
 
 typeof = (obj) ->
-    return rawget(obj, '_type') or type(obj)
+    t = type(obj)
+    if t == 'table'
+        return rawget(obj, '_type') or t
+    return t
 
 from_set = (set) -> (name) -> (obj, args) ->
     val = args[name] 
@@ -47,10 +51,12 @@ M.Area = _node {
 }
 
 M.Polygon = _node {
+    name: typecheck("string")
+    points: typecheck("table")
 
 }
 
 for k, v in pairs(M)
     v.name = k
 
-return elements
+return M
