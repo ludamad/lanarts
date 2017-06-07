@@ -16,7 +16,7 @@ B2World = newtype {
         @all_bodies = {}
     add_body: (shape, density = 1.0) =>
         -- Density 0.0 implies a static box2d object
-        body = B2Utils.create_body @world, shape, 1.0
+        body = B2Utils.create_body @world, shape, density
         if density == 0.0
             append @static_bodies, body
         else
@@ -40,6 +40,8 @@ B2World = newtype {
             return
         @world\SetDebugDraw with b2.GLDrawer()
             \SetFlags(b2.Draw.e_shapeBit + b2.Draw.e_jointBit)
+        w,h = DebugUtils.visualization_size()
+        require("core.Display").set_world_region {-w/2, -h/2, w/2, h/2}
         require("core.GameState").game_loop () ->
             font = font_cached_load "fonts/Gudea-Regular.ttf", 14
             @world\DrawDebugData()
@@ -204,33 +206,34 @@ _spread_shapes = (args) ->
         b2world.world\Step(0.1, n_subiterations, n_subiterations)
         if i % 10 == 0
             b2world\visualize("Iteration #{i}")
-    return for {:body} in *b2world.dynamic_bodies
-        body\GetTransform()
+    for i, {:body} in ipairs b2world.dynamic_bodies
+        args.sync(i, body)
 
 -- Standardizes the conversion from map regions and fixed polygons to a B2World
 _b2_world_from_args = (args) ->
     b2world = B2World.create()
     for region in *args.regions
         b2world\add_body(region.polygons)
-    for polygon in *args.fixed_polygons
+    for polygon in *(args.fixed_polygons or {})
         -- Use density 0.0 to represent a static body
         -- These will not generate transforms in _spread_shapes
         b2world\add_body({polygon}, 0.0)
     return b2world
 
 spread_map_regions = (args) ->
-    transforms = _spread_shapes {
+    regions = args.regions
+    _spread_shapes {
         b2world: _b2_world_from_args(args)
         n_iterations: args.n_iterations
         n_subiterations: args.n_subiterations
         clump_once_near: args.clump_once_near
         mode: args.mode
+        sync: (i, body) ->
+            r = regions[i]
+            t = body\GetTransform()
+            r.polygons = for p in *r.polygons
+                B2Utils.transform_polygon(t, p)
     }
-
-    assert #transforms == #args.regions, "Should have one transform per region"
-
-    for i=1,#transforms
-        args.regions[i] = B2Utils.transform_polygon(transforms[i], args.regions[i])
 
 connect_map_regions = (args) ->
     assert args.rng, "Need 'rng' object"
@@ -245,4 +248,10 @@ connect_map_regions = (args) ->
     -- Tunnels have 'index_a', 'index_b', 'polygon'
     return connector.tunnels
 
-return {:connect_map_regions, :spread_map_regions}
+visualize_map_regions = (args) ->
+    if not DebugUtils.is_debug_visualization()
+        return
+    b2world = _b2_world_from_args(args)
+    b2world\visualize(args.title)
+
+return {:connect_map_regions, :spread_map_regions, :visualize_map_regions}

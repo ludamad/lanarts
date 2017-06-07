@@ -21,18 +21,18 @@ convex_hull = (polygons) ->
         for point in polygon
             _tinsert points, point
 
-    local p = #points
+    p = #points
 
     _lexicographical_point_sort(points)
 
-    local lower = {}
+    lower = {}
     for i = 1, p
         while (#lower >= 2 and cross(lower[#lower - 1], lower[#lower], points[i]) <= 0)
             _tremove(lower, #lower)
 
         _tinsert(lower, points[i])
 
-    local upper = {}
+    upper = {}
     for i = p, 1, -1
         while (#upper >= 2 and cross(upper[#upper - 1], upper[#upper], points[i]) <= 0)
             _tremove(upper, #upper)
@@ -55,9 +55,22 @@ scale_polygon = (points, scale_x, scale_y) ->
         y = (y - cy)*scale_y + cy
         {x, y}
 
-polygon_bbox = (polygon) ->
-
+polygon_bbox = (polygon) -> 
+    x1,y1 = math.huge, math.huge
+    x2,y2 = -math.huge, -math.huge
+    for {x, y} in *polygon
+        x1, y1 = math.min(x1, x), math.min(y1, y)
+        x2, y2 = math.max(x2, x), math.max(y2, y)
+    return {x1, y1, x2, y2}
 
 polygon_set_bbox = (polygons) ->
+    x1,y1 = math.huge, math.huge
+    x2,y2 = -math.huge, -math.huge
+    for polygon in *polygons
+        for {x, y} in *polygon
 
-return {:convex_hull, :scale_polygon}
+            x1, y1 = math.min(x1, x), math.min(y1, y)
+            x2, y2 = math.max(x2, x), math.max(y2, y)
+    return {x1, y1, x2, y2}
+
+return {:convex_hull, :scale_polygon, :polygon_set_bbox, :polygon_bbox}
