@@ -56,9 +56,7 @@ create_body = (world, polygons, density = 0.0, x = 0.0, y = 0.0) ->
         body\CreateFixture with b2.PolygonShape()
             \Set(shape),
             density
-    else nil
     return {:body, :fixtures, is_dynamic: density > 0.0}
-
 
 local body_distance
 _body_distance = (o1, others) ->
@@ -78,7 +76,7 @@ body_distance = (o1, o2) ->
     t2, fixs2 = o2.body\GetTransform(), o2.fixtures
     return shape_set_distance(t1, fixs1, t2, fixs2)
 
-set_velocities_to_fixed_set = (bodies, fixed_bodies, clump_once_near = false) =>
+set_velocities_to_fixed_set = (bodies, fixed_bodies, clump_once_near = false) ->
     for o in *bodies
         pos = o.body\GetPosition()
         p1, p2, dist = body_distance(o, fixed_bodies)

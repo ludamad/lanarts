@@ -55,4 +55,9 @@ scale_polygon = (points, scale_x, scale_y) ->
         y = (y - cy)*scale_y + cy
         {x, y}
 
+polygon_bbox = (polygon) ->
+
+
+polygon_set_bbox = (polygons) ->
+
 return {:convex_hull, :scale_polygon}

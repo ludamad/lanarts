@@ -1,4 +1,5 @@
 B2GenerateUtils = require "newmaps.B2GenerateUtils"
+GenerateUtils = require "maps.GenerateUtils"
 
 -- Define a map region in terms of polygons
 -- Should be within (0, 0) to (map.w, map.h)
@@ -22,10 +23,15 @@ make_polygon = (x, y, w, h, points) ->
 sample_shape = () ->
     make_map_regions = (n) ->
         return for i=4,3 + n 
-            polygon = make_polygon(i * 10, i * 10, i * math.random() + 3)
+            -- Start at random locations:
+            polygon = make_polygon rng\random(-200, 200), 
+                rng\random(-200,200), 
+                i * 10, -- w
+                i * 10, -- h
+                i * math.random() + 3
             MapRegion.create {polygon}
 
-    return B2GenerateUtils.spread_map_regions {
+    B2GenerateUtils.spread_map_regions {
         :rng
         regions: make_map_regions(4)
         fixed_polygons: {make_polygon(0, 0, 8, 8)}
@@ -33,6 +39,7 @@ sample_shape = () ->
         mode: 'towards_fixed_shapes'
         clump_once_near: true
     }
+
 
 __visualize = () ->
     SourceMap = require "core.SourceMap"

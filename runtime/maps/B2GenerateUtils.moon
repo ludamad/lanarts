@@ -204,8 +204,8 @@ _spread_shapes = (args) ->
         b2world.world\Step(0.1, n_subiterations, n_subiterations)
         if i % 10 == 0
             b2world\visualize("Iteration #{i}")
-    return for {:body} in *b2world.bodies
-        return body\GetTransform()
+    return for {:body} in *b2world.dynamic_bodies
+        body\GetTransform()
 
 -- Standardizes the conversion from map regions and fixed polygons to a B2World
 _b2_world_from_args = (args) ->
@@ -230,7 +230,7 @@ spread_map_regions = (args) ->
     assert #transforms == #args.regions, "Should have one transform per region"
 
     for i=1,#transforms
-        args.regions[i] = apply_transform transforms[i], args.regions[i]
+        args.regions[i] = B2Utils.transform_polygon(transforms[i], args.regions[i])
 
 connect_map_regions = (args) ->
     assert args.rng, "Need 'rng' object"
