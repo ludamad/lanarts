@@ -43,7 +43,6 @@ function M.spawn_enemy(map, type, tile_xy)
     }
     table.insert(map.instances, object)
     return object
-
 end
 
 function M.spawn_epic_store(map, items, tile_xy)

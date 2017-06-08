@@ -966,24 +966,29 @@ test_vault_create = (template) ->
         }
 
 test_create = (offset = 1) ->
-    dungeon = require("maps.Arena")
-    MapSeq = MapSequence.create {preallocate: 1}
-    return NewDungeons.make_linear_dungeon {
-        :MapSeq
-        :offset
-        dungeon_template: dungeon.TEMPLATE
-        on_generate: (floor) ->
-            assert(floor)
-            log_verbose "on_generate", floor
-        sprite_up: (floor) ->
-            return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
-        sprite_down: (floor) ->
-            return "spr_gates.enter"
-        portals_up: (floor) ->
-            return if floor == 1 then 0 else 3
-        portals_down: (floor) ->
-            return if floor == dungeon.N_FLOORS then 0 else 3
-    }
+    Arena = require("maps.Arena")
+    rng = require("mtwist").create(random(0,2^30))
+    game_map, map, player_spawn_points = Arena.generate(rng)
+    World.players_spawn(game_map, player_spawn_points)
+    return game_map
+
+    ---MapSeq = MapSequence.create {preallocate: 1}
+    --return NewDungeons.make_linear_dungeon {
+    --    :MapSeq
+    --    :offset
+    --    dungeon_template: dungeon.TEMPLATE
+    --    on_generate: (floor) ->
+    --        assert(floor)
+    --        log_verbose "on_generate", floor
+    --    sprite_up: (floor) ->
+    --        return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
+    --    sprite_down: (floor) ->
+    --        return "spr_gates.enter"
+    --    portals_up: (floor) ->
+    --        return if floor == 1 then 0 else 3
+    --    portals_down: (floor) ->
+    --        return if floor == dungeon.N_FLOORS then 0 else 3
+    --}
 
 overworld_create = () ->
     MapSeq = MapSequence.create {preallocate: 1}
