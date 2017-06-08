@@ -144,7 +144,7 @@ static void run_bare_lua_state(int argc, char** argv) {
     lua_State* L = init_luastate();
 
     if (std::getenv("LANARTS_HEADLESS") == NULL) {
-        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0) {
                 printf("SDL_Init failed: %s\n", SDL_GetError());
                 exit(1);
         }
@@ -244,7 +244,7 @@ static bool run_game_instance(const vector<string>& args) {
 static void run_outer_game_loop(const vector<string>& args) {
     // Initialize SDL if we are not in headless mode
     if (std::getenv("LANARTS_HEADLESS") == NULL) {
-        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0) {
             printf("SDL_Init failed: %s\n", SDL_GetError());
             exit(1);
         }

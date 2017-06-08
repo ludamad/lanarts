@@ -96,44 +96,6 @@ void PlayerInst::deinit(GameState* gs) {
 	gs->collision_avoidance().remove_object(collision_simulation_id());
 }
 
-static Pos seen_square_in_area(MTwist& mt, GameTiles& tiles) {
-	Pos p, ret;
-	do {
-		p.x = mt.rand(tiles.tile_width());
-		p.y = mt.rand(tiles.tile_height());
-	} while (!tiles.was_seen(p) || tiles.is_solid(p));
-	return centered_multiple(p, TILE_SIZE);
-}
-
-// Assumes overworld == map ID 0
-static void spawn_in_overworld(GameState* gs, PlayerInst* player) {
-	int current_map = gs->game_world().get_current_level_id();
-	int overworld_map = 0;
-	GameMapState* overworld = gs->game_world().get_level(overworld_map);
-	Pos sqr = seen_square_in_area(gs->rng(), overworld->tiles());
-
-	for (int i = 0; i < gs->player_data().all_players().size(); i++) {
-		PlayerDataEntry& pde = gs->player_data().all_players()[i];
-		if (pde.player_inst.get() == player) {
-			pde.action_queue.clear_actions();
-		}
-	}
-
-	gs->game_chat().add_message(
-			player->is_local_player() ?
-					"You have respawned!" : "Your ally has respawned!",
-			Colour(100, 150, 150));
-	if (current_map != overworld_map) {
-		gs->game_world().level_move(player->id, sqr.x, sqr.y, current_map,
-				overworld_map);
-	} else {
-		player->update_position(sqr.x, sqr.y);
-		if (player->is_local_player()) {
-			gs->view().sharp_center_on(player->ipos());
-		}
-	}
-}
-
 //Either finds new or shifts target
 void PlayerInst::shift_autotarget(GameState* gs) {
 	const std::vector<obj_id>& mids = gs->monster_controller().monster_ids();

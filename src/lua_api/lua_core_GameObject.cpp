@@ -589,7 +589,8 @@ static GameInst* player_create(LuaStackValue args) {
 	using namespace luawrap;
 	GameState* gs = lua_api::gamestate(args);
 	Pos xy = args["xy"].as<Pos>();
-	GameInst* inst = new PlayerInst(CombatStats(), -1, xy, PLAYER_TEAM, false);
+	int team = luawrap::defaulted(args["team"], PLAYER_TEAM);
+	GameInst* inst = new PlayerInst(CombatStats(), -1, xy, team, false);
 	gs->player_data().register_player(args["name"].to_str(), (PlayerInst*)inst, -1, -1);
 	return initialize_object(gs, inst, args, &base_object_exclusions);
 }
