@@ -8,9 +8,9 @@ SourceMap = require "core.SourceMap"
 -- Define a map region in terms of polygons
 -- Should be within (0, 0) to (map.w, map.h)
 MapRegion = newtype {
-    init: (polygons) =>
+    init: (polygons, tunnels = {}) =>
         @polygons = assert polygons
-        @tunnels = {}
+        @tunnels = tunnels
     apply: (args) =>
         {:map, :area, :operator} = args
         for polygon in *@polygons
@@ -36,6 +36,26 @@ MapRegion = newtype {
         return nil
 }
 
+combine_map_regions = (regions) ->
+    c_polygons = {}
+    c_tunnels = {}
+    for {:polygons, :tunnels} in *regions
+        for p in *polygons
+            append c_polygons, p
+        for t in *tunnels
+            append c_tunnels, t
+    return MapRegion.create(c_polygons, c_tunnels)
+
+map_regions_bbox = (regions) ->
+    x1,y1 = math.huge, math.huge
+    x2,y2 = -math.huge, -math.huge
+    for {:polygons} in *regions
+        for polygon in *polygons
+            for {x, y} in *polygon
+                x1, y1 = math.min(x1, x), math.min(y1, y)
+                x2, y2 = math.max(x2, x), math.max(y2, y)
+    return {x1, y1, x2, y2}
+
 -- Main is used if the module is run directly:
 main = (raw_args) ->
     argparse = require "argparse"
@@ -47,16 +67,6 @@ main = (raw_args) ->
     rng = require("mtwist").create(os.time())
     make_polygon = (x, y, w, h, points) ->
         return GenerateUtils.skewed_ellipse_points(rng, {x,y}, {w, h}, points)
-    map_regions_bbox = (regions) ->
-        x1,y1 = math.huge, math.huge
-        x2,y2 = -math.huge, -math.huge
-        for {:polygons} in *regions
-            for polygon in *polygons
-                for {x, y} in *polygon
-                    x1, y1 = math.min(x1, x), math.min(y1, y)
-                    x2, y2 = math.max(x2, x), math.max(y2, y)
-        return {x1, y1, x2, y2}
-
     sample_shape = () ->
         make_map_regions = (n) ->
             regions = {}
@@ -150,4 +160,4 @@ main = (raw_args) ->
 
     DebugUtils.debug_show_source_map(map, 1, 1)
 
-return {:MapRegion, :main}
+return {:MapRegion, :main, :combine_map_regions, :map_regions_bbox}

@@ -17,6 +17,7 @@
 #include "map_misc_ops.h"
 
 #include "lua_ldungeon_impl.h"
+#include "../ldungeon_assert.h"
 
 namespace ldungeon_gen {
 
@@ -263,6 +264,25 @@ namespace ldungeon_gen {
 						lua_square_get(args)));
 		ptr->luafields = args;
 		return ptr;
+	}
+
+	static void map_copy(Map& map1, BBox area1, Map& map2, BBox area2) {
+            LDUNGEON_ASSERT(area1.size() == area2.size());
+            int dx = area2.x1 - area1.x1;
+            int dy = area2.y1 - area1.y1;
+
+            FOR_EACH_BBOX(area1, x, y) {
+                map2[Pos(x + dx, y + dy)] = map1[Pos(x,y)];
+            }
+	}
+	
+        static void lmap_copy(LuaStackValue args) {
+            using namespace luawrap;
+            MapPtr from = args["from"].as<MapPtr>();
+            BBox from_area = defaulted(args["from_area"], BBox(0,0, from->width(), from->height()));
+            MapPtr to = args["to"].as<MapPtr>();
+            BBox to_area = defaulted(args["to_area"], BBox(0,0, to->width(), to->height()));
+            map_copy(*from, from_area, *to, to_area);
 	}
 
 	/*****************************************************************************
@@ -703,6 +723,7 @@ namespace ldungeon_gen {
 
 	static void lua_register_placement_functions(const LuaValue& submodule) {
 		submodule["map_create"].bind_function(map_create);
+		submodule["map_copy"].bind_function(lmap_copy);
 		submodule["rectangle_operator"].bind_function(rectangle_operator);
 		submodule["tunnel_operator"].bind_function(tunnel_operator);
 		submodule["rectangle_apply"].bind_function(rectangle_apply);

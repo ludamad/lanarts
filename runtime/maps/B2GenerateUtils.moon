@@ -231,7 +231,8 @@ spread_map_regions = (args) ->
         sync: (i, body) ->
             r = regions[i]
             t = body\GetTransform()
-            r.polygons = for p in *r.polygons
+            -- Note: transform polygons in-place, as they can be shared between MapRegion's
+            for p in *r.polygons
                 B2Utils.transform_polygon(t, p)
     }
 

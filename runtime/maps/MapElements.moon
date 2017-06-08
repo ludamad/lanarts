@@ -1,4 +1,4 @@
-M = {}
+M = nilprotect {}
 
 _node = (handler_map) ->
     handlers = {}
@@ -40,20 +40,35 @@ typecheck = (type) -> (name) -> (obj, args) ->
         error("Invalid argument type #{name} = #{val}")
     obj[name] = args[name]
 
+optional = (type) -> (name) -> (obj, args) ->
+    val = args[name] 
+    if val == nil
+        return
+    if typeof(val) ~= type
+        error("Invalid argument type #{name} = #{val}")
+    obj[name] = args[name]
+
 _CONNECTION_SCHEMES = {
     direct: true
 }
 
-M.Area = _node {
-    name: typecheck("string")
-    subareas: typecheck("table") -- TODO
-    connection_scheme: from_set(_CONNECTION_SCHEMES)
+_SPREAD_SCHEMES = {
+    random: true
+    box2d: true
 }
 
-M.Polygon = _node {
-    name: typecheck("string")
-    points: typecheck("table")
+M.ConnectedRegions = _node {
+    name: optional "string"
+    regions: typecheck "table"
+    connection_scheme: from_set(_CONNECTION_SCHEMES)
+    spread_scheme: from_set(_SPREAD_SCHEMES)
+}
 
+M.FilledRegion = _node {
+    name: optional "string"
+    shape: typecheck "string"
+    size: typecheck "table"
+    --rotation: optional "string" -- TODO
 }
 
 for k, v in pairs(M)

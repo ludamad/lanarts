@@ -95,9 +95,10 @@ set_velocities_to_point = (bodies, x, y) ->
     return nil
 
 transform_polygon = (t, polygon) ->
-    return for {x, y} in *polygon
+    for point in *polygon
+        {x, y} = point
         vec = b2.b2Mul(t, b2.Vec2(x, y))
-        {vec.x, vec.y}
+        point[1], point[2] = vec.x, vec.y
 
 return {
     :shape_distance, :shape_set_distance, :ray_cast, :create_body
