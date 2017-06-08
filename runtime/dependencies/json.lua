@@ -26,8 +26,6 @@
 -- Modified 02/27/2010 - v0.4 Added unicode handling (written by David Fifield). Renamed toJson
 -- and fromJson intogenerate() and parse(), implemented more proper numeric parsing and added some more error checking.
 
-module("json", package.seeall)
-
 -- Javascript null representation, see explanation above
 NULL = {}
 
@@ -64,7 +62,7 @@ end
 --- Makes a table be treated as a JSON Array when generating JSON
 --  A table treated as an Array has all non-number indices ignored.
 -- () param t a table to be treated as an array
-function make_array(t)
+local function make_array(t)
     local mt = getmetatable(t) or {}
     mt["json"] = "array"
     setmetatable(t, mt)
@@ -73,7 +71,7 @@ end
 --- Makes a table be treated as a JSON Object when generating JSON
 --  A table treated as an Object has all non-number indices ignored.
 -- () param t a table to be treated as an object
-function make_object(t)
+local function make_object(t)
     local mt = getmetatable(t) or {}
     mt["json"] = "object"
     setmetatable(t, mt)
@@ -83,7 +81,7 @@ end
 -- () param var a variable to inspect
 -- () return a string containing the JSON type. Valid values are "array",
 --        "object", "number", "string", "boolean", and "null"
-function typeof(var)
+local function typeof(var)
     local t = type(var)
     if var == NULL then
         return "null"
@@ -103,7 +101,7 @@ end
 --- Creates json data from an object
 --@param obj a table containing data
 --@return a string containing valid json
-function generate(obj)
+local function generate(obj)
 
     -- NULL-check must be performed before
     -- checking type == table, since the NULL-object
@@ -372,7 +370,7 @@ end
 --@param data a json string
 --@return status true if ok, false if bad
 --@return an object representing the json, or error message
-function parse(data)
+local function parse(data)
     local parser = Json:new(data)
     local result = parser:parseStart()
     if(parser.error) then
@@ -415,7 +413,7 @@ local TESTS = {
     '{"a}": 1}',        -- Should become Lua {"a}" = 1}
     '["key": "value"]', -- error
 }
-function test()
+local function test()
     print("Tests running")
     local i,v,res,status
     for i,v in pairs(TESTS) do
@@ -431,4 +429,7 @@ function test()
     end
 end
 
-return getfenv()
+-- Ludamad edit:
+return {
+    parse = parse
+}
