@@ -89,7 +89,7 @@ namespace ldungeon_gen {
 
         FOR_EACH_BBOX(area, x, y) {
             if (map[Pos(x,y)].matches(unfilled) && !map[Pos(x,y)].matches(marked)) {
-            //    map[Pos(x,y)].apply(fill);
+                map[Pos(x,y)].apply(fill);
             }
         }
     }

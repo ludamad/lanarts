@@ -14,13 +14,11 @@ MapRegion = newtype {
     apply: (args) =>
         {:map, :area, :operator} = args
         for polygon in *@polygons
-            pretty(polygon)
             SourceMap.polygon_apply {
                 :map, :area, :operator
                 points: polygon
             }
         for {:polygon} in *@tunnels
-            pretty(polygon)
             SourceMap.polygon_apply {
                 :map, :area, :operator
                 points: polygon
@@ -133,8 +131,6 @@ main = (raw_args) ->
         }
     print "Time spent rasterizing polygons: ", timer\get_milliseconds()
 
-    DebugUtils.debug_show_source_map(map, 1, 1)
-
     timer = timer_create()
     SourceMap.area_fill_unconnected {
         :map, 
@@ -142,7 +138,7 @@ main = (raw_args) ->
         unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
         mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
         marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
-        fill_operator: {content: 1} --{content: 0, add: SourceMap.FLAG_SOLID, remove: SourceMap.FLAG_SEETHROUGH}
+        fill_operator: {content: 0, add: SourceMap.FLAG_SOLID, remove: SourceMap.FLAG_SEETHROUGH}
     }
     print "Time spent filling unconnected: ", timer\get_milliseconds()
 
