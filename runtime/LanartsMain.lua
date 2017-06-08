@@ -47,13 +47,6 @@ function Engine.resources_load(...)
         return ret
     end
 
-    _G.items = {}
-    _G.spells = {}
-    _G.effects = {}
-    _G.enemies = {}
-    _G.sprites = {}
-    _G.projectiles = {}
-    _G.classes = {}
     -- DO NOT mess with the order of these willy nilly.
     _req "effects.Effects"
     _req "spells.Spells"

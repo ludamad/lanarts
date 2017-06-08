@@ -49,12 +49,14 @@ optional = (type) -> (name) -> (obj, args) ->
     obj[name] = args[name]
 
 _CONNECTION_SCHEMES = {
+    none: true
     direct: true
 }
 
 _SPREAD_SCHEMES = {
     random: true
     box2d: true
+    box2d_solid_center: true
 }
 
 M.ConnectedRegions = _node {

@@ -134,9 +134,9 @@ projectile_create = (args, for_enemy = false) ->
         -- For enemies, we want all damage to come from 'damage'.
         -- The strength and magic stats work differently for enemies thusly.
         args.power or= {base: {0, 0}}
-        damage = damage_multiplier * (args.cooldown / 60 * args.damage)
         args.damage or= {base: {0, 0}, strength: args.damage_type.physical, magic: args.damage_type.magic}
     else
+        --damage = damage_multiplier * (args.cooldown / 60 * args.damage)
         args.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
         args.power or= {base: {0, 0}, strength: args.damage_type.physical, magic: args.damage_type.magic}
     args.spr_item or= "none"

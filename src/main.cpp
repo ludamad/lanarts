@@ -4,6 +4,8 @@
 #include <ctime>
 #include <csignal>
 
+#include <memory>
+
 #include <lcommon/fatal_error.h>
 #include <lcommon/unittest.h>
 
@@ -33,6 +35,8 @@
 #include "lua_api/lua_api.h"
 #include "lua_api/lua_yaml.h"
 #include "lua_api/lua_api.h"
+
+using namespace std;
 
 extern "C" {
 // From dependency lpeg, lpeg bindings for moonscript:
@@ -99,8 +103,8 @@ const char* traceback(lua_State* L) {
     return lua_tostring(L, -1);
 }
 
-static GameState* init_gamestate(bool reinit) {
-        lua_State* L = init_luastate();
+static shared_ptr<GameState> init_gamestate() {
+    lua_State* L = init_luastate();
 	GameSettings settings; // Initialized with defaults
 	// Load the manual settings
 	if (!load_settings_data(settings, "settings.yaml")) {
@@ -113,12 +117,6 @@ static GameState* init_gamestate(bool reinit) {
 		printf("Problem creating save directory, will not be able to create save files!\n");
 	}
 
-	if (!reinit){
-		if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-			printf("SDL_Init failed: %s\n", SDL_GetError());
-			exit(1);
-		}
-	}
         // Width 0 resolves to monitor width:
         Size screen_size = ldraw::screen_size();
         if (settings.view_width == 0) {
@@ -139,18 +137,18 @@ static GameState* init_gamestate(bool reinit) {
 	luawrap::globals(L)["__initialize_internal_graphics"].bind_function(__initialize_internal_graphics);
 	luawrap::globals(L)["_lanarts_unit_tests"].bind_function(run_unittests);
 
-	return gs;
+	return shared_ptr<GameState>(gs);
 }
 
 static void run_bare_lua_state(int argc, char** argv) {
-        lua_State* L = init_luastate();
+    lua_State* L = init_luastate();
 
-        if (std::getenv("LANARTS_HEADLESS") == NULL) {
-            if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-                    printf("SDL_Init failed: %s\n", SDL_GetError());
-                    exit(1);
-            }
+    if (std::getenv("LANARTS_HEADLESS") == NULL) {
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+                printf("SDL_Init failed: %s\n", SDL_GetError());
+                exit(1);
         }
+    }
 
         // When running a bare state, pass an empty GameSettings object:
 	GameState* gs = new GameState(GameSettings(), L);
@@ -158,97 +156,109 @@ static void run_bare_lua_state(int argc, char** argv) {
 	lua_api::register_api(gs, L);
 
 	LuaValue main_func = luawrap::dofile(L, "Main2.lua");
-        if (!main_func.isnil()) {
-            main_func.push();
-            luawrap::call<void>(L, std::vector<std::string>(argv + 1, argv + argc));
-        }
-        // Cleanup
-        delete gs;
+    if (!main_func.isnil()) {
+        main_func.push();
+        luawrap::call<void>(L, vector<string>(argv + 1, argv + argc));
+    }
+    // Cleanup
+    delete gs;
+    lanarts_system_quit();
 }
 
-static void run_engine(int argc, char** argv) {
-	bool reinit = false;
-	label_StartOver:
-	GameState* gs = init_gamestate(reinit);
-	reinit = true;
+// Returns: Should we keep running our outer game loop?
+static bool run_game_instance(const vector<string>& args) {
+    shared_ptr<GameState> gs_owner = init_gamestate();
+    GameState* gs = gs_owner.get();
 
-	/* Load low-level Lua bootstrapping code.
-	 * Implements the module system used by the rest of the engine,
-	 * and other important utilities.
-	 */
-	LuaValue entry_point = luawrap::dofile(gs->luastate(), "Main.lua");
+    /* Load low-level Lua bootstrapping code.
+     * Implements the module system used by the rest of the engine,
+     * and other important utilities.
+     */
+    LuaValue entry_point = luawrap::dofile(gs->luastate(), "Main.lua");
 
-	LuaValue engine = luawrap::globals(gs->luastate())["Engine"];
+    LuaValue engine = luawrap::globals(gs->luastate())["Engine"];
 
-	bool did_exit, should_continue;
+    bool did_exit, should_continue;
 
-	entry_point.push();
-	should_continue = luawrap::call<bool>(gs->luastate(),
-			std::vector<std::string>(argv + 1, argv + argc));
-	if (!should_continue) {
-		/* User has quit! */
-		goto label_Quit;
-	}
+    entry_point.push();
+    should_continue = luawrap::call<bool>(gs->luastate(), args);
+    if (!should_continue) {
+        /* User has quit! */
+        return false;
+    }
 
-	engine["menu_start"].push();
-	did_exit = !luawrap::call<bool>(gs->luastate());
-	save_settings_data(gs->game_settings(), "saves/saved_settings.yaml"); // Save settings from menu
-	if (did_exit) {
-		/* User has quit! */
-		goto label_Quit;
-	}
+    engine["menu_start"].push();
+    did_exit = !luawrap::call<bool>(gs->luastate());
+    save_settings_data(gs->game_settings(), "saves/saved_settings.yaml"); // Save settings from menu
+    if (did_exit) {
+        /* User has quit! */
+        return false;
+    }
 
+    try {
+        gs->start_connection();
+    } catch (const LNetConnectionError& err) {
+        fprintf(stderr, "The connection attempt was aborted%s\n",
+                        err.what());
+        return true; // Restart on connection abort TODO make this smoother
+    }
+
+    init_game_data(gs->luastate());
+    engine["resources_load"].push();
+    luawrap::call<void>(gs->luastate());
+
+    if (gs->game_settings().conntype == GameSettings::SERVER) {
+        engine["pregame_menu_start"].push();
+        bool did_exit = !luawrap::call<bool>(gs->luastate());
+
+        if (did_exit) { /* User has quit! */
+            return false;
+        }
+    }
+
+    if (gs->start_game()) {
         try {
-            gs->start_connection();
+            engine["game_start"].push();
+            luawrap::call<void>(gs->luastate());
         } catch (const LNetConnectionError& err) {
-                fprintf(stderr, "The connection attempt was aborted%s\n",
-                                err.what());
-                goto label_StartOver;
+            fprintf(stderr, "The game must end due to a connection termination:%s\n",
+                    err.what());
         }
 
+        if (!gs->io_controller().user_has_exit()) {
+            if (gs->game_settings().conntype != GameSettings::CLIENT) {
+                save_settings_data(gs->game_settings(),
+                        "saves/saved_settings.yaml"); // Save settings from in-game
+            }
+            return true; // Keep looping
+        }
+    }
 
-	engine["resources_load"].push();
-	init_game_data(gs->luastate());
-	luawrap::call<void>(gs->luastate());
+    if (gs->game_settings().conntype != GameSettings::CLIENT) {
+        save_settings_data(gs->game_settings(), "saves/saved_settings.yaml"); // Save settings from in-game
+    }
+    return false; // Game over
+}
 
-	if (gs->game_settings().conntype == GameSettings::SERVER) {
-		engine["pregame_menu_start"].push();
-		bool did_exit = !luawrap::call<bool>(gs->luastate());
+// Run the loop that completely restarts the game (creating a new GameState) when the user fully exits
+static void run_outer_game_loop(const vector<string>& args) {
+    // Initialize SDL if we are not in headless mode
+    if (std::getenv("LANARTS_HEADLESS") == NULL) {
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+            printf("SDL_Init failed: %s\n", SDL_GetError());
+            exit(1);
+        }
+    }
+    // Run game instances until the user asks to quit
+    bool should_continue = true;
+    while (should_continue) {
+        should_continue = run_game_instance(args);
+        if (std::getenv("LANARTS_HARD_QUIT") != NULL) { // TODO hack!!
+            should_continue = false;
+        }
+    }
 
-		if (did_exit) { /* User has quit! */
-			goto label_Quit;
-		}
-	}
-
-	if (gs->start_game()) {
-		try {
-			engine["game_start"].push();
-			luawrap::call<void>(gs->luastate());
-		} catch (const LNetConnectionError& err) {
-			fprintf(stderr, "The game must end due to a connection termination:%s\n",
-					err.what());
-		}
-
-		if (!gs->io_controller().user_has_exit()) {
-			if (gs->game_settings().conntype != GameSettings::CLIENT) {
-				save_settings_data(gs->game_settings(),
-						"saves/saved_settings.yaml"); // Save settings from in-game
-			}
-			delete gs;
-                        
-			goto label_StartOver;
-		}
-	}
-
-	if (gs->game_settings().conntype != GameSettings::CLIENT) {
-		save_settings_data(gs->game_settings(), "saves/saved_settings.yaml"); // Save settings from in-game
-	}
-
-	label_Quit:
-
-	lanarts_system_quit();
-
-	delete gs;
+    lanarts_system_quit();
 }
 
 /* Handle Ctrl+C */
@@ -266,11 +276,11 @@ int main(int argc, char** argv) {
 #if NDEBUG
 	try {
 #endif
-            if (argc >= 2 && std::string(argv[1]) == "bare") { // TODO, stop-gap measure until better solution
-                run_bare_lua_state(argc - 1, argv + 1); // Remove 'bare' argument
-            } else {
-		run_engine(argc, argv);
-            }
+    if (argc >= 2 && std::string(argv[1]) == "bare") { // TODO, stop-gap measure until better solution
+        run_bare_lua_state(argc - 1, argv + 1); // Remove 'bare' argument
+    } else {
+        run_outer_game_loop(vector<string>{argv + 1, argv + argc});
+    }
 #if NDEBUG
 	} catch (const std::exception& err) {
 		fprintf(stderr, "%s\n", err.what());

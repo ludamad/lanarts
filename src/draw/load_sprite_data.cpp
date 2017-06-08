@@ -19,27 +19,6 @@
 
 using namespace std;
 
-/* Either given as a list of filenames or a base name, extension,
- * and number of sequentially numbered files */
-static FilenameList parse_imgfilelist(const YAML::Node& node) {
-	int seq = parse_defaulted(node, "variations", 0);
-	bool is_seq = seq > 0;
-
-	FilenameList filenames;
-
-	if (is_seq) {
-		string tilefile = parse_str(node["file"]);
-		std::string ext = parse_str(node["extension"]);
-		for (int i = 0; i < seq; i++) {
-			filenames.push_back(
-					format("%s%d%s", tilefile.c_str(), i, ext.c_str()));
-		}
-	} else {
-		node["file"] >> filenames;
-	}
-	return filenames;
-}
-
 void load_tile_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	TileEntry entry;

@@ -40,6 +40,7 @@ void StoreInst::draw(GameState* gs) {
 	if (gs->object_radius_test(this, NULL, 0, player_colfilter, x, y, 24)) {
 		drawcolour = Colour(255, 255, 100, 255);
 	}
+
 	if (last_seen_spr > -1) {
 		draw_sprite_centered(gs->view(), last_seen_spr, x, y, 0,0, spr_frame, drawcolour);
 	}

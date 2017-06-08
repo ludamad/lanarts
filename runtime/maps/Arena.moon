@@ -1,6 +1,5 @@
 import MapRegion, combine_map_regions, map_regions_bbox from require "maps.MapRegion"
 
-
 World = require "core.World"
 {:MapCompiler} = require "maps.MapCompiler"
 MapUtils = require "maps.MapUtils"
@@ -12,16 +11,13 @@ Map = require "core.Map"
 import ConnectedRegions, FilledRegion
     from require "maps.MapElements"
 
-node = (args) ->
-
 TEMPLATE = ConnectedRegions {
     regions: for i=1,10
         FilledRegion {
-            --shape: 'deformed_ellipse'
-            shape: 'windows'
-            size: {25, 25}
+            shape: 'deformed_ellipse'
+            size: {5, 5}
         }
-    spread_scheme: 'box2d'
+    spread_scheme: 'box2d_solid_center'
     connection_scheme: 'direct'
 }
 
@@ -57,10 +53,13 @@ generate = (rng) ->
     -- Place items
     --compiler\for_all_nodes (node) =>
 
-
     player_spawn_points = for player in *World.players
         {x, y} = MapUtils.random_square(compiler.map, nil)
         {x*32+16,y*32+16}
+    for enemy, amount in pairs loadstring(os.getenv "ARENA_ENEMIES")()
+        for i=1,amount
+            {x, y} = MapUtils.random_square(compiler.map, nil)
+            MapUtils.spawn_enemy(compiler.map, enemy, {x, y})
     return compiler\compile(), compiler.map, player_spawn_points
 
 main = () ->

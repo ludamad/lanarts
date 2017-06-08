@@ -23,7 +23,6 @@ projectile_id projectile_from_lua(lua_State* L, int idx);
 weapon_id weapon_from_lua(lua_State* L, int idx);
 tileset_id tileset_from_lua(lua_State* L, int idx);
 
-extern LuaValue lua_sprites, lua_armours, lua_enemies, lua_weapons,
-		_lua_projectiles, _lua_items, lua_dungeon, lua_classes, lua_spells;
+extern LuaValue lua_sprites, lua_enemies, _lua_items, lua_dungeon, lua_classes, lua_spells;
 
 #endif /* LUA_GAME_DATA_H_ */

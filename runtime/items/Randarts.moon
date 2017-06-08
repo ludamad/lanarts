@@ -404,7 +404,6 @@ define_weapon_randarts = (rng) ->
         -- Judge whether its a weapon by a cooldown being present
         if item.randart_sprites ~= nil and item.cooldown ~= nil
             append candidates, item
-        print name, item
     for item in *candidates
         for i=1,(item.randart_weight or 20) * 4
             template = define_randart(rng, item, item.randart_sprites, apply_enchantment)

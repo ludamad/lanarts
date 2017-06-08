@@ -23,7 +23,6 @@ MapCompiler = newtype {
         @operators = {}
         @root_node = assert args.root
         @rng = assert args.rng
-        @instances = {}
         -- Maps from node -> data
         @_children = {}
         @_regions = {}
@@ -54,23 +53,42 @@ MapCompiler = newtype {
                     polygons = MapRegionShapes.get_shape_polygons(name, x, y, w, h)
                     return polygons
     _spread_regions: (scheme, regions) =>
-        assert scheme == 'box2d'
-        B2GenerateUtils.spread_map_regions {
-            rng: @rng
-            :regions 
-            fixed_polygons: @_generate_shape('deformed_ellipse', 0,0,4,4)
-            n_iterations: 10
-            mode: 'towards_fixed_shapes'
-            clump_once_near: true
-        }
-
+        timer = timer_create()
+        switch scheme
+            when 'box2d'
+                B2GenerateUtils.spread_map_regions {
+                    rng: @rng
+                    :regions 
+                    n_iterations: 100
+                    mode: 'towards_center'
+                    clump_once_near: true
+                }
+            when 'box2d_solid_center'
+                B2GenerateUtils.spread_map_regions {
+                    rng: @rng
+                    :regions 
+                    fixed_polygons: @_generate_shape('deformed_ellipse', 0,0,4,4)
+                    n_iterations: 100
+                    mode: 'towards_fixed_shapes'
+                    clump_once_near: true
+                }
+            else
+                error("Unexpected")
+        log_verbose "Spread regions time: #{timer\get_milliseconds()}ms"
     _connect_regions: (scheme, regions) =>
-        assert scheme == 'direct'
-        B2GenerateUtils.connect_map_regions {
-            rng: @rng
-            :regions 
-            n_connections: #regions * 2
-        }
+        switch scheme
+            when 'direct'
+                timer = timer_create()
+                B2GenerateUtils.connect_map_regions {
+                    rng: @rng
+                    :regions 
+                    n_connections: #regions * 2
+                }
+                log_verbose "Connect regions time: #{timer\get_milliseconds()}ms"
+            when 'none'
+                nil
+            else
+                error("Unexpected")
 
     -- Sets node_children and node_regions
     _prepare_map_topology: (node) =>
@@ -140,6 +158,7 @@ MapCompiler = newtype {
             :label
             size: {w + padding*2, h + padding*2}
             flags: SourceMap.FLAG_SOLID
+            instances: {}
             :content 
         }
 
@@ -155,7 +174,7 @@ MapCompiler = newtype {
         return Map.create {
             map: @map
             label: @map.label
-            instances: @instances
+            instances: @map.instances
             wandering_enabled: true
         }
 }
