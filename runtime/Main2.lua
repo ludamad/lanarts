@@ -17,12 +17,18 @@ local function main(raw_args)
     parser:option("-R --require", "Require lua modules."):count("*")
     -- Parse arguments
     local args = parser:parse(raw_args)
+    local req_call = function(modulename) 
+        local module = require(modulename)
+        if type(module) == "table" and rawget(module, "main") then
+            module.main(raw_args)
+        end
+    end
     for _, filename in ipairs(args.lua) do
         local modulename = filename:gsub(".moon", ""):gsub(".lua", ""):gsub("/", ".")
-        require(modulename)
+        req_call(modulename)
     end
     for _, modulename in ipairs(args.require) do
-        require(modulename)
+        req_call(modulename)
     end
 end
 

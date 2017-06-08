@@ -78,7 +78,7 @@ fi
 if handle_flag "--optimize" || handle_flag "-O" ; then
     export BUILD_OPTIMIZE=1
 fi
-if handle_flag "--sanitize" || handle_flag "-S" ; then
+if handle_flag "--sanitize"  ; then
     export BUILD_SANITIZE=1
 fi
 if handle_flag "--profile-gen" || handle_flag "--pgen" ; then

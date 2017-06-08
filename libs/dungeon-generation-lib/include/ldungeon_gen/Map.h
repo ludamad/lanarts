@@ -51,7 +51,7 @@ namespace ldungeon_gen {
 		Selector(uint16_t must_be_on_bits = 0, uint16_t must_be_off_bits = 0) :
 						must_be_on_bits(must_be_on_bits),
 						must_be_off_bits(must_be_off_bits),
-						must_be_content(0),
+						must_be_content(-1),
 						must_be_group(-1),
 						use_must_be_content(false) {
 		}
@@ -134,17 +134,19 @@ namespace ldungeon_gen {
 					&& ((flags & ~selector.must_be_off_bits)
 							== flags)
 					&& (!selector.use_must_be_content
-							|| content == selector.must_be_content);
+							|| content == selector.must_be_content)
+					&& (selector.must_be_group == uint16_t(-1)
+							|| group == selector.must_be_group);
 		}
 		inline void apply(Operator oper) {
 			/* By turning off first, we can wipe all flags and set new ones */
 			flags &= ~oper.turn_off_bits;
 			flags |= oper.turn_on_bits;
 			flags ^= oper.flip_bits;
-			if (oper.content_value != -1) {
+			if (oper.content_value != uint16_t(-1)) {
 				content = oper.content_value;
 			}
-			if (oper.group_value != -1) {
+			if (oper.group_value != uint16_t(-1)) {
 				group = oper.group_value;
                         }
 		}

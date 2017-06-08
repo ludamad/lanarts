@@ -123,7 +123,7 @@ B2ShapeConnector = newtype {
             return false
 
         -- Find closest points:
-        p1, p2, dist = body_distance(body_a, body_b)
+        p1, p2, dist = B2Utils.body_distance(body_a, body_b)
         x1, y1 = p1.x, p1.y
         x2, y2 = p2.x, p2.y
         local dx, dy 
@@ -239,14 +239,15 @@ connect_map_regions = (args) ->
     assert args.rng, "Need 'rng' object"
     b2world = _b2_world_from_args(args)
     -- Perform connection pass
-    tunnels = {}
     connector = B2ShapeConnector.create(b2world)
-    for i=1,100
+    for i=1,args.n_connections or #args.regions
         if not connector\do_random_connection(args.rng)
             break
         b2world\visualize("Random connection #{i}")
     -- Tunnels have 'index_a', 'index_b', 'polygon'
-    return connector.tunnels
+    -- We add them to the region with index 'index_a'
+    for tunnel in *connector.tunnels
+        append args.regions[tunnel.index_a].tunnels, tunnel
 
 visualize_map_regions = (args) ->
     if not DebugUtils.is_debug_visualization()

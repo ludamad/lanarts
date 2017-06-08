@@ -17,8 +17,8 @@ _cross_product = (p, q, r) ->
 --   Direct port from Javascript version
 convex_hull = (polygons) ->
     points = {}
-    for polygon in polygons
-        for point in polygon
+    for polygon in *polygons
+        for point in *polygon
             _tinsert points, point
 
     p = #points
@@ -27,20 +27,20 @@ convex_hull = (polygons) ->
 
     lower = {}
     for i = 1, p
-        while (#lower >= 2 and cross(lower[#lower - 1], lower[#lower], points[i]) <= 0)
+        while (#lower >= 2 and _cross_product(lower[#lower - 1], lower[#lower], points[i]) <= 0)
             _tremove(lower, #lower)
 
         _tinsert(lower, points[i])
 
     upper = {}
     for i = p, 1, -1
-        while (#upper >= 2 and cross(upper[#upper - 1], upper[#upper], points[i]) <= 0)
+        while (#upper >= 2 and _cross_product(upper[#upper - 1], upper[#upper], points[i]) <= 0)
             _tremove(upper, #upper)
         _tinsert(upper, points[i])
 
     _tremove(upper, #upper)
     _tremove(lower, #lower)
-    for _, point in ipairs(lower)
+    for point in *lower
         _tinsert(upper, point)
 
     return upper

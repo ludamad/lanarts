@@ -1013,14 +1013,16 @@ function ParseState:pass(arg)
          self.argument = self.arguments[self.argument_i]
       end
    else
-      local command = self:get_command(arg)
-      self.result[command._target or command._name] = true
+      if self.commands[arg] then
+          local command = self:get_command(arg)
+          self.result[command._target or command._name] = true
 
-      if self.parser._command_target then
-         self.result[self.parser._command_target] = command._name
+          if self.parser._command_target then
+             self.result[self.parser._command_target] = command._name
+          end
+
+          self:switch(command)
       end
-
-      self:switch(command)
    end
 end
 
@@ -1114,12 +1116,14 @@ function ParseState:parse(args)
                else
                   for i = 2, #arg do
                      local name = first .. arg:sub(i, i)
-                     local option = self:get_option(name)
-                     self:invoke(option, name)
+                     if self.options[name] then
+                         local option = self:get_option(name)
+                         self:invoke(option, name)
 
-                     if i ~= #arg and option.element._maxargs > 0 then
-                        self:pass(arg:sub(i + 1))
-                        break
+                         if i ~= #arg and option.element._maxargs > 0 then
+                            self:pass(arg:sub(i + 1))
+                            break
+                         end
                      end
                   end
                end

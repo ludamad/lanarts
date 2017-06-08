@@ -43,8 +43,57 @@
 //end
 //end
 
+using namespace ldungeon_gen;
+
+// Base function of area_fill_unconnected, and area_fully_connected
+// Mark the map with our marker Operator
+void area_connected_search_mark(Map& map, BBox area, Pos seed, Selector unfilled, Operator mark, Selector marked) {
+    std::vector<Pos> queue {seed};
+    map[seed].apply(mark);
+    while (!queue.empty()) {
+        Pos curr = queue.back();
+        queue.pop_back();
+        auto queue_pos = [&](Pos next) {
+            if (next.x < area.x1 || next.y < area.y1 || next.x >= area.x2 || next.y >= area.y2) {
+                return;
+            }
+            if (map[next].matches(marked) || !map[next].matches(unfilled)) {
+                return;
+            }
+            map[next].apply(mark);
+            queue.push_back(next);
+        };
+        int x = curr.x, y = curr.y;
+        queue_pos(Pos(x-1, y));
+        queue_pos(Pos(x, y-1));
+        queue_pos(Pos(x, y+1));
+        queue_pos(Pos(x+1, y));
+    }
+}
 
 namespace ldungeon_gen {
+    void area_fill_unconnected(Map& map, BBox area, Pos seed, Selector unfilled, Operator mark, Selector marked, Operator fill) {
+        if (!map[seed].matches(unfilled)) {
+            FOR_EACH_BBOX(area, x, y) {
+                if (map[Pos(x,y)].matches(unfilled)) {
+                    seed = Pos(x, y);
+                    break;
+                }
+            }
+            if (seed.x == -1 && seed.y == -1) {
+                return; // Fully filled area is fully connected, technically.
+            }
+        }
+
+        area_connected_search_mark(map, area, seed, unfilled, mark, marked);
+
+        FOR_EACH_BBOX(area, x, y) {
+            if (map[Pos(x,y)].matches(unfilled) && !map[Pos(x,y)].matches(marked)) {
+            //    map[Pos(x,y)].apply(fill);
+            }
+        }
+    }
+
     // Used for outright rejecting maps, as a pragmatic step:
     bool area_fully_connected(Map& map, BBox area, Selector unfilled, Operator mark, Selector marked) {
         // Find first unfilled element:
@@ -59,27 +108,7 @@ namespace ldungeon_gen {
             return true; // Fully filled area is fully connected, technically.
         }
 
-        std::vector<Pos> queue {seed};
-        map[seed].apply(mark);
-        while (!queue.empty()) {
-            Pos curr = queue.back();
-            queue.pop_back();
-            auto queue_pos = [&](Pos next) {
-                if (next.x < area.x1 || next.y < area.y1 || next.x >= area.x2 || next.y >= area.y2) {
-                    return;
-                }
-                if (map[next].matches(marked) || !map[next].matches(unfilled)) {
-                    return;
-                }
-                map[next].apply(mark);
-                queue.push_back(next);
-            };
-            int x = curr.x, y = curr.y;
-            queue_pos(Pos(x-1, y));
-            queue_pos(Pos(x, y-1));
-            queue_pos(Pos(x, y+1));
-            queue_pos(Pos(x+1, y));
-        }
+        area_connected_search_mark(map, area, seed, unfilled, mark, marked);
 
         FOR_EACH_BBOX(area, x, y) {
             if (map[Pos(x,y)].matches(unfilled) && !map[Pos(x,y)].matches(marked)) {

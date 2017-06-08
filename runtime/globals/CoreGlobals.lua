@@ -41,7 +41,8 @@ end
 -- @usage new_load = memoized(load)
 function memoized(func, --[[Optional]] separator) 
     local cache = {}
-    setmetatable( cache, {__mode = "kv"} ) -- Make table weak
+    -- TODO should we use weak tables? Better to limit usage, explicit clearing, etc
+    --setmetatable( cache, {__mode = "kv"} ) -- Make table weak
 
     separator = separator or ";"
 
