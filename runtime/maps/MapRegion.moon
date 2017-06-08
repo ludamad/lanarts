@@ -75,18 +75,20 @@ main = (raw_args) ->
                         append regions, MapRegion.create {polygon} -- 1 polygon for 'random'
                     else
                         polygons = MapRegionShapes.get_shape_polygons(name, x, y, w, h)
-                        for polygon in *polygons
-                            append regions, MapRegion.create {polygon} -- 1 polygon for 'random'
+                        append regions, MapRegion.create(polygons)
+                        --for polygon in *polygons
+                        --    append regions, MapRegion.create {polygon} -- 1 polygon for 'random'
             return regions
         regions = make_map_regions(4)
-        --B2GenerateUtils.spread_map_regions {
-        --    :rng
-        --    :regions 
-        --    fixed_polygons: {make_polygon(0, 0, 8, 8)}
-        --    n_iterations: 50
-        --    mode: 'towards_fixed_shapes'
-        --    clump_once_near: true
-        --}
+        if #regions > 1
+            B2GenerateUtils.spread_map_regions {
+                :rng
+                :regions 
+                fixed_polygons: {make_polygon(0, 0, 8, 8)}
+                n_iterations: 50
+                mode: 'towards_fixed_shapes'
+                clump_once_near: true
+            }
         DebugUtils.enable_visualization(800, 600)
         if #regions > 1
             B2GenerateUtils.connect_map_regions {
