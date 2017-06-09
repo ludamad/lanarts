@@ -11,14 +11,19 @@ Map = require "core.Map"
 import ConnectedRegions, FilledRegion
     from require "maps.MapElements"
 
-TEMPLATE = ConnectedRegions {
-    regions: for i=1,10
-        FilledRegion {
-            shape: 'deformed_ellipse'
-            size: {5, 5}
-        }
-    spread_scheme: 'box2d_solid_center'
-    connection_scheme: 'direct'
+--TEMPLATE = ConnectedRegions {
+--    regions: for i=1,10
+--        FilledRegion {
+--            shape: 'deformed_ellipse'
+--            size: {5, 5}
+--        }
+--    spread_scheme: 'box2d_solid_center'
+--    connection_scheme: 'direct'
+--}
+
+TEMPLATE = FilledRegion {
+    shape: 'sanic'
+    size: {40,40}
 }
 
 TILESET = TileSets.lair

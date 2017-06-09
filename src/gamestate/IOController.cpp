@@ -32,21 +32,21 @@ IOState::IOState() {
 	for (int i = 0; i < SDL_NumJoysticks(); i++) {
 
 	}
-    int MaxJoysticks = SDL_NumJoysticks();
-    int ControllerIndex = 0;
-    for(int JoystickIndex=0; JoystickIndex < MaxJoysticks; ++JoystickIndex)
-    {
-        if (!SDL_IsGameController(JoystickIndex))
-        {
-            continue;
-        }
-        if (ControllerIndex >= MAX_CONTROLLERS)
-        {
-            break;
-        }
-        ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(JoystickIndex);
-        ControllerIndex++;
-    }
+    //int MaxJoysticks = SDL_NumJoysticks();
+    //int ControllerIndex = 0;
+    //for(int JoystickIndex=0; JoystickIndex < MaxJoysticks; ++JoystickIndex)
+    //{
+    //    if (!SDL_IsGameController(JoystickIndex))
+    //    {
+    //        continue;
+    //    }
+    //    if (ControllerIndex >= MAX_CONTROLLERS)
+    //    {
+    //        break;
+    //    }
+    //    ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(JoystickIndex);
+    //    ControllerIndex++;
+    //}
 }
 
 void IOState::clear() {

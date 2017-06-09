@@ -308,7 +308,7 @@ DataW.enemy_create {
     defeat_message: "The clown mage is defeated."
     stats: {
         attacks: {
-            {projectile: "Magic Blast"}
+            {projectile: "Chain Lightning"}
         }
         hp: 65
         hpregen: 0.03

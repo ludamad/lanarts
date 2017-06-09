@@ -63,6 +63,56 @@ M.SpellWall.on_draw = () =>
         alpha = math.max(0, math.min(alpha, 1))
         ObjectUtils.screen_draw(@sprite, @xy, alpha)
 
+M._skull_trap_sprite = tosprite "spr_effects.deathnote"
+
+M.SkullTrap = LuaGameObject.type_create()
+M.SkullTrap.init = (args) => 
+    {:points, :point_index, :vx, :vy, :caster, :duration} = args
+    M.SkullTrap.parent_init(@, points[point_index], 8, true, SPELL_WALL_DEPTH)
+    @traits or= {}
+    @sprite = M._skull_trap_sprite
+    @n_steps = 0
+    @caster = caster
+    @duration = duration
+    @n_ramp = 45
+    @vx = vx
+    @vy = vy
+M.SkullTrap.on_step = () =>
+    if Map.radius_tile_check(@map, {@x + @vx, @y}, @radius)
+        @vx = 0
+    if Map.radius_tile_check(@map, {@x, @y + @vy}, @radius)
+        @vy = 0
+    @x += @vx
+    @y += @vy
+    @n_steps += 1
+    if @n_steps >= @duration
+        tile_xy = ObjectUtils.tile_xy(@, true)
+        if @solidified
+            Map.tile_set_solid(self.map, tile_xy, false)
+        GameObject.destroy(@)
+    else
+        collisions = Map.rectangle_collision_check(@map, {@x - 8, @y - 8, @x+8, @y+8}, @)
+        had_collision = false
+        for col in *collisions
+            if not col.is_combat_object --is_enemy
+                continue
+            if @collided[col.id] and @collided[col.id] + 45 > @n_steps
+                continue
+        if had_collision
+            collisions = Map.rectangle_collision_check(@map, {@x - 64, @y - 64, @x+64, @y+64}, @)
+            for col in *collisions
+                @collided[col.id] = @n_steps
+                eff = @caster\effective_stats()
+                col\damage(eff.magic / 2, 2 + eff.magic * 0.2, 0, 1)
+
+M.SkullTrap.on_draw = () =>
+    if Display.object_within_view(@) 
+        min = math.min(@n_ramp, if @n_steps > @duration / 2 then math.abs(@n_steps - @duration) else @n_steps)
+        alpha = (min / @n_ramp)
+        alpha = math.max(0, math.min(alpha, 1))
+        ObjectUtils.screen_draw(@sprite, @xy, alpha)
+
+
 M.SpellSpikes = LuaGameObject.type_create()
 M.SpellSpikes.init = (args) => 
     {:points, :point_index, :caster, :duration} = args

@@ -117,7 +117,7 @@ add_random_spell = (rng, data) ->
         "Berserk",
         "Blink",
         "Magic Arrow",
-        "Magic Blast",
+        "Chain Lightning",
         "Power Strike",
         "Pain",
         "Greater Pain",

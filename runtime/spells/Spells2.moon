@@ -111,12 +111,12 @@ DataW.spell_create {
     cooldown: 35
 }
 
--- MAGIC BLAST
+-- CHAIN LIGHTNING
 
 DataW.spell_create {
-    name: "Magic Blast",
-    description: "A slow, powerful magic blast of energy. The blast can bounce off an enemy twice before dissipating.",
-    spr_spell: "magic blast",
+    name: "Chain Lightning",
+    description: "A slow, powerful blast of lightning. The blast can bounce off an enemy twice before dissipating.",
+    spr_spell: "charge_effected",
     projectile: {
         speed: 4
         number_of_target_bounces: 3
@@ -372,4 +372,29 @@ DataW.spell_create {
 
     autotarget_func: (caster) -> caster.x, caster.y
 }
+
+
+---- Link of Loyalty
+--DataW.spell_create {
+--    name: "Skull Trap",
+--    spr_spell: "spr_effects.deathnote",
+--    description: "You summon skull bombs.",
+--    mp_cost: 20
+--    cooldown: 0
+--    can_cast_with_held_key: true
+--    fallback_to_melee: true
+--    spell_cooldown: 40
+--    prereq_func: (caster) ->
+--        return not caster\has_effect("Exhausted") and not (caster\has_effect "Summoning")
+--    action_func: (caster, x, y) ->
+--        play_sound "sound/lifelink.ogg"
+--        {cx, cy} = caster.xy
+--        points = {
+--            {cx - 8, cy -8}
+--            {cx + 8, cy -8}
+--            {cx - 8, cy +8}
+--            {cx + 8, cy +8}
+--        }
+--        obj = SpellObjects.SpellSpikes.create { points points, point_index = i, caster = caster, duration = 500}
+--}
 
