@@ -7,11 +7,12 @@
 
 #include "draw/SpriteEntry.h"
 
+#include "data/ResourceDataSet.h"
 #include "items/ProjectileEntry.h"
 
 #include "SpellEntry.h"
 
-extern std::vector<SpellEntry> game_spell_data;
+extern ResourceDataSet<SpellEntry> game_spell_data;
 
 spell_id get_spell_by_name(const char* name);
 
@@ -64,5 +65,5 @@ SpellEntry& res::spell(const std::string& name) {
 }
 
 SpellEntry& res::spell(::spell_id id) {
-	return game_spell_data.at(id);
+	return game_spell_data.get(id);
 }

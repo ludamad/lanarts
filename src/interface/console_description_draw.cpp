@@ -296,7 +296,7 @@ static void draw_spells_granted_overlay(GameState* gs,
 static void draw_effect_modifiers_overlay(GameState* gs,
 		DescriptionBoxHelper& dbh, StatusEffectModifiers& status_effects) {
         for (StatusEffect status_effect : status_effects.status_effects) {
-            EffectEntry& entry = game_effect_data.at(status_effect.id);
+            EffectEntry& entry = game_effect_data.get(status_effect.id);
             if (entry.console_draw_func.isnil())  {
                 continue;
             }

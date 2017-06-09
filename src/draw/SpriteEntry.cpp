@@ -4,7 +4,7 @@ sprite_id get_sprite_by_name(const char* name, bool error_if_not_found = false);
 
 namespace res {
 	const std::string& sprite_name(::sprite_id idx) {
-		return game_sprite_data.at(idx).name;
+		return game_sprite_data.get(idx).name;
 	}
 
 	bool sprite_exists(const std::string& name) {
@@ -12,7 +12,7 @@ namespace res {
 	}
 
 	ldraw::Drawable& sprite(::sprite_id idx) {
-		return game_sprite_data.at(idx).sprite;
+		return game_sprite_data.get(idx).sprite;
 	}
 
 	ldraw::Drawable& sprite(const char* name) {

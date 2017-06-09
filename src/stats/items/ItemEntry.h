@@ -76,11 +76,11 @@ public:
 	bool stackable;
 };
 
-extern std::vector<ItemEntry*> game_item_data;
+extern ResourceDataSet<ItemEntry*> game_item_data;
 
 ItemEntry& get_item_entry(item_id id);
 item_id get_item_by_name(const char* name, bool error_if_not_found = true);
-void clear_item_data(std::vector<ItemEntry*>& items);
+void clear_item_data(ResourceDataSet<ItemEntry*>& items);
 
 bool is_item_projectile(ItemEntry& ientry);
 bool is_item_weapon(ItemEntry& ientry);

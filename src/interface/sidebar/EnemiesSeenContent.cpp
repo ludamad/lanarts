@@ -37,7 +37,7 @@ static void draw_enemies_seen(GameState* gs, EnemiesSeen& es, const BBox& bbox,
 			if (slot >= max_slot)
 				break;
 
-			EnemyEntry& eentry = game_enemy_data.at(*it);
+			EnemyEntry& eentry = game_enemy_data.get(*it);
 
 			BBox slotbox(x, y, x + TILE_SIZE, y + TILE_SIZE);
 			Colour outline(COL_UNFILLED_OUTLINE);

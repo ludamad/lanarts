@@ -8,8 +8,9 @@
 
 #include "draw/SpriteEntry.h"
 #include "stats/items/WeaponEntry.h"
+#include "data/ResourceDataSet.h"
 
-extern std::vector<SpriteEntry> game_sprite_data;
+extern ResourceDataSet<SpriteEntry> game_sprite_data;
 
 static void setup_mock_data() {
 	game_sprite_data.clear();

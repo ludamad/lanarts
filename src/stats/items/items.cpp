@@ -55,7 +55,7 @@ void ItemProperties::deserialize(GameState* gs, SerializeBuffer& serializer) {
 }
 
 ItemEntry& Item::item_entry() const {
-	return *game_item_data.at(id);
+	return *game_item_data.get(id);
 }
 
 EquipmentEntry& Item::equipment_entry() const {
@@ -71,22 +71,22 @@ WeaponEntry& Item::weapon_entry() const {
 }
 
 bool Item::is_normal_item() const {
-	ItemEntry* item_entry = game_item_data.at(id);
+	ItemEntry* item_entry = game_item_data.get(id);
 	return (dynamic_cast<EquipmentEntry*>(item_entry) == NULL);
 }
 
 bool Item::is_equipment() const {
-	ItemEntry* item_entry = game_item_data.at(id);
+	ItemEntry* item_entry = game_item_data.get(id);
 	return (dynamic_cast<EquipmentEntry*>(item_entry) != NULL);
 }
 
 bool Item::is_projectile() const {
-	ItemEntry* item_entry = game_item_data.at(id);
+	ItemEntry* item_entry = game_item_data.get(id);
 	return (dynamic_cast<ProjectileEntry*>(item_entry) != NULL);
 }
 
 bool Item::is_weapon() const {
-	ItemEntry* item_entry = game_item_data.at(id);
+	ItemEntry* item_entry = game_item_data.get(id);
 	return (dynamic_cast<WeaponEntry*>(item_entry) != NULL);
 }
 

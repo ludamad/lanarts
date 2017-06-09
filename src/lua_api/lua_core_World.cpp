@@ -42,7 +42,7 @@ struct PlayerDataProxy {
 	}
 
 	static const char* class_name(const LuaStackValue& proxy) {
-		return game_class_data.at(_entry(proxy).classtype).name.c_str();
+		return game_class_data.get(_entry(proxy).classtype).name.c_str();
 	}
 
 	static GameInst* instance(const LuaStackValue& proxy) {
@@ -70,7 +70,7 @@ static int world_players(lua_State* L) {
             value[i].newtable();
             value[i]["name"] = entry.player_name;
             value[i]["instance"] = entry.player();
-            value[i]["class_name"] = game_class_data.at(entry.classtype).name;
+            value[i]["class_name"] = game_class_data.get(entry.classtype).name;
             i += 1;
 	}
         value.push();

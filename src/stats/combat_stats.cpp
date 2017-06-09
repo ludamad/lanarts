@@ -121,7 +121,7 @@ ProjectileEntry& AttackStats::projectile_entry() const {
 
 //	int created = weapon.weapon_entry().created_projectile;
 //	LANARTS_ASSERT(created > -1);
-//	return game_projectile_data.at(created);
+//	return game_projectile_data.get(created);
 }
 
 int AttackStats::atk_cooldown() const {

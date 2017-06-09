@@ -40,6 +40,6 @@ struct EffectEntry {
 };
 
 effect_id get_effect_by_name(const char* name);
-extern std::vector<EffectEntry> game_effect_data;
+extern ResourceDataSet<EffectEntry> game_effect_data;
 
 #endif /* EFFECT_DATA_H_ */

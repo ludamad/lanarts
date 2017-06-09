@@ -17,10 +17,9 @@
 
 using namespace std;
 
-extern std::vector<SpellEntry> game_spell_data;
-extern std::vector<EffectEntry> game_effect_data;
-extern std::vector<ItemEntry*> game_item_data;
-
+extern ResourceDataSet<SpellEntry> game_spell_data;
+extern ResourceDataSet<EffectEntry> game_effect_data;
+extern ResourceDataSet<ItemEntry*> game_item_data;
 
 void lapi_data_create_spell(const LuaStackValue& table) {
 	SpellEntry entry;

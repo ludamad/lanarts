@@ -20,7 +20,7 @@ equipment_id get_equipment_by_name(const char* name) {
 		return NO_ITEM;
 	}
 	item_id id = get_item_by_name(name);
-	LANARTS_ASSERT(dynamic_cast<EquipmentEntry*>(game_item_data.at(id)));
+	LANARTS_ASSERT(dynamic_cast<EquipmentEntry*>(game_item_data.get(id)));
 	return (equipment_id) id;
 }
 
@@ -28,7 +28,7 @@ EquipmentEntry& get_equipment_entry(projectile_id id) {
 	if (id == NO_ITEM) {
 		return get_equipment_entry(get_item_by_name("Nothing"));
 	}
-	ItemEntry* item = game_item_data.at(id);
+	ItemEntry* item = game_item_data.get(id);
 
 	return dynamic_cast<EquipmentEntry&>(*item);
 }

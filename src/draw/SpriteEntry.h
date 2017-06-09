@@ -8,6 +8,7 @@
 #include <ldraw/Colour.h>
 #include <ldraw/Drawable.h>
 
+#include "data/ResourceDataSet.h"
 #include "data/FilenameList.h"//For FilenameList
 #include "lanarts_defines.h"
 
@@ -39,7 +40,7 @@ struct SpriteEntry {
 	}
 };
 
-extern std::vector<SpriteEntry> game_sprite_data;
+extern ResourceDataSet<SpriteEntry> game_sprite_data;
 
 namespace res {
 	const std::string& sprite_name(::sprite_id idx);

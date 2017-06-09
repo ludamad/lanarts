@@ -83,14 +83,14 @@ namespace res {
 	}
 
 	ClassEntry class_entry(const char* name) {
-		return game_class_data.at(class_id(name));
+		return game_class_data.get(class_id(name));
 	}
 
 	ClassEntry class_entry(const std::string& name) {
-		return game_class_data.at(class_id(name));
+		return game_class_data.get(class_id(name));
 	}
 
 	ClassEntry class_entry(::class_id id) {
-		return game_class_data.at(id);
+		return game_class_data.get(id);
 	}
 }

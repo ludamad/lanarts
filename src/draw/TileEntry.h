@@ -11,6 +11,7 @@
 #include "data/FilenameList.h"
 
 #include "lanarts_defines.h"
+#include "data/ResourceDataSet.h"
 
 typedef std::vector<ldraw::Image> ImageList;
 
@@ -29,7 +30,7 @@ struct TileEntry {
 	}
 };
 
-extern std::vector<TileEntry> game_tile_data;
+extern ResourceDataSet<TileEntry> game_tile_data;
 
 namespace res {
 	TileEntry& tile(tile_id idx);

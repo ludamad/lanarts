@@ -15,7 +15,7 @@ projectile_id get_projectile_by_name(const char* name) {
 		return NO_ITEM;
 	}
 	item_id id = get_item_by_name(name);
-	LANARTS_ASSERT(dynamic_cast<ProjectileEntry*>(game_item_data.at(id)));
+	LANARTS_ASSERT(dynamic_cast<ProjectileEntry*>(game_item_data.get(id)));
 	return (projectile_id)id;
 }
 
@@ -23,7 +23,7 @@ ProjectileEntry& get_projectile_entry(projectile_id id) {
 	if (id == NO_ITEM) {
 		return get_projectile_entry(get_item_by_name("Nothing"));
 	}
-	ItemEntry* item = game_item_data.at(id);
+	ItemEntry* item = game_item_data.get(id);
 
 	return dynamic_cast<ProjectileEntry&>(*item);
 }

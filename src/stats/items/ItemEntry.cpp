@@ -18,28 +18,28 @@
 #include "ProjectileEntry.h"
 
 SpriteEntry& ItemEntry::item_sprite_entry() {
-	return game_sprite_data.at(item_sprite);
+	return game_sprite_data.get(item_sprite);
 }
 ldraw::Drawable& ItemEntry::item_image() {
 	return res::sprite(item_sprite);
 }
 
-std::vector<ItemEntry*> game_item_data;
+ResourceDataSet<ItemEntry*> game_item_data;
 
 ItemEntry& get_item_entry(item_id id) {
-	return *game_item_data.at(id);
+	return *game_item_data.get(id);
 }
 
-void clear_item_data(std::vector<ItemEntry*>& items) {
+void clear_item_data(ResourceDataSet<ItemEntry*>& items) {
 	for (int i = 0; i < items.size(); i++) {
-		delete items[i];
+            delete items.get(i);
 	}
 	items.clear();
 }
 
 item_id get_item_by_name(const char* name, bool error_if_not_found) {
 	for (int i = 0; i < game_item_data.size(); i++) {
-		if (name == game_item_data.at(i)->name) {
+		if (name == game_item_data.get(i)->name) {
 			return i;
 		}
 	}

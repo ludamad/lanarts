@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include "lanarts_defines.h"
+#include "data/ResourceDataSet.h"
 
 struct TilesetEntry {
 	std::string name;
@@ -33,7 +34,7 @@ struct TilesetEntry {
 	}
 };
 
-extern std::vector<TilesetEntry> game_tileset_data;
+extern ResourceDataSet<TilesetEntry> game_tileset_data;
 
 tileset_id get_tileset_by_name(const char* name);
 

@@ -199,7 +199,7 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 	for (int i = 0; i < spell_n; i++) {
 		spell_id spell = spells.get(i);
 		SpellEntry& spl_entry = res::spell(spell);
-		SpriteEntry& spr_entry = game_sprite_data.at(spl_entry.sprite);
+		SpriteEntry& spr_entry = game_sprite_data.get(spl_entry.sprite);
 		ldraw::DrawOptions options;
 		int cooldown = player->cooldowns().spell_cooldowns[spl_entry.id];
 		if (spl_entry.spell_cooldown) {

@@ -129,7 +129,7 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 		Pos position = positions.at(i);
 		PlayerDataEntry& pde = gs->player_data().all_players()[i];
 		bool islocal = &pde == &gs->player_data().local_player_data();
-		ClassEntry& c = game_class_data.at(pde.classtype);
+		ClassEntry& c = game_class_data.get(pde.classtype);
 		int spriteidx = gs->rng().rand(c.sprites.size());
 
 //		if (pde.player_inst.empty()) {

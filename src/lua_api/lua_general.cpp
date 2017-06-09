@@ -301,7 +301,7 @@ static ldraw::Drawable lapi_tosprite(const char* name) {
     return res::sprite(name);
 }
 static ldraw::Drawable lapi_monster_sprite(const char* name) {
-    return res::sprite(game_enemy_data.at(get_enemy_by_name(name)).enemy_sprite);
+    return res::sprite(game_enemy_data.get(get_enemy_by_name(name)).enemy_sprite);
 }
 
 static LuaValue lengine_import_internal_raw(LuaStackValue importstring) {

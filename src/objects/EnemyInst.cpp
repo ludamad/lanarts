@@ -43,7 +43,7 @@
 static const int DEPTH = 50;
 
 static EnemyEntry& __E(enemy_id enemytype) {
-	return game_enemy_data.at(enemytype);
+	return game_enemy_data.get(enemytype);
 }
 
 float monster_difficulty_multiplier(GameState* gs, EnemyEntry& etype) {
@@ -126,7 +126,7 @@ bool EnemyInst::damage(GameState* gs, int dmg) {
 }
 
 EnemyEntry& EnemyInst::etype() {
-	return game_enemy_data.at(enemytype);
+	return game_enemy_data.get(enemytype);
 }
 
 void EnemyInst::init(GameState* gs) {

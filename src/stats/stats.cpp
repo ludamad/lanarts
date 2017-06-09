@@ -148,7 +148,7 @@ void CooldownStats::reset_hurt_cooldown(int cooldown) {
 }
 
 ClassEntry& ClassStats::class_entry() const {
-	return game_class_data.at(classid);
+	return game_class_data.get(classid);
 }
 
 CoreStats parse_core_stats(const LuaField& value, bool required) {

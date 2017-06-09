@@ -25,7 +25,7 @@ void draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 	float PI = 3.1415921f;
 	float direction = PI * 2.5f + atan2f(dy, dx);
 
-	SpriteEntry& entry = game_sprite_data.at(sprite);
+	SpriteEntry& entry = game_sprite_data.get(sprite);
 	entry.sprite.draw(DrawOptions().colour(c).angle(direction).frame(frame), Pos(x-view.x,y-view.y));
 }
 
@@ -36,14 +36,14 @@ void draw_sprite_centered(const GameView& view, sprite_id sprite, int x, int y,
     float PI = 3.1415921f;
     float direction = PI * 2.5f + atan2f(dy, dx);
 
-    SpriteEntry& entry = game_sprite_data.at(sprite);
+    SpriteEntry& entry = game_sprite_data.get(sprite);
     entry.sprite.draw(DrawOptions().origin(ldraw::CENTER).colour(c).angle(direction).frame(frame), Pos(x-view.x,y-view.y));
 }
 
 void draw_sprite(sprite_id sprite, int x, int y, const Colour& c) {
 	using namespace ldraw;
 
-	SpriteEntry& entry = game_sprite_data.at(sprite);
+	SpriteEntry& entry = game_sprite_data.get(sprite);
 	entry.sprite.draw(DrawOptions().colour(c.multiply(entry.drawcolour)), Pos(x,y));
 }
 

@@ -24,6 +24,8 @@
 #include "stats/items/WeaponEntry.h"
 #include "stats/items/WeaponEntry.h"
 
+#include "data/ResourceDataSet.h"
+
 #include "game_data.h"
 
 /* Components of init_game_data */
@@ -39,13 +41,13 @@ void lapi_data_create_weapon(const LuaStackValue& table);
 
 /* Definition of game data */
 
-std::vector<ClassEntry> game_class_data;
-std::vector<EffectEntry> game_effect_data;
-std::vector<EnemyEntry> game_enemy_data;
-std::vector<TileEntry> game_tile_data;
-std::vector<TilesetEntry> game_tileset_data;
-std::vector<SpellEntry> game_spell_data;
-std::vector<SpriteEntry> game_sprite_data;
+ResourceDataSet<ClassEntry> game_class_data;
+ResourceDataSet<EffectEntry> game_effect_data;
+ResourceDataSet<EnemyEntry> game_enemy_data;
+ResourceDataSet<TileEntry> game_tile_data;
+ResourceDataSet<TilesetEntry> game_tileset_data;
+ResourceDataSet<SpellEntry> game_spell_data;
+ResourceDataSet<SpriteEntry> game_sprite_data;
 
 template<typename T>
 static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
@@ -119,7 +121,7 @@ tile_id get_tile_by_name(const char* name) {
 }
 
 TileEntry& get_tile_entry(tile_id id) {
-	return game_tile_data.at(id);
+	return game_tile_data.get(id);
 }
 
 effect_id get_effect_by_name(const char* name) {

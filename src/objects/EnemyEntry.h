@@ -46,7 +46,7 @@ struct EnemyEntry: public ResourceEntryBase {
 	}
 };
 
-extern std::vector<EnemyEntry> game_enemy_data;
+extern ResourceDataSet<EnemyEntry> game_enemy_data;
 
 enemy_id get_enemy_by_name(const char* name, bool error_if_not_found = true);
 

@@ -25,7 +25,7 @@ static void lua_init_metatable(lua_State* L, LuaValue& value,
     lua_setmetatable(L, -2);
 
     /* Set index as effect object */
-    EffectEntry& entry = game_effect_data.at(id);
+    EffectEntry& entry = game_effect_data.get(id);
     entry.raw_lua_object.push();
     lua_setfield(L, -2, "__index");
     /* Pop self */
@@ -35,7 +35,7 @@ static void lua_init_metatable(lua_State* L, LuaValue& value,
 static void lua_init_effect(lua_State* L, LuaValue& value, GameInst* inst, effect_id id) {
     value.init(L);
     value.newtable();
-    EffectEntry& entry = game_effect_data.at(id);
+    EffectEntry& entry = game_effect_data.get(id);
     lua_init_metatable(L, value, id);
     if (entry.init_func.isnil()) {
         return;
@@ -54,7 +54,7 @@ bool EffectStats::has_active_effect() const {
 }
 
 static float draw_alpha(Effect& effect) {
-    EffectEntry& eentry = game_effect_data.at(effect.id);
+    EffectEntry& eentry = game_effect_data.get(effect.id);
     if (effect.time_left() >= eentry.fade_out) {
         return 1.0f;
     }
@@ -65,7 +65,7 @@ Colour EffectStats::effected_colour() {
     int r = 255 * 256, g = 255 * 256, b = 255 * 256, a = 255 * 256;
     for (Effect& eff : effects) {
         if (eff.is_active()) {
-            EffectEntry& eentry = game_effect_data.at(eff.id);
+            EffectEntry& eentry = game_effect_data.get(eff.id);
             Colour c = eentry.effected_colour.mute_colour(draw_alpha(eff));
             r *= c.r + 1, g *= c.g + 1, b *= c.b + 1, a *= c.a + 1;
             r /= 256, g /= 256, b /= 256, a /= 256;
@@ -78,7 +78,7 @@ void EffectStats::draw_effect_sprites(GameState* gs, GameInst* inst, const Pos& 
     GameView& view = gs->view();
     for (Effect& eff : effects) {
         if (eff.is_active()) {
-            EffectEntry& eentry = game_effect_data.at(eff.id);
+            EffectEntry& eentry = game_effect_data.get(eff.id);
             if (eentry.effected_sprite > -1) {
                 Colour drawcolour(255, 255, 255, 255 * draw_alpha(eff));
                 draw_sprite(view, eentry.effected_sprite, p.x, p.y,
@@ -100,7 +100,7 @@ void EffectStats::draw_effect_sprites(GameState* gs, GameInst* inst, const Pos& 
 bool EffectStats::can_rest() {
     for (Effect& eff : effects) {
         if (eff.is_active()) {
-            EffectEntry& eentry = game_effect_data.at(eff.id);
+            EffectEntry& eentry = game_effect_data.get(eff.id);
             if (!eentry.allowed_actions.can_use_rest) {
                 return false;
             }
@@ -113,7 +113,7 @@ AllowedActions EffectStats::allowed_actions(GameState* gs) const {
     AllowedActions actions;
     for (const Effect& eff : effects) {
         if (eff.is_active()) {
-            EffectEntry& ee = game_effect_data.at(eff.id);
+            EffectEntry& ee = game_effect_data.get(eff.id);
             actions = actions.only_in_both(ee.allowed_actions);
         }
     }
@@ -133,7 +133,7 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
 
     for (const Effect& eff : effects) {
         if (eff.is_active()) {
-            auto& stat_func = game_effect_data.at(eff.id).stat_func;
+            auto& stat_func = game_effect_data.get(eff.id).stat_func;
             if (stat_func.isnil()) {
                 continue;
             }
@@ -175,7 +175,7 @@ void EffectStats::remove(GameState* gs, GameInst* inst, Effect* effect) {
         LANARTS_ASSERT(false);// TODO check if needed
         return;
     }
-    EffectEntry& eentry = game_effect_data.at(effect->id);
+    EffectEntry& eentry = game_effect_data.get(effect->id);
     lua_State* L = gs->luastate();
     lua_effect_func_callback(L, eentry.remove_func, effect->state, inst);
 }
@@ -183,7 +183,7 @@ void EffectStats::remove(GameState* gs, GameInst* inst, Effect* effect) {
 void EffectStats::ensure_effects_active(GameState* gs, GameInst* inst, const std::vector<StatusEffect>& status_effects, const char* name) {
     for (StatusEffect status_effect : status_effects) {
          Effect& eff = get(gs, inst, status_effect.id);
-         EffectEntry& entry = game_effect_data.at(eff.id);
+         EffectEntry& entry = game_effect_data.get(eff.id);
          // Apply as a 'derived' effect, letting the effect decide how best to accumulate.
          entry.apply_derived_func.push();
          luawrap::call<void>(gs->luastate(), eff.state, inst, status_effect.args, name != NULL ? name : "");
@@ -194,7 +194,7 @@ void EffectStats::step(GameState* gs, GameInst* inst) {
     lua_State* L = gs->luastate();
     CombatGameInst* combat_inst = dynamic_cast<CombatGameInst*>(inst);
     for (Effect& eff : effects) {
-         EffectEntry& entry = game_effect_data.at(eff.id);
+         EffectEntry& entry = game_effect_data.get(eff.id);
          entry.remove_derived_func.push();
          luawrap::call<void>(L, eff.state, inst);
     }
@@ -215,7 +215,7 @@ void EffectStats::step(GameState* gs, GameInst* inst) {
         if (!eff.is_active()) {
             continue;
         }
-        EffectEntry& entry = game_effect_data.at(eff.id);
+        EffectEntry& entry = game_effect_data.get(eff.id);
         lua_effect_func_callback(L, entry.step_func, eff.state, inst);
     }
 }
@@ -232,7 +232,7 @@ Effect* EffectStats::get_active(effect_id id) {
 
 Effect* EffectStats::get_active(const char* name) {
     for (Effect& eff : effects) {
-        EffectEntry& entry = game_effect_data.at(eff.id);
+        EffectEntry& entry = game_effect_data.get(eff.id);
         if (eff.is_active() && entry.name == name) {
             return &eff;
         }
@@ -256,7 +256,7 @@ Effect& EffectStats::get(GameState* gs, GameInst* inst, effect_id id) {
 
 Effect& EffectStats::get(GameState* gs, GameInst* inst, const char* name) {
     for (Effect& eff : effects) {
-        EffectEntry& entry = game_effect_data.at(eff.id);
+        EffectEntry& entry = game_effect_data.get(eff.id);
         if (eff.is_active() && entry.name == name) {
             return eff;
         }
@@ -290,7 +290,7 @@ bool EffectStats::has_category(const char* category) {
 LuaValue EffectStats::add(GameState* gs, GameInst* inst, StatusEffect status_effect) {
     lua_State* L = gs->luastate();
     Effect& eff = get(gs, inst, status_effect.id);
-    EffectEntry& entry = game_effect_data.at(status_effect.id);
+    EffectEntry& entry = game_effect_data.get(status_effect.id);
     entry.apply_buff_func.push();
     luawrap::call<void>(L, eff.state, inst, status_effect.args);
     LANARTS_ASSERT(!eff.state.isnil());
