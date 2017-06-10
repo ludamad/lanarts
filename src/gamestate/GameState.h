@@ -236,6 +236,30 @@ public:
 	bool mouse_upwheel();
 	bool mouse_downwheel();
 
+	/* Gamepad states */
+	float gamepad_axis_left_trigger();
+	float gamepad_axis_right_trigger();
+	float gamepad_axis_left_x();
+	float gamepad_axis_left_y();
+	float gamepad_axis_right_x();
+	float gamepad_axis_right_y();
+	float gamepad_axis_left_trigger();
+	bool gamepad_button_a();
+	bool gamepad_button_b();
+	bool gamepad_button_x();
+	bool gamepad_button_y();
+	bool gamepad_button_back();
+	bool gamepad_button_guide();
+	bool gamepad_button_start();
+	bool gamepad_button_left_stick());
+	bool gamepad_button_right_stick());
+	bool gamepad_button_left_shoulder());
+	bool gamepad_button_right_shoulder());
+	bool gamepad_button_up_dpad());
+	bool gamepad_button_down_dpad());
+	bool gamepad_button_left_dpad());
+	bool gamepad_button_right_dpad());
+
 	/* Current frame number */
 	int& frame() {
 		return frame_n;

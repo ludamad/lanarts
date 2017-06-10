@@ -137,6 +137,11 @@ if ! handle_flag "-f" && ! handle_flag "--force" ; then
     fi
 fi
 
+#   --build/-b: Do not run (build only)
+if handle_flag "-b" || handle_flag "--build" ; then
+    exit
+fi
+
 ###############################################################################
 # Running the game. 
 ###############################################################################

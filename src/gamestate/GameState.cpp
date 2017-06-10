@@ -627,6 +627,98 @@ bool GameState::mouse_downwheel() {
 }
 
 /* End mouse click states */
+
+/* Gamepad states */
+float GameState::gamepad_axis_left_trigger() {
+	return 0.0;
+}
+
+float GameState::gamepad_axis_right_trigger() {
+	return 0.0;
+}
+
+float GameState::gamepad_axis_left_x() {
+	return 0.0;
+}
+
+float GameState::gamepad_axis_left_y() {
+	return 0.0;
+}
+
+float GameState::gamepad_axis_right_x() {
+	return 0.0;
+}
+
+float GameState::gamepad_axis_right_y() {
+	return 0.0;
+}
+
+float GameState::gamepad_axis_left_trigger() {
+	return 0.0;
+}
+
+bool GameState::gamepad_button_a() {
+	return false;
+}
+
+bool GameState::gamepad_button_b() {
+	return false;
+}
+
+bool GameState::gamepad_button_x() {
+	return false;
+}
+
+bool GameState::gamepad_button_y() {
+	return false;
+}
+
+bool GameState::gamepad_button_back() {
+	return false;
+}
+
+bool GameState::gamepad_button_guide() {
+	return false;
+}
+
+bool GameState::gamepad_button_start() {
+	return false;
+}
+
+bool GameState::gamepad_button_left_stick()) {
+	return false;
+}
+
+bool GameState::gamepad_button_right_stick()) {
+	return false;
+}
+
+bool GameState::gamepad_button_left_shoulder()) {
+	return false;
+}
+
+bool GameState::gamepad_button_right_shoulder()) {
+	return false;
+}
+
+bool GameState::gamepad_button_up_dpad()) {
+	return false;
+}
+
+bool GameState::gamepad_button_down_dpad()) {
+	return false;
+}
+
+bool GameState::gamepad_button_left_dpad()) {
+	return false;
+}
+
+bool GameState::gamepad_button_right_dpad()) {
+	return false;
+}
+
+/* End joypad states */
+
 GameTiles& GameState::tiles() {
 	return get_level()->tiles();
 }

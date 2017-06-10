@@ -242,6 +242,9 @@ int IOController::mouse_x() {
 int IOController::mouse_y() {
 	return iostate.mousey;
 }
+std::vector<IOGamepadState>& IOController::get_gamepad_states() {
+	
+}
 
 int IOController::handle_event(SDL_Event* event) {
 	int done = 0;

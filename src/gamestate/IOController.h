@@ -9,6 +9,7 @@
 #include <vector>
 #include <unordered_map>
 #include <SDL.h>
+#include <SDL_gamecontroller.h>
 
 #include "lanarts_defines.h"
 
@@ -95,6 +96,8 @@ struct IOState {
 	bool mouse_middleclick, mouse_middledown;
 	bool mouse_leftrelease, mouse_rightrelease;
 	bool mouse_didupwheel, mouse_diddownwheel;
+
+	
 	std::vector<TriggeredIOEvent> active_events;
 	std::vector<SDL_Event> sdl_events;
 
@@ -103,6 +106,31 @@ struct IOState {
 	void clear();
 	void clear_for_step(bool resetprev = true);
 };
+
+struct IOGamepadState {
+	float gamepad_axis_left_trigger;
+	float gamepad_axis_right_trigger;
+	float gamepad_axis_left_x;
+	float gamepad_axis_left_y;
+	float gamepad_axis_right_x;
+	float gamepad_axis_right_y;
+	float gamepad_axis_left_trigger;
+	bool gamepad_button_a;
+	bool gamepad_button_b;
+	bool gamepad_button_x;
+	bool gamepad_button_y;
+	bool gamepad_button_back;
+	bool gamepad_button_guide;
+	bool gamepad_button_start;
+	bool gamepad_button_left_stick;
+	bool gamepad_button_right_stick;
+	bool gamepad_button_left_shoulder;
+	bool gamepad_button_right_shoulder;
+	bool gamepad_button_up_dpad;
+	bool gamepad_button_down_dpad;
+	bool gamepad_button_left_dpad;
+	bool gamepad_button_right_dpad;
+}
 
 class IOController {
 public:
@@ -126,6 +154,8 @@ public:
 
 	int mouse_x();
 	int mouse_y();
+
+	std::vector<IOGamepadState>& get_gamepad_states();
 
 	bool key_down_state(int keyval);
 	bool key_press_state(int keyval);
