@@ -30,7 +30,7 @@ struct TileEntry {
 	}
 };
 
-extern ResourceDataSet<TileEntry> game_tile_data;
+extern std::vector<TileEntry> game_tile_data;
 
 namespace res {
 	TileEntry& tile(tile_id idx);

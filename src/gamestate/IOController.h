@@ -9,7 +9,6 @@
 #include <vector>
 #include <unordered_map>
 #include <SDL.h>
-#include <SDL_gamecontroller.h>
 
 #include "lanarts_defines.h"
 
@@ -90,7 +89,6 @@ struct IOState {
     std::unordered_map<SDL_Keycode, bool> key_press_states;
 	SDL_Keymod keymod;
 	// Mouse io state
-	std::vector<SDL_GameController*> active_controllers;
 	int mousex, mousey;
 	bool mouse_leftdown, mouse_rightdown;
 	bool mouse_leftclick, mouse_rightclick;

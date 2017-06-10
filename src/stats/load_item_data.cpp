@@ -40,8 +40,6 @@ void lapi_data_create_item(const LuaStackValue& table) {
 	ItemEntry* entry = new ItemEntry;
 	entry->init(game_item_data.size(), table);
 
-	game_item_data.new_entry(entry->name, entry);
-
-        luawrap::globals(table.luastate())["items"][entry->name] = table;
+	game_item_data.new_entry(entry->name, entry, table);
 }
 

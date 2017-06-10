@@ -25,7 +25,7 @@ void load_tile_callbackf(const YAML::Node& node, lua_State* L,
 	entry.name = parse_str(node["name"]);
     entry.images = parse_image_list(node["files"]);
 
-    game_tile_data.new_entry(entry.name, entry);
+    game_tile_data.push_back(entry);
 }
 
 void load_tile_data(const FilenameList& filenames) {

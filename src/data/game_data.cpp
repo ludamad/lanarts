@@ -44,7 +44,7 @@ void lapi_data_create_weapon(const LuaStackValue& table);
 ResourceDataSet<ClassEntry> game_class_data;
 ResourceDataSet<EffectEntry> game_effect_data;
 ResourceDataSet<EnemyEntry> game_enemy_data;
-ResourceDataSet<TileEntry> game_tile_data;
+std::vector<TileEntry> game_tile_data;
 ResourceDataSet<TilesetEntry> game_tileset_data;
 ResourceDataSet<SpellEntry> game_spell_data;
 ResourceDataSet<SpriteEntry> game_sprite_data;
@@ -53,20 +53,16 @@ template<typename T>
 static int get_X_by_name(T& t, const char* name, bool error_if_not_found =
 		true) {
     typename T::id_t id = t.get_id(name);
-    if (error_if_not_found) {
+    if (id == T::id_t::NONE && error_if_not_found) {
        /*Error if resource not found*/
        fprintf(stderr, "Failed to load resource!\nname: %s, of type %s\n",
                        name, typeid(t.get(0)).name());
        fflush(stderr);
        LANARTS_ASSERT(false /*resource not found*/);
     }
-    for (int i = 0; i < t.size(); i++) {
-            if (name == t.get(i).name) {
-                    return i;
-            }
-    }
-    return -1;
+	return (int)id;
 }
+
 template<typename E>
 static E& get_X_ref_by_name(std::vector<E>& t, const char* name) {
 	for (int i = 0; i < t.size(); i++) {
@@ -118,11 +114,19 @@ spell_id get_spell_by_name(const char* name) {
 	return get_X_by_name(game_spell_data, name);
 }
 tile_id get_tile_by_name(const char* name) {
-	return get_X_by_name(game_tile_data, name);
+    int id = 0;
+    for (auto& entry : game_tile_data) {
+        if (entry.name == name) {
+            return id;
+        }
+        id++;
+    }
+    LANARTS_ASSERT(false);
+    return NONE;
 }
 
 TileEntry& get_tile_entry(tile_id id) {
-	return game_tile_data.get(id);
+	return game_tile_data.at(id);
 }
 
 effect_id get_effect_by_name(const char* name) {
@@ -149,9 +153,9 @@ sprite_id sprite_from_lua(lua_State* L, int idx) {
 spell_id spell_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_spell_data, lua_tostring(L, idx));
 }
-tile_id tile_from_lua(lua_State* L, int idx) {
-	return get_X_by_name(game_tile_data, lua_tostring(L, idx));
-}
+//tile_id tile_from_lua(lua_State* L, int idx) {
+//	return get_X_by_name(game_tile_data, lua_tostring(L, idx));
+//}
 effect_id effect_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_effect_data, lua_tostring(L, idx));
 }
@@ -178,18 +182,18 @@ LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames);
 void init_game_data(lua_State* L) {
     game_class_data.init(L);
     game_effect_data.init(L);
+	game_item_data.init(L);
     game_enemy_data.init(L);
-    game_tile_data.init(L);
+    game_tile_data.clear();
     game_tileset_data.init(L);
     game_spell_data.init(L);
     game_sprite_data.init(L);
 
     LuaSpecialValue globals = luawrap::globals(L);
-    globals["classs"] = game_class_data.get_raw_data();
-    globals["effects"] = game_effect_data.get_raw_data();
+    globals["classes"] = game_class_data.get_raw_data();
+	globals["effects"] = game_effect_data.get_raw_data();
+	globals["items"] = game_item_data.get_raw_data();
     globals["enemies"] = game_enemy_data.get_raw_data();
-    globals["tiles"] = game_tile_data.get_raw_data();
-    globals["tilesets"] = game_tileset_data.get_raw_data();
     globals["spells"] = game_spell_data.get_raw_data();
     globals["sprites"] = game_sprite_data.get_raw_data();
 

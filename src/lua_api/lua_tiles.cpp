@@ -29,6 +29,9 @@ static int tile_create(LuaStackValue args) {
 	lua_State* L = args.luastate();
 	TileEntry entry;
 	LuaField images = args["images"];
+    if (args.has("name")) {
+        entry.name = args["name"].to_str();
+    }
 	if (!images.isnil()) {
 		entry.images = images.as<ImageList>();
 	} else {
@@ -44,7 +47,7 @@ static int tile_create(LuaStackValue args) {
 			entry.images.insert(entry.images.end(), list.begin(), list.end());
 		}
 	}
-	game_tile_data.new_entry(entry.name, entry);
+	game_tile_data.push_back(entry);
 	return game_tile_data.size() - 1;
 }
 

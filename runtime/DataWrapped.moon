@@ -106,7 +106,6 @@ weapon_create = (args, for_enemy = false) ->
         args.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
     args.power or= {base: {power, power}, strength: 1}
     args.range or= 7
-    items[args.name] = args -- HACK
     Data.weapon_create(args)
 
 spell_create = (args) ->

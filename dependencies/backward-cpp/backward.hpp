@@ -1885,7 +1885,7 @@ private:
                 Colorize colorize;
                 colorize.init();
 		colorize.set_color((Color::type)37, stack_output.back(), ";2");
-		output(format("%sSource \"%s\", line %i, in %s",
+		output(format("%s%s:%i: in %s",
 				indent, source_loc.filename.c_str(), (int)source_loc.line,
 				source_loc.function.c_str()));
 
