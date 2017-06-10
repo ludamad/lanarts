@@ -274,7 +274,7 @@ bool EffectStats::has_category(const char* category) {
         if (!eff.is_active()) {
             continue;
         }
-        if ((game_effect_data[eff.id].category == category)) {
+        if ((game_effect_data.get(eff.id).category == category)) {
             return true;
         }
     }

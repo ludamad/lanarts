@@ -50,8 +50,7 @@ EnemyEntry parse_enemy_type(lua_State* L, const YAML::Node& n) {
 void load_enemy_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	EnemyEntry entry = parse_enemy_type(L, node);
-	game_enemy_data.push_back(entry);
-
+	game_enemy_data.new_entry(entry.name, entry);
 
 	(*value)[entry.name] = node;
 }
@@ -110,6 +109,7 @@ static EnemyEntry parse_enemy_type(const LuaStackValue& table) {
 }
 
 void lapi_data_create_enemy(const LuaStackValue& table) {
-    game_enemy_data.push_back(parse_enemy_type(table));
+    EnemyEntry entry = parse_enemy_type(table);
+    game_enemy_data.new_entry(entry.name, entry);
 }
 

@@ -56,10 +56,10 @@ static TilesetEntry parse_tilesetentry(const YAML::Node& node) {
 
 void load_tileset_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	game_tileset_data.push_back(parse_tilesetentry(node));
+    TilesetEntry entry = parse_tilesetentry(node);
+    game_tileset_data.new_entry(entry.name, entry);
 }
 
 void load_tileset_data(const FilenameList& filenames) {
-	game_tileset_data.clear();
 	load_data_impl_template(filenames, "tilesets", load_tileset_callbackf);
 }

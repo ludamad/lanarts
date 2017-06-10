@@ -14,6 +14,7 @@
 
 #include "lanarts_defines.h"
 #include "data/ResourceEntryBase.h"
+#include "data/ResourceDataSet.h"
 
 #include "../LuaAction.h"
 

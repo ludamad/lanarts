@@ -44,7 +44,7 @@ static int tile_create(LuaStackValue args) {
 			entry.images.insert(entry.images.end(), list.begin(), list.end());
 		}
 	}
-	game_tile_data.push_back(entry);
+	game_tile_data.new_entry(entry.name, entry);
 	return game_tile_data.size() - 1;
 }
 

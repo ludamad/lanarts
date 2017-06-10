@@ -43,12 +43,11 @@ static void load_projectile(const YAML::Node& node, lua_State* L,
 	ProjectileEntry* entry = new ProjectileEntry;
 	parse_projectile_entry(L, node, *entry);
 
-	game_item_data.push_back(entry);
 	/* Lua loading code */
 
 	LuaValue nodetable = lua_yaml(L, node);
 	nodetable["type"] = "projectile";
-	(*value)[entry->name] = nodetable;
+	game_item_data.new_entry(entry->name, entry, nodetable);
 }
 
 

@@ -14,6 +14,7 @@
 #include <lcommon/LuaLazyValue.h>
 
 #include "data/ResourceEntryBase.h"
+#include "data/ResourceDataSet.h"
 
 #include "stats/combat_stats.h"
 

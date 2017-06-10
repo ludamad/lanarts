@@ -249,7 +249,7 @@
 #define SDL_ShowMessageBox SDL_ShowMessageBox_REAL
 #define SDL_ShowSimpleMessageBox SDL_ShowSimpleMessageBox_REAL
 #define SDL_GetMouseFocus SDL_GetMouseFocus_REAL
-#define SDL_GetMouseState SDL_GetMouseState_REAL
+#define SDL_GetMouseState SDL_GetMouoseState_REAL
 #define SDL_GetRelativeMouseState SDL_GetRelativeMouseState_REAL
 #define SDL_WarpMouseInWindow SDL_WarpMouseInWindow_REAL
 #define SDL_SetRelativeMouseMode SDL_SetRelativeMouseMode_REAL

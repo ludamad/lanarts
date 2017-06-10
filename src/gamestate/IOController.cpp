@@ -29,9 +29,9 @@ bool IOEventTrigger::should_trigger(IOEventTrigger::trigger_t trigger,
 IOState::IOState() {
 	clear();
 
-	for (int i = 0; i < SDL_NumJoysticks(); i++) {
-
-	}
+//	for (int i = 0; i < SDL_NumJoysticks(); i++) {
+//
+//	}
     //int MaxJoysticks = SDL_NumJoysticks();
     //int ControllerIndex = 0;
     //for(int JoystickIndex=0; JoystickIndex < MaxJoysticks; ++JoystickIndex)

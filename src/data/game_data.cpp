@@ -50,21 +50,22 @@ ResourceDataSet<SpellEntry> game_spell_data;
 ResourceDataSet<SpriteEntry> game_sprite_data;
 
 template<typename T>
-static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
+static int get_X_by_name(T& t, const char* name, bool error_if_not_found =
 		true) {
-	for (int i = 0; i < t.size(); i++) {
-		if (name == t.at(i).name) {
-			return i;
-		}
-	}
-	if (error_if_not_found) {
-		/*Error if resource not found*/
-		fprintf(stderr, "Failed to load resource!\nname: %s, of type %s\n",
-				name, typeid(t[0]).name());
-		fflush(stderr);
-		LANARTS_ASSERT(false /*resource not found*/);
-	}
-	return -1;
+    typename T::id_t id = t.get_id(name);
+    if (error_if_not_found) {
+       /*Error if resource not found*/
+       fprintf(stderr, "Failed to load resource!\nname: %s, of type %s\n",
+                       name, typeid(t.get(0)).name());
+       fflush(stderr);
+       LANARTS_ASSERT(false /*resource not found*/);
+    }
+    for (int i = 0; i < t.size(); i++) {
+            if (name == t.get(i).name) {
+                    return i;
+            }
+    }
+    return -1;
 }
 template<typename E>
 static E& get_X_ref_by_name(std::vector<E>& t, const char* name) {
@@ -167,10 +168,6 @@ tileset_id tileset_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_tileset_data, lua_tostring(L, idx));
 }
 
-LuaValue lua_sprites, lua_enemies, lua_items, lua_classes, lua_spells;
-
-LuaValue lua_settings;
-
 template<class T>
 static void __lua_init(lua_State* L, T& t) {
 	for (int i = 0; i < t.size(); i++)
@@ -179,35 +176,30 @@ static void __lua_init(lua_State* L, T& t) {
 
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames);
 void init_game_data(lua_State* L) {
-    game_class_data.clear();
-    game_effect_data.clear();
-    game_enemy_data.clear();
-    game_tile_data.clear();
-    game_tileset_data.clear();
-    game_spell_data.clear();
-    game_sprite_data.clear();
+    game_class_data.init(L);
+    game_effect_data.init(L);
+    game_enemy_data.init(L);
+    game_tile_data.init(L);
+    game_tileset_data.init(L);
+    game_spell_data.init(L);
+    game_sprite_data.init(L);
 
-	LuaSpecialValue globals = luawrap::globals(L);
+    LuaSpecialValue globals = luawrap::globals(L);
+    globals["classs"] = game_class_data.get_raw_data();
+    globals["effects"] = game_effect_data.get_raw_data();
+    globals["enemies"] = game_enemy_data.get_raw_data();
+    globals["tiles"] = game_tile_data.get_raw_data();
+    globals["tilesets"] = game_tileset_data.get_raw_data();
+    globals["spells"] = game_spell_data.get_raw_data();
+    globals["sprites"] = game_sprite_data.get_raw_data();
+
         // D: The table that holds all the resource data
 	LuaValue D = luawrap::ensure_table(globals["Data"]);
-
 
         // Compatibility
 	DataFiles dfiles = load_datafilenames("datafiles.yaml");
 	load_tile_data(dfiles.tile_files);
     load_sprite_data(L, dfiles.sprite_files);
-
-    globals["sprites"].newtable();
-    globals["enemies"].newtable();
-    globals["items"].newtable();
-    globals["classes"].newtable();
-    globals["spells"].newtable();
-
-    lua_sprites = globals["sprites"];
-    lua_enemies = globals["enemies"];
-    lua_items = globals["items"];
-    lua_classes = globals["classes"];
-    lua_spells = globals["spells"];
 
     D["enemy_create"].bind_function(lapi_data_create_enemy);
     D["class_create"].bind_function(lapi_data_create_class);
@@ -226,14 +218,14 @@ static void luayaml_push(LuaValue& value, lua_State* L, const char* name) {
 	lua_replace(L, tableind);
 }
 void luayaml_push_item(lua_State* L, const char* name) {
-	luayaml_push(lua_items, L, name);
+	luayaml_push(game_item_data.get_raw_data(), L, name);
 	LANARTS_ASSERT(!lua_isnil(L, -1));
 }
 void luayaml_push_sprites(lua_State* L, const char* name) {
-	luayaml_push(lua_sprites, L, name);
+	luayaml_push(game_sprite_data.get_raw_data(), L, name);
 	LANARTS_ASSERT(!lua_isnil(L, -1));
 }
 void luayaml_push_enemies(lua_State* L, const char* name) {
-	luayaml_push(lua_enemies, L, name);
+	luayaml_push(game_enemy_data.get_raw_data(), L, name);
 	LANARTS_ASSERT(!lua_isnil(L, -1));
 }

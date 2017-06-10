@@ -48,7 +48,7 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
     event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);
 
     for (Effect& eff : effects.effects) {
-        EffectEntry& entry = game_effect_data[eff.id];
+        EffectEntry& entry = game_effect_data.get(eff.id);
         if (!eff.is_active() || entry.on_damage_func.isnil()) {
             continue;
         }
@@ -265,7 +265,7 @@ void CombatGameInst::draw(GameState *gs, float frame, float alpha) {
         return;
     }
     GameView& view = gs->view();
-    SpriteEntry& spr = game_sprite_data[sprite];
+    SpriteEntry& spr = game_sprite_data.get(sprite);
     Colour draw_colour = effects.effected_colour();
 
     if (cooldowns().is_hurting()) {
@@ -285,7 +285,7 @@ void CombatGameInst::draw(GameState *gs, float frame, float alpha) {
 }
 
 void CombatGameInst::post_draw(GameState *gs) {
-    SpriteEntry& spr = game_sprite_data[sprite];
+    SpriteEntry& spr = game_sprite_data.get(sprite);
     GameView& view = gs->view();
     int w = spr.size().w, h = spr.size().h;
     int xx = x - w / 2, yy = y - h / 2;
@@ -346,7 +346,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
         if (!eff.is_active()) {
             continue;
         }
-        auto& entry = game_effect_data[eff.id];
+        auto& entry = game_effect_data.get(eff.id);
         if (!entry.on_melee_func.isnil()) {
             entry.on_melee_func.push();
             lua_State* L = gs->luastate();
@@ -368,7 +368,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
         if (!eff.is_active()) {
             continue;
         }
-        auto& entry = game_effect_data[eff.id];
+        auto& entry = game_effect_data.get(eff.id);
         if (!entry.on_receive_melee_func.isnil()) {
             entry.on_receive_melee_func.push();
             lua_State* L = gs->luastate();

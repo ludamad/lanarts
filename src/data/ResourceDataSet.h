@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
+#include <stdexcept>
 #include <luawrap/LuaValue.h>
 #include "data/hashmap.h"
 
@@ -36,44 +37,62 @@ public:
     }
 
     // Clears the data set. Can be called multiple times.
-    void init(lua_State* L) {
+    void clear() {
         hashmap_free(map_to_id);
         for (char* key : allocated_keys) {
             delete[] key;
         }
         allocated_keys.clear();
-        map_to_id = hashmap_new();
+        map_to_id = nullptr;
         list.clear();
-
+        raw_data = LuaValue();
+    }
+    void init(lua_State* L) {
+        clear();
+        map_to_id = hashmap_new();
         raw_data.init(L);
         raw_data.newtable();
     }
 
-    R& new_entry(const std::string& name) {
-        return new_entry(name.c_str());
+    R& new_entry(const std::string& name, const R& entry, LuaValue value) {
+        set_raw_data(name, value);
+        return new_entry(name.c_str(), entry);
     }
-    R& new_entry(const char* name) {
+    R& new_entry(const std::string& name, const R& entry) {
+        return new_entry(name.c_str(), entry);
+    }
+    R& new_entry(const char* name, const R& entry) {
         if (_get_id(name) != id_t::NONE) {
-            throw std::runtime_error("Entry '" + std::string(name) + "' already exists!");
+            throw std::runtime_error(("Entry '" + std::string(name) + "' already exists!").c_str());
         }
         id_t next_id = static_cast<id_t>(list.size());
         _put_id(name, next_id);
-        list.resize(list.size() + 1);
-        return list[next_id];
+        list.push_back(entry);
+        return list.back();
     }
     R& get(const char* name) {
         id_t id = _get_id(name);
         if (id == id_t::NONE) {
-            throw std::runtime_error("Entry '" + std::string(name) + "' does not exist!");
+            throw std::runtime_error(("Entry '" + std::string(name) + "' already exists!").c_str());
         }
         return get(id);
     }
-    R& get(id_t id) {
-        int id_i = static_cast<int>(id);
+    id_t get_id(const char* name) {
+        return _get_id(name);
+    }
+    R& get(int id) {
         return list.at(id);
     }
     size_t size() {
         return list.size();
+    }
+
+    LuaValue& get_raw_data() {
+        return raw_data;
+    }
+
+    void set_raw_data(const std::string& name, LuaValue value) {
+        raw_data[name.c_str()] = value;
     }
 
     void set_raw_data(const char* name, LuaValue value) {
@@ -94,14 +113,14 @@ private:
     // Only call after confirming _get_id returns NONE
     void _put_id(const char* name, id_t id) {
         char* name_cpy = strclone(name);
-        hashmap_put(map_to_id, name_cpy, static_cast<any_t>(id));
+        hashmap_put(map_to_id, name_cpy, (any_t)(long long)id);
     }
     id_t _get_id(const char* name) {
         any_t result = nullptr;
         if (hashmap_get(map_to_id, (char*)name, &result) == MAP_MISSING) {
             return id_t::NONE;
         }
-        return static_cast<id_t>(result);
+        return static_cast<id_t>((long long)result);
     }
 
     std::vector<R> list;

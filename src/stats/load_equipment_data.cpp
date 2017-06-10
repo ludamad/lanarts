@@ -47,7 +47,7 @@ void load_equipment_callbackf(const YAML::Node& node, lua_State* L,
 	EquipmentEntry* entry = new EquipmentEntry;
 	parse_equipment_entry(L, node, *entry);
 
-	game_item_data.push_back(entry);
+	game_item_data.new_entry(entry->name, entry);
 	/* Lua loading code */
 	lua_pushyaml(L, node);
 	lua_pushvalue(L, -1); // Duplicate
@@ -60,7 +60,7 @@ void load_equipment_callbackf(const YAML::Node& node, lua_State* L,
 
 void lapi_data_create_equipment(const LuaStackValue& table) {
 	EquipmentEntry* entry = new EquipmentEntry;
-	game_item_data.push_back(entry);
+	game_item_data.new_entry(entry->name, entry);
 
 	int idx = game_item_data.size();
 	entry->init(idx, table);

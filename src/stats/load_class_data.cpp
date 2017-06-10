@@ -31,9 +31,9 @@ void lapi_data_create_class(const LuaStackValue& table) {
 	ClassEntry entry;
 	entry.init(entry.class_id, table);
 	entry.class_id = game_class_data.size();
-	game_class_data.push_back(entry);
-        auto& cstats = game_class_data.back().starting_stats;
-        cstats.class_stats.classid = (game_class_data.size() - 1);
-        cstats.init();
+	auto& created_entry = game_class_data.new_entry(entry.name, entry);
+	auto& cstats = created_entry.starting_stats;
+	cstats.class_stats.classid = (game_class_data.size() - 1);
+	cstats.init();
 }
 

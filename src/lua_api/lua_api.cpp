@@ -182,7 +182,7 @@ namespace lua_api {
 		lua_spelltarget_bindings(L);
 
 		// New-style API
-                if (std::getenv("LANARTS_HEADLESS") == NULL) {
+                if (getenv("LANARTS_HEADLESS") == NULL) {
                     register_lua_core_Display(L);
                 }
 		register_lua_core_RVOWorld(L);
