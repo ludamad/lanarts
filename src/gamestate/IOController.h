@@ -78,6 +78,31 @@ struct IOEventTrigger {
 	}
 };
 
+struct IOGamepadState {
+    int gamepad_id;
+    float gamepad_axis_left_trigger;
+    float gamepad_axis_right_trigger;
+    float gamepad_axis_left_x;
+    float gamepad_axis_left_y;
+    float gamepad_axis_right_x;
+    float gamepad_axis_right_y;
+    bool gamepad_button_a;
+    bool gamepad_button_b;
+    bool gamepad_button_x;
+    bool gamepad_button_y;
+    bool gamepad_button_back;
+    bool gamepad_button_guide;
+    bool gamepad_button_start;
+    bool gamepad_button_left_stick;
+    bool gamepad_button_right_stick;
+    bool gamepad_button_left_shoulder;
+    bool gamepad_button_right_shoulder;
+    bool gamepad_button_up_dpad;
+    bool gamepad_button_down_dpad;
+    bool gamepad_button_left_dpad;
+    bool gamepad_button_right_dpad;
+};
+
 struct IOState {
 	struct TriggeredIOEvent {
 		IOEvent event;
@@ -86,6 +111,8 @@ struct IOState {
 				event(event), triggered_already(triggered_already) {
 		}
 	};
+
+    
     std::unordered_map<SDL_Keycode, bool> key_down_states;
     std::unordered_map<SDL_Keycode, bool> key_press_states;
 	SDL_Keymod keymod;
@@ -100,37 +127,13 @@ struct IOState {
 	
 	std::vector<TriggeredIOEvent> active_events;
 	std::vector<SDL_Event> sdl_events;
-
+	std::vector<IOGamepadState> gamepad_states;
+    
 	IOState();
 	void add_triggered_event(const IOEvent & event, bool triggered_already);
 	void clear();
 	void clear_for_step(bool resetprev = true);
 };
-
-struct IOGamepadState {
-	float gamepad_axis_left_trigger;
-	float gamepad_axis_right_trigger;
-	float gamepad_axis_left_x;
-	float gamepad_axis_left_y;
-	float gamepad_axis_right_x;
-	float gamepad_axis_right_y;
-	float gamepad_axis_left_trigger;
-	bool gamepad_button_a;
-	bool gamepad_button_b;
-	bool gamepad_button_x;
-	bool gamepad_button_y;
-	bool gamepad_button_back;
-	bool gamepad_button_guide;
-	bool gamepad_button_start;
-	bool gamepad_button_left_stick;
-	bool gamepad_button_right_stick;
-	bool gamepad_button_left_shoulder;
-	bool gamepad_button_right_shoulder;
-	bool gamepad_button_up_dpad;
-	bool gamepad_button_down_dpad;
-	bool gamepad_button_left_dpad;
-	bool gamepad_button_right_dpad;
-}
 
 class IOController {
 public:
@@ -155,7 +158,7 @@ public:
 	int mouse_x();
 	int mouse_y();
 
-	std::vector<IOGamepadState>& get_gamepad_states();
+	std::vector<IOGamepadState>& gamepad_states();
 
 	bool key_down_state(int keyval);
 	bool key_press_state(int keyval);
