@@ -29,9 +29,7 @@ void save_settings_data(GameSettings& settings, const char* filename) {
 		save_yaml_attr(file, "time_per_step", settings.time_per_step);
 		save_yaml_attr(file, "frame_action_repeat", settings.frame_action_repeat);
 
-		if (settings.class_type != -1 && settings.class_type < game_class_data.size()) {
-			save_yaml_attr(file, "class", res::class_entry(settings.class_type).name);
-		}
+		save_yaml_attr(file, "class", settings.class_type);
 
 		save_yaml_attr(file, "port", settings.port);
 		save_yaml_attr(file, "regen_level_on_death",
@@ -44,7 +42,6 @@ void save_settings_data(GameSettings& settings, const char* filename) {
 		save_yaml_attr(file, "connection_type",
 				connection_strings[settings.conntype]);
 	}
-
 }
 bool load_settings_data(GameSettings& settings, const char* filename) {
 
@@ -105,10 +102,7 @@ bool load_settings_data(GameSettings& settings, const char* filename) {
 			}
 
 			if (yaml_has_node(root, "class")) {
-				std::string classname;
-				root["class"] >> classname;
-				if (game_class_data.size() == 0)
-					settings.class_type = get_class_by_name(classname.c_str());
+				root["class"] >> settings.class_type;
 			}
 		} catch (const YAML::Exception& parse) {
 			printf("Settings Parsed Incorrectly: \n");

@@ -70,15 +70,21 @@ public:
         list.push_back(entry);
         return list.back();
     }
+    R& get(const std::string& name) {
+        return get(name.c_str());
+    }
     R& get(const char* name) {
         id_t id = _get_id(name);
         if (id == id_t::NONE) {
             throw std::runtime_error(("Entry '" + std::string(name) + "' already exists!").c_str());
         }
-        return get(id);
+        return get((int)id);
     }
     id_t get_id(const char* name) {
         return _get_id(name);
+    }
+    id_t get_id(const std::string& name) {
+        return _get_id(name.c_str());
     }
     R& get(int id) {
         return list.at(id);

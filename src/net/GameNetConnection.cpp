@@ -150,9 +150,9 @@ void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
         PlayerData& pd) {
     printf("Recv conn with size=%d\n", sb.size());
     std::string name;
-    class_id classtype;
+    std::string classtype;
     sb.read(name);
-    sb.read_int(classtype);
+    sb.read(classtype);
     printf("connection affirm read\n");
     pd.register_player(name, NULL, classtype, sender);
     printf("now there are %d players\n", (int) pd.all_players().size());
@@ -184,10 +184,10 @@ void net_recv_game_init_data(SerializeBuffer& sb, int sender,
     LANARTS_ASSERT(pd.all_players().empty());
     for (int i = 0; i < playern; i++) {
         std::string name;
-        class_id classtype;
+        std::string classtype;
         int net_id;
         sb.read(name);
-        sb.read_int(classtype);
+        sb.read(classtype);
         sb.read_int(net_id);
         pd.register_player(name, NULL, classtype, net_id);
     }
@@ -224,7 +224,7 @@ void net_send_game_init_data(GameNetConnection& net, PlayerData& pd,
         for (int i = 0; i < plist.size(); i++) {
             PlayerDataEntry& pde = plist[i];
             sb.write(pde.player_name);
-            sb.write_int(pde.classtype);
+            sb.write(pde.classtype);
             sb.write_int(pde.net_id);
         }
         printf("net_send_game_init_data: Sending to player %d\n", n);

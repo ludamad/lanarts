@@ -115,13 +115,12 @@ void GameState::start_connection() {
 		connection.initialize_as_client(callback, settings.ip.c_str(), settings.port);
 		printf("client connected\n");
 		net_send_connection_affirm(connection, settings.username,
-				settings.class_type);
+				get_class_by_name(settings.class_type));
 	}
 	if (settings.conntype == GameSettings::SERVER
 			|| settings.conntype == GameSettings::NONE) {
 		player_data().set_local_player_idx(0);
-		player_data().register_player(settings.username, NULL,
-				settings.class_type);
+		player_data().register_player(settings.username, NULL, settings.class_type);
 	}
 }
 
@@ -156,10 +155,13 @@ bool GameState::start_game() {
 		connection.set_accepting_connections(false);
 	}
 	if (!settings.loadreplay_file.empty()) {
-		load_init(this, init_data.seed, settings.class_type);
+		class_id class_type = -1;
+		load_init(this, init_data.seed, class_type);
+		settings.class_type = game_class_data.get(class_type).name;
 	}
 	if (!settings.savereplay_file.empty()) {
-		save_init(this, init_data.seed, settings.class_type);
+		class_id class_type = (int)game_class_data.get_id(settings.class_type);
+		save_init(this, init_data.seed, class_type);
 	}
 
 	if (settings.conntype == GameSettings::CLIENT) {
@@ -178,7 +180,7 @@ bool GameState::start_game() {
         initial_seed = init_data.seed;
 	base_rng_state.init_genrand(init_data.seed);
         /* If class was not set, we may be loading a game -- don't init level */
-	if (settings.class_type != -1) {
+	if (settings.class_type != "") {
 		restart();
 	}
 

@@ -167,8 +167,7 @@ static void run_bare_lua_state(int argc, char** argv) {
 
 // Returns: Should we keep running our outer game loop?
 static bool run_game_instance(const vector<string>& args) {
-    shared_ptr<GameState> gs_owner = init_gamestate();
-    GameState* gs = gs_owner.get();
+    shared_ptr<GameState> gs = init_gamestate();
 
     /* Load low-level Lua bootstrapping code.
      * Implements the module system used by the rest of the engine,

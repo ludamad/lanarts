@@ -23,13 +23,13 @@ struct PlayerDataEntry {
 	std::string player_name;
 	MultiframeActionQueue action_queue;
 	GameInstRef player_inst;
-	class_id classtype;
+	std::string classtype;
 	int net_id;
 
 	PlayerInst* player() const;
 
 	PlayerDataEntry(const std::string& player_name, GameInst* player_inst,
-			class_id classtype, int net_id) :
+					const std::string& classtype, int net_id) :
 			player_name(player_name), player_inst(player_inst), classtype(
 					classtype), net_id(net_id) {
 	}
@@ -43,7 +43,7 @@ public:
 	}
 	void clear();
 	void register_player(const std::string& name, PlayerInst* player,
-			class_id classtype, int net_id = 0);
+			const std::string& classtype, int net_id = 0);
 	PlayerInst* local_player();
 	PlayerDataEntry& local_player_data();
 

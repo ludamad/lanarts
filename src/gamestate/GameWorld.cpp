@@ -123,7 +123,7 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 	bool flocal = (gs->game_settings().conntype == GameSettings::CLIENT);
 	GameSettings& settings = gs->game_settings();
 	GameNetConnection& netconn = gs->net_connection();
-	int myclassn = gs->game_settings().class_type;
+	int myclassn = get_class_by_name(gs->game_settings().class_type);
 
 	for (int i = 0; i < gs->player_data().all_players().size(); i++) {
 		Pos position = positions.at(i);

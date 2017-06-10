@@ -42,7 +42,7 @@ void PlayerData::clear() {
 }
 
 void PlayerData::register_player(const std::string& name, PlayerInst* player,
-		class_id classtype, int net_id) {
+		const std::string& classtype, int net_id) {
 	_players.push_back(PlayerDataEntry(name, player, classtype, net_id));
 }
 
