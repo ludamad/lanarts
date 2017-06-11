@@ -296,6 +296,15 @@ local function class_choice_buttons_create()
         { "Necromancer", sprite_base .. "necromancer.png"},
 --        { "Lifelinker", sprite_base .. "lifelinker.png"}
     }
+    local prev, next = {}, {}
+    for i, button in ipairs(buttons) do
+        local name = button[1] 
+        local prev_i = i <= 1 and #buttons or i - 1
+        local next_i = i >= #buttons and 1 or i + 1
+
+        prev[name] = buttons[prev_i][1]
+        next[name] = buttons[next_i][1]
+    end
 
     local button_size = { 96, 96 + y_padding + font.height }
     local button_row = InstanceLine.create( { dx = button_size[1] + x_padding } )
@@ -305,9 +314,9 @@ local function class_choice_buttons_create()
 
         -- Allow choosing a class by using left/right arrows or tab
         if Keys.key_pressed(Keys.LEFT) then
-            settings.class_type = ( settings.class_type - 1 ) % #buttons
+            settings.class_type = prev[settings.class_type] or buttons[#buttons][1]
         elseif Keys.key_pressed(Keys.RIGHT) or Keys.key_pressed(Keys.TAB) then
-            settings.class_type = ( settings.class_type + 1 ) % #buttons
+            settings.class_type = next[settings.class_type] or buttons[1][1]
         end
     end
 
@@ -322,14 +331,14 @@ local function class_choice_buttons_create()
                   sprite = image_cached_load(button[2]) 
                 },
                 function(self, xy) -- color_formula
-                    if settings.class_type == i-1 then
+                    if settings.class_type == button[1] then
                         return COL_GOLD
                     else 
                         return self:mouse_over(xy) and COL_PALE_YELLOW or COL_WHITE
                     end
                 end,
                 function(self, xy) -- on_click
-                    settings.class_type = i-1
+                    settings.class_type = button[1]
                 end
              ) 
          )
@@ -397,7 +406,7 @@ local function choose_class_message_create()
     end
 
     function label:set_color()
-        self.options.color = settings.class_type == -1 and COL_PALE_RED or COL_INVISIBLE
+        self.options.color = settings.class_type == "" and COL_PALE_RED or COL_INVISIBLE
     end
 
     label:set_color() -- Ensure correct starting color

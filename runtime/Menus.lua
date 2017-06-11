@@ -162,7 +162,7 @@ function setup_settings_menu()
     
     menu_state.back = setup_start_menu
     menu_state.continue = function ()
-        if settings.class_type ~= -1 then
+        if settings.class_type ~= "" then
             exit_menu()
         end
     end
