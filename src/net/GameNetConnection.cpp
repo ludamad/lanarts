@@ -19,12 +19,8 @@
 
 #include "GameNetConnection.h"
 
-GameNetConnection::GameNetConnection(GameChat& chat, PlayerData& pd,
-        GameStateInitData& init_data) :
-                chat(chat),
-                pd(pd),
-                init_data(init_data),
-                _connection(NULL) {
+
+GameNetConnection::GameNetConnection(GameState* gs) : gs(gs), _connection(NULL) {
     _message_buffer = new SerializeBuffer();
 }
 
@@ -390,22 +386,22 @@ bool GameNetConnection::_handle_message(int sender,
     switch (type) {
 
     case PACKET_CLIENT2SERV_CONNECTION_AFFIRM: {
-        net_recv_connection_affirm(serializer, sender, pd);
+        net_recv_connection_affirm(serializer, sender, gs->player_data());
         break;
     }
     case PACKET_SERV2CLIENT_INITIALPLAYERDATA: {
-        net_recv_game_init_data(serializer, sender, init_data, pd);
+        net_recv_game_init_data(serializer, sender, gs->game_state_init_data(), gs->player_data());
         break;
     }
 
     case PACKET_ACTION: {
-        net_recv_player_actions(serializer, sender, pd);
+        net_recv_player_actions(serializer, sender, gs->player_data());
         break;
     }
     case PACKET_CHAT_MESSAGE: {
         ChatMessage msg;
         msg.deserialize(serializer);
-        chat.add_message(msg);
+        gs->game_chat().add_message(msg);
         break;
     }
     default:
@@ -468,8 +464,8 @@ std::vector<QueuedMessage> GameNetConnection::sync_on_message(message_t msg) {
     }
     QueuedMessage qm;
     const int timeout = 1;
-    PlayerDataEntry& pde = pd.local_player_data();
-    std::vector<bool> received(pd.all_players().size(), false);
+    PlayerDataEntry& pde = gs->player_data().local_player_data();
+    std::vector<bool> received(gs->player_data().all_players().size(), false);
 
     bool all_ack = false;
     while (!all_ack) {

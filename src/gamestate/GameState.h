@@ -21,9 +21,6 @@
 
 #include "fov/fov.h"
 
-#include "interface/GameChat.h"
-
-#include "interface/GameHud.h"
 #include "net/GameNetConnection.h"
 
 #include "GameLogger.h"
@@ -36,6 +33,8 @@
 #include "Team.h"
 
 #include <lsound/lsound.h>
+
+#include "GameScreen.h"
 
 struct lua_State;
 class GameMapState;
@@ -151,12 +150,12 @@ public:
 
 	/* GameState components */
 	GameView& view() {
-		return _view;
+		return screens.view();
 	}
 
 	GameTiles& tiles();
 	GameHud& game_hud() {
-		return hud;
+		return screens.hud();
 	}
 
 	GameWorld& game_world() {
@@ -300,14 +299,14 @@ private:
 	GameStateInitData init_data;
 
 	GameNetConnection connection;
-	GameHud hud;
-	GameView _view;
 	GameWorld world;
 
 	// Maintain a LIFO stack of RNG states so that portions of game-play can isolate from each other.
 	std::vector<MTwist*> rng_state_stack;
-        MTwist base_rng_state;
+    MTwist base_rng_state;
 
+    // Game screens to draw:
+    GameScreenSet screens;
 	// For dragging purposes:
 	GameView previous_view;
 	bool is_dragging_view;
@@ -319,6 +318,7 @@ private:
 	LuaSerializeConfig config;
 	GameStatePostSerializeData _post_deserialize_data;
         int initial_seed = 0;
+    friend class GameWorld;
 };
 
 void play(const char* sound_path);

@@ -68,11 +68,8 @@ static const int GAME_SIDEBAR_WIDTH = 160;
 GameState::GameState(const GameSettings& settings, lua_State* L) :
 		settings(settings),
 		L(L),
-		connection(game_chat(), player_data(), init_data),
+		connection(this),
 		frame_n(0),
-		hud(BBox(settings.view_width - GAME_SIDEBAR_WIDTH, 0, settings.view_width, settings.view_height),
-			BBox(0, 0, settings.view_width - GAME_SIDEBAR_WIDTH, settings.view_height)),
-		_view(0, 0, settings.view_width - GAME_SIDEBAR_WIDTH, settings.view_height),
 		world(this),
 		repeat_actions_counter(0),
 		config(L) {
@@ -184,6 +181,17 @@ bool GameState::start_game() {
 		restart();
 	}
 
+    for (int i = 0; i < 1; i++) {
+        screens.add({
+                GameHud {
+                        BBox(settings.view_width - GAME_SIDEBAR_WIDTH, 0, settings.view_width, settings.view_height),
+                        BBox(0, 0, settings.view_width - GAME_SIDEBAR_WIDTH, settings.view_height)
+                }, // hud
+                GameView {0, 0, settings.view_width - GAME_SIDEBAR_WIDTH, settings.view_height}, // view
+                BBox {0, 0, settings.view_width, settings.view_height}, // window_region
+                player_data().get_local_player_idx() // focus player id
+        });
+    }
 	return true;
 }
 
@@ -266,7 +274,9 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	player_data().deserialize(this, serializer);
 	world.set_current_level(local_player()->current_floor);
 
-	_view.sharp_center_on(local_player()->ipos());
+    screens.for_each_screen( [&]() {
+        view().sharp_center_on(local_player()->ipos());
+    });
 
 	settings.class_type = local_player()->class_stats().classid;
 	post_deserialize_data().process(this);
@@ -335,8 +345,10 @@ void GameState::restart() {
 	set_level(game_world().get_level(levelid));
 //		set_level(game_world().get_level(0, true));
 
-	PlayerInst* p = local_player();
-	view().sharp_center_on(p->x, p->y);
+    screens.for_each_screen( [&]() {
+        PlayerInst *p = local_player();
+        view().sharp_center_on(p->x, p->y);
+    });
 }
 
 int GameState::handle_event(SDL_Event* event, bool trigger_event_handling) {
@@ -346,13 +358,16 @@ int GameState::handle_event(SDL_Event* event, bool trigger_event_handling) {
 
 	GameMapState* level = get_level();
 
-	if (trigger_event_handling && level && level->id() != -1) {
-		if (hud.handle_event(this, event)) {
-			return false;
-		}
-	}
+    bool should_exit = false;
+    screens.for_each_screen( [&]() {
+        if (trigger_event_handling && level && level->id() != -1) {
+            if (game_hud().handle_event(this, event)) {
+                return false;
+            }
+        }
+    });
 
-	return iocontroller.handle_event(event);
+	return !should_exit && iocontroller.handle_event(event);
 }
 bool GameState::update_iostate(bool resetprev, bool trigger_event_handling) {
 	/* If 'resetprev', clear the io state for held keys
@@ -367,7 +382,9 @@ bool GameState::update_iostate(bool resetprev, bool trigger_event_handling) {
 			}
 		}
 		/* Fire IOEvents for the current step*/
-		iocontroller.trigger_events(BBox(0, 0, _view.width, _view.height));
+        screens.for_each_screen( [&]() {
+            iocontroller.trigger_events(BBox(0, 0, view().width, view().height));
+        });
 	} else {
 		iocontroller.update_iostate(false);
 		repeat_actions_counter--;
@@ -387,7 +404,7 @@ bool GameState::step() {
 
         connection.poll_messages();
 
-	hud.step(this);
+	game_hud().step(this);
         // Handles frame_n incrementing and restarting:
 	if (!world.step()) {
 		return false;
@@ -407,18 +424,18 @@ int GameState::key_press_state(int keyval) {
 
 void GameState::adjust_view_to_dragging() {
 	if (!is_dragging_view) {
-		previous_view = _view;
+		previous_view = view();
 	}
 	/*Adjust the view if the player is far from view center,
 	 *if we are following the cursor, or if the minimap is clicked */
 	bool is_dragged = false;
 
 	if (mouse_right_down()) {
-		BBox minimap_bbox = hud.minimap().minimap_bounds(this);
+		BBox minimap_bbox = game_hud().minimap().minimap_bounds(this);
 		if (is_dragging_view || minimap_bbox.contains(mouse_pos())) {
 			Pos minimap_xy = mouse_pos() - minimap_bbox.left_top();
-			Pos world_xy = hud.minimap().minimap_xy_to_world_xy(this, previous_view, minimap_xy);
-			_view.sharp_center_on(world_xy);
+			Pos world_xy = game_hud().minimap().minimap_xy_to_world_xy(this, previous_view, minimap_xy);
+            view().sharp_center_on(world_xy);
 			is_dragged = true;
 		}
 	}
@@ -427,7 +444,7 @@ void GameState::adjust_view_to_dragging() {
 	if (!is_dragged && is_dragging_view) {
 		PlayerInst* p = local_player();
 		if (p) {
-			_view.sharp_center_on(p->x, p->y);
+            view().sharp_center_on(p->x, p->y);
 		}
 	}
 	is_dragging_view = is_dragged;
@@ -450,41 +467,43 @@ void GameState::draw(bool drawhud) {
 
 	ldraw::display_draw_start();
 
-	adjust_view_to_dragging();
+    screens.for_each_screen( [&]() {
+        adjust_view_to_dragging();
 
-	if (drawhud) {
-		ldraw::display_set_window_region(
-				BBoxF(0, 0, _view.width, _view.height));
-	} else {
-		ldraw::display_set_window_region(
-				BBoxF(0, 0, _view.width + hud.width(), _view.height));
-	}
+        if (drawhud) {
+            ldraw::display_set_window_region(
+                    BBoxF(0, 0, view().width, view().height));
+        } else {
+            ldraw::display_set_window_region(
+                    BBoxF(0, 0, view().width + game_hud().width(), view().height));
+        }
 
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	get_level()->tiles().pre_draw(this);
+        glClearColor(0.0, 0.0, 0.0, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        get_level()->tiles().pre_draw(this);
 
-	std::vector<GameInst*> safe_copy = get_level()->game_inst_set().to_vector();
-	LuaDrawableQueue::Iterator lua_drawables = get_level()->drawable_queue();
+        std::vector<GameInst *> safe_copy = get_level()->game_inst_set().to_vector();
+        LuaDrawableQueue::Iterator lua_drawables = get_level()->drawable_queue();
 
-	for (size_t i = 0; i < safe_copy.size(); i++) {
-		lua_drawables_draw_below_depth(lua_drawables, safe_copy[i]->depth);
-		safe_copy[i]->draw(this);
-	}
-	lua_drawables_draw_rest(lua_drawables);
+        for (size_t i = 0; i < safe_copy.size(); i++) {
+            lua_drawables_draw_below_depth(lua_drawables, safe_copy[i]->depth);
+            safe_copy[i]->draw(this);
+        }
+        lua_drawables_draw_rest(lua_drawables);
 
-	lua_api::luacall_post_draw(L);
+        lua_api::luacall_post_draw(L);
 
-	monster_controller().post_draw(this);
-	get_level()->tiles().post_draw(this);
-	for (size_t i = 0; i < safe_copy.size(); i++) {
-		safe_copy[i]->post_draw(this);
-	}
-	if (drawhud) {
-		hud.draw(this);
-	}
+        monster_controller().post_draw(this);
+        get_level()->tiles().post_draw(this);
+        for (size_t i = 0; i < safe_copy.size(); i++) {
+            safe_copy[i]->post_draw(this);
+        }
+        if (drawhud) {
+            game_hud().draw(this);
+        }
 
-	lua_api::luacall_overlay_draw(L); // Used for debug purposes
+        lua_api::luacall_overlay_draw(L); // Used for debug purposes
+    });
 
 	ldraw::display_draw_finish();
 

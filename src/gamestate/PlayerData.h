@@ -55,6 +55,9 @@ public:
 
 	PlayerDataEntry& get_entry_by_netid(int netid);
 
+	PlayerDataEntry& get(int player_idx) {
+		return _players.at(player_idx);
+	}
 	void set_local_player_idx(int idx);
 	int get_local_player_idx() {
 		return _local_player_idx;

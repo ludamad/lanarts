@@ -149,8 +149,10 @@ GameMapState* GameWorld::get_level(level_id id) {
 void GameWorld::set_current_level(GameMapState* level) {
     lvl = level;
     if (lvl != NULL) {
-            gs->view().world_width = lvl->width();
-            gs->view().world_height = lvl->height();
+		gs->screens.for_each_screen([&]() {
+			gs->view().world_width = lvl->width();
+			gs->view().world_height = lvl->height();
+		});
     }
 }
 
@@ -162,10 +164,12 @@ bool GameWorld::pre_step(bool update_iostate) {
 
 	midstep = true;
 
-	/* Queue actions for local player */
-	/* This will result in a network send of the player's actions */
-	PlayerData& pd = gs->player_data();
-	pd.local_player()->enqueue_io_actions(gs);
+    gs->screens.for_each_screen( [&]() {
+        /* Queue actions for local player */
+        /* This will result in a network send of the player's actions */
+        PlayerData &pd = gs->player_data();
+        pd.local_player()->enqueue_io_actions(gs);
+    });
 
 	set_current_level(current_level);
 	midstep = false;
