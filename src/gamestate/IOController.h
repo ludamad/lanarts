@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <SDL.h>
 #include <SDL_gamecontroller.h>
+#include <SDL_joystick.h>
 
 #include "lanarts_defines.h"
 
@@ -184,9 +185,12 @@ private:
 			SDL_Keymod mod, bool holding_key);
 	IOState iostate;
 
+    IOGamepadState create_gamepad_state(SDL_GameController* controller, int id);
+    
 	std::vector<spell_id> spells_bound;
 	std::vector<item_id> items_bound;
 	std::vector<IOEventTrigger> event_bindings;
+    std::vector<SDL_GameController*> controllers;
 };
 
 #endif /* IOCONTROLLER_H_ */

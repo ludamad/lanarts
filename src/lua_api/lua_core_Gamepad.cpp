@@ -23,6 +23,15 @@ static IOGamepadState* gamepad_by_id(LuaStackValue lgamepad_id){
         return NULL;
 }
 
+static std::vector<int> gamepad_ids(LuaStackValue unused){
+    GameState* gs = lua_api::gamestate(unused.luastate());
+    std::vector<int> ids;
+    for (auto& gamepad : gs->gamepad_states()) {
+        ids.push_back(gamepad.gamepad_id);
+    }
+    return ids;
+}
+
 #define GAMEPAD_BUTTON_GETTER(member) \
  static bool member (LuaStackValue lgamepad_id) { \
      auto *gamepad = gamepad_by_id(lgamepad_id); \

@@ -182,6 +182,24 @@ IOController::IOController() {
 		event_bindings.push_back(trigger);
 	}
 
+	/* Initialize controllers */
+    int num_joysticks = SDL_NumJoysticks();
+    iostate.gamepad_states.clear();
+    for(int joystick_idx=0; joystick_idx < num_joysticks; ++joystick_idx)
+    {
+        if (!SDL_IsGameController(joystick_idx))
+        {
+            continue;
+        }
+
+        SDL_Joystick* joystick = SDL_JoystickOpen(joystick_idx);
+		SDL_JoystickID instance_id = SDL_JoystickInstanceID(joystick);
+		printf("Initial Controller Detected ID: %i, Instance ID: %i\n",  joystick_idx, instance_id);
+
+        SDL_GameController* controller = SDL_GameControllerOpen(joystick_idx);//SDL_GameControllerFromInstanceID(instance_id);
+
+		controllers.push_back(controller);
+    }
 }
 
 void IOController::bind_spell(spell_id spell) {
@@ -305,6 +323,12 @@ int IOController::handle_event(SDL_Event* event) {
 	}
 	case SDL_QUIT:
 		done = 2;
+		
+		/*TODO Handle closing all joysticks
+        if (SDL_JoystickGetAttached(joystick)) {
+            SDL_JoystickClose(joystick);
+        }
+        */
 		break;
 	}
 
@@ -320,7 +344,45 @@ void IOController::update_iostate(bool resetprev) {
     //scale the mouse position for when display_size != window_size
 	iostate.mousex = display_size.w * (iostate.mousex / (float) window_size.w);
 	iostate.mousey = display_size.h * (iostate.mousey / (float) window_size.h);
+	
+	iostate.gamepad_states.clear();
+
+	for ( auto controller : controllers ) {
+        int instance_id = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller));
+        IOGamepadState state = create_gamepad_state(controller,  instance_id);
+
+        iostate.gamepad_states.push_back(state);
+    }
 }
+
+IOGamepadState IOController::create_gamepad_state(SDL_GameController* controller, int id) {
+    IOGamepadState state;
+    state.gamepad_id = id;
+    state.gamepad_axis_left_trigger = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+    state.gamepad_axis_right_trigger = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+    state.gamepad_axis_left_x = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_LEFTX);
+    state.gamepad_axis_left_y = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_LEFTY);
+    state.gamepad_axis_right_x = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_RIGHTX);
+    state.gamepad_axis_right_y = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_RIGHTY);
+    state.gamepad_button_a = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_A);
+    state.gamepad_button_b = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_B);
+    state.gamepad_button_x = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X);
+    state.gamepad_button_y = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y);
+    state.gamepad_button_back = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK);
+    state.gamepad_button_guide = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_GUIDE);
+    state.gamepad_button_start = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_START);
+    state.gamepad_button_left_stick = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSTICK);
+    state.gamepad_button_right_stick = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSTICK);
+    state.gamepad_button_left_shoulder = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+    state.gamepad_button_right_shoulder = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+    state.gamepad_button_up_dpad = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP);
+    state.gamepad_button_down_dpad = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+    state.gamepad_button_left_dpad = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+    state.gamepad_button_right_dpad = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+    
+    return state;
+}
+
 
 std::vector<SDL_Event>& IOController::get_events() {
 	return iostate.sdl_events;
@@ -441,3 +503,4 @@ bool IOController::shift_held() {
 void IOController::clear() {
     iostate.clear();
 }
+
