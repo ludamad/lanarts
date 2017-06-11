@@ -31,6 +31,7 @@ struct GameScreenSet {
     PlayerInst* focus_object(GameState* gs);
     GameMapState* map(GameState* gs);
     GameHud& hud();
+    BBox& window_region();
 
     template <typename Func>
     void for_each_screen(Func&& f, bool allow_nesting = false) {

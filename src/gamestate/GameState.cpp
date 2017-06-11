@@ -181,14 +181,20 @@ bool GameState::start_game() {
 		restart();
 	}
 
-    for (int i = 0; i < 1; i++) {
+
+    const int N_PLAYERS = 2;
+    const int WIDTH = settings.view_width / N_PLAYERS;
+    const int HEIGHT = settings.view_height; // / N_PLAYERS;
+    for (int i = 0; i < N_PLAYERS; i++) {
+        const int x1 = i * WIDTH, y1 = 0;
+        const int x2 = x1 + WIDTH, y2 = y1 + HEIGHT;
         screens.add({
                 GameHud {
-                        BBox(settings.view_width - GAME_SIDEBAR_WIDTH, 0, settings.view_width, settings.view_height),
-                        BBox(0, 0, settings.view_width - GAME_SIDEBAR_WIDTH, settings.view_height)
+                        BBox(x2 - GAME_SIDEBAR_WIDTH, y1, x2, y2),
+                        BBox(x1, y1, x2 - GAME_SIDEBAR_WIDTH, y2)
                 }, // hud
-                GameView {0, 0, settings.view_width - GAME_SIDEBAR_WIDTH, settings.view_height}, // view
-                BBox {0, 0, settings.view_width, settings.view_height}, // window_region
+                GameView {x1, y1, x2 - GAME_SIDEBAR_WIDTH, y2}, // view
+                BBox {x1,y1, x2, y2}, // window_region
                 player_data().get_local_player_idx() // focus player id
         });
     }
@@ -362,7 +368,7 @@ int GameState::handle_event(SDL_Event* event, bool trigger_event_handling) {
     screens.for_each_screen( [&]() {
         if (trigger_event_handling && level && level->id() != -1) {
             if (game_hud().handle_event(this, event)) {
-                return false;
+                should_exit = true;
             }
         }
     });
@@ -469,19 +475,18 @@ void GameState::draw(bool drawhud) {
 
 	ldraw::display_draw_start();
 
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     screens.for_each_screen( [&]() {
         adjust_view_to_dragging();
 
-        if (drawhud) {
-            ldraw::display_set_window_region(
-                    BBoxF(0, 0, view().width, view().height));
-        } else {
-            ldraw::display_set_window_region(
-                    BBoxF(0, 0, view().width + game_hud().width(), view().height));
-        }
+        //if (drawhud) {
+        ldraw::display_set_window_region(screens.window_region());
+        //} else {
+        //    ldraw::display_set_window_region(
+        //            BBoxF(0, 0, view().width + game_hud().width(), view().height));
+        //}
 
-        glClearColor(0.0, 0.0, 0.0, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         get_level()->tiles().pre_draw(this);
 
         std::vector<GameInst *> safe_copy = get_level()->game_inst_set().to_vector();

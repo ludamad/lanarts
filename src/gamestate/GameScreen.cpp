@@ -17,3 +17,6 @@ GameHud& GameScreenSet::hud() {
 GameView& GameScreenSet::view() {
     return screen().view;
 }
+BBox& GameScreenSet::window_region() {
+    return screen().window_region;
+}
