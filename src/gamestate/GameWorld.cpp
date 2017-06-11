@@ -152,7 +152,7 @@ void GameWorld::set_current_level(GameMapState* level) {
 		gs->screens.for_each_screen([&]() {
 			gs->view().world_width = lvl->width();
 			gs->view().world_height = lvl->height();
-		});
+		}, true);
     }
 }
 

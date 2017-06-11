@@ -158,7 +158,7 @@ void PlayerInst::step(GameState* gs) {
 	vx = 0, vy = 0;
 
 	CombatGameInst::step(gs);
-	GameView& view = gs->view();
+
 
 	//Stats/effect step
 	if (cooldowns().is_hurting())
@@ -183,9 +183,6 @@ void PlayerInst::step(GameState* gs) {
 	vx = round(vx * 256.0f) / 256.0f;
 	vy = round(vy * 256.0f) / 256.0f;
 
-	if (!gs->key_down_state(SDLK_x) && is_local_player())
-		view.center_on(last_x, last_y);
-
 	update_position(rx + vx, ry + vy);
         if (is_ghost()) {
             stats().core.hp = 0;
@@ -198,6 +195,9 @@ void PlayerInst::step(GameState* gs) {
 
 void PlayerInst::draw(GameState* gs) {
 	CombatGameInst::draw(gs, 0.0f, is_ghost() ? 0.4 : 1.0);
+	GameView& view = gs->view();
+	if (!gs->key_down_state(SDLK_x) && is_local_player())
+		view.center_on(last_x, last_y);
 }
 
 void PlayerInst::copy_to(GameInst *inst) const {

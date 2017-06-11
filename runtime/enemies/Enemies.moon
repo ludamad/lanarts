@@ -322,17 +322,6 @@ DataW.enemy_create {
     effects_active: {"StopOnceInRange", "Enraging"}
 }
 
--- enemy_charge = (caster) ->
---     for target in *Map.enemies_list(caster)
---         if vector_distance({target.x, target.y}, {caster.x, caster.y}) < target.target_radius + caster.target_radius + 30
---             str_diff = math.max(0, caster.stats.strength - target.stats.strength)
---             thrown = target\add_effect("Thrown", 10)
---             thrown.angle = vector_direction({caster.x, caster.y}, {target.x, target.y})
---             if not caster.is_enemy and caster\is_local_player() 
---                 EventLog.add("The " .. target.name .." is thrown back!", {200,200,255})
---             elseif not target.is_enemy and target\is_local_player()
---                 EventLog.add("You are thrown back!", {200,200,255})
-
 DataW.enemy_create {
     name: "Elephant"
     sprite: "spr_enemies.animals.elephant"

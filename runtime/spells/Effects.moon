@@ -1,5 +1,6 @@
 EventLog = require "ui.EventLog"
 GameObject = require "core.GameObject"
+GameState = require "core.GameState"
 Map = require "core.Map"
 World = require "core.World"
 Bresenham = require "core.Bresenham"
@@ -56,18 +57,20 @@ DataW.effect_create {
         @extensions = 0
     remove_func: (obj) =>
         obj\add_effect("Exhausted", @exhausted_duration)
-        if obj\is_local_player()
-            play_sound "sound/exhausted.ogg"
-            EventLog.add("You are now exhausted...", {255,200,200})
+        GameState.for_screens () ->
+            if obj\is_local_player()
+                play_sound "sound/exhausted.ogg"
+                EventLog.add("You are now exhausted...", {255,200,200})
     step_func: (obj) =>
         diff = math.max(obj.kills - @kill_tracker, 0)
         for i=1,diff
             @time_left = math.min(@max_time * 1.5, @time_left + 60)
-            if obj\is_local_player()
-                EventLog.add("Your rage grows ...", {200,200,255})
-                play_sound "sound/berserk.ogg"
-            if settings.verbose_output 
-                EventLog.add("Killed Enemy, berserk time_left = " .. @time_left)
+            GameState.for_screens () ->
+                if obj\is_local_player()
+                    EventLog.add("Your rage grows ...", {200,200,255})
+                    play_sound "sound/berserk.ogg"
+                if settings.verbose_output 
+                    EventLog.add("Killed Enemy, berserk time_left = " .. @time_left)
             if obj\has_effect("AmuletBerserker") and chance(0.05) then
                 play_sound "sound/summon.ogg"
                 eff = obj\add_effect("Summoning", 20)
@@ -91,8 +94,9 @@ DataW.effect_create {
         new.cooldown_mult = new.cooldown_mult * 1.25
         obj\reset_rest_cooldown()
     remove_func: (obj) =>
-        if obj\is_local_player()
-            EventLog.add("You are no longer exhausted.", {200,200,255})
+        GameState.for_screens () ->
+            if obj\is_local_player()
+                EventLog.add("You are no longer exhausted.", {200,200,255})
 }
 DataW.effect_create {
     name: "Expedited"
@@ -102,8 +106,9 @@ DataW.effect_create {
         new.ranged_cooldown_multiplier /= 1.5
     can_use_rest: false
     finish_func: (obj) => 
-        if obj\is_local_player()
-            EventLog.add("You are no longer expedited.", {255,200,200}) 
+        GameState.for_screens () ->
+            if obj\is_local_player()
+                EventLog.add("You are no longer expedited.", {255,200,200}) 
     effected_colour: {220,220,255}
     effected_sprite: "haste effected"
 }
@@ -318,8 +323,9 @@ DataW.additive_effect_create {
         percentage_recoil = @_get_value()
         if attacker\direct_damage(damage * percentage_recoil)
             defender\gain_xp_from(attacker)
-        if defender.is_local_player and defender\is_local_player()
-            EventLog.add("You strike back with spikes!", COL_PALE_BLUE)
+        GameState.for_screens () ->
+            if defender.is_local_player and defender\is_local_player()
+                EventLog.add("You strike back with spikes!", COL_PALE_BLUE)
         return damage
 }
 
@@ -379,14 +385,16 @@ DataW.effect_create {
     stat_func: (obj, old, new) =>
         for k, v in pairs @active_bonuses -- Abuse that stat_func is called every frame
             if v == 0 
-                EventLog.add("Your defence falls back down...", COL_PALE_BLUE)
+                GameState.for_screens () ->
+                    EventLog.add("Your defence falls back down...", COL_PALE_BLUE)
                 @active_bonuses[k] = nil
             else 
                 new.defence += 2
                 @active_bonuses[k] -= 1
     on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
         if not @active_bonuses[attacker.id]
-            EventLog.add("Your defence rises due to getting hit!", COL_PALE_BLUE)
+            GameState.for_screens () ->
+                EventLog.add("Your defence rises due to getting hit!", COL_PALE_BLUE)
             @active_bonuses[attacker.id] = @duration
         elseif @active_bonuses[attacker.id] < @duration
             @active_bonuses[attacker.id] = @duration
@@ -428,8 +436,9 @@ for equip_slot in *{"", "Armour", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
             @kill_tracker = caster.kills
         step_func: (caster) =>
             while caster.kills > @kill_tracker
-                if caster\is_local_player()
-                    EventLog.add("You regain health for killing!", COL_PALE_BLUE)
+                GameState.for_screens () ->
+                    if caster\is_local_player()
+                        EventLog.add("You regain health for killing!", COL_PALE_BLUE)
                 caster\heal_hp(3 + caster.stats.level)
                 @kill_tracker += 1
     }
@@ -440,8 +449,9 @@ for equip_slot in *{"", "Armour", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
             @kill_tracker = caster.kills
         step_func: (caster) =>
             while caster.kills > @kill_tracker
-                if caster\is_local_player()
-                    EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
+                GameState.for_screens () ->
+                    if caster\is_local_player()
+                        EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
                 caster\heal_mp(3 + caster.stats.level)
                 @kill_tracker += 1
     }
@@ -456,7 +466,8 @@ DataW.effect_create {
     step_func: (caster) =>
         while caster.kills > @kill_tracker
             if chance(0.03 * @n_derived)
-                EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
+                GameState.for_screens () ->
+                    EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
                 play_sound "sound/summon.ogg"
                 monster = "Centaur Hunter"
                 if not (caster\has_effect "Summoning")
@@ -476,7 +487,8 @@ DataW.effect_create {
     step_func: (caster) =>
         while caster.kills > @kill_tracker
             if chance(0.05 * @n_derived)
-                EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
+                GameState.for_screens () ->
+                    EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
                 play_sound "sound/summon.ogg"
                 monster = "Storm Elemental"
                 if not (caster\has_effect "Summoning")
@@ -497,7 +509,8 @@ DataW.effect_create {
     step_func: (caster) =>
         while caster.kills > @kill_tracker
             if chance(0.03 * @n_derived)
-                EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
+                GameState.for_screens () ->
+                    EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
                 play_sound "sound/summon.ogg"
                 monster = "Golem"
                 if not (caster\has_effect "Summoning")
@@ -649,10 +662,11 @@ DataW.effect_create {
             if dist < @range
                 mon\add_effect("Sapped", 35)
                 mon.stats.mp = math.max(0, mon.stats.mp - 10)
-                if mon\is_local_player() 
-                    EventLog.add("Your MP is drained!", {200,200,255})
-                elseif not mon.is_enemy
-                    EventLog.add(mon.name .. "'s MP is drained!", {200,200,255})
+                GameState.for_screens () ->
+                    if mon\is_local_player() 
+                        EventLog.add("Your MP is drained!", {200,200,255})
+                    elseif not mon.is_enemy
+                        EventLog.add(mon.name .. "'s MP is drained!", {200,200,255})
     draw_func: (caster, top_left_x, top_left_y) =>
         @max_alpha = 0.35
         AuraBase.draw(@, COL_PALE_BLUE, COL_BLUE, caster.x, caster.y)
@@ -713,8 +727,9 @@ DataW.effect_create {
     console_draw_func: (player, xy) => 
         draw_weapon_console_effect(player, DataW._vampirism, "Heal +25% dealt", xy)
     on_melee_func: (attacker, defender, damage, attack_stats) =>
-        if attacker\is_local_player() 
-            EventLog.add("You steal the enemy's life!", {200,200,255})
+        GameState.for_screens () ->
+            if attacker\is_local_player() 
+                EventLog.add("You steal the enemy's life!", {200,200,255})
         attacker\heal_hp(damage / 4 * @n_derived)
         return damage
 }
@@ -779,13 +794,15 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage", "Lifelinker"}
                 eff.duration = 30
             while caster.kills > @kill_tracker
                 if name == "Necromancer"
-                    if caster\is_local_player()
-                        EventLog.add("You gain mana for killing!", COL_PALE_BLUE)
+                    GameState.for_screens () ->
+                        if caster\is_local_player()
+                            EventLog.add("You gain mana for killing!", COL_PALE_BLUE)
                     caster\heal_mp(5)
                 for {:instance, :class_name} in *World.players
                     if instance ~= caster and class_name == "Necromancer"
-                        if instance\is_local_player()
-                            EventLog.add("You gain mana from the carnage!", COL_PALE_BLUE)
+                        GameState.for_screens () ->
+                            if instance\is_local_player()
+                                EventLog.add("You gain mana from the carnage!", COL_PALE_BLUE)
                         instance\heal_mp(2)
                 @kill_tracker += 1
         on_damage_func: (caster, damage) =>
@@ -795,15 +812,17 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage", "Lifelinker"}
                     continue
                 append new_links, link
                 share_damage(link, damage, 5)
-                if caster\is_local_player()
-                    EventLog.add("Your link feels your pain!", COL_PALE_RED)
+                GameState.for_screens () ->
+                    if caster\is_local_player()
+                        EventLog.add("Your link feels your pain!", COL_PALE_RED)
             @links = new_links
         on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
             if name == "Necromancer"
                 if attacker\direct_damage(damage * 0.33)
                     defender\gain_xp_from(attacker)
-                if defender\is_local_player()
-                    EventLog.add("Your corrosive flesh hurts #{attacker.name} as you are hit!", COL_PALE_BLUE)
+                GameState.for_screens () ->
+                    if defender\is_local_player()
+                        EventLog.add("Your corrosive flesh hurts #{attacker.name} as you are hit!", COL_PALE_BLUE)
             return damage
     }
 
@@ -840,8 +859,9 @@ DataW.effect_create {
                 if @attacked[mon.id]
                     continue
                 @attacked[mon.id] = true
-                if caster\is_local_player()
-                    EventLog.add("You strike as you pass!", {200,200,255})
+                GameState.for_screens () ->
+                    if caster\is_local_player()
+                        EventLog.add("You strike as you pass!", {200,200,255})
                 @n_hits += 1
                 caster\melee(mon, math.max(0.1, 1.0 / @n_hits))
     draw_func: (caster) =>
@@ -868,8 +888,9 @@ DataW.effect_create {
         assert @linker, "No linker set in lifelink!"
         {:links} = @linker\get_effect("Lifelinker")
         share_damage(@linker, damage, 15) -- Cannot bring below 15HP
-        if @linker\is_local_player()
-            EventLog.add("You feel your links pain!", COL_PALE_RED)
+        GameState.for_screens () ->
+            if @linker\is_local_player()
+                EventLog.add("You feel your links pain!", COL_PALE_RED)
         for link in *links do if link ~= summon
             share_damage(link, damage, 5) -- Cannot bring below 5HP
 }
@@ -897,7 +918,8 @@ DataW.effect_create {
         @damage_tracker += dmg
         new_hp = mon.stats.hp - dmg
         if new_hp < @next_hp_threshold
-            EventLog.add((if mon.unique then "" else "The ") .. mon.name .. " gets mad!", {255,255,255})
+            GameState.for_screens () ->
+                EventLog.add((if mon.unique then "" else "The ") .. mon.name .. " gets mad!", {255,255,255})
             mon\add_effect("Charging", 100)
             @next_hp_threshold -= @damage_interval
         return dmg
@@ -924,9 +946,10 @@ DataW.effect_create {
         if @n_steps > @n_ramp
             thrown = defender\add_effect("Thrown", 10)
             thrown.angle = vector_direction({mon.x, mon.y}, {defender.x, defender.y})
-            if not mon.is_enemy and mon\is_local_player() 
-                EventLog.add("The " .. defender.name .." is thrown back!", {200,200,255})
-            elseif not defender.is_enemy and defender\is_local_player()
-                EventLog.add("You are thrown back!", {200,200,255})
+            GameState.for_screens () ->
+                if not mon.is_enemy and mon\is_local_player() 
+                    EventLog.add("The " .. defender.name .." is thrown back!", {200,200,255})
+                elseif not defender.is_enemy and defender\is_local_player()
+                    EventLog.add("You are thrown back!", {200,200,255})
             -- mon\remove_effect("Charging")
 }

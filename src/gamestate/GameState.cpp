@@ -404,7 +404,9 @@ bool GameState::step() {
 
         connection.poll_messages();
 
-	game_hud().step(this);
+    screens.for_each_screen( [&](){
+        game_hud().step(this);
+    });
         // Handles frame_n incrementing and restarting:
 	if (!world.step()) {
 		return false;

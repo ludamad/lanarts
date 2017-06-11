@@ -208,7 +208,9 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
         snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
                 attack.damage, attack.power, int(attack.magic_percentage * 100),
                 dmg);
-        gs->game_chat().add_message(buff);
+	gs->for_screens( [&] () {
+		gs->game_chat().add_message(buff);
+	});
 
     }
 

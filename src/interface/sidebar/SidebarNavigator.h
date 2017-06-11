@@ -11,6 +11,7 @@
 #include "gamestate/ActionQueue.h"
 
 #include "gamestate/GameAction.h"
+#include <memory>
 
 class SidebarContent;
 
@@ -40,14 +41,14 @@ private:
 		INVENTORY, SPELLS, EQUIPMENT, STATS, ENEMIES, CONFIG
 	};
 	struct NavigationOption {
-		NavigationOption(const std::string& icon, SidebarContent* content,
+		NavigationOption(const std::string& icon, std::shared_ptr<SidebarContent> content,
 				const BBox& icon_bbox);
 		~NavigationOption();
 
 		void draw_icon(GameState* gs, bool selected = false);
 
 		std::string iconsprite;
-		SidebarContent* content;
+		std::shared_ptr<SidebarContent> content;
 		BBox icon_bbox;
 	};
 	NavigationOption& current_option();

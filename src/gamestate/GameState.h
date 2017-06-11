@@ -285,6 +285,10 @@ public:
 	GameStatePostSerializeData& post_deserialize_data() {
 	    return _post_deserialize_data;
 	}
+	template <typename Func>
+	void for_screens(Func&& f) {
+	    screens.for_each_screen(f);
+	}
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
 

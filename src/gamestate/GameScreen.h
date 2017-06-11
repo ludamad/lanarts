@@ -33,13 +33,14 @@ struct GameScreenSet {
     GameHud& hud();
 
     template <typename Func>
-    void for_each_screen(Func&& f) {
+    void for_each_screen(Func&& f, bool allow_nesting = false) {
         // Do not allow nesting of for_each_screen;
-        LANARTS_ASSERT(current_screen == -1);
+        LANARTS_ASSERT(allow_nesting || current_screen == -1);
+	int prev_screen = current_screen;
         for (current_screen = 0; current_screen < screens.size(); current_screen++) {
             f();
         }
-        current_screen = -1;
+        current_screen = prev_screen;
     };
 private:
     int current_screen = -1;
