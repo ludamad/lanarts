@@ -49,6 +49,9 @@ struct GameScreenSet {
         }
         current_screen = prev_screen;
     };
+
+    GameScreen& get_screen(GameState *gs, PlayerInst *player);
+
 private:
     int current_screen = -1;
     std::vector<GameScreen> screens;

@@ -24,6 +24,7 @@
 
 #include "objects/CombatGameInst.h"
 #include "objects/GameInst.h"
+#include "objects/PlayerIOActions.h"
 
 const int REST_COOLDOWN = 200;
 // TODO: Now used for all 'major characters', i.e, players, their allies, and bosses
@@ -179,7 +180,8 @@ private:
     bool local = false, moving = false;
     int autouse_mana_potion_try_count = 0;
     PosF _last_moved_direction = {0, -1}; // Never 0,0
-    int previous_spellselect = 0, spellselect = 0;
+    int previous_spell_cast = 0, spellselect = 0;
+    PlayerIOActions io_value;
 };
 
 bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position);

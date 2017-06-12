@@ -292,6 +292,9 @@ public:
 	void for_screens(Func&& f) {
 	    screens.for_each_screen(f);
 	}
+
+    GameScreen &get_screen(PlayerInst *player);
+
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
 

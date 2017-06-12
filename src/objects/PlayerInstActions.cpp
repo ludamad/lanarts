@@ -122,19 +122,19 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	bool used_item = false;
 
 //Item use
-	IOEvent::event_t item_events[] = {IOEvent::USE_ITEM_N, IOEvent::SELL_ITEM_N};
-	for (int i = 0; i < 9 && !used_item; i++) {
-	    for (auto& event : item_events) {
-            if (io.query_event(IOEvent(event, i))) {
-                if (inventory().get(i).amount() > 0) {
-                    item_used = true;
-                    GameAction::action_t action_type = (event == IOEvent::USE_ITEM_N ? GameAction::USE_ITEM : GameAction::SELL_ITEM);
-                    queued_actions.push_back(
-                            GameAction(id, action_type, frame, level, i, p.x, p.y));
-                }
-            }
-	    }
-	}
+//	IOGameAction::event_t item_events[] = {IOGameAction::USE_ITEM_N, IOGameAction::SELL_ITEM_N};
+//	for (int i = 0; i < 9 && !used_item; i++) {
+//	    for (auto& event : item_events) {
+//            if (io.query_event(IOGameAction(event, i))) {
+//                if (inventory().get(i).amount() > 0) {
+//                    item_used = true;
+//                    GameAction::action_t action_type = (event == IOGameAction::USE_ITEM_N ? GameAction::USE_ITEM : GameAction::SELL_ITEM);
+//                    queued_actions.push_back(
+//                            GameAction(id, action_type, frame, level, i, p.x, p.y));
+//                }
+//            }
+//	    }
+//	}
 	if (!used_item && gs->game_settings().autouse_health_potions
 			&& core_stats().hp < AUTOUSE_HEALTH_POTION_THRESHOLD) {
 		int item_slot = inventory().find_slot(
@@ -279,33 +279,31 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
 
 void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 //Arrow/wasd movement
-	if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
+	if (io_value.move_direction().y < 0) {
 		dy -= 1;
 	}
-	if (gs->key_down_state(SDLK_RIGHT) || gs->key_down_state(SDLK_d)) {
+    if (io_value.move_direction().x > 0) {
 		dx += 1;
 	}
-	if (gs->key_down_state(SDLK_DOWN) || gs->key_down_state(SDLK_s)) {
+    if (io_value.move_direction().y > 0) {
 		dy += 1;
 	}
-	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
+    if (io_value.move_direction().x < 0) {
 		dx -= 1;
 	}
         bool explore_used = false;
         if (dx == 0 && dy == 0) {
-            if (gs->key_down_state(SDLK_e) && (is_ghost() || !has_visible_monster(gs, this))) {
+            if (io_value.should_explore() && (is_ghost() || !has_visible_monster(gs, this))) {
                 explore_used = true;
                 Pos towards = direction_towards_unexplored(gs);
                 if (towards != Pos{0,0}) {
                     dx = towards.x;
                     dy = towards.y;
                 } else {
-                    gs->game_chat().add_message("There is nothing to travel to in sight!",
-                                    Colour(255, 100, 100));
+                    gs->get_screen(this).hud.game_chat().add_message("There is nothing to travel to in sight!", Colour(255, 100, 100));
                 }
-            } else if (gs->key_down_state(SDLK_e)) {
-                gs->game_chat().add_message("Deal with the enemy before exploring!",
-                                Colour(255, 100, 100));
+            } else if (io_value.should_explore()) {
+                gs->get_screen(this).hud.game_chat().add_message("Deal with the enemy before exploring!", Colour(255, 100, 100));
             }
         }
 	if (dx != 0 || dy != 0) {
@@ -331,6 +329,12 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 	if (actions_set_for_turn) {
 		return;
 	}
+
+    if (io_value.value.empty()) {
+        luawrap::globals(gs->luastate())["Engine"]["player_input"].push();
+        io_value.init(luawrap::call<LuaValue>(gs->luastate(), this));
+    }
+    io_value.poll_input();
 
 	bool single_player = (gs->player_data().all_players().size() <= 1);
 
@@ -368,12 +372,9 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 		do_stopaction = true;
 	}
 //Shifting target
-	if (gs->key_press_state(SDLK_k)) {
+	if (io_value.should_shift_autotarget()) {
 		shift_autotarget(gs);
 	}
-
-	if (gs->key_press_state(SDLK_m))
-		spellselect = -1;
 
 	bool attack_used = false;
 	if (!gs->game_hud().handle_io(gs, queued_actions)) {
@@ -381,18 +382,19 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 		enqueue_io_equipment_actions(gs, do_stopaction);
 	}
 
-	bool action_usage = io.query_event(IOEvent::ACTIVATE_SPELL_N)
-			|| io.query_event(IOEvent::USE_WEAPON)
-			|| io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
-			|| io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION)
-			|| io.query_event(IOEvent::MOVE_X_M)
-			|| io.query_event(IOEvent::MOVE_Y_M);
-	if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_PERIOD)
-			|| gs->mouse_downwheel()) {
+	bool action_usage = io_value.use_spell_slot() != NO_ITEM
+            || io_value.use_item_slot() != NO_ITEM
+			|| io_value.should_use_weapon()
+			|| io_value.target_position() != PosF()
+			|| io_value.should_explore()
+            || io_value.move_direction() != PosF();
+
+    // No other way to use portal but to stop-move without doing other actions:
+	if ((do_stopaction && !action_usage)) {
 		queue_portal_use(gs, this, queued_actions);
 	}
 
-// If we haven't done anything, rest
+    // If we haven't done anything, rest
 	if (queued_actions.empty()) {
 		queued_actions.push_back(game_action(gs, this, GameAction::USE_REST));
 	}

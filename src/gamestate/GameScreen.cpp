@@ -27,3 +27,13 @@ GameView& GameScreenSet::view() {
 BBox& GameScreenSet::window_region() {
     return screen().window_region;
 }
+
+GameScreen& GameScreenSet::get_screen(GameState* gs, PlayerInst* player) {
+    int screen = -1;
+    for_each_screen([&]() {
+        if (focus_object(gs) == player) {
+            screen = current_screen;
+        }
+    });
+    return screens.at(screen);
+}

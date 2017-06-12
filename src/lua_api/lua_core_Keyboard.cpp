@@ -78,6 +78,16 @@ namespace lua_api {
 		keys["F13"] = (int)SDLK_F13;
 		keys["F14"] = (int)SDLK_F14;
 		keys["F15"] = (int)SDLK_F15;
+		keys["0"] = (int)SDLK_0;
+		keys["1"] = (int)SDLK_1;
+		keys["2"] = (int)SDLK_2;
+		keys["3"] = (int)SDLK_3;
+		keys["4"] = (int)SDLK_4;
+		keys["5"] = (int)SDLK_5;
+		keys["6"] = (int)SDLK_6;
+		keys["7"] = (int)SDLK_7;
+		keys["8"] = (int)SDLK_8;
+		keys["9"] = (int)SDLK_9;
                 keys["a"] = (int)SDLK_a;
                 keys["b"] = (int)SDLK_b;
                 keys["c"] = (int)SDLK_c;

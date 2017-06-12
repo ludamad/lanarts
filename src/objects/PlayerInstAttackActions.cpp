@@ -321,68 +321,34 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
     SpellsKnown& spells = spells_known();
 
     bool perform_spell = false;
-    bool chose_spell = false;
-    bool triggered_already = false;
 
-    int newspell = spell_selected();
+    int spell_to_cast = spell_selected();
     //Spell choice
     for (int i = 0; i < spells.amount(); i++) {
-        IOEvent event(IOEvent::ACTIVATE_SPELL_N, i);
-        if (io.query_event(event, &triggered_already)) {
-            chose_spell = true;
-            // Use the remembered choice to determine if its appropriate to cast this spell
-            // This makes sure the key must be hit once to switch spell, and again to use it
-//            if (spell_selected() == i ) {
-                // NB: Commenting out double hit for now, remove other comments when this is deemed superior
-//                    && previous_spellselect == spell_selected()) {
-                //Double hit a spell switch to quick-perform it
-                perform_spell = true;
-//            } else if (!triggered_already) {
-                newspell = i;
-//            }
+        if (io_value.use_spell_slot() == i) {
+            perform_spell = true;
+            spell_to_cast = i;
             break;
         }
     }
-    if (!chose_spell) {
-        // If we did not switch a spell with one of the quick-select keys, remember our choice
-        previous_spellselect = spell_selected();
 
-        if (io.query_event(IOEvent::TOGGLE_ACTION_UP)) {
-            if (spells.amount() > 0) {
-                newspell = (spell_selected() + 1) % spells.amount();
-            }
-        } else if (io.query_event(IOEvent::TOGGLE_ACTION_DOWN)) {
-            if (spell_selected() <= 0) {
-                newspell = spells.amount() - 1;
-            } else {
-                newspell = spell_selected() - 1;
-            }
-        }
-    }
-
-    if (newspell != spell_selected()) {
+    if (spell_to_cast != spell_selected()) {
         queued_actions.push_back(
-                game_action(gs, this, GameAction::CHOSE_SPELL, newspell));
+                game_action(gs, this, GameAction::CHOSE_SPELL, spell_to_cast));
     }
 
-    bool auto_target = true;
-    // We don't auto-target unless a mouse is not used
-    if (!perform_spell
-            && io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION,
-                    &triggered_already)) {
-        perform_spell = true;
-        auto_target = false;
-
-    } else if (!perform_spell) {
-        perform_spell = io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION,
-                &triggered_already);
+    bool auto_target = false;
+    // We auto-target if a mouse is not used
+    if (io_value.target_position() == PosF(0,0)) {
+        auto_target = true;
     }
-
     *fallback_to_melee = false;
 
-    if (newspell > -1 && perform_spell) {
-        SpellEntry& spl_entry = spells.get_entry(newspell);
+    if (spell_to_cast > -1 && perform_spell) {
+        SpellEntry& spl_entry = spells.get_entry(spell_to_cast);
 
+        bool triggered_already = (previous_spell_cast == spell_to_cast);
+        previous_spell_cast = spell_to_cast;
         Pos target;
         bool can_trigger = !triggered_already
                 || spl_entry.can_cast_with_held_key;
@@ -391,6 +357,7 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
             can_target = lua_spell_get_target(gs, this,
                     spl_entry.autotarget_func.get(L), target);
         } else {
+            // TODO have target_position here
             int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
             target = Pos(rmx, rmy);
             can_target = true;
@@ -417,7 +384,7 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
             if (can_use) {
                 queued_actions.push_back(
                         game_action(gs, this, GameAction::USE_SPELL,
-                                newspell, target.x, target.y));
+                                spell_to_cast, target.x, target.y));
                 return true;
             } else if (!auto_target) {
                 gs->game_chat().add_message("Target location is not valid.");
@@ -475,27 +442,23 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 
     bool attack_used = enqueue_io_spell_actions(gs, &fallback_to_melee);
 
-    bool autotarget = io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
-            || io.query_event(IOEvent::ACTIVATE_SPELL_N);
-    bool mousetarget = io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION);
+    bool autotarget = (io_value.target_position() == PosF());
 
-    bool weaponuse = spell_selected() == -1;
+    bool weaponuse = false;
 
     // choose & use weapon
-    if (io.query_event(IOEvent::USE_WEAPON)) {
+    if (io_value.should_use_weapon()) {
         queued_actions.push_back(
                 game_action(gs, this, GameAction::CHOSE_SPELL, -1));
-        autotarget = true;
         weaponuse = true;
     }
 
     if (fallback_to_melee) {
-        autotarget = true;
         weaponuse = true;
     }
 
     // weapon use
-    if (!attack_used && weaponuse && (autotarget || mousetarget)) {
+    if (!attack_used && weaponuse) {
 
         bool is_projectile = wentry.uses_projectile
                 || equipment().has_projectile();
@@ -506,13 +469,13 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
         Pos targ_pos;
 
         if (is_projectile) {
-            if (mousetarget) {
+            if (!autotarget) {
                 targ_pos = Pos(rmx, rmy);
             } else if (autotarget && curr_target) {
                 targ_pos = curr_target->ipos();
             }
         } else {
-            if (mousetarget) {
+            if (autotarget) {
                 dx = rmx - x, dy = rmy - y;
             }
             target = get_weapon_autotarget(gs, this, curr_target, dx, dy);
@@ -520,7 +483,7 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
                 targ_pos = Pos(target->x, target->y);
 
             }
-            if (!is_moving && !target && !mousetarget && spell_selected() == -1
+            if (!is_moving && !target && autotarget && spell_selected() == -1
                     && curr_target && !is_projectile) {
                 int vx, vy;
                 GameInst* closest = get_nearest_visible_enemy(gs, this);
@@ -534,7 +497,7 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
                 }
             }
         }
-        if (target || (is_projectile && (mousetarget || curr_target))) {
+        if (target || (is_projectile && (!autotarget || curr_target))) {
             queued_actions.push_back(
                     game_action(gs, this, GameAction::USE_WEAPON, spellselect,
                             targ_pos.x, targ_pos.y));

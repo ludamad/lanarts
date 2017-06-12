@@ -409,9 +409,6 @@ bool GameState::update_iostate(bool resetprev, bool trigger_event_handling) {
 			io_callback.push();
 			luawrap::call<void>(luastate());
 		}
-        screens.for_each_screen( [&]() {
-            iocontroller.trigger_events(BBox(0, 0, view().width, view().height));
-        });
 	} else {
 		iocontroller.update_iostate(false);
 		repeat_actions_counter--;
@@ -700,6 +697,10 @@ level_id GameState::get_level_id() {
 
 PlayerDataEntry& GameState::local_player_data() {
     return screens.local_player_data(this);
+}
+
+GameScreen& GameState::get_screen(PlayerInst *player) {
+    return screens.get_screen(this, player);
 }
 
 static std::map<const char*, lsound::Sound> SOUND_MAP;

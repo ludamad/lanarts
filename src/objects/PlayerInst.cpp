@@ -33,7 +33,7 @@
 PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, Pos xy, team_id team, bool local) :
 		CombatGameInst(stats, sprite, xy, team, RADIUS, true, DEPTH), actions_set_for_turn(
 				false), local(local), moving(0), autouse_mana_potion_try_count(
-				0), previous_spellselect(0), spellselect(-1) {
+				0), previous_spell_cast(0), spellselect(-1) {
 	last_chosen_weaponclass = "unarmed";
 	field_of_view = new fov();
 }
@@ -192,7 +192,7 @@ void PlayerInst::step(GameState* gs) {
             reset_rest_cooldown();
         }
     gs->for_screens([&]() {
-        if (!gs->key_down_state(SDLK_x) && is_local_player()) {
+        if (is_local_player()) {
             GameView& view = gs->view();
             view.center_on(last_x, last_y);
         }
@@ -256,6 +256,7 @@ void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 
 	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
 	collision_simulation_id() = coll_avoid.add_player_object(this);
+	io_value.init(LuaValue());
 }
 
 PlayerInst *PlayerInst::clone() const {

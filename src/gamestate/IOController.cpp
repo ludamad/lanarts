@@ -8,24 +8,6 @@
 
 #include "IOController.h"
 
-bool IOEventTrigger::should_trigger(IOEventTrigger::trigger_t trigger,
-		SDL_Keycode trigger_key, SDL_Keymod mod, bool holding_key) {
-	if (!this->trigger_continuously && holding_key) {
-		return false;
-	}
-	if ((this->trigger && this->trigger != trigger)
-			|| (this->trigger_key && this->trigger_key != trigger_key)) {
-		return false;
-	}
-	if (this->mod_required && !(this->mod_required & mod)) {
-		return false;
-	}
-	if (this->mod_rejected && (this->mod_rejected & mod)) {
-		return false;
-	}
-	return true;
-}
-
 IOState::IOState() {
 	clear();
 
@@ -62,28 +44,10 @@ void IOState::clear() {
 	mouse_middledown = false;
 }
 
-inline void IOState::add_triggered_event(const IOEvent& event,
-		bool triggered_already) {
-	for (int i = 0; i < active_events.size(); i++) {
-		if (active_events[i].event == event) {
-			if (!triggered_already) {
-				active_events[i].triggered_already = false;
-			}
-			return;
-		}
-	}
-
-	active_events.push_back(TriggeredIOEvent(event, triggered_already));
-}
-
 void IOState::clear_for_step(bool resetprev) {
         for (std::pair<const SDL_Keycode, bool>& entry : key_press_states) {
             entry.second = false; // No longer pressed.
         }
-
-	if (resetprev) {
-		active_events.clear();
-	}
 
 	mouse_leftclick = false;
 	mouse_rightclick = false;
@@ -97,90 +61,90 @@ void IOState::clear_for_step(bool resetprev) {
 
 	sdl_events.clear();
 }
-
-static void bind_key_events(std::vector<IOEventTrigger>& bindings,
-		const char* keys, IOEvent::event_t ev, SDL_Keymod required, SDL_Keymod rejected,
-		bool allow_heldkey) {
-	for (int i = 0; keys[i] != '\0'; i++) {
-		IOEvent event(ev, i);
-		IOEventTrigger trigger(event, IOEventTrigger::NONE, SDL_Keycode(keys[i]),
-				required, rejected, allow_heldkey);
-		bindings.push_back(trigger);
-	}
-}
+//
+//static void bind_key_events(std::vector<IOEventTrigger>& bindings,
+//		const char* keys, IOGameAction::event_t ev, SDL_Keymod required, SDL_Keymod rejected,
+//		bool allow_heldkey) {
+//	for (int i = 0; keys[i] != '\0'; i++) {
+//		IOGameAction event(ev, i);
+//		IOEventTrigger trigger(event, IOEventTrigger::NONE, SDL_Keycode(keys[i]),
+//				required, rejected, allow_heldkey);
+//		bindings.push_back(trigger);
+//	}
+//}
 IOController::IOController() {
-	//XXX: For now we hardcode the specific actions
-	SDL_Keymod item_mod = SDL_Keymod(KMOD_LCTRL | KMOD_RCTRL);
-
-	// Spell choice
-	bind_key_events(event_bindings, "yuiopjkl", IOEvent::ACTIVATE_SPELL_N,
-			KMOD_NONE, KMOD_NONE, true);
-//	bind_key_events(event_bindings, "12345", IOEvent::ACTIVATE_SPELL_N,
-//			KMOD_NONE, item_mod/*rejected*/, true);
-
-//	// Item choice
-//	bind_key_events(event_bindings, "yuiop67890", IOEvent::USE_ITEM_N, item_mod,
-//			KMOD_NONE, false);
-	bind_key_events(event_bindings, "1234567890", IOEvent::USE_ITEM_N,
-			KMOD_NONE, item_mod/*rejected*/, false);
-	bind_key_events(event_bindings, "1234567890", IOEvent::SELL_ITEM_N,
-	        item_mod/*requisite*/, KMOD_NONE, false);
-
-
-	/*Scroll spell up*/
-	{
-		IOEvent event(IOEvent::TOGGLE_ACTION_UP);
-		IOEventTrigger trigger1(event, IOEventTrigger::MOUSE_WHEEL_UP,
-				SDL_Keycode(0), KMOD_NONE, KMOD_NONE, true);
-		IOEventTrigger trigger2(event, IOEventTrigger::NONE, SDL_Keycode('e'),
-				KMOD_NONE, KMOD_NONE);
-		IOEventTrigger trigger3(event, IOEventTrigger::NONE, SDL_Keycode('.'),
-				KMOD_NONE, KMOD_NONE);
-		event_bindings.push_back(trigger1);
-		event_bindings.push_back(trigger2);
-		event_bindings.push_back(trigger3);
-	}
-	/*Scroll spell down*/
-	{
-		IOEvent event(IOEvent::TOGGLE_ACTION_DOWN);
-		IOEventTrigger trigger1(event, IOEventTrigger::MOUSE_WHEEL_DOWN,
-				SDL_Keycode(0), KMOD_NONE, KMOD_NONE, true);
-		IOEventTrigger trigger2(event, IOEventTrigger::NONE, SDL_Keycode('q'),
-				KMOD_NONE, KMOD_NONE);
-		IOEventTrigger trigger3(event, IOEventTrigger::NONE, SDL_Keycode(','),
-				KMOD_NONE, KMOD_NONE);
-		event_bindings.push_back(trigger1);
-		event_bindings.push_back(trigger2);
-		event_bindings.push_back(trigger3);
-	}
-	/*Use weapon*/
-	{
-		IOEvent event(IOEvent::USE_WEAPON);
-		IOEventTrigger trigger1(event, IOEventTrigger::MOUSE_MIDDLE_CLICK,
-				SDL_Keycode(0), KMOD_NONE, KMOD_NONE, true);
-		IOEventTrigger trigger2(event, IOEventTrigger::NONE, SDL_Keycode('h'),
-				KMOD_NONE, KMOD_NONE, true);
-		IOEventTrigger trigger3(event, IOEventTrigger::NONE, SDL_Keycode('t'),
-				KMOD_NONE, KMOD_NONE, true);
-		event_bindings.push_back(trigger1);
-		event_bindings.push_back(trigger2);
-		event_bindings.push_back(trigger3);
-	}
-
-	/*Do autotarget action */
-	{
-		IOEvent event(IOEvent::AUTOTARGET_CURRENT_ACTION);
-		IOEventTrigger trigger(event, IOEventTrigger::NONE, SDLK_SPACE,
-				KMOD_NONE, KMOD_NONE, true);
-		event_bindings.push_back(trigger);
-	}
-
-	/*Do targetted action */{
-		IOEvent event(IOEvent::MOUSETARGET_CURRENT_ACTION);
-		IOEventTrigger trigger(event, IOEventTrigger::MOUSE_LEFT_CLICK,
-				SDL_Keycode(0), KMOD_NONE, KMOD_NONE, true);
-		event_bindings.push_back(trigger);
-	}
+//	//XXX: For now we hardcode the specific actions
+//	SDL_Keymod item_mod = SDL_Keymod(KMOD_LCTRL | KMOD_RCTRL);
+//
+//	// Spell choice
+//	bind_key_events(event_bindings, "yuiopjkl", IOGameAction::ACTIVATE_SPELL_N,
+//			KMOD_NONE, KMOD_NONE, true);
+////	bind_key_events(event_bindings, "12345", IOGameAction::ACTIVATE_SPELL_N,
+////			KMOD_NONE, item_mod/*rejected*/, true);
+//
+////	// Item choice
+////	bind_key_events(event_bindings, "yuiop67890", IOGameAction::USE_ITEM_N, item_mod,
+////			KMOD_NONE, false);
+//	bind_key_events(event_bindings, "1234567890", IOGameAction::USE_ITEM_N,
+//			KMOD_NONE, item_mod/*rejected*/, false);
+//	bind_key_events(event_bindings, "1234567890", IOGameAction::SELL_ITEM_N,
+//	        item_mod/*requisite*/, KMOD_NONE, false);
+//
+//
+//	/*Scroll spell up*/
+//	{
+//		IOGameAction event(IOGameAction::TOGGLE_ACTION_UP);
+//		IOEventTrigger trigger1(event, IOEventTrigger::MOUSE_WHEEL_UP,
+//				SDL_Keycode(0), KMOD_NONE, KMOD_NONE, true);
+//		IOEventTrigger trigger2(event, IOEventTrigger::NONE, SDL_Keycode('e'),
+//				KMOD_NONE, KMOD_NONE);
+//		IOEventTrigger trigger3(event, IOEventTrigger::NONE, SDL_Keycode('.'),
+//				KMOD_NONE, KMOD_NONE);
+//		event_bindings.push_back(trigger1);
+//		event_bindings.push_back(trigger2);
+//		event_bindings.push_back(trigger3);
+//	}
+//	/*Scroll spell down*/
+//	{
+//		IOGameAction event(IOGameAction::TOGGLE_ACTION_DOWN);
+//		IOEventTrigger trigger1(event, IOEventTrigger::MOUSE_WHEEL_DOWN,
+//				SDL_Keycode(0), KMOD_NONE, KMOD_NONE, true);
+//		IOEventTrigger trigger2(event, IOEventTrigger::NONE, SDL_Keycode('q'),
+//				KMOD_NONE, KMOD_NONE);
+//		IOEventTrigger trigger3(event, IOEventTrigger::NONE, SDL_Keycode(','),
+//				KMOD_NONE, KMOD_NONE);
+//		event_bindings.push_back(trigger1);
+//		event_bindings.push_back(trigger2);
+//		event_bindings.push_back(trigger3);
+//	}
+//	/*Use weapon*/
+//	{
+//		IOGameAction event(IOGameAction::USE_WEAPON);
+//		IOEventTrigger trigger1(event, IOEventTrigger::MOUSE_MIDDLE_CLICK,
+//				SDL_Keycode(0), KMOD_NONE, KMOD_NONE, true);
+//		IOEventTrigger trigger2(event, IOEventTrigger::NONE, SDL_Keycode('h'),
+//				KMOD_NONE, KMOD_NONE, true);
+//		IOEventTrigger trigger3(event, IOEventTrigger::NONE, SDL_Keycode('t'),
+//				KMOD_NONE, KMOD_NONE, true);
+//		event_bindings.push_back(trigger1);
+//		event_bindings.push_back(trigger2);
+//		event_bindings.push_back(trigger3);
+//	}
+//
+//	/*Do autotarget action */
+//	{
+//		IOGameAction event(IOGameAction::AUTOTARGET_CURRENT_ACTION);
+//		IOEventTrigger trigger(event, IOEventTrigger::NONE, SDLK_SPACE,
+//				KMOD_NONE, KMOD_NONE, true);
+//		event_bindings.push_back(trigger);
+//	}
+//
+//	/*Do targetted action */{
+//		IOGameAction event(IOGameAction::MOUSETARGET_CURRENT_ACTION);
+//		IOEventTrigger trigger(event, IOEventTrigger::MOUSE_LEFT_CLICK,
+//				SDL_Keycode(0), KMOD_NONE, KMOD_NONE, true);
+//		event_bindings.push_back(trigger);
+//	}
 
     reinit_controllers();
 }
@@ -416,87 +380,6 @@ void IOController::set_key_press_state(int keyval) {
     iostate.key_press_states[keyval] = true;
 }
 
-void IOController::__trigger_events(IOEventTrigger::trigger_t trigger,
-		SDL_Keycode trigger_key, SDL_Keymod mod, bool holding_key) {
-	for (int i = 0; i < event_bindings.size(); i++) {
-		IOEventTrigger& event_trigger = event_bindings[i];
-		if (event_trigger.should_trigger(trigger, trigger_key, mod,
-				holding_key)) {
-			iostate.add_triggered_event(event_trigger.event, holding_key);
-		}
-	}
-}
-
-void IOController::trigger_events(const BBox& playing_area) {
-	IOEventTrigger::trigger_t notrigger = IOEventTrigger::NONE;
-	// Loop over all possible active key states:
-        for (std::pair<const SDL_Keycode, bool>& entry : iostate.key_down_states) {
-            if (entry.second) {
-                // Trigger key hold events
-                __trigger_events(notrigger, entry.first, iostate.keymod, true);
-            }
-        }
-        for (std::pair<const SDL_Keycode, bool>& entry : iostate.key_press_states) {
-            if (entry.second) {
-                // Trigger key press events
-                __trigger_events(notrigger, entry.first, iostate.keymod, false);
-            }
-        }
-
-	if (playing_area.contains(mouse_x(), mouse_y())) {
-		if (mouse_left_click() || mouse_left_down()) {
-			__trigger_events(IOEventTrigger::MOUSE_LEFT_CLICK, SDL_Keycode(0),
-					iostate.keymod, !mouse_left_click());
-		}
-		if (mouse_right_click() || mouse_right_down()) {
-			__trigger_events(IOEventTrigger::MOUSE_RIGHT_CLICK, SDL_Keycode(0),
-					iostate.keymod, !mouse_left_click());
-		}
-	}
-
-	if (iostate.mouse_middleclick || iostate.mouse_middledown) {
-		__trigger_events(IOEventTrigger::MOUSE_MIDDLE_CLICK, SDL_Keycode(0),
-				iostate.keymod, !iostate.mouse_middleclick);
-	}
-	if (mouse_upwheel()) {
-		__trigger_events(IOEventTrigger::MOUSE_WHEEL_UP, SDL_Keycode(0),
-				iostate.keymod, false);
-	}
-	if (mouse_downwheel()) {
-		__trigger_events(IOEventTrigger::MOUSE_WHEEL_DOWN, SDL_Keycode(0),
-				iostate.keymod, false);
-	}
-	if (mouse_downwheel()) {
-		__trigger_events(IOEventTrigger::MOUSE_WHEEL_DOWN, SDL_Keycode(0),
-				iostate.keymod, false);
-	}
-}
-
-bool IOController::query_event(const IOEvent& event, bool* triggered_already) {
-	for (int i = 0; i < iostate.active_events.size(); i++) {
-		if (event == iostate.active_events[i].event) {
-			if (triggered_already) {
-				*triggered_already = iostate.active_events[i].triggered_already;
-			}
-			return true;
-		}
-	}
-	return false;
-}
-
-bool IOController::query_event(IOEvent::event_t event,
-		bool* triggered_already) {
-	for (int i = 0; i < iostate.active_events.size(); i++) {
-		if (event == iostate.active_events[i].event.event_type) {
-			if (triggered_already != NULL) {
-				*triggered_already = iostate.active_events[i].triggered_already;
-			}
-			return true;
-		}
-	}
-	return false;
-}
-
 bool IOController::ctrl_held() {
     return key_down_state(SDLK_LCTRL) || key_down_state(SDLK_RCTRL);
 //    return (iostate.keymod & KMOD_LCTRL) || (iostate.keymod & KMOD_RCTRL);
@@ -510,8 +393,3 @@ bool IOController::shift_held() {
 void IOController::clear() {
     iostate.clear();
 }
-
-void IOController::push_event(const IOEvent &event) {
-	iostate.add_triggered_event(event, false);
-}
-

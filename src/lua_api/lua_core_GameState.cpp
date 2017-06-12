@@ -115,13 +115,6 @@ static void game_simulate_key_press(LuaStackValue key) {
     controller.set_key_down_state(key.to_num());
 }
 
-static int game_trigger_events(lua_State* L) {
-    IOController& controller = lua_api::gamestate(L)->io_controller();
-    GameView& view = lua_api::gamestate(L)->view();
-    controller.trigger_events(BBox(0, 0, view.width, view.height));
-    return 0;
-}
-
 static void game_for_screens(LuaStackValue func) {
     lua_api::gamestate(func)->for_screens([&]() {
         func.push();
@@ -290,8 +283,7 @@ namespace lua_api {
 		game["game_loop"].bind_function(game_loop);
 
 		game["_input_clear"].bind_function(game_input_clear);
-                game["_simulate_key_press"].bind_function(game_simulate_key_press);
-                game["_trigger_events"].bind_function(game_trigger_events);
+		game["_simulate_key_press"].bind_function(game_simulate_key_press);
 
 		game["score_board_fetch"].bind_function(score_board_fetch);
 		game["score_board_store"].bind_function(game_score_board_store);

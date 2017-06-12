@@ -124,8 +124,15 @@ function Engine.post_serialize()
 end
 
 function Engine.io()
-    local Gamepad = require "input.Gamepad"
-    Gamepad.step_for_all()
+    --local Gamepad = require "input.Gamepad"
+    --Gamepad.step_for_all()
+end
+
+function Engine.player_input(player)
+    if player.name == "Player 2" then
+        return (require "input.GamepadInputSource").create(player)
+    end
+    return (require "input.KeyboardInputSource").create(player)
 end
 
 -- Same steps:
