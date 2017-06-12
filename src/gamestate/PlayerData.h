@@ -24,28 +24,27 @@ struct PlayerDataEntry {
 	MultiframeActionQueue action_queue;
 	GameInstRef player_inst;
 	std::string classtype;
+	bool is_local_player;
 	int net_id;
+    int index; // Index in list, for convenience
 
 	PlayerInst* player() const;
 
 	PlayerDataEntry(const std::string& player_name, GameInst* player_inst,
-					const std::string& classtype, int net_id) :
+					const std::string& classtype, bool is_local_player, int net_id, int index) :
 			player_name(player_name), player_inst(player_inst), classtype(
-					classtype), net_id(net_id) {
+					classtype), is_local_player(is_local_player), net_id(net_id), index(index) {
 	}
 };
 
 //Global data
 class PlayerData {
 public:
-	PlayerData() :
-			_local_player_idx(0) {
+	PlayerData() {
 	}
 	void clear();
 	void register_player(const std::string& name, PlayerInst* player,
-			const std::string& classtype, int net_id = 0);
-	PlayerInst* local_player();
-	PlayerDataEntry& local_player_data();
+			const std::string& classtype, bool is_local_player, int net_id = 0);
 
 	std::vector<PlayerDataEntry>& all_players() {
 		return _players;
@@ -58,35 +57,31 @@ public:
 	PlayerDataEntry& get(int player_idx) {
 		return _players.at(player_idx);
 	}
-	void set_local_player_idx(int idx);
-	int get_local_player_idx() {
-		return _local_player_idx;
-	}
 	void remove_all_players(GameState* gs);
 	void copy_to(PlayerData& pc) const;
 
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
 
-        int& n_enemy_killed(int type) {
-            if (type >= _kill_amounts.size()) {
-                _kill_amounts.resize(type + 1, 0);
-            }
-            return _kill_amounts.at(type);
-        }
-        money_t& money() {
-            return _money;
-        }
-        void reset() {
-            _money = 0;
-            _kill_amounts.resize(0);
-        }
+	int& n_enemy_killed(int type) {
+		if (type >= _kill_amounts.size()) {
+			_kill_amounts.resize(type + 1, 0);
+		}
+		return _kill_amounts.at(type);
+	}
+	money_t& money() {
+		return _money;
+	}
+	void reset() {
+		_money = 0;
+		_kill_amounts.resize(0);
+	}
 private:
-        // Gold pool for all players:
-        money_t _money = 0;
+    // Gold pool for all players:
+    money_t _money = 0;
 	int _local_player_idx;
 	std::vector<PlayerDataEntry> _players;
-        // Tracks player kills:
+    // Tracks player kills:
 	std::vector<int> _kill_amounts;
 };
 

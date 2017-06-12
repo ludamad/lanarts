@@ -116,8 +116,15 @@ void GameState::start_connection() {
 	}
 	if (settings.conntype == GameSettings::SERVER
 			|| settings.conntype == GameSettings::NONE) {
-		player_data().set_local_player_idx(0);
-		player_data().register_player(settings.username, NULL, settings.class_type);
+		player_data().register_player(settings.username, NULL, settings.class_type, /* local player */ true);
+        if (getenv("LANARTS_2P")) {
+            player_data().register_player("Player 2", NULL, getenv("LANARTS_2P"), /* local player */ true);
+
+        }
+        if (getenv("LANARTS_3P")) {
+            player_data().register_player("Player 3", NULL, getenv("LANARTS_3P"), /* local player */ true);
+
+        }
 	}
 }
 
@@ -179,20 +186,28 @@ bool GameState::start_game() {
 
 
     screens.clear(); // Clear previous screens
-    const int N_PLAYERS = 2;
-    const int WIDTH = settings.view_width / N_PLAYERS;
+    int n_local_players = 0;
+    for (PlayerDataEntry& player: player_data().all_players()) {
+        if (player.is_local_player) {
+            n_local_players++;
+        }
+    }
+    const int WIDTH = settings.view_width / n_local_players;
     const int HEIGHT = settings.view_height; // / N_PLAYERS;
-    for (int i = 0; i < N_PLAYERS; i++) {
-        const int x1 = i * WIDTH, y1 = 0;
+    for (PlayerDataEntry& player: player_data().all_players()) {
+        if (!player.is_local_player) {
+            continue;
+        }
+        const int x1 = player.index * WIDTH, y1 = 0;
         const int x2 = x1 + WIDTH, y2 = y1 + HEIGHT;
         screens.add({
-                GameHud {
-                        BBox(x2 - GAME_SIDEBAR_WIDTH, y1, x2, y2),
-                        BBox(x1, y1, x2 - GAME_SIDEBAR_WIDTH, y2)
-                }, // hud
-                GameView {0,0, WIDTH - GAME_SIDEBAR_WIDTH, HEIGHT}, // view
-                BBox {x1,y1, x2, y2}, // window_region
-                player_data().get_local_player_idx() // focus player id
+            GameHud {
+                BBox(x2 - GAME_SIDEBAR_WIDTH, y1, x2, y2),
+                BBox(x1, y1, x2 - GAME_SIDEBAR_WIDTH, y2)
+            }, // hud
+            GameView {0, 0, WIDTH - GAME_SIDEBAR_WIDTH, HEIGHT}, // view
+            BBox {x1, y1, x2, y2}, // window_region
+            player.index // focus player id
         });
     }
     /* If class was not set, we may be loading a game -- don't init level */
@@ -208,7 +223,7 @@ void GameState::set_level(GameMapState* lvl) {
 
 /*Handle new characters and exit signals*/
 PlayerInst* GameState::local_player() {
-	return player_data().local_player();
+	return screens.focus_object(this);
 }
 
 int GameState::object_radius_test(int x, int y, int radius, col_filterf f,
@@ -676,6 +691,10 @@ level_id GameState::get_level_id() {
 		return -1;
 	}
 	return get_level()->id();
+}
+
+PlayerDataEntry& GameState::local_player_data() {
+    return screens.local_player_data(this);
 }
 
 static std::map<const char*, lsound::Sound> SOUND_MAP;

@@ -150,9 +150,8 @@ void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
     sb.read(name);
     sb.read(classtype);
     printf("connection affirm read\n");
-    pd.register_player(name, NULL, classtype, sender);
+    pd.register_player(name, NULL, classtype, /* is local player */ false, sender);
     printf("now there are %d players\n", (int) pd.all_players().size());
-    pd.set_local_player_idx(0);
 }
 
 void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
@@ -174,7 +173,6 @@ void net_recv_game_init_data(SerializeBuffer& sb, int sender,
     //Read player data
     int localidx;
     sb.read_int(localidx);
-    pd.set_local_player_idx(localidx);
     int playern;
     sb.read_int(playern);
     LANARTS_ASSERT(pd.all_players().empty());
@@ -185,7 +183,7 @@ void net_recv_game_init_data(SerializeBuffer& sb, int sender,
         sb.read(name);
         sb.read(classtype);
         sb.read_int(net_id);
-        pd.register_player(name, NULL, classtype, net_id);
+        pd.register_player(name, NULL, classtype, (i == localidx), net_id);
     }
 
     printf(
@@ -283,14 +281,11 @@ void net_recv_sync_data(SerializeBuffer& sb, GameState* gs) {
     int mtwistseed;
     sb.read_int(mtwistseed);
     gs->rng().init_genrand(mtwistseed);
-    int nplayer = gs->player_data().get_local_player_idx();
     gs->deserialize(sb);
     std::vector<PlayerDataEntry>& pdes = gs->player_data().all_players();
     for (int i = 0; i < pdes.size(); i++) {
-        pdes[i].player()->set_local_player(false);
+        pdes[i].player()->set_local_player(pdes[i].is_local_player);
     }
-    gs->player_data().set_local_player_idx(nplayer);
-    gs->game_world().set_current_level(gs->local_player()->current_floor);
 }
 
 void net_send_sync_ack(GameNetConnection& net) {
@@ -468,7 +463,7 @@ std::vector<QueuedMessage> GameNetConnection::sync_on_message(message_t msg) {
     }
     QueuedMessage qm;
     const int timeout = 1;
-    PlayerDataEntry& pde = gs->player_data().local_player_data();
+    PlayerDataEntry& pde = gs->local_player_data();
     std::vector<bool> received(gs->player_data().all_players().size(), false);
 
     bool all_ack = false;

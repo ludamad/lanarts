@@ -74,7 +74,7 @@ static const int player_colours_n = sizeof(player_colours) / sizeof(Colour);
 
 ChatMessage GameChat::get_field_as_chat_message(GameState* gs,
 		bool include_username) const {
-	int colour_idx = gs->player_data().local_player_data().net_id
+	int colour_idx = gs->local_player_data().net_id
 			% player_colours_n;
 
 	ChatMessage typed_message;

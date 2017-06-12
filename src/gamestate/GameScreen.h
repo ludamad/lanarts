@@ -11,6 +11,8 @@
 class GameInst;
 class GameMapState;
 
+struct PlayerDataEntry;
+
 struct GameScreen {
     GameHud hud;
     GameView view;
@@ -29,6 +31,7 @@ struct GameScreenSet {
     GameScreen& screen();
     GameView& view();
     PlayerInst* focus_object(GameState* gs);
+    PlayerDataEntry& local_player_data(GameState* gs);
     GameMapState* map(GameState* gs);
     GameHud& hud();
     BBox& window_region();

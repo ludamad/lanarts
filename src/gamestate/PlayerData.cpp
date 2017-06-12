@@ -42,15 +42,8 @@ void PlayerData::clear() {
 }
 
 void PlayerData::register_player(const std::string& name, PlayerInst* player,
-		const std::string& classtype, int net_id) {
-	_players.push_back(PlayerDataEntry(name, player, classtype, net_id));
-}
-
-PlayerInst* PlayerData::local_player() {
-	if (_local_player_idx >= _players.size()) {
-		return NULL;
-	}
-	return local_player_data().player();
+		const std::string& classtype, bool is_local_player, int net_id) {
+	_players.push_back(PlayerDataEntry(name, player, classtype, is_local_player, net_id, /*Player index, for convenience: */ _players.size()));
 }
 
 std::vector<PlayerInst*> PlayerData::players_in_level(level_id level) {
@@ -102,10 +95,6 @@ void PlayerData::serialize(GameState* gs, SerializeBuffer& serializer) {
 	for (int i = 0; i < _players.size(); i++) {
 		write_inst_ref(_players[i].player_inst, gs, serializer);
 	}
-}
-
-PlayerDataEntry& PlayerData::local_player_data() {
-	return _players.at(_local_player_idx);
 }
 
 PlayerDataEntry& PlayerData::get_entry_by_netid(int netid) {
@@ -202,21 +191,6 @@ bool players_poll_for_actions(GameState* gs) {
 	return true;
 }
 
-void PlayerData::set_local_player_idx(int idx) {
-	if (_local_player_idx != -1) {
-		PlayerInst* oldlocal = local_player();
-		if (oldlocal) {
-			oldlocal->set_local_player(false);
-		}
-	}
-	_local_player_idx = idx;
-	if (_local_player_idx != -1) {
-		PlayerInst* newlocal = local_player();
-		if (newlocal) {
-			newlocal->set_local_player(true);
-		}
-	}
-}
 
 //for (int i = 0; i < pids.size(); i++) {
 //	PlayerInst* player = (PlayerInst*)gs->get_instance(pids[i]);

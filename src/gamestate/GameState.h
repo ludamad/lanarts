@@ -115,7 +115,10 @@ public:
 	//used for synchronization purposes in network play
 	void skip_next_instance_id();
 
+	// Errors if called during step event
+	// During draw event, different for each screen
 	PlayerInst* local_player();
+	PlayerDataEntry& local_player_data();
 
 	/* Dimensions (in pixels) of game world */
 	int width();

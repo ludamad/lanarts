@@ -339,7 +339,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 	GameSettings& settings = gs->game_settings();
 	GameView& view = gs->view();
 
-	PlayerDataEntry& pde = gs->player_data().local_player_data();
+	PlayerDataEntry& pde = gs->local_player_data();
 
 	if (pde.action_queue.has_actions_for_frame(gs->frame())) {
 		pde.action_queue.extract_actions_for_frame(queued_actions, gs->frame());

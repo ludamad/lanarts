@@ -128,16 +128,15 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 	for (int i = 0; i < gs->player_data().all_players().size(); i++) {
 		Pos position = positions.at(i);
 		PlayerDataEntry& pde = gs->player_data().all_players()[i];
-		bool islocal = &pde == &gs->player_data().local_player_data();
 		ClassEntry& c = game_class_data.get(pde.classtype);
 		int spriteidx = gs->rng().rand(c.sprites.size());
 
 //		if (pde.player_inst.empty()) {
 			pde.player_inst = new PlayerInst(c.starting_stats,
-					c.sprites[spriteidx], position, PLAYER_TEAM, islocal);
+					c.sprites[spriteidx], position, PLAYER_TEAM, pde.is_local_player);
 //		}
 		printf("Spawning for player %d: %s\n", i,
-				islocal ? "local player" : "network player");
+			   pde.is_local_player ? "local player" : "network player");
 		map->add_instance(gs, pde.player_inst.get());
 	}
 }
@@ -167,8 +166,7 @@ bool GameWorld::pre_step(bool update_iostate) {
     gs->screens.for_each_screen( [&]() {
         /* Queue actions for local player */
         /* This will result in a network send of the player's actions */
-        PlayerData &pd = gs->player_data();
-        pd.local_player()->enqueue_io_actions(gs);
+        gs->local_player()->enqueue_io_actions(gs);
     });
 
 	set_current_level(current_level);
