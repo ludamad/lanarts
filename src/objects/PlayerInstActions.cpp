@@ -520,9 +520,11 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 		itemslot.deequip();
 		itemslot.remove_copies(dropped_item.amount);
 	}
-	if (this->local) {
-		gs->game_hud().reset_slot_selected();
-	}
+    gs->for_screens([&]() {
+        if (this->local) {
+            gs->game_hud().reset_slot_selected();
+        }
+    });
 }
 
 void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
@@ -553,7 +555,9 @@ void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
         if (action.use_id != action.use_id2) {
             play("sound/inventory_sound_effects/leather_inventory.ogg");
         }
-	gs->game_hud().reset_slot_selected();
+    gs->for_screens([&]() {
+        gs->game_hud().reset_slot_selected();
+    });
 }
 
 void PlayerInst::perform_action(GameState* gs, const GameAction& action) {

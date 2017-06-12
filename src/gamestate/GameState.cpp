@@ -190,7 +190,7 @@ bool GameState::start_game() {
                         BBox(x2 - GAME_SIDEBAR_WIDTH, y1, x2, y2),
                         BBox(x1, y1, x2 - GAME_SIDEBAR_WIDTH, y2)
                 }, // hud
-                GameView {x1, y1, x2 - GAME_SIDEBAR_WIDTH, y2}, // view
+                GameView {0,0, WIDTH - GAME_SIDEBAR_WIDTH, HEIGHT}, // view
                 BBox {x1,y1, x2, y2}, // window_region
                 player_data().get_local_player_idx() // focus player id
         });
@@ -506,12 +506,13 @@ void GameState::draw(bool drawhud) {
         for (size_t i = 0; i < safe_copy.size(); i++) {
             safe_copy[i]->post_draw(this);
         }
+        // Set drawing region to full screen:
+        ldraw::display_set_window_region({0,0,game_settings().view_width, game_settings().view_height});
         if (drawhud) {
             game_hud().draw(this);
         }
-
-        lua_api::luacall_overlay_draw(L); // Used for debug purposes
     });
+    lua_api::luacall_overlay_draw(L); // Used for debug purposes
 
 	ldraw::display_draw_finish();
 

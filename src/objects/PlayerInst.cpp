@@ -191,13 +191,16 @@ void PlayerInst::step(GameState* gs) {
             effective_stats().core.mp = 0;
             reset_rest_cooldown();
         }
+    gs->for_screens([&]() {
+        if (!gs->key_down_state(SDLK_x) && is_local_player()) {
+            GameView& view = gs->view();
+            view.center_on(last_x, last_y);
+        }
+    });
 }
 
 void PlayerInst::draw(GameState* gs) {
 	CombatGameInst::draw(gs, 0.0f, is_ghost() ? 0.4 : 1.0);
-	GameView& view = gs->view();
-	if (!gs->key_down_state(SDLK_x) && is_local_player())
-		view.center_on(last_x, last_y);
 }
 
 void PlayerInst::copy_to(GameInst *inst) const {

@@ -1,4 +1,5 @@
 local GameObject = require "core.GameObject"
+local GameState = require "core.GameState"
 local Map = require "core.Map"
 local Display = require "core.Display"
 local EventLog = require "ui.EventLog"
@@ -66,12 +67,6 @@ end
 function Door:on_draw()
     if Map.object_visible(self) then
         self.sprite = self.real_sprite
-    end
-
-    local is_open = (self.open_timeout >= DOOR_OPEN_TIMEOUT - 1)
-    local real_sprite = is_open and self.open_sprite or self.closed_sprite
-    if self.sprite ~= real_sprite and Map.object_visible(self) then
-        self.sprite = real_sprite
     end
 end
 
@@ -143,6 +138,12 @@ function Door:on_step()
         Map.tile_set_seethrough(self.map, tile_xy, is_open)
     end
 
+    GameState.for_screens(function()
+        local real_sprite = is_open and self.open_sprite or self.closed_sprite
+        if self.sprite ~= real_sprite and Map.object_visible(self) then
+            self.sprite = real_sprite
+        end
+    end)
     self.was_open = is_open
 end
 function Door:on_map_init()

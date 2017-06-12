@@ -28,11 +28,13 @@ void StoreInst::step(GameState* gs) {
 	int nplayers = gs->object_radius_test(this, players, MAX_PLAYERS_IN_STORE,
 			player_colfilter, x, y, 24);
 
-	for (int i = 0; i < nplayers; i++ ) {
-		if ((PlayerInst*)players[i] == gs->local_player()) {
-			gs->game_hud().override_sidebar_contents(&sidebar_display);
-		}
-	}
+    gs->for_screens([&]() {
+        for (int i = 0; i < nplayers; i++ ) {
+            if ((PlayerInst*)players[i] == gs->local_player()) {
+                gs->game_hud().override_sidebar_contents(&sidebar_display);
+            }
+        }
+    });
 }
 
 void StoreInst::draw(GameState* gs) {
