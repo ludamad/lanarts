@@ -321,11 +321,14 @@ local Luminos = {
 function Luminos.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
     caster:add_effect("Daze Aura", 200).range = Luminos.range
-    if caster:is_local_player() then
-        EventLog.add("You daze nearby enemies!", {200,200,255})
-    else
-        EventLog.add(caster.name .. " dazes nearby enemies!", {200,200,255})
-    end
+
+    GameState.for_screens(function()
+        if caster:is_local_player() then
+            EventLog.add("You daze nearby enemies!", {200,200,255})
+        else
+            EventLog.add(caster.name .. " dazes nearby enemies!", {200,200,255})
+        end
+    end)
 end
 
 function Luminos.prereq_func(caster)

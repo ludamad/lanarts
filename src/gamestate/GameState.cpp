@@ -176,12 +176,9 @@ bool GameState::start_game() {
 
         initial_seed = init_data.seed;
 	base_rng_state.init_genrand(init_data.seed);
-        /* If class was not set, we may be loading a game -- don't init level */
-	if (settings.class_type != "") {
-		restart();
-	}
 
 
+    screens.clear(); // Clear previous screens
     const int N_PLAYERS = 2;
     const int WIDTH = settings.view_width / N_PLAYERS;
     const int HEIGHT = settings.view_height; // / N_PLAYERS;
@@ -198,6 +195,10 @@ bool GameState::start_game() {
                 player_data().get_local_player_idx() // focus player id
         });
     }
+    /* If class was not set, we may be loading a game -- don't init level */
+	if (settings.class_type != "") {
+		restart();
+	}
 	return true;
 }
 

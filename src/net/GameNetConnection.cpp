@@ -243,9 +243,11 @@ static void post_sync(GameState* gs) {
         pde.action_queue.clear();
         pde.action_queue.queue_actions_for_frame(ActionQueue(), gs->frame());
         pde.player()->actions_set() = true;
-        if (pde.player()->is_local_player()) {
-            gs->view().sharp_center_on(pde.player()->ipos());
-        }
+        gs->for_screens([&](){
+            if (pde.player()->is_local_player()) {
+                gs->view().sharp_center_on(pde.player()->ipos());
+            }
+        });
     }
 }
 
@@ -401,7 +403,9 @@ bool GameNetConnection::_handle_message(int sender,
     case PACKET_CHAT_MESSAGE: {
         ChatMessage msg;
         msg.deserialize(serializer);
-        gs->game_chat().add_message(msg);
+        gs->for_screens([&]() {
+            gs->game_chat().add_message(msg);
+        });
         break;
     }
     default:

@@ -202,15 +202,17 @@ bool GameWorld::step() {
 	}
         if (gs->local_player()->current_floor != get_current_level_id()) {
                 current_level = get_level(gs->local_player()->current_floor);
-		set_current_level(current_level);
-                // Ensure the view is up to date before view operations:
-                LANARTS_ASSERT(current_level->width() == gs->view().world_width && current_level->height() == gs->view().world_height);
-                Pos diff = (gs->local_player()->ipos() - last_player_pos);
-                gs->view().sharp_move(diff);
-                // Ensure that the view is centered. Having the view move after due to being at the edge of a level is jarring:
-                for (int i = 0; i< 100;i++) {
-                    gs->view().center_on(gs->local_player()->ipos(), 10);
-                }
+                set_current_level(current_level);
+                gs->for_screens([&]() {
+                    // Ensure the view is up to date before view operations:
+                    LANARTS_ASSERT(current_level->width() == gs->view().world_width && current_level->height() == gs->view().world_height);
+                    Pos diff = (gs->local_player()->ipos() - last_player_pos);
+                    gs->view().sharp_move(diff);
+                    // Ensure that the view is centered. Having the view move after due to being at the edge of a level is jarring:
+                    for (int i = 0; i< 100;i++) {
+                        gs->view().center_on(gs->local_player()->ipos(), 10);
+                    }
+                });
         }
         last_player_pos = gs->local_player()->ipos();
 
@@ -271,8 +273,10 @@ void GameWorld::reset() {
 	std::vector<GameMapState*> delete_list = level_states;
         player_data().remove_all_players(gs);
         level_states.clear();
-        gs->game_hud().override_sidebar_contents(NULL);
-        gs->game_chat().clear();
+        gs->for_screens([&]() {
+            gs->game_hud().override_sidebar_contents(NULL);
+            gs->game_chat().clear();
+        });
         gs->frame() += 128; // Ensure we don't have any hold-over frames sent.
         // TODO find a better solution than just ensuring unique frame number.
         last_player_pos = {0,0};

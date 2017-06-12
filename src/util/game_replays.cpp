@@ -45,7 +45,9 @@ void load_actions(GameState* gs, std::deque<GameAction>& actions) {
 		if (!nread) {
 			fclose(loadfile);
 			loadfile = NULL;
-			gs->game_chat().add_message("*** Replay has finished ***", COL_RED);
+            gs->for_screens([&]() {
+                gs->game_chat().add_message("*** Replay has finished ***", COL_RED);
+            });
 			gs->game_settings().loadreplay_file = "";
 			break;
 		}

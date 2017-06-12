@@ -680,10 +680,12 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 				&& item_check_lua_prereq(L, type, this)) {
 			item_do_lua_action(L, type, this,
 					Pos(action.action_x, action.action_y), item.amount);
-			if (is_local_player() && !type.inventory_use_message().empty()) {
-				gs->game_chat().add_message(type.inventory_use_message(),
-						Colour(100, 100, 255));
-			}
+            gs->for_screens([&](){
+                if (is_local_player() && !type.inventory_use_message().empty()) {
+                    gs->game_chat().add_message(type.inventory_use_message(),
+                            Colour(100, 100, 255));
+                }
+            });
 			if (item.is_projectile())
 				itemslot.clear();
 			else
@@ -712,14 +714,20 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
             int gold_gained = type.sell_cost() * sell_amount;
             auto message = format("Transaction: %s x %d for %d GP.", type.name.c_str(), sell_amount, gold_gained);
             item.remove_copies(sell_amount);
-            gs->game_chat().add_message(message, COL_PALE_YELLOW);
+            gs->for_screens([&](){
+                gs->game_chat().add_message(message, COL_PALE_YELLOW);
+            });
             gold(gs) += gold_gained;
             play("sound/inventory_sound_effects/sellbuy.ogg");
         } else {
-            gs->game_chat().add_message("Cannot sell this item!", COL_RED);
+            gs->for_screens([&](){
+                gs->game_chat().add_message("Cannot sell this item!", COL_RED);
+            });
         }
     } else {
-        gs->game_chat().add_message("Cannot sell currently equipped items!", COL_RED);
+        gs->for_screens([&](){
+            gs->game_chat().add_message("Cannot sell currently equipped items!", COL_RED);
+        });
     }
 }
 
@@ -818,10 +826,12 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
             return;
         }
 	if (!effective_stats().allowed_actions.can_use_stairs) {
-		if (is_local_player()) {
-			gs->game_chat().add_message(
-					"You cannot use the exit in this state!");
-		}
+        gs->for_screens([&](){
+            if (is_local_player()) {
+                gs->game_chat().add_message(
+                        "You cannot use the exit in this state!");
+            }
+        });
 		return;
 	}
 
@@ -852,10 +862,12 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
 		}
 	}
 
-	gs->game_chat().add_message(
-			format("%s to %s%s", subject_and_verb.c_str(),
-					label_has_digit ? "" : "the ", map_label.c_str()),
-			is_local_player() ? COL_WHITE : COL_YELLOW);
+    gs->for_screens([&](){
+        gs->game_chat().add_message(
+                format("%s to %s%s", subject_and_verb.c_str(),
+                        label_has_digit ? "" : "the ", map_label.c_str()),
+                is_local_player() ? COL_WHITE : COL_YELLOW);
+    });
         if (map_label == "Plain Valley") {
             loop("sound/overworld.ogg");
         } else {

@@ -33,6 +33,9 @@ struct GameScreenSet {
     GameHud& hud();
     BBox& window_region();
 
+    void clear() {
+        screens.clear();
+    }
     template <typename Func>
     void for_each_screen(Func&& f, bool allow_nesting = false) {
         // Do not allow nesting of for_each_screen;
