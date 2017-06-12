@@ -43,7 +43,7 @@ struct IOEvent {
     float event_magnitude; //Not-always-necessary event magnitude
 
 	explicit IOEvent(event_t event_type, int event_num = 0, float event_magnitude = 0.0) :
-			event_type(event_type), event_num(event_num) {
+			event_type(event_type), event_num(event_num), event_magnitude(event_magnitude) {
 	}
 	bool operator==(const IOEvent& o) const {
 		return event_type == o.event_type && event_num == o.event_num;
@@ -130,7 +130,6 @@ struct IOState {
 	bool mouse_leftrelease, mouse_rightrelease;
 	bool mouse_didupwheel, mouse_diddownwheel;
 
-	
 	std::vector<TriggeredIOEvent> active_events;
 	std::vector<SDL_Event> sdl_events;
 	std::vector<IOGamepadState> gamepad_states;
