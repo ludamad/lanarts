@@ -20,6 +20,7 @@ struct BBox;
 // GameEventTrigger instances can exist
 struct IOEvent {
 	/* Events with _N at the end require a number for disambiguation */
+    /* Events with _M at the end require a magnitude */
 	enum event_t {
         USE_ITEM_N,
         SELL_ITEM_N,
@@ -31,13 +32,17 @@ struct IOEvent {
 		// Rely on mouse coordinates:
 		MOUSETARGET_CURRENT_ACTION,
 		MOUSETARGET_MOVE_TOWARDS,
+        // Rely on magnitude
+        MOVE_X_M,
+        MOVE_Y_M,
 		// Non-gameplay actions:
 		EXIT_GAME
 	};
 	event_t event_type;
 	int event_num; // Not-always-necessary event data
+    float event_magnitude; //Not-always-necessary event magnitude
 
-	explicit IOEvent(event_t event_type, int event_num = 0) :
+	explicit IOEvent(event_t event_type, int event_num = 0, float event_magnitude = 0.0) :
 			event_type(event_type), event_num(event_num) {
 	}
 	bool operator==(const IOEvent& o) const {
@@ -173,6 +178,7 @@ public:
 	void trigger_events(const BBox& playing_area);
 
 	int handle_event(SDL_Event* event);
+    void push_event(const IOEvent& event);
 	bool query_event(const IOEvent& event, bool* triggered_already = NULL);
 	bool query_event(IOEvent::event_t event, bool* triggered_already = NULL);
 
@@ -191,6 +197,8 @@ private:
 	std::vector<item_id> items_bound;
 	std::vector<IOEventTrigger> event_bindings;
     std::vector<SDL_GameController*> controllers;
+
+    void reinit_controllers();
 };
 
 #endif /* IOCONTROLLER_H_ */

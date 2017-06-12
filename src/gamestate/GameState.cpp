@@ -367,7 +367,12 @@ bool GameState::update_iostate(bool resetprev, bool trigger_event_handling) {
 			}
 		}
 		/* Fire IOEvents for the current step*/
-		iocontroller.trigger_events(BBox(0, 0, _view.width, _view.height));
+		LuaField io_callback = luawrap::globals(luastate())["Engine"]["io"];
+		if (!io_callback.isnil()) {
+			io_callback.push();
+			luawrap::call<void>(luastate());
+		}
+		iocontroller.trigger_events(BBox(0, 0, _view. width, _view.height));
 	} else {
 		iocontroller.update_iostate(false);
 		repeat_actions_counter--;

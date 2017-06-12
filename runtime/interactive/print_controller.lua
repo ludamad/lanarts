@@ -13,15 +13,21 @@ GameState.game_loop(function()
 	local x, y = x1, y1
 	for _, id in ipairs(ids) do
 			font:draw(
-				{color=COL_WHITE, origin=Display.CENTER}, 
+				{color=COL_WHITE, origin=Display.CENTER},
 				{x, y},
 				"ID = " .. id
 			)
 			font:draw(
-				{color=COL_WHITE, origin=Display.CENTER}, 
+				{color=COL_WHITE, origin=Display.CENTER},
 				{x, y + 25},
-				"'a' state: " .. tostring(Gamepad.button_a(id))
+				"'left X' state: " .. tostring(Gamepad.axis_left_x(id))
 			)
-			x = x + 100
+			font:draw(
+				{color=COL_WHITE, origin=Display.CENTER},
+				{x, y + 50},
+				"'left Y' state: " .. tostring(Gamepad.axis_left_y(id))
+			)
+--			x = x + 200
+			y = y + 100
 	end
 end)

@@ -123,6 +123,11 @@ function Engine.post_serialize()
 
 end
 
+function Engine.io()
+    local Gamepad = require "input.Gamepad"
+    Gamepad.step_for_all()
+end
+
 -- Same steps:
 Engine.pre_deserialize = Engine.pre_serialize
 

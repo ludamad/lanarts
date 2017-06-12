@@ -384,7 +384,9 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 	bool action_usage = io.query_event(IOEvent::ACTIVATE_SPELL_N)
 			|| io.query_event(IOEvent::USE_WEAPON)
 			|| io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
-			|| io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION);
+			|| io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION)
+			|| io.query_event(IOEvent::MOVE_X_M)
+			|| io.query_event(IOEvent::MOVE_Y_M);
 	if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_PERIOD)
 			|| gs->mouse_downwheel()) {
 		queue_portal_use(gs, this, queued_actions);

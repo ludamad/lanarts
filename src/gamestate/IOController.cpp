@@ -182,24 +182,29 @@ IOController::IOController() {
 		event_bindings.push_back(trigger);
 	}
 
-	/* Initialize controllers */
-    int num_joysticks = SDL_NumJoysticks();
-    iostate.gamepad_states.clear();
-    for(int joystick_idx=0; joystick_idx < num_joysticks; ++joystick_idx)
-    {
-        if (!SDL_IsGameController(joystick_idx))
-        {
-            continue;
-        }
+    reinit_controllers();
+}
 
-        SDL_Joystick* joystick = SDL_JoystickOpen(joystick_idx);
+void IOController::reinit_controllers() {
+    controllers.clear();
+	/* Initialize controllers */
+	int num_joysticks = SDL_NumJoysticks();
+	iostate.gamepad_states.clear();
+	for(int joystick_idx=0; joystick_idx < num_joysticks; ++joystick_idx)
+	{
+		if (!SDL_IsGameController(joystick_idx))
+		{
+			continue;
+		}
+
+		SDL_Joystick* joystick = SDL_JoystickOpen(joystick_idx);
 		SDL_JoystickID instance_id = SDL_JoystickInstanceID(joystick);
 		printf("Initial Controller Detected ID: %i, Instance ID: %i\n",  joystick_idx, instance_id);
 
-        SDL_GameController* controller = SDL_GameControllerOpen(joystick_idx);//SDL_GameControllerFromInstanceID(instance_id);
+		SDL_GameController* controller = SDL_GameControllerOpen(joystick_idx);//SDL_GameControllerFromInstanceID(instance_id);
 
 		controllers.push_back(controller);
-    }
+	}
 }
 
 void IOController::bind_spell(spell_id spell) {
@@ -321,14 +326,16 @@ int IOController::handle_event(SDL_Event* event) {
 		}
 		break;
 	}
+	case SDL_CONTROLLERDEVICEADDED: {
+        reinit_controllers();
+		break;
+	}
+	case SDL_CONTROLLERDEVICEREMOVED: {
+        reinit_controllers();
+		break;
+	}
 	case SDL_QUIT:
 		done = 2;
-		
-		/*TODO Handle closing all joysticks
-        if (SDL_JoystickGetAttached(joystick)) {
-            SDL_JoystickClose(joystick);
-        }
-        */
 		break;
 	}
 
@@ -358,12 +365,12 @@ void IOController::update_iostate(bool resetprev) {
 IOGamepadState IOController::create_gamepad_state(SDL_GameController* controller, int id) {
     IOGamepadState state;
     state.gamepad_id = id;
-    state.gamepad_axis_left_trigger = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_TRIGGERLEFT);
-    state.gamepad_axis_right_trigger = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
-    state.gamepad_axis_left_x = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_LEFTX);
-    state.gamepad_axis_left_y = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_LEFTY);
-    state.gamepad_axis_right_x = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_RIGHTX);
-    state.gamepad_axis_right_y = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_RIGHTY);
+    state.gamepad_axis_left_trigger = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_TRIGGERLEFT) / (float)(INT16_MAX);
+    state.gamepad_axis_right_trigger = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / (float)(INT16_MAX);
+    state.gamepad_axis_left_x = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_LEFTX) / (float)(INT16_MAX);
+    state.gamepad_axis_left_y = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_LEFTY) / (float)(INT16_MAX);
+    state.gamepad_axis_right_x = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_RIGHTX) / (float)(INT16_MAX);
+    state.gamepad_axis_right_y = SDL_GameControllerGetAxis(controller,  SDL_CONTROLLER_AXIS_RIGHTY) / (float)(INT16_MAX);
     state.gamepad_button_a = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_A);
     state.gamepad_button_b = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_B);
     state.gamepad_button_x = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X);
@@ -502,5 +509,9 @@ bool IOController::shift_held() {
 
 void IOController::clear() {
     iostate.clear();
+}
+
+void IOController::push_event(const IOEvent &event) {
+	iostate.add_triggered_event(event, false);
 }
 

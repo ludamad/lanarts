@@ -2,25 +2,23 @@
  * lua_core_Gamepad.cpp:
  *  Bindings for gamepad state queries
  */
- 
+
 #include <luawrap/luawrap.h>
 
 #include "gamestate/GameState.h"
 
 #include "lua_api.h"
- 
- 
- 
- 
-static IOGamepadState* gamepad_by_id(LuaStackValue lgamepad_id){
+
+
+static IOGamepadState *gamepad_by_id(LuaStackValue lgamepad_id) {
     int gamepad_id = lgamepad_id.as<int>();
-        GameState* gs = lua_api::gamestate(lgamepad_id.luastate());
-        for (auto& gamepad : gs->gamepad_states()) {
-            if(gamepad_id == gamepad.gamepad_id){
-                return &gamepad;
-            }
+    GameState *gs = lua_api::gamestate(lgamepad_id.luastate());
+    for (auto &gamepad : gs->gamepad_states()) {
+        if (gamepad_id == gamepad.gamepad_id) {
+            return &gamepad;
         }
-        return NULL;
+    }
+    return NULL;
 }
 
 static std::vector<int> gamepad_ids(LuaStackValue unused){
@@ -56,7 +54,7 @@ GAMEPAD_AXIS_GETTER( gamepad_axis_left_x );
 GAMEPAD_AXIS_GETTER( gamepad_axis_left_y );
 GAMEPAD_AXIS_GETTER( gamepad_axis_right_x );
 GAMEPAD_AXIS_GETTER( gamepad_axis_right_y );
- 
+
 GAMEPAD_BUTTON_GETTER( gamepad_button_a );
 GAMEPAD_BUTTON_GETTER( gamepad_button_b );
 GAMEPAD_BUTTON_GETTER( gamepad_button_x );
@@ -72,7 +70,7 @@ GAMEPAD_BUTTON_GETTER( gamepad_button_up_dpad );
 GAMEPAD_BUTTON_GETTER( gamepad_button_down_dpad );
 GAMEPAD_BUTTON_GETTER( gamepad_button_left_dpad );
 GAMEPAD_BUTTON_GETTER( gamepad_button_right_dpad );
- 
+
 namespace lua_api {
     void register_lua_core_Gamepad(lua_State* L) {
         LuaValue gamepad = lua_api::register_lua_submodule(L, "core.Gamepad");
@@ -82,7 +80,6 @@ namespace lua_api {
         gamepad["axis_left_y"].bind_function(gamepad_axis_left_y);
         gamepad["axis_right_x"].bind_function(gamepad_axis_right_x);
         gamepad["axis_right_y"].bind_function(gamepad_axis_right_y);
-        
         gamepad["button_a"].bind_function(gamepad_button_a);
         gamepad["button_b"].bind_function(gamepad_button_b);
         gamepad["button_x"].bind_function(gamepad_button_x);
