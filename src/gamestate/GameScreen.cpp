@@ -10,6 +10,7 @@ PlayerInst* GameScreenSet::focus_object(GameState* gs) {
 }
 PlayerDataEntry& GameScreenSet::local_player_data(GameState* gs) {
     if (current_screen == -1) {
+        LANARTS_ASSERT(false);
         return gs->player_data().get(screens.at(0).focus_player_id);
     } else {
         return gs->player_data().get(screen().focus_player_id);
@@ -36,4 +37,22 @@ GameScreen& GameScreenSet::get_screen(GameState* gs, PlayerInst* player) {
         }
     });
     return screens.at(screen);
+}
+
+void GameScreenSet::set_current_level(GameMapState* map) {
+    if (current_screen == -1) {
+        simulation_map = map;
+        return;
+    }
+    screen().current_level = map;
+    if (map != NULL) {
+        screen().view.world_width = map->width();
+        screen().view.world_height = map->height();
+    }
+}
+GameMapState* GameScreenSet::get_current_level() {
+    if (current_screen == -1) {
+        return simulation_map;
+    }
+    return screen().current_level;
 }

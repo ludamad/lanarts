@@ -628,9 +628,10 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 bool PlayerInst::melee_attack(GameState* gs, CombatGameInst* e,
         const Item& weapon, bool ignore_cooldowns,
         float damage_multiplier) {
+    gs->for_screens([&]() {
     if (gs->local_player()->current_floor == current_floor) {
         play(attack_sound, "sound/melee.ogg");
-    }
+    }});
     // Killed ? 
     return CombatGameInst::melee_attack(gs, e, weapon, ignore_cooldowns);
 }

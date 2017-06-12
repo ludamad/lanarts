@@ -340,9 +340,11 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     }
 
     if (!dynamic_cast<PlayerInst*>(this)) {
-        if (gs->local_player()->current_floor == current_floor) {
-            play("sound/slash.ogg");
-        }
+        gs->for_screens([&]() {
+            if (gs->local_player()->current_floor == current_floor) {
+                play("sound/slash.ogg");
+            }
+        });
     }
 
     // Callbacks on attacker object:

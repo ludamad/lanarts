@@ -16,6 +16,7 @@ public:
     bool should_use_weapon();
     bool should_exit_game();
     void poll_input();
+
     void init(LuaValue value) {
         this->value = value;
     }

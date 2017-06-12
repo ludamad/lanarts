@@ -463,32 +463,34 @@ std::vector<QueuedMessage> GameNetConnection::sync_on_message(message_t msg) {
     }
     QueuedMessage qm;
     const int timeout = 1;
-    PlayerDataEntry& pde = gs->local_player_data();
-    std::vector<bool> received(gs->player_data().all_players().size(), false);
+    gs->for_screens([&]() {
+        PlayerDataEntry& pde = gs->local_player_data();
+        std::vector<bool> received(gs->player_data().all_players().size(), false);
 
-    bool all_ack = false;
-    while (!all_ack) {
-        _connection->poll(gamenetconnection_queue_message, (void*) this,
-                timeout);
+        bool all_ack = false;
+        while (!all_ack) {
+            _connection->poll(gamenetconnection_queue_message, (void*) this,
+                    timeout);
 
-        int idx;
-        while ((idx = find_message_type(qm, _delayed_messages, msg)) != -1) {
-            if (received[qm.sender]) {
-                break;
+            int idx;
+            while ((idx = find_message_type(qm, _delayed_messages, msg)) != -1) {
+                if (received[qm.sender]) {
+                    break;
+                }
+                received[qm.sender] = true;
+                qm.message->move_read_position(sizeof(int));
+                responses.push_back(qm);
+                _delayed_messages.erase(_delayed_messages.begin() + idx);
             }
-            received[qm.sender] = true;
-            qm.message->move_read_position(sizeof(int));
-            responses.push_back(qm);
-            _delayed_messages.erase(_delayed_messages.begin() + idx);
-        }
 
-        all_ack = true;
-        for (int i = 0; i < received.size(); i++) {
-            if (!received[i] && i != pde.net_id) {
-                all_ack = false;
-                break;
+            all_ack = true;
+            for (int i = 0; i < received.size(); i++) {
+                if (!received[i] && i != pde.net_id) {
+                    all_ack = false;
+                    break;
+                }
             }
         }
-    }
+    });
     return responses;
 }

@@ -37,7 +37,6 @@ void PlayerData::remove_all_players(GameState* gs) {
 	}
 }
 void PlayerData::clear() {
-	_local_player_idx = -1;
 	_players.clear();
 }
 
@@ -69,7 +68,6 @@ bool PlayerData::level_has_player(level_id level) {
 }
 
 void PlayerData::copy_to(PlayerData& pc) const {
-	pc._local_player_idx = _local_player_idx;
 	pc._players = _players;
 	LANARTS_ASSERT(false /*This has to be fixed to work with object ids!*/);
 }
@@ -88,7 +86,6 @@ static void read_inst_ref(GameInstRef& ref, GameState* gs,
 }
 
 void PlayerData::serialize(GameState* gs, SerializeBuffer& serializer) {
-	serializer.write_int(_local_player_idx);
 	serializer.write_int(_money);
 	serializer.write_container(_kill_amounts);
 	serializer.write_int(_players.size());
@@ -109,7 +106,6 @@ PlayerDataEntry& PlayerData::get_entry_by_netid(int netid) {
 }
 
 void PlayerData::deserialize(GameState* gs, SerializeBuffer & serializer) {
-	serializer.read_int(_local_player_idx);
 	serializer.read_int(_money);
 	serializer.read_container(_kill_amounts);
 

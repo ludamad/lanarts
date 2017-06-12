@@ -30,7 +30,6 @@ GameWorld::GameWorld(GameState* gs) :
 		next_room_id(-1) {
 	lua_level_states = LuaValue::newtable(gs->luastate());
 	midstep = false;
-	lvl = NULL;
 }
 
 GameWorld::~GameWorld() {
@@ -90,6 +89,13 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 	gs->set_level(original);
 	midstep = false;
         team_data().deserialize(gs, serializer);
+
+    gs->for_screens([&]() {
+        GameMapState *level = gs->local_player()->get_map(gs);
+        if (level != get_current_level()) {
+            set_current_level(level);
+        }
+    });
 }
 
 GameMapState* GameWorld::map_create(const Size& size, ldungeon_gen::MapPtr source_map, bool wandering_enabled) {
@@ -139,6 +145,12 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 			   pde.is_local_player ? "local player" : "network player");
 		map->add_instance(gs, pde.player_inst.get());
 	}
+    gs->for_screens([&]() {
+        GameMapState *level = gs->local_player()->get_map(gs);
+        if (level != get_current_level()) {
+            set_current_level(level);
+        }
+    });
 }
 
 GameMapState* GameWorld::get_level(level_id id) {
@@ -146,13 +158,7 @@ GameMapState* GameWorld::get_level(level_id id) {
 }
 
 void GameWorld::set_current_level(GameMapState* level) {
-    lvl = level;
-    if (lvl != NULL) {
-		gs->screens.for_each_screen([&]() {
-			gs->view().world_width = lvl->width();
-			gs->view().world_height = lvl->height();
-		}, true);
-    }
+	return gs->screens.set_current_level(level);
 }
 
 bool GameWorld::pre_step(bool update_iostate) {
@@ -175,8 +181,6 @@ bool GameWorld::pre_step(bool update_iostate) {
 }
 
 bool GameWorld::step() {
-	GameMapState* current_level = gs->get_level();
-
 	midstep = true;
 
 	/* Queue all actions for players */
@@ -198,21 +202,23 @@ bool GameWorld::step() {
                 // Don't increment frame number because we're doing a new game:
                 return true;
 	}
+	gs->for_screens([&]() {
+        GameMapState* level = gs->local_player()->get_map(gs);
+        if (level != get_current_level()) {
+            set_current_level(level);
+        }
         if (gs->local_player()->current_floor != get_current_level_id()) {
-                current_level = get_level(gs->local_player()->current_floor);
-                set_current_level(current_level);
-                gs->for_screens([&]() {
-                    // Ensure the view is up to date before view operations:
-                    LANARTS_ASSERT(current_level->width() == gs->view().world_width && current_level->height() == gs->view().world_height);
-                    Pos diff = (gs->local_player()->ipos() - last_player_pos);
-                    gs->view().sharp_move(diff);
-                    // Ensure that the view is centered. Having the view move after due to being at the edge of a level is jarring:
-                    for (int i = 0; i< 100;i++) {
-                        gs->view().center_on(gs->local_player()->ipos(), 10);
-                    }
-                });
+			// Ensure the view is up to date before view operations:
+			LANARTS_ASSERT(level->width() == gs->view().world_width && level->height() == gs->view().world_height);
+			Pos diff = (gs->local_player()->ipos() - last_player_pos);
+			gs->view().sharp_move(diff);
+			// Ensure that the view is centered. Having the view move after due to being at the edge of a level is jarring:
+			for (int i = 0; i< 100;i++) {
+				gs->view().center_on(gs->local_player()->ipos(), 10);
+			}
         }
         last_player_pos = gs->local_player()->ipos();
+	});
 
 	gs->frame()++;
 	return true;
@@ -312,4 +318,8 @@ void GameWorld::pop_level_object(level_id id) {
 
 void GameWorld::spawn_players(GeneratedRoom& genlevel, void** player_instances,
 		size_t nplayers) {
+}
+
+GameMapState *GameWorld::get_current_level() {
+	return gs->screens.get_current_level();
 }

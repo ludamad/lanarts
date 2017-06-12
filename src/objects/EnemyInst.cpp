@@ -196,16 +196,16 @@ void EnemyInst::step(GameState* gs) {
 
 	update_position();
 
-	if (!seen && team == MONSTER_TEAM && gs->object_visible_test(this, gs->local_player())) {
-		seen = true;
-		gs->enemies_seen().mark_as_seen(enemytype);
-                if (gs->local_player()->current_floor == current_floor) {
-                    play(etype().unique ? "sound/boss_appears.ogg" : "sound/see_monster.ogg");
-                }
-		gs->for_screens( [&]() {
+	gs->for_screens( [&]() {
+		if (!seen && team == MONSTER_TEAM && gs->object_visible_test(this, gs->local_player())) {
+			seen = true;
+			gs->enemies_seen().mark_as_seen(enemytype);
+					if (gs->local_player()->current_floor == current_floor) {
+						play(etype().unique ? "sound/boss_appears.ogg" : "sound/see_monster.ogg");
+					}
 			show_appear_message(gs->game_chat(), etype());
-		});
-	}
+		}
+	});
 }
 void EnemyInst::draw(GameState* gs) {
 	GameView& view = gs->view();

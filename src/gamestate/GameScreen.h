@@ -18,11 +18,14 @@ struct GameScreen {
     GameView view;
     BBox window_region;
     int focus_player_id;
+    GameMapState* current_level;
 };
 
 // Represents all active screens being drawn
 // Multiple screens are used in split screen, while no screens are used
 // when lanarts is being run headlessly.
+// GameScreen was introduced when implementing split-screen.
+// A lot of code that was originally a single statement had to become a loop over all screens.
 struct GameScreenSet {
     void add(GameScreen screen) {
         screens.push_back(screen);
@@ -52,8 +55,13 @@ struct GameScreenSet {
 
     GameScreen& get_screen(GameState *gs, PlayerInst *player);
 
+    GameMapState* get_current_level();
+    void set_current_level(GameMapState *map);
+
 private:
     int current_screen = -1;
+    // For non-drawing purposes:
+    GameMapState* simulation_map = NULL;
     std::vector<GameScreen> screens;
 };
 

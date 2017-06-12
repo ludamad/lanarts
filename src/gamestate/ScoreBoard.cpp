@@ -156,18 +156,20 @@ void ScoreBoard::write_entries(const std::vector<ScoreBoardEntry>& entries) {
 }
 
 void score_board_store(GameState* gs, bool won_the_game) {
-	PlayerInst* player = gs->local_player();
+	gs->for_screens([&]() {
+		PlayerInst *player = gs->local_player();
 
-	std::string name = player->player_entry(gs).player_name;
-	std::string sprite_name = res::sprite_name(player->get_sprite());
-	std::string class_name = player->class_stats().class_entry().name;
+		std::string name = player->player_entry(gs).player_name;
+		std::string sprite_name = res::sprite_name(player->get_sprite());
+		std::string class_name = player->class_stats().class_entry().name;
 
-	bool hardcore = !gs->game_settings().regen_on_death;
-	ScoreBoardEntry entry(name, sprite_name, class_name, player->score_stats(),
-			player->class_stats().xplevel, gs->game_timestamp(), won_the_game,
-			hardcore);
+		bool hardcore = !gs->game_settings().regen_on_death;
+		ScoreBoardEntry entry(name, sprite_name, class_name, player->score_stats(),
+							  player->class_stats().xplevel, gs->game_timestamp(), won_the_game,
+							  hardcore);
 
-	ScoreBoard::get_instance().store_entry(entry);
+		ScoreBoard::get_instance().store_entry(entry);
+	});
 }
 
 std::vector<ScoreBoardEntry> score_board_fetch() {

@@ -80,6 +80,5 @@ function KeyboardInputSource:should_exit_game()
     error("TODO")
 end
 function KeyboardInputSource:poll_input()
-    log_verbose "KeyboardInputSource:poll_input()"
 end
 return KeyboardInputSource

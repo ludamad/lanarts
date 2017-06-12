@@ -66,12 +66,6 @@ struct IOState {
 class IOController {
 public:
 	IOController();
-
-	void bind_spell(spell_id spell);
-	void unbind_spell(spell_id spell);
-
-	void bind_item(spell_id spell);
-	void unbind_item(spell_id spell);
 	bool ctrl_held();
     bool shift_held();
 	bool mouse_left_click();
@@ -97,7 +91,6 @@ public:
 	std::vector<SDL_Event>& get_events();
 
 	void update_iostate(bool resetprev);
-	void trigger_events(const BBox& playing_area);
 
 	int handle_event(SDL_Event* event);
 

@@ -57,6 +57,5 @@ function GamepadInputSource:should_exit_game()
     error("TODO")
 end
 function GamepadInputSource:poll_input()
-    log_verbose "GamepadInputSource:poll_input()"
 end
 return GamepadInputSource

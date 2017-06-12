@@ -465,9 +465,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
                 // Do nothing, as commanded by Lua
         } else if (type.id == get_item_by_name("Gold")) {
 		gold(gs) += amnt;
-                //if (gs->local_player() == this) {
-                    play("sound/gold.ogg");
-                //}
+        play("sound/gold.ogg");
 	} else {
 		itemslot_t slot = inventory().add(type);
 		if (slot == -1) {
@@ -476,9 +474,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 				this->last_chosen_weaponclass)) {
 			projectile_smart_equip(inventory(), slot);
 		}
-                //if (gs->local_player() == this) {
-                    play("sound/item.ogg");
-                //}
+        play("sound/item.ogg");
 	}
 
 	if (!inventory_full) {
@@ -847,35 +843,35 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
         if (portal == NULL) {
             return;
         }
-        if (gs->local_player()->current_floor == current_floor) {
-            play("sound/stairs.ogg");
-        }
-	cooldowns().reset_stopaction_timeout(50);
-	portal->player_interact(gs, this);
-	reset_rest_cooldown();
+        cooldowns().reset_stopaction_timeout(50);
+        portal->player_interact(gs, this);
+        reset_rest_cooldown();
+        // Play sounds and write to chat
+        gs->for_screens([&](){
+            if (gs->local_player()->current_floor == current_floor) {
+                play("sound/stairs.ogg");
+            }
 
-	std::string subject_and_verb = "You travel";
-	if (!is_local_player()) {
-		subject_and_verb = player_entry(gs).player_name + " travels";
-	}
+            std::string subject_and_verb = "You travel";
+            if (!is_local_player()) {
+                subject_and_verb = player_entry(gs).player_name + " travels";
+            }
 
-	const std::string& map_label =
-			gs->game_world().get_level(current_floor)->label();
+            const std::string& map_label =
+                    gs->game_world().get_level(current_floor)->label();
 
-	bool label_has_digit = false; // Does it have a number in the label?
-	for (int i = 0; i < map_label.size(); i++) {
-		if (isdigit(map_label[i])) {
-			label_has_digit = true;
-			break;
-		}
-	}
-
-    gs->for_screens([&](){
-        gs->game_chat().add_message(
+            bool label_has_digit = false; // Does it have a number in the label?
+            for (int i = 0; i < map_label.size(); i++) {
+                if (isdigit(map_label[i])) {
+                    label_has_digit = true;
+                    break;
+                }
+            }
+            gs->game_chat().add_message(
                 format("%s to %s%s", subject_and_verb.c_str(),
-                        label_has_digit ? "" : "the ", map_label.c_str()),
+                    label_has_digit ? "" : "the ", map_label.c_str()),
                 is_local_player() ? COL_WHITE : COL_YELLOW);
-    });
+        });
         if (map_label == "Plain Valley") {
             loop("sound/overworld.ogg");
         } else {
@@ -887,9 +883,11 @@ void PlayerInst::gain_xp(GameState* gs, int xp) {
 	int levels_gained = stats().gain_xp(xp, this);
 	if (levels_gained > 0) {
 		char level_gain_str[128];
-		snprintf(level_gain_str, 128, "%s reached level %d!",
-				is_local_player() ? "You have" : "Your ally has",
-				class_stats().xplevel);
-		gs->game_chat().add_message(level_gain_str, Colour(50, 205, 50));
+        gs->for_screens([&]() {
+            snprintf(level_gain_str, 128, "%s reached level %d!",
+                    is_local_player() ? "You have" : "Your ally has",
+                    class_stats().xplevel);
+            gs->game_chat().add_message(level_gain_str, Colour(50, 205, 50));
+        });
 	}
 }

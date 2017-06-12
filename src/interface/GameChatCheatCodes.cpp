@@ -123,9 +123,7 @@ static bool handle_create_item(GameState* gs, const std::string& command) {
 			p->stats().equipment.inventory.add(Item(item, amnt));
 			printed.message_colour = Colour(50, 255, 50);
 		}
-        gs->for_screens([&]() {
-            gs->game_chat().add_message(printed);
-        });
+        gs->game_chat().add_message(printed);
 		return true;
 	}
 	return false;
@@ -147,10 +145,8 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 		luaL_loadstring(L, content);
 		if (lua_isstring(L, -1)) {
 			const char* val = lua_tostring(L, -1);
-            gs->for_screens([&]() {
-                gs->game_chat().add_message(val, /*iserr ? Colour(255,50,50) :*/
-                    Colour(120, 120, 255));
-            });
+            gs->game_chat().add_message(val, /*iserr ? Colour(255,50,50) :*/
+                Colour(120, 120, 255));
 		} else {
                     bool iserr = (lua_pcall(L, 0, LUA_MULTRET, 0) != 0);
 
@@ -159,10 +155,8 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
                     for (; prior_top < current_top; prior_top++) {
                             if (lua_isstring(L, -1)) {
                                     const char* val = lua_tostring(L, -1);
-                                    gs->for_screens([&]() {
-                                        gs->game_chat().add_message(val,
-                                                    iserr ? Colour(255, 50, 50) : Colour(120, 120, 255));
-                                    });
+                                    gs->game_chat().add_message(val,
+                                                iserr ? Colour(255, 50, 50) : Colour(120, 120, 255));
                             }
                             lua_pop(L, 1);
                     }
@@ -176,17 +170,13 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 		int err_func = luaL_loadfile(L, filename.c_str());
 		if (err_func) {
 			const char* val = lua_tostring(L, -1);
-            gs->for_screens([&]() {
-                gs->game_chat().add_message(val, Colour(120, 120, 255));
-            });
+            gs->game_chat().add_message(val, Colour(120, 120, 255));
 			lua_pop(L, 1);
 		} else {
                     bool err_call = (lua_pcall(L, 0, 0, 0) != 0);
                     if (err_call) {
                             const char* val = lua_tostring(L, -1);
-                            gs->for_screens([&]() {
-                                gs->game_chat().add_message(val, Colour(120, 120, 255));
-                            });
+                            gs->game_chat().add_message(val, Colour(120, 120, 255));
                             lua_pop(L, 1);
                     }
                 }

@@ -296,11 +296,15 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	player_data().deserialize(this, serializer);
 	world.set_current_level(local_player()->current_floor);
 
+    bool first = true;
     screens.for_each_screen( [&]() {
         view().sharp_center_on(local_player()->ipos());
+        if (first) {
+            settings.class_type = local_player()->class_stats().classid;
+            first = false; // HACK to get first player's class
+        }
     });
 
-	settings.class_type = local_player()->class_stats().classid;
 	post_deserialize_data().process(this);
 	luawrap::globals(L)["Engine"]["post_deserialize"].push();
 	luawrap::call<void>(L);
@@ -378,10 +382,9 @@ int GameState::handle_event(SDL_Event* event, bool trigger_event_handling) {
 		return false;
 	}
 
-	GameMapState* level = get_level();
-
     bool should_exit = false;
     screens.for_each_screen( [&]() {
+        GameMapState* level = get_level();
         if (trigger_event_handling && level && level->id() != -1) {
             if (game_hud().handle_event(this, event)) {
                 should_exit = true;
@@ -528,8 +531,8 @@ void GameState::draw(bool drawhud) {
         if (drawhud) {
             game_hud().draw(this);
         }
+		lua_api::luacall_overlay_draw(L); // Used for debug purposes
     });
-    lua_api::luacall_overlay_draw(L); // Used for debug purposes
 
 	ldraw::display_draw_finish();
 

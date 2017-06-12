@@ -171,18 +171,6 @@ void IOController::reinit_controllers() {
 	}
 }
 
-void IOController::bind_spell(spell_id spell) {
-}
-
-void IOController::unbind_spell(spell_id spell) {
-}
-
-void IOController::bind_item(spell_id spell) {
-}
-
-void IOController::unbind_item(spell_id spell) {
-}
-
 /* Mouse click states */
 bool IOController::mouse_right_click() {
 	return iostate.mouse_rightclick;
