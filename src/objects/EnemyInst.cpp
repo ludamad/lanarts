@@ -202,7 +202,9 @@ void EnemyInst::step(GameState* gs) {
                 if (gs->local_player()->current_floor == current_floor) {
                     play(etype().unique ? "sound/boss_appears.ogg" : "sound/see_monster.ogg");
                 }
-		show_appear_message(gs->game_chat(), etype());
+		gs->for_screens( [&]() {
+			show_appear_message(gs->game_chat(), etype());
+		});
 	}
 }
 void EnemyInst::draw(GameState* gs) {
@@ -300,7 +302,9 @@ void EnemyInst::die(GameState *gs) {
 		CollisionAvoidance& coll_avoid = gs->collision_avoidance();
 		coll_avoid.remove_object(collision_simulation_id());
 
-		show_defeat_message(gs->game_chat(), etype());
+		gs->for_screens( [&]() {
+			show_defeat_message(gs->game_chat(), etype());
+		});
 		if (etype().death_sprite > -1) {
 			const int DEATH_SPRITE_TIMEOUT = 1600;
 			gs->add_instance(

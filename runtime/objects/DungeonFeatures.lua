@@ -1,4 +1,5 @@
 local GameObject = require "core.GameObject"
+local GameState = require "core.GameState"
 local Map = require "core.Map"
 local Display = require "core.Display"
 local EventLog = require "ui.EventLog"
@@ -46,12 +47,6 @@ function Decoration:on_step()
 --    if self.sprite or Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
 --        return -- Need to be able to scale to many deactivated instances
 --    end 
-    if Map.object_visible(self) then
-        self.sprite = self.real_sprite
-    end
-    if not self.sprite and Display.object_within_view(self) and Map.tile_was_seen(self.map, ObjectUtils.tile_xy(self, true)) then
-        self.sprite = self.real_sprite
-    end
 end
 function Decoration:init(args)
     Decoration.parent_init(self, args)
@@ -68,6 +63,13 @@ local DOOR_OPEN_TIMEOUT = 128
 local function is_solid(obj) 
     return obj.solid
 end
+
+function Door:on_draw()
+    if Map.object_visible(self) then
+        self.sprite = self.real_sprite
+    end
+end
+
 function Door:on_step()
 --    if Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
 --        return -- Need to be able to scale to many deactivated instances
@@ -112,7 +114,9 @@ function Door:on_step()
                 break
             end
             if object.is_enemy == false and needs_lanarts then
-                EventLog.add("You require " .. self.lanarts_needed .. " Lanarts to open these doors!", COL_RED)
+                GameState.for_screens(function()
+                    EventLog.add("You require " .. self.lanarts_needed .. " Lanarts to open these doors!", COL_RED)
+                end)
             end
         end
     end
@@ -134,13 +138,12 @@ function Door:on_step()
         Map.tile_set_seethrough(self.map, tile_xy, is_open)
     end
 
-    local real_sprite = is_open and self.open_sprite or self.closed_sprite
-    if self.sprite ~= real_sprite and Map.object_visible(self) then
-        self.sprite = real_sprite
-    end
-    if not self.sprite and Display.object_within_view(self) and Map.tile_was_seen(self.map, ObjectUtils.tile_xy(self, true)) then
-        self.sprite = self.closed_sprite
-    end
+    GameState.for_screens(function()
+        local real_sprite = is_open and self.open_sprite or self.closed_sprite
+        if self.sprite ~= real_sprite and Map.object_visible(self) then
+            self.sprite = real_sprite
+        end
+    end)
     self.was_open = is_open
 end
 function Door:on_map_init()

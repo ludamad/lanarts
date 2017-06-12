@@ -240,7 +240,7 @@ Data.item_create {
 
     action_func = function(self, user)
         MiscSpellAndItemEffects.magic_map_effect(user)
-        EventLog.add("The map is revealed!", {255,255,255})
+        EventLog.add_all("The map is revealed!", {255,255,255})
     end
 }
 

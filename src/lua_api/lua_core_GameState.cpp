@@ -122,6 +122,13 @@ static int game_trigger_events(lua_State* L) {
     return 0;
 }
 
+static void game_for_screens(LuaStackValue func) {
+    lua_api::gamestate(func)->for_screens([&]() {
+        func.push();
+        lua_call(func.luastate(),  0,0);
+    });
+}
+
 static int game_input_handle(lua_State* L) {
 	bool status = lua_api::gamestate(L)->pre_step(luawrap::get_defaulted(L, 1, true));
 	lua_pushboolean(L, status); // should quit on false
@@ -273,6 +280,7 @@ namespace lua_api {
 		game["step"].bind_function(game_step);
 		game["draw"].bind_function(game_draw);
 		game["raw_event_log"].bind_function(game_raw_event_log);
+		game["for_screens"].bind_function(game_for_screens);
                 // Can directly bind event_log_is_active:
 		game["event_log_is_active"].bind_function(event_log_is_active);
                 game["wait"].bind_function(lapi_wait);

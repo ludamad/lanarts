@@ -45,8 +45,7 @@ public:
 	};
 	// Initialize with references to structures that are updated by messages
 	// Keep parts of the game-state that are updated explicit
-	GameNetConnection(GameChat& chat, PlayerData& pd,
-			GameStateInitData& init_data);
+	GameNetConnection(GameState* gs);
 	~GameNetConnection();
 
 	bool initialize_as_client(const conn_callback &callback, const char* host, int port);
@@ -81,10 +80,8 @@ public:
 			bool queue_messages = false);
 
 private:
-	//Keep back-references so that we can alter world state based on messages received
-	GameChat& chat;
-	PlayerData& pd;
-	GameStateInitData& init_data;
+	//Keep back-reference so that we can alter world state based on messages received
+	GameState* gs;
 
 	std::vector<QueuedMessage> _delayed_messages;
 

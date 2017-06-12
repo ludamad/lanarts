@@ -28,14 +28,17 @@ void StoreInst::step(GameState* gs) {
 	int nplayers = gs->object_radius_test(this, players, MAX_PLAYERS_IN_STORE,
 			player_colfilter, x, y, 24);
 
-	for (int i = 0; i < nplayers; i++ ) {
-		if ((PlayerInst*)players[i] == gs->local_player()) {
-			gs->game_hud().override_sidebar_contents(&sidebar_display);
-		}
-	}
+    gs->for_screens([&]() {
+        for (int i = 0; i < nplayers; i++ ) {
+            if ((PlayerInst*)players[i] == gs->local_player()) {
+                gs->game_hud().override_sidebar_contents(&sidebar_display);
+            }
+        }
+    });
 }
 
 void StoreInst::draw(GameState* gs) {
+	sidebar_display.init(this, gs->game_hud().sidebar_content_area());
 	Colour drawcolour;
 	if (gs->object_radius_test(this, NULL, 0, player_colfilter, x, y, 24)) {
 		drawcolour = Colour(255, 255, 100, 255);
@@ -53,7 +56,7 @@ void StoreInst::copy_to(GameInst* inst) const {
 
 void StoreInst::init(GameState* gs) {
 	GameInst::init(gs);
-	sidebar_display.init(this, gs->game_hud().sidebar_content_area());
+	sidebar_display = StoreContent();
 }
 
 StoreInst* StoreInst::clone() const {
@@ -70,10 +73,10 @@ void StoreInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 
 void StoreInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	GameInst::deserialize(gs, serializer);
-	sidebar_display.init(this, gs->game_hud().sidebar_content_area());
 	inv.deserialize(serializer);
 	serializer.read(last_seen_spr);
 	serializer.read(spriteid);
 	serializer.read(spr_frame);
+	sidebar_display = StoreContent();
 }
 

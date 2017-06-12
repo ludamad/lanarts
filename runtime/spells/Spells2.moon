@@ -1,5 +1,6 @@
 EventLog = require "ui.EventLog"
 GameObject = require "core.GameObject"
+GameState = require "core.GameState"
 Map = require "core.Map"
 World = require "core.World"
 Bresenham = require "core.Bresenham"
@@ -164,17 +165,19 @@ DataW.spell_create {
             eff.damage = caster.stats.magic / 2
             eff.power = caster.stats.magic * 0.3
             eff.magic_percentage = 1.0
-        if caster\is_local_player()
-            EventLog.add("You daze all enemies in sight!", {200,200,255})
-        elseif caster.name == "Your ally"
-            EventLog.add(caster.name .. " dazes all enemies in sight!", {200,200,255})
+        GameState.for_screens () ->
+            if caster\is_local_player()
+                EventLog.add("You daze all enemies in sight!", {200,200,255})
+            elseif caster.name == "Your ally"
+                EventLog.add(caster.name .. " dazes all enemies in sight!", {200,200,255})
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) -> 
         if not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
             for mon in *(Map.enemies_list caster)
                 if Map.object_visible(mon)
                     return true
-            EventLog.add("No monsters in sight!", COL_PALE_RED)
+            GameState.for_screens () ->
+                EventLog.add("No monsters in sight!", COL_PALE_RED)
             return false
         return false
 }
@@ -191,14 +194,16 @@ DataW.spell_create {
     fallback_to_melee: false
     action_func: (caster, x, y) ->
         caster\add_effect("Ice Form", 300)
-        if caster\is_local_player()
-            EventLog.add("You enter a glacial state!", {200,200,255})
-        elseif caster.name == "Your ally"
-            EventLog.add(caster.name .. " enters a glacial state!", {200,200,255})
+        GameState.for_screens () ->
+            if caster\is_local_player()
+                EventLog.add("You enter a glacial state!", {200,200,255})
+            elseif caster.name == "Your ally"
+                EventLog.add(caster.name .. " enters a glacial state!", {200,200,255})
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) -> 
         if not caster.can_rest
-            EventLog.add("Ice Form requires perfect concentration!", {200,200,255})
+            GameState.for_screens () ->
+                EventLog.add("Ice Form requires perfect concentration!", {200,200,255})
             return false
         return not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
 }
@@ -224,12 +229,13 @@ DataW.spell_create {
         -- Level 1 willpower is expected to be 7, and any additional willpower grants half a second of cooldown time.
         -- At level 7, this is an extra 3 seconds of cooldown, plus items, leading to ~double expected time.
         caster\add_effect("Baleful Regeneration", 60 * 6 + (willpower - 7) * 30)
-        if caster\is_local_player()
-            EventLog.add("You start to regenerate quickly!", {200,200,255})
-            --play_sound "sound/Jingle_Win_Synth/Jingle_Win_Synth_00.ogg"
-            play_sound "sound/berserk.ogg"
-        else
-            EventLog.add(caster.name .. " starts to regenerate quickly!", {200,200,255})
+        GameState.for_screens () ->
+            if caster\is_local_player()
+                EventLog.add("You start to regenerate quickly!", {200,200,255})
+                --play_sound "sound/Jingle_Win_Synth/Jingle_Win_Synth_00.ogg"
+                play_sound "sound/berserk.ogg"
+            else
+                EventLog.add(caster.name .. " starts to regenerate quickly!", {200,200,255})
 }
 
 -- Requires kills from the necromancer, in the form of mana.
@@ -246,18 +252,21 @@ DataW.spell_create {
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) ->
         if caster.stats.hp < 55
-            if caster\is_local_player() 
-                EventLog.add("You do not have enough health!", {200,200,255})
-            return false
+            GameState.for_screens () ->
+                if caster\is_local_player() 
+                    EventLog.add("You do not have enough health!", {200,200,255})
+                return false
         if not caster\has_effect "Necromancer"
-            if caster\is_local_player() 
-                EventLog.add("You must be a necromancer to cast this spell!", {200,200,255})
+            GameState.for_screens () ->
+                if caster\is_local_player() 
+                    EventLog.add("You must be a necromancer to cast this spell!", {200,200,255})
             return false
         amount = math.max 1, math.ceil((caster\effective_stats().willpower - 7) / 2)
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons >= amount
-            if caster\is_local_player() 
-                EventLog.add("You cannot currently control more than #{amount} aspects!", {200,200,255})
+            GameState.for_screens () ->
+                if caster\is_local_player() 
+                    EventLog.add("You cannot currently control more than #{amount} aspects!", {200,200,255})
             return false
         return not caster\has_effect("Exhausted") and not (caster\has_effect "Summoning")
     action_func: (caster, x_unused, y_unused) ->
@@ -295,8 +304,9 @@ DataW.spell_create {
     action_func: (x, y) =>
         effect = @add_effect "Dash Attack", 15
         effect.angle = vector_direction(@xy, {x,y})
-        if @is_local_player()
-            EventLog.add("You dash valiantly forward!", {200,200,255})
+        GameState.for_screens () ->
+            if @is_local_player()
+                EventLog.add("You dash valiantly forward!", {200,200,255})
     prereq_func: () =>
         return not @has_ranged_weapon()
     autotarget_func: () =>
@@ -317,8 +327,9 @@ DataW.spell_create {
     prereq_func: (caster) ->
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons >= 2 -- caster.stats.level
-            if caster\is_local_player() 
-                EventLog.add("You cannot currently control more than #{2} aspects!", {200,200,255})
+            GameState.for_screens () ->
+                if caster\is_local_player() 
+                    EventLog.add("You cannot currently control more than #{2} aspects!", {200,200,255})
             return false
         return not caster\has_effect("Exhausted") and not (caster\has_effect "Summoning")
     action_func: (caster, x, y) ->
@@ -354,8 +365,9 @@ DataW.spell_create {
     prereq_func: (caster) ->
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons == 0
-            if caster\is_local_player() 
-                EventLog.add("You have no lifelinked monsters!", {200,200,255})
+            GameState.for_screens () ->
+                if caster\is_local_player() 
+                    EventLog.add("You have no lifelinked monsters!", {200,200,255})
             return false
         return not caster\has_effect("Exhausted") and not (caster\has_effect "Summoning")
     action_func: (caster, x, y) ->

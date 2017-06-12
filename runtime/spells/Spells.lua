@@ -1,5 +1,6 @@
 local EventLog = require "ui.EventLog"
 local GameObject = require "core.GameObject"
+local GameState = require "core.GameState"
 local Map = require "core.Map"
 local Bresenham = require "core.Bresenham"
 local SpellObjects = require "objects.SpellObjects"
@@ -37,11 +38,13 @@ end
 
 function Regeneration.action_func(caster, x, y)
     caster:add_effect("Regeneration", 60 * 2)
-    if caster:is_local_player() then
-        EventLog.add("You start to regenerate quickly!", {200,200,255})
-    else
-        EventLog.add(caster.name .. " starts to regenerate quickly!", {200,200,255})
-    end
+    GameState.for_screens(function() 
+        if caster:is_local_player() then
+            EventLog.add("You start to regenerate quickly!", {200,200,255})
+        else
+            EventLog.add(caster.name .. " starts to regenerate quickly!", {200,200,255})
+        end
+    end)
 end
 
 Data.spell_create(Regeneration)
@@ -70,12 +73,14 @@ end
 
 function Berserk.action_func(caster, x, y)
     caster:add_effect("Berserk", 130 + math.min(3, caster.stats.level) * 30)
-    if caster:is_local_player() then
-        play_sound "sound/berserk.ogg"
-        EventLog.add("You enter a powerful rage!", {200,200,255})
-    elseif caster.name == "Your ally" then
-        EventLog.add(caster.name .. " enters a powerful rage!", {200,200,255})
-    end
+    GameState.for_screens(function() 
+        if caster:is_local_player() then
+            play_sound "sound/berserk.ogg"
+            EventLog.add("You enter a powerful rage!", {200,200,255})
+        elseif caster.name == "Your ally" then
+            EventLog.add(caster.name .. " enters a powerful rage!", {200,200,255})
+        end
+    end)
 end
 
 Data.spell_create(Berserk)
@@ -130,9 +135,11 @@ local function ChargeCallback(_, caster)
             local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)
                 local thrown = mon:add_effect("Thrown", 10 + 10 * str_diff)
                 thrown.angle = vector_direction(caster.xy, mon.xy)
-                if caster:is_local_player() then
-                    EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
-                end
+                GameState.for_screens(function() 
+                    if caster:is_local_player() then
+                        EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
+                    end
+                end)
             --end
         end
     end
@@ -140,13 +147,15 @@ end
 
 function PowerStrike.action_func(caster)
     caster:apply_melee_cooldown()
-    if caster:is_local_player() then
-        EventLog.add("You strike wildly in all directions!", {200,200,255})
-        play_sound "sound/knockback.ogg"
-    elseif caster.name == "Your ally" then
-        EventLog.add(caster.name .. " strikes wildly in all directions!", {200,200,255})
-        play_sound "sound/knockback.ogg"
-    end
+    GameState.for_screens(function() 
+        if caster:is_local_player() then
+            EventLog.add("You strike wildly in all directions!", {200,200,255})
+            play_sound "sound/knockback.ogg"
+        elseif caster.name == "Your ally" then
+            EventLog.add(caster.name .. " strikes wildly in all directions!", {200,200,255})
+            play_sound "sound/knockback.ogg"
+        end
+    end)
 
     caster:add_effect("Charge", 8).callback = ChargeCallback
 end
@@ -217,18 +226,22 @@ function Pain.action_func(caster, x, y, target)
         caster:direct_damage(20)
     end
     caster:add_effect("Pained", 50)
-    if caster:is_local_player() then
-        EventLog.add("You attack your enemy's life force directly!", {200,200,255})
-    else
-        EventLog.add(caster.name .. " attacks their enemy's life force directly!", {200,200,255})
-    end
+    GameState.for_screens(function() 
+        if caster:is_local_player() then
+            EventLog.add("You attack your enemy's life force directly!", {200,200,255})
+        else
+            EventLog.add(caster.name .. " attacks their enemy's life force directly!", {200,200,255})
+        end
+    end)
 end
 
 function Pain.prereq_func(caster)
     if caster.stats.hp < 35 then
-        if caster:is_local_player() then
-            EventLog.add("You require more health!", {200,200,255})
-        end
+        GameState.for_screens(function() 
+            if caster:is_local_player() then
+                EventLog.add("You require more health!", {200,200,255})
+            end
+        end)
         return false
     end
     for _, mon in ipairs(Map.enemies_list(caster)) do
@@ -263,11 +276,13 @@ local HealAura = {
 function HealAura.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
     caster:add_effect("Healing Aura", 100).range = HealAura.range
-    if caster:is_local_player() then
-        EventLog.add("You release a healing radiance!", {200,200,255})
-    else
-        EventLog.add(caster.name .. " releases a healing radiance!", {200,200,255})
-    end
+    GameState.for_screens(function() 
+        if caster:is_local_player() then
+            EventLog.add("You release a healing radiance!", {200,200,255})
+        else
+            EventLog.add(caster.name .. " releases a healing radiance!", {200,200,255})
+        end
+    end)
 end
 
 function HealAura.prereq_func(caster)
@@ -276,7 +291,11 @@ function HealAura.prereq_func(caster)
             return true
         end
     end
-    EventLog.add("No allies in sight!", COL_PALE_RED)
+    GameState.for_screens(function() 
+        if caster:is_local_player() then
+            EventLog.add("No allies in sight!", COL_PALE_RED)
+        end
+    end)
     return false
 end
 
@@ -302,11 +321,14 @@ local Luminos = {
 function Luminos.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
     caster:add_effect("Daze Aura", 200).range = Luminos.range
-    if caster:is_local_player() then
-        EventLog.add("You daze nearby enemies!", {200,200,255})
-    else
-        EventLog.add(caster.name .. " dazes nearby enemies!", {200,200,255})
-    end
+
+    GameState.for_screens(function()
+        if caster:is_local_player() then
+            EventLog.add("You daze nearby enemies!", {200,200,255})
+        else
+            EventLog.add(caster.name .. " dazes nearby enemies!", {200,200,255})
+        end
+    end)
 end
 
 function Luminos.prereq_func(caster)
@@ -343,19 +365,23 @@ function GreaterPain.action_func(caster, x, y, target)
     caster:direct_damage(40)
     caster:add_effect("Pained", 50)
     caster:add_effect("Pain Aura", 100).range = GreaterPain.range + caster.stats.level * 5
-    if caster:is_local_player() then
-        EventLog.add("You attack nearby enemies life force directly!", {200,200,255})
-    else
-        EventLog.add(caster.name .. " attacks nearby enemies life force directly!", {200,200,255})
-    end
+    GameState.for_screens(function() 
+        if caster:is_local_player() then
+            EventLog.add("You attack nearby enemies life force directly!", {200,200,255})
+        else
+            EventLog.add(caster.name .. " attacks nearby enemies life force directly!", {200,200,255})
+        end
+    end)
 end
 
 function GreaterPain.prereq_func(caster)
     if caster.stats.hp < 55 then
-        if caster:is_local_player() then
-            EventLog.add("You do not have enough health!", {255,200,200})
-        end
-        return false
+        GameState.for_screens(function() 
+            if caster:is_local_player() then
+                EventLog.add("You do not have enough health!", {255,200,200})
+            end
+            return false
+        end)
     end
     for _, mon in ipairs(Map.enemies_list(caster)) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + Pain.range then
@@ -399,11 +425,13 @@ function FearStrike.action_func(caster, x, y)
     end
     caster:melee(closest_mon)
     closest_mon:add_effect("Fear", 100)
-    if caster:is_local_player() then
-        EventLog.add("You strike into the soul of your enemy!", {200,200,255})
-    elseif caster.name == "Your ally" then
-        EventLog.add(caster.name .. " strikes into the soul of their enemy!", {200,200,255})
-    end
+    GameState.for_screens(function() 
+        if caster:is_local_player() then
+            EventLog.add("You strike into the soul of your enemy!", {200,200,255})
+        elseif caster.name == "Your ally" then
+            EventLog.add(caster.name .. " strikes into the soul of their enemy!", {200,200,255})
+        end
+    end)
 end
 
 function FearStrike.prereq_func(caster)
@@ -448,11 +476,13 @@ end
 
 function Expedite.action_func(caster, x, y)
     caster:add_effect("Expedited", 600)
-    if caster:is_local_player() then
-        EventLog.add("You feel expedient!", {200,200,255})
-    elseif caster.name == "Your ally" then
-        EventLog.add(caster.name .. " seems expedient.", {200,200,255})
-    end
+    GameState.for_screens(function() 
+        if caster:is_local_player() then
+            EventLog.add("You feel expedient!", {200,200,255})
+        elseif caster.name == "Your ally" then
+            EventLog.add(caster.name .. " seems expedient.", {200,200,255})
+        end
+    end)
 end
 
 Data.spell_create(Expedite)
@@ -484,11 +514,13 @@ end
 
 function CallSpikes.action_func(caster, x, y)
     play_sound("sounds/slash.ogg")
-    if caster:is_local_player() then
-        EventLog.add("You create spikes!", {200,200,255})
-    else 
-        EventLog.add(caster.name .. " creates spikes!", {200,200,255})
-    end
+    GameState.for_screens(function() 
+        if caster:is_local_player() then
+            EventLog.add("You create spikes!", {200,200,255})
+        else 
+            EventLog.add(caster.name .. " creates spikes!", {200,200,255})
+        end
+    end)
 
     local dx, dy = x - caster.x, y - caster.y
     local mag = math.sqrt(dx*dx+dy*dy)
@@ -534,11 +566,13 @@ function Wallanthor.autotarget_func(caster)
 end
 
 function Wallanthor.action_func(caster, x, y)
-    if caster:is_local_player() then
-        EventLog.add("You create a wall of pure energy!", {200,200,255})
-    else 
-        EventLog.add(caster.name .. " creates a wall of pure energy!", {200,200,255})
-    end
+    GameState.for_screens(function() 
+        if caster:is_local_player() then
+            EventLog.add("You create a wall of pure energy!", {200,200,255})
+        else 
+            EventLog.add(caster.name .. " creates a wall of pure energy!", {200,200,255})
+        end
+    end)
 
     local dx, dy = x - caster.x, y - caster.y
     local mag = math.sqrt(dx*dx+dy*dy)

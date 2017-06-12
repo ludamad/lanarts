@@ -19,12 +19,8 @@
 
 #include "GameNetConnection.h"
 
-GameNetConnection::GameNetConnection(GameChat& chat, PlayerData& pd,
-        GameStateInitData& init_data) :
-                chat(chat),
-                pd(pd),
-                init_data(init_data),
-                _connection(NULL) {
+
+GameNetConnection::GameNetConnection(GameState* gs) : gs(gs), _connection(NULL) {
     _message_buffer = new SerializeBuffer();
 }
 
@@ -154,9 +150,8 @@ void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
     sb.read(name);
     sb.read(classtype);
     printf("connection affirm read\n");
-    pd.register_player(name, NULL, classtype, sender);
+    pd.register_player(name, NULL, classtype, /* is local player */ false, sender);
     printf("now there are %d players\n", (int) pd.all_players().size());
-    pd.set_local_player_idx(0);
 }
 
 void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
@@ -178,7 +173,6 @@ void net_recv_game_init_data(SerializeBuffer& sb, int sender,
     //Read player data
     int localidx;
     sb.read_int(localidx);
-    pd.set_local_player_idx(localidx);
     int playern;
     sb.read_int(playern);
     LANARTS_ASSERT(pd.all_players().empty());
@@ -189,7 +183,7 @@ void net_recv_game_init_data(SerializeBuffer& sb, int sender,
         sb.read(name);
         sb.read(classtype);
         sb.read_int(net_id);
-        pd.register_player(name, NULL, classtype, net_id);
+        pd.register_player(name, NULL, classtype, (i == localidx), net_id);
     }
 
     printf(
@@ -247,9 +241,11 @@ static void post_sync(GameState* gs) {
         pde.action_queue.clear();
         pde.action_queue.queue_actions_for_frame(ActionQueue(), gs->frame());
         pde.player()->actions_set() = true;
-        if (pde.player()->is_local_player()) {
-            gs->view().sharp_center_on(pde.player()->ipos());
-        }
+        gs->for_screens([&](){
+            if (pde.player()->is_local_player()) {
+                gs->view().sharp_center_on(pde.player()->ipos());
+            }
+        });
     }
 }
 
@@ -285,14 +281,11 @@ void net_recv_sync_data(SerializeBuffer& sb, GameState* gs) {
     int mtwistseed;
     sb.read_int(mtwistseed);
     gs->rng().init_genrand(mtwistseed);
-    int nplayer = gs->player_data().get_local_player_idx();
     gs->deserialize(sb);
     std::vector<PlayerDataEntry>& pdes = gs->player_data().all_players();
     for (int i = 0; i < pdes.size(); i++) {
-        pdes[i].player()->set_local_player(false);
+        pdes[i].player()->set_local_player(pdes[i].is_local_player);
     }
-    gs->player_data().set_local_player_idx(nplayer);
-    gs->game_world().set_current_level(gs->local_player()->current_floor);
 }
 
 void net_send_sync_ack(GameNetConnection& net) {
@@ -390,22 +383,24 @@ bool GameNetConnection::_handle_message(int sender,
     switch (type) {
 
     case PACKET_CLIENT2SERV_CONNECTION_AFFIRM: {
-        net_recv_connection_affirm(serializer, sender, pd);
+        net_recv_connection_affirm(serializer, sender, gs->player_data());
         break;
     }
     case PACKET_SERV2CLIENT_INITIALPLAYERDATA: {
-        net_recv_game_init_data(serializer, sender, init_data, pd);
+        net_recv_game_init_data(serializer, sender, gs->game_state_init_data(), gs->player_data());
         break;
     }
 
     case PACKET_ACTION: {
-        net_recv_player_actions(serializer, sender, pd);
+        net_recv_player_actions(serializer, sender, gs->player_data());
         break;
     }
     case PACKET_CHAT_MESSAGE: {
         ChatMessage msg;
         msg.deserialize(serializer);
-        chat.add_message(msg);
+        gs->for_screens([&]() {
+            gs->game_chat().add_message(msg);
+        });
         break;
     }
     default:
@@ -468,8 +463,8 @@ std::vector<QueuedMessage> GameNetConnection::sync_on_message(message_t msg) {
     }
     QueuedMessage qm;
     const int timeout = 1;
-    PlayerDataEntry& pde = pd.local_player_data();
-    std::vector<bool> received(pd.all_players().size(), false);
+    PlayerDataEntry& pde = gs->local_player_data();
+    std::vector<bool> received(gs->player_data().all_players().size(), false);
 
     bool all_ack = false;
     while (!all_ack) {

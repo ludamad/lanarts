@@ -24,12 +24,11 @@
 #include "SpellsContent.h"
 
 SidebarNavigator::NavigationOption::NavigationOption(const std::string& icon,
-		SidebarContent* content, const BBox& icon_bbox) :
+		std::shared_ptr<SidebarContent> content, const BBox& icon_bbox) :
 		iconsprite(icon), content(content), icon_bbox(icon_bbox) {
 }
 
 SidebarNavigator::NavigationOption::~NavigationOption() {
-	delete content;
 }
 
 void SidebarNavigator::NavigationOption::draw_icon(GameState* gs,
@@ -61,15 +60,15 @@ SidebarNavigator::SidebarNavigator(const BBox& sidebar_bounds,
 		const BBox& main_content_bounds) :
 		side_bar(sidebar_bounds), main_content(main_content_bounds), view(
 				INVENTORY), content_overlay(NULL), inventory("inventory_icon",
-				new InventoryContent(main_content_bounds),
+				std::make_shared<InventoryContent>(main_content_bounds),
 				icon_bounds(main_content_bounds, 0, NUM_ICONS_ROW_1)), equipment(
-				"equipment_icon", new EquipmentContent(main_content_bounds),
+				"equipment_icon", std::make_shared<EquipmentContent>(main_content_bounds),
 				icon_bounds(main_content_bounds, 1, NUM_ICONS_ROW_1)), spells(
-				"spells_icon", new SpellsContent(main_content_bounds),
+				"spells_icon", std::make_shared<SpellsContent>(main_content_bounds),
 				icon_bounds(main_content_bounds, 2, NUM_ICONS_ROW_1)), enemies(
-				"enemies_icon", new EnemiesSeenContent(main_content_bounds),
+				"enemies_icon", std::make_shared<EnemiesSeenContent>(main_content_bounds),
 				icon_bounds(main_content_bounds, 0, NUM_ICONS_ROW_2, 1)), config(
-				"config_icon", new ConfigContent(main_content_bounds),
+				"config_icon", std::make_shared<ConfigContent>(main_content_bounds),
 				icon_bounds(main_content_bounds, 1, NUM_ICONS_ROW_2, 1)) {
 }
 
@@ -102,7 +101,7 @@ void SidebarNavigator::step(GameState* gs) {
 }
 
 void SidebarNavigator::reset_slot_selected() {
-	((InventoryContent*)inventory.content)->reset_slot_selected();
+	((InventoryContent*)inventory.content.get())->reset_slot_selected();
 }
 
 bool SidebarNavigator::handle_icon_io(GameState* gs, NavigationOption& option,
@@ -127,7 +126,7 @@ bool SidebarNavigator::handle_io(GameState* gs, ActionQueue& queued_actions) {
 
 SidebarContent* SidebarNavigator::current_content() {
 	if (!content_overlay) {
-		return current_option().content;
+		return current_option().content.get();
 	} else {
 		return content_overlay;
 	}
