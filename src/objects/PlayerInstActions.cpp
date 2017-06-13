@@ -281,20 +281,22 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
     return {dx, dy};
 }
 
-void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
+void PlayerInst::enqueue_io_movement_actions(GameState* gs, float& dx, float& dy) {
 //Arrow/wasd movement
-	if (io_value.move_direction().y < 0) {
-		dy -= 1;
-	}
-    if (io_value.move_direction().x > 0) {
-		dx += 1;
-	}
-    if (io_value.move_direction().y > 0) {
-		dy += 1;
-	}
-    if (io_value.move_direction().x < 0) {
-		dx -= 1;
-	}
+//	if (io_value.move_direction().y < 0) {
+//		dy -= 1;
+//	}
+//    if (io_value.move_direction().x > 0) {
+//		dx += 1;
+//	}
+//    if (io_value.move_direction().y > 0) {
+//		dy += 1;
+//	}
+//    if (io_value.move_direction().x < 0) {
+//		dx -= 1;
+//	}
+        dx = io_value.move_direction().x;
+        dy = io_value.move_direction().y;
         bool explore_used = false;
         if (dx == 0 && dy == 0) {
             if (io_value.should_explore() && (is_ghost() || !has_visible_monster(gs, this))) {
@@ -359,7 +361,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 		gs->set_repeat_actions_counter(settings.frame_action_repeat);
 	}
 
-	int dx = 0, dy = 0;
+	float dx = 0, dy = 0;
 	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
@@ -543,6 +545,11 @@ void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
 	LANARTS_ASSERT(dynamic_cast<StoreInst*>(gs->get_instance(action.use_id)));
 	StoreInventory& inv = store->inventory();
 	StoreItemSlot& slot = inv.get(action.use_id2);
+        if (slot.item == NO_ITEM) {
+            // For some reason this item isn't here anymore (e.g, both players try to buy same item)
+            // Just return.
+            return;
+        }
 	if (gold(gs) >= slot.cost) {
 		inventory().add(slot.item);
 		gold(gs) -= slot.cost;
@@ -565,7 +572,7 @@ void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
-	event_log("Player id=%d performing act=%d, xy=(%d,%d), frame=%d, origin=%d, room=%d, use_id=%d, use_id2=%d\n",
+	event_log("Player id=%d performing act=%d, xy=(%.2f,%.2f), frame=%d, origin=%d, room=%d, use_id=%d, use_id2=%d\n",
 			this->player_entry(gs).net_id,
 			action.act, action.action_x,
 			action.action_y, action.frame, action.origin, action.room,
@@ -771,7 +778,7 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
         }
 
         // Get the move direction:
-	int dx = action.action_x, dy = action.action_y;
+	float dx = action.action_x, dy = action.action_y;
         // Multiply by the move speed to get the displacement. 
         // Note that players technically move faster when moving diagonally.
 	float ddx = dx * mag, ddy = dy * mag;
@@ -892,6 +899,6 @@ void PlayerInst::gain_xp(GameState* gs, int xp) {
                      is_focus_player(gs) ? "You have" : "Your ally has",
                     class_stats().xplevel);
             gs->game_chat().add_message(level_gain_str, Colour(50, 205, 50));
-        });
+        }, true);
 	}
 }

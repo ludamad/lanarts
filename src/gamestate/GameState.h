@@ -289,8 +289,8 @@ public:
 	    return _post_deserialize_data;
 	}
 	template <typename Func>
-	void for_screens(Func&& f) {
-	    screens.for_each_screen(f);
+	void for_screens(Func&& f, bool allow_nesting = false) {
+	    screens.for_each_screen(f, allow_nesting);
 	}
 
     GameScreen &get_screen(PlayerInst *player);

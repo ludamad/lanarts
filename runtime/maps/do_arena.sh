@@ -1,5 +1,5 @@
-export ARENA_ENEMIES='return {Ciribot = 1}'
-#export LANARTS_LEVEL=1
+export ARENA_ENEMIES='return {Adder = 10}'
+export LANARTS_LEVEL=3
 export LANARTS_FIGHTER=1
 export LANARTS_2P=Mage
 export LANARTS_3P=Necromancer

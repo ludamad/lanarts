@@ -7,6 +7,7 @@ TileSets = require "tiles.Tilesets"
 GenerateUtils = require "maps.GenerateUtils"
 SourceMap = require "core.SourceMap"
 Map = require "core.Map"
+Region1 = require "maps.Region1"
 
 import ConnectedRegions, FilledRegion
     from require "maps.MapElements"
@@ -22,7 +23,7 @@ import ConnectedRegions, FilledRegion
 --}
 
 TEMPLATE = FilledRegion {
-    shape: 'sanic'
+    shape: 'windows'
     size: {40,40}
 }
 
@@ -65,6 +66,9 @@ generate = (rng) ->
         for i=1,amount
             {x, y} = MapUtils.random_square(compiler.map, nil)
             MapUtils.spawn_enemy(compiler.map, enemy, {x, y})
+    for i=1,10
+        {x, y} = MapUtils.random_square(compiler.map, nil)
+        Region1.generate_epic_store(compiler.map, {x, y})
     return compiler\compile(), compiler.map, player_spawn_points
 
 main = () ->

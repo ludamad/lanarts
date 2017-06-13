@@ -70,7 +70,7 @@ static int world_players(lua_State* L) {
             value[i].newtable();
             value[i]["name"] = entry.player_name;
             value[i]["instance"] = entry.player();
-            value[i]["class_name"] = game_class_data.get(entry.classtype).name;
+            value[i]["class_name"] = entry.classtype;
             i += 1;
 	}
         value.push();

@@ -29,7 +29,9 @@ void save_settings_data(GameSettings& settings, const char* filename) {
 		save_yaml_attr(file, "time_per_step", settings.time_per_step);
 		save_yaml_attr(file, "frame_action_repeat", settings.frame_action_repeat);
 
-		save_yaml_attr(file, "class", settings.class_type);
+                if (!settings.class_type.empty()) {
+                    save_yaml_attr(file, "class", settings.class_type);
+                }
 
 		save_yaml_attr(file, "port", settings.port);
 		save_yaml_attr(file, "regen_level_on_death",

@@ -237,11 +237,11 @@ end
 
 function Pain.prereq_func(caster)
     if caster.stats.hp < 35 then
-        GameState.for_screens(function() 
+        --GameState.for_screens(function() 
             if caster:is_local_player() then
                 EventLog.add("You require more health!", {200,200,255})
             end
-        end)
+        --end)
         return false
     end
     for _, mon in ipairs(Map.enemies_list(caster)) do
@@ -291,11 +291,11 @@ function HealAura.prereq_func(caster)
             return true
         end
     end
-    GameState.for_screens(function() 
+    --GameState.for_screens(function() 
         if caster:is_local_player() then
             EventLog.add("No allies in sight!", COL_PALE_RED)
         end
-    end)
+    --end)
     return false
 end
 
@@ -376,12 +376,12 @@ end
 
 function GreaterPain.prereq_func(caster)
     if caster.stats.hp < 55 then
-        GameState.for_screens(function() 
+        --GameState.for_screens(function() 
             if caster:is_local_player() then
                 EventLog.add("You do not have enough health!", {255,200,200})
             end
             return false
-        end)
+        --end)
     end
     for _, mon in ipairs(Map.enemies_list(caster)) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + Pain.range then

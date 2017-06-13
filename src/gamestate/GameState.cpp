@@ -317,16 +317,16 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);
 	player_data().deserialize(this, serializer);
-	world.set_current_level(local_player()->current_floor);
 
-    bool first = true;
-    screens.for_each_screen( [&]() {
-        view().sharp_center_on(local_player()->ipos());
-        if (first) {
-            settings.class_type = local_player()->class_stats().classid;
-            first = false; // HACK to get first player's class
-        }
-    });
+        bool first = true;
+        screens.for_each_screen( [&]() {
+            world.set_current_level(local_player()->current_floor);
+            view().sharp_center_on(local_player()->ipos());
+            if (first) {
+                settings.class_type = local_player()->class_stats().class_entry().name;
+                first = false; // HACK to get first player's class
+            }
+        });
 
 	post_deserialize_data().process(this);
 	luawrap::globals(L)["Engine"]["post_deserialize"].push();

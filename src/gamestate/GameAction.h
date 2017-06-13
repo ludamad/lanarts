@@ -32,19 +32,19 @@ struct GameAction {
 	};
 	GameAction();
 	GameAction(obj_id origin, action_t act, int frame, int level,
-			int use_id = 0, int action_x = 0, int action_y = 0,
+			int use_id = 0, float action_x = 0, float action_y = 0,
 			int use_id2 = 0);
 	obj_id origin;
 	action_t act;
 	//TODO: Remove frame from GameAction informaiton
 	int frame, room;
 	int use_id, use_id2;
-	int action_x, action_y;
+	float action_x, action_y;
 };
 
 GameAction game_action(GameState* gs, GameInst* origin,
-		GameAction::action_t action, int use_id = 0, int action_x = 0,
-		int action_y = 0, int use_id2 = 0);
+		GameAction::action_t action, int use_id = 0, float action_x = 0,
+		float action_y = 0, int use_id2 = 0);
 
 void to_action_file(FILE* f, const GameAction& action);
 GameAction from_action_file(FILE* f);

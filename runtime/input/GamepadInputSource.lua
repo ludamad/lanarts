@@ -6,13 +6,13 @@ local GameState = require "core.GameState"
 
 function GamepadInputSource:init(player, id)
     self.player = player
-    self.id = tonumber(assert(Gamepad.ids()[1]))
+    self.id = id or tonumber(assert(Gamepad.ids()[1]))
 end
 
 function GamepadInputSource:move_direction()
     local dir = {Gamepad.axis_left_x(self.id), Gamepad.axis_left_y(self.id)}
     for i=1,2 do
-        if math.abs(dir[i]) < 0.1 then
+        if math.abs(dir[i]) < 0.2 then
             dir[i] = 0
         end
     end

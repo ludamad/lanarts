@@ -76,7 +76,7 @@ public:
     R& get(const char* name) {
         id_t id = _get_id(name);
         if (id == id_t::NONE) {
-            throw std::runtime_error(("Entry '" + std::string(name) + "' already exists!").c_str());
+            throw std::runtime_error(("Entry '" + std::string(name) + "' does not exist!").c_str());
         }
         return get((int)id);
     }

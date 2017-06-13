@@ -142,7 +142,7 @@ private:
     ///////////////////////////
     // ** Private methods ** //
     ///////////////////////////
-    void enqueue_io_movement_actions(GameState* gs, int& dx, int& dy);
+    void enqueue_io_movement_actions(GameState* gs, float& dx, float& dy);
     bool enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee);
     bool enqueue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
     void enqueue_io_equipment_actions(GameState* gs, bool do_stop_action);
