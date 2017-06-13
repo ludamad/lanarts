@@ -370,9 +370,10 @@ namespace lua_api {
 	}
 
         void play_sound(LuaStackValue sound) {
-            if (lua_api::gamestate(sound)->get_level_id() == lua_api::gamestate(sound)->local_player()->current_floor) {
-                play(sound.as<const char*>());
-            }
+//			if (lua_api::gamestate(sound)->get_level_id() ==
+//				lua_api::gamestate(sound)->local_player()->current_floor) {
+				play(sound.as<const char *>());
+//			}
         }
 
         std::vector<std::string> lapi_cpp_traceback() {

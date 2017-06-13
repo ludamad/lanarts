@@ -192,7 +192,7 @@ void PlayerInst::step(GameState* gs) {
             reset_rest_cooldown();
         }
     gs->for_screens([&]() {
-        if (is_local_player()) {
+        if (this == gs->local_player()) {
             GameView& view = gs->view();
             view.center_on(last_x, last_y);
         }

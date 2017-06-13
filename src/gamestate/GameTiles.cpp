@@ -93,6 +93,8 @@ void GameTiles::pre_draw(GameState* gs, bool reveal_all) {
 	Size size = this->size();
 	GameView& view = gs->view();
 
+	view.world_width = gs->get_level()->width();
+	view.world_height = gs->get_level()->height();
 	BBox region = view.tile_region_covered();
 
 	if (region.x2 >= size.w) {

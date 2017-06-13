@@ -11,27 +11,25 @@ ASTAR_BUFFER = PathFinding.astar_buffer_create()
 _sim = (k) ->
     GameState._simulate_key_press(Keyboard[k])
 
-_collisions = (type = nil) ->
-    player = World.local_player
+_collisions = (player, type = nil) ->
     collisions = Map.rectangle_collision_check(player.map, {player.x - 8, player.y - 8, player.x+8, player.y+8}, player)
     if not type
         return collisions
     return table.filter collisions, () => GameObject.get_type(@) == type
 
-_objects = (type = nil) ->
-    player = World.local_player
+_objects = (player, type = nil) ->
     objects = Map.objects_list(player.map)
     if not type
         return objects
     return table.filter objects, () => GameObject.get_type(@) == type
 
-portal_planner = () -> nilprotect {
+portal_planner = (player) -> nilprotect {
     -- State:
     portal_next: {}
     level_connections: {}
     last_touched_portal: false
     -- Helpers:
-    _current_label: () => Map.map_label(World.local_player.map)
+    _current_label: () => Map.map_label(player.map)
     _get_label_distances: (root_label) =>
         distance_levels = {
             {root_label}
@@ -52,7 +50,6 @@ portal_planner = () -> nilprotect {
         return distance_to
     -- Public API:
     step: () =>
-        player = World.local_player
         if @last_touched_portal and not @portal_next[@last_touched_portal]
             {:map} = @last_touched_portal
             if player.map ~= map
@@ -61,20 +58,19 @@ portal_planner = () -> nilprotect {
             append @level_connections[@_current_label()], Map.map_label(map)
             @level_connections[Map.map_label(map)] or= {}
             append @level_connections[Map.map_label(map)], @_current_label()
-        for portal in *_collisions("feature")
+        for portal in *_collisions(player, "feature")
             @last_touched_portal = portal
             break
     -- Gives the closest portal that will take us where we want to go.
     closest_portal: (map_label) =>
         if map_label == @_current_label()
             return nil
-        player = World.local_player
         distances = @_get_label_distances(map_label)
         current_distance = distances[@_current_label()]
         if current_distance == nil
             return nil
         closest,closest_distance = nil,math.huge
-        for portal in *_objects("feature")
+        for portal in *_objects(player, "feature")
             next = @portal_next[portal]
             if not next
                 continue
@@ -87,11 +83,11 @@ portal_planner = () -> nilprotect {
                     closest_distance = obj_dist 
         return closest 
     unused_portals: () =>
-        portals = _objects "feature"
+        portals = _objects player, "feature"
         return table.filter portals, (p) -> not @portal_next[p]
 }
 
-path_planner = () -> nilprotect {
+path_planner = (player) -> nilprotect {
     -- State:
     stored_path: {}
     coord: false
@@ -100,13 +96,13 @@ path_planner = () -> nilprotect {
             next = @stored_path[@coord]
             if not next
                 return nil -- Path done
-            {:xy} = World.local_player
+            {:xy} = player
             if vector_distance(next, xy) >= 6
                 return next -- Next coord far enough away to path towards
             -- Next coord close enough to continue
             @coord += 1
     set_path_towards: (obj) =>
-        {:map, :tile_xy} = World.local_player
+        {:map, :tile_xy} = player
         @stored_path = ASTAR_BUFFER\calculate_path map, tile_xy, obj.tile_xy
         @coord = 2
     next_direction_towards: () =>
@@ -114,16 +110,16 @@ path_planner = () -> nilprotect {
         if not coord
             return nil
         {tx, ty} = coord
-        {:x, :y} = World.local_player
+        {:x, :y} = player
         dx, dy = tx - x, ty - y
         if dx ~= 0 then dx /= math.abs(dx)
         if dy ~= 0 then dy /= math.abs(dy)
         return {dx, dy}
 }
 
-ai_state = () -> {
-    portal_planner: portal_planner()
-    path_planner: path_planner()
+ai_state = (player) -> {
+    portal_planner: portal_planner(player)
+    path_planner: path_planner(player)
     key_items: {"Azurite Key", "Dandelite Key"}
     rng: require("mtwist").create(HARDCODED_AI_SEED)
     step: () =>
@@ -137,12 +133,11 @@ ai_state = () -> {
             return item
         return nil
     get_next_direction: () => 
-        player = World.local_player
         dir = @path_planner\next_direction_towards()
         if dir
             return dir
         next_obj = nil
-        for obj in *_objects("item")
+        for obj in *_objects(player, "item")
             if obj.type == @next_key_item()
                 next_obj = obj
                 break
@@ -166,10 +161,10 @@ ai_state = () -> {
             return @path_planner\next_direction_towards()
         return nil
     get_next_wander_direction: () => 
-        assert #_objects("feature") > 0
+        --assert #_objects(player, "feature") > 0
         objs = @portal_planner\unused_portals()
         if #objs == 0
-            objs = _objects("feature") --@rng\random_choice {"item", "feature"})
+            objs = _objects(player, "feature") --@rng\random_choice {"item", "feature"})
         if #objs == 0
             return nil
         next_obj = @rng\random_choice(objs)

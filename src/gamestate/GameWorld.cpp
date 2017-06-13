@@ -206,18 +206,16 @@ bool GameWorld::step() {
         GameMapState* level = gs->local_player()->get_map(gs);
         if (level != get_current_level()) {
             set_current_level(level);
-        }
-        if (gs->local_player()->current_floor != get_current_level_id()) {
 			// Ensure the view is up to date before view operations:
 			LANARTS_ASSERT(level->width() == gs->view().world_width && level->height() == gs->view().world_height);
-			Pos diff = (gs->local_player()->ipos() - last_player_pos);
+			Pos diff = (gs->local_player()->ipos() - gs->screens.screen().last_player_pos);
 			gs->view().sharp_move(diff);
 			// Ensure that the view is centered. Having the view move after due to being at the edge of a level is jarring:
 			for (int i = 0; i< 100;i++) {
 				gs->view().center_on(gs->local_player()->ipos(), 10);
 			}
         }
-        last_player_pos = gs->local_player()->ipos();
+        gs->screens.screen().last_player_pos = gs->local_player()->ipos();
 	});
 
 	gs->frame()++;
@@ -283,7 +281,6 @@ void GameWorld::reset() {
         });
         gs->frame() += 128; // Ensure we don't have any hold-over frames sent.
         // TODO find a better solution than just ensuring unique frame number.
-        last_player_pos = {0,0};
         for (GameMapState* map : delete_list) {
             delete map;
         }

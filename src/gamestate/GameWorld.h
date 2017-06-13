@@ -86,10 +86,9 @@ private:
 	GameMapState* lvl;
 	GameState* gs;
 	LuaValue lua_level_states;
-        bool _should_sync_states = false;
+	bool _should_sync_states = false;
 	std::vector<GameMapState*> level_states;
-        Pos last_player_pos = {0,0};
-        TeamData _team_data;
+	TeamData _team_data;
 };
 
 #endif /* GAMEWORLD_H_ */

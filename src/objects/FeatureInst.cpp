@@ -47,15 +47,17 @@ void FeatureInst::draw(GameState* gs) {
 }
 
 void FeatureInst::step(GameState* gs) {
-	if (gs->object_visible_test(this)) {
-		sprite_id spr = spriteid;
-		if (feature == DOOR_CLOSED) {
-			spr = res::sprite_id("closed door");
-		} else if (feature == DOOR_OPEN) {
-			spr = res::sprite_id("open door");
-		}
-		last_seen_spr = spr;
-	}
+    gs->for_screens([&]() {
+        if (gs->object_visible_test(this)) {
+            sprite_id spr = spriteid;
+            if (feature == DOOR_CLOSED) {
+                spr = res::sprite_id("closed door");
+            } else if (feature == DOOR_OPEN) {
+                spr = res::sprite_id("open door");
+            }
+            last_seen_spr = spr;
+        }
+    });
 
 	Pos tile_xy(x / TILE_SIZE, y / TILE_SIZE);
 	if (gs->object_radius_test(x, y, TILE_SIZE)) {

@@ -200,14 +200,14 @@ bool GameState::start_game() {
         }
         const int x1 = player.index * WIDTH, y1 = 0;
         const int x2 = x1 + WIDTH, y2 = y1 + HEIGHT;
-        screens.add({
+        screens.add({-1, // index placeholder
             GameHud {
                 BBox(x2 - GAME_SIDEBAR_WIDTH, y1, x2, y2),
                 BBox(x1, y1, x2 - GAME_SIDEBAR_WIDTH, y2)
             }, // hud
             GameView {0, 0, WIDTH - GAME_SIDEBAR_WIDTH, HEIGHT}, // view
             BBox {x1, y1, x2, y2}, // window_region
-            player.index // focus player id
+            player.index, // focus player id
         });
     }
     /* If class was not set, we may be loading a game -- don't init level */

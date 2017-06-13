@@ -295,6 +295,8 @@ public:
 
     GameScreen &get_screen(PlayerInst *player);
 
+	// Game screens to draw:
+	GameScreenSet screens;
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
 
@@ -314,9 +316,6 @@ private:
 	// Maintain a LIFO stack of RNG states so that portions of game-play can isolate from each other.
 	std::vector<MTwist*> rng_state_stack;
     MTwist base_rng_state;
-
-    // Game screens to draw:
-    GameScreenSet screens;
 	// For dragging purposes:
 	GameView previous_view;
 	bool is_dragging_view;

@@ -116,10 +116,22 @@ static void game_simulate_key_press(LuaStackValue key) {
 }
 
 static void game_for_screens(LuaStackValue func) {
-    lua_api::gamestate(func)->for_screens([&]() {
-        func.push();
-        lua_call(func.luastate(),  0,0);
-    });
+	lua_api::gamestate(func)->for_screens([&]() {
+		func.push();
+		lua_call(func.luastate(),  0,0);
+	});
+}
+
+static void game_screen_set(LuaStackValue screen) {
+	lua_api::gamestate(screen)->screens.set_screen(screen.to_int());
+}
+
+static int game_screen_amount(LuaStackValue screen) {
+	return lua_api::gamestate(screen)->screens.amount();
+}
+
+static int game_screen_get(LuaStackValue screen) {
+	return lua_api::gamestate(screen)->screens.amount();
 }
 
 static int game_input_handle(lua_State* L) {
@@ -274,6 +286,9 @@ namespace lua_api {
 		game["draw"].bind_function(game_draw);
 		game["raw_event_log"].bind_function(game_raw_event_log);
 		game["for_screens"].bind_function(game_for_screens);
+		game["screen_set"].bind_function(game_screen_set);
+		game["screen_get"].bind_function(game_screen_get);
+		game["screen_amount"].bind_function(game_screen_amount);
                 // Can directly bind event_log_is_active:
 		game["event_log_is_active"].bind_function(event_log_is_active);
                 game["wait"].bind_function(lapi_wait);

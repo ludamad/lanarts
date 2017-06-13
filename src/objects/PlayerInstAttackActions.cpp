@@ -396,6 +396,8 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
                     "Cannot currently auto-target spell. Use manual controls (with mouse).");
             *fallback_to_melee = spl_entry.fallback_to_melee;
         }
+    } else {
+        previous_spell_cast = -1;
     }
     return false;
 }

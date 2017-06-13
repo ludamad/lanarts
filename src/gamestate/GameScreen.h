@@ -14,11 +14,13 @@ class GameMapState;
 struct PlayerDataEntry;
 
 struct GameScreen {
+    int index;
     GameHud hud;
     GameView view;
     BBox window_region;
     int focus_player_id;
     GameMapState* current_level;
+    Pos last_player_pos;
 };
 
 // Represents all active screens being drawn
@@ -28,6 +30,7 @@ struct GameScreen {
 // A lot of code that was originally a single statement had to become a loop over all screens.
 struct GameScreenSet {
     void add(GameScreen screen) {
+        screen.index = screens.size();
         screens.push_back(screen);
     }
 
@@ -54,6 +57,12 @@ struct GameScreenSet {
     };
 
     GameScreen& get_screen(GameState *gs, PlayerInst *player);
+    void set_screen(int screen_idx) {
+        current_screen = screen_idx;
+    }
+    size_t amount() {
+        return screens.size();
+    }
 
     GameMapState* get_current_level();
     void set_current_level(GameMapState *map);

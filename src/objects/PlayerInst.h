@@ -180,7 +180,7 @@ private:
     bool local = false, moving = false;
     int autouse_mana_potion_try_count = 0;
     PosF _last_moved_direction = {0, -1}; // Never 0,0
-    int previous_spell_cast = 0, spellselect = 0;
+    int previous_spell_cast = -1, spellselect = 0;
     PlayerIOActions io_value;
 };
 

@@ -46,3 +46,21 @@ function event_log(format_str, ...)
         GameState.raw_event_log(format_str:format(...))
     end
 end
+
+local _screen_iter = setmetatable({0}, {
+    __call = function(self) 
+        if self[1] >= GameState.screen_amount() then
+            GameState.screen_set(-1)
+            self[1] = "Purposeful error causing string"
+            return nil
+        end
+        GameState.screen_set(self[1])
+        local ret = (self[1] + 1)
+        self[1] = self[1] + 1
+        return ret
+    end
+})
+function screens()
+    _screen_iter[1] = 0
+    return _screen_iter
+end

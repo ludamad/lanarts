@@ -30,12 +30,14 @@ local Base = M.FeatureBase
 function Base:init(args)
     Base.parent_init(self, args.xy, args.radius or 15, args.solid, args.depth or M.FEATURE_DEPTH)
     self.traits = self.traits or {}
+    self.sprites = {}
     table.insert(self.traits, M.FEATURE_TRAIT)
 end 
 function Base:on_draw()
     if Display.object_within_view(self) then
-        if self.sprite then
-            ObjectUtils.screen_draw(self.sprite, self.xy, self.alpha, self.frame)
+        local sprite = self.sprite or self.sprites[GameState.screen_get()] 
+        if sprite ~= nil then
+            ObjectUtils.screen_draw(sprite, self.xy, self.alpha, self.frame)
         end
     end
 end
@@ -47,6 +49,11 @@ function Decoration:on_step()
 --    if self.sprite or Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
 --        return -- Need to be able to scale to many deactivated instances
 --    end 
+    for screen_idx in screens() do
+        if self.sprites[screen_idx] ~= self.real_sprite and Map.object_visible(self) then
+            self.sprites[screen_idx] = self.real_sprite
+        end
+    end
 end
 function Decoration:init(args)
     Decoration.parent_init(self, args)
@@ -62,12 +69,6 @@ local Door = M.Door
 local DOOR_OPEN_TIMEOUT = 128
 local function is_solid(obj) 
     return obj.solid
-end
-
-function Door:on_draw()
-    if Map.object_visible(self) then
-        self.sprite = self.real_sprite
-    end
 end
 
 function Door:on_step()
@@ -138,12 +139,12 @@ function Door:on_step()
         Map.tile_set_seethrough(self.map, tile_xy, is_open)
     end
 
-    GameState.for_screens(function()
+    for screen_idx in screens() do
         local real_sprite = is_open and self.open_sprite or self.closed_sprite
-        if self.sprite ~= real_sprite and Map.object_visible(self) then
-            self.sprite = real_sprite
+        if self.sprites[screen_idx] ~= real_sprite and Map.object_visible(self) then
+            self.sprites[screen_idx] = real_sprite
         end
-    end)
+    end
     self.was_open = is_open
 end
 function Door:on_map_init()

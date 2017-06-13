@@ -300,10 +300,10 @@ void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
                     dx = towards.x;
                     dy = towards.y;
                 } else {
-                    gs->get_screen(this).hud.game_chat().add_message("There is nothing to travel to in sight!", Colour(255, 100, 100));
+                    gs->game_chat().add_message("There is nothing to travel to in sight!", Colour(255, 100, 100));
                 }
             } else if (io_value.should_explore()) {
-                gs->get_screen(this).hud.game_chat().add_message("Deal with the enemy before exploring!", Colour(255, 100, 100));
+                gs->game_chat().add_message("Deal with the enemy before exploring!", Colour(255, 100, 100));
             }
         }
 	if (dx != 0 || dy != 0) {
@@ -871,12 +871,12 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
                 format("%s to %s%s", subject_and_verb.c_str(),
                     label_has_digit ? "" : "the ", map_label.c_str()),
                 is_local_player() ? COL_WHITE : COL_YELLOW);
+            if (map_label == "Plain Valley") {
+                loop("sound/overworld.ogg");
+            } else {
+                loop("sound/dungeon.ogg");
+            }
         });
-        if (map_label == "Plain Valley") {
-            loop("sound/overworld.ogg");
-        } else {
-            loop("sound/dungeon.ogg");
-        }
 }
 
 void PlayerInst::gain_xp(GameState* gs, int xp) {
