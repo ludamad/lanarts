@@ -328,7 +328,7 @@ void PlayerInst::enqueue_actions(const ActionQueue& queue) {
 }
 
 void PlayerInst::enqueue_io_actions(GameState* gs) {
-	LANARTS_ASSERT(is_local_player() && gs->local_player() == this);
+	LANARTS_ASSERT(is_focus_player(gs) && gs->local_player() == this);
 
 	if (actions_set_for_turn) {
 		return;
@@ -689,7 +689,7 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 			item_do_lua_action(L, type, this,
 					Pos(action.action_x, action.action_y), item.amount);
             gs->for_screens([&](){
-                if (is_local_player() && !type.inventory_use_message().empty()) {
+                if (is_focus_player(gs) && !type.inventory_use_message().empty()) {
                     gs->game_chat().add_message(type.inventory_use_message(),
                             Colour(100, 100, 255));
                 }
@@ -835,7 +835,7 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
         }
 	if (!effective_stats().allowed_actions.can_use_stairs) {
         gs->for_screens([&](){
-            if (is_local_player()) {
+            if (is_focus_player(gs)) {
                 gs->game_chat().add_message(
                         "You cannot use the exit in this state!");
             }
@@ -857,7 +857,7 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
             }
 
             std::string subject_and_verb = "You travel";
-            if (!is_local_player()) {
+            if (!is_focus_player(gs)) {
                 subject_and_verb = player_entry(gs).player_name + " travels";
             }
 
@@ -874,7 +874,7 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
             gs->game_chat().add_message(
                 format("%s to %s%s", subject_and_verb.c_str(),
                     label_has_digit ? "" : "the ", map_label.c_str()),
-                is_local_player() ? COL_WHITE : COL_YELLOW);
+                is_focus_player(gs) ? COL_WHITE : COL_YELLOW);
             if (map_label == "Plain Valley") {
                 loop("sound/overworld.ogg");
             } else {
@@ -889,7 +889,7 @@ void PlayerInst::gain_xp(GameState* gs, int xp) {
 		char level_gain_str[128];
         gs->for_screens([&]() {
             snprintf(level_gain_str, 128, "%s reached level %d!",
-                    is_local_player() ? "You have" : "Your ally has",
+                     is_focus_player(gs) ? "You have" : "Your ally has",
                     class_stats().xplevel);
             gs->game_chat().add_message(level_gain_str, Colour(50, 205, 50));
         });

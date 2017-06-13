@@ -247,7 +247,7 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	PlayerInst* p;
 	if ((p = dynamic_cast<PlayerInst*>(inst))) {
 		p->update_field_of_view(gs);
-		if (p->is_local_player()) {
+		if (p->is_focus_player(gs)) {
 			set_current_level_lazy(roomid2);
 		}
 	}

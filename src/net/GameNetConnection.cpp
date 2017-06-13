@@ -242,7 +242,7 @@ static void post_sync(GameState* gs) {
         pde.action_queue.queue_actions_for_frame(ActionQueue(), gs->frame());
         pde.player()->actions_set() = true;
         gs->for_screens([&](){
-            if (pde.player()->is_local_player()) {
+            if (pde.player()->is_focus_player(gs)) {
                 gs->view().sharp_center_on(pde.player()->ipos());
             }
         });

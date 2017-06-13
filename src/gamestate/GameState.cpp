@@ -150,63 +150,86 @@ static void _event_log_initialize(GameState* gs, GameSettings& settings) {
 }
 
 bool GameState::start_game() {
-	if (settings.conntype == GameSettings::SERVER) {
-		init_data.frame_action_repeat = settings.frame_action_repeat;
-		init_data.network_debug_mode = settings.network_debug_mode;
-		init_data.regen_on_death = settings.regen_on_death;
-		init_data.time_per_step = settings.time_per_step;
-		net_send_game_init_data(connection, player_data(), init_data);
-		connection.set_accepting_connections(false);
-	}
-	if (!settings.loadreplay_file.empty()) {
-		class_id class_type = -1;
-		load_init(this, init_data.seed, class_type);
-		settings.class_type = game_class_data.get(class_type).name;
-	}
-	if (!settings.savereplay_file.empty()) {
-		class_id class_type = (int)game_class_data.get_id(settings.class_type);
-		save_init(this, init_data.seed, class_type);
-	}
+    if (settings.conntype == GameSettings::SERVER) {
+        init_data.frame_action_repeat = settings.frame_action_repeat;
+        init_data.network_debug_mode = settings.network_debug_mode;
+        init_data.regen_on_death = settings.regen_on_death;
+        init_data.time_per_step = settings.time_per_step;
+        net_send_game_init_data(connection, player_data(), init_data);
+        connection.set_accepting_connections(false);
+    }
+    if (!settings.loadreplay_file.empty()) {
+        class_id class_type = -1;
+        load_init(this, init_data.seed, class_type);
+        settings.class_type = game_class_data.get(class_type).name;
+    }
+    if (!settings.savereplay_file.empty()) {
+        class_id class_type = (int) game_class_data.get_id(settings.class_type);
+        save_init(this, init_data.seed, class_type);
+    }
 
-	if (settings.conntype == GameSettings::CLIENT) {
-		while (!init_data.received_init_data && !io_controller().user_has_requested_exit()) {
-			connection.poll_messages(1 /* milliseconds */);
-			if(!update_iostate(false)){
+    if (settings.conntype == GameSettings::CLIENT) {
+        while (!init_data.received_init_data && !io_controller().user_has_requested_exit()) {
+            connection.poll_messages(1 /* milliseconds */);
+            if (!update_iostate(false)) {
                 break;
             }
-		}
-		settings.frame_action_repeat = init_data.frame_action_repeat;
-		settings.network_debug_mode = init_data.network_debug_mode;
-		settings.regen_on_death = init_data.regen_on_death;
-		settings.time_per_step = init_data.time_per_step;
-	}
+        }
+        settings.frame_action_repeat = init_data.frame_action_repeat;
+        settings.network_debug_mode = init_data.network_debug_mode;
+        settings.regen_on_death = init_data.regen_on_death;
+        settings.time_per_step = init_data.time_per_step;
+    }
 
-        initial_seed = init_data.seed;
-	base_rng_state.init_genrand(init_data.seed);
+    initial_seed = init_data.seed;
+    base_rng_state.init_genrand(init_data.seed);
 
 
     screens.clear(); // Clear previous screens
     int n_local_players = 0;
-    for (PlayerDataEntry& player: player_data().all_players()) {
+    for (PlayerDataEntry &player: player_data().all_players()) {
         if (player.is_local_player) {
             n_local_players++;
         }
     }
-    const int WIDTH = settings.view_width / n_local_players;
-    const int HEIGHT = settings.view_height; // / N_PLAYERS;
+    // Number of split-screens tiled together
+    int n_x = 1, n_y = 1;
+    if (n_local_players <= 2) {
+        n_x = n_local_players;
+    } else if (n_local_players <= 4) {
+        // More than 2, less than 4? Try 2x2 tiling
+        n_x = 2, n_y = 2;
+    } else if (n_local_players <= 6) {
+        n_x = 3, n_y = 2;
+    } else {
+        LANARTS_ASSERT(n_local_players <= 9);
+        // Last resort, Try 3x3 tiling
+        n_x = 3, n_y = 3;
+    }
+
+    const int WIDTH = settings.view_width / n_x;
+    const int HEIGHT = settings.view_height / n_y; // / N_PLAYERS;
+    std::vector<BBox> bounding_boxes;
+    for (PlayerDataEntry &player: player_data().all_players()) {
+        const int x1 = (player.index % n_x) * WIDTH, y1 = (player.index / n_x) * HEIGHT;
+        bounding_boxes.push_back(BBox {x1, y1, x1 + WIDTH, y1 + HEIGHT});
+    }
+//    if (bounding_boxes.size() == 3) {
+//        bounding_boxes.back() = {0, HEIGHT, WIDTH *2, HEIGHT*2};
+//    }
+
     for (PlayerDataEntry& player: player_data().all_players()) {
         if (!player.is_local_player) {
             continue;
         }
-        const int x1 = player.index * WIDTH, y1 = 0;
-        const int x2 = x1 + WIDTH, y2 = y1 + HEIGHT;
+        BBox b = bounding_boxes.at(player.index);
         screens.add({-1, // index placeholder
             GameHud {
-                BBox(x2 - GAME_SIDEBAR_WIDTH, y1, x2, y2),
-                BBox(x1, y1, x2 - GAME_SIDEBAR_WIDTH, y2)
+                BBox(b.x2 - GAME_SIDEBAR_WIDTH, b.y1, b.x2, b.y2),
+                BBox(b.x1, b.y1, b.x2 - GAME_SIDEBAR_WIDTH, b.y2)
             }, // hud
             GameView {0, 0, WIDTH - GAME_SIDEBAR_WIDTH, HEIGHT}, // view
-            BBox {x1, y1, x2, y2}, // window_region
+            b, // window_region
             player.index, // focus player id
         });
     }
@@ -531,8 +554,8 @@ void GameState::draw(bool drawhud) {
         if (drawhud) {
             game_hud().draw(this);
         }
-        ldraw::display_set_window_region(screens.window_region());
-		lua_api::luacall_overlay_draw(L); // Used for debug purposes
+////        ldraw::display_set_window_region(screens.window_region());
+//		lua_api::luacall_overlay_draw(L); // Used for debug purposes
     });
 
 	ldraw::display_draw_finish();

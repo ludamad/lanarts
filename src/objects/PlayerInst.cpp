@@ -267,3 +267,7 @@ std::vector<StatusEffect> PlayerInst::base_status_effects(GameState* gs) {
     effect_id id = get_effect_by_name(class_stats().class_entry().name.c_str());
     return {{id, LuaValue(gs->luastate())}};
 }
+
+bool PlayerInst::is_focus_player(GameState *gs) const {
+	return gs->local_player() == this;
+}

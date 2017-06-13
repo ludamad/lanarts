@@ -113,7 +113,8 @@ public:
 
     PlayerDataEntry& player_entry(GameState* gs) const;
 
-    bool is_local_player() {
+    bool is_focus_player(GameState *gs) const;
+    bool is_local_player() const {
         return local;
     }
     void set_local_player(bool islocal) {

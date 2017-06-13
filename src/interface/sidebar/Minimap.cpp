@@ -178,7 +178,7 @@ void Minimap::draw(GameState* gs) {
 	for (int i = 0; i < players_in_level.size(); i++) {
 		PlayerInst* player = players_in_level[i];
 		int arr_x = (player->x / TILE_SIZE) - world_portion.x1, arr_y = (player->y / TILE_SIZE) - world_portion.y1;
-		fill_buff2d(minimap_arr, ptw, pth, arr_x, arr_y, player->is_local_player() ? COL_YELLOW : COL_BABY_BLUE, 1, 1);
+		fill_buff2d(minimap_arr, ptw, pth, arr_x, arr_y, player->is_focus_player(gs) ? COL_YELLOW : COL_BABY_BLUE, 1, 1);
 	}
 	minimap_buff.from_bytes(Size(ptw, pth), minimap_arr);
 

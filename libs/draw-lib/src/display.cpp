@@ -18,14 +18,6 @@ static SDL_Window* MAIN_WINDOW = NULL;
 static Size RENDER_SIZE;
 static SDL_Renderer* MAIN_RENDERER = NULL;
 
-static void gl_set_window_region(int x, int y, int wa, int ha) {
-    int w = 0, h = 0;
-    SDL_GetWindowSize(MAIN_WINDOW, &w, &h);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glViewport(x, y, w, h);
-}
-
 //Set up the coordinate system x1 -> x2, y2 -> y1
 static void gl_set_world_region(double x1, double y1, double x2, double y2) {
     //Set projection
@@ -34,6 +26,16 @@ static void gl_set_world_region(double x1, double y1, double x2, double y2) {
     glLoadIdentity();
     glOrtho(x1, x2, y2, y1, 0.0, 1.0);
 }
+
+static void gl_set_window_region(int x, int y, int wa, int ha) {
+    int w = 0, h = 0;
+    SDL_GetWindowSize(MAIN_WINDOW, &w, &h);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glViewport(x, h - ha - y , wa, ha);
+    gl_set_world_region(0, 0, wa, ha);
+}
+
 
 // Set up sane 2D drawing defaults
 static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullscreen) {
