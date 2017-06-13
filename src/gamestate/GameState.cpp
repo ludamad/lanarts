@@ -214,9 +214,9 @@ bool GameState::start_game() {
         const int x1 = (player.index % n_x) * WIDTH, y1 = (player.index / n_x) * HEIGHT;
         bounding_boxes.push_back(BBox {x1, y1, x1 + WIDTH, y1 + HEIGHT});
     }
-//    if (bounding_boxes.size() == 3) {
-//        bounding_boxes.back() = {0, HEIGHT, WIDTH *2, HEIGHT*2};
-//    }
+    if (bounding_boxes.size() == 3) {
+        bounding_boxes.back() = {0, HEIGHT, settings.view_width, settings.view_height};
+    }
 
     for (PlayerDataEntry& player: player_data().all_players()) {
         if (!player.is_local_player) {
@@ -228,7 +228,7 @@ bool GameState::start_game() {
                 BBox(b.x2 - GAME_SIDEBAR_WIDTH, b.y1, b.x2, b.y2),
                 BBox(b.x1, b.y1, b.x2 - GAME_SIDEBAR_WIDTH, b.y2)
             }, // hud
-            GameView {0, 0, WIDTH - GAME_SIDEBAR_WIDTH, HEIGHT}, // view
+            GameView {0, 0, b.width() - GAME_SIDEBAR_WIDTH, b.height()}, // view
             b, // window_region
             player.index, // focus player id
         });
