@@ -247,6 +247,9 @@ static void run_outer_game_loop(const vector<string>& args) {
             printf("SDL_Init failed: %s\n", SDL_GetError());
             exit(1);
         }
+        if (SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt") < 0) {
+            printf("WARNING Controller mapping failed: %s\n", SDL_GetError());
+        }
     }
     // Run game instances until the user asks to quit
     bool should_continue = true;
