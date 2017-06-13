@@ -40,7 +40,7 @@ function GamepadInputSource:use_spell_slot()
 end
 
 function GamepadInputSource:sell_item_slot()
-    error("TODO")
+    return -1
 end
 
 function GamepadInputSource:should_shift_autotarget()

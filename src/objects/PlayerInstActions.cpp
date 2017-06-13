@@ -122,19 +122,23 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	bool used_item = false;
 
 //Item use
-//	IOGameAction::event_t item_events[] = {IOGameAction::USE_ITEM_N, IOGameAction::SELL_ITEM_N};
-//	for (int i = 0; i < 9 && !used_item; i++) {
-//	    for (auto& event : item_events) {
-//            if (io.query_event(IOGameAction(event, i))) {
-//                if (inventory().get(i).amount() > 0) {
-//                    item_used = true;
-//                    GameAction::action_t action_type = (event == IOGameAction::USE_ITEM_N ? GameAction::USE_ITEM : GameAction::SELL_ITEM);
-//                    queued_actions.push_back(
-//                            GameAction(id, action_type, frame, level, i, p.x, p.y));
-//                }
-//            }
-//	    }
-//	}
+	for (int i = 0; i < 9 && !used_item; i++) {
+        if (io_value.use_item_slot() == i) {
+            if (inventory().get(i).amount() > 0) {
+                item_used = true;
+                GameAction::action_t action_type = GameAction::USE_ITEM;
+                queued_actions.push_back(
+                        GameAction(id, action_type, frame, level, i, p.x, p.y));
+            }
+        } else if (io_value.sell_item_slot() == i) {
+            if (inventory().get(i).amount() > 0) {
+                item_used = true;
+                GameAction::action_t action_type = GameAction::SELL_ITEM;
+                queued_actions.push_back(
+                        GameAction(id, action_type, frame, level, i, p.x, p.y));
+            }
+        }
+	}
 	if (!used_item && gs->game_settings().autouse_health_potions
 			&& core_stats().hp < AUTOUSE_HEALTH_POTION_THRESHOLD) {
 		int item_slot = inventory().find_slot(

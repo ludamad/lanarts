@@ -531,6 +531,7 @@ void GameState::draw(bool drawhud) {
         if (drawhud) {
             game_hud().draw(this);
         }
+        ldraw::display_set_window_region(screens.window_region());
 		lua_api::luacall_overlay_draw(L); // Used for debug purposes
     });
 

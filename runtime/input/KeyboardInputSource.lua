@@ -40,6 +40,9 @@ function KeyboardInputSource:should_explore()
 end
 
 function KeyboardInputSource:use_item_slot()
+    if Keys.ctrl_held() then
+        return -1
+    end
     local slot = -1
     for i=1,9 do
         if pressed(tostring(i)) then
@@ -63,7 +66,17 @@ function KeyboardInputSource:use_spell_slot()
 end
 
 function KeyboardInputSource:sell_item_slot()
-    error("TODO")
+    if not Keys.ctrl_held() then
+        return -1
+    end
+    local slot = -1
+    for i=1,9 do
+        if pressed(tostring(i)) then
+            slot = (i - 1)
+            break
+        end
+    end
+    return slot
 end
 
 function KeyboardInputSource:should_shift_autotarget()

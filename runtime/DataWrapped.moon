@@ -91,7 +91,7 @@ additive_effect_create = (args) ->
     return _subeffect_effect_create(args, 0, accum)
 
 STANDARD_WEAPON_DPS = 10
-STANDARD_RANGED_DPS = 5
+STANDARD_RANGED_DPS = 7
 
 weapon_create = (args, for_enemy = false) -> 
     damage_multiplier = args.damage_multiplier or 1.0
@@ -112,7 +112,7 @@ spell_create = (args) ->
     proj = args.projectile
     if proj
         damage_multiplier = proj.damage_multiplier or 1.0
-        damage = damage_multiplier * (args.cooldown / 60 * STANDARD_WEAPON_DPS)
+        damage = damage_multiplier * (args.cooldown / 60 * STANDARD_RANGED_DPS)
         proj.name or= args.name
         proj.weapon_class or= "magic"
         proj.spr_item or= "none"

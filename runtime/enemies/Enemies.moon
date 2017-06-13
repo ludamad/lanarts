@@ -1219,6 +1219,7 @@ DataW.enemy_create {
         damage_type: {magic: 1.0}
         range: 65
         cooldown: 35
+        power: {base: {5, 5}}
         speed: 7
         spr_attack: "magic bolt"
     }
