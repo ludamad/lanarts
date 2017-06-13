@@ -74,9 +74,7 @@ static bool handle_spawn_enemies(GameState* gs, const std::string& command) {
 			generate_enemies(gs, enemy, amnt);
 			printed.message_colour = Colour(50, 255, 50);
 		}
-        gs->for_screens([&]() {
-            gs->game_chat().add_message(printed);
-        });
+                gs->game_chat().add_message(printed);
 		return true;
 	}
 	return false;
@@ -93,9 +91,7 @@ static bool handle_set_gamespeed(GameState* gs, const std::string& command) {
 		printed.message = std::string("Game speed set.");
 		printed.message_colour = Colour(50, 255, 50);
 
-        gs->for_screens([&]() {
-            gs->game_chat().add_message(printed);
-        });
+                gs->game_chat().add_message(printed);
 		return true;
 	}
 	return false;

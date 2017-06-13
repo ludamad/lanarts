@@ -116,15 +116,19 @@ void GameState::start_connection() {
 	}
 	if (settings.conntype == GameSettings::SERVER
 			|| settings.conntype == GameSettings::NONE) {
-		player_data().register_player(settings.username, NULL, settings.class_type, /* local player */ true);
-        if (getenv("LANARTS_2P")) {
-            player_data().register_player("Player 2", NULL, getenv("LANARTS_2P"), /* local player */ true);
-
-        }
-        if (getenv("LANARTS_3P")) {
-            player_data().register_player("Player 3", NULL, getenv("LANARTS_3P"), /* local player */ true);
-
-        }
+	    player_data().register_player(settings.username, NULL, settings.class_type, /* local player */ true);
+            // Hardcoded for now:
+            int n_extra_players = gamepad_states().size();
+            const char* classes[] = {
+                "Fighter",
+                "Necromancer",
+                "Mage"
+            };
+            for (int i = 0 ; i < n_extra_players; i++) {
+                std::string p = "Player ";
+                p += char('0' + (i+2)); // Start at 'player 2'
+                player_data().register_player(p, NULL, classes[i%3], /* local player */ true);
+            }
 	}
 }
 

@@ -545,7 +545,7 @@ void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
 	LANARTS_ASSERT(dynamic_cast<StoreInst*>(gs->get_instance(action.use_id)));
 	StoreInventory& inv = store->inventory();
 	StoreItemSlot& slot = inv.get(action.use_id2);
-        if (slot.item == NO_ITEM) {
+        if (slot.item.id == NO_ITEM) {
             // For some reason this item isn't here anymore (e.g, both players try to buy same item)
             // Just return.
             return;
