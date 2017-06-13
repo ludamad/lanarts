@@ -215,7 +215,7 @@ bool GameState::start_game() {
         bounding_boxes.push_back(BBox {x1, y1, x1 + WIDTH, y1 + HEIGHT});
     }
     if (bounding_boxes.size() == 3) {
-        bounding_boxes.back() = {0, HEIGHT, settings.view_width, settings.view_height};
+        bounding_boxes[1] = {WIDTH, 0, settings.view_width, settings.view_height};
     }
 
     for (PlayerDataEntry& player: player_data().all_players()) {
@@ -555,8 +555,8 @@ void GameState::draw(bool drawhud) {
             game_hud().draw(this);
         }
 ////        ldraw::display_set_window_region(screens.window_region());
-//		lua_api::luacall_overlay_draw(L); // Used for debug purposes
     });
+    lua_api::luacall_overlay_draw(L); // Used for debug purposes
 
 	ldraw::display_draw_finish();
 

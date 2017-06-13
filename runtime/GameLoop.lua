@@ -96,7 +96,7 @@ function M.overlay_draw()
         fps_timer:start()
         fps_count = 0
     end
-    HelpOverlay.draw()
+    --HelpOverlay.draw()
 end
 
 function M.run_loop()
