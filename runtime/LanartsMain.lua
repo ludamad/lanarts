@@ -129,8 +129,13 @@ function Engine.io()
 end
 
 function Engine.player_input(player)
+    local Gamepad = require "core.Gamepad"
+    local ids = Gamepad.ids()
+    if player.name == "Player 3" then
+        return (require "input.GamepadInputSource").create(player, ids[2])
+    end
     if player.name == "Player 2" then
-        return (require "input.GamepadInputSource").create(player)
+        return (require "input.GamepadInputSource").create(player, ids[1])
     end
     return (require "input.KeyboardInputSource").create(player)
 end
