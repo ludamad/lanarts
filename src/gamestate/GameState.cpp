@@ -119,6 +119,9 @@ void GameState::start_connection() {
 	    player_data().register_player(settings.username, NULL, settings.class_type, /* local player */ true);
             // Hardcoded for now:
             int n_extra_players = gamepad_states().size();
+            if (getenv("LANARTS_CONTROLLER")) {
+                n_extra_players -=1; // Remove one player if first player controller is desired
+            }
             const char* classes[] = {
                 "Fighter",
                 "Necromancer",

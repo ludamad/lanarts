@@ -131,15 +131,22 @@ end
 function Engine.player_input(player)
     local Gamepad = require "core.Gamepad"
     local ids = Gamepad.ids()
+    local offset = 1
+    if os.getenv("LANARTS_CONTROLLER") then
+        offset = 0
+    end
     for i=2,10 do
         if player.name == "Player " .. tostring(i) then
-            return (require "input.GamepadInputSource").create(player, ids[i-1])
+            return (require "input.GamepadInputSource").create(player, ids[i-offset])
         end
     end
-    --if #ids > 0 then
-    --    return (require "input.GamepadInputSource").create(player, ids[1])
-    --end
-    return (require "input.KeyboardInputSource").create(player)
+    local key_input = (require "input.KeyboardInputSource").create(player)
+    if os.getenv("LANARTS_CONTROLLER") then
+        local pad_input = (require "input.GamepadInputSource").create(player, ids[1])
+        return (require "input.CombinedInputSource").create(key_input, pad_input)
+    else
+        return key_input
+    end
 end
 
 -- Same steps:
