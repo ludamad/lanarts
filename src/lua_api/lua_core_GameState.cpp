@@ -45,7 +45,7 @@ static void game_load(LuaStackValue filename) {
 	SerializeBuffer sb(file, SerializeBuffer::INPUT);
 	lua_api::gamestate(filename)->deserialize(sb);
         // Ensure no class is chosen, otherwise the game will do an incorrect form of restart where levels are still generated:
-        lua_api::gamestate(filename)->game_settings().class_type = -1; 
+        lua_api::gamestate(filename)->game_settings().class_type = "";
 	fclose(file);
 }
 

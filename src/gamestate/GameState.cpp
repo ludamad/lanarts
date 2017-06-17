@@ -123,9 +123,9 @@ void GameState::start_connection() {
                 n_extra_players -=1; // Remove one player if first player controller is desired
             }
             const char* classes[] = {
+                "Mage",
                 "Fighter",
                 "Necromancer",
-                "Mage"
             };
             for (int i = 0 ; i < n_extra_players; i++) {
                 std::string p = "Player ";
@@ -224,6 +224,10 @@ bool GameState::start_game() {
     if (bounding_boxes.size() == 3) {
         bounding_boxes[1] = {WIDTH, 0, settings.view_width, settings.view_height};
     }
+    /* If class was not set, we are loading a game -- don't reinit game state */
+    if (settings.class_type == "") {
+            return true;
+    }
 
     for (PlayerDataEntry& player: player_data().all_players()) {
         if (!player.is_local_player) {
@@ -240,11 +244,8 @@ bool GameState::start_game() {
             player.index, // focus player id
         });
     }
-    /* If class was not set, we may be loading a game -- don't init level */
-	if (settings.class_type != "") {
-		restart();
-	}
-	return true;
+    restart();
+    return true;
 }
 
 void GameState::set_level(GameMapState* lvl) {
@@ -293,6 +294,7 @@ void GameState::serialize(SerializeBuffer& serializer) {
 	world.serialize(serializer);
 
 	player_data().serialize(this, serializer);
+    screens.serialize(this, serializer);
 	luawrap::globals(L)["Engine"]["post_serialize"].push();
 	luawrap::call<void>(L);
 
@@ -308,7 +310,6 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	luawrap::call<void>(L);
 
 	settings.deserialize_gameplay_settings(serializer);
-
 	serializer.read(base_rng_state); // Load RNG state
 	serializer.read_int(_game_timestamp);
 	serializer.read_int(initial_seed);
@@ -325,19 +326,20 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	world.deserialize(serializer);
 	player_data().deserialize(this, serializer);
 
-        bool first = true;
-        screens.for_each_screen( [&]() {
-            world.set_current_level(local_player()->current_floor);
-            view().sharp_center_on(local_player()->ipos());
-            if (first) {
-                settings.class_type = local_player()->class_stats().class_entry().name;
-                first = false; // HACK to get first player's class
-            }
-        });
-
 	post_deserialize_data().process(this);
-	luawrap::globals(L)["Engine"]["post_deserialize"].push();
-	luawrap::call<void>(L);
+    screens.deserialize(this, serializer);
+
+    bool first = true;
+    screens.for_each_screen( [&]() {
+        world.set_current_level(local_player()->current_floor);
+        view().sharp_center_on(local_player()->ipos());
+        if (first) {
+            settings.class_type = local_player()->class_stats().class_entry().name;
+            first = false; // HACK to get first player's class
+        }
+    });
+    luawrap::globals(L)["Engine"]["post_deserialize"].push();
+    luawrap::call<void>(L);
 }
 
 obj_id GameState::add_instance(level_id level, GameInst* inst) {

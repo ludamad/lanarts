@@ -381,8 +381,9 @@ DataW.enemy_create {
     }
     projectile: {
         weapon_class: "magic"
+        can_wall_bounce: true
         damage_type: {magic: 0.5, physical: 0.5}
-        range: 250
+        range: 1150
         radius: 11
         cooldown: 40
         speed: 8
@@ -544,13 +545,6 @@ DataW.enemy_create {
         cooldown: 30
         speed: 9
         spr_attack: 'nessos arrows'
-        on_hit_func: (target, atkstats) =>
-            if chance(.25) -- TODO poison resistance
-                effect = target\add_effect("Poison", 100, atkstats)
-                effect.damage = atkstats.damage
-                effect.power = atkstats.power
-                effect.magic_percentage = atkstats.magic_percentage
-                effect.physical = atkstats.physical
     }
 }
 
@@ -1270,11 +1264,10 @@ DataW.enemy_create {
     radius: 14
     xpaward: 55
     stats: {
-        attacks: { {weapon: "Fast Melee"}}
         hp: 200
         hpregen: 0
         movespeed: 1
-        strength: 20
+        strength: 50
         defence: 10
         willpower: 10
     }

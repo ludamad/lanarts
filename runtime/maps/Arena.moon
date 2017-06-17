@@ -8,24 +8,25 @@ GenerateUtils = require "maps.GenerateUtils"
 SourceMap = require "core.SourceMap"
 Map = require "core.Map"
 Region1 = require "maps.Region1"
+OldMaps = require "maps.OldMaps"
 
 import ConnectedRegions, FilledRegion
     from require "maps.MapElements"
 
---TEMPLATE = ConnectedRegions {
---    regions: for i=1,10
---        FilledRegion {
---            shape: 'deformed_ellipse'
---            size: {5, 5}
---        }
---    spread_scheme: 'box2d_solid_center'
---    connection_scheme: 'direct'
---}
-
-TEMPLATE = FilledRegion {
-    shape: 'windows'
-    size: {40,40}
+TEMPLATE = ConnectedRegions {
+    regions: for i=1,40
+        FilledRegion {
+            shape: 'deformed_ellipse'
+            size: {5, 5}
+        }
+    spread_scheme: 'box2d_solid_center'
+    connection_scheme: 'direct'
 }
+
+--TEMPLATE = FilledRegion {
+--    shape: 'windows'
+--    size: {40,40}
+--}
 
 TILESET = TileSets.lair
 
@@ -69,6 +70,9 @@ generate = (rng) ->
     for i=1,10
         {x, y} = MapUtils.random_square(compiler.map, nil)
         Region1.generate_epic_store(compiler.map, {x, y})
+    for i=1,10
+        {x, y} = MapUtils.random_square(compiler.map, nil)
+        MapUtils.spawn_decoration(compiler.map, OldMaps.statue, {x, y}, random(0,17))
     return compiler\compile(), compiler.map, player_spawn_points
 
 main = () ->

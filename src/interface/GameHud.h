@@ -43,7 +43,7 @@ public:
 	BBox minimap_bbox(GameState* gs);
 	Minimap& minimap();
 
-	GameHud(const BBox& sidebar_box, const BBox& view_box);
+	GameHud(const BBox& sidebar_box = BBox(), const BBox& view_box = BBox());
 
 	/* Width of overlay */
 	int width() {

@@ -218,13 +218,30 @@ public:
 	void read_container(T& t) {
 		int size;
 		read(size);
-		LSERIALIZE_CHECK(size_t(size * sizeof(T)) < MAX_ALLOC_SIZE);
+        LSERIALIZE_CHECK(size_t(size * sizeof(T)) < MAX_ALLOC_SIZE);
 		t.resize(size);
 		for (typename T::iterator it = t.begin(); it != t.end(); ++it) {
 			read(*it);
 		}
 	}
-
+	// High-level read/writes:
+	template<class T, class F>
+	void write_container(const T& t, F f) {
+		write((int)t.size());
+		for (typename T::const_iterator it = t.begin(); it != t.end(); ++it) {
+			f(*it);
+		}
+	}
+	template<class T, class F>
+	void read_container(T& t, F f) {
+		int size;
+		read(size);
+		LSERIALIZE_CHECK(size_t(size * sizeof(T)) < MAX_ALLOC_SIZE);
+		t.resize(size);
+		for (typename T::iterator it = t.begin(); it != t.end(); ++it) {
+			f(*it);
+		}
+	}
 	~SerializeBuffer();
 
 	const char* data() const {

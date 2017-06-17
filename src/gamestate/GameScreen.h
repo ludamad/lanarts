@@ -10,6 +10,7 @@
 
 class GameInst;
 class GameMapState;
+class SerializeBuffer;
 
 struct PlayerDataEntry;
 
@@ -21,6 +22,8 @@ struct GameScreen {
     int focus_player_id;
     GameMapState* current_level;
     Pos last_player_pos;
+    void serialize(GameState* gs, SerializeBuffer& serializer) const;
+    void deserialize(GameState* gs, SerializeBuffer& serializer);
 };
 
 // Represents all active screens being drawn
@@ -30,7 +33,7 @@ struct GameScreen {
 // A lot of code that was originally a single statement had to become a loop over all screens.
 struct GameScreenSet {
     void add(GameScreen screen) {
-        screen.index = screens.size();
+        screen.index = (int)screens.size();
         screens.push_back(screen);
     }
 
@@ -66,6 +69,8 @@ struct GameScreenSet {
 
     GameMapState* get_current_level();
     void set_current_level(GameMapState *map);
+    void serialize(GameState* gs, SerializeBuffer& serializer);
+    void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 private:
     int current_screen = -1;

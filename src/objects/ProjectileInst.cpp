@@ -142,6 +142,7 @@ void ProjectileInst::step(GameState* gs) {
 				vy = -vy;
 			}
 		}
+		gs->for_screens([&]() {gs->game_chat().add_message("BOUNCE");});
 	} else if (collides) {
 		gs->remove_instance(this);
 	}
@@ -181,7 +182,7 @@ void ProjectileInst::step(GameState* gs) {
                 snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
                         atkstats.damage, atkstats.power, int(atkstats.magic_percentage * 100),
                         damage);
-                gs->game_chat().add_message(buff);
+		gs->for_screens([&]() {gs->game_chat().add_message(buff);});
 
             }
 

@@ -490,21 +490,24 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
     int range = pentry.range();
 
     bool has_greater_fire = (effects.get_active("AmuletGreaterFire") != NULL);
-    if (pentry.name == "Mephitize" || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt")) {
+    bool is_spread_spell = pentry.name == "Mephitize" || pentry.name == "Red Dragon Projectile";
+    if (is_spread_spell || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt")) {
           float vx = 0, vy = 0;
           ::direction_towards(Pos {x, y}, p, vx, vy, 10000);
-          int directions = (pentry.name == "Mephitize" ? 16 : 4);
+          int directions = (is_spread_spell ? 16 : 4);
 
           for (int i = 0; i < directions; i++) {
               const float PI =3.141592;
               float angle = PI / directions * 2 * i;
               Pos new_target {x + cos(angle) * vx - sin(angle) * vy, y + cos(angle) * vy + sin(angle) * vx};
-              GameInst* pinst = new ProjectileInst(projectile, atkstats, id, ipos(), new_target, pentry.speed, pentry.range(), NONE);
+              GameInst* pinst = new ProjectileInst(projectile, atkstats, id, ipos(), new_target, pentry.speed, pentry.range(), 
+                NONE, pentry.can_wall_bounce, pentry.number_of_target_bounces, pentry.can_pass_through);
               gs->add_instance(pinst);
           }
       } else {
           GameInst* bullet = new ProjectileInst(projectile, atkstats, id, Pos(x, y),
-            p, pentry.speed, range);
+            p, pentry.speed, range,
+            NONE, pentry.can_wall_bounce, pentry.number_of_target_bounces, pentry.can_pass_through);
           gs->add_instance(bullet);
     }
     cooldowns().reset_action_cooldown(
