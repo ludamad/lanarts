@@ -63,7 +63,6 @@ function Decoration:init(args)
 end
 
 local test_mode = os.getenv("LANARTS_TESTCASE")
--- Door
 M.Door = LuaGameObject.type_create({base = Base})
 local Door = M.Door
 local DOOR_OPEN_TIMEOUT = 128
@@ -177,6 +176,56 @@ function Door:init(args)
     self.padding = 6
     self.required_key = args.required_key or false
     self.lanarts_needed = args.lanarts_needed or 0
+end
+
+M.Chest = LuaGameObject.type_create({base = Decoration})
+local Chest = M.Chest
+local DOOR_OPEN_TIMEOUT = 128
+function Chest:on_map_init()
+    local whalf = self.real_sprite.width / 2
+    local hhalf = self.real_sprite.height / 2 
+    self.area = {
+        self.x - whalf, self.y - hhalf,
+        self.x + whalf, self.y + hhalf
+    }
+end
+
+function Chest:on_step()
+    Decoration.on_step(self)
+
+    if self.was_opened then
+        return
+    end
+    -- If not opened, check for players:
+    local collisions = Map.rectangle_collision_check(self.map, self.area, self)
+    for _, object in ipairs(collisions) do
+        -- TODO hackish single-shot player check:
+        if (object.is_enemy == false) then
+            self.was_opened = true
+            self.real_sprite = M._chest_open
+            for _, content in ipairs(self.contents) do
+                ObjectUtils.spawn_item_near(self, content.type, content.amount, --[[Avoid self]] true)
+            end
+            play_sound "sound/inventory_sound_effects/metal-clash.ogg"
+            break
+        end
+    end
+
+end
+
+M._chest_open = tosprite("spr_gates.chest-open")
+M._chest_closed = tosprite("spr_gates.chest-closed")
+function Chest:init(args)
+    args.sprite = M._chest_closed
+    Chest.parent_init(self, args)
+    self.was_opened = false
+    -- Check contents arg:
+    for _, content in ipairs(args.contents) do
+        assert(content.type)
+        assert(content.amount)
+    end
+    self.contents = args.contents
+    self.depth = M.FEATURE_DEPTH
 end
 
 return M

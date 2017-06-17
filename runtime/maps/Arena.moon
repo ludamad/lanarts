@@ -72,7 +72,16 @@ generate = (rng) ->
         Region1.generate_epic_store(compiler.map, {x, y})
     for i=1,10
         {x, y} = MapUtils.random_square(compiler.map, nil)
-        MapUtils.spawn_decoration(compiler.map, OldMaps.statue, {x, y}, random(0,17))
+        MapUtils.spawn_decoration(compiler.map, OldMaps.statue, {x, y}, random(0,17), true)
+    for i=1,10
+        {x, y} = MapUtils.random_square(compiler.map, nil)
+        MapUtils.spawn_chest(compiler.map, {x, y}, {
+            {type: 'Arrow', amount: 10}
+            {type: 'Arrow', amount: 10}
+            {type: 'Arrow', amount: 10}
+            {type: 'Arrow', amount: 10}
+        })
+
     return compiler\compile(), compiler.map, player_spawn_points
 
 main = () ->

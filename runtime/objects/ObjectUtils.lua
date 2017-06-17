@@ -77,11 +77,14 @@ local function item_filter(obj)
     return GameObject.get_type(obj) == 'item'
 end
 
-local function viable_item_square(obj, tx, ty)
+local function viable_item_square(obj, tx, ty, avoid_obj)
     if Map.tile_is_solid(obj.map, {tx, ty}) then
         return false
     end
     local x, y = tx * 32 + 16, ty * 32 + 16
+    if avoid_obj and x == obj.x and y == obj.y then
+        return false
+    end
     local collisions = Map.rectangle_collision_check(obj.map, {x - 16, y - 16, x+16, y+16}, obj)
     collisions = table.filter(collisions, item_filter)
     if #collisions > 0 then
@@ -104,18 +107,18 @@ local function spiral_iterate(f)
     end
 end
 
-local function try_spawn_item(obj, item, amount, tx, ty)
-    if not viable_item_square(obj, tx, ty) then
+local function try_spawn_item(obj, item, amount, tx, ty, avoid_obj)
+    if not viable_item_square(obj, tx, ty, avoid_obj) then
         return false
     end
     GameObject.item_create {type = item, amount = amount, xy = {tx*32+16, ty*32+16}, do_init = true}
     return true
 end
 
-function M.spawn_item_near(obj, item, amount)
+function M.spawn_item_near(obj, item, amount, --[[Optional]] avoid_obj)
     local x, y = math.floor(obj.x / 32), math.floor(obj.y / 32)
     spiral_iterate(function(dx, dy)
-        return try_spawn_item(obj, item, amount, x + dx, y + dy)
+        return try_spawn_item(obj, item, amount, x + dx, y + dy, avoid_obj)
     end)
 end
 
