@@ -527,14 +527,14 @@ DataW.enemy_create {
     sprite: "spr_enemies.humanoid.centaur"
     death_sprite: "blood"
     radius: 12
-    xpaward: 30
+    xpaward: 50
     appear_message: "A centaur hunter readies his bow."
     defeat_message: "The centaur hunter has been defeated."
     stats: {
         hp: 80
         hpregen: 0.01
         movespeed: 4
-        strength: 20
+        strength: 15
         defence: 8
         willpower: 8
     }
@@ -544,6 +544,7 @@ DataW.enemy_create {
         damage_type: {physical: 1.0}
         cooldown: 30
         speed: 9
+        power: {base: {15, 15}}
         spr_attack: 'nessos arrows'
     }
 }
@@ -1267,7 +1268,7 @@ DataW.enemy_create {
         hp: 200
         hpregen: 0
         movespeed: 1
-        strength: 50
+        strength: 25
         defence: 10
         willpower: 10
     }
@@ -1276,6 +1277,7 @@ DataW.enemy_create {
         damage_type: {physical: 1.0}
         range: 300
         cooldown: 100
+        power: {base: {40, 40}} -- 200% damage
         speed: 9
         spr_attack: "big stone"
     }

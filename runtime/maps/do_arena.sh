@@ -1,4 +1,4 @@
-export ARENA_ENEMIES='return {["Red Dragon"] = 1}'
+export ARENA_ENEMIES='return {["'$ENEMY'"] = 1}'
 export LANARTS_LEVEL=3
 export LANARTS_FIGHTER=1
 export LANARTS_2P=Mage
