@@ -111,8 +111,7 @@ void GameState::start_connection() {
 	} else if (settings.conntype == GameSettings::CLIENT) {
 		connection.initialize_as_client(callback, settings.ip.c_str(), settings.port);
 		printf("client connected\n");
-		net_send_connection_affirm(connection, settings.username,
-				get_class_by_name(settings.class_type));
+		net_send_connection_affirm(connection, settings.username, settings.class_type);
 	}
 	if (settings.conntype == GameSettings::SERVER
 			|| settings.conntype == GameSettings::NONE) {
@@ -191,8 +190,15 @@ bool GameState::start_game() {
     initial_seed = init_data.seed;
     base_rng_state.init_genrand(init_data.seed);
 
-
     screens.clear(); // Clear previous screens
+
+    if (is_loading_save()) {
+        // is_loading_save() is true if and only if lua_core_GameState.cpp#game_load is called
+        // we set it to false here to treat further restarts per usual
+        is_loading_save() = false;
+        /* We are loading a game -- don't reinit game state */
+        return true;
+    }
     int n_local_players = 0;
     for (PlayerDataEntry &player: player_data().all_players()) {
         if (player.is_local_player) {
@@ -223,10 +229,6 @@ bool GameState::start_game() {
     }
     if (bounding_boxes.size() == 3) {
         bounding_boxes[1] = {WIDTH, 0, settings.view_width, settings.view_height};
-    }
-    /* If class was not set, we are loading a game -- don't reinit game state */
-    if (settings.class_type == "") {
-            return true;
     }
 
     for (PlayerDataEntry& player: player_data().all_players()) {

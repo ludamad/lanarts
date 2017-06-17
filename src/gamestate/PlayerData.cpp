@@ -8,6 +8,7 @@
 #include "fov/fov.h"
 #include "objects/PlayerInst.h"
 #include <lcommon/math_util.h>
+#include <stats/ClassEntry.h>
 
 #include "lanarts_defines.h"
 
@@ -114,10 +115,9 @@ void PlayerData::deserialize(GameState* gs, SerializeBuffer & serializer) {
 	for (int i = 0; i < psize; i++) {
 		PlayerDataEntry& pde = _players.at(i);
 		read_inst_ref(pde.player_inst, gs, serializer);
-		pde.classtype = pde.player()->class_stats().classid;
+		pde.classtype = game_class_data.get(pde.player()->class_stats().classid).name;
 		pde.action_queue.clear();
 	}
-
 }
 
 void players_gain_xp(GameState* gs, int xp) {

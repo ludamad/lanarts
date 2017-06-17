@@ -285,6 +285,9 @@ public:
 	TeamData& team_data() {
 	    return game_world().team_data();
 	}
+	bool& is_loading_save() {
+		return _is_loading_save;
+	}
 	GameStatePostSerializeData& post_deserialize_data() {
 	    return _post_deserialize_data;
 	}
@@ -306,6 +309,7 @@ private:
 	GameSettings settings;
 	lua_State* L;
 	int frame_n;
+	bool _is_loading_save = false;
         // Used for restarting purposes, the initial value held by core.GlobalData, decided by runtime/InitialGlobalData.lua:
         LuaValue initial_global_data;
 	GameStateInitData init_data;

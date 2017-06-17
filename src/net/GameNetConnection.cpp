@@ -155,11 +155,11 @@ void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
 }
 
 void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
-        class_id classtype) {
+        const std::string&  classtype) {
     SerializeBuffer& sb = net.grab_buffer(
             GameNetConnection::PACKET_CLIENT2SERV_CONNECTION_AFFIRM);
     sb.write(name);
-    sb.write_int(classtype);
+    sb.write(classtype);
     printf("connection affirm sent\n");
     net.send_packet(sb, NetConnection::SERVER_RECEIVER);
 }
