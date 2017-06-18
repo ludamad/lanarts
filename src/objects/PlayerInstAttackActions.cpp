@@ -510,16 +510,6 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
     return attack_used;
 }
 
-static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
-        GameInst* target) {
-    if (!callback.empty() && !callback.isnil()) {
-        callback.push();
-        luawrap::push(L, user);
-        luawrap::push(L, target);
-        lua_call(L, 2, 0);
-    }
-}
-
 // Happens when you use up a projectile
 // -- next try option some other weapon projectile
 // -- next try unarmed projectile (redundant if already prefer unarmed)
@@ -610,8 +600,6 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 
         for (int i = 0; i < numhit; i++) {
             EnemyInst* e = (EnemyInst*)enemies[i];
-            lua_hit_callback(gs->luastate(), wentry.action_func().get(L), this,
-                    e);
             attack(gs, e, AttackStats(equipment().weapon()) );
         }
         cooldown = wentry.cooldown();

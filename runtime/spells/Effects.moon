@@ -7,6 +7,7 @@ Bresenham = require "core.Bresenham"
 Display = require "core.Display"
 SpellObjects = require "objects.SpellObjects"
 DataW = require "DataWrapped"
+EffectUtils = require "spells.EffectUtils"
 
 DataW.effect_create {
     name: "Poison"
@@ -235,6 +236,8 @@ DataW.effect_create {
 --DataW.weapon_vampirism = tosprite("spr_effects.weapon_vampirism")
 
 DataW._poison = tosprite("spr_weapons.i-venom")
+DataW._fire_resist = tosprite("spr_effects.i-r-fire-big")
+DataW._poison_resist = tosprite("spr_effects.i-r-poison-big")
 DataW._confusion = tosprite("spr_weapons.i-confusion")
 DataW._vampirism = tosprite("spr_weapons.i-vampirism")
 DataW._fleeing = tosprite("spr_effects.fleeing")
@@ -254,22 +257,6 @@ draw_weapon_console_effect = (player, sprite, text, xy) ->
         origin: Display.LEFT_CENTER
     }, {xy[1], xy[2] + 4}
     draw_console_effect(sprite, text, xy)
-
-DataW.effect_create {
-    name: "PoisonedWeapon"
-    console_draw_func: (player, xy) => 
-        draw_weapon_console_effect(player, DataW._poison, "+25% chance poison", xy)
-    on_melee_func: (attacker, defender, damage, attack_stats) =>
-        if defender\has_effect("Poison")
-            return
-        if (if attacker.is_enemy then chance(.25 * @n_derived) else chance(.1 * @n_derived))
-            eff = defender\add_effect("Poison", 100)
-            eff.poison_rate = 25
-            eff.damage = attack_stats.damage
-            eff.power = attack_stats.power
-            eff.magic_percentage = attack_stats.magic_percentage
-        return damage
-}
 
 DataW.effect_create {
     name: "FearWeapon"
@@ -318,6 +305,38 @@ DataW.effect_create {
         else
             regen_rate = hpregen * (if caster\has_effect("AmuletGreatPain") then 29 else 14)
             caster\heal_hp(regen_rate)
+}
+
+for {sprite, name, text} in *{
+    {DataW._poison_resist, "PoisonResist", "Poison Resist"}
+    {DataW._fire_resist, "FireResist", "Fire Resist"}
+    --{DataW._ice_resist, "IceResist", "Ice Resist"}
+} do
+    -- Simply a stat variable:
+    DataW.additive_effect_create {
+        :name
+        key: "resist" -- Additive effect, accessed with @_get_value().
+        console_draw_func: (player, xy) => 
+            res = if @resist < 0 then @resist else "+"..@resist
+            draw_weapon_console_effect(player, sprite, "#{res} #{text}", xy)
+    }
+DataW.additive_effect_create {
+    name: "PoisonedWeapon"
+    key: "poison_percentage" -- Additive effect, accessed with @_get_value().
+    console_draw_func: (player, xy) => 
+        draw_weapon_console_effect(player, DataW._poison, "+#{math.floor(@poison_percentage * 100)}% chance poison", xy)
+    on_melee_func: (attacker, defender, damage, attack_stats) =>
+        if defender\has_effect("Poison")
+            return
+        resist = EffectUtils.get_resistance(defender, "Poison")
+        poison_chance = @_get_value()
+        if chance(poison_chance * resist)
+            eff = defender\add_effect("Poison", 100)
+            eff.poison_rate = 25
+            eff.damage = attack_stats.damage
+            eff.power = attack_stats.power
+            eff.magic_percentage = attack_stats.magic_percentage
+        return damage
 }
 
 DataW.additive_effect_create {
@@ -796,7 +815,6 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage", "Lifelinker"}
                 caster\add_effect "Summoner", 2 -- Keep effect from dying
             else
                 eff = caster\add_effect "Summoner", 2
-                print("EFF", eff)
                 eff.duration = 30
             while caster.kills > @kill_tracker
                 if name == "Necromancer"

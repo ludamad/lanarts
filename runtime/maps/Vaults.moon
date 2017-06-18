@@ -26,6 +26,7 @@ M._closed_door_crypt = Display.image_load "spr_doors/closed_door_crypt.png"
 M._door_key1 = Display.image_load "spr_keys/door01.png"
 M._door_key2 = Display.image_load "spr_keys/door02.png"
 M._door_key3 = Display.image_load "spr_keys/door03.png"
+M._door_magentite = Display.image_load "spr_keys/magentite_door.png"
 M._anvil = Display.image_load "features/sprites/anvil.png"
 
 -- Common definitions:

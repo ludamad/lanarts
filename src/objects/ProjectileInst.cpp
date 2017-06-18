@@ -95,18 +95,40 @@ ProjectileInst* ProjectileInst::clone() const {
 	return new ProjectileInst(*this);
 }
 
-static void lua_hit_callback(lua_State* L, LuaValue& callback,
-		const EffectiveAttackStats& atkstats, GameInst* projectile,
+float lua_hit_callback(lua_State* L, LuaValue& callback,
+		const EffectiveAttackStats& atkstats, float damage, GameInst* obj,
 		GameInst* target) {
 	if (!callback.empty() && !callback.isnil()) {
 		callback.push();
-		luawrap::push(L, projectile);
+		luawrap::push(L, obj);
 		luawrap::push(L, target);
 		lua_push_effectiveattackstats(L, atkstats);
-		lua_call(L, 3, 0);
+		lua_pushinteger(L, damage);
+		lua_call(L, 4, 1);
+		if (lua_isnumber(L, -1)) {
+			damage = lua_tonumber(L, -1);
+		}
+		lua_pop(L, 1);
 	}
+	return damage;
 }
 
+void lua_attack_stats_callback(lua_State* L, LuaValue& callback,
+		EffectiveAttackStats& atkstats, GameInst* obj, GameInst* target) {
+    if (!callback.empty() && !callback.isnil()) {
+            callback.push();
+            luawrap::push(L, obj);
+            luawrap::push(L, target);
+            lua_push_effectiveattackstats(L, atkstats);
+            LuaValue value(L);
+            value.pop();
+            value.push();
+            lua_call(L, 3, 1);
+            atkstats.power = value["power"].to_num();
+            atkstats.damage = value["damage"].to_num();
+            atkstats.magic_percentage = value["magic_percentage"].to_num();
+    }
+}
 static bool enemy_filter(GameInst* g1, GameInst* g2) {
     static CombatGameInst* comparison = NULL;
     if (g1 == NULL) {
@@ -172,17 +194,20 @@ void ProjectileInst::step(GameState* gs) {
                     id, origin->id, colobj->id);
             origin->signal_attacked_successfully();
 
-            lua_hit_callback(L,
+            EffectiveAttackStats tmp_stats = atkstats;
+            lua_attack_stats_callback(L, 
+                    projectile.projectile_entry().attack_stat_func,
+                    tmp_stats, this, victim);
+            float damage = damage_formula(tmp_stats, victim->effective_stats());
+            damage = lua_hit_callback(L,
                     projectile.projectile_entry().action_func().get(L),
-                    atkstats, this, victim);
-
-            int damage = damage_formula(atkstats, victim->effective_stats());
+                    tmp_stats, damage, this, victim);
 
             if (gs->game_settings().verbose_output) {
                 char buff[100];
                 snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
-                        atkstats.damage, atkstats.power, int(atkstats.magic_percentage * 100),
-                        damage);
+                        tmp_stats.damage, tmp_stats.power, int(tmp_stats.magic_percentage * 100),
+                        (int)damage);
 		gs->for_screens([&]() {gs->game_chat().add_message(buff);});
 
             }
@@ -200,7 +225,7 @@ void ProjectileInst::step(GameState* gs) {
 			});
             if (!projectile.projectile_entry().deals_special_damage) {
                 char buffstr[32];
-                snprintf(buffstr, 32, "%d", damage);
+                snprintf(buffstr, 32, "%d", (int)damage);
                 float rx = vx / speed * .5;
                 float ry = vy / speed * .5;
                 gs->add_instance(

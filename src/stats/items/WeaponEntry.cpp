@@ -41,4 +41,5 @@ void WeaponEntry::parse_lua_table(const LuaValue& table) {
 	}
 
 	uses_projectile = luawrap::defaulted(table, "uses_projectile", false);
+        attack_stat_func = table["attack_stat_func"];
 }

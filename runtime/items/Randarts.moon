@@ -97,7 +97,9 @@ add_random_effect = (rng, data) ->
         {effect, description} = rng\random_choice {
             {"VampiricWeapon", "You gain the power to steal life with your melee blows."}
             {"ConfusingWeapon", "You gain the power to daze foes in melee."}
-            {"PoisonedWeapon", "You gain the power to poison foes in melee."}
+            {{"PoisonedWeapon", {poison_percentage: 0.10}}, "You gain the power to poison foes in melee."}
+            {{"FireResist", {resist: 1}}, ""}
+            {{"PoisonResist", {resist: 1}}, ""}
             {"KnockbackWeapon", "You gain the power to knock back foes in melee."}
         }
     --data.description ..= " #{description}"

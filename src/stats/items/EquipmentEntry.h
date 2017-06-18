@@ -8,6 +8,7 @@
 
 #include "lanarts_defines.h"
 
+#include <luawrap/LuaValue.h>
 #include "../stat_modifiers.h"
 
 #include "ItemEntry.h"

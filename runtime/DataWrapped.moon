@@ -1,3 +1,5 @@
+EffectUtils = require "spells.EffectUtils"
+
 -- Normal effect. By default, takes the 'max' of all applied time_left's
 effect_create = (args) ->
     wrapped_init = args.init_func
@@ -93,6 +95,38 @@ additive_effect_create = (args) ->
 STANDARD_WEAPON_DPS = 10
 STANDARD_RANGED_DPS = 7
 
+add_on_hit_func = (args, f1) ->
+    f2 = args.on_hit_func
+    if f2 == nil 
+        args.on_hit_func = f1
+    else
+        args.on_hit_func = (obj, target, atkstats, damage) -> 
+            damage = f1(obj, target, atkstats, damage) or damage
+            return f2(obj, target, atkstats, damage)
+
+add_attack_stat_func = (args, f1) ->
+    f2 = args.attack_stat_func
+    if f2 == nil 
+        args.attack_stat_func = f1
+    else
+        args.attack_stat_func = (obj, target, atkstats) -> 
+            f1(obj, target, atkstats)
+            f2(obj, target, atkstats)
+
+add_types = (args, types) ->
+    for type in *types
+        add_on_hit_func args, (obj, target, atkstats, damage) ->
+            log_verbose "APPLYING TYPE RESISTANCE #{type}"
+            return damage * EffectUtils.get_resistance(target, type)
+        add_attack_stat_func args, (obj, target, atkstats) ->
+            log_verbose "APPLYING TYPE POWER #{type}"
+            atkstats.power += EffectUtils.get_power(obj, type)
+
+resistance_effects = (resists, effects = {}) ->
+    for type, resist in pairs resists
+        append effects, {"#{type}Resist", {:resist}}
+    return effects
+
 weapon_create = (args, for_enemy = false) -> 
     damage_multiplier = args.damage_multiplier or 1.0
     dps = if args.type == "bows" then STANDARD_RANGED_DPS else STANDARD_WEAPON_DPS
@@ -104,6 +138,8 @@ weapon_create = (args, for_enemy = false) ->
         args.damage = {base: {math.floor(damage *0.9), math.ceil(damage * 1.1)}, strength: 0}
     else 
         args.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
+    if args.types ~= nil
+        add_types args, args.types
     args.power or= {base: {power, power}, strength: 1}
     args.range or= 7
     Data.weapon_create(args)
@@ -122,6 +158,8 @@ spell_create = (args) ->
         proj.damage_type or= {magic: 1.0}
         proj.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
         proj.power or= {base: {0, 0}, magic: 1}
+        if proj.types ~= nil
+            add_types proj, proj.types
         Data.projectile_create(proj)
         args.projectile = proj.name
     Data.spell_create(args)
@@ -140,6 +178,8 @@ projectile_create = (args, for_enemy = false) ->
         args.power or= {base: {0, 0}, strength: args.damage_type.physical, magic: args.damage_type.magic}
     args.spr_item or= "none"
     args.range or= 300
+    if args.types ~= nil
+        add_types args, args.types
     Data.projectile_create(args)
 
 enemy_create = (args) ->
@@ -157,6 +197,9 @@ enemy_create = (args) ->
         p.spr_item or= "none"
         append args.stats.attacks, {projectile: p.name}
         projectile_create(p, true)
+    if args.resistances ~= nil
+        args.effects_active or= {}
+        resistance_effects(args.resistances, args.effects_active)
     Data.enemy_create(args)
 
-return {:additive_effect_create, :effect_create, :weapon_create, :spell_create, :projectile_create, :enemy_create}
+return {:additive_effect_create, :effect_create, :weapon_create, :spell_create, :projectile_create, :enemy_create, :resistance_effects}

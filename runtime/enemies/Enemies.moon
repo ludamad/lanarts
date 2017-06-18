@@ -75,7 +75,9 @@ DataW.enemy_create {
         magic: 25
         willpower: 8
     }
-    effects_active: {"PoisonedWeapon"}
+    effects_active: {
+        {"PoisonedWeapon", {poison_percentage: 0.25}}
+    }
 }
 
 DataW.enemy_create {
@@ -120,7 +122,9 @@ DataW.enemy_create {
         magic: 15
         willpower: 0
    }
-   effects_active: {"PoisonedWeapon"}
+   effects_active: {
+        {"PoisonedWeapon", {poison_percentage: 0.25}}
+   }
 }
 
 summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) -> (data) -> table.merge data, {
@@ -193,7 +197,10 @@ DataW.enemy_create {
         defence: 0
         willpower: 12
     }
-    effects_active: {"PoisonedWeapon", "Enraging"}
+    effects_active: {
+        {"PoisonedWeapon", {poison_percentage: 0.25}}
+        "Enraging"
+    }
 }
 
 DataW.enemy_create {
@@ -215,7 +222,7 @@ DataW.enemy_create {
         willpower: 12
     }
     effects_active: {
-        "PoisonedWeapon", 
+        {"PoisonedWeapon", {poison_percentage: 0.25}}
         {"Spiky", {recoil_percentage: 0.25}}
     }
 }
@@ -237,7 +244,7 @@ DataW.enemy_create {
         willpower: 20
     }
     effects_active: {
-        "PoisonedWeapon", 
+        {"PoisonedWeapon", {poison_percentage: 0.25}}
         {"Spiky", {recoil_percentage: 0.25}}
         "Enraging"
     }
@@ -277,7 +284,9 @@ DataW.enemy_create {
         magic: 17
         willpower: 0
     }
-    effects_active: {"PoisonedWeapon"}
+    effects_active: {
+        {"PoisonedWeapon", {poison_percentage: 0.25}}
+    }
 }
 
 DataW.enemy_create {
@@ -297,7 +306,9 @@ DataW.enemy_create {
         defence: 0
         willpower: 0
     }
-    effects_active: {"PoisonedWeapon"}
+    effects_active: {
+        {"PoisonedWeapon", {poison_percentage: 0.25}}
+    }
 }
 
 DataW.enemy_create {
@@ -363,7 +374,7 @@ DataW.enemy_create {
     effects_active: {"Enraging"}
 }
   
-DataW.enemy_create {
+DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
     name: "Purple Dragon"
     appear_message: "A frighteningly large purple dragon comes into view!"
     defeat_message: "You have slain the purple dragon!"
@@ -375,8 +386,8 @@ DataW.enemy_create {
         hp: 220
         hpregen: 0.1
         movespeed: 2.5
-        strength: 10
-        magic: 10
+        strength: 20
+        magic: 20
         defence: 15
         willpower: 15
     }
@@ -386,10 +397,10 @@ DataW.enemy_create {
         damage_type: {magic: 0.5, physical: 0.5}
         range: 1150 * 4
         radius: 11
-        power: {base: {10, 10}}
+        power: {base: {30, 30}}
         cooldown: 200
         speed: 8
-        spr_attack: "fire ball"
+        spr_attack: "spr_effects.dragon_fireball"
     }
     init_func: () =>
         @timeout = 0
@@ -801,13 +812,35 @@ DataW.enemy_create {
     appear_message: "A giant fiery bat surveys the scene."
     defeat_message: "The fire bat has died."
     stats: {
-        attacks: { {weapon: "Fast Melee"} }
         hp: 18
         hpregen: 0.03
-        movespeed: 3
+        movespeed: 4
         strength: 10
         defence: 5
         willpower: 5
+    }
+    init_func: () =>
+        @timeout = 0
+    step_func: () =>
+        @timeout -= 1
+        if @timeout <= 0
+            @projectile_attack "Fire Bat Projectile"
+            @projectile_attack "Fire Bat Projectile"
+            @projectile_attack "Fire Bat Projectile"
+            @projectile_attack "Fire Bat Projectile"
+            @timeout = 20
+    projectile: {
+        weapon_class: "magic"
+        damage_type: {magic: 0.5, physical: 0.5}
+        range: 96
+        radius: 11
+        power: {base: {10, 10}}
+        cooldown: 20
+        speed: 8
+        spr_attack: "spr_effects.fireball_small"
+    }
+    resistances: {
+        Fire: 3
     }
 }
  

@@ -53,6 +53,7 @@ DataW.spell_create {
     spr_spell: "fire ball",
     description: "A great, strong bolt of fire. Hits a single target.",
     projectile: {
+        types: {"Fire"}
         speed: 5
         damage_multiplier: 2.00
     }
@@ -104,6 +105,7 @@ DataW.spell_create {
     spr_spell: "fire bolt",
     description: "A fast bolt of fire. Hits a single target.",
     projectile: {
+        types: {"Fire"}
         speed: 7
         damage_multiplier: 1.25
         spr_attack: "fire bolt"

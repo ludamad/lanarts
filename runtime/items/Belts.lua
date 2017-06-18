@@ -50,7 +50,9 @@ Data.equipment_create {
 
     spr_item = "spr_belts.poison",
 
-    effects_granted = {"PoisonedWeapon"}
+    effects_granted = {
+        {"PoisonedWeapon", {poison_percentage = 0.10}}
+    }
 }
 
 Data.equipment_create {

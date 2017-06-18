@@ -9,6 +9,17 @@ function GamepadInputSource:init(player, id)
     self.id = id or tonumber(assert(Gamepad.ids()[1]))
 end
 
+-- Make diagonals as fast in each direction as non-diagonals:
+local function lanarts_skew(dir) 
+    local x, y = dir[1], dir[2]
+    local mx = math.max(math.abs(x), math.abs(y))
+    if mx == 0 then mx = 1 end
+    x, y = x / mx, y / mx
+    x = math.min(math.max(-1, x), 1)
+    y = math.min(math.max(-1, y), 1)
+    return {x, y}
+end
+
 function GamepadInputSource:move_direction()
     local dir = {Gamepad.axis_left_x(self.id), Gamepad.axis_left_y(self.id)}
     for i=1,2 do
@@ -16,7 +27,7 @@ function GamepadInputSource:move_direction()
             dir[i] = 0
         end
     end
-    return dir
+    return lanarts_skew(dir)
 end
 
 function GamepadInputSource:should_explore()

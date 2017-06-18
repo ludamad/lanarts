@@ -312,6 +312,13 @@ void CombatGameInst::post_draw(GameState *gs) {
     }
 }
 
+float lua_hit_callback(lua_State* L, LuaValue& callback,
+                            const EffectiveAttackStats& atkstats, float damage, GameInst* obj,
+                            GameInst* target); // Defined in ProjectileInst.cpp TODO organize better
+
+void lua_attack_stats_callback(lua_State* L, LuaValue& callback,
+		EffectiveAttackStats& atkstats, GameInst* obj, GameInst* target);
+
 bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
         const Item& weapon, bool ignore_cooldowns, float damage_multiplier) {
     event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d\n", id, inst->id,     weapon.id);
@@ -326,8 +333,13 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     EffectiveAttackStats atkstats = effective_atk_stats(mt,
             AttackStats(weapon));
 
+    // Modify the attack stat function:
+    lua_attack_stats_callback(gs->luastate(), weapon.weapon_entry().attack_stat_func, atkstats, this, inst); 
     float damage = damage_formula(atkstats, inst->effective_stats()) * damage_multiplier;
 
+    damage = lua_hit_callback(gs->luastate(),
+                              weapon.weapon_entry().action_func().get(gs->luastate()),
+                              atkstats, damage, this, inst);
     if (gs->game_settings().verbose_output) {
         char buff[100];
         snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %f",

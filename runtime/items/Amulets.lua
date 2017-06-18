@@ -92,7 +92,9 @@ Data.equipment_create {
 
     spr_item = "spr_amulets.cabochon",
     spells_granted = {"Mephitize"},
-    effects_granted = {"PoisonedWeapon"}
+    effects_granted = {
+        {"PoisonedWeapon", {poison_percentage = 0.10}}
+    }
 }
 
 Data.equipment_create {
