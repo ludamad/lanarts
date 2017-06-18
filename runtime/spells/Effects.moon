@@ -188,6 +188,12 @@ DataW.effect_create {
     -- Effect in CPP
 }
 
+
+DataW.effect_create {
+    name: "AlwaysAttack"
+    -- Effect in CPP
+}
+
 DataW.effect_create {
     name: "Slowed"
     effected_sprite: "spr_effects.slowed"

@@ -389,8 +389,15 @@ DataW.enemy_create {
         power: {base: {10, 10}}
         cooldown: 200
         speed: 8
-        spr_attack: "large fire"
+        spr_attack: "fire ball"
     }
+    init_func: () =>
+        @timeout = 0
+    step_func: () =>
+        @timeout -= 1
+        if @timeout <= 0
+            @projectile_attack "Purple Dragon Projectile"
+            @timeout = 200
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
@@ -785,6 +792,25 @@ DataW.enemy_create {
     }
 }
               
+DataW.enemy_create {
+    name: "Fire Bat"
+    sprite: "spr_enemies.animals.fire_bat"
+    death_sprite: "blood"
+    radius: 12
+    xpaward: 8
+    appear_message: "A giant fiery bat surveys the scene."
+    defeat_message: "The fire bat has died."
+    stats: {
+        attacks: { {weapon: "Fast Melee"} }
+        hp: 18
+        hpregen: 0.03
+        movespeed: 3
+        strength: 10
+        defence: 5
+        willpower: 5
+    }
+}
+ 
 DataW.enemy_create {
     name: "Giant Bat"
     sprite: "giant bat"

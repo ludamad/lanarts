@@ -16,30 +16,14 @@ import ConnectedRegions, FilledRegion
     from require "maps.MapElements"
 
 
-
--- The room before the dragon lair.
-DragonLairFoyer = newtype {
-    parent: MapCompiler
-    root_node: ConnectedRegions {
-        regions: for i=1,10
-            FilledRegion {
-                shape: 'deformed_ellipse'
-                size: {4, 7}
-            }
-        spread_scheme: 'box2d_solid_center'
-        connection_scheme: 'direct'
-    }
-    tileset: TileSets.lair
-}
-
-cave = () -> ConnectedRegions {
+cave = (n_outer = 3) -> ConnectedRegions {
     regions: {
         for i=1,5
             FilledRegion {
                 shape: 'deformed_ellipse'
                 size: {5, 10}
             }
-        for i=1,3
+        for i=1,n_outer
             FilledRegion {
                 shape: 'deformed_ellipse'
                 size: {7, 12}
@@ -49,20 +33,66 @@ cave = () -> ConnectedRegions {
     connection_scheme: 'direct'
 }
 
-DragonLair = newtype {
+-- The room before the dragon lair.
+DragonLairFoyer = newtype {
     parent: MapCompiler
     root_node: ConnectedRegions {
-        regions: {
-            cave()
-            cave()
-            cave()
+        regions: for i=1,5 do ConnectedRegions {
+            regions: {
+                for i=1,1
+                    FilledRegion {
+                        shape: 'deformed_ellipse'
+                        size: {5, 10}
+                    }
+                for i=1,1
+                    FilledRegion {
+                        shape: 'deformed_ellipse'
+                        size: {7, 12}
+                    }
+                for i=1,1
+                    FilledRegion {
+                        shape: 'deformed_ellipse'
+                        size: {12, 12}
+                    }
+            }
+            spread_scheme: 'box2d_solid_center'
+            connection_scheme: 'direct'
         }
         spread_scheme: 'box2d_solid_center'
         connection_scheme: 'direct'
     }
     tileset: TileSets.lair
     enemies: {
+        "Fire Bat": 10
+    }
+    -- Called before compile() is called 
+    generate: (cc) =>
+        for enemy, amount in pairs @enemies
+            for i=1,amount
+                sqr = MapUtils.random_square(@map, nil)
+                MapUtils.spawn_enemy(@map, enemy, sqr)
+        for i=1,5
+            ItemUtils.item_object_generate(@map, ItemGroups.basic_items)
+        for i=1,3
+            sqr = @random_square_not_near_wall()
+            @map\square_apply(sqr, {add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT}, remove: SourceMap.FLAG_SEETHROUGH})
+            MapUtils.spawn_decoration(@map, OldMaps.statue, sqr, @rng\random(0,17))
+}
+
+DragonLair = newtype {
+    parent: MapCompiler
+    root_node: ConnectedRegions {
+        regions: {
+            cave()
+            cave()
+        }
+        spread_scheme: 'box2d_solid_center'
+        connection_scheme: 'direct_light'
+    }
+    tileset: TileSets.lair
+    enemies: {
         "Purple Dragon": 1
+        "Fire Bat": 8
     }
     -- Called before compile() is called 
     generate: (cc) =>
@@ -85,11 +115,11 @@ DragonLair = newtype {
         for i=1,3
             sqr = @random_square_not_near_wall()
             MapUtils.spawn_healing_square(@map, sqr)
-        for i=1,10
+        for i=1,2
             sqr = @random_square_not_near_wall()
             items = for i=1,2
                 {type: "Gold", amount: @rng\random(2,5)}
             MapUtils.spawn_chest(@map, sqr, items)
 }
 
-return {:DragonLair}
+return nilprotect {:DragonLair, :DragonLairFoyer}

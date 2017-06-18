@@ -19,13 +19,16 @@ ellipse_points = (x, y, w, h, n_points = 16, start_angle = 0) ->
 skewed_ellipse_points = (rng, xy, wh, n_points = 16, start_angle = 0) ->
     {x, y} = xy
     {w, h} = wh
-    points = {}
-    angle,step = start_angle,(1/n_points* 2 * math.pi)
-    cx, cy = x+w/2, y+h/2
-    for i=1,n_points
-        append points, {math.sin(angle) * w / 2 + x, math.cos(angle) * h / 2 + y}
-        angle += rng\randomf(0, step) + step / 2
-    return points
+    while true
+        points = {}
+        angle,step = start_angle,(1/n_points* 2 * math.pi)
+        cx, cy = x+w/2, y+h/2
+        for i=1,n_points
+            append points, {math.sin(angle) * w / 2 + x, math.cos(angle) * h / 2 + y}
+            angle += rng\randomf(0, step) + step / 2
+        -- Reject all that have too high angle:
+        if angle < 1.9 * math.pi
+            return points
 
 Region = newtype {
     init: (@x, @y, @w, @h, @n_points = 16, @angle = 0) =>

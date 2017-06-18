@@ -28,6 +28,9 @@ Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
 
+{:MapCompilerContext, :make_on_player_interact} = require "maps.MapCompilerContext"
+Places = require "maps.Places"
+
 -- Generation constants and data
 {   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE, 
     :FLAG_OVERWORLD, :FLAG_ROOM, :FLAG_NO_ENEMY_SPAWN, :FLAG_NO_ITEM_SPAWN
@@ -560,7 +563,7 @@ overworld_features = (map) ->
                 sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
                 if not sqr
                     return nil
-                MapUtils.spawn_enemy(map, "Red Dragon", sqr)
+                --MapUtils.spawn_enemy(map, "Red Dragon", sqr)
                 ------------------------- 
 
             else if floor == 1
@@ -857,12 +860,28 @@ overworld_features = (map) ->
         enemy_placer = (map, xy) ->
             enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
             MapUtils.spawn_enemy(map, enemy, xy)
+        i = 1
         boss_placer = (map, xy) ->
             --if map.rng\randomf() < .5
             --    enemy = OldMaps.enemy_generate(OldMaps.strong_hell)
             --    MapUtils.spawn_enemy(map, enemy, xy)
             --else
-            MapUtils.spawn_enemy(map, "Centaur Hunter", xy)
+            if i == 1 -- Place dragon lair
+                -- Make portal
+                portal = MapUtils.spawn_portal(map, xy, "spr_gates.volcano_portal")
+                -- Make level description
+                cc = MapCompilerContext.create()
+                name = "Dragon's Lair"
+                cc\register(name, Places.DragonLair)
+                other_portal = cc\add_pending_portal name, (feature, compiler) ->
+                    MapUtils.random_portal(compiler.map, nil, "spr_gates.volcano_exit")
+                append post_poned, (game_map) ->
+                    cc\register("root", () -> game_map)
+                    other_portal\connect {feature: portal, label: "root"}
+                portal.on_player_interact = make_on_player_interact(cc, other_portal)
+            else
+                MapUtils.spawn_enemy(map, "Centaur Hunter", xy)
+            i += 1
         n_items_placed = 0
         item_placer = (map, xy) ->
             item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, (if n_items_placed == 0 then 100 else 2)

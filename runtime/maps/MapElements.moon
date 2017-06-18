@@ -51,6 +51,7 @@ optional = (type) -> (name) -> (obj, args) ->
 _CONNECTION_SCHEMES = {
     none: true
     direct: true
+    direct_light: true
 }
 
 _SPREAD_SCHEMES = {

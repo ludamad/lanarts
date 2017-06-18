@@ -99,6 +99,7 @@ namespace ldungeon_gen {
 				flags_get(args["matches_none"]),
 				luawrap::defaulted(args["matches_content"], uint16_t(-1)));
 		selector.use_must_be_content = has_content;
+                selector.must_be_group = luawrap::defaulted(args["matches_group"], uint16_t(-1));
 		return selector;
 	}
 

@@ -224,6 +224,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true,
             // Damage multiplier:
             luawrap::get_defaulted(L, 3, 1.0f))) );
+    LUAWRAP_METHOD(methods, projectile_attack, OBJ->projectile_attack(lua_api::gamestate(L), NULL, Weapon(), Item(get_projectile_by_name(lua_tostring(L, 2)))));
 
     methods["damage"].bind_function(lapi_combatgameinst_damage);
 	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);

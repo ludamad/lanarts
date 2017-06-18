@@ -28,10 +28,26 @@ default_fill = () =>
                 remove: SourceMap.FLAG_SOLID
                 add: SourceMap.FLAG_SEETHROUGH
                 content: if i%2 == 1 then @tileset.floor else @tileset.floor_alt
+                group: i
+            }
+        }
+        SourceMap.perimeter_apply {map: @map,
+            candidate_selector: {matches_all: SourceMap.FLAG_SOLID}, inner_selector: {matches_none: SourceMap.FLAG_SOLID, matches_group: i}
+            operator: {
+                content: if i%2 == 1 then @tileset.wall else @tileset.wall_alt
             }
         }
         i += 1
-    --@fill_unconnected()
+    SourceMap.erode_diagonal_pairs {map: @map, rng: @rng, selector: {matches_all: SourceMap.FLAG_SOLID}}
+    if not SourceMap.area_fully_connected {
+        map: @map, 
+        unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
+        mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
+        marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
+    }
+        log_verbose("ABORT: connection check failed")
+        return false
+    return true
 MapCompiler = newtype {
     init: (args) =>
         -- Result memoizing table 
@@ -44,6 +60,7 @@ MapCompiler = newtype {
         @_children = {}
         @_regions = {}
         @_combined_region = {}
+        @_next_group_id = 1
         @fill_function = args.fill_function or rawget(@, "fill_function") or default_fill
         @prepare(args)
     add: (selector, operator) =>
@@ -114,6 +131,14 @@ MapCompiler = newtype {
         log_verbose "Spread regions time: #{timer\get_milliseconds()}ms"
     _connect_regions: (scheme, regions) =>
         switch scheme
+            when 'direct_light'
+                timer = timer_create()
+                B2GenerateUtils.connect_map_regions {
+                    rng: @rng
+                    :regions 
+                    n_connections: 2
+                }
+                log_verbose "Connect regions time: #{timer\get_milliseconds()}ms"
             when 'direct'
                 timer = timer_create()
                 B2GenerateUtils.connect_map_regions {
@@ -225,8 +250,10 @@ MapCompiler = newtype {
             instances: {}
             :content 
         }
-        @fill_function()
+        if not @fill_function()
+            return false
         @_recalculate_perimeter()
+        return true
 
     random_square: (area = nil) => 
         return MapUtils.random_square(@map, area, {matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
@@ -235,11 +262,16 @@ MapCompiler = newtype {
 
     -- Creates @map, ready to be filled
     prepare: (args) => 
-        label = assert (args.label or @label), "Should have map 'label'"
-        padding = args.padding or 10
-        content = args.content or (if rawget(self, 'tileset') then @tileset.wall else 0)
-        @_prepare_map_topology(@root_node)
-        return @_prepare_source_map(label, padding, content)
+        success = false
+        while not success
+            table.clear @_regions
+            table.clear @_children
+            table.clear @_combined_region
+            label = assert (args.label or @label), "Should have map 'label'"
+            padding = args.padding or 10
+            content = args.content or (if rawget(self, 'tileset') then @tileset.wall else 0)
+            @_prepare_map_topology(@root_node)
+            success = @_prepare_source_map(label, padding, content)
     -- Creates a game map
     compile: (C) =>
         return Map.create {

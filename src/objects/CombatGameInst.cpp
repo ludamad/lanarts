@@ -458,7 +458,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
     if (!cooldowns().can_doaction())
         return false;
 
-    event_log("CombatGameInst::projectile_attack: id %d hitting id %d, weapon = id %d\n", id, inst->id, weapon.id);
+    event_log("CombatGameInst::projectile_attack: id %d hitting id %d, weapon = id %d\n", id, inst ? inst->id : 0, weapon.id);
     MTwist& mt = gs->rng();
 
     WeaponEntry& wentry = weapon.weapon_entry();
@@ -470,7 +470,8 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
     attack.projectile = projectile;
     EffectiveAttackStats atkstats = effective_atk_stats(mt, attack);
 
-    Pos p(inst->x, inst->y);
+    Pos target_p = inst == NULL ? Pos(x + gs->rng().rand(-32, 32), y + gs->rng().rand(-32, 32)) : inst->ipos();
+    Pos p = target_p;
     if (dynamic_cast<EnemyInst*>(this) && dynamic_cast<EnemyInst*>(this)->etype().name == "Ogre Mage") {
         p.x += gs->rng().rand(-199, +200);
         p.y += gs->rng().rand(-199, +200);
@@ -478,8 +479,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
         p.x += gs->rng().rand(-12, +13);
         p.y += gs->rng().rand(-12, +13);
         if (gs->tile_radius_test(p.x, p.y, 10)) {
-            p.x = inst->x;
-            p.y = inst->y;
+            p = target_p;
         }
     }
 
