@@ -33,6 +33,7 @@
 #include "collision_filters.h"
 
 static lsound::Sound minor_missile_sound;
+static lsound::Sound hurt_sound;
 void play(lsound::Sound& sound, const char* path);
 
 ProjectileInst::~ProjectileInst() {
@@ -186,6 +187,9 @@ void ProjectileInst::step(GameState* gs) {
 
             }
 
+            if (dynamic_cast<PlayerInst*>(victim)) {
+                play(hurt_sound, "sound/player_hurt.ogg");
+            }
             damage *= damage_mult;
 
 			gs->for_screens([&]() {

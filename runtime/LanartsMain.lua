@@ -105,8 +105,11 @@ function Engine.event_occurred(...)
 end
 
 function Engine.first_map_create(...)
+    if os.getenv("LINEAR_MODE") then
+        local linear_mode = interceptable_require "maps.LinearMode"
+        return linear_mode.first_map_create()
+    end
     local region1 = interceptable_require "maps.01_Overworld"
-
     local map = region1.overworld_create(...)
     return map
 end

@@ -254,7 +254,7 @@ static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
     float speed = pentry.speed * p->effective_stats().core.spell_velocity_multiplier;
 
     bool has_greater_fire = p->effects.has("AmuletGreaterFire");
-    bool is_spread_spell = pentry.name == "Mephitize" || pentry.name == "Red Dragon Projectile";
+    bool is_spread_spell = pentry.name == "Mephitize" || pentry.name == "Purple Dragon Projectile";
     if (is_spread_spell || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt")) {
         float vx = 0, vy = 0;
         ::direction_towards(Pos {p->x, p->y}, target, vx, vy, 10000);

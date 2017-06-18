@@ -6,6 +6,10 @@ sprites:
    
   - name: red dragon
     file: enemies/bosses/sprites/reddragon.png
+   
+  - name: purple dragon
+    file: enemies/bosses/sprites/purpledragon.png
+
 
   - name: pisilohe
     file: enemies/bosses/sprites/pisilohe8_0.png

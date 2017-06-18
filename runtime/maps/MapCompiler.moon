@@ -6,6 +6,9 @@ DebugUtils = require "maps.DebugUtils"
 SourceMap = require "core.SourceMap"
 MapRegionShapes = require("maps.MapRegionShapes")
 Map = require "core.Map"
+MapUtils = require "maps.MapUtils"
+World = require "core.World"
+Vaults = require "maps.Vaults"
 
 import MapRegion, combine_map_regions, map_regions_bbox
     from require("maps.MapRegion")
@@ -16,27 +19,61 @@ import ConnectedRegions, FilledRegion
 make_polygon_points = (rng, w, h, n_points) ->
     return GenerateUtils.skewed_ellipse_points(rng, {0,0}, {30, 30}, rng\random(4,12))
 
+default_fill = () =>
+    -- Fill the room:
+    i = 1
+    @for_all_nodes (node) =>
+        @apply node, {
+            operator: {
+                remove: SourceMap.FLAG_SOLID
+                add: SourceMap.FLAG_SEETHROUGH
+                content: if i%2 == 1 then @tileset.floor else @tileset.floor_alt
+            }
+        }
+        i += 1
+    --@fill_unconnected()
 MapCompiler = newtype {
     init: (args) =>
         -- Result memoizing table 
         @result = {}
         @operators = {}
-        @root_node = assert args.root
+        @label = assert (args.label or @label)
+        @root_node = assert (args.root or @root_node) -- Take from base class
         @rng = assert args.rng
         -- Maps from node -> data
         @_children = {}
         @_regions = {}
         @_combined_region = {}
-        @_prepare(args)
+        @fill_function = args.fill_function or rawget(@, "fill_function") or default_fill
+        @prepare(args)
     add: (selector, operator) =>
         append @operators, {:selector, :operator}
- 
+
+    -- Override to handle explicitly set spawn points
+    get_player_spawn_points: () =>
+        log_verbose "get_player_spawn_points #{@label} #{#World.players}"
+        return for player in *World.players
+            log_verbose "get_player_spawn_points #{player.name}"
+            {x, y} = MapUtils.random_square(@map, nil)
+            {x*32+16,y*32+16}
+
     get_map_region: (node) =>
         assert @_regions[node], "Must run compile_map_topology on node first!"
         regions = for child in *@_children[node]
             region = @get_map_region(child)
-        combine_map_regions()
+        return combine_map_regions(regions)
 
+    _recalculate_perimeter: () =>
+        -- Detect the perimeter, important for the winding-tunnel algorithm.
+        SourceMap.perimeter_apply {map: @map,
+            candidate_selector: {matches_all: SourceMap.FLAG_SOLID}, inner_selector: {matches_none: SourceMap.FLAG_SOLID}
+            operator: {add: SourceMap.FLAG_PERIMETER}
+        }
+        SourceMap.perimeter_apply {map: @map,
+            candidate_selector: {matches_none: {SourceMap.FLAG_SOLID}}, 
+            inner_selector: {matches_all: {SourceMap.FLAG_PERIMETER, SourceMap.FLAG_SOLID}}
+            operator: {add: Vaults.FLAG_INNER_PERIMETER}
+        }
     _generate_shape: (scheme, x, y, w, h) =>
         switch scheme
             when 'deformed_ellipse'
@@ -90,6 +127,13 @@ MapCompiler = newtype {
             else
                 error("Unexpected")
 
+    _flatten: (l, accum={}) =>
+        if getmetatable(l)
+            append accum, l
+        else
+            for elem in *l
+                @_flatten(elem, accum)
+        return accum
     -- Sets node_children and node_regions
     _prepare_map_topology: (node) =>
         map_regions = {}
@@ -98,7 +142,7 @@ MapCompiler = newtype {
         switch getmetatable(node)
             when ConnectedRegions
                 {:name, :regions, :connection_scheme, :spread_scheme} = node
-                child_regions = for region_node in *regions
+                child_regions = for region_node in *@_flatten(regions)
                     append children, region_node
                     @_prepare_map_topology(region_node)
                     -- TODO smarter spreading
@@ -128,6 +172,16 @@ MapCompiler = newtype {
     get_node_children: (node) => @_children[node]
     get_node_total_region: (node) => @_combined_region[node]
 
+    fill_unconnected: () =>
+        {w,h} = @map.size
+        SourceMap.area_fill_unconnected {
+            map: @map 
+            seed: {w/2, h/2}
+            unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
+            mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
+            marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
+            fill_operator: {content: @tileset.wall, add: SourceMap.FLAG_SOLID, remove: SourceMap.FLAG_SEETHROUGH}
+        }
     apply: (node, args) =>
         assert not args.map, "Passing map here redundant!"
         args.map = @map
@@ -143,16 +197,26 @@ MapCompiler = newtype {
 
     _prepare_source_map: (label, padding, content) => 
         -- Correct map topology:
-        bbox = map_regions_bbox({@_combined_region[@root_node]})
-        total_region = @get_node_total_region(@root_node)
-        total_region\translate(-bbox[1] + padding, -bbox[2] + padding)
+        all_regions = {}
+        @for_all_nodes (node) =>
+            for region in *@_regions[node]
+                append all_regions, region
+        --bbox = map_regions_bbox({@_combined_region[@root_node]})
+        bbox = map_regions_bbox(all_regions)
+        --total_region = @get_node_total_region(@root_node)
+        --total_region\translate(-bbox[1] + padding, -bbox[2] + padding)
         -- TODO remove this when confident about the code
         -- Assert that our polygons fit within our created source map bounds:
         w, h = bbox[3] - bbox[1], bbox[4] - bbox[2] 
-        for polygon in *total_region.polygons
-            for {x, y} in *polygon
-                assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
-                assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
+        -- TODO DEBUG-ONLY CHECK Really make sure we are drawing in correct bounds
+        @for_all_nodes (node) =>
+            for region in *@_regions[node]
+                region\translate(-bbox[1] + padding, -bbox[2] + padding)
+                for polygon in *region.polygons
+                    for {x, y} in *polygon
+                        assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
+                        assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
+        print("WIDTH", w, "HEIGHT", h)
         @map = SourceMap.map_create {
             rng: @rng
             :label
@@ -161,16 +225,23 @@ MapCompiler = newtype {
             instances: {}
             :content 
         }
+        @fill_function()
+        @_recalculate_perimeter()
+
+    random_square: (area = nil) => 
+        return MapUtils.random_square(@map, area, {matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+    random_square_not_near_wall: (area = nil) =>
+        return MapUtils.random_square(@map, area, {matches_none: {Vaults.FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
 
     -- Creates @map, ready to be filled
-    _prepare: (args) => 
-        label = assert args.label, "Should have map 'label'"
+    prepare: (args) => 
+        label = assert (args.label or @label), "Should have map 'label'"
         padding = args.padding or 10
-        content = args.content or 0
+        content = args.content or (if rawget(self, 'tileset') then @tileset.wall else 0)
         @_prepare_map_topology(@root_node)
         return @_prepare_source_map(label, padding, content)
     -- Creates a game map
-    compile: () =>
+    compile: (C) =>
         return Map.create {
             map: @map
             label: @map.label

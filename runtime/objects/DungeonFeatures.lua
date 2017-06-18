@@ -204,7 +204,7 @@ function Chest:on_step()
             self.was_opened = true
             self.real_sprite = M._chest_open
             for _, content in ipairs(self.contents) do
-                ObjectUtils.spawn_item_near(self, content.type, content.amount, --[[Avoid self]] true)
+                ObjectUtils.spawn_item_near(self, content.type, content.amount or 1, --[[Avoid self]] true)
             end
             play_sound "sound/inventory_sound_effects/metal-clash.ogg"
             break
@@ -222,7 +222,6 @@ function Chest:init(args)
     -- Check contents arg:
     for _, content in ipairs(args.contents) do
         assert(content.type)
-        assert(content.amount)
     end
     self.contents = args.contents
     self.depth = M.FEATURE_DEPTH

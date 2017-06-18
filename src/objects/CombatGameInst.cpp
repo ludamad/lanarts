@@ -490,7 +490,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
     int range = pentry.range();
 
     bool has_greater_fire = (effects.get_active("AmuletGreaterFire") != NULL);
-    bool is_spread_spell = pentry.name == "Mephitize" || pentry.name == "Red Dragon Projectile";
+    bool is_spread_spell = pentry.name == "Mephitize" || pentry.name == "Purple Dragon Projectile";
     if (is_spread_spell || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt")) {
           float vx = 0, vy = 0;
           ::direction_towards(Pos {x, y}, p, vx, vy, 10000);

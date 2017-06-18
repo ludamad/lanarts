@@ -130,9 +130,10 @@ function M.spawn_decoration(map, sprite, sqr, frame, solid)
         xy = M.from_tile_xy(sqr),
         type = DungeonFeatures.Decoration,
         sprite = sprite,
-        frame = frame,
-        solid=solid
+        frame = frame
     } 
+    if solid then
+    end
     table.insert(map.instances, object)
     return object
 end

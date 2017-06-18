@@ -14,11 +14,17 @@ MapRegion = newtype {
     apply: (args) =>
         {:map, :area, :operator} = args
         for polygon in *@polygons
+            for {x,y} in *polygon
+                assert x > 5 and y > 5
+                assert x < map.size[1] - 5 and y < map.size[2] - 5
             SourceMap.polygon_apply {
                 :map, :area, :operator
                 points: polygon
             }
         for {:polygon} in *@tunnels
+            for {x,y} in *polygon
+                assert x > 5 and y > 5
+                assert x < map.size[1] - 5 and y < map.size[2] - 5
             SourceMap.polygon_apply {
                 :map, :area, :operator
                 points: polygon
@@ -49,8 +55,12 @@ combine_map_regions = (regions) ->
 map_regions_bbox = (regions) ->
     x1,y1 = math.huge, math.huge
     x2,y2 = -math.huge, -math.huge
-    for {:polygons} in *regions
+    for {:polygons, :tunnels} in *regions
         for polygon in *polygons
+            for {x, y} in *polygon
+                x1, y1 = math.min(x1, x), math.min(y1, y)
+                x2, y2 = math.max(x2, x), math.max(y2, y)
+        for {:polygon} in *tunnels
             for {x, y} in *polygon
                 x1, y1 = math.min(x1, x), math.min(y1, y)
                 x2, y2 = math.max(x2, x), math.max(y2, y)

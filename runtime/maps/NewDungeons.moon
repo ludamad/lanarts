@@ -197,6 +197,8 @@ M.make_dungeon_template = (data) -> table.merge {
         @connector.post_connect(game_map)
 }, data
 
+-- Requires a 'types' object of the form
+-- { on_generate = func, on_finish = func, up = {n_portals, sprite, connect}, down = {n_portals, sprite, connect}
 M.make_connector = (types) ->
     placed_portals = {}
     on_generate = types.on_generate

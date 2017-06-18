@@ -2,6 +2,7 @@ Map = require "core.Map"
 ObjectUtils = require "objects.ObjectUtils"
 EventLog = require "ui.EventLog"
 DataW = require "DataWrapped"
+World = require "core.World"
 
 -- ELEMENTAL ENEMIES --
 
@@ -361,7 +362,45 @@ DataW.enemy_create {
     }
     effects_active: {"Enraging"}
 }
- 
+  
+DataW.enemy_create {
+    name: "Purple Dragon"
+    appear_message: "A frighteningly large purple dragon comes into view!"
+    defeat_message: "You have slain the purple dragon!"
+    sprite: "purple dragon"
+    radius: 27
+    xpaward: 150
+    unique: true
+    stats: {
+        hp: 220
+        hpregen: 0.1
+        movespeed: 2.5
+        strength: 10
+        magic: 10
+        defence: 15
+        willpower: 15
+    }
+    projectile: {
+        weapon_class: "magic"
+        can_wall_bounce: true
+        damage_type: {magic: 0.5, physical: 0.5}
+        range: 1150 * 4
+        radius: 11
+        power: {base: {10, 10}}
+        cooldown: 200
+        speed: 8
+        spr_attack: "large fire"
+    }
+    death_func: () =>
+        ItemUtils = require "maps.ItemUtils"
+        ItemGroups = require "maps.ItemGroups"
+        ObjectUtils.spawn_item_near(@, 'Dragon Lanart', 1)
+        -- Spawn level 1 randarts scaling to #players:
+        for i=1,#World.players
+            {:type, :amount} = ItemUtils.randart_generate(1)
+            ObjectUtils.spawn_item_near(@, type, amount)
+}
+
 DataW.enemy_create {
     name: "Red Dragon"
     appear_message: "A frighteningly large red dragon comes into view!"

@@ -48,6 +48,24 @@ Data.item_create {
 }
 
 Data.item_create {
+    name = "Magentite Key",
+    description = "Now that you have picked up this key, you can open Magentite doors.",
+    type = "key",
+    spr_item = "spr_keys.magentite_key",
+    pickup_func = function(self, user)
+        if not GlobalData.keys_picked_up[self.name] then
+            play_sound "sound/win sound 2-1.ogg"
+        end
+        GlobalData.keys_picked_up[self.name] = true 
+    end,
+    prereq_func = function (self, user)
+        return false
+    end,
+    sellable = false,
+    stackable = false
+}
+
+Data.item_create {
     name = "Burgundite Key",
     description = "Now that you have picked up this key, you can open Burgundite doors.",
     type = "key",
