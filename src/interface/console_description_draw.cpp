@@ -109,7 +109,7 @@ public:
 		int row = draw_index / cols_per_row;
 		draw_index++;
 
-		return Pos(SX + xinterval * col, SY + yinterval * row);
+                return Pos(bbox.x1 + SX + xinterval * col, bbox.y1 + SY + yinterval * row);
 	}
 private:
 	int cols_per_row;
@@ -121,7 +121,7 @@ private:
 
 static void draw_base_entry_overlay(GameState* gs, ResourceEntryBase& entry) {
 	GameTextConsole& console = gs->game_console();
-	BBox bbox(console.bounding_box());
+        BBox bbox(console.bounding_box());
 	int descriptxoff = TILE_SIZE * 1.25;
 	int itemoffset = draw_icon_and_name(gs, entry, Colour(), bbox.x1 + 4,
 			bbox.y1 + 4, TILE_SIZE * 1.25 - 4, TILE_SIZE / 4);
@@ -388,6 +388,7 @@ void draw_console_enemy_description(GameState* gs, EnemyEntry& entry) {
 	console.draw_box(gs);
 	draw_base_entry_overlay(gs, entry);
 	CoreStats& ecore = entry.basestats.core;
+
 	DescriptionBoxHelper dbh(console.bounding_box());
 	draw_value(gs, dbh, "HP: ", ecore.hp, COL_PALE_YELLOW, COL_PALE_RED);
 	draw_value(gs, dbh, "Strength: ", ecore.strength, COL_PALE_YELLOW,
@@ -412,7 +413,15 @@ void draw_console_item_description(GameState* gs, const Item& item,
 	}
 	console.draw_box(gs);
 	draw_base_entry_overlay(gs, entry);
-	DescriptionBoxHelper dbh(console.bounding_box());
+
+        // Hackishly position the content where it should be:
+        BBox window_region = gs->screens.window_region();
+        //gs->game_chat().add_message(format("Window region %d, %d", window_region.x1, window_region.y1),
+        //                COL_PALE_RED);
+        BBox bbox = console.bounding_box();
+        //bbox.translate(window_region.x1, window_region.y1);
+	DescriptionBoxHelper dbh(bbox);
+	//DescriptionBoxHelper dbh(console.bounding_box());
 
 	if (is_item_projectile(entry)) {
 		draw_projectile_description_overlay(gs, dbh, item);
