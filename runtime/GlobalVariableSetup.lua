@@ -52,10 +52,6 @@ return function(--[[Optional]] dont_load_draw_globals)
     require "ltn12"
     require "mime"
 
-    log "Preload legacy internal modules that set globals (and need refactoring to not):"
-
-    require "effects.Effects"
-
     log "Assigning, in effect declaring, global variables used by the engine."
     items = false
     spells = false

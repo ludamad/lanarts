@@ -8,11 +8,12 @@ Data.projectile_create {
     spr_item = "none"
 }
 
-Data.projectile_create {
+DataW.projectile_create {
     name = "Arrow",
     shop_cost = {2,3},
     description = "A trusty arrow, for use with a bow.",
     weapon_class = "bows",
+    types = {"Piercing"},
     spr_item = "arrow_item",
     spr_attack = "arrow_projectile",
     -- Stats
@@ -20,11 +21,12 @@ Data.projectile_create {
     speed = 6.75
 }
 
-Data.projectile_create {
+DataW.projectile_create {
     name = "Silver Arrow",
     shop_cost = {3,4},
     description = "A deadly silver arrow.",
     weapon_class = "bows",
+    types = {"Piercing"},
     spr_item = "stone_arrow_item",
     spr_attack = "stone_arrow_projectile",
     -- Stats
@@ -36,11 +38,12 @@ Data.projectile_create {
     speed = 7
 }
 
-Data.projectile_create {
+DataW.projectile_create {
     name = "Stone",
     shop_cost = {2,2},
     description = "A fist sized stone, good for throwing.",
     weapon_class = "unarmed",
+    types = {"Bludgeon"},
     spr_item = "stone",
     drop_chance = 90, -- % chance
     -- Stats
@@ -63,10 +66,10 @@ DataW.weapon_create {
     name = "Dagger",
     description = "A short, swift, pointy blade.",
     type = "short blades",
+    types = {"Slashing"},
 
     shop_cost = {0,0},
     spr_item = "spr_weapons.dagger",
-    randart_sprites = {"spr_weapons.randart_dagger1", "spr_weapons.randart_dagger2"},
 
     cooldown = 35,
 
@@ -78,11 +81,11 @@ DataW.weapon_create {
     name = "Short Sword",
     description = "An easy-to-wield short sword.",
     type = "short blades",
+    types = {"Slashing"},
 
     shop_cost = {20, 35},
 
     spr_item = "spr_weapons.short_sword1",
-    randart_sprites = {"spr_weapons.randart_short_sword1", "spr_weapons.randart_short_sword2"},
 
     --stat_bonuses = {
     --    strength = 1
@@ -113,10 +116,12 @@ DataW.weapon_create {
     description = "A magical staff that gives MP back for every kill.",
     type = "staves",
 
+    types = {
+        "Bludgeon"
+    },
     shop_cost = {75, 105},
 
     spr_item = "spr_weapons.staff",
-    randart_sprites = {"spr_weapons.staff_mummy"},
 
     cooldown = 40,
     range = 7,
@@ -129,6 +134,9 @@ DataW.weapon_create {
     type = "staves",
 
     shop_cost = {125, 255},
+    types = {
+        "Bludgeon"
+    },
 
     spr_item = "epic staff",
     
@@ -145,6 +153,7 @@ DataW.weapon_create {
     name = "Serated Sword",
     description = "A cruel jagged sword.",
     type = "short blades",
+    types = {"Slashing"},
 
     shop_cost = {100, 160},
 
@@ -158,8 +167,9 @@ DataW.weapon_create {
 
 DataW.weapon_create {
     name = "Iron Broadsword",
-    description = "Long and Heavy, but effective.",
+    description = "Long and heavy, but effective.",
     type = "blades",
+    types = {"Slashing"},
 
     shop_cost = {70, 100},
 
@@ -178,6 +188,9 @@ DataW.weapon_create {
     description = "A club owned by Gragh, embued with his life force as he died. Has a chance of knocking back enemies on hit. Regains health on kill.",
     type = "axes and maces",
 
+    types = {
+        "Bludgeon"
+    },
     shop_cost = {350, 500},
 
     spr_item = "spr_weapons.giant_club2",
@@ -196,11 +209,11 @@ DataW.weapon_create {
     name = "Mace",
     description = "A large, strong mace.",
     type = "axes and maces",
+    types = {"Bludgeon"},
 
     shop_cost = {35, 50},
 
     spr_item = "mace",
-    randart_sprites = {"spr_weapons.randart_mace1", "spr_weapons.randart_mace2", "spr_weapons.randart_mace3"},
 
     cooldown = 55,
 
@@ -211,6 +224,7 @@ DataW.weapon_create {
     name = "Magic Sword",
     description = "An enchanted sword that saps your mana reserves, but does greater damage.",
     type = "short blades",
+    types = {"Slashing"},
 
     shop_cost = {75, 95},
 
@@ -271,6 +285,9 @@ DataW.weapon_create {
     description = "An axe built by fierce orcs.",
     type = "axes and maces",
 
+    types = {
+        "Bludgeon"
+    },
     shop_cost = {100, 120},
 
     spr_item = "orc axe",
@@ -284,6 +301,7 @@ DataW.weapon_create {
     name = "Iron Scimitar",
     description = "A scimitar of iron, slices quickly and efficiently.",
     type = "blades",
+    types = {"Slashing"},
 
     shop_cost = {100, 150},
 
@@ -303,12 +321,12 @@ DataW.weapon_create {
     description = "A handy small bow.",
     type = "bows",
 
+    -- Arrows are piercing, no types here
     shop_cost = {10, 20},
 
     spr_item = "bow1",
 
     uses_projectile = true,
-    randart_sprites = {"spr_weapons.randart_shortbow"},
 
     cooldown = 50,
 
@@ -320,12 +338,12 @@ DataW.weapon_create {
     description = "A powerful long-bow.",
     type = "bows",
 
+    -- Arrows are piercing, no types here
     shop_cost = {95, 125},
 
     spr_item = "long bow",
 
     uses_projectile = true,
-    randart_sprites = {"spr_weapons.urand_krishna", "spr_weapons.longbow3"},
 
     cooldown = 55,
 
@@ -377,6 +395,7 @@ DataW.weapon_create {
 
     spr_item = "none",
 
+    types = {"Bludgeon"}, 
     damage = {base = {2, 5}, strength = 1.5},
     power = {base = 2, strength = 0.3},
 
@@ -393,6 +412,7 @@ DataW.weapon_create {
     spr_item = "none",
 
 
+    types = {"Bludgeon"}, 
     damage = {base = {2, 5}, strength = 1},
     power = {base = 0, strength = 0.2},
 
@@ -407,6 +427,7 @@ DataW.weapon_create {
 
     spr_item = "none",
 
+    types = {"Bludgeon"}, 
     damage_type = {magic = 0.5, physical = 0.5},
 
     damage = {base = {2, 5}, strength = 1},
@@ -423,6 +444,7 @@ DataW.weapon_create {
 
     spr_item = "none",
 
+    types = {"Bludgeon"}, 
     damage_type = {magic = 0.5, physical = 0.5},
 
     damage = {base = {2, 5}, strength = 0.5},
@@ -440,6 +462,7 @@ DataW.weapon_create {
 
     spr_item = "none",
 
+    types = {"Bludgeon"}, 
     damage = {base = {2, 5}, strength = 0.5},
     power = {base = 0, strength = 0.2},
 
@@ -454,6 +477,7 @@ DataW.weapon_create {
 
     spr_item = "none",
 
+    types = {"Bludgeon"}, 
     damage_type = {magic = 0.5, physical = 0.5},
     damage = {base = {2, 5}, strength = 0.5},
     power = {base = 0, strength = 0.2},

@@ -122,8 +122,17 @@ add_types = (args, types) ->
             log_verbose "APPLYING TYPE POWER #{type}"
             atkstats.power += EffectUtils.get_power(obj, type)
 
+power_effects = (powers, effects = {}) ->
+    for type, power in pairs powers
+        if power == 0 -- Special case for simplifying code-generated content
+            continue
+        append effects, {"#{type}Power", {:power}}
+    return effects
+
 resistance_effects = (resists, effects = {}) ->
     for type, resist in pairs resists
+        if resist == 0 -- Special case for simplifying code-generated content
+            continue
         append effects, {"#{type}Resist", {:resist}}
     return effects
 
@@ -165,17 +174,18 @@ spell_create = (args) ->
     Data.spell_create(args)
 
 projectile_create = (args, for_enemy = false) -> 
-    damage_multiplier = args.damage_multiplier or 1.0
-    damage = damage_multiplier * (args.cooldown / 60 * STANDARD_WEAPON_DPS)
-    if for_enemy
-        -- For enemies, we want all damage to come from 'damage'.
-        -- The strength and magic stats work differently for enemies thusly.
-        args.power or= {base: {0, 0}}
-        args.damage or= {base: {0, 0}, strength: args.damage_type.physical, magic: args.damage_type.magic}
-    else
-        --damage = damage_multiplier * (args.cooldown / 60 * args.damage)
-        args.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
-        args.power or= {base: {0, 0}, strength: args.damage_type.physical, magic: args.damage_type.magic}
+    if args.cooldown
+        damage_multiplier = args.damage_multiplier or 1.0
+        damage = damage_multiplier * (args.cooldown / 60 * STANDARD_WEAPON_DPS)
+        if for_enemy
+            -- For enemies, we want all damage to come from 'damage'.
+            -- The strength and magic stats work differently for enemies thusly.
+            args.power or= {base: {0, 0}}
+            args.damage or= {base: {0, 0}, strength: args.damage_type.physical, magic: args.damage_type.magic}
+        else
+            --damage = damage_multiplier * (args.cooldown / 60 * args.damage)
+            args.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
+            args.power or= {base: {0, 0}, strength: args.damage_type.physical, magic: args.damage_type.magic}
     args.spr_item or= "none"
     args.range or= 300
     if args.types ~= nil
@@ -202,4 +212,4 @@ enemy_create = (args) ->
         resistance_effects(args.resistances, args.effects_active)
     Data.enemy_create(args)
 
-return {:additive_effect_create, :effect_create, :weapon_create, :spell_create, :projectile_create, :enemy_create, :resistance_effects}
+return {:additive_effect_create, :effect_create, :weapon_create, :spell_create, :projectile_create, :enemy_create, :resistance_effects, :power_effects, :add_types}

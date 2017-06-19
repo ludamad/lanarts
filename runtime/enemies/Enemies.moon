@@ -599,6 +599,7 @@ DataW.enemy_create {
     projectile: {
         weapon_class: 'bows'
         damage_type: {physical: 1.0}
+        types: {"Piercing"}
         cooldown: 30
         speed: 9
         power: {base: {15, 15}}
@@ -627,6 +628,7 @@ DataW.enemy_create {
         weapon_class: 'bows'
         damage_type: {physical: 1.0}
         cooldown: 30
+        types: {"Piercing", "Poison"}
         speed: 9
         spr_attack: 'nessos arrows'
         on_hit_func: (target, atkstats) =>
@@ -663,6 +665,7 @@ DataW.enemy_create {
         cooldown: 20
         speed: 9
         spr_attack: 'nessos arrows'
+        types: {"Piercing", "Poison"}
         on_hit_func: (target, atkstats) =>
             if chance(.25) -- TODO poison resistance
                 effect = target\add_effect("Poison", 100, atkstats)
@@ -691,6 +694,7 @@ DataW.enemy_create {
     }
    projectile: {
        weapon_class: "magic"
+       types: {"Fire"}
        damage_type: {magic: 0.5, physical: 0.5}
        range: 250
        radius: 11
@@ -722,6 +726,7 @@ DataW.enemy_create {
         weapon_class: "magic"
         damage_type: {magic: 1.0}
         range: 130
+        types: {"Storm"}
         cooldown: 45
         speed: 7
         spr_attack: "storm bolt"
@@ -748,6 +753,7 @@ DataW.enemy_create {
         weapon_class: "magic"
         damage_type: {magic: 1.0}
         range: 130
+        types: {"Storm"}
         cooldown: 45
         speed: 7
         spr_attack: "storm bolt"
@@ -773,6 +779,7 @@ DataW.enemy_create {
     projectile: {
         weapon_class: "magic"
         damage_type: {magic: 1.0}
+        types: {"Storm"}
         range: 130
         cooldown: 45
         speed: 7
@@ -832,6 +839,7 @@ DataW.enemy_create {
     projectile: {
         weapon_class: "magic"
         damage_type: {magic: 0.5, physical: 0.5}
+        types: {"Fire"}
         range: 96
         radius: 11
         power: {base: {10, 10}}
@@ -852,6 +860,7 @@ DataW.enemy_create {
     xpaward: 8
     appear_message: "A hungry giant bat surveys the scene."
     defeat_message: "The giant bat has died."
+    weapon: {cooldown: 25, types: {"Bludgeon"}}
     stats: {
         attacks: { {weapon: "Fast Melee"} }
         hp: 18
@@ -860,6 +869,9 @@ DataW.enemy_create {
         strength: 10
         defence: 5
         willpower: 5
+    }
+    resistances: {
+        Poison: 3
     }
 }
  
@@ -871,14 +883,17 @@ DataW.enemy_create {
     xpaward: 10
     appear_message: "A demonic tarantella crawls towards you!"
     defeat_message: "The demonic tarantella has been squashed."
+    weapon: {cooldown: 25, types: {"Poison", "Bludgeon"}}
     stats: {
-        attacks: { {weapon: "Fast Melee"} }
         hp: 65
         hpregen: 0.04
         movespeed: 4.5
         strength: 25
         defence: 12
         willpower: 10
+    }
+    resistances: {
+        Poison: 3
     }
 }
  
@@ -890,14 +905,17 @@ DataW.enemy_create {
     xpaward: 10
     appear_message: "A giant spider crawls towards you!"
     defeat_message: "The giant spider has been squashed."
+    weapon: {cooldown: 25, types: {"Poison", "Bludgeon"}}
     stats: {
-        attacks: { {weapon: "Fast Melee"} }
         hp: 15
         hpregen: 0.04
         movespeed: 4
         strength: 12
         defence: 4
         willpower: 10
+    }
+    resistances: {
+        Poison: 3
     }
 }
        
@@ -909,14 +927,18 @@ DataW.enemy_create {
     xpaward: 10
     appear_message: "A hungry, feral hound notices you."
     defeat_message: "The hound yelps as it is pulverized."
+    weapon: {cooldown: 40, types: {"Bludgeon"}}
     stats: {
-        attacks: { {weapon: "Basic Melee"} }
         hp: 25
         hpregen: 0.03
         movespeed: 2.5
         strength: 12
         defence: 5
         willpower: 5
+    }
+    resistances: {
+        Fire: -1
+        Ice: -1
     }
 }
        
@@ -928,8 +950,8 @@ DataW.enemy_create {
     xpaward: 30
     appear_message: "A hydra appears!"
     defeat_message: "The hydra is vanquished."
+    weapon: {cooldown: 40, types: {"Poison", "Bludgeon"}}
     stats: {
-        attacks: { {weapon: "Basic Melee"} }
         hp: 100
         hpregen: 0.05
         movespeed: 3.0
@@ -937,7 +959,15 @@ DataW.enemy_create {
         defence: 20
         willpower: 15
     }
+    effects_active: {
+        {"PoisonedWeapon", {poison_percentage: 0.25}}
+    }
+    resistances: {
+        Fire: -1
+        Poison: 3
+    }
 }
+
 DataW.enemy_create {
     name: "Giant Frog"
     sprite: "giant frog"
@@ -946,6 +976,7 @@ DataW.enemy_create {
     xpaward: 10
     appear_message: "A giant frog hops onto the scene."
     defeat_message: "The giant frog dies!"
+    weapon: {cooldown: 40, types: {"Bludgeon"}}
     stats: {
         attacks: { {weapon: "Slow Melee"} }
         hp: 25
@@ -954,6 +985,9 @@ DataW.enemy_create {
         strength: 12
         defence: 5
         willpower: 5
+    }
+    resistances: {
+        Poison: 1
     }
 }
            
@@ -966,7 +1000,7 @@ DataW.enemy_create {
     kills_before_stale: 100
     appear_message: "An adder slithers onto the scene! "
     defeat_message: "The adder is dead. "
-    weapon: {cooldown: 20, damage: 11}
+    weapon: {cooldown: 20, types: {"Piercing", "Poison"}, damage: 11}
     stats: {
         hp: 20
         hpregen: 0.04
@@ -974,6 +1008,9 @@ DataW.enemy_create {
         strength: 3
         defence: 0
         willpower: 0
+    }
+    resistances: {
+        Poison: 1
     }
 }
          
@@ -985,7 +1022,7 @@ DataW.enemy_create {
     xpaward: 15
     appear_message: "A hostile chicken appears!"
     defeat_message: "The chicken may as well be fried."
-    weapon: {cooldown: 20, damage: 11}
+    weapon: {cooldown: 20, types: {"Bludgeon"}, damage: 11}
     stats: {
         hp: 25
         hpregen: 0.04
@@ -1004,8 +1041,8 @@ DataW.enemy_create {
     xpaward: 15
     appear_message: "A horse comes at full gallop!"
     defeat_message: "The horse is beaten."
+    weapon: {cooldown: 30, types: {"Bludgeon"}}
     stats: {
-        attacks: { {weapon: "Basic Melee"} }
         hp: 35
         hpregen: 0.02
         movespeed: 5
@@ -1043,7 +1080,7 @@ DataW.enemy_create {
     xpaward: 10
     appear_message: "A re-animated skeleton appears!"
     defeat_message: "The skeleton is broken unto a pile of bones."
-    weapon: {cooldown: 40, damage: 12}
+    weapon: {cooldown: 40, damage: 12, types: {"Bludgeon"}}
     stats: {
         hp: 50
         hpregen: 0
@@ -1062,7 +1099,7 @@ DataW.enemy_create {
     xpaward: 30
     appear_message: "A re-animated skeleton appears!"
     defeat_message: "The skeleton is broken unto a pile of bones."
-    weapon: {cooldown: 40, damage: 20}
+    weapon: {cooldown: 40, damage: 25, types: {"Bludgeon"}}
     stats: {
         hp: 75
         hpregen: 0.05
@@ -1082,7 +1119,7 @@ DataW.enemy_create {
     defeat_message: "The zombie is beaten into a mess of flesh."
     radius: 14
     xpaward: 25
-    weapon: {cooldown: 60, damage: 20}
+    weapon: {cooldown: 60, damage: 25, types: {"Bludgeon"}}
     stats: {
         hp: 40
         hpregen: 0.05
@@ -1103,7 +1140,7 @@ DataW.enemy_create {
     defeat_message: "The krell dies at last."
     radius: 14
     xpaward: 30
-    weapon: {cooldown: 60, damage: 35}
+    weapon: {cooldown: 60, damage: 35, types: {"Bludgeon"}}
     stats: {
         hp: 35
         hpregen: 0.25
@@ -1236,6 +1273,7 @@ DataW.enemy_create {
         damage_type: {magic: 0.5, physical: 0.5}
         range: 250
         radius: 11
+        types: {"Fire"}
         cooldown: 40
         speed: 8
         spr_attack: "large fire"

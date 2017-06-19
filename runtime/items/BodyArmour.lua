@@ -7,7 +7,6 @@ Data.equipment_create {
 
     spr_item = "leather armour",
     randart_weight = 100,
-    randart_sprites = {"spr_armour.leather_armour3"},
 
     spell_cooldown_multiplier = 1.1,
 
@@ -25,7 +24,6 @@ Data.equipment_create {
     randart_weight = 20,
 
     spr_item = "spr_armour.chain_mail1",
-    randart_sprites = {"spr_armour.chain_mail2", "spr_armour.chain_mail3"},
 
     spell_cooldown_multiplier = 1.15,
 
@@ -41,8 +39,6 @@ Data.equipment_create {
     description = "An armour made of heavy but magically unburdensome crystals. Slows down movement speed considerably.",
     type = "armour",
 
-    randart_sprites = {"spr_armour.crystal_plate3"},
-    randart_weight = 1,
     shop_cost = {295,305},
 
     spr_item = "spr_armour.crystal_plate2",
@@ -59,8 +55,6 @@ Data.equipment_create {
     description = "A strong, heavy armour.",
     type = "armour",
 
-    randart_sprites = {"spr_armour.randart_plate"},
-    randart_weight = 1,
     shop_cost = {95,105},
 
     spr_item = "platemail",
@@ -78,10 +72,8 @@ Data.equipment_create {
     name = "Robe",
     description = "A lightly protective, uninhibited robe.",
     type = "armour",
-    randart_weight = 100,
 
     shop_cost = {10,20},
-    randart_sprites = {"spr_armour.randart_robe1", "spr_armour.randart_robe2"},
 
     spr_item = "robe",
 

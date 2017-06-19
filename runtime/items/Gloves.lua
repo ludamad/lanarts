@@ -20,7 +20,6 @@ Data.equipment_create {
     shop_cost = { 55, 75 },
 
     spr_item = "steel gloves",
-    randart_sprites = {"spr_armour.randart_glove1", "spr_armour.randart_glove2", "spr_armour.randart_glove3", "spr_armour.randart_glove4"},
     stat_bonuses = { 
         defence = 2,
     },
@@ -38,7 +37,6 @@ Data.equipment_create {
     stat_bonuses = { 
         defence = 1,
     },
-    --randart_sprites = {"spr_armour.gloves_confusion_randart"},
     effects_granted = {"ConfusingWeapon"}
 }
 
@@ -53,7 +51,6 @@ Data.equipment_create {
         defence = 1,
     },
     spr_item = "spr_armour.gloves_fear",
-    --randart_sprites = {"spr_armour.gloves_fear_randart"},
     effects_granted = {"FearWeapon"}
 }
 

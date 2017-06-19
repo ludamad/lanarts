@@ -3,6 +3,8 @@ TYPE_POWER_EFFECT = {}
 TYPES = {
     "Poison"
     "Fire"
+    "Ice"
+    "Storm"
     "Slashing"
     "Piercing"
     "Bludgeon"
@@ -42,4 +44,4 @@ get_resistance = (obj, type) ->
         else
             error("Out of range resist value #{resist}")
 
-return {:get_effect_stat, :get_resistance, :get_power}
+return {:get_effect_stat, :get_resistance, :get_power, :TYPES}

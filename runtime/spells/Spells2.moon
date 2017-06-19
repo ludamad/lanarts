@@ -35,6 +35,7 @@ DataW.spell_create {
     mp_cost: 20
     projectile: {
         speed: 7.25
+        types: {"Piercing"}
         spr_attack: "crystal spear"
         range: 150
         speed: 9
@@ -70,6 +71,7 @@ DataW.spell_create {
     projectile: {
         speed: 2
         cooldown: 105
+        types: {"Poison"}
         on_hit_func: (target, atkstats) =>
             effect = target\add_effect("Poison", 100) 
             effect.damage = atkstats.damage 
@@ -114,6 +116,21 @@ DataW.spell_create {
     cooldown: 35
 }
 
+-- COLD BOLT
+DataW.spell_create {
+    name: "Cold Bolt",
+    spr_spell: "spr_effects.iceball",
+    description: "A short range frosty bolt of cold. Hits a single target.",
+    projectile: {
+        types: {"Ice"}
+        speed: 2
+        range: 100
+        damage_multiplier: 1.5
+    }
+    mp_cost: 20,
+    cooldown: 35
+}
+
 -- CHAIN LIGHTNING
 
 DataW.spell_create {
@@ -121,6 +138,7 @@ DataW.spell_create {
     description: "A slow, powerful blast of lightning. The blast can bounce off an enemy twice before dissipating.",
     spr_spell: "charge_effected",
     projectile: {
+        types: {"Storm"}
         speed: 4
         number_of_target_bounces: 3
     }
@@ -133,6 +151,7 @@ DataW.projectile_create {
     weapon_class: "magic"
     spr_spell: "spr_spells.skullthrow"
     range: 300
+    -- types: {"Dark"}
     damage_type: {magic: 0.5, physical: 0.5}
     speed: 7.25
     can_wall_bounce: true
@@ -149,6 +168,8 @@ DataW.projectile_create {
 DataW.spell_create {
     name: "Ludaze"
     spr_spell: "spr_spells.ludaze"
+    -- types: {"Dark"}
+    damage_type: {magic: 0.5, physical: 0.5}
     description: "Dazes and poisons all enemies in sight." 
     mp_cost: 25
     cooldown: 0
@@ -191,6 +212,7 @@ DataW.spell_create {
     description: "Initiates Ice Form, a powerful ability for safe dungeoneering, preventing attacks and spells, and lowering speed drastically, but providing near immunity for 10 seconds." 
     mp_cost: 40
     cooldown: 100
+    damage_type: {magic: 0.5, physical: 0.5}
     spell_cooldown: 1600
     can_cast_with_held_key: false
     fallback_to_melee: false

@@ -267,39 +267,7 @@ M.basic_items = {
     -- M.enchanted_items -- Chance of being moved up a category. See enchanted_items for the weight.
 }
 
-M.randart_items = {}
--- For the randart levels:
-for i=1,Randarts.MAX_POWER_LEVEL
-    item_table = {
-        ring: {randart_list: true, chance: 12}
-        legwear: {randart_list: true, chance: 3}
-        belt: {randart_list: true, chance: 3}
-        amulet: {randart_list: true, chance: 8}
-        boots: {randart_list: true, chance: 3}
-        helmet: {randart_list: true, chance: 3}
-        "short blades": {randart_list: true, chance: 5}
-        "staves": {randart_list: true, chance: 5}
-        "axes and maces": {randart_list: true, chance: 5}
-        armour: {randart_list: true, chance: 8}
-        bows: {randart_list: true, chance: 5}
-        projectile: {randart_list: true, chance: 5}
-        gloves: {randart_list: true, chance: 5}
-    }
-    for name in *Randarts.RANDARTS[i]
-        {:type} = items[name] or projectiles[name]
-        if not type
-            type = "projectile"
-        if not item_table[type]
-            pretty(items[name])
-            error("*** SHOULD HAVE '" .. type.. "' IN ITEM TABLE")
-            -- continue
-        --if type == "armour"
-        --    print(name)
-        append item_table[type], name
-    item_selection_list = (for k, v in pairs item_table do v)
-    for k,v in pairs item_table
-        assert(#v > 0, "Not enough " .. k)
-    append(M.randart_items, item_selection_list)
+M.randart_items = require("items.Randarts").RANDARTS
 
 M.epic_store_items = {
     consumables(40, ignore_weak: true)

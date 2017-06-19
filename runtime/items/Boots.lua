@@ -6,7 +6,6 @@ Data.equipment_create {
     shop_cost = { 15, 25 },
 
     spr_item = "spr_boots.boots1_brown",
-    randart_sprites = {"spr_boots.randart_leather_boots"},
 
     stat_bonuses = {
         defence = 1,

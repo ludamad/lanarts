@@ -48,7 +48,6 @@ function Engine.resources_load(...)
     end
 
     -- DO NOT mess with the order of these willy nilly.
-    _req "effects.Effects"
     _req "spells.Spells"
 
     _req "items.Items"
