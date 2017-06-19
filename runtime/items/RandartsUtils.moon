@@ -119,30 +119,52 @@ apply_core_stat_buff = () =>
         "magic"
     }
 
+_is_melee_weapon = () =>
+    return @base.cooldown ~= nil and @base.type ~= 'bows'
+
+_is_bow = () =>
+    return @base.cooldown ~= nil and @base.type == 'bows'
+
+_is_amulet = () =>
+    return @base.type == 'amulet'
+
+_is_jewellery = () =>
+    -- Very rarely, assign 'inappropriate' attributes
+    if @rng\randomf() < 0.01
+        return true
+    return @base.type == 'amulet' or @base.type == 'ring'
+
+_is_armour = () =>
+    -- Very rarely, assign 'inappropriate' attributes
+    if @rng\randomf() < 0.01
+        return true
+    return @base.type == 'belt' or @base.type == 'armour' or @base.type == 'gloves' or @base.type == 'legwear'
+
 apply_random_effect = () =>
-    if (@base.cooldown ~= nil) and @rng\randomf() < 0.001
+    if _is_jewellery(@) and @rng\randomf() < 0.01
         return @add_bonus "RandomSpell"
-    elseif  @rng\randomf() < 0.01
+    elseif _is_armour(@) and @rng\randomf() < 0.01
         return @add_bonus "Fortification"
-    elseif @rng\randomf() < 0.05
+    elseif _is_armour(@) and @rng\randomf() < 0.05
         return @add_bonus "Spiky"
-    elseif @rng\randomf() < 0.05
+    elseif _is_jewellery(@) and @rng\randomf() < 0.05
         return @add_bonus "PossiblySummonCentaurOnKill"
-    elseif @rng\randomf() < 0.05
+    elseif _is_jewellery(@) and @rng\randomf() < 0.05
         return @add_bonus "PossiblySummonGolemOnKill"
-    elseif @rng\randomf() < 0.1
+    elseif _is_jewellery(@) and @rng\randomf() < 0.1
         return @add_bonus "PossiblySummonStormElementalOnKill"
     else
-        effects = if @base.cooldown then {
+        effects = if _is_melee_weapon(@) then {
             "VampiricWeapon"
             "ConfusingWeapon"
             "PoisonedWeapon"
             "KnockbackWeapon"
         } else {}
         for type in *EffectUtils.TYPES
-            if type ~= "Slashing" -- Not used atm
+            if _is_armour(@) and type ~= "Slashing" and type ~= "Bludgeon" -- Only have piercing resist ATM
                 append effects, "#{type}Resist"
-            append effects, "#{type}Power"
+            if not _is_armour(@) and type ~= "Slashing" and type ~= "Bludgeon" and type ~= "Piercing"
+                append effects, "#{type}Power"
         effect = @rng\random_choice(effects)
         return @add_bonus effect
 

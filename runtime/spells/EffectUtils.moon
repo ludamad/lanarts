@@ -1,10 +1,11 @@
 TYPE_RESIST_EFFECT = {}
 TYPE_POWER_EFFECT = {}
 TYPES = {
-    "Poison"
-    "Fire"
-    "Ice"
-    "Storm"
+    "Red"
+    "Blue"
+    "Green"
+    "White"
+    "Black"
     "Slashing"
     "Piercing"
     "Bludgeon"
@@ -12,6 +13,40 @@ TYPES = {
 for type in *TYPES
     TYPE_RESIST_EFFECT[type] = "#{type}Resist"
     TYPE_POWER_EFFECT[type] = "#{type}POWER"
+
+get_monster_resistances = (types) ->
+    resists = {
+        "Red": 0
+        "Blue": 0
+        "Green": 0
+        "White": 0
+        "Black": 0
+        "Slashing": 0
+        "Piercing": 0
+        "Bludgeon": 0
+    }
+    for type in *types
+        if type == "Red"
+            resists.Red += 2
+            resists.Blue -= 1
+            resists.Piercing += 1
+        elseif type == "Black"
+            resists.Black += 2
+            resists.White -= 1
+            resists.Slashing += 1
+            resists.Piercing += 1
+        elseif type == "White"
+            resists.White += 2
+            resists.Black -= 1
+        elseif type == "Green"
+            resists.Bludgeon += 1
+            resists.Green += 2
+            resists.Red -= 1
+        elseif type == "Blue"
+            resists.Slashing += 1
+            resists.Green -= 1
+            resists.Blue += 2
+    return resists
 
 get_effect_stat = (obj, type, default = 0) ->
     assert(obj and type and default)
@@ -44,4 +79,4 @@ get_resistance = (obj, type) ->
         else
             error("Out of range resist value #{resist}")
 
-return {:get_effect_stat, :get_resistance, :get_power, :TYPES}
+return {:get_effect_stat, :get_resistance, :get_power, :TYPES, :get_monster_resistances}

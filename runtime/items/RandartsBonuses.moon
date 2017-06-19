@@ -100,7 +100,7 @@ for type in *TYPES
                 @resistances[type] += @rng\random(-1, 2)
     _EFFECT_BONUSES["#{type}Power"] = (level) =>
         for i=1,level
-            @powers[type] += @rng\random(-3,4)
+            @powers[type] += @rng\random(-2,3)
         @powers[type] = math.max(@powers[type], 0)
 
 _BONUSES = {}

@@ -199,6 +199,7 @@ enemy_create = (args) ->
         w.name or= args.name .. " Melee"
         w.type or= "unarmed"
         w.spr_item or= "none"
+        w.types or= args.types
         append args.stats.attacks, {weapon: w.name}
         weapon_create(w, true)
     p = args.projectile
@@ -206,7 +207,10 @@ enemy_create = (args) ->
         p.name or= args.name .. " Projectile"
         p.spr_item or= "none"
         append args.stats.attacks, {projectile: p.name}
+        p.types or= args.types
         projectile_create(p, true)
+    if args.resistances == nil and args.types ~= nil
+        args.resistances = EffectUtils.get_monster_resistances(args.types)
     if args.resistances ~= nil
         args.effects_active or= {}
         resistance_effects(args.resistances, args.effects_active)

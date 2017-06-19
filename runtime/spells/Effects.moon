@@ -242,10 +242,12 @@ M._fire_resist = tosprite("spr_effects.i-r-fire-big")
 M._ice_resist = tosprite("spr_effects.i-r-cold-big")
 M._generic_resist = tosprite("spr_effects.i-protection-big")
 M._poison_resist = tosprite("spr_effects.i-r-poison-big")
+M._black_resist = tosprite("spr_effects.black-resist")
 M._storm_resist = tosprite("spr_effects.shock-resist")
 
 M._fire_power = tosprite("spr_effects.i-fire-big")
 M._ice_power = tosprite("spr_effects.i-cold-big")
+M._black_power = tosprite("spr_effects.black-power")
 M._storm_power = tosprite("spr_effects.shock")
 M._generic_power = tosprite("spr_effects.sword")
 M._poison_power = tosprite("spr_effects.i-poison-big")
@@ -321,16 +323,16 @@ DataW.effect_create {
 }
 
 for {resist_sprite, power_sprite, type, color} in *{
-    {M._poison_resist, M._poison_power, "Poison", {226, 66, 244}}
-    {M._fire_resist, M._fire_power, "Fire", {244, 72, 66}}
-    {M._ice_resist, M._ice_power, "Ice", COL_WHITE}
-    {M._storm_resist, M._storm_power, "Storm", COL_BLUE}
+    {M._poison_resist, M._poison_power, "Green", {226, 66, 244}}
+    {M._fire_resist, M._fire_power, "Red", {244, 72, 66}}
+    {M._ice_resist, M._ice_power, "Blue", COL_WHITE}
+    {M._storm_resist, M._storm_power, "White", COL_BLUE}
+    {M._black_resist, M._black_power, "Black", COL_BLUE}
     -- Swords
     {M._generic_resist, M._generic_power, "Slashing", {66, 222, 188}}
     {M._generic_resist, M._generic_power, "Bludgeon", {66, 244, 194}}
     -- 
     {M._generic_resist, M._generic_power, "Piercing", {66, 244, 214}}
-    --{M._ice_resist, "IceResist", "Ice Resist"}
 } do
     color = COL_WHITE -- OVERRIDE HACK FOR NOW
     -- Simply a stat variable:
@@ -361,7 +363,7 @@ DataW.additive_effect_create {
     on_melee_func: (attacker, defender, damage, attack_stats) =>
         if defender\has_effect("Poison")
             return
-        resist = EffectUtils.get_resistance(defender, "Poison")
+        resist = EffectUtils.get_resistance(defender, "Green")
         poison_chance = @_get_value()
         if chance(poison_chance * resist)
             eff = defender\add_effect("Poison", 100)

@@ -54,7 +54,7 @@ DataW.spell_create {
     spr_spell: "fire ball",
     description: "A great, strong bolt of fire. Hits a single target.",
     projectile: {
-        types: {"Fire"}
+        types: {"Red"}
         speed: 5
         damage_multiplier: 2.00
     }
@@ -71,7 +71,7 @@ DataW.spell_create {
     projectile: {
         speed: 2
         cooldown: 105
-        types: {"Poison"}
+        types: {"Green"}
         on_hit_func: (target, atkstats) =>
             effect = target\add_effect("Poison", 100) 
             effect.damage = atkstats.damage 
@@ -107,7 +107,7 @@ DataW.spell_create {
     spr_spell: "fire bolt",
     description: "A fast bolt of fire. Hits a single target.",
     projectile: {
-        types: {"Fire"}
+        types: {"Red"}
         speed: 7
         damage_multiplier: 1.25
         spr_attack: "fire bolt"
@@ -122,7 +122,7 @@ DataW.spell_create {
     spr_spell: "spr_effects.iceball",
     description: "A short range frosty bolt of cold. Hits a single target.",
     projectile: {
-        types: {"Ice"}
+        types: {"Blue"}
         speed: 2
         range: 100
         damage_multiplier: 1.5
@@ -138,7 +138,7 @@ DataW.spell_create {
     description: "A slow, powerful blast of lightning. The blast can bounce off an enemy twice before dissipating.",
     spr_spell: "charge_effected",
     projectile: {
-        types: {"Storm"}
+        types: {"White"}
         speed: 4
         number_of_target_bounces: 3
     }
@@ -150,8 +150,8 @@ DataW.projectile_create {
     name: "Skullthrow"
     weapon_class: "magic"
     spr_spell: "spr_spells.skullthrow"
+    types: {"Black"}
     range: 300
-    -- types: {"Dark"}
     damage_type: {magic: 0.5, physical: 0.5}
     speed: 7.25
     can_wall_bounce: true
@@ -167,6 +167,7 @@ DataW.projectile_create {
 
 DataW.spell_create {
     name: "Ludaze"
+    types: {"Black"}
     spr_spell: "spr_spells.ludaze"
     -- types: {"Dark"}
     damage_type: {magic: 0.5, physical: 0.5}
@@ -208,6 +209,7 @@ DataW.spell_create {
 
 DataW.spell_create {
     name: "Ice Form"
+    types: {"Blue"}
     spr_spell: "spr_spells.iceform"
     description: "Initiates Ice Form, a powerful ability for safe dungeoneering, preventing attacks and spells, and lowering speed drastically, but providing near immunity for 10 seconds." 
     mp_cost: 40
@@ -234,6 +236,7 @@ DataW.spell_create {
 
 DataW.spell_create {
     name: "Baleful Regeneration",
+    types: {"Black"}
     spr_spell: "spr_spells.regeneration",
     description: "You tap into necromancy to very quickly bind your wounds, until your are fully healed or its power runs out. Takes longer to run out the more willpower you have.",
     -- TODO have an interface for displaying custom stats, -- description_draw_func ?? Maybe directly call the draw API, but have positioning handled.
@@ -265,6 +268,7 @@ DataW.spell_create {
 -- Requires kills from the necromancer, in the form of mana.
 DataW.spell_create {
     name: "Summon Dark Aspect",
+    types: {"Black"}
     spr_spell: "spr_spells.summon",
     description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower.",
     --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
@@ -317,6 +321,7 @@ DataW.spell_create {
 -- Dash Attack
 DataW.spell_create {
     name: "Dash Attack",
+    types: {"Green"}
     spr_spell: "expedite",
     description: "Dash in a straight line, hitting all enemies in your path. Stops if you hit a wall." -- Can still perform abilities while dashing.",
     --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
@@ -341,6 +346,7 @@ DataW.spell_create {
 -- Link of Loyalty
 DataW.spell_create {
     name: "Link of Loyalty",
+    types: {"Black"}
     spr_spell: "spr_spells.forgelink",
     description: "You summon a linked companion near an enemy, sending them to immediate combat but taking damage whenever they take damage. The type of companion depends on your amulet's summoning aspect.",
     mp_cost: 20
@@ -379,6 +385,7 @@ DataW.spell_create {
 -- TODO AOE link all enemies?
 DataW.spell_create {
     name: "Unlink",
+    types: {"Black"}
     spr_spell: "spr_spells.unlink",
     description: "You break the link with all life-linked monsters. Monsters you have summoned are returned to their domain. Heals a small amount of health per monster."
     mp_cost: 0
