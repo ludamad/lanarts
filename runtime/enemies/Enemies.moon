@@ -291,7 +291,7 @@ DataW.enemy_create {
         -- base stats:
         strength: 5
         defence: 0
-        magic: 17
+        magic: 25
         willpower: 0
     }
     effects_active: {

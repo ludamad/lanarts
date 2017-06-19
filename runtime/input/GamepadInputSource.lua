@@ -13,8 +13,9 @@ end
 local function lanarts_skew(dir) 
     local x, y = dir[1], dir[2]
     local mx = math.max(math.abs(x), math.abs(y))
+    local mag = math.min(1, math.sqrt(x*x + y*y))
     if mx == 0 then mx = 1 end
-    x, y = x / mx, y / mx
+    x, y = x / mx * mag, y / mx * mag
     x = math.min(math.max(-1, x), 1)
     y = math.min(math.max(-1, y), 1)
     return {x, y}
