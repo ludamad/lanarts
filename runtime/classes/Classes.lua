@@ -67,7 +67,7 @@ end
 
 Data.class_create {
     name = "Red Mage",
-    sprites = {"wizard3", "spr_enemies.humanoid.deep_elf_sorceror"},
+    sprites = {"spr_classes.red_mage1", "spr_classes.red_mage2"},
     available_spells = {
       { spell = "Minor Missile",
     	level_needed = 1 },
@@ -112,11 +112,11 @@ Data.class_create {
 
 Data.class_create {
     name = "Blue Mage",
-    sprites = {"spr_enemies.humanoid.deep_elf_high_priest", "spr_enemies.bosses.fannar"},
+    sprites = {"spr_classes.blue_mage1", "spr_classes.blue_mage2"},
     available_spells = {
       { spell = "Minor Missile",
     	level_needed = 1 },
-      { spell = "Cold Bolt",
+      { spell = "Water Bolt",
         level_needed = 1 },
       { spell = "Chain Lightning",
         level_needed = 2 },
@@ -155,7 +155,7 @@ Data.class_create {
 
 Data.class_create {
     name = "White Mage",
-    sprites = {"spr_enemies.bosses.jessica", "wizard2"},
+    sprites = {"spr_classes.white_mage1", "spr_classes.white_mage2"},
     available_spells = {
       { spell = "Minor Missile",
     	level_needed = 1 },

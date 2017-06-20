@@ -107,8 +107,8 @@ DataW.spell_create {
     name: "Fire Bolt",
     spr_spell: "fire bolt",
     description: "A fast bolt of fire. Hits a single target.",
+    types: {"Red"}
     projectile: {
-        types: {"Red"}
         speed: 7
         damage_multiplier: 1.25
         spr_attack: "fire bolt"
@@ -117,37 +117,31 @@ DataW.spell_create {
     cooldown: 35
 }
 
--- COLD BOLT
 DataW.spell_create {
-    name: "Cold Bolt",
-    spr_spell: "spr_effects.iceball",
+    name: "Water Bolt",
     description: "A short range frosty bolt of cold. Hits a single target.",
+    types: {"Blue"}
+    spr_spell: "spr_effects.waterbolt",
     projectile: {
-        types: {"Blue"}
-        speed: 2
-        range: 100
-        damage_multiplier: 1.5
+        speed: 5
+        damage_multiplier: 1.35
     }
-    mp_cost: 15,
+    mp_cost: 10,
     cooldown: 35
 }
 
 -- LIGHTNING BOLT
 DataW.spell_create {
     name: "Lightning Bolt",
-    spr_spell: "spr_effects.shock",
-    description: "A super fast projectile lightning attack. Weakens enemies to its effects upon successive hits.",
+    spr_spell: "spr_effects.lightningbolt",
+    description: "A super fast projectile lightning attack.",
+    types: {"White"}
     projectile: {
-        types: {"White"}
         speed: 9
-        can_wall_bounce: true
-        range: 900
-        damage_multiplier: 1.25
-        on_hit_func: (target, atkstats) =>
-            target\add_effect("WhiteResist", {resist: -1, time_left: 100})
+        damage_multiplier: 1.2
     }
-    mp_cost: 8,
-    cooldown: 45
+    mp_cost: 10,
+    cooldown: 35
 }
 
 

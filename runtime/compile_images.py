@@ -9,8 +9,34 @@ from collections import OrderedDict, defaultdict
 print "local Display = require 'core.Display'"
 print "local M = nilprotect {}"
 
-SPR_FOLDERS = ["spr_doors", "spr_keys", "spr_rings", "spr_weapons", "spr_armour", "spr_effects", "spr_spells", "spr_amulets", "spr_belts", "spr_legwear", "spr_boots", "spr_scrolls", "spr_runes", "spr_gates", "spr_enemies", "spr_enemies/undead", "spr_enemies/animals",
-        "spr_enemies/demons", "spr_enemies/humanoid", "spr_enemies/demonspawn", "spr_enemies/draco", "spr_enemies/dragons", "spr_enemies/bosses"]
+SPR_FOLDERS = [
+    "spr_classes", 
+    "spr_doors", 
+    "spr_keys", 
+    "spr_rings", 
+    "spr_weapons", 
+    "spr_armour", 
+    "spr_effects", 
+    "spr_spells", 
+    "spr_amulets", 
+    "spr_belts", 
+    "spr_legwear", 
+    "spr_boots", 
+    "spr_scrolls", 
+    "spr_runes", 
+    "spr_gates", 
+    "spr_enemies", 
+    "spr_enemies/undead", 
+    "spr_enemies/animals",
+    "spr_enemies/demons", 
+    "spr_enemies/humanoid", 
+    "spr_enemies/demonspawn", 
+    "spr_enemies/draco", 
+    "spr_enemies/dragons", 
+    "spr_enemies/bosses"
+]
+
+# Expand wherever a 'randarts' subfolder is present:
 for spr in SPR_FOLDERS:
     try:
         os.lstat(spr + "/randarts")
@@ -18,6 +44,7 @@ for spr in SPR_FOLDERS:
         SPR_FOLDERS.append(spr + "/randarts")
     except OSError:
         pass
+
 used_ids = defaultdict(lambda: None)
 resources = []
 for spr_folder in SPR_FOLDERS:
@@ -33,7 +60,11 @@ for spr_folder in SPR_FOLDERS:
         used_ids[id] = True
         full_id = spr_folder.replace('/', '.') + "." + id
         resources.append(full_id)
-        if len(filename.split(".")) > 2:
+        if len(filename.split(".")) > 3:
+            assert filename.split(".")[2] == "dir"
+            dims = filename.split(".")[1]
+            print "M['" + full_id + "'] = Display.directional_create(Display.images_load '" + filename + "%" + dims +"')"
+        elif len(filename.split(".")) > 2:
             dims = filename.split(".")[1]
             print "M['" + full_id + "'] = Display.animation_create(Display.images_load '" + filename + "%" + dims +"', 0.1)"
         else:

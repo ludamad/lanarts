@@ -164,6 +164,7 @@ spell_create = (args) ->
         proj.spr_attack or= args.spr_spell
         proj.cooldown or= args.cooldown
         proj.range or= 300
+        proj.types or= args.types
         proj.damage_type or= {magic: 1.0}
         proj.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
         proj.power or= {base: {0, 0}, magic: 1}
