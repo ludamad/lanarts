@@ -1,62 +1,62 @@
-local GamepadInputSource = newtype()
+local ProgrammableInputSource = newtype()
 
-local Gamepad = require "core.Gamepad"
 local GameActions = require "core.GameActions"
 local GameState = require "core.GameState"
 
-function GamepadInputSource:init(player)
+function ProgrammableInputSource:init(player)
     self.player = player
     self:reset()
 end
 
-function GamepadInputSource:move_direction()
+function ProgrammableInputSource:move_direction()
     return self.input.move_direction
 end
 
-function GamepadInputSource:should_explore()
+function ProgrammableInputSource:should_explore()
     return self.input.should_explore
 end
 
-function GamepadInputSource:use_item_slot()
+function ProgrammableInputSource:use_item_slot()
     return self.input.use_item_slot
 end
 
-function GamepadInputSource:use_spell_slot()
+function ProgrammableInputSource:use_spell_slot()
     return self.input.use_spell_slot
 end
 
-function GamepadInputSource:sell_item_slot()
-    error("TODO")
+function ProgrammableInputSource:sell_item_slot()
+    return self.input.sell_item_slot
 end
 
-function GamepadInputSource:should_shift_autotarget()
+function ProgrammableInputSource:should_shift_autotarget()
     return self.input.should_shift_autotarget
 end
 
-function GamepadInputSource:target_position()
+function ProgrammableInputSource:target_position()
     return self.input.target_position
 end
-function GamepadInputSource:should_use_weapon()
+function ProgrammableInputSource:should_use_weapon()
     return self.input.should_use_weapon
 end
-function GamepadInputSource:should_exit_game()
+function ProgrammableInputSource:should_exit_game()
     error("TODO")
 end
-function GamepadInputSource:set(key, val)
+function ProgrammableInputSource:set(key, val)
     self.input[key] = val
 end
-function GamepadInputSource:reset()
+function ProgrammableInputSource:reset()
     -- "Do nothing" state
     self.input = {
         move_direction = {0,0},
         should_explore = false,
         use_item_slot = -1,
+        sell_item_slot = -1,
         should_shift_autotarget = false, 
         target_position = {0,0},
         should_use_weapon = false,
         use_spell_slot = -1,
     }
 end
-function GamepadInputSource:poll_input()
+function ProgrammableInputSource:poll_input()
 end
-return GamepadInputSource
+return ProgrammableInputSource
