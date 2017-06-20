@@ -66,16 +66,104 @@ Data.class_create = function(data)
 end
 
 Data.class_create {
-    name = "Mage",
-    sprites = {"wizard", "wizard2"},
+    name = "Red Mage",
+    sprites = {"wizard3", "spr_enemies.humanoid.deep_elf_sorceror"},
     available_spells = {
       { spell = "Minor Missile",
     	level_needed = 1 },
-      { spell = "Chain Lightning",
-        level_needed = 2 },
       { spell = "Fire Bolt",
         level_needed = 1 },
+      { spell = "Chain Lightning",
+        level_needed = 2 },
       { spell = "Mephitize",
+        level_needed = 3 },
+      --{ spell = "Inner Fire", -- Makes fire bolt shoot in all directions
+      --  level_needed = 2 },
+      --{ 
+    },
+    start_stats = {
+        movespeed = 4,
+        hp = 100,
+        mp = 120,
+        hpregen = 2 / 60, -- Per 60 frames
+        mpregen = 4 / 60, -- Per 60 frames 
+        strength = 4,
+        defence = 4,
+        willpower = 7,
+        magic = 7,
+        equipment = {
+          gold = 0,
+          inventory = table.tconcat({
+             {item = "Mana Potion"},
+          }, TEST_INVENTORY)
+        }
+    },
+    gain_per_level = {
+        hp = 15,
+        mp = 20,
+        hpregen = 0.5 / 60, -- Per 60 frames
+        mpregen = 1 / 60, -- Per 60 frames
+        magic = 2,
+        strength = 1,
+        defence = 1,
+        willpower = 2
+    }
+}
+
+Data.class_create {
+    name = "Blue Mage",
+    sprites = {"spr_enemies.humanoid.deep_elf_high_priest", "spr_enemies.bosses.fannar"},
+    available_spells = {
+      { spell = "Minor Missile",
+    	level_needed = 1 },
+      { spell = "Cold Bolt",
+        level_needed = 1 },
+      { spell = "Chain Lightning",
+        level_needed = 2 },
+      { spell = "Mephitize",
+        level_needed = 3 },
+    },
+    start_stats = {
+        movespeed = 4,
+        hp = 100,
+        mp = 120,
+        hpregen = 2 / 60, -- Per 60 frames
+        mpregen = 4 / 60, -- Per 60 frames 
+        strength = 4,
+        defence = 4,
+        willpower = 7,
+        magic = 7,
+        equipment = {
+          gold = 0,
+          inventory = table.tconcat({
+             {item = "Mana Potion"},
+          }, TEST_INVENTORY)
+        }
+    },
+    gain_per_level = {
+        hp = 15,
+        mp = 20,
+        hpregen = 0.5 / 60, -- Per 60 frames
+        mpregen = 1 / 60, -- Per 60 frames
+        magic = 2,
+        strength = 1,
+        defence = 1,
+        willpower = 2
+    }
+}
+
+
+Data.class_create {
+    name = "White Mage",
+    sprites = {"spr_enemies.bosses.jessica", "wizard2"},
+    available_spells = {
+      { spell = "Minor Missile",
+    	level_needed = 1 },
+      { spell = "Lightning Bolt",
+        level_needed = 1 },
+      { spell = "Chain Lightning",
+        level_needed = 2 },
+      { spell = "Luminos",
         level_needed = 3 }
     },
     start_stats = {

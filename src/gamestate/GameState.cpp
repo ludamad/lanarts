@@ -122,7 +122,7 @@ void GameState::start_connection() {
                 n_extra_players -=1; // Remove one player if first player controller is desired
             }
             const char* classes[] = {
-                "Mage",
+                "White Mage",
                 "Fighter",
                 "Necromancer",
             };

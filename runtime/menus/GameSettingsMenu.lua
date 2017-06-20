@@ -290,7 +290,9 @@ local function class_choice_buttons_create()
     local font = MID_SETTINGS_FONT
 
     local buttons = { 
-        { "Mage", sprite_base .. "wizard.png"},
+        { "White Mage", sprite_base .. "wizard.png"},
+        { "Red Mage", sprite_base .. "wizard.png"},
+        { "Blue Mage", sprite_base .. "wizard.png"},
         { "Fighter", sprite_base .. "fighter.png"},
 --        { "Ranger", sprite_base .. "archer.png"},
         { "Necromancer", sprite_base .. "necromancer.png"},

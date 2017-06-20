@@ -116,7 +116,7 @@ function setup_start_menu()
         exit_menu()
         return
     elseif os.getenv("LANARTS_MAGE") then
-        settings.class_type = "Mage"
+        settings.class_type = "White Mage"
         exit_menu()
         return
     elseif os.getenv("LANARTS_SERVER") then

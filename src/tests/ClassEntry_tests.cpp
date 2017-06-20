@@ -11,7 +11,7 @@ SUITE(ClassEntry) {
 	TEST(parse_lua_table) {
 
 		std::string program = "table = {\n"
-				"    name = \"Mage\","
+				"    name = \"White Mage\","
 				"    sprites = { },\n"
 				"   available_spells = {\n"
 				"    },\n"
@@ -36,7 +36,7 @@ SUITE(ClassEntry) {
 
 		ClassEntry mage;
 		mage.init(0, luawrap::globals(L)["table"]);
-		CHECK("Mage" ==  mage.name);
+		CHECK("White Mage" ==  mage.name);
 		CHECK(1 ==  mage.starting_stats.movespeed);
 		CHECK(2 ==  mage.starting_stats.core.hp);
 		CHECK(3 ==  mage.starting_stats.core.mp);

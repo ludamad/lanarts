@@ -828,14 +828,10 @@ share_damage = (target, damage, min_health) ->
         damage = math.max(0, target.stats.hp - min_health)
     target.stats.hp -= damage
 
-for name in *{"Ranger", "Fighter", "Necromancer", "Mage", "Lifelinker"}
+for name in *{"Ranger", "Fighter", "Necromancer", "White Mage", "Red Mage", "Blue Mage", "Lifelinker"}
     DataW.effect_create {
         :name
         stat_func: (obj, old, new) =>
-            if name == "Mage" and obj.stats.level == 1
-                new.spell_cooldown_multiplier *= 1.1
-            if name == "Mage" and obj.stats.level == 2
-                new.spell_cooldown_multiplier *= 1.05
             if name ~= "Fighter"
                 new.melee_cooldown_multiplier *= 1.25
             if name ~= "Ranger" or name ~= "Fighter"

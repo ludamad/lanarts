@@ -13,10 +13,11 @@ mon_title = (mon) -> if mon.unique then mon.name else "the #{mon.name}"
 
 -- MINOR MISSILE
 
+-- Basic typeless mage spell
 DataW.spell_create {
     name: "Minor Missile"
     spr_spell: "minor missile"
-    description: "A low cost, fast bolt of energy. Hits a single target. The bolt can bounce off walls safely."
+    description: "A low cost neutral bolt of energy. Hits a single target. The bolt can bounce off walls safely."
     projectile: {
         speed: 7.25
         damage_multiplier: 0.75
@@ -127,9 +128,28 @@ DataW.spell_create {
         range: 100
         damage_multiplier: 1.5
     }
-    mp_cost: 20,
+    mp_cost: 15,
     cooldown: 35
 }
+
+-- LIGHTNING BOLT
+DataW.spell_create {
+    name: "Lightning Bolt",
+    spr_spell: "spr_effects.shock",
+    description: "A super fast projectile lightning attack. Weakens enemies to its effects upon successive hits.",
+    projectile: {
+        types: {"White"}
+        speed: 9
+        can_wall_bounce: true
+        range: 900
+        damage_multiplier: 1.25
+        on_hit_func: (target, atkstats) =>
+            target\add_effect("WhiteResist", {resist: -1, time_left: 100})
+    }
+    mp_cost: 8,
+    cooldown: 45
+}
+
 
 -- CHAIN LIGHTNING
 
