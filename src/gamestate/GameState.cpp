@@ -296,7 +296,7 @@ void GameState::serialize(SerializeBuffer& serializer) {
 	world.serialize(serializer);
 
 	player_data().serialize(this, serializer);
-    screens.serialize(this, serializer);
+        screens.serialize(this, serializer);
 	luawrap::globals(L)["Engine"]["post_serialize"].push();
 	luawrap::call<void>(L);
 
@@ -342,6 +342,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
     });
     luawrap::globals(L)["Engine"]["post_deserialize"].push();
     luawrap::call<void>(L);
+    is_loading_save() = true;
 }
 
 obj_id GameState::add_instance(level_id level, GameInst* inst) {

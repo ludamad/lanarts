@@ -121,7 +121,7 @@ DataW.spell_create {
     name: "Water Bolt",
     description: "A short range frosty bolt of cold. Hits a single target.",
     types: {"Blue"}
-    spr_spell: "spr_effects.waterbolt",
+    spr_spell: "spr_effects.iceball",
     projectile: {
         speed: 5
         damage_multiplier: 1.35
@@ -133,7 +133,7 @@ DataW.spell_create {
 -- LIGHTNING BOLT
 DataW.spell_create {
     name: "Lightning Bolt",
-    spr_spell: "spr_effects.lightningbolt",
+    spr_spell: "spr_effects.shock",
     description: "A super fast projectile lightning attack.",
     types: {"White"}
     projectile: {

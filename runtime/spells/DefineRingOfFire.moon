@@ -1,48 +1,54 @@
 EventLog = require "ui.EventLog"
 GameObject = require "core.GameObject"
 GameState = require "core.GameState"
-Map = require "core.Map"
-World = require "core.World"
-Bresenham = require "core.Bresenham"
 Display = require "core.Display"
-SpellObjects = require "objects.SpellObjects"
 DataW = require "DataWrapped"
 LuaGameObject = require "objects.LuaGameObject"
 
-spell_object_create = (T) ->
+M = nilprotect {
+    _fire: tosprite "spr_effects.fire-anim"
+}
 
-    LuaGameObject.type_create(T)
+spell_object_type = (T) ->
+    wrapped_on_init = T.on_init
+    T.init = (caster, time_left) =>
+        @caster = assert caster
+        @time_left = assert time_left
+        @total_time = assert time_left
+        T.parent_init(@, @caster.xy)
+        if wrapped_on_init
+            wrapped_on_init(@)
+    T.in_time_slice = (frac1, frac2) =>
+        time_passed = @total_time - @time_left
+        return (time_passed >= frac1 * @total_time and time_passed < frac2 * @total_time)
+    T.get_progress = (frac1, frac2) =>
+        time_passed = @total_time - @time_left
+        progress = time_passed / @total_time
+        return math.max(0, math.min(progress, 1)
 
-RingOfFireObject = LuaGameObject.type_create {
-    init: (caster) =>
-        @owner = caster
-        @parent_init(@, @owner.xy)
-    on_step: () =>
-        if @owner.destroyed
-            @owner = nil
-            @destroy()
+    wrapped_on_step = T.on_step
+    T.on_step = () =>
+        @xy = @caster.xy
+        if @caster.destroyed or @time_left <= 0
+            @caster = nil
+            GameObject.destroy(@)
             return
+        @time_left -= 1
+        if wrapped_on_step
+            wrapped_on_step(@)
+    return LuaGameObject.type_create(T)
+
+
+RingOfFireObject = spell_object_type {
+--    on_step: () =>
+
+    on_draw: () =>
+        if @in_time_slice 0.1
+
+
     _position: () =>
 
 }
-
-M.FeatureBase = LuaGameObject.type_create()
-local Base = M.FeatureBase
-function Base:init(args)
-    Base.parent_init(self, args.xy, args.radius or 15, args.solid, args.depth or M.FEATURE_DEPTH)
-    self.traits = self.traits or {}
-    self.sprites = {}
-    table.insert(self.traits, M.FEATURE_TRAIT)
-end 
-function Base:on_draw()
-    if Display.object_within_view(self) then
-        local sprite = self.sprite or self.sprites[GameState.screen_get()] 
-        if sprite ~= nil then
-            ObjectUtils.screen_draw(sprite, self.xy, self.alpha, self.frame)
-        end
-    end
-end
-
 
 DataW.spell_create {
     name: "Ring of Fire",
@@ -59,3 +65,5 @@ DataW.spell_create {
     spell_cooldown: 400
     cooldown: 35
 }
+
+return M

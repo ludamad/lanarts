@@ -61,7 +61,7 @@ _EFFECT_BONUSES = {
         append @effects, {{"PoisonedWeapon", {:poison_percentage}}, poison_percentage / 0.05}
     RandomSpell: (level) =>
         spell = @rng\random_choice {
-            "Cold Bolt"
+            "Water Bolt"
             "Minor Missile"
             --"Mephitize",
             --"Trepidize",

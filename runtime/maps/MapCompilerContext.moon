@@ -53,7 +53,6 @@ MapCompilerContext = newtype {
         return @add_pending_feature(label, feature)
     -- Register map compilers with unique labels
     register: (label, C) =>
-        log_info "Register MapCompilerContext with #{label}"
         assert (not @pending_maps[label]), "#{label} already registered!"
         assert C
         @pending_maps[label] = C
