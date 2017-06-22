@@ -56,8 +56,8 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
 -- When something dies from RingOfFire, this is spawned
 SpawnedFire = RingFireBase {
     -- RingFireBase config
+    _damage: 2 / 8
     init: (args) =>
-        @_damage = 2 / 8
         @damage_cooldowns = {} -- takes [dx][dy][obj]
         @base_init(args)
     for_all_rings: (f) =>
@@ -77,8 +77,8 @@ SpawnedFire = RingFireBase {
 
 RingOfFire = RingFireBase {
     -- RingFireBase config
+    _damage: 2 / 6
     init: (args) =>
-        @_damage = 2 / 6
         @damage_cooldowns = {} -- takes [index][obj]
         @fireballs = {}
         @base_init(args)
@@ -121,6 +121,23 @@ RingOfFire = RingFireBase {
             f(x + @caster.x, y + @caster.y, @damage_cooldowns[idx])
 }
 
+draw_console_text = (xy, texts) ->
+    {x, y} = xy
+    for {color, text} in *texts
+        x += font_cached_load(settings.font, 10)\draw {
+            :color
+            origin: Display.LEFT_CENTER
+        }, {x, y}, text 
+    return nil
+
+
+draw_console_effect = (xy, sprite, texts) ->
+    {x, y} = xy
+    sprite\draw {
+        origin: Display.LEFT_CENTER
+    }, {x, y + 4}
+    draw_console_text {x + Map.TILE_SIZE + 4, y}, texts
+
 DataW.spell_create {
     name: "Ring of Flames",
     description: ""
@@ -129,9 +146,21 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        GameObject.add_to_level RingOfFire.create({:caster, duration: 300 + EffectUtils.get_power(obj, 'Red') * 15})
+        GameObject.add_to_level RingOfFire.create({:caster, duration: 300 + EffectUtils.get_power(caster, 'Red') * 15})
+    console_draw_func: (get_next) =>
+        damage = math.floor(RingOfFire._damage * 60 / 5)
+        power = @effective_stats().magic + EffectUtils.get_power(@, "Red")
+        draw_console_effect get_next(), tosprite("spr_spells.spell_icon_ring_of_flames"), {
+            {COL_PALE_GREEN, damage}
+            {COL_PALE_YELLOW, " damage per second"}
+        }
+        get_next() -- Leave a gap
+        draw_console_text get_next(), {
+            {COL_PALE_YELLOW, "Power: "}
+            {COL_PALE_GREEN, power}
+        }
     mp_cost: 50
-    spell_cooldown: 1200
+    spell_cooldown: 400
     cooldown: 100
 }
 ----------------- </RING OF FIRE IMPL> ---------------------
@@ -144,41 +173,49 @@ DataW.effect_create {
     fade_out: 5
     effected_colour: {255,160,160}
     effected_sprite: "spr_effects.inner_flame"
-    apply_func: (obj, time_left) =>
-        @kill_tracker = obj.kills
+    apply_func: (caster, time_left) =>
+        @kill_tracker = caster.kills
         @max_time = math.max(@max_time or 0, time_left)
         @extensions = 0
-    --remove_func: (obj) =>
-    --    obj\add_effect("Exhausted", @exhausted_duration)
+    --remove_func: (caster) =>
+    --    caster\add_effect("Exhausted", @exhausted_duration)
     --    GameState.for_screens () ->
-    --        if obj\is_local_player()
+    --        if caster\is_local_player()
     --            play_sound "sound/exhausted.ogg"
     --            EventLog.add("You are now exhausted...", {255,200,200})
-    step_func: (obj) =>
+    step_func: (caster) =>
         time_passed = @max_time - @time_left
         if time_passed % 20 == 0
             play_sound "sound/ringfire-loop.ogg"
-        diff = math.max(obj.kills - @kill_tracker, 0)
+        diff = math.max(caster.kills - @kill_tracker, 0)
         for i=1,diff
-            @time_left = math.min(@max_time * 1.5, @time_left + 60 + EffectUtils.get_power(obj, 'Red') * 5)
+            @time_left = math.min(@max_time * 1.5, @time_left + 60 + EffectUtils.get_power(caster, 'Red') * 5)
             GameState.for_screens () ->
-                if obj\is_local_player()
+                if caster\is_local_player()
                     EventLog.add("Your inner fire grows ...", {200,200,255})
                     play_sound "sound/berserk.ogg"
             @extensions += 1
-        @kill_tracker = obj.kills
+        @kill_tracker = caster.kills
 }
 
 
 DataW.spell_create {
     name: "Inner Fire"
-    description: ""
+    description: "A form of great fire. For a limited time, you rapidly shoot exploding fire bolts."
     types: {"Red"}
     spr_spell: "spr_spells.spell_icon_inner_fire"
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        caster\add_effect "Inner Fire", 200 + math.min(3, caster.stats.level) * 30 + EffectUtils.get_power(obj, 'Red') * 15
+        caster\add_effect "Inner Fire", 200 + math.min(3, caster.stats.level) * 30 + EffectUtils.get_power(caster, 'Red') * 15
+    console_draw_func: (get_next) =>
+        power = @effective_stats().magic + EffectUtils.get_power(@, "Red")
+        draw_console_effect get_next(), tosprite("fire bolt"), {
+            {COL_PALE_GREEN, "4x Fire Bolts"}
+        }
+        draw_console_effect get_next(), tosprite("spr_effects.fire-anim"), {
+            {COL_PALE_GREEN, "Fire Bolts explode"}
+        }
     mp_cost: 30
     spell_cooldown: 1600
     cooldown: 0
@@ -203,7 +240,7 @@ DataW.spell_create {
                 GameObject.add_to_level SpawnedFire.create {
                     caster: @caster
                     xy: @xy
-                    duration: 20 + EffectUtils.get_power(obj, 'Red') * 3
+                    duration: 20 + EffectUtils.get_power(@caster, 'Red') * 3
                 }
     }
     mp_cost: 10,

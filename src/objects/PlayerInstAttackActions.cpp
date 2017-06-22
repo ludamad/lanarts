@@ -8,13 +8,13 @@
 #include <luawrap/luawrap.h>
 
 #include "data/game_data.h"
+#include "data/lua_util.h"
 #include "draw/colour_constants.h"
 #include "draw/draw_sprite.h"
 #include "draw/SpriteEntry.h"
 #include "draw/TileEntry.h"
 #include "gamestate/GameState.h"
 
-#include "lua_api/lua_api.h"
 #include "lua_api/lua_api.h"
 
 #include "stats/items/ItemEntry.h"
@@ -213,35 +213,6 @@ static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
     return !nilresult;
 }
 
-static void player_use_luacallback_spell(GameState* gs, PlayerInst* p,
-        SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
-    lua_State* L = gs->luastate();
-    action.push();
-    luawrap::push(L, p);
-    lua_pushnumber(L, target.x);
-    lua_pushnumber(L, target.y);
-    luawrap::push(L, gs->get_instance(p->target()));
-    lua_call(L, 4, 0);
-}
-
-static bool lua_spell_check_prereq(GameState* gs, PlayerInst* p,
-        SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
-    lua_State* L = gs->luastate();
-    bool passes = true;
-
-    if (!action.empty()) {
-        action.push();
-        luawrap::push(L, p);
-        lua_pushnumber(L, target.x);
-        lua_pushnumber(L, target.y);
-        lua_call(L, 3, 1);
-        passes = lua_toboolean(L, -1);
-        lua_pop(L, 1);
-    }
-
-    return passes;
-}
-
 const float PI = 3.141592f;
 
 static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
@@ -299,8 +270,8 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
         player_use_projectile_spell(gs, p, spl_entry, spl_entry.projectile,
                 target);
     } else {
-        player_use_luacallback_spell(gs, p, spl_entry,
-                spl_entry.action_func.get(L), target);
+        // Use action_func callback
+        lcall(spl_entry.action_func, /*caster*/ p, target.x, target.y, /*target object*/ gs->get_instance(p->target()));
     }
 }
 
@@ -361,7 +332,7 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
         bool can_target;
         if (auto_target) {
             can_target = lua_spell_get_target(gs, this,
-                    spl_entry.autotarget_func.get(L), target);
+                    spl_entry.autotarget_func, target);
         } else {
             // TODO have target_position here
             int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
@@ -385,8 +356,8 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
         }
 
         if (can_trigger && can_target) {
-            bool can_use = lua_spell_check_prereq(gs, this, spl_entry,
-                    spl_entry.prereq_func.get(L), target);
+            bool can_use = lcall(/*default*/ true, spl_entry.prereq_func,
+                    /*caster*/ this, target.x, target.y);
             if (can_use) {
                 queued_actions.push_back(
                         game_action(gs, this, GameAction::USE_SPELL,

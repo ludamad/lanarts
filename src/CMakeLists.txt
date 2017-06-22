@@ -8,7 +8,7 @@ set( LIBS ../libs)
 set( DEPS ../dependencies)
 set( BUILTDEPS ${CMAKE_BINARY_DIR}/dependencies )
 
-add_definitions( -std=c++11 -Wno-deprecated-declarations)
+add_definitions( -std=c++14 -Wno-deprecated-declarations)
 
 if (${USE_LUAJIT})
     set( lua_includes ${DEPS}/luajit/src )

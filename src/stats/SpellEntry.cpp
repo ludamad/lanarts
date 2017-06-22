@@ -34,6 +34,7 @@ void SpellEntry::parse_lua_table(const LuaValue& table) {
 				luawrap::globals(table.luastate())["spell_choose_target"];
 	}
 	autotarget_func = table["autotarget_func"];
+	console_draw_func = table["console_draw_func"];
 	LANARTS_ASSERT(!autotarget_func.isnil());
     action_func = table["action_func"];
     prereq_func = table["prereq_func"];

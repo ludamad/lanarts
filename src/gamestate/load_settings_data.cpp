@@ -64,8 +64,8 @@ bool load_settings_data(GameSettings& settings, const char* filename) {
 			optional_set(root, "view_height", settings.view_height);
             if (getenv("LANARTS_SMALL")) {
                 settings.fullscreen = false;
-                settings.view_width = 640;
-                settings.view_height = 480;
+                settings.view_width = 800;
+                settings.view_height = 600;
             }
 			optional_set(root, "ip", settings.ip);
 			optional_set(root, "port", settings.port);

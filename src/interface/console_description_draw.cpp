@@ -12,6 +12,7 @@
 #include "draw/colour_constants.h"
 #include "draw/draw_sprite.h"
 #include "draw/SpriteEntry.h"
+#include "data/lua_util.h"
 #include "gamestate/GameState.h"
 #include "objects/PlayerInst.h"
 
@@ -366,9 +367,6 @@ void draw_console_spell_description(GameState* gs, SpellEntry& entry) {
 	}
 	console.draw_box(gs);
 	draw_base_entry_overlay(gs, entry);
-	if (!entry.console_draw_func.empty()) {
-		
-	}
 
 	DescriptionBoxHelper dbh(console.bounding_box());
 	draw_value(gs, dbh, "MP cost: ", entry.mp_cost, COL_PALE_YELLOW,
@@ -377,8 +375,17 @@ void draw_console_spell_description(GameState* gs, SpellEntry& entry) {
 	if (!entry.projectile.empty()) {
 		draw_projectile_description_overlay(gs, dbh, entry.projectile);
 	}
+
 	draw_value(gs, dbh, "Cooldown: ", std::max(entry.cooldown, entry.spell_cooldown), COL_PALE_YELLOW,
 			COL_PALE_RED);
+
+    lua_State* L = gs->luastate();
+    int n_top = lua_gettop(L);
+    lua_push_unsafe_closure(L, [&dbh]() -> Pos {
+        return dbh.get_next_draw_position();
+    });
+    lcall(entry.console_draw_func, gs->local_player(), LuaStackValue(L, n_top +1));
+    lua_settop(L, n_top);
 }
 
 void draw_console_enemy_description(GameState* gs, EnemyEntry& entry) {
