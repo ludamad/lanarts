@@ -178,7 +178,6 @@ void ProjectileInst::step(GameState* gs) {
 				vy = -vy;
 			}
 		}
-		gs->for_screens([&]() {gs->game_chat().add_message("BOUNCE");});
 	} else if (collides) {
 		gs->remove_instance(this);
 	}
