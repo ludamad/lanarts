@@ -372,8 +372,8 @@ void GameInstSet::copy_to(GameInstSet& inst_set) const {
 int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
 	int rad = radius == -1 ? obj->target_radius : radius;
-	x = x == -1 ? obj->x : x;
-	y = y == -1 ? obj->y : y;
+	x = x == -1024 ? obj->x : x;
+	y = y == -1024 ? obj->y : y;
 
 	int mingrid_x = (x - rad) / REGION_SIZE, mingrid_y = (y - rad)
 			/ REGION_SIZE;

@@ -39,7 +39,7 @@ public:
 	GameInst* get_instance(int id) const;
 
 	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap =
-			0, col_filterf f = NULL, int x = -1, int y = -1, int radius = -1);
+			0, col_filterf f = NULL, int x = -1024, int y = -1024, int radius = -1);
 //	int object_square_test(GameInst** objs = NULL, int obj_cap =
 //			0, const Pos& pos, col_filterf f = NULL);
 

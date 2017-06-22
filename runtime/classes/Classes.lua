@@ -76,7 +76,7 @@ Data.class_create {
       { spell = "Ring of Flames",
     	level_needed = 2 },
       { spell = "Inner Fire", -- Makes fire bolt shoot in all directions
-        level_needed = 2 },
+        level_needed = 3 },
     },
     start_stats = {
         movespeed = 4,

@@ -115,15 +115,15 @@ add_attack_stat_func = (args, f1) ->
 
 add_types = (args, types) ->
     for type in *types
+        assert table.contains(EffectUtils.TYPES, type), "Invalid type!"
         add_on_hit_func args, (obj, target, atkstats, damage) ->
-            log_verbose "APPLYING TYPE RESISTANCE #{type}"
             return damage * EffectUtils.get_resistance(target, type)
         add_attack_stat_func args, (obj, target, atkstats) ->
-            log_verbose "APPLYING TYPE POWER #{type}"
             atkstats.power += EffectUtils.get_power(obj, type)
 
 power_effects = (powers, effects = {}) ->
     for type, power in pairs powers
+        assert table.contains(EffectUtils.TYPES, type), "Invalid type!"
         if power == 0 -- Special case for simplifying code-generated content
             continue
         append effects, {"#{type}Power", {:power}}
@@ -131,6 +131,7 @@ power_effects = (powers, effects = {}) ->
 
 resistance_effects = (resists, effects = {}) ->
     for type, resist in pairs resists
+        assert table.contains(EffectUtils.TYPES, type), "Invalid type!"
         if resist == 0 -- Special case for simplifying code-generated content
             continue
         append effects, {"#{type}Resist", {:resist}}

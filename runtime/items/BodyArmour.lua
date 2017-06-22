@@ -69,18 +69,79 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
-    name = "Robe",
-    description = "A lightly protective, uninhibited robe.",
+    name = "Green Robe",
+    description = "The magic robes of a beginner green mage.",
     type = "armour",
 
     shop_cost = {10,20},
 
-    spr_item = "robe",
+    spr_item = "spr_armour.green_robe",
 
     stat_bonuses = { 
         willpower = 1,
     },
+    effects_granted = {
+        {"RedResist", {resist = -1}},
+        {"RedPower", {resist = -1}},
+        {"GreenResist", {resist = 1}},
+        {"GreenPower", {resist = 1}},
+    }
 }
+
+Data.equipment_create {
+     name = "Robe",
+     description = "A lightly protective, uninhibited robe.",
+     type = "armour",
+ 
+     shop_cost = {10,20},
+ 
+     spr_item = "robe",
+ 
+     stat_bonuses = { 
+         willpower = 1,
+     },
+}
+
+Data.equipment_create {
+    name = "White Robe",
+    description = "The magic robes of a beginner white mage.",
+    type = "armour",
+
+    shop_cost = {10,20},
+
+    spr_item = "spr_armour.white_robe",
+
+    stat_bonuses = { 
+        willpower = 1,
+    },
+    effects_granted = {
+        {"BlackResist", {resist = -1}},
+        {"BlackPower", {resist = -1}},
+        {"WhiteResist", {resist = 1}},
+        {"WhitePower", {resist = 1}},
+    }
+}
+
+Data.equipment_create {
+    name = "Red Robe",
+    description = "The magic robes of a beginner red mage.",
+    type = "armour",
+
+    shop_cost = {10,20},
+
+    spr_item = "spr_armour.robe_ego1",
+
+    stat_bonuses = { 
+        willpower = 1,
+    },
+    effects_granted = {
+        {"BlueResist", {resist = -1}},
+        {"BluePower", {resist = -1}},
+        {"RedResist", {resist = 1}},
+        {"RedPower", {resist = 1}},
+    }
+}
+
 
 Data.equipment_create {
     name = "Magician's Robe",

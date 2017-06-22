@@ -128,10 +128,10 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        GameObject.add_to_level RingOfFire.create({:caster, duration: 400})
+        GameObject.add_to_level RingOfFire.create({:caster, duration: 300})
     mp_cost: 50
     spell_cooldown: 1200
-    cooldown: 0
+    cooldown: 100
 }
 ----------------- </RING OF FIRE IMPL> ---------------------
 
@@ -177,8 +177,8 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        caster\add_effect "Inner Fire", 530 + math.min(3, caster.stats.level) * 30
-    mp_cost: 50
+        caster\add_effect "Inner Fire", 200 + math.min(3, caster.stats.level) * 30
+    mp_cost: 80
     spell_cooldown: 1600
     cooldown: 0
 }
@@ -201,7 +201,7 @@ DataW.spell_create {
                 SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
                 GameObject.add_to_level SpawnedFire.create {
                     caster: @caster
-                    xy: {@x, @y}
+                    xy: @xy
                     duration: 20
                 }
     }

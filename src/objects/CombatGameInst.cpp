@@ -48,8 +48,11 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
     event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);
 
     for (Effect& eff : effects.effects) {
+        if (!eff.is_active()) {
+            continue;
+        }
         EffectEntry& entry = game_effect_data.get(eff.id);
-        if (!eff.is_active() || entry.on_damage_func.isnil()) {
+        if (entry.on_damage_func.isnil()) {
             continue;
         }
         entry.on_damage_func.push();
