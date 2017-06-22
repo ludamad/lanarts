@@ -115,10 +115,6 @@ Data.class_create {
     	level_needed = 1 },
       { spell = "Water Bolt",
         level_needed = 1 },
-      { spell = "Chain Lightning",
-        level_needed = 2 },
-      { spell = "Mephitize",
-        level_needed = 3 },
     },
     start_stats = {
         movespeed = 4,

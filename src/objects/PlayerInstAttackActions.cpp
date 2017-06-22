@@ -18,6 +18,7 @@
 #include "lua_api/lua_api.h"
 
 #include "stats/items/ItemEntry.h"
+#include "stats/SpellEntry.h"
 
 #include "stats/items/ProjectileEntry.h"
 #include "stats/items/WeaponEntry.h"
@@ -289,8 +290,11 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
             p->effective_stats().cooldown_modifiers.spell_cooldown_multiplier;
     p->cooldowns().reset_action_cooldown(
             spl_entry.cooldown * spell_cooldown_mult);
+    float cooldown_mult = game_spell_data.call_lua(spl_entry.name, "cooldown_multiplier", /*Default value:*/ 1.0f, p);
+    spell_cooldown_mult *= cooldown_mult;
+//    game_spell_data.
     // Set global cooldown for spell:
-    p->cooldowns().spell_cooldowns[spl_entry.id] = std::max(int(spl_entry.spell_cooldown * spell_cooldown_mult), p->cooldowns().spell_cooldowns[spl_entry.id]);
+    p->cooldowns().spell_cooldowns[spl_entry.id] = (int)std::max(spl_entry.spell_cooldown * spell_cooldown_mult, p->cooldowns().spell_cooldowns[spl_entry.id] * spell_cooldown_mult);
     if (spl_entry.uses_projectile()) {
         player_use_projectile_spell(gs, p, spl_entry, spl_entry.projectile,
                 target);

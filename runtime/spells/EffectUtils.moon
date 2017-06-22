@@ -66,17 +66,18 @@ get_resistance = (obj, type) ->
         return 10
     if raw_resist >= 100
         return 0
-    -- Otherwise, resistances are capped between -3 and +3 (inclusive)
-    resist = math.max(math.min(math.floor(raw_resist), 3), -2)
-    return switch resist
-        when 3 then 0.4
-        when 2 then 0.6
-        when 1 then 0.8
-        when 0 then 1.0
-        when -1 then 1.33
-        when -2 then 1.66
-        when -3 then 2
-        else
-            error("Out of range resist value #{resist}")
+    -- Otherwise, resistances are capped between -10 and +10 (inclusive)
+    resist = math.max(math.min(math.floor(raw_resist), 10), -10)
+    return math.pow(2, resist / 5)
 
+--        when 3 then 0.4
+--        when 2 then 0.6
+--        when 1 then 0.8
+--        when 0 then 1.0
+--        when -1 then 1.33
+--        when -2 then 1.66
+--        when -3 then 2
+--        else
+--            error("Out of range resist value #{resist}")
+--
 return {:get_effect_stat, :get_resistance, :get_power, :TYPES, :get_monster_resistances}

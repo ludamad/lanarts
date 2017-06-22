@@ -5,7 +5,7 @@
 #include <string>
 #include <cstring>
 #include <stdexcept>
-#include <luawrap/LuaValue.h>
+#include <luawrap/luawrap.h>
 #include "data/hashmap.h"
 
 /*
@@ -95,6 +95,17 @@ public:
 
     LuaValue& get_raw_data() {
         return raw_data;
+    }
+
+    template <class ReturnType, class... Args>
+    ReturnType call_lua(const std::string& name, const char* method, ReturnType _default, Args... args) {
+        lua_State* L = raw_data.luastate();
+        raw_data[name.c_str()][method].push();
+        if (lua_isnil(L, -1)) {
+            lua_pop(L, 1);
+            return _default;
+        }
+        return luawrap::call<ReturnType>(L, args...);
     }
 
     void set_raw_data(const std::string& name, LuaValue value) {

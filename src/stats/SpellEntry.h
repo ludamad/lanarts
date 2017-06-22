@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "data/ResourceEntryBase.h"
+#include "data/ResourceDataSet.h"
 
 #include <lcommon/LuaLazyValue.h>
 
@@ -20,10 +21,12 @@
 struct SpellEntry: public ResourceEntryBase {
 	sprite_id sprite = NONE;
 	int mp_cost = 0, cooldown = 0, spell_cooldown = 0;
-	LuaLazyValue action_func; // Immediate action
-	LuaLazyValue autotarget_func; // Auto-target func
-	LuaLazyValue prereq_func; // Pre-req to casting
-	Projectile projectile; // Projectile used, if any
+	LuaValue action_func; // Immediate action
+    LuaValue console_draw_func; // Drawing in the help bar
+    LuaValue autotarget_func; // Auto-target func
+    LuaValue prereq_func; // Pre-req to casting
+
+    Projectile projectile;
 	bool can_cast_with_cooldown = false, can_cast_with_held_key = false, fallback_to_melee = false;
 
 	virtual const char* entry_type() {
@@ -33,11 +36,6 @@ struct SpellEntry: public ResourceEntryBase {
 		return sprite;
 	}
 
-	void initialize(lua_State* L) {
-		action_func.initialize(L);
-		autotarget_func.initialize(L);
-		prereq_func.initialize(L);
-	}
 	bool uses_projectile() {
 		return projectile.id != NO_ITEM;
 	}
@@ -52,4 +50,6 @@ namespace res {
 	SpellEntry& spell(const std::string& name);
 	SpellEntry& spell(::spell_id id);
 }
+
+extern ResourceDataSet<SpellEntry> game_spell_data;
 #endif /* SPELLENTRY_H_ */

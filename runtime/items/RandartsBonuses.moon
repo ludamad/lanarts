@@ -165,15 +165,20 @@ Bonuses = newtype {
         }
         for k, v in pairs @stat_multipliers
             append dims, -(1 - v) / 0.05 -- For every 0.05 we take off, have one bonus dim
+        n_resists = 0
         for k, v in pairs @resistances
-            append dims, v * 2 -- Specific resistances are quite powerful
+            if v ~= 0 then n_resists += 1
+            append dims, v
+        n_powers = 0
         for k, v in pairs @powers
-            append dims, v * 0.75 -- Specific powers count for 0.75; strictly worse than a core stat
+            if v ~= 0 then n_powers += 1
+            append dims, v 
         for {effect, v} in *@effects
             append dims, v
         for {spell, v} in *@spells
             append dims, v
         effective_bonuses = 0
+        penalties = 0
         score = 0
         for dim in *dims
             sign = 1
@@ -182,8 +187,14 @@ Bonuses = newtype {
                 sign = -1
             if math.abs(dim) > 0.25
                 effective_bonuses += 1
+            if dim < 0
+                penalties += 1
             score += sign * dim * dim * 100
 
+        if n_resists + n_powers > 2 -- reject
+            return false
+        if penalties > 1 -- reject
+            return false
         if score < min_score or score > max_score
             return false
         if effective_bonuses < 2 -- reject

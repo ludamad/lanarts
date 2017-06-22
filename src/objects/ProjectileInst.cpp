@@ -62,7 +62,8 @@ void ProjectileInst::init(GameState *gs) {
     lua_State* L = gs->luastate();
     luawrap::push(L, (GameInst*)this); // Ensure lua_variables are set TODO have an on_create method for when lua variables are created for an object
     lua_pop(L, 1);
-    lua_variables["on_deinit"] = metatable["__index"]["on_deinit"];
+	lua_variables["on_deinit"] = metatable["__index"]["on_deinit"];
+	lua_variables["on_step"] = metatable["__index"]["on_step"];
     lua_variables["caster"] = gs->get_instance(origin_id);
 }
 void ProjectileInst::deinit(GameState* gs) {

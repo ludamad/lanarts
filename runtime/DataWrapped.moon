@@ -113,6 +113,15 @@ add_attack_stat_func = (args, f1) ->
             f1(obj, target, atkstats)
             f2(obj, target, atkstats)
 
+add_cooldown_multiplier = (args, f1) ->
+    f2 = args.cooldown_multiplier
+    if f2 == nil
+        args.cooldown_multiplier = f1
+    else
+        args.cooldown_multiplier = () =>
+            f1(@)
+            f2(@)
+
 add_types = (args, types) ->
     for type in *types
         assert table.contains(EffectUtils.TYPES, type), "Invalid type!"
@@ -173,6 +182,10 @@ spell_create = (args) ->
             add_types proj, proj.types
         Data.projectile_create(proj)
         args.projectile = proj.name
+    if args.types
+        for type in *args.types
+            add_cooldown_multiplier args, () =>
+                return 1 - EffectUtils.get_power(@, type) * 0.03
     Data.spell_create(args)
 
 projectile_create = (args, for_enemy = false) -> 

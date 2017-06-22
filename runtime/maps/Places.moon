@@ -15,7 +15,6 @@ ItemGroups = require "maps.ItemGroups"
 import ConnectedRegions, FilledRegion
     from require "maps.MapElements"
 
-
 cave = (n_outer = 3) -> ConnectedRegions {
     regions: {
         for i=1,5
@@ -111,7 +110,11 @@ DragonLair = newtype {
             MapUtils.spawn_decoration(@map, OldMaps.statue, sqr, @rng\random(0,17))
         for i=1,1
             sqr = @random_square_not_near_wall()
-            MapUtils.spawn_chest(@map, sqr, {{type: "Magentite Key"}})
+            randarts = {}
+            for j=1,#World.players *2
+                 append randarts, ItemUtils.randart_generate(2)
+            append randarts, {type: "Magentite Key"}
+            MapUtils.spawn_chest(@map, sqr, randarts)
         for i=1,3
             sqr = @random_square_not_near_wall()
             MapUtils.spawn_healing_square(@map, sqr)

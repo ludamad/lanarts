@@ -25,9 +25,8 @@ void lapi_data_create_spell(const LuaStackValue& table) {
 	SpellEntry entry;
 	int idx = game_spell_data.size();
 	entry.init(idx, table);
-        LuaValue spell_table = luawrap::globals(table.luastate())["spells"];
-	spell_table[idx+1] = table;
 	game_spell_data.new_entry(entry.name, entry);
+    game_spell_data.set_raw_data(entry.name, table);
 }
 
 

@@ -180,7 +180,7 @@ DataW.spell_create {
         caster\add_effect("Ludaze", 30)
         play_sound "sound/ludaze.ogg"
         for mon in *(Map.enemies_list caster)
-            if not Map.object_visible(mon)
+            if not Map.object_visible(mon, mon.xy, caster)
                 continue
             mon\add_effect("Dazed", 100)
             eff = mon\add_effect("Poison", 100)
@@ -197,7 +197,7 @@ DataW.spell_create {
     prereq_func: (caster) -> 
         if not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
             for mon in *(Map.enemies_list caster)
-                if Map.object_visible(mon)
+                if Map.object_visible(mon, mon.xy, caster)
                     return true
             GameState.for_screens () ->
                 EventLog.add("No monsters in sight!", COL_PALE_RED)

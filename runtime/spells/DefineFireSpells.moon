@@ -6,6 +6,7 @@ Display = require "core.Display"
 DataW = require "DataWrapped"
 ObjectUtils = require "objects.ObjectUtils"
 SpellUtils = require "spells.SpellUtils"
+EffectUtils = require "spells.EffectUtils"
 
 M = nilprotect {
     _fire: tosprite "spr_effects.fire-anim"
@@ -77,7 +78,7 @@ SpawnedFire = RingFireBase {
 RingOfFire = RingFireBase {
     -- RingFireBase config
     init: (args) =>
-        @_damage = 2 / 8
+        @_damage = 2 / 6
         @damage_cooldowns = {} -- takes [index][obj]
         @fireballs = {}
         @base_init(args)
@@ -128,7 +129,7 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        GameObject.add_to_level RingOfFire.create({:caster, duration: 300})
+        GameObject.add_to_level RingOfFire.create({:caster, duration: 300 + EffectUtils.get_power(obj, 'Red') * 15})
     mp_cost: 50
     spell_cooldown: 1200
     cooldown: 100
@@ -159,7 +160,7 @@ DataW.effect_create {
             play_sound "sound/ringfire-loop.ogg"
         diff = math.max(obj.kills - @kill_tracker, 0)
         for i=1,diff
-            @time_left = math.min(@max_time * 1.5, @time_left + 60)
+            @time_left = math.min(@max_time * 1.5, @time_left + 60 + EffectUtils.get_power(obj, 'Red') * 5)
             GameState.for_screens () ->
                 if obj\is_local_player()
                     EventLog.add("Your inner fire grows ...", {200,200,255})
@@ -177,8 +178,8 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        caster\add_effect "Inner Fire", 200 + math.min(3, caster.stats.level) * 30
-    mp_cost: 80
+        caster\add_effect "Inner Fire", 200 + math.min(3, caster.stats.level) * 30 + EffectUtils.get_power(obj, 'Red') * 15
+    mp_cost: 30
     spell_cooldown: 1600
     cooldown: 0
 }
@@ -202,7 +203,7 @@ DataW.spell_create {
                 GameObject.add_to_level SpawnedFire.create {
                     caster: @caster
                     xy: @xy
-                    duration: 20
+                    duration: 20 + EffectUtils.get_power(obj, 'Red') * 3
                 }
     }
     mp_cost: 10,

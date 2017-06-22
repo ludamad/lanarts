@@ -410,7 +410,7 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
         weapon_class: "magic"
         can_wall_bounce: true
         damage_type: {magic: 0.5, physical: 0.5}
-        range: 1150 * 4
+        range: 1150 * 4 * 4
         radius: 11
         power: {base: {30, 30}}
         cooldown: 200
@@ -423,15 +423,18 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
         @timeout -= 1
         if @timeout <= 0
             @projectile_attack "Purple Dragon Projectile"
-            @timeout = 200
+            --
+            @timeout = if Map.object_visible(@) then 200 else 50
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
         ObjectUtils.spawn_item_near(@, 'Dragon Lanart', 1)
         -- Spawn level 1 randarts scaling to #players:
-        for i=1,#World.players
+        for i=1,#World.players * 2
             {:type, :amount} = ItemUtils.randart_generate(1)
             ObjectUtils.spawn_item_near(@, type, amount)
+        item = random_choice {"Will Scroll", "Strength Scroll", "Defence Scroll", "Magic Scroll"}
+        ObjectUtils.spawn_item_near(@, item, 1)
 }
 
 DataW.enemy_create {
@@ -738,7 +741,7 @@ DataW.enemy_create {
     xpaward: 5
     stats: {
         movespeed: 2
-        hp: 30
+        hp: 25
         hpregen: 0.02
         strength: 5
         magic: 25
@@ -1403,7 +1406,7 @@ DataW.enemy_create {
         hp: 200
         hpregen: 0
         movespeed: 1
-        strength: 25
+        strength: 20
         defence: 10
         willpower: 10
     }

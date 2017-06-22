@@ -370,7 +370,7 @@ M.hive_create = (MapSeq) ->
 M.place_hive = (map, MapSeq) ->
     door_placer = (map, xy) ->
         -- nil is passed for the default open sprite
-        MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
+        MapUtils.spawn_door(map, xy, nil, Vaults._magentite_door, "Magentite Key")
     next_dungeon = {1}
     place_dungeon = (map, xy) ->
         portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
@@ -429,7 +429,7 @@ M.crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
             Seq = MapSequence.create {preallocate: 1}
             door_placer = (map, xy) ->
                 -- nil is passed for the default open sprite
-                MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
+                MapUtils.spawn_door(map, xy, nil, Vaults._magentite_door, "Magentite Key")
             next_dungeon = {1}
             place_dungeon = (map, xy) ->
                 portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_hell1")
@@ -571,8 +571,9 @@ overworld_features = (map) ->
                 -- Place inner dungeon vault     --
                 on_generate_dungeon = (map, floor) ->
                     ---------------------------------------------------------- 
-                    for item in *{"Scroll of Experience", "Scroll of Experience", "Scroll of Experience"} 
-                        item_placer = (map, xy) -> MapUtils.spawn_item(map, item, 1, xy)
+                    for i=1,3
+                        item = ItemUtils.randart_generate(1)
+                        item_placer = (map, xy) -> MapUtils.spawn_item(map, item.type, item.amount, xy)
                         tileset = Tilesets.snake
                         vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
                         if not place_feature(map, vault, (r) -> true)
@@ -770,7 +771,7 @@ overworld_features = (map) ->
             }
         tileset = Tilesets.lair
         door_placer = (map, xy) ->
-            MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
         next_dungeon = {1}
         place_dungeon = (map, xy) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")

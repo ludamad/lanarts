@@ -12,8 +12,6 @@
 
 #include "SpellEntry.h"
 
-extern ResourceDataSet<SpellEntry> game_spell_data;
-
 spell_id get_spell_by_name(const char* name);
 
 void SpellEntry::parse_lua_table(const LuaValue& table) {
@@ -35,14 +33,11 @@ void SpellEntry::parse_lua_table(const LuaValue& table) {
 		table["autotarget_func"] =
 				luawrap::globals(table.luastate())["spell_choose_target"];
 	}
-	autotarget_func = LuaLazyValue(table["autotarget_func"]);
-	LANARTS_ASSERT(!autotarget_func.get(table.luastate()).isnil());
-	if (!table["action_func"].isnil()) {
-		action_func = LuaLazyValue(table["action_func"]);
-	}
-	if (!table["prereq_func"].isnil()) {
-		prereq_func = LuaLazyValue(table["prereq_func"]);
-	}
+	autotarget_func = table["autotarget_func"];
+	LANARTS_ASSERT(!autotarget_func.isnil());
+    action_func = table["action_func"];
+    prereq_func = table["prereq_func"];
+    console_draw_func = table["console_draw_func"];
 
 	can_cast_with_cooldown = set_if_nil(table, "can_cast_with_cooldown", false);
 	can_cast_with_held_key = set_if_nil(table, "can_cast_with_held_key", true);

@@ -366,6 +366,9 @@ void draw_console_spell_description(GameState* gs, SpellEntry& entry) {
 	}
 	console.draw_box(gs);
 	draw_base_entry_overlay(gs, entry);
+	if (!entry.console_draw_func.empty()) {
+		
+	}
 
 	DescriptionBoxHelper dbh(console.bounding_box());
 	draw_value(gs, dbh, "MP cost: ", entry.mp_cost, COL_PALE_YELLOW,
