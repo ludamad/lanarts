@@ -289,7 +289,7 @@ DataW.enemy_create {
         hpregen: 0.03
         movespeed: 1
         -- base stats:
-        strength: 5
+        strength: 25
         defence: 0
         magic: 25
         willpower: 0
@@ -738,7 +738,7 @@ DataW.enemy_create {
     xpaward: 5
     stats: {
         movespeed: 2
-        hp: 15
+        hp: 30
         hpregen: 0.02
         strength: 5
         magic: 25

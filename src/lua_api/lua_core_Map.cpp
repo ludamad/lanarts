@@ -391,6 +391,22 @@ static int gmap_object_collision_check(lua_State* L) {
     return 1;
 }
 
+static int gmap_radius_collision_check(lua_State* L) {
+    GameState* gs = lua_api::gamestate(L);
+    GameInst* objects[MAX_RET];
+    GameMapState* map = mapstate(LuaStackValue(L, 1));
+    double radius = luawrap::get<double>(L, 2);
+    Pos xy = luawrap::get<Pos>(L, 3);
+
+    int nret = gs->object_radius_test(NULL, objects, MAX_RET, NULL, xy.x, xy.y, radius);
+    lua_newtable(L);
+    for (int i = 0; i < nret; i++){
+        luawrap::push(L, objects[i]);
+        lua_rawseti(L, -2, i+1);
+    }
+    return 1;
+}
+
 static std::vector<GameInst*> gmap_rectangle_collision_check(LuaStackValue map_obj, BBox area, LuaStackValue tester /* Can be empty */) {
     GameState* gs = lua_api::gamestate(map_obj);
     GameMapState* map = mapstate(map_obj);
@@ -529,6 +545,7 @@ namespace lua_api {
         gmap["radius_visible"].bind_function(gmap_radius_visible);
 
         gmap["object_collision_check"].bind_function(gmap_object_collision_check);
+        gmap["radius_collision_check"].bind_function(gmap_radius_collision_check);
         gmap["object_tile_check"].bind_function(gmap_object_tile_check);
         gmap["radius_tile_check"].bind_function(gmap_radius_tile_check);
         gmap["rectangle_collision_check"].bind_function(gmap_rectangle_collision_check);

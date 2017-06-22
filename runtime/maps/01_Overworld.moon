@@ -740,7 +740,7 @@ overworld_features = (map) ->
                 MapUtils.spawn_enemy(map, enemy, xy)
         })
         return place_feature(map, vault, ()->true)
-    if not place_purple_dragon_lair() then return nil
+    --if not place_purple_dragon_lair() then return nil
 
     -----------------------------
     -- Gragh's lair            --

@@ -18,14 +18,14 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
     base_init: (args) =>
         assert @_damage
         -- Damage cooldowns by individual flame
-        @cooldown = args.cooldown or 20
+        @cooldown = args.cooldown or 5
     _on_kill: (obj) => nil -- Default do nothing
     base_on_step: () =>
         if @every 20
             play_sound "sound/ringfire-loop.ogg"
         @for_all_rings (x, y, damage_cooldown) ->
             for obj in *Map.radius_collision_check(@map, 15, {x, y})
-                if damage_cooldown[obj] or (obj.team == nil) or obj.team == @team
+                if damage_cooldown[obj] or (obj.team == nil) or obj.team == @caster.team
                     continue
                 if @do_damage(obj, @_damage)
                     @_on_kill(obj)
@@ -45,7 +45,7 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
         if @in_time_slice(0.0, 0.1)
             alpha = @get_progress(0.0, 0.1)
         elseif @in_time_slice(0.9, 1)
-            alpha = @get_progress(0.9, 1)
+            alpha = 1.0 - @get_progress(0.9, 1)
         frame = @time_passed()
         @for_all_rings (x, y) ->
             ObjectUtils.screen_draw(M._fire, {x, y}, alpha, frame)
@@ -55,7 +55,7 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
 SpawnedFire = RingFireBase {
     -- RingFireBase config
     init: (args) =>
-        @_damage = 2
+        @_damage = 2 / 8
         @damage_cooldowns = {} -- takes [dx][dy][obj]
         @base_init(args)
     for_all_rings: (f) =>
@@ -76,15 +76,14 @@ SpawnedFire = RingFireBase {
 RingOfFire = RingFireBase {
     -- RingFireBase config
     init: (args) =>
-        @_damage = 2
-        @_rings = @_create_rings()
+        @_damage = 2 / 8
         @damage_cooldowns = {} -- takes [index][obj]
         @fireballs = {}
         @base_init(args)
-    _create_rings: () =>
-        sub_radius = 8 / (1 + @caster_type_power() / 10)
+    _create_rings: (radius_bonus = 0) =>
+        sub_radius = 20 -- / (1 + @caster_type_power() / 10)
         n_points = 14 + @caster_type_power()
-        radius = sub_radius * n_points / (2 * math.pi)
+        radius = sub_radius * n_points / (2 * math.pi) + radius_bonus
         step_angle = (2 * math.pi) / n_points
         return for i=0,n_points-1
             angle = step_angle * i
@@ -108,23 +107,16 @@ RingOfFire = RingFireBase {
         @base_on_step()
 
     for_all_rings: (f) =>
-        for idx=1,#@_rings
-            {x, y} = @_rings[idx]
+        radius_percentage = nil
+        for i=1,10
+            if @percent_passed() <= i / 10
+                radius_percentage = @get_progress((i-1)/10,i/10)
+                break
+        rings = @_create_rings(50 - 50 * radius_percentage)
+        for idx=1,#rings
+            {x, y} = rings[idx]
+            @damage_cooldowns[idx] or= {}
             f(x + @caster.x, y + @caster.y, @damage_cooldowns[idx])
-        --for dy=-rad,rad
-        --    for dx=-rad,rad
-        --        sqr_dist = dx*dx+dy*dy 
-        --        if sqr_dist < @_inner_radius * @_inner_radius
-        --            continue
-        --        if sqr_dist > @_outer_radius * @_outer_radius
-        --            continue
-        --        {cx, cy} = @_xy()
-        --        x, y = cx + dx * Map.TILE_SIZE, cy + dy * Map.TILE_SIZE
-        --        if @_clip_to_view and not @caster\within_field_of_view({x, y})
-        --            continue
-        --        @damage_cooldowns[dy] or= {}
-        --        @damage_cooldowns[dy][dx] or= {}
-        --        f(x, y, @damage_cooldowns[dy][dx])
 }
 
 DataW.spell_create {
@@ -137,7 +129,7 @@ DataW.spell_create {
     action_func: (caster, x, y) ->
         GameObject.add_to_level RingOfFire.create({:caster, duration: 400})
     mp_cost: 50
-    spell_cooldown: 1600
+    spell_cooldown: 1200
     cooldown: 0
 }
 

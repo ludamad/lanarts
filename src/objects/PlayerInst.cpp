@@ -79,7 +79,14 @@ money_t& PlayerInst::gold(GameState* gs) {
 void PlayerInst::update_field_of_view(GameState* gs) {
 	int sx = last_x / TILE_SIZE;
 	int sy = last_y / TILE_SIZE;
-	field_of_view->calculate(gs, (is_ghost() ? 3 : gs->game_world().get_current_level()->vision_radius()), sx, sy);
+    int radius = (is_ghost() ? 3 : gs->game_world().get_current_level()->vision_radius());
+    lua_State* L = gs->luastate();
+    this->lua_lookup(L, "__vision_radius_override"); // HACK
+    if (!lua_isnil(L, -1)) {
+        radius = lua_tointeger(L, -1);
+    }
+    lua_pop(L, -1);
+	field_of_view->calculate(gs, radius, sx, sy);
 }
 
 bool PlayerInst::within_field_of_view(const Pos& pos) {

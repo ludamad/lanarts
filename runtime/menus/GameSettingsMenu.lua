@@ -285,17 +285,17 @@ local function label_button_create(params, color_formula, on_click)
 end
 
 local function class_choice_buttons_create()
-    local sprite_base = "interface/sprites/class_icons/"
+    local sprite_base = "spr_classes/icons/"
     local x_padding, y_padding = 32, 16
     local font = MID_SETTINGS_FONT
 
     local buttons = { 
-        { "White Mage", sprite_base .. "wizard.png"},
-        { "Red Mage", sprite_base .. "wizard.png"},
-        { "Blue Mage", sprite_base .. "wizard.png"},
-        { "Fighter", sprite_base .. "fighter.png"},
+        { "White Mage", sprite_base .. "whitemage.png", COL_WHITE},
+        { "Red Mage", sprite_base .. "redmage.png", COL_PALE_RED},
+        { "Blue Mage", sprite_base .. "bluemage.png", COL_PALE_BLUE},
+        { "Fighter", sprite_base .. "fighter.png", {244, 140, 66}},
 --        { "Ranger", sprite_base .. "archer.png"},
-        { "Necromancer", sprite_base .. "necromancer.png"},
+        { "Necromancer", sprite_base .. "necromancer.png", COL_GRAY},
 --        { "Lifelinker", sprite_base .. "lifelinker.png"}
     }
     local prev, next = {}, {}
@@ -336,7 +336,7 @@ local function class_choice_buttons_create()
                     if settings.class_type == button[1] then
                         return COL_GOLD
                     else 
-                        return self:mouse_over(xy) and COL_PALE_YELLOW or COL_WHITE
+                        return self:mouse_over(xy) and COL_PALE_YELLOW or COL_WHITE--button[3]
                     end
                 end,
                 function(self, xy) -- on_click

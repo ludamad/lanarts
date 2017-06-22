@@ -190,22 +190,27 @@ Pos CombatGameInst::direction_towards_object(GameState* gs, col_filterf filter) 
 }
 
 
+static int random_round(MTwist& rng, float f) {
+    float rem = fmod(f, 1.0f);
+    return int((f - rem) + (rng.genrand_real2() < rem ? 1 : 0));
+}
+
 bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
     event_log("CombatGameInst::damage: id %d getting hit by {cooldown = %d, "
-            "damage=%d, power=%d, magic_percentage=%f, physical_percentage=%f}",
+            "damage=%.2f, power=%.2f, magic_percentage=%f, physical_percentage=%f}",
             id, attack.cooldown, attack.damage, attack.power,
             attack.magic_percentage, 
             attack.physical_percentage());
 
     float fdmg = damage_formula(attack, effective_stats());
-    if (fdmg < 1 && gs->rng().randf() < fdmg) {
-        fdmg = 1;
+    int dmg = random_round(gs->rng(), fdmg);
+    if (dmg == 0) {
+        return false; // Do nothing if damage is 0
     }
-    int dmg = fdmg;
 
     if (gs->game_settings().verbose_output) {
         char buff[100];
-        snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
+        snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%] -> Damage: %d",
                 attack.damage, attack.power, int(attack.magic_percentage * 100),
                 dmg);
         gs->for_screens( [&] () {
@@ -342,7 +347,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
                               atkstats, damage, this, inst);
     if (gs->game_settings().verbose_output) {
         char buff[100];
-        snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %f",
+        snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%] -> Damage: %f",
                 atkstats.damage, atkstats.power, int(atkstats.magic_percentage * 100),
                 damage);
         gs->for_screens([&](){

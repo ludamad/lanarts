@@ -169,8 +169,8 @@ static int lapi_combatgameinst_damage(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	EffectiveAttackStats attack;
 	int nargs = lua_gettop(L);
-	attack.damage = round(lua_tonumber(L, 2));
-	attack.power = round(lua_tonumber(L, 3));
+	attack.damage = lua_tonumber(L, 2);
+	attack.power = lua_tonumber(L, 3);
 	attack.magic_percentage = nargs >= 4 ? lua_tonumber(L, 4) : 1.0f;
 
 	bool died = (luawrap::get<CombatGameInst*>(L, 1)->damage(lua_api::gamestate(L), attack));
@@ -322,6 +322,7 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
     
 	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->weapon().weapon_entry().uses_projectile);
 	LUAWRAP_GETTER(methods, has_ranged_weapon, OBJ->weapon().weapon_entry().uses_projectile);
+	LUAWRAP_GETTER(methods, within_field_of_view, OBJ->within_field_of_view(luawrap::get<Pos>(L, 2)));
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_focus_player(lua_api::gamestate(L)));
 	LUAWRAP_GETTER(methods, can_benefit_from_rest, OBJ->can_benefit_from_rest());
 	LUAWRAP_METHOD(methods, gain_xp, players_gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));

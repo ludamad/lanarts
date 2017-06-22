@@ -80,7 +80,7 @@ struct DerivedStats {
 
 /* Stats related to a chosen attack */
 struct EffectiveAttackStats {
-	int damage, power, cooldown;
+	float damage, power, cooldown;
 	float magic_percentage;
 	EffectiveAttackStats() :
 			damage(0), power(0), cooldown(0), magic_percentage(0.0f) {

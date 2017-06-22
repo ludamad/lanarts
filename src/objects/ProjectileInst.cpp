@@ -205,7 +205,7 @@ void ProjectileInst::step(GameState* gs) {
 
             if (gs->game_settings().verbose_output) {
                 char buff[100];
-                snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
+                snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%] -> Damage: %d",
                         tmp_stats.damage, tmp_stats.power, int(tmp_stats.magic_percentage * 100),
                         (int)damage);
 		gs->for_screens([&]() {gs->game_chat().add_message(buff);});

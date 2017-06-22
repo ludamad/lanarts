@@ -20,6 +20,7 @@ void SpellEntry::parse_lua_table(const LuaValue& table) {
 	using namespace luawrap;
 
 	sprite = res::sprite_id(table["spr_spell"].to_str());
+	LANARTS_ASSERT(sprite != -1);
 
     cooldown = table["cooldown"].to_num();
     spell_cooldown = defaulted(table, "spell_cooldown", 0);

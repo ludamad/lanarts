@@ -25,19 +25,7 @@ sprites:
     
   - name: right_arrow
     file: interface/sprites/right_arrow.png
-        
-  - name: archer_icon
-    file: interface/sprites/class_icons/archer.png
-    
-  - name: druid_icon
-    file: interface/sprites/class_icons/druid.png
-    
-  - name: fighter_icon
-    file: interface/sprites/class_icons/fighter.png
-    
-  - name: wizard_icon
-    file: interface/sprites/class_icons/wizard.png
-    
+
   - name: speed setting icon
     file: interface/sprites/config/speed_setting.png
     

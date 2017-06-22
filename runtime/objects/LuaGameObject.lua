@@ -9,7 +9,11 @@ function M.type_create(T)
     T = T or {}
     local base = T.base or GameObject.Base
     T.base = nil
-    tmerge(T, base)
+    for k,v in pairs(base) do
+        if T[k] == nil then
+            T[k] = v
+        end
+    end
 
     function T.is_instance(obj, T)
         return (getmetatable(obj).parents[T] ~= nil)

@@ -73,6 +73,8 @@ Data.class_create {
     	level_needed = 1 },
       { spell = "Fire Bolt",
         level_needed = 1 },
+      { spell = "Ring of Fire",
+    	level_needed = 1 },
       { spell = "Chain Lightning",
         level_needed = 2 },
       { spell = "Mephitize",
