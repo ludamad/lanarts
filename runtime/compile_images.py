@@ -51,6 +51,8 @@ resources = []
 for spr_folder in SPR_FOLDERS:
     print "-- " + spr_folder + " resource loads:"
     for basename in os.listdir(spr_folder):
+        if basename.startswith("."): # Hidden file? Skip
+            continue
         if "." not in basename: # No file extension? Skip.
             continue
         filename = spr_folder + "/" + basename

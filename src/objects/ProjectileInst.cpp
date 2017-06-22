@@ -53,6 +53,18 @@ void ProjectileInst::draw(GameState* gs) {
 	draw_sprite(view, sprite(), xx, yy, vx, vy, frame);
 }
 
+void ProjectileInst::init(GameState *gs) {
+    GameInst::init(gs);
+    LuaValue& metatable = projectile.projectile_entry().projectile_metatable;
+    if (metatable.empty()) {
+        return;
+    }
+    lua_State* L = gs->luastate();
+    luawrap::push(L, (GameInst*)this); // Ensure lua_variables are set TODO have an on_create method for when lua variables are created for an object
+    lua_pop(L, 1);
+    lua_variables["on_deinit"] = metatable["__index"]["on_deinit"];
+    lua_variables["caster"] = gs->get_instance(origin_id);
+}
 void ProjectileInst::deinit(GameState* gs) {
 	ProjectileEntry& pentry = projectile.projectile_entry();
 	int break_roll = gs->rng().rand(100);
@@ -63,6 +75,7 @@ void ProjectileInst::deinit(GameState* gs) {
 				origin_id, true /*auto-pickup*/);
 		gs->add_instance(item);
 	}
+    GameInst::deinit(gs);
 }
 
 void ProjectileInst::copy_to(GameInst* inst) const {
@@ -88,7 +101,7 @@ ProjectileInst::ProjectileInst(const Item& projectile,
 				hits(hits),
 				damage_mult(1.0f),
 				pass_through(pass_through) {
-	direction_towards(start, target, vx, vy, speed);
+    direction_towards(start, target, vx, vy, speed);
 }
 
 ProjectileInst* ProjectileInst::clone() const {
@@ -197,7 +210,7 @@ void ProjectileInst::step(GameState* gs) {
             EffectiveAttackStats tmp_stats = atkstats;
             lua_attack_stats_callback(L, 
                     projectile.projectile_entry().attack_stat_func,
-                    tmp_stats, this, victim);
+                    tmp_stats, origin, victim);
             float damage = damage_formula(tmp_stats, victim->effective_stats());
             damage = lua_hit_callback(L,
                     projectile.projectile_entry().action_func().get(L),
@@ -295,13 +308,6 @@ void ProjectileInst::step(GameState* gs) {
 		}
 	}
 
-	// Trying to get floating point stability
-	vx = round(vx * 256.0) / 256.0;
-	vy = round(vy * 256.0) / 256.0;
-
-	rx = round(rx * 256.0) / 256.0;
-	ry = round(ry * 256.0) / 256.0;
-	speed = round(speed * 256.0) / 256.0;
 	event_log("ProjectileInst id=%d has rx=%f, ry=%f, vx=%f,vy=%f\n", id, rx,
 			ry, vx, vy);
 }
@@ -328,4 +334,5 @@ void ProjectileInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 bool ProjectileInst::bullet_target_hit2(GameInst* self, GameInst* other) {
 	return ((ProjectileInst*) self)->sole_target == other->id;
 }
+
 

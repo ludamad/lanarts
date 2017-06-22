@@ -7,7 +7,7 @@ Bresenham = require "core.Bresenham"
 Display = require "core.Display"
 SpellObjects = require "objects.SpellObjects"
 DataW = require "DataWrapped"
-require "spells.DefineRingOfFire"
+require "spells.DefineFireSpells"
 
 INFINITE_DURATION = 2^30 -- For all intents and purposes
 mon_title = (mon) -> if mon.unique then mon.name else "the #{mon.name}"
@@ -100,22 +100,6 @@ DataW.spell_create {
     mp_cost: 0
     cooldown: 35
     spell_cooldown: 1600
-}
-
--- FIRE BOLT
-
-DataW.spell_create {
-    name: "Fire Bolt",
-    spr_spell: "fire bolt",
-    description: "A fast bolt of fire. Hits a single target.",
-    types: {"Red"}
-    projectile: {
-        speed: 7
-        damage_multiplier: 1.25
-        spr_attack: "fire bolt"
-    }
-    mp_cost: 10,
-    cooldown: 35
 }
 
 DataW.spell_create {

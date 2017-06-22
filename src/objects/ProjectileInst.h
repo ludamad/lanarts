@@ -26,6 +26,7 @@ public:
 	~ProjectileInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
+	virtual void init(GameState* gs);
 	virtual void deinit(GameState* gs);
 	virtual void copy_to(GameInst* inst) const;
 	virtual ProjectileInst* clone() const;

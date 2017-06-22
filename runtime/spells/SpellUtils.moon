@@ -57,5 +57,9 @@ spell_object_type = (T) ->
             wrapped_on_step(@)
     return LuaGameObject.type_create(T)
 
+message = (user, msg, color) ->
+    for _ in screens()
+        if user\is_local_player()
+            EventLog.add(msg, color)
 mon_title = (mon) -> if mon.unique then mon.name else "the #{mon.name}"
-return {:spell_object_type, :mon_title}
+return {:spell_object_type, :mon_title, :message}

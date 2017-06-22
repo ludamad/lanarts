@@ -11,6 +11,7 @@ M = nilprotect {
     _fire: tosprite "spr_effects.fire-anim"
 }
 
+----------------- <RING OF FIRE IMPL> ---------------------
 -- Utility class that does most of RingOfFire, leaving enough for its commonality
 -- to implemented the SpawnedFire's that result from killing enemies with RingOfFire
 RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
@@ -91,7 +92,7 @@ RingOfFire = RingFireBase {
     -- Extra functionality over RingFireBase: creating SpawnedFire
     _on_kill: (obj) =>
         mon_name = SpellUtils.mon_title(obj)
-        @message("Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
+        SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
         GameObject.add_to_level SpawnedFire.create {
             caster: @caster
             xy: obj.xy -- Create around the damaged enemy
@@ -120,10 +121,10 @@ RingOfFire = RingFireBase {
 }
 
 DataW.spell_create {
-    name: "Ring of Fire",
+    name: "Ring of Flames",
     description: ""
     types: {"Red"}
-    spr_spell: "spr_spells.spell_icon_ring_of_fire"
+    spr_spell: "spr_spells.spell_icon_ring_of_flames"
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
@@ -131,6 +132,81 @@ DataW.spell_create {
     mp_cost: 50
     spell_cooldown: 1200
     cooldown: 0
+}
+----------------- </RING OF FIRE IMPL> ---------------------
+
+
+----------------- <INNER FIRE IMPL> ---------------------
+DataW.effect_create {
+    name: "Inner Fire"
+    can_use_rest: false
+    fade_out: 5
+    effected_colour: {255,160,160}
+    effected_sprite: "spr_effects.inner_flame"
+    apply_func: (obj, time_left) =>
+        @kill_tracker = obj.kills
+        @max_time = math.max(@max_time or 0, time_left)
+        @extensions = 0
+    --remove_func: (obj) =>
+    --    obj\add_effect("Exhausted", @exhausted_duration)
+    --    GameState.for_screens () ->
+    --        if obj\is_local_player()
+    --            play_sound "sound/exhausted.ogg"
+    --            EventLog.add("You are now exhausted...", {255,200,200})
+    step_func: (obj) =>
+        time_passed = @max_time - @time_left
+        if time_passed % 20 == 0
+            play_sound "sound/ringfire-loop.ogg"
+        diff = math.max(obj.kills - @kill_tracker, 0)
+        for i=1,diff
+            @time_left = math.min(@max_time * 1.5, @time_left + 60)
+            GameState.for_screens () ->
+                if obj\is_local_player()
+                    EventLog.add("Your inner fire grows ...", {200,200,255})
+                    play_sound "sound/berserk.ogg"
+            @extensions += 1
+        @kill_tracker = obj.kills
+}
+
+
+DataW.spell_create {
+    name: "Inner Fire"
+    description: ""
+    types: {"Red"}
+    spr_spell: "spr_spells.spell_icon_inner_fire"
+    prereq_func: (caster) -> return true
+    autotarget_func: (caster) -> caster.x, caster.y
+    action_func: (caster, x, y) ->
+        caster\add_effect "Inner Fire", 530 + math.min(3, caster.stats.level) * 30
+    mp_cost: 50
+    spell_cooldown: 1600
+    cooldown: 0
+}
+----------------- </INNER FIRE IMPL> ---------------------
+
+-- FIRE BOLT
+DataW.spell_create {
+    name: "Fire Bolt",
+    spr_spell: "fire bolt",
+    description: "A fast bolt of fire. Hits a single target.",
+    types: {"Red"}
+    projectile: {
+        speed: 7
+        damage_multiplier: 1.25
+        spr_attack: "fire bolt"
+        on_deinit: () =>
+            if @caster.destroyed
+                return
+            if @caster\has_effect "Inner Fire"
+                SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
+                GameObject.add_to_level SpawnedFire.create {
+                    caster: @caster
+                    xy: {@x, @y}
+                    duration: 20
+                }
+    }
+    mp_cost: 10,
+    cooldown: 35
 }
 
 return M

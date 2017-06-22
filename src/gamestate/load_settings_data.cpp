@@ -62,6 +62,11 @@ bool load_settings_data(GameSettings& settings, const char* filename) {
 			optional_set(root, "regen_level_on_death", settings.regen_on_death);
 			optional_set(root, "view_width", settings.view_width);
 			optional_set(root, "view_height", settings.view_height);
+            if (getenv("LANARTS_SMALL")) {
+                settings.fullscreen = false;
+                settings.view_width = 640;
+                settings.view_height = 480;
+            }
 			optional_set(root, "ip", settings.ip);
 			optional_set(root, "port", settings.port);
 			optional_set(root, "lobby_server_url", settings.lobby_server_url);
