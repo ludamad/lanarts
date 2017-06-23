@@ -1,0 +1,48 @@
+#ifndef DATA_LUA_UTIL
+#define DATA_LUA_UTIL
+
+#include <new>
+
+#include "lambda_util.h"
+#include <luawrap/luawrap.h>
+#include "lanarts_defines.h"
+
+template<typename LuaWrapper, typename T, typename ...Args>
+inline T lmethod_call(T _default, const LuaWrapper& wrapper, const char* key, const Args... args) {
+    LuaField field = wrapper[key];
+    if (field.isnil()) {
+        return _default;
+    }
+    field.push();
+    return luawrap::call<T>(wrapper.luastate(), args...);
+}
+
+template<typename LuaWrapper, typename ...Args>
+inline void lmethod_call(const LuaWrapper& wrapper, const char* key, const Args... args) {
+    LuaField field = wrapper[key];
+    if (field.isnil()) {
+        return;
+    }
+    field.push();
+    luawrap::call<void>(wrapper.luastate(), args...);
+}
+
+template<typename ...Args>
+inline void lcall(const LuaValue& field, const Args... args) {
+    if (field.empty() || field.isnil()) {
+        return;
+    }
+    field.push();
+    luawrap::call<void>(field.luastate(), args...);
+}
+
+template<typename T, typename ...Args>
+inline T lcall(T _default, const LuaValue& field, const Args... args) {
+    if (field.empty() || field.isnil()) {
+        return _default;
+    }
+    field.push();
+    return luawrap::call<T>(field.luastate(), args...);
+}
+
+#endif
