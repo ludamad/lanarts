@@ -61,11 +61,11 @@ floor_plans = (rng) ->
             n_encounter_vaults: 3
             enemy_entries: {
                 {enemy: "Sheep", guaranteed_spawns: 5, chance: 100}
-                {enemy: "Mouther", guaranteed_spawns: 5}
-                {enemy: "Black Mamba", guaranteed_spawns: 5}
+                {enemy: "Mouther", guaranteed_spawns: 4}
+                {enemy: "Black Mamba", guaranteed_spawns: 4}
                 {enemy: "Centaur Hunter", guaranteed_spawns: 3}
                 {enemy: "Gragh", guaranteed_spawns: 1}
-                {enemy: "Elephant", guaranteed_spawns: 9}
+                {enemy: "Elephant", guaranteed_spawns: 5}
             }
             item_groups: {{ItemGroups.enchanted_items, 4}}
             :number_regions

@@ -160,7 +160,7 @@ DataW.spell_create {
             {COL_PALE_GREEN, power}
         }
     mp_cost: 50
-    spell_cooldown: 400
+    spell_cooldown: 800
     cooldown: 100
 }
 ----------------- </RING OF FIRE IMPL> ---------------------

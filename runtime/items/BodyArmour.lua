@@ -82,9 +82,9 @@ Data.equipment_create {
     },
     effects_granted = {
         {"RedResist", {resist = -1}},
-        {"RedPower", {resist = -1}},
+        {"RedPower", {power = -1}},
         {"GreenResist", {resist = 1}},
-        {"GreenPower", {resist = 1}},
+        {"GreenPower", {power = 1}},
     }
 }
 
@@ -116,9 +116,9 @@ Data.equipment_create {
     },
     effects_granted = {
         {"BlackResist", {resist = -1}},
-        {"BlackPower", {resist = -1}},
+        {"BlackPower", {power= -1}},
         {"WhiteResist", {resist = 1}},
-        {"WhitePower", {resist = 1}},
+        {"WhitePower", {power = 1}},
     }
 }
 

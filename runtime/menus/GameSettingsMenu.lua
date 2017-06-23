@@ -292,7 +292,7 @@ local function class_choice_buttons_create()
     local buttons = { 
         { "White Mage", sprite_base .. "whitemage.png", COL_WHITE},
         { "Red Mage", sprite_base .. "redmage.png", COL_PALE_RED},
-        { "Blue Mage", sprite_base .. "bluemage.png", COL_PALE_BLUE},
+--        { "Blue Mage", sprite_base .. "bluemage.png", COL_PALE_BLUE},
         { "Fighter", sprite_base .. "fighter.png", {244, 140, 66}},
 --        { "Ranger", sprite_base .. "archer.png"},
         { "Necromancer", sprite_base .. "necromancer.png", COL_GRAY},

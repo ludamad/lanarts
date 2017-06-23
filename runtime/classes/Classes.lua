@@ -74,9 +74,9 @@ Data.class_create {
       { spell = "Fire Bolt",
         level_needed = 1 },
       { spell = "Ring of Flames",
-    	level_needed = 1 },
+    	level_needed = 2 },
       { spell = "Inner Fire", -- Makes fire bolt shoot in all directions
-        level_needed = 2 },
+        level_needed = 3 },
     },
     start_stats = {
         movespeed = 4,
@@ -156,7 +156,7 @@ Data.class_create {
         level_needed = 1 },
       { spell = "Chain Lightning",
         level_needed = 2 },
-      { spell = "Luminos",
+      { spell = "Mephitize",
         level_needed = 3 }
     },
     start_stats = {

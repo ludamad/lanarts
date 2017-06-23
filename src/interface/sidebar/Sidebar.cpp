@@ -80,8 +80,8 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 			player_inst->score_stats().kills);
 
 	if (gs->game_settings().regen_on_death) {
-		gs->font().drawf(COL_PALE_RED, Pos(x + x_interval, y), "Deaths %d",
-				player_inst->score_stats().deaths);
+                int lives = luawrap::globals(gs->luastate())["package"]["loaded"]["core.GlobalData"]["n_lives"].to_num();
+		gs->font().drawf(COL_PALE_GREEN, Pos(x + x_interval, y), "Lives %d", lives);
 	} else {
 		//gs->font().draw(COL_PALE_BLUE, Pos(x + x_interval, y), "Hardcore");
 		gs->font().drawf(COL_PALE_YELLOW, Pos(x + x_interval, y), "Level %d", class_stats.xplevel);

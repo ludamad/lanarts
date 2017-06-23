@@ -103,6 +103,7 @@ for _, entry in ipairs {
                 play_sound "sound/win sound 2-3.ogg"
             end
             GlobalData.lanarts_picked_up[self.name] = true 
+            GlobalData.n_lives = GlobalData.n_lives + #require("core.World").players
         end,
         prereq_func = function (self, user)
             return false
