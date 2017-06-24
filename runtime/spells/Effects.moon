@@ -594,12 +594,14 @@ DataW.effect_create {
         @duration = @time_left
         @on_summon = do_nothing
         @summon_xy = caster.xy
+        @start_map = caster.map
         caster.summoned or= {}
     step_func: (caster) =>
         @n_steps += 1
         if @n_steps == @delay
-            ability = SpellObjects.SummonAbility.create {monster: @monster, :caster, xy: @summon_xy, duration: @duration, on_summon: @on_summon}
-            GameObject.add_to_level(ability)
+            if caster.map == @start_map
+                ability = SpellObjects.SummonAbility.create {monster: @monster, :caster, xy: @summon_xy, duration: @duration, on_summon: @on_summon}
+                GameObject.add_to_level(ability)
 }
 
 DataW.effect_create {

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.6)
 
 if ($ENV{BUILD_OPTIMIZE})
     message("Building release... no debug symbols will be available.")
-    set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Relwithdebinfo)
 else()
     message("Building debug... performance will not be optimal.")
     set(CMAKE_BUILD_TYPE Debug)
@@ -40,9 +40,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_definitions(
           "-fsanitize=undefined"  
           )
-    endif()
+      endif()
 else()
-    add_definitions(-DNDEBUG -g)
+    #add_definitions(-DNDEBUG -g)
+    add_definitions(-g)
     if ($ENV{BUILD_PROF_GEN})
         SET (CMAKE_EXE_LINKER_FLAGS
            -fprofile-generate

@@ -125,4 +125,17 @@ DragonLair = newtype {
             MapUtils.spawn_chest(@map, sqr, items)
 }
 
-return nilprotect {:DragonLair, :DragonLairFoyer}
+Arena = newtype {
+    parent: MapCompiler
+    root_node: cave()
+    tileset: TileSets.lair
+    -- Called before compile() is called 
+    generate: (cc) =>
+        enemies = loadstring(os.getenv "ARENA_ENEMIES")()
+        for enemy, amount in pairs enemies
+            for i=1,amount
+                sqr = MapUtils.random_square(@map, nil)
+                MapUtils.spawn_enemy(@map, enemy, sqr)
+}
+
+return nilprotect {:DragonLair, :DragonLairFoyer, :Arena}

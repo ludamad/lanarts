@@ -47,7 +47,8 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
     gs->set_level(gs->get_level(current_floor));
     event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);
 
-    for (Effect& eff : effects.effects) {
+    for (int i = 0; i < effects.effects.size(); i++) {
+        Effect& eff = effects.effects[i];
         if (!eff.is_active()) {
             continue;
         }
@@ -368,7 +369,8 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     }
 
     // Callbacks on attacker object:
-    for (Effect& eff : effects.effects) {
+    for (int i = 0; i < effects.effects.size(); i++) {
+        Effect& eff = effects.effects[i];
         if (!eff.is_active()) {
             continue;
         }

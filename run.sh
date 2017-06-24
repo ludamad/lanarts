@@ -108,8 +108,18 @@ function build_lanarts(){
     if [ $BUILD_OPTIMIZE ] ; then
         BUILD_DIR="build_release"
     fi
+    # Specialize build dirs 
     if [ $BUILD_LUAJIT ] ; then
         BUILD_DIR="${BUILD_DIR}_luajit"
+    fi
+    if [ $BUILD_SANITIZE ] ; then
+        BUILD_DIR="${BUILD_DIR}_asan"
+    fi
+    if [ $BUILD_PROF_GEN ] ; then
+        BUILD_DIR="${BUILD_DIR}_profgen"
+    fi
+    if [ $BUILD_PROF_USE ] ; then
+        BUILD_DIR="${BUILD_DIR}_profuse"
     fi
     rm_if_link build
     if [ -d build ] ; then

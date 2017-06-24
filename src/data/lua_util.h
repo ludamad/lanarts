@@ -8,23 +8,30 @@
 #include "lanarts_defines.h"
 
 template<typename LuaWrapper, typename T, typename ...Args>
-inline T lmethod_call(T _default, const LuaWrapper& wrapper, const char* key, const Args... args) {
+inline T lmethod_opt_call(T _default, const LuaWrapper& wrapper, const char* key, const Args... args) {
     LuaField field = wrapper[key];
     if (field.isnil()) {
         return _default;
     }
     field.push();
-    return luawrap::call<T>(wrapper.luastate(), args...);
+    return luawrap::call<T>(wrapper.luastate(), wrapper, args...);
+}
+
+template<typename T, typename LuaWrapper, typename ...Args>
+inline T lmethod_call(const LuaWrapper& wrapper, const char* key, const Args... args) {
+    LuaField field = wrapper[key];
+    field.push();
+    return luawrap::call<T>(wrapper.luastate(), wrapper, args...);
 }
 
 template<typename LuaWrapper, typename ...Args>
-inline void lmethod_call(const LuaWrapper& wrapper, const char* key, const Args... args) {
+inline void lmethod_opt_call(const LuaWrapper& wrapper, const char* key, const Args... args) {
     LuaField field = wrapper[key];
     if (field.isnil()) {
         return;
     }
     field.push();
-    luawrap::call<void>(wrapper.luastate(), args...);
+    luawrap::call<void>(wrapper.luastate(), wrapper, args...);
 }
 
 template<typename ...Args>

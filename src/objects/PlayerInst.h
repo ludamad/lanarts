@@ -138,6 +138,9 @@ public:
     // Are we allowed to rest, and can we regenerate mp, hp, or spell cooldown?
     bool can_benefit_from_rest();
     Pos direction_towards_unexplored(GameState* gs);
+    PlayerIOActions& input_source() {
+        return io_value;
+    }
 private:
     ///////////////////////////
     // ** Private methods ** //

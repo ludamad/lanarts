@@ -15,6 +15,7 @@ public:
     PosF target_position(); // Pos(0,0) if none
     bool should_use_weapon();
     bool should_exit_game();
+    LuaValue raw_call(const char* method);
     void poll_input();
 
     void init(LuaValue value) {

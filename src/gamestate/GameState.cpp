@@ -124,6 +124,7 @@ void GameState::start_connection() {
             const char* classes[] = {
                 "Red Mage",
                 "Fighter",
+               // "Fighter",
                 "White Mage",
                 "Necromancer",
             };

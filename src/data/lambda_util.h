@@ -58,6 +58,7 @@ inline int _lua_lambda_wrap(lua_State* L) {
 
 template<class T>
 struct function_traits : function_traits<decltype(&T::operator())> {
+    typedef T Type;
 };
 
 // partial specialization for function type

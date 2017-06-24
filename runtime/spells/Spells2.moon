@@ -199,8 +199,8 @@ DataW.spell_create {
             for mon in *(Map.enemies_list caster)
                 if Map.object_visible(mon, mon.xy, caster)
                     return true
-            GameState.for_screens () ->
-                EventLog.add("No monsters in sight!", COL_PALE_RED)
+            --GameState.for_screens () ->
+            EventLog.add("No monsters in sight!", COL_PALE_RED)
             return false
         return false
 }
@@ -227,8 +227,8 @@ DataW.spell_create {
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) -> 
         if not caster.can_rest
-            GameState.for_screens () ->
-                EventLog.add("Ice Form requires perfect concentration!", {200,200,255})
+            --GameState.for_screens () ->
+            EventLog.add("Ice Form requires perfect concentration!", {200,200,255})
             return false
         return not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
 }
@@ -279,21 +279,18 @@ DataW.spell_create {
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) ->
         if caster.stats.hp < 55
-            GameState.for_screens () ->
-                if caster\is_local_player() 
-                    EventLog.add("You do not have enough health!", {200,200,255})
-                return false
+            if caster\is_local_player() 
+                EventLog.add("You do not have enough health!", {200,200,255})
+            return false
         if not caster\has_effect "Necromancer"
-            GameState.for_screens () ->
-                if caster\is_local_player() 
-                    EventLog.add("You must be a necromancer to cast this spell!", {200,200,255})
+            if caster\is_local_player() 
+                EventLog.add("You must be a necromancer to cast this spell!", {200,200,255})
             return false
         amount = math.max 1, math.ceil((caster\effective_stats().willpower - 7) / 2)
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons >= amount
-            GameState.for_screens () ->
-                if caster\is_local_player() 
-                    EventLog.add("You cannot currently control more than #{amount} aspects!", {200,200,255})
+            if caster\is_local_player() 
+                EventLog.add("You cannot currently control more than #{amount} aspects!", {200,200,255})
             return false
         return not caster\has_effect("Exhausted") and not (caster\has_effect "Summoning")
     action_func: (caster, x_unused, y_unused) ->

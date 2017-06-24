@@ -136,9 +136,9 @@ Data.equipment_create {
     },
     effects_granted = {
         {"BlueResist", {resist = -1}},
-        {"BluePower", {resist = -1}},
+        {"BluePower", {power = -1}},
         {"RedResist", {resist = 1}},
-        {"RedPower", {resist = 1}},
+        {"RedPower", {power = 1}},
     }
 }
 

@@ -49,6 +49,10 @@ bool PlayerIOActions::should_exit_game() {
     return method_call<bool>(value, "should_exit_game");
 }
 
+LuaValue PlayerIOActions::raw_call(const char* method) {
+    return method_call<LuaValue>(value, method);
+}
+
 void PlayerIOActions::poll_input() {
     method_call<void>(value, "poll_input");
 }

@@ -23,15 +23,16 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
         @cooldown = args.cooldown or 5
     _on_kill: (obj) => nil -- Default do nothing
     base_on_step: () =>
+        if @caster.destroyed or @caster.map ~= @map
+            return
         if @every 20
             play_sound "sound/ringfire-loop.ogg"
         @for_all_rings (x, y, damage_cooldown) ->
             for obj in *Map.radius_collision_check(@map, 15, {x, y})
                 if damage_cooldown[obj] or (obj.team == nil) or obj.team == @caster.team
                     continue
-                if @do_damage(obj, @_damage)
+                if not obj.destroyed and @do_damage(obj, @_damage)
                     @_on_kill(obj)
-
                 --    @message "You gain mana from killing #{mon_name}!", COL_PALE_BLUE
                 --    @caster\heal_mp(5)
                 play_sound "sound/ringfire-hit.ogg"
@@ -41,7 +42,7 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
                 damage_cooldown[k] = (if v > 0 then v else nil)
     on_step: () => @base_on_step()
     on_draw: () =>
-        if @caster.destroyed 
+        if @caster.destroyed or @caster.map ~= @map
             return
         alpha = 1.0
         if @in_time_slice(0.0, 0.1)
@@ -50,16 +51,25 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
             alpha = 1.0 - @get_progress(0.9, 1)
         frame = @time_passed()
         @for_all_rings (x, y) ->
-            ObjectUtils.screen_draw(M._fire, {x, y}, alpha, frame)
+            ObjectUtils.screen_draw(M._fire, {x, y}, alpha / 2, frame)
 }, extension
 
 -- When something dies from RingOfFire, this is spawned
+local SpawnedFire
 SpawnedFire = RingFireBase {
     -- RingFireBase config
-    _damage: 2 / 8
+    _damage: 2 / 4
     init: (args) =>
         @damage_cooldowns = {} -- takes [dx][dy][obj]
         @base_init(args)
+    _on_kill: (obj) => -- Try with chain fire
+        mon_name = SpellUtils.mon_title(obj)
+        SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
+        GameObject.add_to_level SpawnedFire.create {
+            caster: @caster
+            xy: obj.xy -- Create around the damaged enemy
+            duration: 40
+        }
     for_all_rings: (f) =>
         rad = 1
         for dy=-rad,rad
@@ -77,7 +87,7 @@ SpawnedFire = RingFireBase {
 
 RingOfFire = RingFireBase {
     -- RingFireBase config
-    _damage: 2 / 6
+    _damage: 2 / 5
     init: (args) =>
         @damage_cooldowns = {} -- takes [index][obj]
         @fireballs = {}
@@ -105,6 +115,8 @@ RingOfFire = RingFireBase {
         if @caster ~= nil and not @caster.destroyed
             @caster.__vision_radius_override = nil -- Stop overriding vision radius
     on_step: () =>
+        if @caster.destroyed or @caster.map ~= @map
+            return
         @caster.__vision_radius_override = 9
         @base_on_step()
 
@@ -146,7 +158,7 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        GameObject.add_to_level RingOfFire.create({:caster, duration: 300 + EffectUtils.get_power(caster, 'Red') * 15})
+        GameObject.add_to_level RingOfFire.create({:caster, duration: 350 + EffectUtils.get_power(caster, 'Red') * 15})
     console_draw_func: (get_next) =>
         damage = math.floor(RingOfFire._damage * 60 / 5)
         power = @effective_stats().magic + EffectUtils.get_power(@, "Red")
@@ -207,7 +219,7 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        caster\add_effect "Inner Fire", 200 + math.min(3, caster.stats.level) * 30 + EffectUtils.get_power(caster, 'Red') * 15
+        caster\add_effect "Inner Fire", 300 + math.min(3, caster.stats.level) * 30 + EffectUtils.get_power(caster, 'Red') * 15
     console_draw_func: (get_next) =>
         power = @effective_stats().magic + EffectUtils.get_power(@, "Red")
         draw_console_effect get_next(), tosprite("fire bolt"), {

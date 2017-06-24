@@ -10,6 +10,7 @@ Map = require "core.Map"
 Region1 = require "maps.Region1"
 OldMaps = require "maps.OldMaps"
 
+import Arena from require "maps.Places"
 import ConnectedRegions, FilledRegion
     from require "maps.MapElements"
 
