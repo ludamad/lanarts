@@ -627,7 +627,7 @@ DataW.enemy_create {
         types: {"Piercing", "Green"}
         cooldown: 30
         speed: 9
-        power: {base: {5, 5}}
+        power: {base: {10, 10}}
         spr_attack: 'nessos arrows'
     }
 }

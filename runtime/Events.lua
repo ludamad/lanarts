@@ -16,7 +16,7 @@ function events.PlayerDeath(player)
         -- On soft-core, turn players into ghosts when they die:
         player.is_ghost = true
         if not player:has_effect("Reviving") then
-            player:add_effect("Reviving", 5 * 60) -- 20 'seconds'
+            player:add_effect("Reviving", 5 * 60) -- 5 'seconds'
         end
         GlobalData.n_lives = GlobalData.n_lives - 1
         -- On soft-core multiplayer, die if everyone is a ghost:

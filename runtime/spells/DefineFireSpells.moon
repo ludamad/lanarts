@@ -23,6 +23,9 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
         @cooldown = args.cooldown or 5
     _on_kill: (obj) => nil -- Default do nothing
     base_on_step: () =>
+        if @caster.is_ghost
+            GameObject.destroy(@)
+            return
         if @caster.destroyed or @caster.map ~= @map
             return
         if @every 20
