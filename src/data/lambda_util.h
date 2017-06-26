@@ -24,38 +24,38 @@ struct TempFunctionStorer {
 template <typename Function>
 inline int _lua_lambda_wrap(lua_State* L) {
     auto& f = TempFunctionStorer<Function>::get();
-    luawrap::push(L, f());
-    return 1;
+    f();
+    return 0;
 }
 template <typename Function, typename Arg1>
 inline int _lua_lambda_wrap(lua_State* L) {
     auto& f = TempFunctionStorer<Function>::get();
-    luawrap::push(L, f(luawrap::get<Arg1>(L, 1)));
-    return 1;
+    f(luawrap::get<Arg1>(L, 1));
+    return 0;
 }
 
 template <typename Function, typename Arg1, typename Arg2>
 inline int _lua_lambda_wrap(lua_State* L) {
     auto& f = TempFunctionStorer<Function>::get();
-    luawrap::push(L, f(luawrap::get<Arg1>(L, 1), luawrap::get<Arg2>(L, 2)));
-    return 1;
+//    luawrap::push(L,
+    f(luawrap::get<Arg1>(L, 1), luawrap::get<Arg2>(L, 2));
+//    );
+    return 0;
 }
 
 template <typename Function, typename Arg1, typename Arg2, typename Arg3>
 inline int _lua_lambda_wrap(lua_State* L) {
     auto& f = TempFunctionStorer<Function>::get();
-    luawrap::push(L, f(luawrap::get<Arg1>(L, 1), luawrap::get<Arg2>(L, 2), luawrap::get<Arg3>(L, 3)));
-    return 1;
+    f(luawrap::get<Arg1>(L, 1), luawrap::get<Arg2>(L, 2), luawrap::get<Arg3>(L, 3));
+    return 0;
 }
 
 template <typename Function, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 inline int _lua_lambda_wrap(lua_State* L) {
     auto& f = TempFunctionStorer<Function>::get();
-    luawrap::push(L, f(luawrap::get<Arg1>(L, 1), luawrap::get<Arg2>(L, 2), luawrap::get<Arg3>(L, 3), luawrap::get<Arg3>(L, 4)));
-    return 1;
+    f(luawrap::get<Arg1>(L, 1), luawrap::get<Arg2>(L, 2), luawrap::get<Arg3>(L, 3), luawrap::get<Arg3>(L, 4));
+    return 0;
 }
-// END HAND WRITTEN
-
 template<class T>
 struct function_traits : function_traits<decltype(&T::operator())> {
     typedef T Type;
@@ -124,6 +124,11 @@ inline void lua_push_unsafe_closure(lua_State* L, const F& f) {
     function_traits<F>::push(L, f);
     TempFunctionStorer<F>::set(f);
     was_set = true;
+}
+
+template <typename T>
+inline void install_closure(const T& unused) {
+    luawrap::install_type<T, lua_push_unsafe_closure<T>>();
 }
 
 #endif

@@ -416,7 +416,7 @@ function M.enemy_bonus()
 end
 
 function M.adjusted_enemy_amount(amount)
-    return math.ceil(amount + amount * (World.player_amount - 1) / 4)
+    return math.ceil(amount + amount * (World.player_amount - 1) / 8)
 end
 
 function M.adjusted_item_amount(amount)

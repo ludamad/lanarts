@@ -19,6 +19,7 @@ public:
 			bool pickup_by_dropper = false) :
 			GameInst(xy.x, xy.y, RADIUS, false, DEPTH), item(item), dropped_by(
 					dropped_by), pickup_by_dropper(pickup_by_dropper), was_seen(false) {
+		LANARTS_ASSERT(item.id >= 0);
 	}
 	virtual ~ItemInst();
 	virtual void step(GameState* gs);

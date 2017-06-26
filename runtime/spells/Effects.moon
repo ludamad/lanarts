@@ -759,7 +759,11 @@ DataW.effect_create {
                 mon\add_effect("Pained", 50)
                 play_pained_sound()
                 caster\add_effect("Pained", 50)
-                if mon\damage(random(4,15) * 2 + caster.stats.magic * 2, random(2,5) + caster.stats.magic * 0.2, 1.0, 2.0)
+                stats = caster\effective_stats()
+                damage, power = 20, random(2,5) + stats.magic
+                power = power + EffectUtils.get_power(caster, "Black")
+                damage = damage * EffectUtils.get_resistance(mon, "Black")
+                if mon\damage(damage, power, 1) then
                     {:stats} = caster
                     caster\gain_xp_from(mon)
                     {:max_hp} = mon\effective_stats()

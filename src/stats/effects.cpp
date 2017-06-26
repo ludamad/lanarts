@@ -326,7 +326,7 @@ void EffectStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
 
     serializer.read_container(effects, [&](auto& eff){
         eff.state = LuaValue(L);
-        serializer.write_int(eff.id);
+        serializer.read_int(eff.id);
         config.decode(serializer, eff.state);
         lua_init_metatable(L, eff.state, eff.id);
     });

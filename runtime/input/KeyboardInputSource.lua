@@ -94,4 +94,17 @@ function KeyboardInputSource:should_exit_game()
 end
 function KeyboardInputSource:poll_input()
 end
+
+function KeyboardInputSource:slot_highlighted()
+    return -1
+end
+
+function KeyboardInputSource:slot_selected()
+    return -1
+end
+
+
+function KeyboardInputSource:handle_inventory()
+end
+
 return KeyboardInputSource

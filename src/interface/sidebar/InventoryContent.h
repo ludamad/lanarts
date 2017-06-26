@@ -28,7 +28,7 @@ public:
 	virtual bool handle_io(GameState* gs, ActionQueue& queued_actions);
 private:
 	mutable LuaValue handler; // Initialized upon first use
-    int slot_selected;
+    int slot_selected = -1;
 };
 
 #endif /* INVENTORYCONTENT_H_ */

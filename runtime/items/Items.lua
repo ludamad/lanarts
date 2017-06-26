@@ -216,7 +216,7 @@ Data.item_create  {
 
     action_func = function(self, user)
         play_sound "sound/haste.ogg"
-        user:add_effect(effects.Haste.name, 800)
+        user:add_effect("Haste", 800)
     end
 }
 

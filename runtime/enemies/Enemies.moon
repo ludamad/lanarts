@@ -3,6 +3,7 @@ ObjectUtils = require "objects.ObjectUtils"
 EventLog = require "ui.EventLog"
 DataW = require "DataWrapped"
 World = require "core.World"
+EffectUtils = require "spells.EffectUtils"
 
 -- ELEMENTAL ENEMIES --
 
@@ -410,9 +411,9 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
         weapon_class: "magic"
         can_wall_bounce: true
         damage_type: {magic: 0.5, physical: 0.5}
-        range: 1150 * 4 * 4
+        range: 1150 * 3
         radius: 11
-        power: {base: {30, 30}}
+        power: {base: {15, 15}}
         cooldown: 200
         speed: 8
         spr_attack: "spr_effects.dragon_fireball"
@@ -626,7 +627,7 @@ DataW.enemy_create {
         types: {"Piercing", "Green"}
         cooldown: 30
         speed: 9
-        power: {base: {15, 15}}
+        power: {base: {5, 5}}
         spr_attack: 'nessos arrows'
     }
 }
@@ -643,7 +644,7 @@ DataW.enemy_create {
         hp: 120
         hpregen: 0.02
         movespeed: 4
-        strength: 40
+        strength: 30
         defence: 16
         willpower: 16
     }
@@ -657,7 +658,7 @@ DataW.enemy_create {
         speed: 9
         spr_attack: 'nessos arrows'
         on_hit_func: (target, atkstats) =>
-            if chance(.25) -- TODO poison resistance
+            if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
                 effect = target\add_effect("Poison", 100, atkstats)
                 effect.damage = atkstats.damage
                 effect.power = atkstats.power
@@ -693,7 +694,7 @@ DataW.enemy_create {
         spr_attack: 'nessos arrows'
         types: {"Piercing", "Green"}
         on_hit_func: (target, atkstats) =>
-            if chance(.25) -- TODO poison resistance
+            if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
                 effect = target\add_effect("Poison", 100, atkstats)
                 effect.damage = atkstats.damage
                 effect.power = atkstats.power

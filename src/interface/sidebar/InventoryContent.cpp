@@ -55,6 +55,8 @@ static void draw_player_inventory(GameState* gs, LuaValue handler, Inventory& in
 		const BBox& bbox, int min_slot, int max_slot, int slot_selected) {
 	int mx = gs->mouse_x(), my = gs->mouse_y();
 	int slot = min_slot;
+    int slot_highlighted = lmethod_call<int>(handler, "slot_highlighted");
+    int handler_slot_selected = lmethod_call<int>(handler, "slot_selected");
 	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
 		for (int x = bbox.x1; x < bbox.x2; x += TILE_SIZE) {
 			if (slot >= max_slot || slot >= inv.max_size())
@@ -74,9 +76,19 @@ static void draw_player_inventory(GameState* gs, LuaValue handler, Inventory& in
 					outline_col = COL_PALE_YELLOW;
 					draw_console_item_description(gs, itemslot.item,
 							itemslot.item_entry());
-				}
+				} else if (slot == handler_slot_selected) {
+                    outline_col = COL_GREEN;
+                }
 			}
-
+            if (slot == slot_highlighted) {
+                outline_col = COL_PALE_GREEN;
+                if (!itemslot.empty())
+                draw_console_item_description(gs, itemslot.item,
+                                              itemslot.item_entry());
+            }
+            if (slot == handler_slot_selected) {
+                outline_col = COL_GREEN;
+            }
 			if (slot != slot_selected)
 				draw_player_inventory_slot(gs, handler, itemslot, x, y);
 			//draw rectangle over item edges
@@ -156,19 +168,29 @@ bool InventoryContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 		}
 	}
     auto drop_item_slot = [&] (int slot, bool drop_half) {
+	if (slot < 0 || slot >= inv.max_size())
+            return;
+        if (inv.get(slot).empty()) {
+            return;
+        }
         queued_actions.push_back(
                 game_action(gs, p, GameAction::DROP_ITEM, slot, 0,0, drop_half));
     };
     auto reposition_item = [&] (int slot1, int slot2) {
+	if (slot1 < 0 || slot1 >= inv.max_size())
+            return;
+	if (slot2 < 0 || slot2 >= inv.max_size())
+            return;
         queued_actions.push_back(
                 game_action(gs, p, GameAction::REPOSITION_ITEM, slot1, 0, 0, slot2));
     };
-//    lmethod_call(handler, );
+    install_closure(drop_item_slot);
+    install_closure(reposition_item);
+    lmethod_call<void>(handler, "handle_inventory", drop_item_slot, reposition_item);
 
 	/* Drop a dragged item */
 	if (slot_selected > -1 && gs->mouse_right_release()) {
 		int slot = get_itemslotn(inv, bbox, mx, my);
-
 		if (slot == -1 || slot == slot_selected) {
             drop_item_slot(slot_selected, gs->io_controller().shift_held());
 		} else {
@@ -182,7 +204,7 @@ bool InventoryContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 
 void InventoryContent::ensure_init(GameState* gs) const {
 	if (handler.empty()) {
-//		handler = gs->local_player()->input_source().raw_call("inventory_content");
+		handler = gs->local_player()->input_source().value;//.raw_call("inventory_content");
 	}
 }
 

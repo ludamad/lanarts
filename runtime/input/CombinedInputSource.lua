@@ -77,6 +77,34 @@ function CombinedInputSource:should_use_weapon()
     return false
 end
 
+function CombinedInputSource:slot_highlighted()
+    for _, subinput in ipairs(self.subinputs) do
+        local slot = subinput:slot_highlighted()
+        if slot ~= -1 then
+            return slot
+        end
+    end
+    return -1
+end
+
+function CombinedInputSource:slot_selected()
+    for _, subinput in ipairs(self.subinputs) do
+        local slot = subinput:slot_selected()
+        if slot ~= -1 then
+            return slot
+        end
+    end
+    return -1
+end
+
+
+function CombinedInputSource:handle_inventory(...)
+    for _, subinput in ipairs(self.subinputs) do
+        subinput:handle_inventory(...)
+    end
+end
+
+
 function CombinedInputSource:poll_input()
     for _, subinput in ipairs(self.subinputs) do
         subinput:poll_input()

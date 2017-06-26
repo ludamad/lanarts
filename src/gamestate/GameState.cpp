@@ -122,16 +122,15 @@ void GameState::start_connection() {
                 n_extra_players -=1; // Remove one player if first player controller is desired
             }
             const char* classes[] = {
-                "Red Mage",
-                "Fighter",
-               // "Fighter",
-                "White Mage",
-                "Necromancer",
+                getenv("L2") ? getenv("L2") : "Red Mage",
+                getenv("L3") ? getenv("L3") : "Red Mage",
+                getenv("L4") ? getenv("L4") : "Red Mage",
+                getenv("L5") ? getenv("L5") : "Red Mage",
             };
             for (int i = 0 ; i < n_extra_players; i++) {
                 std::string p = "Player ";
                 p += char('0' + (i+2)); // Start at 'player 2'
-                player_data().register_player(p, NULL, classes[i%3], /* local player */ true);
+                player_data().register_player(p, NULL, classes[i%4], /* local player */ true);
             }
 	}
 }

@@ -122,7 +122,7 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	bool used_item = false;
 
 //Item use
-	for (int i = 0; i < 9 && !used_item; i++) {
+	for (int i = 0; i < 8*5 && !used_item; i++) {
         if (io_value.use_item_slot() == i) {
             if (inventory().get(i).amount() > 0) {
                 item_used = true;

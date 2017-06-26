@@ -370,7 +370,8 @@ function GreaterPain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
     caster:direct_damage(40)
     caster:add_effect("Pained", 50)
-    caster:add_effect("Pain Aura", 100).range = GreaterPain.range + caster.stats.level * 5
+    local power = EffectUtils.get_power(caster, "Black")
+    caster:add_effect("Pain Aura", 100 + power * 25).range = GreaterPain.range + (caster.stats.level + power)* 5
     GameState.for_screens(function() 
         if caster:is_local_player() then
             EventLog.add("You attack nearby enemies life force directly!", {200,200,255})

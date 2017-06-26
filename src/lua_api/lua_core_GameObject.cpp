@@ -151,7 +151,7 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
     methods["remove_effect"].bind_function( lapi_gameinst_remove_effect);
 
     LUAWRAP_GETTER(methods, add_effect, OBJ->effects.add(lua_api::gamestate(L), OBJ, StatusEffect {effect_from_lua(L, 2), LuaValue(L, 3)}) );
-    LUAWRAP_GETTER(methods, has_effect, OBJ->effects.get_active(lua_tostring(L, 2)) != NULL);
+    LUAWRAP_GETTER(methods, has_effect, OBJ->effects.has(lua_tostring(L, 2)));
     LUAWRAP_GETTER(methods, get_effect, OBJ->effects.get(lua_api::gamestate(L), OBJ, lua_tostring(L, 2)).state);
     LUAWRAP_GETTER(methods, has_effect_category, OBJ->effects.has_category(luawrap::get<const char*>(L, 2)));
 

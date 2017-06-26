@@ -87,10 +87,11 @@ get_name_and_description = (rng, artifact, power_level) ->
     error "Unexpected!"
 
 -- Desired score ranges for levels:
+pmod = math.sqrt(#require("core.World").players)
 LEVEL_RANGES = {
-    {600, 900}
-    {900, 1600}
-    {1200, 2500}
+    {600 * pmod, 900 * pmod}
+    {900 * pmod, 1600 * pmod}
+    {1200 * pmod, 2500 * pmod}
 }
 
 MAX_TRIES=1000
@@ -101,7 +102,7 @@ INSTANCES = 20
 
 -- Enchantments:
 apply_core_stat_buff = () =>
-    if @rng\randomf() < 0.1 
+    if @rng\randomf() < 0.4
         return @add_bonus @rng\random_choice {
             "magic_cooldown_multiplier"
             "melee_cooldown_multiplier"
@@ -130,13 +131,13 @@ _is_amulet = () =>
 
 _is_jewellery = () =>
     -- Very rarely, assign 'inappropriate' attributes
-    if @rng\randomf() < 0.01
+    if @rng\randomf() < 0.1
         return true
     return @base.type == 'amulet' or @base.type == 'ring'
 
 _is_armour = () =>
     -- Very rarely, assign 'inappropriate' attributes
-    if @rng\randomf() < 0.01
+    if @rng\randomf() < 0.1
         return true
     return @base.type == 'belt' or @base.type == 'armour' or @base.type == 'gloves' or @base.type == 'legwear'
 
@@ -154,12 +155,12 @@ apply_random_effect = () =>
     elseif _is_jewellery(@) and @rng\randomf() < 0.1
         return @add_bonus "PossiblySummonStormElementalOnKill"
     else
-        effects = if _is_melee_weapon(@) then {
+        effects = { --if _is_melee_weapon(@) then {
             "VampiricWeapon"
             "ConfusingWeapon"
             "PoisonedWeapon"
             "KnockbackWeapon"
-        } else {}
+        } 
         for type in *EffectUtils.TYPES
             if _is_armour(@) and type ~= "Slashing" and type ~= "Bludgeon" -- Only have piercing resist ATM
                 append effects, "#{type}Resist"

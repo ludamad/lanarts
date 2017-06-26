@@ -127,6 +127,7 @@ function setup_start_menu()
     end    
 
     local function on_load_click()
+        GameState.mark_loading()
         game_loop.loop_control.startup_function = function()
             if file_exists("saves/savefile.save") then
                 GameState.load("saves/savefile.save")
