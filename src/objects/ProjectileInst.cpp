@@ -54,16 +54,12 @@ void ProjectileInst::draw(GameState* gs) {
 }
 
 void ProjectileInst::init(GameState *gs) {
-    LuaValue& metatable = projectile.projectile_entry().projectile_metatable;
-    if (!metatable.empty()) {
-        lua_State* L = gs->luastate();
-        luawrap::push(L, (GameInst*)this); // Ensure lua_variables are set TODO have an on_create method for when lua variables are created for an object
-        lua_pop(L, 1);
-        lua_variables["on_map_init"] = metatable["__index"]["on_map_init"];
-        lua_variables["on_deinit"] = metatable["__index"]["on_deinit"];
-        lua_variables["on_step"] = metatable["__index"]["on_step"];
-        lua_variables["caster"] = gs->get_instance(origin_id);
-    }
+    LuaValue& table = projectile.projectile_entry().raw_table;
+    lua_State* L = gs->luastate();
+    luawrap::push(L, this); // Ensure lua_variables are set TODO have an on_create method for when lua variables are created for an object
+    lua_pop(L, 1);
+    lua_variables["type"] = table;
+    lua_variables["caster"] = gs->get_instance(origin_id);
     GameInst::init(gs);
 }
 void ProjectileInst::deinit(GameState* gs) {
@@ -155,6 +151,7 @@ static bool enemy_filter(GameInst* g1, GameInst* g2) {
 }
 
 void ProjectileInst::step(GameState* gs) {
+        GameInst::step(gs);
 	lua_State* L = gs->luastate();
 
 	Pos tile_hit;

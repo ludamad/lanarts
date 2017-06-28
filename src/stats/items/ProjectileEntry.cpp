@@ -47,11 +47,6 @@ void ProjectileEntry::parse_lua_table(const LuaValue& table) {
     can_pass_through = defaulted(table, "can_pass_through", false);
     deals_special_damage = defaulted(table, "deals_special_damage", false);
     attack_stat_func = table["attack_stat_func"];
-    if (!table["on_map_init"].isnil() || !table["on_deinit"].isnil() || !table["on_hit_func"].isnil()) {
-        projectile_metatable = LuaValue::newtable(table.luastate());
-        projectile_metatable["__index"] = table;
-    } else {
-        projectile_metatable.clear();
-    }
+    raw_table = table;
     radius = defaulted(table, "radius", 5);
 }

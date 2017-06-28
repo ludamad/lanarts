@@ -28,6 +28,7 @@
 #include "objects/ItemInst.h"
 #include "objects/PlayerInst.h"
 #include "objects/CombatGameInst.h"
+#include "objects/ProjectileInst.h"
 
 #include "lua_api.h"
 
@@ -724,6 +725,7 @@ namespace lua_api {
 		luawrap::install_dynamic_casted_type<EnemyInst*, GameInst*>();
 		luawrap::install_dynamic_casted_type<ItemInst*, GameInst*>();
 		luawrap::install_dynamic_casted_type<FeatureInst*, GameInst*>();
+		luawrap::install_dynamic_casted_type<ProjectileInst*, GameInst*>();
 
 		LuaValue globals = luawrap::globals(L);
 		LuaValue submodule = lua_api::register_lua_submodule(L, "core.GameObject");

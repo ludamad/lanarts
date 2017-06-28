@@ -61,7 +61,15 @@ passing_projectile = (args) ->
     base = {
         can_pass_through: true -- Custom projectile
         deals_special_damge: true -- Custom projectile
+        on_map_init: () =>
+            @n_steps = args.n_steps
+            @attacked_map = {}
+            @n_hits = 0
         on_step: () =>
+            @n_steps -= 1
+            if @n_steps <= 0
+                GameObject.destroy(@)
+                return
             @attacked_map or= {}
             @n_hits or= 0
             for k,v in pairs @attacked_map
@@ -70,13 +78,11 @@ passing_projectile = (args) ->
                 else
                     @attacked_map[k] = v - 1
         on_hit_func: (target, atkstats, damage) =>
-            @attacked_map or= {}
-            @n_hits or= 0
             if @attacked_map[target] ~= nil
                 return 0 -- No damage this step
             @attacked_map[target] = args.redamage_cooldown
             @n_hits += 1
-            return damage * (1.0 + (math.sqrt(@n_hits - 1) - 1.0) / 2)
+            return damage * (1.0 + (math.sqrt(@n_hits - 1) - 1.0) / 20)
     }
     return table.merge base, args
 

@@ -9,20 +9,21 @@ SpellUtils = require "spells.SpellUtils"
 EffectUtils = require "spells.EffectUtils"
 
 M = nilprotect {
-    _fire: tosprite "spr_effects.fire-anim"
 }
 
--- LIGHTNING SPEAR
+-- ENERGY SPEAR
 -- A basic elemental spell that goes through multiple enemies.
 DataW.spell_create {
     name: "Energy Spear",
-    description: "Allows you to create a spear of lightning.",
+    description: "Allows you to create a durable spear of lightning.",
     spr_spell: "magic arrow"
     types: {"White"}
     projectile: SpellUtils.passing_projectile {
-        speed: 8
+        speed: 5
         spr_attack: "crystal spear"
         damage_multiplier: 1
+        n_steps: 500 / 8 
+        can_wall_bounce: true
         redamage_cooldown: 40 -- Cooldown for when enemies are damaged again by effect
     }
     mp_cost: 10,
