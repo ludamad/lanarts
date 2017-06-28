@@ -57,9 +57,32 @@ spell_object_type = (T) ->
             wrapped_on_step(@)
     return LuaGameObject.type_create(T)
 
+passing_projectile = (args) -> 
+    base = {
+        can_pass_through: true -- Custom projectile
+        deals_special_damge: true -- Custom projectile
+        on_step: () =>
+            @attacked_map or= {}
+            @n_hits or= 0
+            for k,v in pairs @attacked_map
+                if v == 0 
+                    @attacked_map[k] = nil
+                else
+                    @attacked_map[k] = v - 1
+        on_hit_func: (target, atkstats, damage) =>
+            @attacked_map or= {}
+            @n_hits or= 0
+            if @attacked_map[target] ~= nil
+                return 0 -- No damage this step
+            @attacked_map[target] = args.redamage_cooldown
+            @n_hits += 1
+            return damage * (1.0 + (math.sqrt(@n_hits - 1) - 1.0) / 2)
+    }
+    return table.merge base, args
+
 message = (user, msg, color) ->
     for _ in screens()
         if user\is_local_player()
             EventLog.add(msg, color)
 mon_title = (mon) -> if mon.unique then mon.name else "the #{mon.name}"
-return {:spell_object_type, :mon_title, :message}
+return {:spell_object_type, :mon_title, :message, :passing_projectile}

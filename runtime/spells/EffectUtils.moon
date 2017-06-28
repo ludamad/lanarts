@@ -27,25 +27,25 @@ get_monster_resistances = (types) ->
     }
     for type in *types
         if type == "Red"
-            resists.Red += 3
-            resists.Blue -= 1
-            resists.Piercing += 1
+            resists.Red += 5
+            resists.Blue -= 2
+            resists.Piercing += 2
         elseif type == "Black"
-            resists.Black += 3
-            resists.White -= 1
-            resists.Slashing += 1
-            resists.Piercing += 1
+            resists.Black += 5
+            resists.White -= 2
+            resists.Slashing += 2
+            resists.Piercing += 2
         elseif type == "White"
-            resists.White += 3
-            resists.Black -= 1
+            resists.White += 5
+            resists.Black -= 2.5
         elseif type == "Green"
-            resists.Bludgeon += 1
-            resists.Green += 3
-            resists.Red -= 1
+            resists.Bludgeon += 2.5
+            resists.Green += 5
+            resists.Red -= 2.5
         elseif type == "Blue"
-            resists.Slashing += 1
-            resists.Green -= 1
-            resists.Blue += 3
+            resists.Slashing += 2.5
+            resists.Green -= 2.5
+            resists.Blue += 5
     return resists
 
 get_effect_stat = (obj, type, default = 0) ->
@@ -66,9 +66,17 @@ get_resistance = (obj, type) ->
         return 10
     if raw_resist >= 100
         return 0
-    -- Otherwise, resistances are capped between -10 and +10 (inclusive)
-    resist = math.max(math.min(math.floor(raw_resist), 10), -10)
-    return math.pow(2, resist / 5)
+    -- Otherwise, resistances are capped between -5 and +5 (inclusive)
+    resist = math.max(math.min(math.floor(raw_resist), 5), -5)
+    return math.pow(2, -(2*resist) / 5) -- from 0.25 to 4x
+
+-- Default implementation of projectile hit function, in Lua
+hit_func = (type, attacker, target, atkstats) ->
+    {:power, :damage, :magic_percentage} = atkstats
+    power += get_power(attacker, type)
+    damage *= get_resistance(target, type)
+    -- TODO take 'attacker' argument
+    return target\damage(damage, power, magic_percentage, attacker)
 
 --        when 3 then 0.4
 --        when 2 then 0.6

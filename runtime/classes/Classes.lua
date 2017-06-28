@@ -150,10 +150,8 @@ Data.class_create {
     name = "White Mage",
     sprites = {"spr_classes.white_mage1", "spr_classes.white_mage2"},
     available_spells = {
-      { spell = "Minor Missile",
+      { spell = "Energy Spear",
     	level_needed = 1 },
-      { spell = "Lightning Bolt",
-        level_needed = 1 },
       { spell = "Chain Lightning",
         level_needed = 2 },
       { spell = "Mephitize",

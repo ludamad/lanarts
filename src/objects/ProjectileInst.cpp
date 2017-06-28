@@ -54,17 +54,17 @@ void ProjectileInst::draw(GameState* gs) {
 }
 
 void ProjectileInst::init(GameState *gs) {
-    GameInst::init(gs);
     LuaValue& metatable = projectile.projectile_entry().projectile_metatable;
-    if (metatable.empty()) {
-        return;
+    if (!metatable.empty()) {
+        lua_State* L = gs->luastate();
+        luawrap::push(L, (GameInst*)this); // Ensure lua_variables are set TODO have an on_create method for when lua variables are created for an object
+        lua_pop(L, 1);
+        lua_variables["on_map_init"] = metatable["__index"]["on_map_init"];
+        lua_variables["on_deinit"] = metatable["__index"]["on_deinit"];
+        lua_variables["on_step"] = metatable["__index"]["on_step"];
+        lua_variables["caster"] = gs->get_instance(origin_id);
     }
-    lua_State* L = gs->luastate();
-    luawrap::push(L, (GameInst*)this); // Ensure lua_variables are set TODO have an on_create method for when lua variables are created for an object
-    lua_pop(L, 1);
-	lua_variables["on_deinit"] = metatable["__index"]["on_deinit"];
-	lua_variables["on_step"] = metatable["__index"]["on_step"];
-    lua_variables["caster"] = gs->get_instance(origin_id);
+    GameInst::init(gs);
 }
 void ProjectileInst::deinit(GameState* gs) {
 	ProjectileEntry& pentry = projectile.projectile_entry();
@@ -212,6 +212,7 @@ void ProjectileInst::step(GameState* gs) {
                     projectile.projectile_entry().attack_stat_func,
                     tmp_stats, origin, victim);
             float damage = damage_formula(tmp_stats, victim->effective_stats());
+            damage *= damage_mult;
             damage = lua_hit_callback(L,
                     projectile.projectile_entry().action_func().get(L),
                     tmp_stats, damage, this, victim);
@@ -225,18 +226,16 @@ void ProjectileInst::step(GameState* gs) {
 
             }
 
-            if (dynamic_cast<PlayerInst*>(victim)) {
-                play(hurt_sound, "sound/player_hurt.ogg");
-            }
-            damage *= damage_mult;
-
-			gs->for_screens([&]() {
-				if (dynamic_cast<PlayerInst *>(origin) &&
-					gs->local_player()->current_floor == dynamic_cast<PlayerInst *>(origin)->current_floor) {
-					play(minor_missile_sound, "sound/minor_missile.ogg");
-				}
-			});
-            if (!projectile.projectile_entry().deals_special_damage) {
+            if (damage > 0 && !projectile.projectile_entry().deals_special_damage) {
+                if (dynamic_cast<PlayerInst*>(victim)) {
+                    play(hurt_sound, "sound/player_hurt.ogg");
+                }
+                gs->for_screens([&]() {
+                        if (dynamic_cast<PlayerInst *>(origin) &&
+                                gs->local_player()->current_floor == dynamic_cast<PlayerInst *>(origin)->current_floor) {
+                                play(minor_missile_sound, "sound/minor_missile.ogg");
+                        }
+                });
                 char buffstr[32];
                 snprintf(buffstr, 32, "%d", (int)damage);
                 float rx = vx / speed * .5;
