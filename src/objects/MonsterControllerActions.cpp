@@ -119,6 +119,7 @@ const int TOO_LARGE_RANGE = 99999;
 static bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 		CombatGameInst* target, AttackStats& attack) {
 	CombatStats& stats = inst->stats();
+        EffectiveStats& estats = inst->effective_stats();
 	std::vector<AttackStats>& attacks = stats.attacks;
 
 	int attack_id = -1;
@@ -131,9 +132,14 @@ static bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 		WeaponEntry& wentry = attacks[i].weapon.weapon_entry();
 		int range = wentry.range();
 		if (!attacks[i].projectile.empty()) {
-			ProjectileEntry& pentry = attacks[i].projectile_entry();
-			range = std::max(range, pentry.range());
-		}
+                    ProjectileEntry& pentry = attacks[i].projectile_entry();
+                    range = std::max(range, pentry.range());
+		    if (!estats.allowed_actions.can_use_spells) {
+                        continue;
+                    }
+		} else if (!estats.allowed_actions.can_use_weapons) {
+                    continue;
+                }
                 event_log("attack_ai_choice radii=%d range=%d smallrange=%d \n", radii, range, smallest_range);
 		if (radii + range >= dist && range < smallest_range) {
 			attack_id = i;

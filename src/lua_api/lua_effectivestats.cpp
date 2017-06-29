@@ -90,6 +90,11 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("magic_damage", stats->magic.damage)
 	else IFLUA_NUM_MEMB_LOOKUP("magic_power", stats->magic.power)
 	else IFLUA_NUM_MEMB_LOOKUP("magic_resistance", stats->magic.resistance)
+        // Allowed actions are lookup only
+	else IFLUA_NUM_MEMB_LOOKUP("can_use_weapons", stats->allowed_actions.can_use_weapons)
+	else IFLUA_NUM_MEMB_LOOKUP("can_use_spells", stats->allowed_actions.can_use_spells)
+	else IFLUA_NUM_MEMB_LOOKUP("can_use_rest", stats->allowed_actions.can_use_rest)
+	else IFLUA_NUM_MEMB_LOOKUP("can_use_stairs", stats->allowed_actions.can_use_stairs)
 	else {
 		lua_getglobal(L, bind_t::className);
 		int tableind = lua_gettop(L);

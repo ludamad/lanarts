@@ -189,7 +189,7 @@ DataW.spell_create {
             eff.damage = caster.stats.magic / 2
             eff.power = caster.stats.magic * 0.3
             eff.magic_percentage = 1.0
-        GameState.for_screens () ->
+        GameState.for_screens () ->  
             if caster\is_local_player()
                 EventLog.add("You daze all enemies in sight!", {200,200,255})
             elseif caster.name == "Your ally"

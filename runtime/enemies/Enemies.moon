@@ -2,6 +2,7 @@ Map = require "core.Map"
 ObjectUtils = require "objects.ObjectUtils"
 EventLog = require "ui.EventLog"
 DataW = require "DataWrapped"
+GameObject = require "core.GameObject"
 World = require "core.World"
 EffectUtils = require "spells.EffectUtils"
 
@@ -417,6 +418,17 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
         cooldown: 200
         speed: 8
         spr_attack: "spr_effects.dragon_fireball"
+        on_init: () =>
+            @n_bounces = 3
+        on_wall_bounce: () =>
+            @n_bounces -= 1
+            if @n_bounces < 0
+                GameObject.destroy(@)
+    }
+    resistances: {
+        Red: 5
+        Blue: -1.25
+        Green: 0
     }
     init_func: () =>
         @timeout = 0

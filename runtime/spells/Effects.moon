@@ -145,7 +145,6 @@ DataW.effect_create {
     effected_sprite: "spr_effects.pain_mirror"
     effected_colour: {200,200,200}
     duration: 15
-    can_use_spells: false
     apply_func: (obj) =>
         @steps = 0
     step_func: (obj) =>

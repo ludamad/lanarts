@@ -137,11 +137,11 @@ local function ChargeCallback(_, caster)
             local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)
                 local thrown = mon:add_effect("Thrown", 10 + 10 * str_diff)
                 thrown.angle = vector_direction(caster.xy, mon.xy)
-                GameState.for_screens(function() 
+                for _ in screens() do 
                     if caster:is_local_player() then
                         EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
                     end
-                end)
+                end
             --end
         end
     end
@@ -149,7 +149,7 @@ end
 
 function PowerStrike.action_func(caster)
     caster:apply_melee_cooldown()
-    GameState.for_screens(function() 
+    for _ in screens() do 
         if caster:is_local_player() then
             EventLog.add("You strike wildly in all directions!", {200,200,255})
             play_sound "sound/knockback.ogg"
@@ -157,7 +157,7 @@ function PowerStrike.action_func(caster)
             EventLog.add(caster.name .. " strikes wildly in all directions!", {200,200,255})
             play_sound "sound/knockback.ogg"
         end
-    end)
+    end
 
     caster:add_effect("Charge", 8).callback = ChargeCallback
 end
