@@ -155,9 +155,9 @@ Data.class_create {
       { spell = "Energy Spear",
     	level_needed = 1 },
       { spell = "Chain Lightning",
-        level_needed = 1 },
+        level_needed = 2 },
       { spell = "Tornado",
-    	level_needed = 1 },
+    	level_needed = 3 },
     },
     start_stats = {
         movespeed = 4,

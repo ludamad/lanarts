@@ -24,7 +24,6 @@ rings = (chance, args) -> _filter{
     { item: "Ring of Spells",     chance: 8                      }
     { item: "Ring of Vitality",   chance: 8                      }
     { item: "Ring of Stone",      chance: 4                      }
---    { item: RANDART("Ring"),      chance: 4                      }
 }
 
 -- Amulets
@@ -41,20 +40,19 @@ amulets = (chance, args) -> {
     -- { item: "Amulet of Greater Fire", chance: 1 }
     { item: "Amulet of Fortification", chance: 4 }
 --    { item: "Amulet of the Berserker", chance: 4 }
---    { item: "Amulet of Pain", chance: 4 }
     { item: "Amulet of Great Pain", chance: 2 }
     { item: "Amulet of Ringholding", chance: 4 }
 --    { item: "Amulet of Ice Form", chance: 4 } -- For now, a guaranteed drop only
     args.ignore_strong or { item: "Amulet of Regeneration", chance: 1 }
-    args.ignore_strong or { item: "Amulet of Light", chance: 1 }
---    { item: RANDART("Amulet"),      chance: 1 }
+    args.ignore_strong or { item: "Amulet of Greater Fire", chance: 1 }
+--    args.ignore_strong or { item: "Amulet of Light", chance: 1 }
 }
 
 -- Consumables
 consumables = (chance, args) -> _filter { 
     :chance
     {
-        chance: 99
+        chance: 95
         { item: "Arrow",              chance: 5,  amount: {5,10}  }
         { item: "Silver Arrow",       chance: 4,  amount: {2,6}   }
         -- Scrolls
@@ -69,7 +67,7 @@ consumables = (chance, args) -> _filter {
 
     -- Permanent enchantments
     args.ignore_strong or { 
-        chance: 1
+        chance: 5
         { item: "Strength Scroll",    chance: 1                      }
         { item: "Magic Scroll",       chance: 1                      }
         { item: "Defence Scroll",     chance: 1                      }

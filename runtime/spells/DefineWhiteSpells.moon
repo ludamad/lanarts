@@ -13,6 +13,14 @@ M = nilprotect {
     _bolt: tosprite "spr_spells.spell_icon_lightning_bolt"
 }
 
+-- A standardized stun for white mage:
+try_stun = (caster, mon) ->
+    white_power = EffectUtils.get_power(caster, "White")
+    resist = math.min(1.25, EffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
+    if chance(resist)
+        mon\add_effect("Stunned", (100 + white_power * 10) * resist)
+        play_sound "sound/ringfire-hit.ogg"
+
 Flash = SpellUtils.spell_object_type {
     types: {"White"}
     init: (args) =>
@@ -27,17 +35,13 @@ Flash = SpellUtils.spell_object_type {
             return
         if @caster.destroyed or @caster.map ~= @map
             return
-        white_power = EffectUtils.get_power(@caster, "White")
         @for_all_rings (x, y, damage_cooldown) ->
             for mon in *Map.radius_collision_check(@map, 15, {x, y})
                 if damage_cooldown[mon] or (mon.team == nil) or mon.team == @caster.team
                     continue
                 if not mon.destroyed and @do_damage(mon, @_damage)
                     @_on_kill(mon)
-                resist = math.min(1.25, EffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
-                mon\add_effect("Stunned", (100 + white_power * 10) * resist)
-
-                play_sound "sound/ringfire-hit.ogg"
+                try_stun(@caster, mon)
                 damage_cooldown[mon] = @cooldown
             for k,v in pairs damage_cooldown
                 v -= 1
@@ -71,16 +75,27 @@ Flash = SpellUtils.spell_object_type {
             ObjectUtils.screen_draw(M._bolt, {x, y}, alpha / 2, frame)
 }
 
+interpolate = (val, min, max, omin, omax) ->
+    val = math.max(min, math.min(max, val))
+    w1 = max - min
+    w2 = omax - omin
+    return (val - min) * (w2 / w1) + omin
+
 -- CHAIN LIGHTNING
 DataW.spell_create {
     name: "Chain Lightning",
     description: "A slow, powerful blast of lightning. The blast can bounce off an enemy twice before dissipating.",
-    spr_spell: "charge_effected",
+    spr_spell: "spr_spells.spell_icon_chain_lightning",
     projectile: {
         types: {"White"}
+        spr_attack: "charge_effected",
         speed: 4
         number_of_target_bounces: 3
         on_hit_func: (target, atkstats) =>
+            white_power = EffectUtils.get_power(@caster, "White")
+            prob = interpolate(white_power, 0, 5, 0.0, 0.2)
+            if chance(prob)
+                try_stun(@caster, target)
             
     }
     mp_cost: 20,
@@ -100,6 +115,11 @@ DataW.spell_create {
         n_steps: 500 / 8 
         can_wall_bounce: true
         redamage_cooldown: 40 -- Cooldown for when enemies are damaged again by effect
+        on_hit_func: (target, atkstats) =>
+            white_power = EffectUtils.get_power(@caster, "White")
+            prob = interpolate(white_power, 0, 5, 0.0, 0.2)
+            if chance(prob)
+                try_stun(@caster, target)
     }
     mp_cost: 10,
     cooldown: 35
@@ -120,6 +140,9 @@ DataW.spell_create {
         on_map_init: () =>
             @cx, @cy = @caster.x, @caster.y
         on_step: () =>
+            if @map ~= @caster.map
+                GameObject.destroy(@)
+                return
             dx, dy = @caster.x - @cx, @caster.y - @cy
             --@x += random(-1, 1) + dx
             --@y += random(-1, 1) + dy
@@ -134,40 +157,6 @@ DataW.spell_create {
     cooldown: 35
     spell_cooldown: 800
 }
-
-
--- LIGHTNING BLAST
---    spr_spell: "spr_spells.spell_icon_lightning_bolt",
-
--- DataW.effect_create {
---     name: "Blinding Light"
---     effected_sprite: "spr_amulets.light"
---     effected_colour: {200,200,200}
---     duration: 15
---     can_use_rest: false
---     can_use_spells: true
---     can_use_stairs: false
---     can_use_weapons: false
---     apply_func: (caster) =>
---         @n_steps = 0
---     step_func: (caster) =>
---         if @n_steps % 5 == 0
---             white_power = EffectUtils.get_power(caster, "White")
---             for mon in *(Map.enemies_list caster)
---                 if not Map.object_visible(mon, mon.xy, caster)
---                     continue
---                 white_resist = EffectUtils.get_resistance(mon, "White")
---                 chance_mod = 0.5 + (white_power * 0.1)
---                 if chance(math.min(1.0, white_resist * chance_mod))
---                     mon\add_effect("Stunned", 5)
---             for _ in screens()
---                 if caster\is_local_player()
---                     EventLog.add("You try to daze all enemies in sight!", {200,200,255})
---                 elseif caster.name == "Your ally"
---                     EventLog.add(caster.name .. " tries to daze all enemies in sight!", {200,200,255})
---         @n_steps += 1
---     fade_out: 5
--- }
 
 DataW.effect_create {
     name: "Stunned"

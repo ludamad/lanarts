@@ -130,22 +130,6 @@ DataW.spell_create {
     cooldown: 35
 }
 
-
--- CHAIN LIGHTNING
-
-DataW.spell_create {
-    name: "Chain Lightning",
-    description: "A slow, powerful blast of lightning. The blast can bounce off an enemy twice before dissipating.",
-    spr_spell: "charge_effected",
-    projectile: {
-        types: {"White"}
-        speed: 4
-        number_of_target_bounces: 3
-    }
-    mp_cost: 20,
-    cooldown: 65
-}
-
 DataW.projectile_create {
     name: "Skullthrow"
     weapon_class: "magic"
