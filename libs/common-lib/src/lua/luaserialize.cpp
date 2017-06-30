@@ -258,7 +258,8 @@ void LuaSerializeContext::_decode(int type) {
 		int id = buffer->read_int();
 		lua_rawgeti(L, this->index_to_obj, id);
 		if (lua_isnil(L, -1)) {
-			luaL_error(L, "LS_REF_ID resolved to nil loading id=%d (problem with serialized Lua value!)", id);
+			lua_pop(L,1);
+                        lua_newtable(L);//luaL_error(L, "LS_REF_ID resolved to nil loading id=%d (problem with serialized Lua value!)", id);
 		} //else if (lua_type(L, -1) != recorded_type){
 //	        const char* was = lua_typename(L, lua_type(L, -1));
 //	        const char* expected = lua_typename(L, recorded_type);

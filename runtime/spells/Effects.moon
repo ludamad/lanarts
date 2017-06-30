@@ -1003,6 +1003,7 @@ DataW.effect_create {
             play_sound "sound/wavy.ogg"
         @n_steps += 1
     on_melee_func: (mon, defender, damage, attack_stats) =>
+        do return nil
         if @n_steps > @n_ramp
             thrown = defender\add_effect("Thrown", 10)
             thrown.angle = vector_direction({mon.x, mon.y}, {defender.x, defender.y})

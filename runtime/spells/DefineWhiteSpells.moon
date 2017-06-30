@@ -19,6 +19,7 @@ try_stun = (caster, mon) ->
     resist = math.min(1.25, EffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
     if chance(resist)
         mon\add_effect("Stunned", (100 + white_power * 10) * resist)
+        mon\add_effect("Stunned", (100 + white_power * 10) * resist)
         play_sound "sound/ringfire-hit.ogg"
 
 Flash = SpellUtils.spell_object_type {
@@ -122,17 +123,39 @@ DataW.spell_create {
                 try_stun(@caster, target)
             return damage
     }
-    mp_cost: 10,
+    mp_cost: 12,
     cooldown: 35
 }
 
--- TORNADO
--- A spell that wrecks havoc in a random path.
+draw_console_text = (xy, texts) ->
+    {x, y} = xy
+    for {color, text} in *texts
+        x += font_cached_load(settings.font, 10)\draw {
+            :color
+            origin: Display.LEFT_CENTER
+        }, {x, y}, text 
+    return nil
+
+
+draw_console_effect = (xy, sprite, texts) ->
+    {x, y} = xy
+    sprite\draw {
+        origin: Display.LEFT_CENTER
+    }, {x, y + 4}
+    draw_console_text {x + Map.TILE_SIZE + 4, y}, texts
+
+
+-- TORNADO STORM
 DataW.spell_create {
-    name: "Tornado",
-    description: "Swirling death.",
+    name: "Tornado Storm",
+    description: "Tornados of swirling death .",
     spr_spell: "spr_effects.tornado"
     types: {"White"}
+    console_draw_func: (get_next) =>
+        draw_console_effect get_next(), M._bolt, {
+            {COL_PALE_GREEN, "5"}
+            {COL_PALE_YELLOW, " damage"}
+        }
     projectile: SpellUtils.passing_projectile {
         speed: 4
         damage_multiplier: 1

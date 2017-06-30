@@ -227,12 +227,12 @@ static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
 
     bool has_greater_fire = p->effects.has("AmuletGreaterFire") || p->effects.has("Inner Fire");
     bool is_spread_spell = pentry.name == "Mephitize" || pentry.name == "Purple Dragon Projectile";
-    if (is_spread_spell || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt") || (pentry.name == "Tornado")) {
+    if (is_spread_spell || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt") || (pentry.name == "Tornado Storm")) {
         float vx = 0, vy = 0;
         ::direction_towards(Pos {p->x, p->y}, target, vx, vy, 10000);
         int directions = (pentry.name == "Trepidize" ? 4 : 16);
         if (pentry.name == "Fire Bolt") directions = 4;
-        if (pentry.name == "Tornado") directions = 8;
+        if (pentry.name == "Tornado Storm") directions = 8;
 
         for (int i = 0; i < directions; i++) {
             float angle = PI / directions * 2 * i;

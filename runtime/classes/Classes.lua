@@ -156,7 +156,7 @@ Data.class_create {
     	level_needed = 1 },
       { spell = "Chain Lightning",
         level_needed = 2 },
-      { spell = "Tornado",
+      { spell = "Tornado Storm",
     	level_needed = 3 },
     },
     start_stats = {
