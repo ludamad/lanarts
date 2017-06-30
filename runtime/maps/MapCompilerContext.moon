@@ -75,6 +75,9 @@ MapCompilerContext = newtype {
             @maps[label] = compiler\compile()
             if spawn_players 
                 World.players_spawn @maps[label], compiler\get_player_spawn_points()
+                if os.getenv "LANARTS_XP"
+                    for p in *World.players
+                        p.instance\gain_xp(tonumber(os.getenv "LANARTS_XP"))
         @pending_maps[label] = nil
         @pending_features[label] = nil
         return @maps[label]

@@ -175,8 +175,8 @@ void ProjectileInst::step(GameState* gs) {
 				vx = -vx;
 				vy = -vy;
 			}
+                    try_callback("on_wall_bounce");
 		}
-                try_callback("on_wall_bounce");
 	} else if (collides) {
 		gs->remove_instance(this);
 	}

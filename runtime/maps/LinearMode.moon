@@ -23,5 +23,4 @@ first_map_create = () ->
 
     -- Compile the first map
     return cc\get(LAIR[1][1], true) -- 'true' to spawn players
-
 return {:first_map_create}

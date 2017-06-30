@@ -64,12 +64,6 @@ passing_projectile = (args) ->
     base = {
         can_pass_through: true -- Custom projectile
         deals_special_damge: true -- Custom projectile
-        on_hit_func: (target, atkstats, damage) =>
-            if @destroyed or @attacked_map[target] ~= nil
-                return 0 -- No damage this step
-            @attacked_map[target] = args.redamage_cooldown
-            @n_hits += 1
-            return damage * (1.0 + (math.sqrt(@n_hits - 1) - 1.0) / 20)
     }
     combined = table.merge base, args
     combined.on_map_init = () =>
@@ -92,6 +86,15 @@ passing_projectile = (args) ->
                 @attacked_map[k] = v - 1
         if args.on_step
             args.on_step(@)
+    combined.on_hit_func = (target, atkstats, damage) =>
+        if @destroyed or @attacked_map[target] ~= nil
+            return 0 -- No damage this step
+        @attacked_map[target] = args.redamage_cooldown
+        @n_hits += 1
+        damage = damage * (1.0 + (math.sqrt(@n_hits - 1) - 1.0) / 20)
+        if args.on_hit_func
+            damage = args.on_hit_func(@, target, atkstats, damage)
+        return damage
     return combined
 
 for_all_visible_mons = (caster, f) ->

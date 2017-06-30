@@ -112,14 +112,15 @@ DataW.spell_create {
     projectile: SpellUtils.passing_projectile {
         speed: 5
         damage_multiplier: 1
-        n_steps: 500 / 8 
+        n_steps: 500 / 8
         can_wall_bounce: true
         redamage_cooldown: 40 -- Cooldown for when enemies are damaged again by effect
-        on_hit_func: (target, atkstats) =>
+        on_hit_func: (target, atkstats, damage) =>
             white_power = EffectUtils.get_power(@caster, "White")
             prob = interpolate(white_power, 0, 5, 0.0, 0.2)
             if chance(prob)
                 try_stun(@caster, target)
+            return damage
     }
     mp_cost: 10,
     cooldown: 35
@@ -150,12 +151,12 @@ DataW.spell_create {
             @y += dy
             @cx, @cy = @caster.x, @caster.y
         on_deinit: () => 
-            GameObject.add_to_level Flash.create({caster: @caster, duration: 30, damage: 2, xy: @xy})
+            GameObject.add_to_level Flash.create({caster: @caster, duration: 30, damage: 5, xy: @xy})
         redamage_cooldown: 40 -- Cooldown for when enemies are damaged again by effect
     }
-    mp_cost: 20,
+    mp_cost: 25,
     cooldown: 35
-    spell_cooldown: 800
+    spell_cooldown: 300
 }
 
 DataW.effect_create {
@@ -172,36 +173,36 @@ DataW.effect_create {
         obj.x, obj.y = @ox, @oy
 }
 
-WHITE_TYPES = {"White"}
--- Blinding Light
-DataW.spell_create {
-    name: "Blinding Light"
-    types: {"White"}
-    spr_spell: "spr_amulets.light"
-    damage_type: {magic: 0.5, physical: 0.5}
-    description: "Thunder rains from above."
-    mp_cost: 20
-    cooldown: 0
-    spell_cooldown: 1600
-    can_cast_with_held_key: true
-    fallback_to_melee: false
-    action_func: (caster, x, y) ->
-        GameObject.add_to_level Flash.create({:caster, duration: 100, damage: 10})
-        --white_power = EffectUtils.get_power(caster, "White")
-        --for_all_visible_mons caster, (mon) ->
-        --    resist = math.min(1.25, EffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
-        --    mon\add_effect("Stunned", (100 + white_power * 10) * resist)
-        --SpellUtils.message(caster, "You try to daze all enemies in sight!", {200,200,255})
-        ----caster\add_effect("Blinding Light", 500 + EffectUtils.get_power(caster,"White")*100)
-        play_sound "sound/ludaze.ogg"
-    autotarget_func: (caster) -> caster.x, caster.y
-    prereq_func: (caster) -> 
-        for mon in *(Map.enemies_list caster)
-            if Map.object_visible(mon, mon.xy, caster)
-                return true
-        EventLog.add("No monsters in sight!", COL_PALE_RED)
-        return false
-}
+--WHITE_TYPES = {"White"}
+---- Blinding Light
+--DataW.spell_create {
+--    name: "Blinding Light"
+--    types: {"White"}
+--    spr_spell: "spr_amulets.light"
+--    damage_type: {magic: 0.5, physical: 0.5}
+--    description: "Thunder rains from above."
+--    mp_cost: 20
+--    cooldown: 0
+--    spell_cooldown: 1600
+--    can_cast_with_held_key: true
+--    fallback_to_melee: false
+--    action_func: (caster, x, y) ->
+--        GameObject.add_to_level Flash.create({:caster, duration: 100, damage: 10})
+--        --white_power = EffectUtils.get_power(caster, "White")
+--        --for_all_visible_mons caster, (mon) ->
+--        --    resist = math.min(1.25, EffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
+--        --    mon\add_effect("Stunned", (100 + white_power * 10) * resist)
+--        --SpellUtils.message(caster, "You try to daze all enemies in sight!", {200,200,255})
+--        ----caster\add_effect("Blinding Light", 500 + EffectUtils.get_power(caster,"White")*100)
+--        play_sound "sound/ludaze.ogg"
+--    autotarget_func: (caster) -> caster.x, caster.y
+--    prereq_func: (caster) -> 
+--        for mon in *(Map.enemies_list caster)
+--            if Map.object_visible(mon, mon.xy, caster)
+--                return true
+--        EventLog.add("No monsters in sight!", COL_PALE_RED)
+--        return false
+--}
 
 
 return M

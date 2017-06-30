@@ -418,7 +418,7 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
         cooldown: 200
         speed: 8
         spr_attack: "spr_effects.dragon_fireball"
-        on_init: () =>
+        on_map_init: () =>
             @n_bounces = 3
         on_wall_bounce: () =>
             @n_bounces -= 1
