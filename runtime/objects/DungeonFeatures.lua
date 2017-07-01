@@ -120,6 +120,9 @@ function Door:on_step()
             end
         end
     end
+    if test_mode then
+        is_open = true
+    end
 
     if is_open then
         self.open_timeout = DOOR_OPEN_TIMEOUT
@@ -132,9 +135,7 @@ function Door:on_step()
         else
             --play_sound "sound/doorClose_3.ogg"
         end
-        if not test_mode then
-            Map.tile_set_solid(self.map, tile_xy, not is_open)
-        end
+        Map.tile_set_solid(self.map, tile_xy, not is_open)
         Map.tile_set_seethrough(self.map, tile_xy, is_open)
     end
 

@@ -32,12 +32,26 @@ const int PLAYER_PATHING_RADIUS = 500;
 
 /* Statistics that do not affect gameplay but are kept for scoring */
 struct PlayerScoreStats {
-    PlayerScoreStats() {
-        deaths = 0;
-        kills = 0;
-        deepest_floor = 0;
+    int deaths = 0, kills = 0, deepest_floor = 0;
+};
+
+struct PlayerExploreState {
+    Pos move_xy;
+    int time_out = 0; // move_xy is invalid if time_out <= 0
+    void set_move(Pos move_xy, int time_out) {
+        this->move_xy = move_xy;
+        if (move_xy == Pos()) {
+            time_out = 0;
+        } else {
+            time_out = time_out;
+        }
     }
-    int deaths, kills, deepest_floor;
+    void step() {
+        if (time_out <= 0) {
+            return;
+        }
+        time_out -= 1;
+    }
 };
 
 struct PlayerDataEntry;
@@ -185,6 +199,7 @@ private:
     int autouse_mana_potion_try_count = 0;
     PosF _last_moved_direction = {0, -1}; // Never 0,0
     int previous_spell_cast = -1, spellselect = 0;
+    PlayerExploreState explore_state;
     PlayerIOActions io_value;
 };
 

@@ -89,7 +89,7 @@ M = nilprotect {
         --    return user_input_handle(true)
     _try_move_action: (dx, dy) =>
         @input_source\set("move_direction", {dx, dy})
-        return (dx ~= 0 or dy ~= 0)
+        return true
     _attack_action: () =>
         -- Necromancer:
         player = @input_source.player
@@ -186,14 +186,16 @@ M = nilprotect {
         player = @input_source.player
         --if #Map.enemies_list(player) == 0
         --    player\direct_damage(player.stats.hp + 1)
-        dir = @_ai_state\get_next_direction() or {0,0}
-        if not @_try_move_action(dir[1], dir[2])
-            if not @_try_collect_items()
-                if not @_try_rest_if_needed()
-                    if not @_try_explore()
-                        dir = @_ai_state\get_next_wander_direction() or {0,0}
-                        if @_try_move_action(dir[1], dir[2])
-                            @_attack_action()
+        dir = @_ai_state\get_next_direction()
+        if dir
+            @_try_move_action(dir[1], dir[2])
+        elseif not @_try_rest_if_needed()
+            if not @_try_explore() then
+                dir = @_ai_state\get_next_wander_direction()
+                if dir
+                    @_try_move_action(dir[1], dir[2])
+                else
+                    @_attack_action()
         else
             @_attack_action()
         @_lpx, @_lpy = player.x, player.y

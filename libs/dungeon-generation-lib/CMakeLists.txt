@@ -3,7 +3,6 @@ PROJECT(project_lanarts_dungeon_gen)
 
 set( DEPS ../../dependencies)
 
-add_definitions( -std=c++11 )
 
 include_directories(
 	include/ldungeon_gen

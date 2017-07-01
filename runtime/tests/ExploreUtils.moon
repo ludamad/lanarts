@@ -106,6 +106,9 @@ path_planner = (player) -> nilprotect {
         @stored_path = ASTAR_BUFFER\calculate_path map, tile_xy, obj.tile_xy
         @coord = 2
     next_direction_towards: () =>
+        if @coord == #@stored_path + 1
+            @coord += 1
+            return {0,0}
         coord = @get_next_coord()
         if not coord
             return nil
@@ -133,33 +136,47 @@ ai_state = (player) -> {
             return item
         return nil
     get_next_direction: () => 
+        if @rng\randomf() < 0.1
+            return @get_next_wander_direction()
         dir = @path_planner\next_direction_towards()
+        --pretty(dir)
         if dir
             return dir
-        next_obj = nil
-        for obj in *_objects(player, "item")
-            if obj.type == @next_key_item()
-                next_obj = obj
-                break
-        if not next_obj
-            if @next_key_item() == "Azurite Key"
-                for i=2,1,-1
-                    if next_obj 
-                        break
-                    next_obj = @portal_planner\closest_portal("Snake Pit ".. i)
-                for i=3,1,-1
-                    if next_obj 
-                        break
-                    next_obj = @portal_planner\closest_portal("Temple ".. i)
-            elseif @key_items[2] == ""
-                for i=3,1,-1
-                    if next_obj 
-                        break
-                    next_obj = @portal_planner\closest_portal("Outpost ".. i)
-        if next_obj
-            @path_planner\set_path_towards(next_obj)
-            return @path_planner\next_direction_towards()
-        return nil
+        --next_obj = nil
+        --for obj in *_objects(player, "item")
+        --    if obj.type == @next_key_item()
+        --        next_obj = obj
+        --        break
+        --if not next_obj
+        --    if @next_key_item() == "Azurite Key"
+        --        for i=2,1,-1
+        --            if next_obj 
+        --                break
+        --            next_obj = @portal_planner\closest_portal("Snake Pit ".. i)
+        --        for i=3,1,-1
+        --            if next_obj 
+        --                break
+        --            next_obj = @portal_planner\closest_portal("Temple ".. i)
+        --    elseif @key_items[2] == ""
+        --        for i=3,1,-1
+        --            if next_obj 
+        --                break
+        --            next_obj = @portal_planner\closest_portal("Outpost ".. i)
+        return @get_next_wander_direction()
+        --if next_obj
+        --    @path_planner\set_path_towards(next_obj)
+        --    return @path_planner\next_direction_towards()
+        --return nil
+    _closest: (objs) =>
+        o = nil
+        min_dist_sqr = math.huge
+        for obj in *objs
+            dx, dy = obj.x - player.x, obj.y - player.y
+            dist_sqr = dx*dx+dy*dy
+            if dist_sqr < min_dist_sqr
+                min_dist_sqr = dist_sqr
+                o = obj
+        return o
     get_next_wander_direction: () => 
         --assert #_objects(player, "feature") > 0
         objs = @portal_planner\unused_portals()
@@ -167,7 +184,8 @@ ai_state = (player) -> {
             objs = _objects(player, "feature") --@rng\random_choice {"item", "feature"})
         if #objs == 0
             return nil
-        next_obj = @rng\random_choice(objs)
+        --next_obj = @rng\random_choice(objs)
+        next_obj = @_closest objs
         @path_planner\set_path_towards(next_obj)
         return @path_planner\next_direction_towards()
 }

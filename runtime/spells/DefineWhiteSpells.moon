@@ -116,14 +116,17 @@ DataW.spell_create {
         n_steps: 500 / 8
         can_wall_bounce: true
         redamage_cooldown: 40 -- Cooldown for when enemies are damaged again by effect
+        on_map_init: () =>
+            @bonus = 0.9
         on_hit_func: (target, atkstats, damage) =>
             white_power = EffectUtils.get_power(@caster, "White")
             prob = interpolate(white_power, 0, 5, 0.0, 0.2)
             if chance(prob)
                 try_stun(@caster, target)
-            return damage
+            @bonus += 0.1
+            return damage * @bonus
     }
-    mp_cost: 12,
+    mp_cost: 12
     cooldown: 35
 }
 

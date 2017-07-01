@@ -10,7 +10,6 @@ include_directories(
 	${DEPS}/sdl2/include
 	"${SRC}/luawrap-lib/include"
 )
-add_definitions( -std=c++98 )
 
 file(GLOB lcommon_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
     src/* 

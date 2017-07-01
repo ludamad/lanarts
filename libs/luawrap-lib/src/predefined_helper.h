@@ -16,8 +16,11 @@
 
 #include <lua.hpp>
 
+#include <type_traits>
 #include <luawrap/LuaValue.h>
 #include <luawrap/types.h>
+
+#include "lambda_util.h"
 
 #include "pushget_helper.h"
 

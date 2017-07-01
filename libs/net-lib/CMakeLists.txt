@@ -4,7 +4,6 @@ PROJECT(project_lanarts_net)
 set( DEPS ../../dependencies)
 
 
-add_definitions( -std=c++11 )
 
 include_directories(
         ${DEPS}/sdl2/include        

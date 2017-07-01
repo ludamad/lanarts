@@ -57,6 +57,16 @@ function ProgrammableInputSource:reset()
         use_spell_slot = -1,
     }
 end
+
+function ProgrammableInputSource:slot_highlighted()
+    return -1
+end
+function ProgrammableInputSource:slot_selected()
+    return -1
+end
+function ProgrammableInputSource:handle_inventory(drop_item, reposition_item)
+end
+
 function ProgrammableInputSource:poll_input()
 end
 return ProgrammableInputSource

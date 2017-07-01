@@ -334,6 +334,8 @@ private:
     friend class GameWorld;
 };
 
+GameState* gs(SerializeBuffer& buff);
+
 void play(const char* sound_path);
 void loop(const char* sound_path);
 

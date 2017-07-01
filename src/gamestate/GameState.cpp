@@ -274,6 +274,7 @@ bool GameState::level_has_player() {
 }
 
 void GameState::serialize(SerializeBuffer& serializer) {
+	serializer.set_user_pointer(this);
 	LuaSerializeConfig& conf = luaserialize_config();
         // Reset the serialization config:
         conf.reset();
@@ -305,6 +306,7 @@ void GameState::serialize(SerializeBuffer& serializer) {
 }
 
 void GameState::deserialize(SerializeBuffer& serializer) {
+	serializer.set_user_pointer(this);
 	LuaSerializeConfig& conf = luaserialize_config();
     post_deserialize_data().clear();
         // Reset the serialization config:
@@ -429,6 +431,10 @@ int GameState::handle_event(SDL_Event* event, bool trigger_event_handling) {
     });
 
 	return !should_exit && iocontroller.handle_event(event);
+}
+
+GameState* gs(SerializeBuffer& buff) {
+	return (GameState*) buff.user_pointer();
 }
 bool GameState::update_iostate(bool resetprev, bool trigger_event_handling) {
 	/* If 'resetprev', clear the io state for held keys

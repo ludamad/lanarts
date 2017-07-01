@@ -3,7 +3,6 @@ PROJECT(project_luawrap)
 
 set( DEPS ../../dependencies)
 
-add_definitions( -std=c++98 )
 
 include_directories(
 	"include/"

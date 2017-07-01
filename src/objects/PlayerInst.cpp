@@ -143,6 +143,7 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 
 void PlayerInst::step(GameState* gs) {
     PERF_TIMER();
+    explore_state.step();
     paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
     //if (cooldowns().action_cooldown > 0)
     //printf("MELEE COOLDOWN %d\n", cooldowns().action_cooldown);
@@ -240,7 +241,8 @@ void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write(_score_stats);
 	serializer.write(actions_set_for_turn);
     serializer.write(last_chosen_weaponclass);
-    serializer.write(_last_moved_direction);
+	serializer.write(_last_moved_direction);
+	serializer.write(explore_state);
 //	serializer.write_container(queued_actions);
 
 	SERIALIZE_POD_REGION(serializer, this, local, spellselect);
@@ -254,6 +256,7 @@ void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(actions_set_for_turn);
 	serializer.read(last_chosen_weaponclass);
     serializer.read(_last_moved_direction);
+	serializer.read(explore_state);
 //	serializer.read_container(queued_actions);
 	queued_actions.clear();
 	paths_to_object().initialize(gs->tiles().solidity_map());

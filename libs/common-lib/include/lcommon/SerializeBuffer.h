@@ -266,10 +266,23 @@ public:
 		return _buffer.empty();
 	}
 
+	void* user_pointer() {
+		return _user_pointer;
+	}
+	void set_user_pointer(void* pointer) {
+		_user_pointer = pointer;
+	}
+
+	template <typename T>
+	void operator()(T& data) {
+
+	}
+
 private:
 	std::vector<char> _buffer;
 	int _read_position;
 	void* _context;
+	void* _user_pointer;
 	buffer_flushf _flushf;
 	buffer_fillf _fillf;
 	buffer_closef _closef;

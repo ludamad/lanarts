@@ -195,62 +195,66 @@ static bool has_visible_monster(GameState* gs, PlayerInst* p = NULL) {
 }
 
 Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
-    static bool LAST_WAS_STOP = false;
+    if (explore_state.time_out > 0) {
+        return explore_state.move_xy;
+    }
     Pos closest = {-1,-1};
-    float min_dist = 10000;//std::numeric_limits<float>::max();
+    float min_dist = std::numeric_limits<float>::max();
     bool found_item = false;
     int dx = 0, dy = 0;
-    if (min_dist == 10000) {//std::numeric_limits<float>::max()) {
-        auto bbox = paths_to_object().location();
-        // Make sure not touching borders:
-        bbox.x1 = std::max(bbox.x1, 1);
-        bbox.x2 = std::min(bbox.x2, gs->tiles().tile_width() - 1);
-        bbox.y1 = std::max(bbox.y1, 1);
-        bbox.y2 = std::min(bbox.y2, gs->tiles().tile_height() - 1);
-        FOR_EACH_BBOX(bbox, x, y) {
-            auto* node = paths_to_object().node_at({x, y});
-            if (node->solid) {
-                continue;
-            }
-            float dist = node->distance;
-            if (dist == 0 && (node->dx != 0 || node->dy != 0)) {
-                continue;
-            }
-            bool near_unseen = false;
-            for (int dy = -1; dy <= +1; dy++) {
-                for (int dx = -1; dx <= +1; dx++) {
-                    if (!(*gs->tiles().previously_seen_map())[{x+dx,y+dy}]) {
-                        near_unseen = true;
-                        break;
-                    }
-                }
-            }
-            // " Ludamad: Automatic item picking up was interesting but way too good.
-            //   Dashing into a dungeon and quickly picking up items around should be a conscious effort by the player."
-            // Ludamad: OK, let's try with just stackable items.
-            bool is_item = (gs->object_radius_test(this, NULL, 0, &autopickup_colfilter, (x*32+16), (y*32+16), 1));
-            // Ghosts can't pickup items, ignore them:
-            if (is_ghost()) {
-                is_item = false;
-            }
-            if (near_unseen || is_item) {
-                if (dist != 0 && (min_dist >= dist || (is_item > found_item)) && (is_item >= found_item)) {
-                    closest = {x,y};
-                    min_dist = dist;
-                    found_item = is_item;
+
+    auto bbox = paths_to_object().location();
+    // Make sure not touching borders:
+    bbox.x1 = std::max(bbox.x1, 1);
+    bbox.x2 = std::min(bbox.x2, gs->tiles().tile_width() - 1);
+    bbox.y1 = std::max(bbox.y1, 1);
+    bbox.y2 = std::min(bbox.y2, gs->tiles().tile_height() - 1);
+    FOR_EACH_BBOX(bbox, x, y) {
+        auto* node = paths_to_object().node_at({x, y});
+        if (node->solid) {
+            continue;
+        }
+        float dist = node->distance;
+        if (dist == 0 && (node->dx != 0 || node->dy != 0)) {
+            continue;
+        }
+        bool near_unseen = false;
+        for (int dy = -1; dy <= +1; dy++) {
+            for (int dx = -1; dx <= +1; dx++) {
+                if (!(*gs->tiles().previously_seen_map())[{x+dx,y+dy}]) {
+                    near_unseen = true;
+                    break;
                 }
             }
         }
+        float rx = (x+.5) *TILE_SIZE, ry = (y+.5)* TILE_SIZE;
+        // float dx = rx - this->rx, dy = ry - this->ry; 
+        // float sqr_dist = rx*rx+ry*ry;
+        // " Ludamad: Automatic item picking up was interesting but way too good.
+        //   Dashing into a dungeon and quickly picking up items around should be a conscious effort by the player."
+        // Ludamad: OK, let's try with just stackable items.
+        bool is_item = (gs->object_radius_test(this, NULL, 0, &item_colfilter, rx, ry, 1));
+        // Ghosts can't pickup items, ignore them:
+        if (is_ghost()) {
+            is_item = false;
+        }
+        if (near_unseen || is_item) {
+            float adjusted_dist = dist;
+            //if (dist < 100) {
+            //    adjusted_dist = (sqrt(sqr_dist) / 32);
+            //}
+
+            if (dist != 0 && (min_dist >= adjusted_dist || (is_item > found_item)) && (is_item >= found_item)) {
+                closest = {x,y};
+                min_dist = adjusted_dist;
+                found_item = is_item;
+            }
+        }
     }
-    if (LAST_WAS_STOP) {
-        dx = rand() % 3 - 1;
-        dy = rand() % 3 - 1;
-        // FIXED SYNC BUG: Do not use rng().rand() here.
-        // dx = gs->rng().rand(Range {-1, +1});
-        // dy = gs->rng().rand(Range {-1, +1});
-    } else if (!is_ghost() && gs->object_radius_test(this, NULL, 0, &autopickup_colfilter)) {
+
+    if (!is_ghost() && gs->object_radius_test(this, NULL, 0, &item_colfilter)) {
         dx = 0, dy = 0;
-    } else if (min_dist != 10000) {//std::numeric_limits<float>::max()) {
+    } else if (min_dist != std::numeric_limits<float>::max()) {
         Pos iter = closest;
         Pos next_nearest;
         while (true) {
@@ -277,7 +281,7 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
         if (abs(dx) > 0) dx /= abs(dx);
         if (abs(dy) > 0) dy /= abs(dy);
     }
-    LAST_WAS_STOP = (min_dist != 10000) && (dx == 0 && dy == 0);
+    explore_state.set_move({dx,dy}, TILE_SIZE / effective_stats().movespeed);
     return {dx, dy};
 }
 

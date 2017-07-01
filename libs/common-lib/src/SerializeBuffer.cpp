@@ -30,11 +30,11 @@ void SerializeBuffer::clear() {
 
 SerializeBuffer::SerializeBuffer(void* context, buffer_flushf flushf,
 		buffer_fillf fillf, buffer_closef closef) :
-		_read_position(0), _context(context), _flushf(flushf), _fillf(fillf), _closef(closef) {
+		_read_position(0), _context(context), _user_pointer(NULL), _flushf(flushf), _fillf(fillf), _closef(closef) {
 }
 
 SerializeBuffer::SerializeBuffer() :
-		_read_position(0), _context(NULL), _flushf(NULL), _fillf(NULL), _closef(NULL) {
+		_read_position(0), _context(NULL), _user_pointer(NULL),  _flushf(NULL), _fillf(NULL), _closef(NULL) {
 }
 
 SerializeBuffer::SerializeBuffer(FILE* file, SerializeBuffer::IOType type, bool close_file) :

@@ -3,6 +3,7 @@
 
 cmake_minimum_required(VERSION 2.6)
 
+
 if ($ENV{BUILD_OPTIMIZE})
     message("Building release... no debug symbols will be available.")
     set(CMAKE_BUILD_TYPE Relwithdebinfo)
