@@ -22,7 +22,7 @@ ellipse_points_0 = (x, y, w, h, n_points = 16, start_angle = 0) ->
     angle,step = start_angle,(1/n_points* 2 * math.pi)
     cx, cy = x+w/2, y+h/2
     for i=1,n_points
-        append points, {(math.sin(angle))/2 * w + x, (math.cos(angle)/2 * h + y}
+        append points, {math.sin(angle)/2 * w + x, math.cos(angle)/2 * h + y}
         angle += step
     return points
 
@@ -40,6 +40,90 @@ skewed_ellipse_points = (rng, xy, wh, n_points = 16, start_angle = 0) ->
         -- Reject all that have too high angle:
         if angle < 1.9 * math.pi
             return points
+
+-- Adapter for the new MapRegion class for the old Region API
+-- TODO normalize this mess. Low priority while content builds and churns
+MapRegionAdapter = newtype {
+    init: (@region) =>
+        bbox = require("maps.MapRegion").map_region_bbox(@region)
+        @x,@y = bbox[1],bbox[2]
+        @ox,@oy = @x,@y
+        @w,@h = bbox[3]-bbox[1],bbox[4]-bbox[2]
+        @_points = false
+        @subregions = {}
+    add: (subregion) => error("Not emulated")
+    get: {
+        points: () => 
+            @_points or= require("maps.GeometryUtils").convex_hull @region.polygons
+            return @_points
+    }
+    apply: (args) =>
+        args.points = @points
+        SourceMap.polygon_apply(args)
+    bbox: () => {@x, @y, @x+@w, @y+@h}
+    ortho_dist: (o) =>
+        cx,cy = @center()
+        ocx, ocy = o\center()
+        dx, dy = cx - ocx, cy - ocy
+        return math.max math.abs(dx),math.abs(dy)
+
+    square_distance: (o) =>
+        cx,cy = @center()
+        ocx, ocy = o\center()
+        dx, dy = cx - ocx, cy - ocy
+        return dx*dx + dy*dy
+
+    ellipse_intersect: (x,y,w,h) =>
+        cx, cy = @center()
+        cxo,cyo = x+w/2,y+h/2
+        dx,dy = cxo-cx, cyo-cy
+        -- Local radius depends on angle:
+        ang = math.atan2(dy, dx)
+        r1 = math.sqrt(  (@w/2*math.cos(ang))^2 + (@h/2*math.sin(ang))^2  )
+        r2 = math.sqrt(  (w/2*math.cos(-ang))^2 + (h/2*math.sin(-ang))^2  )
+        -- Condense into unit coordinates:
+        return (math.sqrt(dx*dx+dy*dy) < (r1+r2))
+
+    rect_intersect: (x,y,w,h) =>
+        if @x > x+w or x > @x+@w
+            return false
+        if @y > y+h or y > @y+@h
+            return false
+        return true
+ 
+    center: () =>
+        return math.floor(@x+@w/2), math.floor(@y+@h/2)
+    -- Create a line between the two regions
+    line_connect: (args) =>
+        args.from_xy = {@center()}
+        args.to_xy = {args.target\center()}
+        SourceMap.line_apply(args)
+    line_match: (args) =>
+        args.from_xy = {@center()}
+        args.to_xy = {args.target\center()}
+        SourceMap.line_match(args)
+    _arc_adjust_params: (args) =>
+        cx, cy = @center()
+        ocx, ocy = args.target\center()
+        w, h = math.abs(cx - ocx) - 1, math.abs(cy - ocy) - 1
+        if w < 2 or h < 2 -- or w > 35 or h > 35
+            return false
+        -- Set up the ellipse section for our connection:
+        args.width, args.height = w*2, h*2
+        args.x, args.y = math.floor((cx+ocx)/2), math.floor((cy+ocy)/2)
+        a1 = math.atan2((args.y - cy) / h , (args.x - cx)/w)
+        a2 = math.atan2((args.y - ocy) / h, (args.x - ocx)/w)
+        args.angle1, args.angle2 = a1 + math.pi/2, (a2 - a1)
+        return true
+    arc_connect: (args) =>
+        if not @_arc_adjust_params(args)
+            return @line_connect(args)
+        SourceMap.arc_apply(args)
+    arc_match: (args) =>
+        if not @_arc_adjust_params(args)
+            return @line_match(args)
+        SourceMap.arc_match(args)
+}
 
 Region = newtype {
     init: (@x, @y, @w, @h, @n_points = 16, @angle = 0) =>
@@ -302,7 +386,7 @@ ring_region_delta_func = (map, rng, outer) ->
     return () => math.sign_of(to_x - @x)*10, math.sign_of(to_y - @y)*10
 
 return {
-    :LEVEL_PADDING, :ellipse_points, :Region, :RVORegionPlacer,
+    :LEVEL_PADDING, :ellipse_points, :Region, :RVORegionPlacer, :MapRegionAdapter
     :subregion_minimum_spanning_tree, :region_minimum_spanning_tree, 
     :spread_region_delta_func
     :center_region_delta_func

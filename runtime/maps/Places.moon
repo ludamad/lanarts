@@ -12,26 +12,24 @@ OldMaps = require "maps.OldMaps"
 ItemUtils = require "maps.ItemUtils"
 ItemGroups = require "maps.ItemGroups"
 
-import Spread, FilledRegion
+import Spread, Shape
     from require "maps.MapElements"
 
 cave = (n_outer = 3) -> Spread {
     regions: {
         for i=1,5
-            FilledRegion {
+            Shape {
                 shape: 'deformed_ellipse'
                 size: {5, 10}
             }
         for i=1,n_outer
-            FilledRegion {
+            Shape {
                 shape: 'deformed_ellipse'
                 size: {7, 12}
             }
     }
-    spread_scheme: 'box2d_solid_center'
+    spread_scheme: 'rvo_center'
     connection_scheme: 'direct'
-    on_gen: (cc, map, ) =>
-        @raster(cc, map, )
 }
 
 -- The room before the dragon lair.
@@ -41,17 +39,17 @@ DragonLairFoyer = newtype {
         regions: for i=1,5 do Spread {
             regions: {
                 for i=1,1
-                    FilledRegion {
+                    Shape {
                         shape: 'deformed_ellipse'
                         size: {5, 10}
                     }
                 for i=1,1
-                    FilledRegion {
+                    Shape {
                         shape: 'deformed_ellipse'
                         size: {7, 12}
                     }
                 for i=1,1
-                    FilledRegion {
+                    Shape {
                         shape: 'deformed_ellipse'
                         size: {12, 12}
                     }

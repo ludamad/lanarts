@@ -66,6 +66,20 @@ map_regions_bbox = (regions) ->
                 x2, y2 = math.max(x2, x), math.max(y2, y)
     return {x1, y1, x2, y2}
 
+map_region_bbox = (region) ->
+    x1,y1 = math.huge, math.huge
+    x2,y2 = -math.huge, -math.huge
+    {:polygons, :tunnels} = region
+    for polygon in *polygons
+        for {x, y} in *polygon
+            x1, y1 = math.min(x1, x), math.min(y1, y)
+            x2, y2 = math.max(x2, x), math.max(y2, y)
+    for {:polygon} in *tunnels
+        for {x, y} in *polygon
+            x1, y1 = math.min(x1, x), math.min(y1, y)
+            x2, y2 = math.max(x2, x), math.max(y2, y)
+    return {x1, y1, x2, y2}
+
 -- Main is used if the module is run directly:
 main = (raw_args) ->
     argparse = require "argparse"
@@ -170,4 +184,4 @@ main = (raw_args) ->
 
     DebugUtils.debug_show_source_map(map, 1, 1)
 
-return {:MapRegion, :main, :combine_map_regions, :map_regions_bbox}
+return {:MapRegion, :main, :combine_map_regions, :map_regions_bbox, :map_region_bbox}

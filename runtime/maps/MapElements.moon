@@ -52,11 +52,16 @@ _CONNECTION_SCHEMES = {
     none: true
     direct: true
     direct_light: true
+    minimum_spanning_arc_and_line: true
+    random_tunnels: true
 }
 
 _SPREAD_SCHEMES = {
     random: true
     box2d: true
+    rvo_spread: true
+    rvo_center: true
+    rvo_ring: true
     box2d_solid_center: true
 }
 
@@ -65,12 +70,14 @@ M.Spread = _node {
     regions: typecheck "table"
     connection_scheme: from_set(_CONNECTION_SCHEMES)
     spread_scheme: from_set(_SPREAD_SCHEMES)
+    post_compile: optional "string"
 }
 
-M.FilledRegion = _node {
+M.Shape = _node {
     name: optional "string"
     shape: typecheck "string"
     size: typecheck "table"
+    post_compile: optional "string"
     --rotation: optional "string" -- TODO
 }
 

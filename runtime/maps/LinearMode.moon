@@ -22,5 +22,5 @@ first_map_create = () ->
     --    p2\connect(p1)
 
     -- Compile the first map
-    return cc\get(LAIR[1][1], true) -- 'true' to spawn players
+    return cc\get {label: LAIR[1][1], spawn_players: true} -- 'true' to spawn players
 return {:first_map_create}

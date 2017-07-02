@@ -1,5 +1,5 @@
 MapCompiler = require "maps.MapCompiler"
-import Spread, FilledRegion
+import Spread, Shape
     from require "maps.MapElements"
 
 import map_place_object, ellipse_points, 
