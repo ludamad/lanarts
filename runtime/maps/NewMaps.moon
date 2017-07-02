@@ -1,3 +1,7 @@
+MapCompiler = require "maps.MapCompiler"
+import Spread, FilledRegion
+    from require "maps.MapElements"
+
 import map_place_object, ellipse_points, 
     LEVEL_PADDING, Region, RVORegionPlacer, 
     random_rect_in_rect, random_ellipse_in_ellipse, 

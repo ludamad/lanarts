@@ -12,10 +12,10 @@ OldMaps = require "maps.OldMaps"
 ItemUtils = require "maps.ItemUtils"
 ItemGroups = require "maps.ItemGroups"
 
-import ConnectedRegions, FilledRegion
+import Spread, FilledRegion
     from require "maps.MapElements"
 
-cave = (n_outer = 3) -> ConnectedRegions {
+cave = (n_outer = 3) -> Spread {
     regions: {
         for i=1,5
             FilledRegion {
@@ -30,13 +30,15 @@ cave = (n_outer = 3) -> ConnectedRegions {
     }
     spread_scheme: 'box2d_solid_center'
     connection_scheme: 'direct'
+    on_gen: (cc, map, ) =>
+        @raster(cc, map, )
 }
 
 -- The room before the dragon lair.
 DragonLairFoyer = newtype {
     parent: MapCompiler
-    root_node: ConnectedRegions {
-        regions: for i=1,5 do ConnectedRegions {
+    root_node: Spread {
+        regions: for i=1,5 do Spread {
             regions: {
                 for i=1,1
                     FilledRegion {
@@ -80,7 +82,7 @@ DragonLairFoyer = newtype {
 
 DragonLair = newtype {
     parent: MapCompiler
-    root_node: ConnectedRegions {
+    root_node: Spread {
         regions: {
             cave()
             cave()

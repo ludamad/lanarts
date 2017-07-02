@@ -60,7 +60,7 @@ _SPREAD_SCHEMES = {
     box2d_solid_center: true
 }
 
-M.ConnectedRegions = _node {
+M.Spread = _node {
     name: optional "string"
     regions: typecheck "table"
     connection_scheme: from_set(_CONNECTION_SCHEMES)

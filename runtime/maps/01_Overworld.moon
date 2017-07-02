@@ -28,6 +28,10 @@ Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
 
+MapCompiler = require "maps.MapCompiler"
+import Spread, FilledRegion
+    from require "maps.MapElements"
+
 {:MapCompilerContext, :make_on_player_interact} = require "maps.MapCompilerContext"
 Places = require "maps.Places"
 
@@ -1043,6 +1047,28 @@ overworld_create = () ->
                 World.players_spawn(game_map, @player_spawn_points)
                 Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
         }
+
+Overworld = newtype {
+
+}
+
+Overworld = newtype {
+    parent: MapCompiler
+    root_node: {
+        FilledRegion {
+            shape: 'rectangle'
+            size: {OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE}
+        }
+    }
+    tileset: TileSets.lair
+    -- Called before compile() is called 
+    generate: (cc) =>
+        enemies = loadstring(os.getenv "ARENA_ENEMIES")()
+        for enemy, amount in pairs enemies
+            for i=1,amount
+                sqr = MapUtils.random_square(@map, nil)
+                MapUtils.spawn_enemy(@map, enemy, sqr)
+}
 
 return {
     :overworld_create

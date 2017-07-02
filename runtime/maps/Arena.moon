@@ -11,10 +11,10 @@ Region1 = require "maps.Region1"
 OldMaps = require "maps.OldMaps"
 
 import Arena from require "maps.Places"
-import ConnectedRegions, FilledRegion
+import Spread, FilledRegion
     from require "maps.MapElements"
 
-TEMPLATE = ConnectedRegions {
+TEMPLATE = Spread {
     regions: for i=1,40
         FilledRegion {
             shape: 'deformed_ellipse'

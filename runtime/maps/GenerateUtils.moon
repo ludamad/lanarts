@@ -16,6 +16,17 @@ ellipse_points = (x, y, w, h, n_points = 16, start_angle = 0) ->
         angle += step
     return points
 
+-- TODO migrate to this, ellipse centered on x,y
+ellipse_points_0 = (x, y, w, h, n_points = 16, start_angle = 0) ->
+    points = {}
+    angle,step = start_angle,(1/n_points* 2 * math.pi)
+    cx, cy = x+w/2, y+h/2
+    for i=1,n_points
+        append points, {(math.sin(angle))/2 * w + x, (math.cos(angle)/2 * h + y}
+        angle += step
+    return points
+
+
 skewed_ellipse_points = (rng, xy, wh, n_points = 16, start_angle = 0) ->
     {x, y} = xy
     {w, h} = wh
@@ -296,6 +307,7 @@ return {
     :spread_region_delta_func
     :center_region_delta_func
     :ellipse_points
+    :ellipse_points_0
     :skewed_ellipse_points
     :towards_region_delta_func
     :random_rect_in_rect, :random_ellipse_in_ellipse, :Tile, :tile_operator

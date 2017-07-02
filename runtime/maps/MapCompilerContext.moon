@@ -57,23 +57,33 @@ MapCompilerContext = newtype {
         assert C
         @pending_maps[label] = C
         @pending_features[label] = {}
-    get: (label, spawn_players = false) => -- Generates if pending
+    -- Gets a core.Map game map object for a label.
+    -- Generation arguments are provided NOTE they only affect the first call to this function.
+    -- Subsequent calls will pass so long as they have 'label', but it is good form to always
+    -- call with generation arguments.
+    get: (args) => -- Generates if pending
+        label = assert args.label, "Must provide label to identify map to retrieve/generate!"
+        -- other args:
+        -- 'spawn_players' whether to spawn players in this room
+        -- 
         if not @pending_maps[label]
             return assert @maps[label], "Map '#{label}' not registered!"
         log_info "Generating map '#{label}'!"
         C = @pending_maps[label]
         if type(C) == 'function' -- Simple callback
-            @maps[label] = C(@, label)
+            args.label = label
+            args.pending_feature = @pending_feature[label]
+            @maps[label] = C(@, args)
         else -- New-style area class
             compiler = C.create {
                 label: label
                 rng: require('mtwist').create(random(0,2^30))
             }
-            compiler\generate(self)
+            compiler\generate(@)
             for pending_feature in *@pending_features[label]
                 pending_feature\compile(@, compiler)
             @maps[label] = compiler\compile()
-            if spawn_players 
+            if args.spawn_players 
                 World.players_spawn @maps[label], compiler\get_player_spawn_points()
                 if os.getenv "LANARTS_XP"
                     for p in *World.players
