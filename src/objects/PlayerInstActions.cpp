@@ -198,6 +198,8 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
     if (explore_state.time_out > 0) {
         return explore_state.move_xy;
     }
+    auto* old_current_level = gs->get_level();
+    gs->set_level(this->get_map(gs));
     Pos closest = {-1,-1};
     float min_dist = std::numeric_limits<float>::max();
     bool found_item = false;
@@ -282,6 +284,7 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
         if (abs(dy) > 0) dy /= abs(dy);
     }
     explore_state.set_move({dx,dy}, TILE_SIZE / effective_stats().movespeed);
+    gs->set_level(old_current_level);
     return {dx, dy};
 }
 

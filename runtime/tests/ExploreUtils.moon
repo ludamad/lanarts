@@ -51,38 +51,6 @@ portal_planner = (player) -> nilprotect {
     -- Public API:
     step: () =>
         do return nil
-        if @last_touched_portal and not @portal_next[@last_touched_portal]
-            {:map} = @last_touched_portal
-            if player.map ~= map
-                @portal_next[@last_touched_portal] = Map.map_label(map)
-            @level_connections[@_current_label()] or= {}
-            append @level_connections[@_current_label()], Map.map_label(map)
-            @level_connections[Map.map_label(map)] or= {}
-            append @level_connections[Map.map_label(map)], @_current_label()
-        for portal in *_collisions(player, "feature")
-            @last_touched_portal = portal
-            break
-    -- Gives the closest portal that will take us where we want to go.
-    closest_portal: (map_label) =>
-        if map_label == @_current_label()
-            return nil
-        distances = @_get_label_distances(map_label)
-        current_distance = distances[@_current_label()]
-        if current_distance == nil
-            return nil
-        closest,closest_distance = nil,math.huge
-        for portal in *_objects(player, "feature")
-            next = @portal_next[portal]
-            if not next
-                continue
-            if distances[next] == nil
-                continue
-            if distances[next] < current_distance
-                obj_dist = vector_distance(portal.xy, player.xy)
-                if obj_dist < closest_distance
-                    closest = portal
-                    closest_distance = obj_dist 
-        return closest 
     unused_portals: () =>
         portals = _objects player, "feature"
         return table.filter portals, (p) -> not p.has_been_used
@@ -184,8 +152,11 @@ ai_state = (player) -> {
                 o = obj
         return assert o
     get_next_wander_direction: () => 
+        portals = _objects player, "actor"
+        objs = table.filter portals, (p) -> p.team ~= player.team
         --assert #_objects(player, "feature") > 0
-        objs = @portal_planner\unused_portals()
+        if #objs == 0
+            objs = @portal_planner\unused_portals()
         if #objs == 0
             return nil
         --next_obj = @rng\random_choice(objs)

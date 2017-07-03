@@ -22,6 +22,10 @@ M.loop_control = {
     startup_function = do_nothing
 }
 
+function M.exit_game()
+    M.loop_control.game_is_over = true
+end
+
 local HEADLESS = os.getenv("LANARTS_HEADLESS")
 local function game_loop_body(steponly)
     if HEADLESS then

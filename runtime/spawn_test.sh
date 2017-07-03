@@ -14,7 +14,7 @@ mkdir saves
 echo "# See settings.yaml for details
 ip: localhost
 username: TestBot
-steps_per_draw: 50
+steps_per_draw: 10
 time_per_step: 0
 frame_action_repeat: 0
 port: 6112

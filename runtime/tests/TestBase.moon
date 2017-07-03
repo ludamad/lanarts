@@ -57,8 +57,8 @@ M = nilprotect {
                 sim 'TAB'
             when 4 -- Ranger
                 sim 'TAB'
-            when 5 -- Necro
-                sim 'TAB'
+            --when 5 -- Necro
+            --    sim 'TAB'
             else
                 sim 'ENTER'
         @_n_inputs += 1
@@ -81,28 +81,26 @@ M = nilprotect {
                 @input_source = (require "input.ProgrammableInputSource").create(player)
                 return @input_source
             else
-                @input_source = (require "input.ProgrammableInputSource").create(player)
+                --@input_source = (require "input.ProgrammableInputSource").create(player)
                 player.input_source = @input_source
+                @input_source.player = player
                 return @input_source
                 --log_info "Calling user_player_input(player)"
                 --return user_player_input(player)
         GameState.step = (...) ->
             val = user_gamestate_step(...)
-            if GameState.frame % 100 == 0 and @_save_frame < GameState.frame
-                state = {}
-                @_save_frame = GameState.frame
-                for k,v in pairs(@)
-                    state[k] = v
-                require("core.GlobalData")._ai_state = state
+            if GameState.frame % 1000 == 0
+                --state = {}
+                --for k,v in pairs(@)
+                --    state[k] = v
+                @input_source = false
                 GameState.save("saves/test-save.save")
                 GameState.load("saves/test-save.save")
-                -- Copy over state:
-                state = require("core.GlobalData")._ai_state
-                for k,v in pairs state
-                    @[k] = v
-                player = World.players[1].instance
-                @input_source.player = player
-                player.input_source = @input_source
+                -- Copy over state:W
+                GlobalData = require("core.GlobalData")
+                GlobalData.__test_initialized = false
+                --for k,v in pairs state
+                --    @[k] = v
             return val
         Engine.io = () ->
             if rawget @, "input_source"
@@ -125,12 +123,16 @@ M = nilprotect {
             -- Cannot rest if an enemy is visible:
             if Map.object_visible(enemy, enemy.xy, @input_source.player)
                 -- Necromancer:
-                if player.stats.hp < player.stats.max_hp * 0.3 and not player\has_effect("Baleful Regeneration") 
+                if player.class_name == 'Necromancer'
+                    if player.stats.hp < player.stats.max_hp * 0.3 and not player\has_effect("Baleful Regeneration") 
+                        @input_source\set("use_spell_slot", 1)
+                    else
+                        @input_source\set("use_spell_slot", 0)
+                        --@simulate 'y'
+                        --@simulate 'i'
+                elseif player.class_name == 'Fighter'
                     @input_source\set("use_spell_slot", 1)
-                else
-                    @input_source\set("use_spell_slot", 0)
-                    --@simulate 'y'
-                    --@simulate 'i'
+                    @input_source\set("should_use_weapon", true)
                 return
     _try_collect_items: () =>
         player = @input_source.player
@@ -183,49 +185,46 @@ M = nilprotect {
     _try_explore: () =>
         player = @input_source.player
         {dx, dy} = player\direction_towards_unexplored()
-        pretty {dx,dy}
-        if @_try_move_action(dx, dy)
+        if (dx ~=0 or dy ~= 0) and @_try_move_action(dx, dy)
             @_attack_action() -- Handle attack action wherever we resolved move action 
             return true
         return false
     simulate_game_input: () =>
         if not GlobalData.__test_initialized
             GlobalData.__test_initialized = true
-            if file_exists("saves/test-save.save")
-                GameState.load("saves/test-save.save")
-                -- Copy over state:
-                for k,v in pairs GlobalData._ai_state
-                    @[k] = v
-            else
-                random_seed(HARDCODED_AI_SEED)
-                @_past_item_stage = false
-                @_lpx = 0
-                @_lpy = 0
-                @_ai_state = ExploreUtils.ai_state(@input_source.player)
-                @_last_object = false
-                @_rng = require("mtwist").create(HARDCODED_AI_SEED)
-                @_used_portals = {}
-                @_past_item_stage = false
-                @_save_frame = 0
-            --@input_source.player\gain_xp(10000)
+            random_seed(HARDCODED_AI_SEED)
+            @_lpx = 0
+            @_lpy = 0
+            @_ai_state = ExploreUtils.ai_state(@input_source.player)
+            @_last_object = false
+            @_rng = require("mtwist").create(HARDCODED_AI_SEED)
+            @_used_portals = {}
+            @_queued = {}
+            if GameState.frame < 1000
+                @input_source.player\gain_xp(100000)
+                @input_source.player.stats.max_hp = 100000
+                @input_source.player.stats.hp = 100000
         @_ai_state\step()
         player = @input_source.player
         --if #Map.enemies_list(player) == 0
         --    player\direct_damage(player.stats.hp + 1)
-        if not @_try_explore() then
-            print "~!~"
-
-            --dir = @_ai_state\get_next_direction()
-            --if dir
-            --    @_try_move_action(dir[1], dir[2])
-            --if not dir and not @_try_rest_if_needed()
-            --    dir = @_ai_state\get_next_wander_direction()
-            --    if dir
-            --        @_try_move_action(dir[1], dir[2])
-            --    else
-            --        @_attack_action()
-        else
-            @_attack_action()
+        dir = nil
+        if #@_queued > 0
+            dir = @_queued[1]
+            @_try_move_action(dir[1], dir[2])
+            table.remove(@_queued, 1)
+        if not dir and not @_try_explore() then
+            dir = @_ai_state\get_next_direction()
+            if dir
+                @_try_move_action(dir[1], dir[2])
+                @_attack_action()
+            if not dir and not @_try_rest_if_needed()
+                dir = @_ai_state\get_next_wander_direction()
+                if dir
+                    @_try_move_action(dir[1], dir[2])
+                @_attack_action()
+            for i=1,4
+                append @_queued, dir
         @_lpx, @_lpy = player.x, player.y
 }
 
