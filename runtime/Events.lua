@@ -7,6 +7,7 @@ local World = require "core.World"
 local M = {} -- Submodule
 
 local events = {}
+M.events = events
 
 function events.PlayerInit(player) 
 end

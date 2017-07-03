@@ -287,4 +287,4 @@ map_create = (template) ->
         print "** MAP GENERATION ATTEMPT " .. i .. " FAILED, RETRYING **"
     error("Could not generate a viable map in 1000 tries!")
 
-return {:map_create, :generate_door_candidates}
+return {:map_create, :generate_door_candidates, :connect_edges}

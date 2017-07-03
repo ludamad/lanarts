@@ -38,15 +38,6 @@ default_fill = () =>
             }
         }
         i += 1
-    SourceMap.erode_diagonal_pairs {map: @map, rng: @rng, selector: {matches_all: SourceMap.FLAG_SOLID}}
-    if not SourceMap.area_fully_connected {
-        map: @map, 
-        unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
-        mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
-        marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
-    }
-        log_verbose("ABORT: connection check failed")
-        return false
     return true
 
 
@@ -55,6 +46,7 @@ MapCompiler = newtype {
         -- Result memoizing table 
         @result = {}
         @operators = {}
+        @post_poned = {}
         @label = assert (args.label or @label)
         @root_node = assert (args.root or @root_node) -- Take from base class
         @rng = assert args.rng
@@ -68,6 +60,8 @@ MapCompiler = newtype {
     add: (selector, operator) =>
         append @operators, {:selector, :operator}
 
+    with_map: (f) =>
+        append @post_poned, f
     -- Override to handle explicitly set spawn points
     get_player_spawn_points: () =>
         log_verbose "get_player_spawn_points #{@label} #{#World.players}"
@@ -174,7 +168,22 @@ MapCompiler = newtype {
                 }
                 log_verbose "Connect regions time: #{timer\get_milliseconds()}ms"
             when 'minimum_spanning_arc_and_line'
-                error("Unexpected")
+                @with_map (map) ->
+                    spreader = GenerateUtils.RVORegionPlacer.create()
+                    adapters = for r in *regions
+                        GenerateUtils.MapRegionAdapter.create(r)
+
+                    edges = GenerateUtils.subregion_minimum_spanning_tree(adapters, () -> @rng\random(12) + @rng\random(12))
+                    map.arc_chance = 0.2
+                    NewMaps = require "maps.NewMaps"
+                    NewMaps.connect_edges map, @rng, {
+                        floor1: @tileset.floor,
+                        floor2: @tileset.floor_alt
+                        connect_line_width: () ->
+                            if @rng\randomf() < 0.2
+                                return 2
+                            return 1
+                    }, {1,1, map.size[1] - 1, map.size[2] - 1}, edges
             when 'random_tunnels'
                 error("Unexpected")
             when 'none'
@@ -281,6 +290,17 @@ MapCompiler = newtype {
             :content 
         }
         if not @fill_function()
+            return false
+        for callback in *@post_poned 
+            callback(@map)
+        SourceMap.erode_diagonal_pairs {map: @map, rng: @rng, selector: {matches_all: SourceMap.FLAG_SOLID}}
+        if not SourceMap.area_fully_connected {
+            map: @map, 
+            unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
+            mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
+            marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
+        }
+            log_verbose("ABORT: connection check failed")
             return false
         @_recalculate_perimeter()
         return true

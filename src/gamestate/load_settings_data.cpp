@@ -80,6 +80,9 @@ bool load_settings_data(GameSettings& settings, const char* filename) {
 			if (settings.frame_action_repeat < 0)
 				settings.frame_action_repeat = 0;
 			optional_set(root, "invincible", settings.invincible);
+                        if (getenv("LANARTS_INVINCIBLE")) {
+                            settings.invincible = true;
+                        }
 			optional_set(root, "time_per_step", settings.time_per_step);
 			optional_set(root, "draw_diagnostics", settings.draw_diagnostics);
 			optional_set(root, "username", settings.username);

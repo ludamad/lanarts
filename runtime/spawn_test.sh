@@ -14,11 +14,11 @@ mkdir saves
 echo "# See settings.yaml for details
 ip: localhost
 username: TestBot
-steps_per_draw: 1
-time_per_step: 10
+steps_per_draw: 50
+time_per_step: 0
 frame_action_repeat: 0
 port: 6112
-regen_level_on_death: no
+regen_level_on_death: yes
 autouse_health_potions: no
 autouse_mana_potions: no
 connection_type: none" > saves/saved_settings.yaml
@@ -29,8 +29,8 @@ lobby_server_url: http://putterson.homedns.org:8080
 
 #Window settings
 fullscreen: no
-view_width: 0
-view_height: 0
+view_width: 640
+view_height: 480
 #Font settings
 font: fonts/Gudea-Regular.ttf
 menu_font: fonts/alagard_by_pix3m-d6awiwp.ttf

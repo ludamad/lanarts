@@ -42,6 +42,9 @@ public:
     bool has_been_seen() const {
         return (last_seen_spr > -1);
     }
+        bool has_been_used() const {
+            return used_yet;
+        }
 private:
 	feature_t feature;
 	sprite_id last_seen_spr;

@@ -50,6 +50,7 @@ portal_planner = (player) -> nilprotect {
         return distance_to
     -- Public API:
     step: () =>
+        do return nil
         if @last_touched_portal and not @portal_next[@last_touched_portal]
             {:map} = @last_touched_portal
             if player.map ~= map
@@ -84,7 +85,7 @@ portal_planner = (player) -> nilprotect {
         return closest 
     unused_portals: () =>
         portals = _objects player, "feature"
-        return table.filter portals, (p) -> not @portal_next[p]
+        return table.filter portals, (p) -> not p.has_been_used
 }
 
 path_planner = (player) -> nilprotect {
@@ -135,13 +136,19 @@ ai_state = (player) -> {
                 continue
             return item
         return nil
+    queued_movements: {}
     get_next_direction: () => 
-        if @rng\randomf() < 0.1
-            return @get_next_wander_direction()
+        if #@queued_movements > 0
+            dir = @queued_movements[#@queued_movements]
+            @queued_movements[#@queued_movements] = nil
+            return dir
         dir = @path_planner\next_direction_towards()
         --pretty(dir)
         if dir
             return dir
+        append @queued_movements, {1,1}
+        append @queued_movements, @get_next_wander_direction()
+        return {0,0}
         --next_obj = nil
         --for obj in *_objects(player, "item")
         --    if obj.type == @next_key_item()
@@ -162,7 +169,6 @@ ai_state = (player) -> {
         --            if next_obj 
         --                break
         --            next_obj = @portal_planner\closest_portal("Outpost ".. i)
-        return @get_next_wander_direction()
         --if next_obj
         --    @path_planner\set_path_towards(next_obj)
         --    return @path_planner\next_direction_towards()
@@ -176,18 +182,18 @@ ai_state = (player) -> {
             if dist_sqr < min_dist_sqr
                 min_dist_sqr = dist_sqr
                 o = obj
-        return o
+        return assert o
     get_next_wander_direction: () => 
         --assert #_objects(player, "feature") > 0
         objs = @portal_planner\unused_portals()
-        if #objs == 0
-            objs = _objects(player, "feature") --@rng\random_choice {"item", "feature"})
         if #objs == 0
             return nil
         --next_obj = @rng\random_choice(objs)
         next_obj = @_closest objs
         @path_planner\set_path_towards(next_obj)
-        return @path_planner\next_direction_towards()
+        dir = @path_planner\next_direction_towards()
+        return dir
+
 }
 
 return {:portal_planner, :path_planner, :ai_state}

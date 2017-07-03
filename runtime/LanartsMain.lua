@@ -131,6 +131,9 @@ function Engine.io()
 end
 
 function Engine.player_input(player)
+    if os.getenv("LANARTS_TESTCASE") then
+        return (require "input.KeyboardInputSource").create(player)
+    end
     local Gamepad = require "core.Gamepad"
     local ids = Gamepad.ids()
     local offset = 1

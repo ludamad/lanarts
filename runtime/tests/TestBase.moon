@@ -5,6 +5,7 @@ GameObject = require "core.GameObject"
 PathFinding = require "core.PathFinding"
 Map = require "core.Map"
 ExploreUtils = require "tests.ExploreUtils"
+World = require "core.World"
 
 HARDCODED_AI_SEED = 1234567800
 
@@ -14,6 +15,7 @@ sim = (k) ->
     GameState._simulate_key_press(Keyboard[k])
 user_input_capture = GameState.input_capture
 user_input_handle = GameState.input_handle
+user_gamestate_step = GameState.step
 user_player_input = false
 ASTAR_BUFFER = PathFinding.astar_buffer_create()
 M = nilprotect {
@@ -27,10 +29,14 @@ M = nilprotect {
         return itable
     -- START EVENTS --
     player_has_won: () => false
-    trigger_event: (event) =>
+    trigger_event: (event, ...) =>
         print '*** EVENT:', event
         if event == "PlayerDeath"
-            @input_source = false
+            dead = require("Events").events.PlayerDeath(...)
+            if dead
+                @input_source = false
+            require("core.GlobalData").n_lives = 100
+            return dead
         return true
     overworld_create: () =>
         O = require("maps.01_Overworld")
@@ -75,8 +81,29 @@ M = nilprotect {
                 @input_source = (require "input.ProgrammableInputSource").create(player)
                 return @input_source
             else
-                log_info "Calling user_player_input(player)"
-                return user_player_input(player)
+                @input_source = (require "input.ProgrammableInputSource").create(player)
+                player.input_source = @input_source
+                return @input_source
+                --log_info "Calling user_player_input(player)"
+                --return user_player_input(player)
+        GameState.step = (...) ->
+            val = user_gamestate_step(...)
+            if GameState.frame % 100 == 0 and @_save_frame < GameState.frame
+                state = {}
+                @_save_frame = GameState.frame
+                for k,v in pairs(@)
+                    state[k] = v
+                require("core.GlobalData")._ai_state = state
+                GameState.save("saves/test-save.save")
+                GameState.load("saves/test-save.save")
+                -- Copy over state:
+                state = require("core.GlobalData")._ai_state
+                for k,v in pairs state
+                    @[k] = v
+                player = World.players[1].instance
+                @input_source.player = player
+                player.input_source = @input_source
+            return val
         Engine.io = () ->
             if rawget @, "input_source"
                 @input_source\reset()
@@ -156,6 +183,7 @@ M = nilprotect {
     _try_explore: () =>
         player = @input_source.player
         {dx, dy} = player\direction_towards_unexplored()
+        pretty {dx,dy}
         if @_try_move_action(dx, dy)
             @_attack_action() -- Handle attack action wherever we resolved move action 
             return true
@@ -163,39 +191,39 @@ M = nilprotect {
     simulate_game_input: () =>
         if not GlobalData.__test_initialized
             GlobalData.__test_initialized = true
-            random_seed(HARDCODED_AI_SEED)
-            @_past_item_stage = false
-            @_lpx = 0
-            @_lpy = 0
-            @_ai_state = ExploreUtils.ai_state(@input_source.player)
-            @_last_object = false
-            @_rng = require("mtwist").create(HARDCODED_AI_SEED)
-            @_used_portals = {}
-            @_past_item_stage = false
+            if file_exists("saves/test-save.save")
+                GameState.load("saves/test-save.save")
+                -- Copy over state:
+                for k,v in pairs GlobalData._ai_state
+                    @[k] = v
+            else
+                random_seed(HARDCODED_AI_SEED)
+                @_past_item_stage = false
+                @_lpx = 0
+                @_lpy = 0
+                @_ai_state = ExploreUtils.ai_state(@input_source.player)
+                @_last_object = false
+                @_rng = require("mtwist").create(HARDCODED_AI_SEED)
+                @_used_portals = {}
+                @_past_item_stage = false
+                @_save_frame = 0
             --@input_source.player\gain_xp(10000)
         @_ai_state\step()
-        if os.getenv("LANARTS_TEST_LOAD_MIDWAY") and GameState.frame == 6000
-            require("core.GlobalData")._ai_state = @_ai_state
-            require("core.GlobalData")._last_object = @_last_object
-            GameState.save("saves/test-save.save")
-            GameState.load("saves/test-save.save")
-            @_ai_state = require("core.GlobalData")._ai_state
-            @_last_object = require("core.GlobalData")._last_object
-        World = require "core.World"
-        GameObject = require "core.GameObject"
         player = @input_source.player
         --if #Map.enemies_list(player) == 0
         --    player\direct_damage(player.stats.hp + 1)
-        dir = @_ai_state\get_next_direction()
-        if dir
-            @_try_move_action(dir[1], dir[2])
-        elseif not @_try_rest_if_needed()
-            if not @_try_explore() then
-                dir = @_ai_state\get_next_wander_direction()
-                if dir
-                    @_try_move_action(dir[1], dir[2])
-                else
-                    @_attack_action()
+        if not @_try_explore() then
+            print "~!~"
+
+            --dir = @_ai_state\get_next_direction()
+            --if dir
+            --    @_try_move_action(dir[1], dir[2])
+            --if not dir and not @_try_rest_if_needed()
+            --    dir = @_ai_state\get_next_wander_direction()
+            --    if dir
+            --        @_try_move_action(dir[1], dir[2])
+            --    else
+            --        @_attack_action()
         else
             @_attack_action()
         @_lpx, @_lpy = player.x, player.y

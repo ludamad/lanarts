@@ -239,6 +239,19 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	return meta;
 }
 
+static LuaValue lua_feature_metatable(lua_State* L) {
+	LUAWRAP_SET_TYPE(FeatureInst*);
+
+	LuaValue meta = lua_gameinst_base_metatable(L);
+
+        LuaValue getters = luameta_getters(meta);
+	LuaValue methods = luameta_constants(meta);
+        LUAWRAP_GETTER(getters, has_been_used, OBJ->has_been_used());
+	LUAWRAP_METHOD(methods, interact, OBJ->player_interact(lua_api::gamestate(L), luawrap::get<GameInst*>(L, 2)));
+	return meta;
+}
+
+
 static LuaValue lua_iteminst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(ItemInst*);
 
@@ -319,6 +332,8 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 
 	LuaValue setters = luameta_setters(meta);
 	LUAWRAP_SETTER(setters, is_ghost, bool, OBJ->is_ghost() = VAL);
+	LUAWRAP_SETTER(setters, input_source, LuaValue, OBJ->input_source().value = VAL);
+	LUAWRAP_GETTER(getters, input_source, OBJ->input_source().value);
 	LUAWRAP_GETTER(getters, weapon_sprite, res::sprite(OBJ->weapon().weapon_entry().item_sprite));
     
 	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->weapon().weapon_entry().uses_projectile);
@@ -345,6 +360,8 @@ static void lua_gameinst_push_metatable(lua_State* L, GameInst* inst) {
 		luameta_push(L, &lua_combatgameinst_metatable);
 	} else if (dynamic_cast<ItemInst*>(inst)) {
 		luameta_push(L, &lua_iteminst_metatable);
+	} else if (dynamic_cast<FeatureInst*>(inst)) {
+		luameta_push(L, &lua_feature_metatable);
 	} else {
 		luameta_push(L, &lua_gameinst_base_metatable);
 	}
@@ -711,6 +728,8 @@ namespace lua_api {
 		submodule["EnemyType"].pop();
 		luameta_push(L, &lua_combatgameinst_metatable);
 		submodule["CombatType"].pop();
+		luameta_push(L, &lua_feature_metatable);
+		submodule["FeatureType"].pop();
 		luameta_push(L, &lua_iteminst_metatable);
 		submodule["ItemType"].pop();
 		luameta_push(L, &lua_gameinst_base_metatable);
