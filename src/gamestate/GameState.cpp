@@ -791,6 +791,13 @@ void GameStatePostSerializeData::process(GameState* gs) {
             GameInst::retain_reference(inst);
             *e.holder = inst;
         }
+        lua_State* L = gs->luastate();
+        if (!inst->lua_variables.empty() && !inst->lua_variables.isnil()) {
+            inst->lua_variables["__objectref"].push();
+            GameInst** udata = (GameInst**) lua_touserdata(L, -1);
+            LANARTS_ASSERT(inst == *udata);
+            lua_pop(L, 1);
+        }
     }
     clear();
 }

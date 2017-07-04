@@ -70,6 +70,13 @@ bool GameInst::try_callback(const char* callback) {
 
 void GameInst::step(GameState* gs) {
 	try_callback("on_step");
+    if (!lua_variables.empty() && !lua_variables.isnil()) {
+        lua_State* L = gs->luastate();
+        lua_variables["__objectref"].push();
+        GameInst** udata = (GameInst**) lua_touserdata(L, -1);
+        LANARTS_ASSERT(this == *udata);
+        lua_pop(L, 1);
+    }
 }
 
 void GameInst::draw(GameState* gs) {
@@ -87,6 +94,15 @@ void GameInst::init(GameState* gs) {
 
 void GameInst::deinit(GameState* gs) {
 	try_callback("on_deinit");
+        //if (!lua_variables.empty() && !lua_variables.isnil()) {
+        //    lua_pushnil(gs->luastate());
+        //    lua_variables["__objectref"].pop();
+
+        //    lua_pushnil(gs->luastate());
+        //    lua_variables.push();
+        //    lua_setmetatable(gs->luastate(), -2);
+        //    lua_pop(L, 1);
+        //}
 	lua_variables.clear();
 	id = 0;
 	current_floor = -1;
@@ -130,6 +146,7 @@ void GameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	//Read the plain-old-data region
 	//Dont load reference count or id
 	DESERIALIZE_POD_REGION(serializer, this, last_x, current_floor);
+	times_serialized++;
 }
 
 // Must be done after the normal serialization to allow for referring to the object.

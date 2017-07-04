@@ -96,6 +96,7 @@ public:
 	float x, y, radius, target_radius;
 	int depth;
 	bool solid, destroyed;
+    int times_serialized = 0; // Debug variable, incremented every time object is read from disk;
 	level_id current_floor;
 	// Serialized / deserialized in a separate pass because they have Lua references to objects throughout the system:
 	LuaValue lua_variables;

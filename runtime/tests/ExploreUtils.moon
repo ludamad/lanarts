@@ -70,14 +70,21 @@ path_planner = (player) -> nilprotect {
                 return next -- Next coord far enough away to path towards
             -- Next coord close enough to continue
             @coord += 1
+    target: false
+    n_till_refresh: 0
+    step: () =>
+        @n_till_refresh = math.max @n_till_refresh - 1, 0
     set_path_towards: (obj) =>
         {:map, :tile_xy} = player
+        @target = obj
         @stored_path = ASTAR_BUFFER\calculate_path map, tile_xy, obj.tile_xy
         @coord = 2
     next_direction_towards: () =>
-        if @coord == #@stored_path + 1
-            @coord += 1
-            return {0,0}
+        if not @target
+            return nil
+        if @n_till_refresh <= 0 
+            @set_path_towards(@target)
+            @n_till_refresh = 32
         coord = @get_next_coord()
         if not coord
             return nil
@@ -95,6 +102,7 @@ ai_state = (player) -> {
     key_items: {"Azurite Key", "Dandelite Key"}
     rng: require("mtwist").create(HARDCODED_AI_SEED)
     step: () =>
+        @path_planner\step()
         @portal_planner\step()
     next_key_item: () =>
         for item in *@key_items
@@ -114,7 +122,6 @@ ai_state = (player) -> {
         --pretty(dir)
         if dir
             return dir
-        append @queued_movements, {1,1}
         append @queued_movements, @get_next_wander_direction()
         return {0,0}
         --next_obj = nil

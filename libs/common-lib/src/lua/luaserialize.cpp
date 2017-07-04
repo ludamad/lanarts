@@ -41,7 +41,11 @@ void LuaSerializeContext::encode_table(int idx) {
 	lua_pushvalue(L, idx);
 	lua_pushnil(L);
 	while (lua_next(L, -2) != 0) {
+                const char* name = NULL;
+                const char* type_name = NULL;
 		if (lua_type(L, -2) == LUA_TSTRING) {
+			name = lua_tostring(L, -2);
+                        type_name = lua_typename(L, lua_type(L, -1));
 			//printf("ENCODING '%s' as '%s'\n", lua_tostring(L, -2), lua_typename(L, lua_type(L, -1)));
 		}
 		encode(-2);

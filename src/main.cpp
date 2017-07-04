@@ -97,9 +97,21 @@ static lua_State* init_luastate() {
         return L;
 }
 
+// For gdb
 const char* traceback(lua_State* L) {
     luawrap::globals(L)["debug"]["traceback"].push();
     lua_call(L, 0, 1);
+    return lua_tostring(L, -1);
+}
+const char* pretty(LuaValue value) {
+    lua_State* L = value.luastate();
+    value.push();
+    lua_pushnil(L);
+    lua_setmetatable(L, -2);
+    lua_pop(L, 1);
+    luawrap::globals(L)["pretty_tostring"].push();
+    value.push();
+    lua_call(L, 1, 1);
     return lua_tostring(L, -1);
 }
 

@@ -431,6 +431,7 @@ namespace GameInstWrap {
         int current_floor = luaL_checkinteger(L, 3);
         // Create a dummy reference:
         GameInst** lua_inst = (GameInst**) lua_newuserdata(L, sizeof(GameInst*));
+        *lua_inst = NULL;
         luameta_push(L, &ref_metatable);
         lua_setmetatable(L, -2);
         // Postpone deserialization until the entire game structure is created:
@@ -465,7 +466,7 @@ namespace GameInstWrap {
 			lua_pushnil(L);
 			return;
 		}
-		LuaValue lua_vars = inst->lua_variables;
+		LuaValue& lua_vars = inst->lua_variables;
 		if (lua_vars.empty()) {
 			lua_vars = LuaValue::newtable(L);
 		}

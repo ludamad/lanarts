@@ -833,6 +833,7 @@ share_damage = (target, damage, min_health) ->
         damage = math.max(0, target.stats.hp - min_health)
     target.stats.hp -= damage
 
+LAST_WARNING = GameVar.create("LAST_WARNING", -math.huge)
 for name in *{"Ranger", "Fighter", "Necromancer", "White Mage", "Red Mage", "Blue Mage", "Lifelinker"}
     DataW.effect_create {
         :name
@@ -845,6 +846,7 @@ for name in *{"Ranger", "Fighter", "Necromancer", "White Mage", "Red Mage", "Blu
         init_func: (caster) =>
             @kill_tracker = caster.kills
             @links = {}
+            LAST_WARNING\set -math.huge -- HACK
         step_func: (caster) =>
             -- Keep state for doing summons in a stateful effect:
             if caster\has_effect "Summoner"
@@ -876,6 +878,13 @@ for name in *{"Ranger", "Fighter", "Necromancer", "White Mage", "Red Mage", "Blu
                     if caster\is_local_player()
                         EventLog.add("Your link feels your pain!", COL_PALE_RED)
             @links = new_links
+            if GameState.frame > LAST_WARNING\get() + 100 and not caster.is_ghost
+                low_num = 50
+                if name == "Necromancer"
+                    low_num = 30
+                if caster.stats.hp - damage <= low_num or caster.stats.hp - damage <= caster\effective_stats().max_hp * 0.1
+                    LAST_WARNING\set GameState.frame
+                    play_sound "sound/allyislow1c.ogg"
         on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
             if name == "Necromancer"
                 if attacker\direct_damage(damage * 0.33)

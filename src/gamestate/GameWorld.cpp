@@ -69,8 +69,9 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 
 	int nlevels;
 	serializer.read_int(nlevels);
-	for (int i = nlevels; i < level_states.size(); i++) {
+	for (int i = 0; i < level_states.size(); i++) {
 		delete level_states.at(i);
+                level_states.at(i) = NULL;
 	}
 	level_states.resize(nlevels, NULL);
 

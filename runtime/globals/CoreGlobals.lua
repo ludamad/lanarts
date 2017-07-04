@@ -303,3 +303,32 @@ function newtype(args)
 
     return type
 end
+
+
+local GlobalData = nil
+local function gamevar(var, default)
+    GlobalData = GlobalData or require("core.GlobalData")
+    local val = GlobalData[var]
+    if val == nil then
+        return default
+    else 
+        return val
+    end
+end
+local function set_gamevar(var, val)
+    GlobalData = GlobalData or require("core.GlobalData")
+    GlobalData[var] = val
+end
+
+GameVar = newtype {
+    init = function(self, var, default)
+        self.var = assert(var)
+        self.default = default
+    end,
+    set = function(self, val)
+        set_gamevar(self.var, val)
+    end,
+    get = function(self)
+        return gamevar(self.var, self.default)
+    end
+}

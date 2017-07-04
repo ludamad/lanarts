@@ -1,3 +1,6 @@
+set -e
+./run.sh -g -b --sanitize
+
 RUNTIME_FOLDER=`readlink -f .`
 RUNTIME_TMP=`mktemp -d`
 # Clean up on exit:
@@ -47,8 +50,9 @@ verbose_output: no
 keep_event_log: no" > settings.yaml
 
 export LANARTS_TESTCASE=tests.ShortRunTest
+export LANARTS_SMALL=1 
 export LANARTS_SEED=123456732
-export LANARTS_2P="White Mage"
+#export LANARTS_2P="White Mage"
 #export ARENA_ENEMIES="return {Ciribot=1}"
-#gdb -silent -ex="break lua_error" -ex="break exit" -ex="break _exit" -ex="break abort" -ex="catch throw" -ex=r --args "$RUNTIME_FOLDER/../build/src/lanarts" $args
-"$RUNTIME_FOLDER/../build/src/lanarts" $args
+gdb -silent -ex="break lua_error" -ex="break exit" -ex="break _exit" -ex="break abort" -ex="catch throw" -ex=r --args "$RUNTIME_FOLDER/../build/src/lanarts" $args
+#"$RUNTIME_FOLDER/../build/src/lanarts" $args
