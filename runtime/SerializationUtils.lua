@@ -30,6 +30,7 @@ end
 function M.require_fallback(_context, str)
     if str:sub(1,3) == "_R:" then
         local mname = str:match("^_R%:[^%;]+")
+
         local t =  require(mname:sub(4))
         -- print(mname, Serialization.index_object_dictionary[mname])
         M.name_subobjects(t, Serialization.index_object_dictionary, Serialization.object_index_dictionary, "_R:"..mname:sub(4))

@@ -215,6 +215,7 @@ _get_randarts = (rng, definer, level, base_entry, base_score, weight, randart_sp
         obj = bonuses\create_definer_object(name, description)
         obj.type = base_entry.type
         obj.shop_cost = {score/4, score/2}
+        obj.is_randart = true
         obj.spr_item = rng\random_choice(randart_sprites)
         obj.pickup_func = randart_pickup
         definer(obj)

@@ -268,10 +268,13 @@ void GameWorld::set_current_level_lazy(int roomid) {
 	next_room_id = roomid;
 }
 
+void GameWorld::lazy_reset() {
+    next_room_id = -2;
+}
 void GameWorld::reset() {
 	if (midstep) {
-		next_room_id = -2;
-                return;
+            lazy_reset();
+            return;
 	}
 	std::vector<GameMapState*> delete_list = level_states;
         player_data().remove_all_players(gs);

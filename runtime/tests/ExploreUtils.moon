@@ -71,15 +71,20 @@ path_planner = (player) -> nilprotect {
             -- Next coord close enough to continue
             @coord += 1
     target: false
+    target_map: false
     n_till_refresh: 0
     step: () =>
         @n_till_refresh = math.max @n_till_refresh - 1, 0
     set_path_towards: (obj) =>
         {:map, :tile_xy} = player
         @target = obj
+        @target_map = map
         @stored_path = ASTAR_BUFFER\calculate_path map, tile_xy, obj.tile_xy
         @coord = 2
     next_direction_towards: () =>
+        if player.map ~= @target_map
+            @target_map = false
+            @target = false
         if not @target
             return nil
         if @n_till_refresh <= 0 

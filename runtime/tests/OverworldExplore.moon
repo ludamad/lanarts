@@ -18,7 +18,55 @@ user_input_handle = GameState.input_handle
 user_gamestate_step = GameState.step
 user_player_input = false
 ASTAR_BUFFER = PathFinding.astar_buffer_create()
-M = nilprotect {
+
+PROGRESSION = () ->
+    idx = 0
+    fs = {}
+    init = () ->
+        for item, attributes in pairs items
+            if attributes.is_randart
+                continue -- TODO test all these much later. mostly boring effects
+            if attributes.spr_item == 'none' -- Not meant to be picked up
+                continue
+            append fs, () ->
+                random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
+                P = require "maps.Places"
+                return P.create_isolated {
+                    label: item
+                    template: P.SimpleRoom
+                    items: {[item]: 1}
+                    enemies: {}
+                    spawn_players: true
+                }
+        for enemy, attributes in pairs enemies
+            append fs, () ->
+                random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
+                P = require "maps.Places"
+                return P.create_isolated {
+                    label: item
+                    template: P.SimpleRoom
+                    items: {}
+                    enemies: {[enemy]: 1}
+                    spawn_players: true
+                }
+    --    () ->
+    --        random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
+    --        O = require("maps.01_Overworld")
+    --        V = require("maps.Vaults")
+    --        -- return O.overworld_create()
+    --        return O.test_vault_create(V.simple_room)
+    --}
+    return () ->
+        init()
+        init = do_nothing
+        idx += 1
+        if idx > #fs
+            os.exit()
+        return fs[idx]()
+
+M = {}
+M.progger = PROGRESSION()
+M.create_player = () -> nilprotect {
     simulate: (k) => sim k
     _n_inputs: 0
     -- Forwarding to handle events from a variety of modules, acts as a pseudo-require:
@@ -32,30 +80,33 @@ M = nilprotect {
     trigger_event: (event, ...) =>
         print '*** EVENT:', event
         if event == "PlayerDeath"
+            if (@_n_same_square >= 100)
+                return true
             dead = require("Events").events.PlayerDeath(...)
             if dead
                 @input_source = false
             require("core.GlobalData").n_lives = 100
             return dead
         return true
-    overworld_create: () =>
-        O = require("maps.01_Overworld")
-        V = require("maps.Vaults")
-        -- return O.overworld_create()
-        return O.test_vault_create(V.simple_room)
+    overworld_create: () => M.progger()
+    --overworld_create: () =>
+    --    O = require("maps.01_Overworld")
+    --    V = require("maps.Vaults")
+    --    -- return O.overworld_create()
+    --    return O.test_vault_create(V.simple_room)
     -- END EVENTS --
     -- Default is to always want to simulate:
-    should_simulate_input: () => not @_past_item_stage
+    should_simulate_input: () => true 
     simulate_menu_input: () =>
         Keyboard = require "core.Keyboard"
         switch @_n_inputs
-            when 1 
+            when 0 
                 sim 'n'
-            when 2 -- Mage
+            when 1 -- Mage
                 sim 'TAB'
-            when 3  -- Fighter
+            when 2  -- Fighter
                 sim 'TAB'
-            when 4 -- Ranger
+            when 3 -- Ranger
                 sim 'TAB'
             --when 5 -- Necro
             --    sim 'TAB'
@@ -63,6 +114,7 @@ M = nilprotect {
                 sim 'ENTER'
         @_n_inputs += 1
     menu_start: () =>
+        print "MENU START"
         GameState.input_capture = () ->
             if @should_simulate_input()
                 GameState._input_clear()
@@ -75,7 +127,6 @@ M = nilprotect {
         pid = 1
         user_player_input or= Engine.player_input
         GameState.input_capture = user_input_capture
-        require("Events").player_death = () -> true
         Engine.player_input = (player) ->
             if not rawget @, "input_source"
                 @input_source = (require "input.ProgrammableInputSource").create(player)
@@ -88,12 +139,18 @@ M = nilprotect {
                 --log_info "Calling user_player_input(player)"
                 --return user_player_input(player)
         GameState.step = (...) ->
-            val = user_gamestate_step(...)
-            if GameState.frame % 1000 == 0
+            should_continue = user_gamestate_step(...)
+            if GameState.frame % 125 == 2
                 --state = {}
                 --for k,v in pairs(@)
                 --    state[k] = v
                 @input_source = false
+                @_lpx = 0
+                @_lpy = 0
+                @_ai_state = false
+                @_last_object = false
+                @_used_portals = {}
+                @_queued = {}
                 GameState.save("saves/test-save.save")
                 GameState.load("saves/test-save.save")
                 -- Copy over state:W
@@ -101,7 +158,14 @@ M = nilprotect {
                 GlobalData.__test_initialized = false
                 --for k,v in pairs state
                 --    @[k] = v
-            return val
+            if should_continue and @_n_same_square > 100 and @input_source
+                GlobalData.__test_initialized = false
+                @_n_inputs = 0 -- Reset menu state TODO refactor
+                @_n_same_square = 0
+                @input_source = false
+                GameState.lazy_reset()
+                return true
+            return should_continue
         Engine.io = () ->
             if rawget @, "input_source"
                 @input_source\reset()
@@ -189,6 +253,7 @@ M = nilprotect {
             @_attack_action() -- Handle attack action wherever we resolved move action 
             return true
         return false
+    _n_same_square: 0
     simulate_game_input: () =>
         if not GlobalData.__test_initialized
             GlobalData.__test_initialized = true
@@ -200,10 +265,11 @@ M = nilprotect {
             @_rng = require("mtwist").create(HARDCODED_AI_SEED)
             @_used_portals = {}
             @_queued = {}
-            if GameState.frame < 1000
-                @input_source.player\gain_xp(100000)
-                @input_source.player.stats.max_hp = 100000
-                @input_source.player.stats.hp = 100000
+            @_n_same_square = 0
+            print "LEVEL UP"
+            @input_source.player\gain_xp(100000)
+            @input_source.player.stats.max_hp = 100000
+            @input_source.player.stats.hp = 100000
         @_ai_state\step()
         player = @input_source.player
         --if #Map.enemies_list(player) == 0
@@ -225,6 +291,11 @@ M = nilprotect {
                 @_attack_action()
             for i=1,4
                 append @_queued, dir
+        if @_lpx == player.x and @_lpy == player.y
+            @_n_same_square += 1
+        else
+            @_n_same_square = 0
+        @input_source\set("use_item_slot", @_rng\random(0, 20))
         @_lpx, @_lpy = player.x, player.y
 }
 

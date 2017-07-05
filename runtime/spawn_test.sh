@@ -1,5 +1,6 @@
 set -e
-./run.sh -g -b --sanitize
+#./run.sh -g -b --sanitize
+./run.sh -O -b -lj
 
 RUNTIME_FOLDER=`readlink -f .`
 RUNTIME_TMP=`mktemp -d`
@@ -49,7 +50,7 @@ draw_diagnostics: no
 verbose_output: no
 keep_event_log: no" > settings.yaml
 
-export LANARTS_TESTCASE=tests.ShortRunTest
+export LANARTS_TESTCASE=tests.OverworldExplore
 export LANARTS_SMALL=1 
 export LANARTS_SEED=123456732
 #export LANARTS_2P="White Mage"

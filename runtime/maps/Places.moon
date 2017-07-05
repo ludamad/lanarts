@@ -65,7 +65,7 @@ DragonLairFoyer = newtype {
         "Fire Bat": 10
     }
     -- Called before compile() is called 
-    generate: (cc) =>
+    generate: (args) =>
         for enemy, amount in pairs @enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)
@@ -94,7 +94,7 @@ DragonLair = newtype {
         "Fire Bat": 8
     }
     -- Called before compile() is called 
-    generate: (cc) =>
+    generate: (args) =>
         for enemy, amount in pairs @enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)
@@ -130,12 +130,45 @@ Arena = newtype {
     root_node: cave()
     tileset: TileSets.lair
     -- Called before compile() is called 
-    generate: (cc) =>
-        enemies = loadstring(os.getenv "ARENA_ENEMIES")()
+    generate: (args) =>
+        enemies = args.enemies or loadstring(os.getenv "ARENA_ENEMIES")() or {}
         for enemy, amount in pairs enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)
                 MapUtils.spawn_enemy(@map, enemy, sqr)
+        items = args.items or loadstring(os.getenv "ARENA_ITEMS")() or {}
+        for type, amount in pairs items
+            sqr = MapUtils.random_square(@map, nil)
+            MapUtils.spawn_item(@map, type, amount, sqr)
 }
 
-return nilprotect {:DragonLair, :DragonLairFoyer, :Arena}
+
+SimpleRoom = newtype {
+    parent: MapCompiler
+    root_node: Shape {
+            shape: 'deformed_ellipse'
+            size: {20, 20}
+        }
+    tileset: TileSets.lair
+    -- Called before compile() is called 
+    generate: (args) =>
+        enemies = args.enemies or loadstring(os.getenv "ARENA_ENEMIES")() or {}
+        for enemy, amount in pairs enemies
+            for i=1,amount
+                sqr = MapUtils.random_square(@map, nil)
+                MapUtils.spawn_enemy(@map, enemy, sqr)
+        items = args.items or loadstring(os.getenv "ARENA_ITEMS")() or {}
+        for type, amount in pairs items
+            sqr = MapUtils.random_square(@map, nil)
+            MapUtils.spawn_item(@map, type, amount, sqr)
+}
+
+
+create_isolated = (args) ->
+    {:MapCompilerContext} = require "maps.MapCompilerContext"
+    cc = MapCompilerContext.create()
+    cc\register(args.label, args.template)
+    -- Compile the map
+    return cc\get(args)
+
+return nilprotect {:DragonLair, :DragonLairFoyer, :Arena, :SimpleRoom, :create_isolated}

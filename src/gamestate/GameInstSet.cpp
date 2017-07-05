@@ -174,48 +174,54 @@ void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
 	}
 }
 
+static void safe_deserialize(GameInst* inst, GameState* gs,
+		SerializeBuffer& serializer) {
+	int lx = inst->last_x, ly = inst->last_y;
+	inst->deserialize(gs, serializer);
+	inst->last_x = lx, inst->last_y = ly;
+
+}
 void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_int(grid_w);
 	serializer.read_int(grid_h);
-	
-        int amnt = 0;
-	serializer.read_int(amnt);
-	serializer.read_int(next_id);
 
 	//Resize and clear
 	unit_grid.resize(grid_w * grid_h);
 	clear();
-	std::vector<GameInstRef> instances;
+
+	int amnt;
+	serializer.read_int(amnt);
+	serializer.read_int(next_id);
+
+	std::vector<GameInst*> instances;
 	for (int i = 0; i < amnt; i++) {
 		InstType type;
-		int id = 0;
+		int id;
 		serializer.read_int(type);
 		serializer.read_int(id);
-		//GameInst* inst = get_instance(id);
-		//bool has_inst = inst != NULL;
-		//if (!has_inst) {
-		//	//inst->last_x = inst->x;
-		//	//inst->last_y = inst->y;
-		//} else {
-                //        //int lx = inst->last_x, ly = inst->last_y;
-                //        //inst->last_x = lx, inst->last_y = ly;
-		//}
-                GameInst* inst = from_inst_type(type);
-                inst->deserialize(gs, serializer);
-                inst->id = id;
-                inst->last_x = inst->x;
-                inst->last_y = inst->y;
-                instances.push_back(GameInstRef(inst));
-		add_instance(inst, inst->id);
+		GameInst* inst = get_instance(id);
+		bool has_inst = inst != NULL;
+		if (!has_inst) {
+			inst = from_inst_type(type);
+			inst->deserialize(gs, serializer);
+			inst->last_x = inst->x;
+			inst->last_y = inst->y;
+			inst->id = id;
+			add_instance(inst, inst->id);
+			instances.push_back(inst);
+		} else {
+			safe_deserialize(inst, gs, serializer);
+		}
+//		if (gs->game_settings().network_debug_mode) {
 		bool seq = serializer_equals_read(serializer, inst->integrity_hash());
 		if (!seq) {
 			lanarts_system_quit();
 			abort();
 		}
+//		}
 	}
-
-        for (GameInstRef& ref : instances) {
-		ref->deserialize_lua(gs, serializer);
+	for (int i = 0; i < instances.size(); i++) {
+		instances[i]->deserialize_lua(gs, serializer);
 	}
 }
 

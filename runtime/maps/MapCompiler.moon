@@ -323,7 +323,7 @@ MapCompiler = newtype {
             @_prepare_map_topology(@root_node)
             success = @_prepare_source_map(label, padding, content)
     -- Creates a game map
-    compile: (C) =>
+    compile: (args) =>
         return Map.create {
             map: @map
             label: @map.label

@@ -199,6 +199,16 @@ static int game_frame(lua_State* L) {
 	return 1;
 }
 
+static int game_lazy_reset(lua_State* L) {
+	lua_api::gamestate(L)->game_world().lazy_reset();
+	return 0;
+}
+
+static int game_reset(lua_State* L) {
+	lua_api::gamestate(L)->game_world().reset();
+	return 0;
+}
+
 static long garbage_collect_while_waiting(lua_State* L, long wait_micro) {
 	// How many times do we step garbage collection before checking time ?
 	static const int ITERS_PER_CHECK = 2;
@@ -291,6 +301,8 @@ namespace lua_api {
 		game["draw"].bind_function(game_draw);
 		game["raw_event_log"].bind_function(game_raw_event_log);
 		game["for_screens"].bind_function(game_for_screens);
+                game["reset"].bind_function(game_reset);
+                game["lazy_reset"].bind_function(game_lazy_reset);
 		game["screen_set"].bind_function(game_screen_set);
 		game["screen_get"].bind_function(game_screen_get);
 		game["screen_amount"].bind_function(game_screen_amount);
