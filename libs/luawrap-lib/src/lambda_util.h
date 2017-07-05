@@ -166,11 +166,6 @@ inline void lua_push_unsafe_closure(lua_State* L, const F& f) {
     was_set = true;
 }
 
-template <typename T>
-inline void install_closure(const T& unused) {
-    luawrap::install_type<T, lua_push_unsafe_closure<T>>();
-}
-
 template<typename T> struct Callable { 
     struct Fallback { int operator()(){} };
     struct Derived : T, Fallback { };

@@ -76,6 +76,12 @@ path_planner = (player) -> nilprotect {
     step: () =>
         @n_till_refresh = math.max @n_till_refresh - 1, 0
     set_path_towards: (obj) =>
+        if obj.destroyed
+            @target = false
+            @target_map = false
+            @stored_path = {}
+            @coord = 1
+            return
         {:map, :tile_xy} = player
         @target = obj
         @target_map = map

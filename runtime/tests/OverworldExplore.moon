@@ -24,6 +24,7 @@ PROGRESSION = () ->
     fs = {}
     init = () ->
         for item, attributes in pairs items
+            do break -- TODO
             if attributes.is_randart
                 continue -- TODO test all these much later. mostly boring effects
             if attributes.spr_item == 'none' -- Not meant to be picked up
@@ -35,18 +36,21 @@ PROGRESSION = () ->
                     label: item
                     template: P.SimpleRoom
                     items: {[item]: 1}
-                    enemies: {}
+                    enemies: {Sheep: 10}
                     spawn_players: true
                 }
+
         for enemy, attributes in pairs enemies
+            if not enemy\match "Dragon"
+                continue
             append fs, () ->
                 random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
                 P = require "maps.Places"
                 return P.create_isolated {
-                    label: item
+                    label: enemy
                     template: P.SimpleRoom
-                    items: {}
-                    enemies: {[enemy]: 1}
+                    items: {["Haste Scroll"]: 1}
+                    enemies: {[enemy]: 10}
                     spawn_players: true
                 }
     --    () ->
@@ -158,7 +162,7 @@ M.create_player = () -> nilprotect {
                 GlobalData.__test_initialized = false
                 --for k,v in pairs state
                 --    @[k] = v
-            if should_continue and @_n_same_square > 100 and @input_source
+            if @_should_end()
                 GlobalData.__test_initialized = false
                 @_n_inputs = 0 -- Reset menu state TODO refactor
                 @_n_same_square = 0
@@ -176,6 +180,18 @@ M.create_player = () -> nilprotect {
         --        --GameState._input_clear()
         --        return user_input_handle(true)
         --    return user_input_handle(true)
+    _should_end: () =>
+        if not @input_source
+            return false
+        player = @input_source.player
+        if @_n_same_square < 100
+            return false
+        for obj in *Map.objects_list(player.map)
+            --if GameObject.get_type(obj) == "item"
+            --    return false
+            if GameObject.get_type(obj) == "actor" and obj.team ~= player.team
+                return false
+        return true
     _try_move_action: (dx, dy) =>
         @input_source\set("move_direction", {dx, dy})
         return true
@@ -266,7 +282,6 @@ M.create_player = () -> nilprotect {
             @_used_portals = {}
             @_queued = {}
             @_n_same_square = 0
-            print "LEVEL UP"
             @input_source.player\gain_xp(100000)
             @input_source.player.stats.max_hp = 100000
             @input_source.player.stats.hp = 100000

@@ -354,7 +354,7 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
         }
 
         if (can_trigger && can_target) {
-            bool can_use = lcall(/*default*/ true, spl_entry.prereq_func,
+            bool can_use = lcall_def(/*default*/ true, spl_entry.prereq_func,
                     /*caster*/ this, target.x, target.y);
             if (can_use) {
                 queued_actions.push_back(

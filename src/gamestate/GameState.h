@@ -66,6 +66,10 @@ class GameStatePostSerializeData {
 public:
     void clear();
     void postpone_instance_deserialization(GameInst** holder, level_id current_floor, obj_id id);
+	void postpone_destroyed_instance_deserialization(GameInst** holder);
+	void postpone_destroyed_instance_serialization(GameInst* inst);
+	void serialize(SerializeBuffer& sb);
+	void deserialize(SerializeBuffer& sb);
     void process(GameState* gs);
 private:
     struct GameInstPostSerializeData {
@@ -75,6 +79,8 @@ private:
     };
     // Used to determine what to fix-up after serialization:
     std::vector<GameInstPostSerializeData> postponed_insts;
+	std::vector<GameInst**> inst_to_deserialize;
+	std::vector<GameInst*> inst_to_serialize;
 };
 
 class GameState {

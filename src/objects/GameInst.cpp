@@ -13,6 +13,7 @@
 #include <lcommon/SerializeBuffer.h>
 #include <lcommon/luaserialize.h>
 
+#include "data/lua_util.h"
 #include "draw/draw_sprite.h"
 
 #include "gamestate/GameState.h"
@@ -94,15 +95,11 @@ void GameInst::init(GameState* gs) {
 
 void GameInst::deinit(GameState* gs) {
 	try_callback("on_deinit");
-        //if (!lua_variables.empty() && !lua_variables.isnil()) {
-        //    lua_pushnil(gs->luastate());
-        //    lua_variables["__objectref"].pop();
-
-        //    lua_pushnil(gs->luastate());
-        //    lua_variables.push();
-        //    lua_setmetatable(gs->luastate(), -2);
-        //    lua_pop(L, 1);
-        //}
+//        if (!lua_variables.empty() && !lua_variables.isnil()) {
+//            lua_pushnil(gs->luastate());
+//            lua_variables["__objectref"].pop();
+//            lcall(luawrap::globals(gs->luastate())["deadprotect"], lua_variables);
+//        }
 	lua_variables.clear();
 	id = 0;
 	current_floor = -1;

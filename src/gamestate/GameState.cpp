@@ -51,6 +51,7 @@
 
 #include "util/game_replays.h"
 #include <lcommon/math_util.h>
+#include <objects/InstTypeEnum.h>
 
 #include "GameMapState.h"
 #include "GameState.h"
@@ -276,6 +277,7 @@ bool GameState::level_has_player() {
 void GameState::serialize(SerializeBuffer& serializer) {
 	serializer.set_user_pointer(this);
 	LuaSerializeConfig& conf = luaserialize_config();
+    post_deserialize_data().clear();
         // Reset the serialization config:
         conf.reset();
 	luawrap::globals(L)["Engine"]["pre_serialize"].push();
@@ -298,7 +300,9 @@ void GameState::serialize(SerializeBuffer& serializer) {
 	world.serialize(serializer);
 
 	player_data().serialize(this, serializer);
-        screens.serialize(this, serializer);
+
+    post_deserialize_data().serialize(serializer);
+    screens.serialize(this, serializer);
 	luawrap::globals(L)["Engine"]["post_serialize"].push();
 	luawrap::call<void>(L);
 
@@ -331,6 +335,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	world.deserialize(serializer);
 	player_data().deserialize(this, serializer);
 
+    post_deserialize_data().deserialize(serializer);
 	post_deserialize_data().process(this);
     screens.deserialize(this, serializer);
 
@@ -776,6 +781,8 @@ void loop(const char* sound_path) {
 
 void GameStatePostSerializeData::clear() {
     postponed_insts.clear();
+    inst_to_deserialize.clear();
+    inst_to_serialize.clear();
 }
 
 void GameStatePostSerializeData::postpone_instance_deserialization(GameInst** holder, level_id current_floor, obj_id id) {
@@ -800,4 +807,35 @@ void GameStatePostSerializeData::process(GameState* gs) {
         }
     }
     clear();
+}
+
+void GameStatePostSerializeData::deserialize(SerializeBuffer &sb) {
+    for (GameInst** ptr : inst_to_deserialize) {
+        InstType type;
+        int id;
+        sb.read_int(type);
+        sb.read_int(id);
+        GameInst*& inst = *ptr;
+        inst = from_inst_type(type);
+        inst->deserialize(gs(sb), sb);
+        inst->last_x = inst->x;
+        inst->last_y = inst->y;
+        inst->id = id;
+    }
+}
+
+void GameStatePostSerializeData::serialize(SerializeBuffer &sb) {
+    for (GameInst* inst : inst_to_serialize) {
+        sb.write_int(get_inst_type(inst));
+        sb.write_int(inst->id);
+        inst->serialize(gs(sb), sb);
+    }
+}
+
+void GameStatePostSerializeData::postpone_destroyed_instance_deserialization(GameInst **holder) {
+    inst_to_deserialize.push_back(holder);
+}
+
+void GameStatePostSerializeData::postpone_destroyed_instance_serialization(GameInst *inst) {
+    inst_to_serialize.push_back(inst);
 }

@@ -184,8 +184,6 @@ bool InventoryContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
         queued_actions.push_back(
                 game_action(gs, p, GameAction::REPOSITION_ITEM, slot1, 0, 0, slot2));
     };
-    install_closure(drop_item_slot);
-    install_closure(reposition_item);
     lmethod_call<void>(handler, "handle_inventory", drop_item_slot, reposition_item);
 
 	/* Drop a dragged item */

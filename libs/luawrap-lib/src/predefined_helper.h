@@ -180,6 +180,24 @@ namespace luawrap {
 		class TypeImpl<char*> : public TypeImpl<std::string> {
 		};
 
+		template<typename T, typename = decltype(&T::operator())>
+		using enable_lambda = T;
+
+		/* C++ Lambdas */
+		template<typename T>
+		class TypeImpl<enable_lambda<T>> {
+		public:
+			static void push(lua_State* L, const T& data) {
+				function_traits<T>::push(L, data);
+			}
+			static LuaValue get(lua_State* L, int idx) {
+				return LuaValue();
+			}
+			static bool check(lua_State *L, int idx) {
+				return true; // Take on faith for now
+			}
+		};
+
 		/* STL Containers */
 
 #ifndef LUAWRAP_NO_WRAP_VECTOR

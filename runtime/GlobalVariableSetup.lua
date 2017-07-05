@@ -12,6 +12,13 @@ return function(--[[Optional]] dont_load_draw_globals)
         return setmetatable(t, nilprotect_meta)
     end
 
+    local deadprotect_meta = {__index = function(self, k)
+        error( ("Key '%s' not available, object is destroyed (only data set from Lua is available)!"):format(k) )
+    end}    
+    function deadprotect(t)
+        return setmetatable(t, deadprotect_meta)
+    end
+
     -- Initial global protection phase, only protect against undefined lookups:
     setmetatable(_G, {__index = function(self, k)
         error( ("Global variable '%s' does not exist!"):format(k) )

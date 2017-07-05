@@ -110,6 +110,6 @@ static EnemyEntry parse_enemy_type(const LuaStackValue& table) {
 
 void lapi_data_create_enemy(const LuaStackValue& table) {
     EnemyEntry entry = parse_enemy_type(table);
-    game_enemy_data.new_entry(entry.name, entry);
+    game_enemy_data.new_entry(entry.name, entry, table);
 }
 

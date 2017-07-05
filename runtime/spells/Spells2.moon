@@ -115,21 +115,6 @@ DataW.spell_create {
     mp_cost: 10,
     cooldown: 35
 }
-
--- LIGHTNING BOLT
-DataW.spell_create {
-    name: "Lightning Bolt",
-    spr_spell: "spr_effects.shock",
-    description: "A super fast projectile lightning attack.",
-    types: {"White"}
-    projectile: {
-        speed: 9
-        damage_multiplier: 1.2
-    }
-    mp_cost: 10,
-    cooldown: 35
-}
-
 DataW.projectile_create {
     name: "Skullthrow"
     weapon_class: "magic"

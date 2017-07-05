@@ -1,6 +1,6 @@
 set -e
-#./run.sh -g -b --sanitize
-./run.sh -O -b -lj
+./run.sh -g -b --sanitize
+#./run.sh -O -b -lj
 
 RUNTIME_FOLDER=`readlink -f .`
 RUNTIME_TMP=`mktemp -d`

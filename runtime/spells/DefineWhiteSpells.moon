@@ -155,13 +155,16 @@ draw_console_effect = (xy, sprite, texts) ->
 -- TORNADO STORM
 DataW.spell_create {
     name: "Tornado Storm",
-    description: "Tornados of swirling death .",
+    description: "Tornados of swirling death.",
     spr_spell: "spr_effects.tornado"
     types: {"White"}
     console_draw_func: (get_next) =>
+        draw_console_effect get_next(), M._flash, {
+            {COL_PALE_GREEN, "Tornados burst into lightning"}
+        }
         draw_console_effect get_next(), M._bolt, {
             {COL_PALE_GREEN, "5"}
-            {COL_PALE_YELLOW, " damage"}
+            {COL_PALE_YELLOW, " damage per second"}
         }
     projectile: SpellUtils.passing_projectile {
         speed: 4

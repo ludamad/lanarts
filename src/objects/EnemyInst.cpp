@@ -112,9 +112,13 @@ void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	eb.deserialize(gs, serializer);
 	serializer.read_int(xpgain);
 	serializer.read_int(enemy_regen_cooloff);
-	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
-	collision_simulation_id() = coll_avoid.add_active_object(ipos(),
-			target_radius, effective_stats().movespeed);
+        if (!destroyed) {
+            // We care about the details of destroyed objects
+            // but they cant add themselves to collision avoidance.
+            CollisionAvoidance& coll_avoid = gs->collision_avoidance();
+            collision_simulation_id() = coll_avoid.add_active_object(ipos(),
+                            target_radius, effective_stats().movespeed);
+        }
 //	ai_state.deserialize(gs, serializer);
 }
 

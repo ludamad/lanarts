@@ -44,7 +44,7 @@ inline void lcall(const LuaValue& field, const Args... args) {
 }
 
 template<typename T, typename ...Args>
-inline T lcall(T _default, const LuaValue& field, const Args... args) {
+inline T lcall_def(T _default, const LuaValue& field, const Args... args) {
     if (field.empty() || field.isnil()) {
         return _default;
     }

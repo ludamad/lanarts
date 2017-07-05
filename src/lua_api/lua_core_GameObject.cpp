@@ -413,7 +413,13 @@ namespace GameInstWrap {
 	static int __save(lua_State* L) {
 		GameState* gs = lua_api::gamestate(L);
 		GameInst** udata = (GameInst**) lua_touserdata(L, 1);
-		LANARTS_ASSERT((*udata)->id != 0);
+//		LANARTS_ASSERT((*udata)->id != 0);
+        if ((*udata)->destroyed) {
+            gs->post_deserialize_data().postpone_destroyed_instance_serialization(*udata);
+            lua_pushinteger(L, 0);
+            lua_pushinteger(L, (*udata)->current_floor);
+            return 2;
+        }
 		GameInst* test_inst = gs->get_level((*udata)->current_floor)->game_inst_set().get_instance((*udata)->id);
         if ((*udata) != test_inst) {
             throw std::runtime_error(format("Attempt to save GameInst that cannot be found at level %d, id %d!", (*udata)->current_floor, (*udata)->id));
@@ -426,6 +432,7 @@ namespace GameInstWrap {
     static LuaValue ref_metatable(lua_State* L);
 
 	static int __load(lua_State* L) {
+        GameState* gs = lua_api::gamestate(L);
 	    // Get our coordinates:
         int id = luaL_checkinteger(L, 2);
         int current_floor = luaL_checkinteger(L, 3);
@@ -435,7 +442,11 @@ namespace GameInstWrap {
         luameta_push(L, &ref_metatable);
         lua_setmetatable(L, -2);
         // Postpone deserialization until the entire game structure is created:
-        lua_api::gamestate(L)->post_deserialize_data().postpone_instance_deserialization(lua_inst, current_floor, id);
+        if (id == 0) {
+            gs->post_deserialize_data().postpone_destroyed_instance_deserialization(lua_inst);
+        } else {
+            gs->post_deserialize_data().postpone_instance_deserialization(lua_inst, current_floor, id);
+        }
         // Return our dummy reference:
 		return 1;
 	}
