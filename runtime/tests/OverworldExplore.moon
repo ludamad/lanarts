@@ -24,7 +24,6 @@ PROGRESSION = () ->
     fs = {}
     init = () ->
         for item, attributes in pairs items
-            do break -- TODO
             if attributes.is_randart
                 continue -- TODO test all these much later. mostly boring effects
             if attributes.spr_item == 'none' -- Not meant to be picked up
@@ -41,8 +40,8 @@ PROGRESSION = () ->
                 }
 
         for enemy, attributes in pairs enemies
-            if not enemy\match "Dragon"
-                continue
+            --if not enemy\match "Dragon"
+            --    continue
             append fs, () ->
                 random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
                 P = require "maps.Places"
