@@ -6,6 +6,7 @@ World = require "core.World"
 -- Represents a pending feature 
 PendingFeature = newtype {
     init: (@label, @placement_function, @max_tries = 100) => 
+        assert @label
     _place: (args) =>
         compiler = args.compiler
         for i=1,@max_tries
@@ -22,7 +23,7 @@ make_on_player_interact = (cc, target_portal) -> (_, user) ->
     -- We call C\get(label) first, to potentially trigger map
     -- generation 
     -- This will ensure .feature is set on @other_portal
-    destination_map = cc\get(target_portal.label)
+    destination_map = cc\get {label: assert target_portal.label}
     assert target_portal.feature, "Connected portal should have compiled!"
     -- Transfer the user object between floors.
     Map.transfer(user, destination_map, target_portal.feature.xy)
@@ -63,7 +64,12 @@ MapCompilerContext = newtype {
     -- Subsequent calls will pass so long as they have 'label', but it is good form to always
     -- call with generation arguments.
     get: (args) => -- Generates if pending
+        if (type args) == "string"
+            args = {label: args}
         label = assert args.label, "Must provide label to identify map to retrieve/generate!"
+        if (type label) ~= "string"
+            label = label.label
+            
         -- other args:
         -- 'spawn_players' whether to spawn players in this room
         -- 
@@ -73,7 +79,7 @@ MapCompilerContext = newtype {
         C = @pending_maps[label]
         if type(C) == 'function' -- Simple callback
             args.label = label
-            args.pending_feature = @pending_feature[label]
+            args.pending_feature = @pending_features[label]
             @maps[label] = C(@, args)
         else -- New-style area class
             compiler = C.create {
@@ -84,7 +90,7 @@ MapCompilerContext = newtype {
             args.compiler = compiler
             compiler\generate(args)
             for pending_feature in *@pending_features[label]
-                pending_feature\compile(@, compiler)
+                pending_feature\compile(args)
             @maps[label] = compiler\compile(args)
             if args.spawn_players 
                 World.players_spawn @maps[label], compiler\get_player_spawn_points()

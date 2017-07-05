@@ -93,6 +93,8 @@ DataW.spell_create {
         speed: 4
         number_of_target_bounces: 3
         on_hit_func: (target, atkstats) =>
+            if @caster
+                return
             white_power = EffectUtils.get_power(@caster, "White")
             prob = interpolate(white_power, 0, 5, 0.0, 0.2)
             if chance(prob)
@@ -119,6 +121,8 @@ DataW.spell_create {
         on_map_init: () =>
             @bonus = 0.9
         on_hit_func: (target, atkstats, damage) =>
+            if @caster
+                return
             white_power = EffectUtils.get_power(@caster, "White")
             prob = interpolate(white_power, 0, 5, 0.0, 0.2)
             if chance(prob)

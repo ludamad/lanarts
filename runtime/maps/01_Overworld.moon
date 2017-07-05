@@ -1007,7 +1007,7 @@ test_vault_create = (template) ->
 test_create = (offset = 1) ->
     cc = MapCompilerContext.create()
     cc\register("root", Places.Arena)
-    return cc\get("root", true)
+    return cc\get {label: "root", spawn_players: true}
 
 overworld_create = () ->
     MapSeq = MapSequence.create {preallocate: 1}

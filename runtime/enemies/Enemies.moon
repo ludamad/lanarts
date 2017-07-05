@@ -627,7 +627,7 @@ DataW.enemy_create {
         hp: 80
         hpregen: 0.01
         movespeed: 4
-        strength: 15
+        strength: 20
         defence: 8
         willpower: 8
     }
@@ -669,6 +669,7 @@ DataW.enemy_create {
         types: {"Piercing", "Green"}
         speed: 9
         spr_attack: 'nessos arrows'
+        power: {base: {10, 10}}
         on_hit_func: (target, atkstats) =>
             if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
                 effect = target\add_effect("Poison", 100, atkstats)
@@ -1419,7 +1420,7 @@ DataW.enemy_create {
         hp: 200
         hpregen: 0
         movespeed: 1
-        strength: 20
+        strength: 24
         defence: 10
         willpower: 10
     }

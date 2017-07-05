@@ -12,7 +12,7 @@ TYPES = {
 }
 for type in *TYPES
     TYPE_RESIST_EFFECT[type] = "#{type}Resist"
-    TYPE_POWER_EFFECT[type] = "#{type}POWER"
+    TYPE_POWER_EFFECT[type] = "#{type}Power"
 
 get_monster_resistances = (types) ->
     resists = {
