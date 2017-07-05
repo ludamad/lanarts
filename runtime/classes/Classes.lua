@@ -194,12 +194,8 @@ Data.class_create {
     available_spells = {
       { spell = "Berserk",
         level_needed = 1 },
-      { spell = "Dash Attack",
-        level_needed = 3 },
       { spell = "Power Strike",
         level_needed = 2 },
-      --{ spell = "Slam",
-      --  level_needed = 3 },
     },
     start_stats = {
         movespeed = 4,
@@ -275,6 +271,43 @@ Data.class_create {
 --    }
 --}
 
+local rogue_spells = {}
+for _, v in ipairs(os.getenv("ROGUE_SPELLS"):split ",") do
+    append(rogue_spells, {spell=v, level_needed=1})
+end
+Data.class_create {
+    name = "Rogue",
+    sprites = {"spr_classes.rogue1", "spr_classes.rogue2"},
+    available_spells = rogue_spells,
+    start_stats = {
+        movespeed = 4,
+        hp = 135,
+        mp = 60,
+        hpregen = 4 / 60, -- Per 60 frames
+        mpregen = 2 / 60, -- Per 60 frames
+        strength = 5,
+        defence = 7,
+        willpower = 4,
+        magic = 6,
+        equipment = {
+          weapon = "Dagger",
+          gold = 0,
+          inventory = table.tconcat({
+             {item = "Health Potion"},
+          }, TEST_INVENTORY)
+        }
+    },
+    gain_per_level = {
+        hp = 20,
+        mp = 15,
+        hpregen = 1 / 60, -- Per 60 frames
+        mpregen = 0.5 / 60, -- Per 60 frames
+        magic = 1,
+        willpower = 2,
+        defence = 1,
+        strength = 2
+    }
+}
 Data.class_create {
     name = "Necromancer",
     sprites = {"spr_enemies.humanoid.necromancer"},

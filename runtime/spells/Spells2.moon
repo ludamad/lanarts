@@ -295,9 +295,9 @@ DataW.spell_create {
     cooldown: 0
     can_cast_with_held_key: true
     fallback_to_melee: true
-    spell_cooldown: 50
+    spell_cooldown: 10
     action_func: (x, y) =>
-        effect = @add_effect "Dash Attack", 15
+        effect = @add_effect "Dash Attack", 10
         effect.angle = vector_direction(@xy, {x,y})
         GameState.for_screens () ->
             if @is_local_player()
