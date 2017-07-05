@@ -236,6 +236,22 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 
 	methods["reset_rest_cooldown"].bind_function(lapi_do_nothing);
 
+        methods["inventory"] = [=](CombatGameInst* inst) -> LuaValue {
+            LuaValue table = LuaValue::newtable(L);
+            auto& inv = inst->inventory();
+            for (int i = 0; i < inv.max_size(); i++) {
+                if (!inv.slot_filled(i)) {
+                    continue;
+                }
+                LuaValue entry = LuaValue::newtable(L);
+                entry["item"] = inv.get(i).item_entry().name;
+                entry["amount"] = inv.get(i).amount();
+                entry["slot"] = i;
+                table[table.objlen() + 1] = entry;
+            }
+            return table;
+        };
+
 	return meta;
 }
 
@@ -288,9 +304,16 @@ static void apply_melee_cooldown(PlayerInst* player) {
     player->cooldowns().reset_action_cooldown(cooldown * cooldown_mult);
 }
 
-static Pos direction_towards_unexplored(LuaStackValue player) {
-    auto* p = player.as<PlayerInst*>();
-    return p->direction_towards_unexplored(lua_api::gamestate(player));
+static int direction_towards_unexplored(lua_State* L) {
+    auto* p = LuaStackValue(L, 1).as<PlayerInst*>();
+    bool finished = false;
+    Pos dir = p->direction_towards_unexplored(lua_api::gamestate(L), &finished);
+    if (finished) {
+        lua_pushnil(L);
+    } else {
+        luawrap::push(L, dir);
+    }
+    return 1;
 }
 
 static LuaValue* ACTIVE_FILTER = NULL;

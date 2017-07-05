@@ -166,16 +166,4 @@ inline void lua_push_unsafe_closure(lua_State* L, const F& f) {
     was_set = true;
 }
 
-template<typename T> struct Callable { 
-    struct Fallback { int operator()(){} };
-    struct Derived : T, Fallback { };
-
-    template<typename C, C> struct ChT; 
-
-    template<typename C> static char (&f(ChT<int Fallback::*, &C::operator()>*))[1]; 
-    template<typename C> static char (&f(...))[2]; 
-
-    static bool const value = sizeof(f<Derived>()) == 2;
-}; 
-
 #endif

@@ -52,6 +52,7 @@ keep_event_log: no" > settings.yaml
 
 export LANARTS_TESTCASE=tests.OverworldExplore
 export LANARTS_SMALL=1 
+export LANARTS_OVERWORLD_TEST=1
 export LANARTS_SEED=123456732
 #export LANARTS_2P="White Mage"
 #export ARENA_ENEMIES="return {Ciribot=1}"

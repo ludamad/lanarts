@@ -188,7 +188,7 @@ namespace luawrap {
 		class TypeImpl<enable_lambda<T>> {
 		public:
 			static void push(lua_State* L, const T& data) {
-				function_traits<T>::push(L, data);
+                                lua_push_unsafe_closure(L, data);
 			}
 			static LuaValue get(lua_State* L, int idx) {
 				return LuaValue();

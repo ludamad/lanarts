@@ -237,6 +237,7 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	if (!gref.get()) {
 		return;
 	}
+        LuaValue lua_object = inst->lua_variables;// stash lua object;
 
 	gs->remove_instance(inst);
 	gref->last_x = x, gref->last_y = y;
@@ -255,7 +256,7 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 
 	//restore the level context
 	gs->set_level(last);
-
+        inst->lua_variables = lua_object;
 }
 
 void GameWorld::set_current_level(int roomid) {

@@ -52,13 +52,12 @@ PROGRESSION = () ->
                     enemies: {[enemy]: 10}
                     spawn_players: true
                 }
-    --    () ->
-    --        random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
-    --        O = require("maps.01_Overworld")
-    --        V = require("maps.Vaults")
-    --        -- return O.overworld_create()
-    --        return O.test_vault_create(V.simple_room)
-    --}
+    if os.getenv "LANARTS_OVERWORLD_TEST"
+        init = do_nothing
+        append fs, () ->
+            random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
+            O = require("maps.01_Overworld")
+            return O.overworld_create()
     return () ->
         init()
         init = do_nothing
@@ -92,11 +91,6 @@ M.create_player = () -> nilprotect {
             return dead
         return true
     overworld_create: () => M.progger()
-    --overworld_create: () =>
-    --    O = require("maps.01_Overworld")
-    --    V = require("maps.Vaults")
-    --    -- return O.overworld_create()
-    --    return O.test_vault_create(V.simple_room)
     -- END EVENTS --
     -- Default is to always want to simulate:
     should_simulate_input: () => true 
@@ -142,8 +136,22 @@ M.create_player = () -> nilprotect {
                 --log_info "Calling user_player_input(player)"
                 --return user_player_input(player)
         GameState.step = (...) ->
+            if @_should_end() and os.getenv "LANARTS_OVERWORLD_TEST"
+                @_goto_random_portal()
+                @_n_inputs = 0 -- Reset menu state TODO refactor
+                @_n_same_square = 0
+            elseif @_should_end()
+                GlobalData.__test_initialized = false
+                @_n_inputs = 0 -- Reset menu state TODO refactor
+                @_n_same_square = 0
+                @input_source = false
+                GameState.lazy_reset()
+                return true
             should_continue = user_gamestate_step(...)
-            if GameState.frame % 125 == 2
+            RATE = 125
+            if os.getenv "LANARTS_OVERWORLD_TEST"
+                RATE = 10000
+            if GameState.frame % RATE == 2
                 --state = {}
                 --for k,v in pairs(@)
                 --    state[k] = v
@@ -151,7 +159,6 @@ M.create_player = () -> nilprotect {
                 @_lpx = 0
                 @_lpy = 0
                 @_ai_state = false
-                @_last_object = false
                 @_used_portals = {}
                 @_queued = {}
                 GameState.save("saves/test-save.save")
@@ -161,13 +168,6 @@ M.create_player = () -> nilprotect {
                 GlobalData.__test_initialized = false
                 --for k,v in pairs state
                 --    @[k] = v
-            if @_should_end()
-                GlobalData.__test_initialized = false
-                @_n_inputs = 0 -- Reset menu state TODO refactor
-                @_n_same_square = 0
-                @input_source = false
-                GameState.lazy_reset()
-                return true
             return should_continue
         Engine.io = () ->
             if rawget @, "input_source"
@@ -179,6 +179,19 @@ M.create_player = () -> nilprotect {
         --        --GameState._input_clear()
         --        return user_input_handle(true)
         --    return user_input_handle(true)
+    _goto_random_portal: () =>
+        if not @input_source
+            return false
+        player = @input_source.player
+        portals = {}
+        for obj in *Map.objects_list(player.map)
+            if GameObject.get_type(obj) == "feature"
+                append portals, obj
+        portal = @_rng\random_choice(portals)
+        player.xy = portal.xy
+        append @_queued, {1,1}
+        @_use_portal = true
+        --portal\on_player_interact(player)
     _should_end: () =>
         if not @input_source
             return false
@@ -193,6 +206,39 @@ M.create_player = () -> nilprotect {
         return true
     _try_move_action: (dx, dy) =>
         @input_source\set("move_direction", {dx, dy})
+        return true
+
+    _fighter_action: () =>
+        USE_DASH = @_rng\randomf() < 0.01
+        USE_KNOCK = @_rng\randomf() < 0.1
+        USE_ITEM = @_rng\randomf() < 0.1
+        SELL_ITEM = @_rng\randomf() < 0.1
+        dir = nil
+        if not @_use_portal
+            if USE_DASH
+                @input_source\set("use_spell_slot", 2)
+            elseif USE_KNOCK
+                @input_source\set("use_spell_slot", 1)
+            elseif USE_ITEM
+                @input_source\set("use_item_slot", @_rng\random(0, 40))
+            elseif SELL_ITEM and #@input_source.player\inventory() > 30
+                @input_source\set("sell_item_slot", @_rng\random(0, 40))
+        if not @_use_portal and @_attack_action() and not USE_DASH and not USE_KNOCK and not USE_ITEM
+            dir = {0,0}
+        if #@_queued > 0
+            dir = @_queued[1]
+            table.remove(@_queued, 1)
+        if not dir
+            dir = @_try_explore()
+        if not dir
+            dir = @_ai_state\get_next_direction()
+            if dir then for i=1,4 do append @_queued, dir
+        if not dir
+            dir = @_ai_state\get_next_wander_direction()
+            if dir then for i=1,4 do append @_queued, dir
+        if dir
+            @input_source\set("move_direction", dir)
+        @_use_portal = false
         return true
     _attack_action: () =>
         -- Necromancer:
@@ -210,46 +256,10 @@ M.create_player = () -> nilprotect {
                         --@simulate 'y'
                         --@simulate 'i'
                 elseif player.class_name == 'Fighter'
-                    @input_source\set("use_spell_slot", 1)
                     @input_source\set("should_use_weapon", true)
-                return
-    _try_collect_items: () =>
-        player = @input_source.player
-        -- If we did not hold still last frame and are on an item, try to pick it up:
-        if (@_lpx ~= player.x or @_lpy ~= player.y)
-            collisions = Map.rectangle_collision_check(player.map, {player.x - 8, player.y - 8, player.x+8, player.y+8}, player)
-            for col in *collisions
-                if col == @_last_object
-                    @_last_object = false
-                obj_type = GameObject.get_type(col) 
-                if obj_type == "item"
-                    @_attack_action() -- No reason not to auto-attack while collecting
-                    return true -- Hold still
-                elseif obj_type == "feature" and not @_used_portals[col.id]
-                    @_used_portals[col.id] = 0
-                    return true -- Hold still
-        -- If we did not have an item to pick up, try to path towards an object:
-        closest = {false, math.huge}
-        {dx, dy} = player\direction_towards_object (_, obj) ->
-            obj_type = GameObject.get_type(obj)
-            local matches
-            if @_last_object
-                matches = (obj == @_last_object)
-            else
-                matches = (obj_type == "item" or obj_type == "feature" and not @_used_portals[obj.id])
-            if matches
-                -- Allow in filter:
-                dist = vector_distance(obj.xy, player.xy)
-                if dist < closest[2]
-                    closest[1],closest[2] = obj, dist
                 return true
-            -- Disallow in filter:
-            return false
-        @_last_object = closest[1]
-        if @_try_move_action(dx, dy)
-            @_attack_action() -- Handle attack action wherever we resolved move action 
-            return true
         return false
+
     _try_rest_if_needed: () =>
         player = @input_source.player
         if not player\can_benefit_from_rest()
@@ -263,11 +273,7 @@ M.create_player = () -> nilprotect {
         return true
     _try_explore: () =>
         player = @input_source.player
-        {dx, dy} = player\direction_towards_unexplored()
-        if (dx ~=0 or dy ~= 0) and @_try_move_action(dx, dy)
-            @_attack_action() -- Handle attack action wherever we resolved move action 
-            return true
-        return false
+        return player\direction_towards_unexplored()
     _n_same_square: 0
     simulate_game_input: () =>
         if not GlobalData.__test_initialized
@@ -276,11 +282,11 @@ M.create_player = () -> nilprotect {
             @_lpx = 0
             @_lpy = 0
             @_ai_state = ExploreUtils.ai_state(@input_source.player)
-            @_last_object = false
             @_rng = require("mtwist").create(HARDCODED_AI_SEED)
             @_used_portals = {}
             @_queued = {}
             @_n_same_square = 0
+            @_use_portal = false
             @input_source.player\gain_xp(100000)
             @input_source.player.stats.max_hp = 100000
             @input_source.player.stats.hp = 100000
@@ -289,27 +295,11 @@ M.create_player = () -> nilprotect {
         --if #Map.enemies_list(player) == 0
         --    player\direct_damage(player.stats.hp + 1)
         dir = nil
-        if #@_queued > 0
-            dir = @_queued[1]
-            @_try_move_action(dir[1], dir[2])
-            table.remove(@_queued, 1)
-        if not dir and not @_try_explore() then
-            dir = @_ai_state\get_next_direction()
-            if dir
-                @_try_move_action(dir[1], dir[2])
-                @_attack_action()
-            if not dir and not @_try_rest_if_needed()
-                dir = @_ai_state\get_next_wander_direction()
-                if dir
-                    @_try_move_action(dir[1], dir[2])
-                @_attack_action()
-            for i=1,4
-                append @_queued, dir
+        @_fighter_action()
         if @_lpx == player.x and @_lpy == player.y
             @_n_same_square += 1
         else
             @_n_same_square = 0
-        @input_source\set("use_item_slot", @_rng\random(0, 20))
         @_lpx, @_lpy = player.x, player.y
 }
 

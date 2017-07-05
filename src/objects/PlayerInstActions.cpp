@@ -194,7 +194,10 @@ static bool has_visible_monster(GameState* gs, PlayerInst* p = NULL) {
     //return false;
 }
 
-Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
+Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
+	if (finished != NULL) {
+		*finished = false;
+	}
     if (explore_state.time_out > 0) {
         return explore_state.move_xy;
     }
@@ -282,8 +285,10 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
         }
         if (abs(dx) > 0) dx /= abs(dx);
         if (abs(dy) > 0) dy /= abs(dy);
-    }
-    explore_state.set_move({dx,dy}, TILE_SIZE / effective_stats().movespeed);
+    } else if (finished != NULL) {
+		*finished = true;
+	}
+    explore_state.set_move({dx,dy}, TILE_SIZE / std::max(4.0f, effective_stats().movespeed));
     gs->set_level(old_current_level);
     return {dx, dy};
 }
@@ -659,11 +664,13 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 	itemslot_t slot = action.use_id;
 	ItemSlot& itemslot = inventory().get(slot);
 	Item& item = itemslot.item;
+	if (item.amount > 0) {
+            return;
+        }
 	ItemEntry& type = itemslot.item_entry();
 
 	lua_State* L = gs->luastate();
 
-	if (item.amount > 0) {
 		if (item.is_equipment()) {
 			if (itemslot.is_equipped()) {
 				inventory().deequip(slot);
