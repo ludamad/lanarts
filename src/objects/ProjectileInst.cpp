@@ -54,13 +54,13 @@ void ProjectileInst::draw(GameState* gs) {
 }
 
 void ProjectileInst::init(GameState *gs) {
-    LuaValue& table = projectile.projectile_entry().raw_table;
-    lua_State* L = gs->luastate();
-    luawrap::push(L, this); // Ensure lua_variables are set TODO have an on_create method for when lua variables are created for an object
-    lua_pop(L, 1);
-    lua_variables["type"] = table;
-    lua_variables["caster"] = gs->get_instance(origin_id);
-    GameInst::init(gs);
+	LuaValue& table = projectile.projectile_entry().raw_table;
+	lua_State* L = gs->luastate();
+	luawrap::push(L, this); // Ensure lua_variables are set TODO have an on_create method for when lua variables are created for an object
+	lua_pop(L, 1);
+	lua_variables["type"] = table;
+	lua_variables["caster"] = gs->get_instance(origin_id);
+	GameInst::init(gs);
 }
 void ProjectileInst::deinit(GameState* gs) {
 	ProjectileEntry& pentry = projectile.projectile_entry();
@@ -69,10 +69,10 @@ void ProjectileInst::deinit(GameState* gs) {
 		int nx = round_to_multiple(x, TILE_SIZE, true), ny = round_to_multiple(
 				y, TILE_SIZE, true);
 		ItemInst* item = new ItemInst(projectile.with_amount(1), Pos(nx, ny),
-				origin_id, true /*auto-pickup*/);
+									  origin_id, true /*auto-pickup*/);
 		gs->add_instance(item);
 	}
-    GameInst::deinit(gs);
+	GameInst::deinit(gs);
 }
 
 void ProjectileInst::copy_to(GameInst* inst) const {
@@ -81,24 +81,24 @@ void ProjectileInst::copy_to(GameInst* inst) const {
 }
 
 ProjectileInst::ProjectileInst(const Item& projectile,
-		const EffectiveAttackStats& atkstats, obj_id origin_id,
-		const Pos& start, const Pos& target, float speed, int range,
-		obj_id sole_target, bool bounce, int hits, bool pass_through) :
-				GameInst(start.x, start.y, projectile.projectile_entry().radius,
-						false, DEPTH),
-				rx(start.x),
-				ry(start.y),
-				speed(speed),
-				origin_id(origin_id),
-				sole_target(sole_target),
-				projectile(projectile),
-				atkstats(atkstats),
-				range_left(range),
-				bounce(bounce),
-				hits(hits),
-				damage_mult(1.0f),
-				pass_through(pass_through) {
-    direction_towards(start, target, vx, vy, speed);
+							   const EffectiveAttackStats& atkstats, obj_id origin_id,
+							   const Pos& start, const Pos& target, float speed, int range,
+							   obj_id sole_target, bool bounce, int hits, bool pass_through) :
+		GameInst(start.x, start.y, projectile.projectile_entry().radius,
+				 false, DEPTH),
+		rx(start.x),
+		ry(start.y),
+		speed(speed),
+		origin_id(origin_id),
+		sole_target(sole_target),
+		projectile(projectile),
+		atkstats(atkstats),
+		range_left(range),
+		bounce(bounce),
+		hits(hits),
+		damage_mult(1.0f),
+		pass_through(pass_through) {
+	direction_towards(start, target, vx, vy, speed);
 }
 
 ProjectileInst* ProjectileInst::clone() const {
@@ -106,8 +106,8 @@ ProjectileInst* ProjectileInst::clone() const {
 }
 
 float lua_hit_callback(lua_State* L, LuaValue& callback,
-		const EffectiveAttackStats& atkstats, float damage, GameInst* obj,
-		GameInst* target) {
+					   const EffectiveAttackStats& atkstats, float damage, GameInst* obj,
+					   GameInst* target) {
 	if (!callback.empty() && !callback.isnil()) {
 		callback.push();
 		luawrap::push(L, obj);
@@ -124,34 +124,34 @@ float lua_hit_callback(lua_State* L, LuaValue& callback,
 }
 
 void lua_attack_stats_callback(lua_State* L, LuaValue& callback,
-		EffectiveAttackStats& atkstats, GameInst* obj, GameInst* target) {
-    if (!callback.empty() && !callback.isnil()) {
-            callback.push();
-            luawrap::push(L, obj);
-            luawrap::push(L, target);
-            lua_push_effectiveattackstats(L, atkstats);
-            LuaValue value(L);
-            value.pop();
-            value.push();
-            lua_call(L, 3, 1);
-            atkstats.power = value["power"].to_num();
-            atkstats.damage = value["damage"].to_num();
-            atkstats.magic_percentage = value["magic_percentage"].to_num();
-    }
+							   EffectiveAttackStats& atkstats, GameInst* obj, GameInst* target) {
+	if (!callback.empty() && !callback.isnil()) {
+		callback.push();
+		luawrap::push(L, obj);
+		luawrap::push(L, target);
+		lua_push_effectiveattackstats(L, atkstats);
+		LuaValue value(L);
+		value.pop();
+		value.push();
+		lua_call(L, 3, 1);
+		atkstats.power = value["power"].to_num();
+		atkstats.damage = value["damage"].to_num();
+		atkstats.magic_percentage = value["magic_percentage"].to_num();
+	}
 }
 static bool enemy_filter(GameInst* g1, GameInst* g2) {
-    static CombatGameInst* comparison = NULL;
-    if (g1 == NULL) {
-        comparison = dynamic_cast<CombatGameInst*>(g2);
-        return false;
-    }
-    auto* c2 = dynamic_cast<CombatGameInst*>(g2);
-    if (!c2) return false;
-    return comparison->team != c2->team;
+	static CombatGameInst* comparison = NULL;
+	if (g1 == NULL) {
+		comparison = dynamic_cast<CombatGameInst*>(g2);
+		return false;
+	}
+	auto* c2 = dynamic_cast<CombatGameInst*>(g2);
+	if (!c2) return false;
+	return comparison->team != c2->team;
 }
 
 void ProjectileInst::step(GameState* gs) {
-        GameInst::step(gs);
+	GameInst::step(gs);
 	lua_State* L = gs->luastate();
 
 	Pos tile_hit;
@@ -160,7 +160,7 @@ void ProjectileInst::step(GameState* gs) {
 	int newx = (int) round(rx + vx); //update based on rounding of true float
 	int newy = (int) round(ry + vy);
 	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
-			&tile_hit);
+										 &tile_hit);
 	if (bounce) {
 		bool hitsx = gs->tile_radius_test(newx, y, radius, true, -1);
 		bool hitsy = gs->tile_radius_test(x, newy, radius, true, -1);
@@ -175,7 +175,7 @@ void ProjectileInst::step(GameState* gs) {
 				vx = -vx;
 				vy = -vy;
 			}
-                    try_callback("on_wall_bounce");
+			try_callback("on_wall_bounce");
 		}
 	} else if (collides) {
 		gs->remove_instance(this);
@@ -193,83 +193,50 @@ void ProjectileInst::step(GameState* gs) {
 		if (sole_target)
 			gs->object_radius_test(this, &colobj, 1, &bullet_target_hit2);
 		else {
-		    enemy_filter(NULL, origin);
+			enemy_filter(NULL, origin);
 			gs->object_radius_test(this, &colobj, 1, &enemy_filter);
 		}
 	}
 
-        if (colobj) {
-                    CombatGameInst* victim = (CombatGameInst*) colobj;
-            event_log(
-                    "ProjectileInst::step id=%d from player id=%d hit enemy id=%d\n",
-                    id, origin->id, colobj->id);
-            origin->signal_attacked_successfully();
+	if (colobj) {
+		CombatGameInst* victim = (CombatGameInst*) colobj;
+		event_log(
+				"ProjectileInst::step id=%d from player id=%d hit enemy id=%d\n",
+				id, origin->id, colobj->id);
+		origin->signal_attacked_successfully();
 
-            EffectiveAttackStats tmp_stats = atkstats;
-            lua_attack_stats_callback(L, 
-                    projectile.projectile_entry().attack_stat_func,
-                    tmp_stats, origin, victim);
-            float damage = damage_formula(tmp_stats, victim->effective_stats());
-            damage *= damage_mult;
-            damage = lua_hit_callback(L,
-                    projectile.projectile_entry().action_func().get(L),
-                    tmp_stats, damage, this, victim);
+		EffectiveAttackStats tmp_stats = atkstats;
+		lua_attack_stats_callback(L,
+								  projectile.projectile_entry().attack_stat_func,
+								  tmp_stats, origin, victim);
+		float damage = damage_formula(tmp_stats, victim->effective_stats());
+		damage *= damage_mult;
+		damage = lua_hit_callback(L,
+								  projectile.projectile_entry().action_func().get(L),
+								  tmp_stats, damage, this, victim);
 
-            if (gs->game_settings().verbose_output) {
-                char buff[100];
-                snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%] -> Damage: %d",
-                        tmp_stats.damage, tmp_stats.power, int(tmp_stats.magic_percentage * 100),
-                        (int)damage);
-		gs->for_screens([&]() {gs->game_chat().add_message(buff);});
+		if (gs->game_settings().verbose_output) {
+			char buff[100];
+			snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%] -> Damage: %d",
+					 tmp_stats.damage, tmp_stats.power, int(tmp_stats.magic_percentage * 100),
+					 (int)damage);
+			gs->for_screens([&]() {gs->game_chat().add_message(buff);});
 
-            }
+		}
 
-            if (damage > 0 && !projectile.projectile_entry().deals_special_damage) {
-                if (dynamic_cast<PlayerInst*>(victim)) {
-                    play(hurt_sound, "sound/player_hurt.ogg");
-                }
-                gs->for_screens([&]() {
-                        if (dynamic_cast<PlayerInst *>(origin) &&
-                                gs->local_player()->current_floor == dynamic_cast<PlayerInst *>(origin)->current_floor) {
-                                play(minor_missile_sound, "sound/minor_missile.ogg");
-                        }
-                });
-                char buffstr[32];
-                snprintf(buffstr, 32, "%d", (int)damage);
-                float rx = vx / speed * .5;
-                float ry = vy / speed * .5;
-                gs->add_instance(
-                                new AnimatedInst(
-                                                Pos(victim->x - 5 + rx * 5, victim->y + ry * 5), -1,
-                                                25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH,
-                                                buffstr));
-                if (victim->damage(gs, damage) && dynamic_cast<EnemyInst*>(victim) && dynamic_cast<EnemyInst*>(victim)->team != PLAYER_TEAM) {
-                        PlayerInst* p = (PlayerInst*) origin;
-                        PlayerData& pc = gs->player_data();
-                        p->signal_killed_enemy();
-                        double xpworth = ((EnemyInst*)victim)->xpworth();
-                        double n_killed = (pc.n_enemy_killed(((EnemyInst*) victim)->enemy_type()) - 1) / pc.all_players().size();
-                        int kills_before_stale = ((EnemyInst*) victim)->etype().kills_before_stale;
-                        xpworth *= pow(0.9, n_killed * 25 / kills_before_stale); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
-                        if (n_killed > kills_before_stale) {
-                            xpworth = 0;
-                        }
-                        float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
-
-                        int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
-
-                        players_gain_xp(gs, amnt);
-                        if (xpworth == 0) {
-                            snprintf(buffstr, 32, "STALE", amnt);
-                        } else {
-                            snprintf(buffstr, 32, "%d XP", amnt);
-                        }
-                        gs->add_instance(
-                                        new AnimatedInst(victim->ipos(), -1, 25, PosF(), PosF(),
-                                                        AnimatedInst::DEPTH, buffstr, COL_GOLD));
-                }
-            }
-        }
+		if (damage > 0 && !projectile.projectile_entry().deals_special_damage) {
+			if (dynamic_cast<PlayerInst *>(victim)) {
+				play(hurt_sound, "sound/player_hurt.ogg");
+			}
+			gs->for_screens([&]() {
+				if (dynamic_cast<PlayerInst *>(origin) &&
+					gs->local_player()->current_floor == dynamic_cast<PlayerInst *>(origin)->current_floor) {
+					play(minor_missile_sound, "sound/minor_missile.ogg");
+				}
+			});
+			victim->damage(gs, damage, origin);
+		}
+	}
 
 	if (colobj || range_left <= 0) {
 		hits--;
@@ -285,14 +252,14 @@ void ProjectileInst::step(GameState* gs) {
 				if (enemy && origin && enemy->team != origin->team && enemy != colobj) {
 
 					float abs = distance_between(Pos(x, y),
-							Pos(enemy->x, enemy->y));
+												 Pos(enemy->x, enemy->y));
 					if (abs < 1)
 						abs = 1;
 					if (abs < mindist) {
 						sole_target = mid;
 						mindist = abs;
 						direction_towards(Pos(x, y), Pos(enemy->x, enemy->y),
-								vx, vy, speed);
+										  vx, vy, speed);
 					}
 				}
 			}
@@ -300,13 +267,13 @@ void ProjectileInst::step(GameState* gs) {
 		if ((hits == 0 || sole_target == 0) && !pass_through) {
 			gs->add_instance(
 					new AnimatedInst(ipos(), sprite(), 15, PosF(),
-							PosF(vx, vy)));
+									 PosF(vx, vy)));
 			gs->remove_instance(this);
 		}
 	}
 
 	event_log("ProjectileInst id=%d has rx=%f, ry=%f, vx=%f,vy=%f\n", id, rx,
-			ry, vx, vy);
+			  ry, vx, vy);
 }
 
 sprite_id ProjectileInst::sprite() const {

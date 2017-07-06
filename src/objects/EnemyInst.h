@@ -45,10 +45,6 @@ public:
 	int enemy_type() {
             return enemytype;
         }
-	int& xpworth(){
-		return xpgain;
-	}
-
     virtual bool is_major_character() {
         return false; // TODO Eventually have major enemies.
         // Bosses, perhaps, might want exact pathing towards them.
@@ -59,7 +55,6 @@ private:
 	EnemyBehaviour eb;
     int enemytype;
 	int enemy_regen_cooloff;
-	int xpgain;
 };
 
 

@@ -8,7 +8,10 @@
 #include "stats/stat_modifiers.h"
 #include "lanarts_defines.h"
 
+#include "data/lua_util.h"
+
 #include "AllowedActions.h"
+#include "effect_data.h"
 
 const int EFFECTS_MAX = 25;
 
@@ -37,6 +40,9 @@ struct Effect {
     //    - 'apply_buff', apply an effect that comes from e.g. a spell or other game event. Usually interacts with 'time_left'.
     //    For other applicable methods, see EffectEntry.
 	LuaValue state;
+    EffectEntry& entry() {
+        return game_effect_data.get(id);
+    }
     bool is_active() const {
         return !state.empty() && !state.isnil() && state["active"].as<bool>();
     }
@@ -73,7 +79,6 @@ struct EffectStats {
                     EffectiveStats& effective) const;
 
     void clear();
-
     std::vector<Effect> effects;
 };
 

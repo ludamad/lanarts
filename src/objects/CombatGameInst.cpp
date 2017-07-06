@@ -16,6 +16,7 @@
 #include "gamestate/GameState.h"
 #include "gamestate/Team.h"
 #include "objects/EnemyInst.h"
+#include "objects/PlayerInst.h"
 
 #include "stats/items/ProjectileEntry.h"
 #include "stats/items/WeaponEntry.h"
@@ -23,8 +24,10 @@
 #include "stats/effect_data.h"
 #include "stats/stat_formulas.h"
 #include "stats/ClassEntry.h"
+#include "data/lua_util.h"
 
 #include <lcommon/math_util.h>
+#include <ldraw/colour_constants.h>
 
 #include "PlayerInst.h"
 
@@ -37,41 +40,73 @@ CombatGameInst::~CombatGameInst() {
     delete _paths_to_object;
 }
 
+static int random_round(MTwist& rng, float f) {
+    float rem = fmod(f, 1.0f);
+    return int((f - rem) + (rng.genrand_real2() < rem ? 1 : 0));
+}
+
 const int HURT_COOLDOWN = 30;
-bool CombatGameInst::damage(GameState* gs, int dmg) {
+bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker) {
     if (current_floor == -1) {
         return false; // Don't die twice.
+    }
+    // Don't damage players during invincibility:
+    if (dynamic_cast<PlayerInst*>(this) && gs->game_settings().invincible) {
+        return false;
     }
     lua_State* L = gs->luastate();
     auto* prev_level = gs->get_level();
     gs->set_level(gs->get_level(current_floor));
-    event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);
+    event_log("CombatGameInst::damage: id %d took %.2f dmg\n", id, fdmg);
 
-    for (int i = 0; i < effects.effects.size(); i++) {
-        Effect& eff = effects.effects[i];
-        if (!eff.is_active()) {
-            continue;
+    for (Effect& eff : effects.effects) {
+        if (eff.is_active()) {
+            fdmg = lcall_def(/*def:*/ fdmg, /*func:*/ eff.entry().on_damage_func, /*args:*/ eff.state, this, fdmg);
         }
-        EffectEntry& entry = game_effect_data.get(eff.id);
-        if (entry.on_damage_func.isnil()) {
-            continue;
-        }
-        entry.on_damage_func.push();
-        luawrap::push(L, eff.state);
-        luawrap::push(L, this);
-        luawrap::push(L, dmg);
-        lua_call(L, 3, 1);
-        if (!lua_isnil(L, -1)) {
-            dmg = lua_tonumber(L, -1);
-        }
-        lua_pop(L, 1);
+    }
+    int dmg = random_round(gs->rng(), fdmg);
+    if (dmg == 0) {
+        return false; // Do nothing if damage is 0
     }
 
     if (core_stats().hurt(dmg)) {
         die(gs);
+        if (attacker != NULL) {
+            attacker->signal_killed_enemy();
+        }
+        if (team == PLAYER_TEAM) {
+            return true; // Don't give out XP; was on players team
+        }
+        PlayerData& pc = gs->player_data();
+        double xpworth = this->xpworth();
+        LANARTS_ASSERT(dynamic_cast<EnemyInst*>(this));
+        double n_killed = (pc.n_enemy_killed(((EnemyInst*) this)->enemy_type()) - 1) / pc.all_players().size();
+        int kills_before_stale = ((EnemyInst*) this)->etype().kills_before_stale;
+        xpworth *= pow(0.9, n_killed * 25 / kills_before_stale); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
+        if (n_killed > kills_before_stale) {
+            xpworth = 0;
+        }
+        float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
+
+        int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
+
+        players_gain_xp(gs, amnt);
+        char buffstr[32];
+        if (xpworth == 0) {
+            snprintf(buffstr, 32, "STALE", amnt);
+        } else {
+            snprintf(buffstr, 32, "%d XP", amnt);
+        }
+        gs->add_instance(
+                new AnimatedInst(ipos(), -1, 25, PosF(), PosF(),
+                                 AnimatedInst::DEPTH, buffstr, COL_GOLD));
         gs->set_level(prev_level);
         return true;
     }
+
+    gs->add_instance(
+            new AnimatedInst(ipos(), -1, 25, PosF(-1,-1), PosF(), AnimatedInst::DEPTH,
+                             format("%d", dmg), Colour(255, 148, 120)));
 
     cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
     gs->set_level(prev_level);
@@ -193,13 +228,7 @@ Pos CombatGameInst::direction_towards_object(GameState* gs, col_filterf filter) 
     return {dx, dy};
 }
 
-
-static int random_round(MTwist& rng, float f) {
-    float rem = fmod(f, 1.0f);
-    return int((f - rem) + (rng.genrand_real2() < rem ? 1 : 0));
-}
-
-bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
+bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack, CombatGameInst* attacker) {
     event_log("CombatGameInst::damage: id %d getting hit by {cooldown = %d, "
             "damage=%.2f, power=%.2f, magic_percentage=%f, physical_percentage=%f}",
             id, attack.cooldown, attack.damage, attack.power,
@@ -207,27 +236,18 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
             attack.physical_percentage());
 
     float fdmg = damage_formula(attack, effective_stats());
-    int dmg = random_round(gs->rng(), fdmg);
-    if (dmg == 0) {
-        return false; // Do nothing if damage is 0
-    }
-
     if (gs->game_settings().verbose_output) {
         char buff[100];
-        snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%] -> Damage: %d",
+        snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%] -> Damage: %.2f",
                 attack.damage, attack.power, int(attack.magic_percentage * 100),
-                dmg);
+                fdmg);
         gs->for_screens( [&] () {
             gs->game_chat().add_message(buff);
         });
 
     }
 
-    gs->add_instance(
-            new AnimatedInst(ipos(), -1, 25, PosF(-1,-1), PosF(), AnimatedInst::DEPTH,
-                    format("%d", dmg), Colour(255, 148, 120)));
-
-    return damage(gs, dmg);
+    return damage(gs, fdmg, attacker);
 }
 
 void CombatGameInst::update_field_of_view(GameState* gs) {
@@ -369,66 +389,20 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     }
 
     // Callbacks on attacker object:
-    for (int i = 0; i < effects.effects.size(); i++) {
-        Effect& eff = effects.effects[i];
-        if (!eff.is_active()) {
-            continue;
-        }
-        auto& entry = game_effect_data.get(eff.id);
-        if (!entry.on_melee_func.isnil()) {
-            entry.on_melee_func.push();
-            lua_State* L = gs->luastate();
-            luawrap::push(L, eff.state);
-            luawrap::push(L, this);
-            luawrap::push(L, inst);
-            luawrap::push(L, damage);
-            lua_push_effectiveattackstats(L, atkstats);
-            lua_call(L, 5, 1);
-            if (!lua_isnil(L, -1)) {
-                damage = lua_tonumber(L, -1);
-            }
-            lua_pop(L, 1);
+    for (Effect& eff : effects.effects) {
+        if (eff.is_active()) {
+            damage = lcall_def(/*def:*/ damage, /*func:*/ eff.entry().on_melee_func, /*args:*/ eff.state, this, inst, damage);
         }
     }
     
     // Callbacks on attacked object:
     for (Effect& eff : inst->effects.effects) {
-        if (!eff.is_active()) {
-            continue;
-        }
-        auto& entry = game_effect_data.get(eff.id);
-        if (!entry.on_receive_melee_func.isnil()) {
-            entry.on_receive_melee_func.push();
-            lua_State* L = gs->luastate();
-            luawrap::push(L, eff.state);
-            luawrap::push(L, this);
-            luawrap::push(L, inst);
-            luawrap::push(L, damage);
-            lua_push_effectiveattackstats(L, atkstats);
-            lua_call(L, 5, 1);
-            if (!lua_isnil(L, -1)) {
-                damage = lua_tonumber(L, -1);
-            }
-            lua_pop(L, 1);
+        if (eff.is_active()) {
+            damage = lcall_def(/*def:*/ damage, /*func:*/ eff.entry().on_receive_melee_func, /*args:*/ eff.state, this, inst, damage);
         }
     }
 
-
-    // Don't damage players during invincibility:
-    if (dynamic_cast<PlayerInst*>(this) || !gs->game_settings().invincible) {
-        isdead = inst->damage(gs, int(damage));
-    }
-
-    char dmgstr[32];
-    snprintf(dmgstr, 32, "%d", int(damage));
-    float rx, ry;
-    ::direction_towards(Pos(x, y), Pos(inst->x, inst->y), rx, ry, 0.5);
-    rx = round(rx * 256.0f) / 256.0f;
-    ry = round(ry * 256.0f) / 256.0f;
-    gs->add_instance(
-            new AnimatedInst(Pos(inst->x - 5 + rx * 5, inst->y + ry * 5), -1,
-                    25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH, dmgstr,
-                    Colour(255, 148, 120)));
+    isdead = inst->damage(gs, int(damage));
 
     if (!ignore_cooldowns) {
         cooldowns().reset_action_cooldown(
@@ -443,34 +417,6 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     }
 
     signal_attacked_successfully();
-    if (isdead && dynamic_cast<EnemyInst*>(inst) && inst->team == MONSTER_TEAM) {
-            PlayerData& pc = gs->player_data();
-            signal_killed_enemy();
-
-            char buffstr[32];
-            double xpworth = ((EnemyInst*)inst)->xpworth();
-            double n_killed = (pc.n_enemy_killed(((EnemyInst*) inst)->enemy_type()) - 1) / pc.all_players().size();
-            int kills_before_stale = ((EnemyInst*) inst)->etype().kills_before_stale;
-            xpworth *= pow(0.9, n_killed * 25 / kills_before_stale); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
-            if (n_killed > kills_before_stale) {
-                xpworth = 0;
-            }
-            // Compensates for enemy numbers not-quite scaling:
-            float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
-            int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
-
-            players_gain_xp(gs, amnt);
-            if (xpworth == 0) {
-                snprintf(buffstr, 32, "STALE", amnt);
-            } else {
-                snprintf(buffstr, 32, "%d XP", amnt);
-            }
-            gs->add_instance(
-                    new AnimatedInst(Pos(inst->x - 5, inst->y - 5), -1, 25,
-                            PosF(), PosF(), AnimatedInst::DEPTH, buffstr,
-                            Colour(255, 215, 11)));
-            return true;
-        }
     return isdead;
 }
 

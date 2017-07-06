@@ -55,8 +55,8 @@ public:
 	void update_position();
 	virtual void update_position(float newx, float newy);
 
-	virtual bool damage(GameState* gs, int dmg);
-	bool damage(GameState* gs, const EffectiveAttackStats& attack);
+	virtual bool damage(GameState* gs, float dmg, CombatGameInst* attacker = NULL);
+	bool damage(GameState* gs, const EffectiveAttackStats& attack, CombatGameInst* attacker = NULL);
 	virtual bool melee_attack(GameState* gs, CombatGameInst* inst,
 			const Weapon& weapon, bool ignore_cooldowns = false, 
                         float damage_multiplier = 1.0f);
@@ -110,6 +110,10 @@ public:
 	    LANARTS_ASSERT(has_paths_data());
 	    return *_paths_to_object;
 	}
+	int& xpworth(){
+		return xpgain;
+	}
+
 //members
 public:
 // <PURE DATA REGION see (de)serialize>
@@ -117,6 +121,7 @@ public:
 	float vx = -1, vy = -1;
 	float rx = -1, ry = -1;
 	bool is_resting = false;
+	int xpgain = 0;
     int vision_radius = 0;
 protected:
 	sprite_id sprite = NONE;

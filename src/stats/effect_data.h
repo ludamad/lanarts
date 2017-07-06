@@ -7,6 +7,7 @@
 
 #include <lcommon/LuaLazyValue.h>
 #include <ldraw/Colour.h>
+#include <data/ResourceDataSet.h>
 
 #include "lanarts_defines.h"
 

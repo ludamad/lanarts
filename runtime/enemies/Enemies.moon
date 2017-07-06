@@ -672,11 +672,13 @@ DataW.enemy_create {
         power: {base: {10, 10}}
         on_hit_func: (target, atkstats) =>
             if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
-                effect = target\add_effect("Poison", 100, atkstats)
-                effect.damage = atkstats.damage
-                effect.power = atkstats.power
-                effect.magic_percentage = atkstats.magic_percentage
-                effect.physical = atkstats.physical
+                eff = target\add_effect "Poison", {
+                    time_left: 100
+                    poison_rate: 25
+                    damage: 30
+                    power: @caster\effective_stats().strength 
+                    magic_percentage: 0
+                }
     }
 }
 
@@ -708,11 +710,13 @@ DataW.enemy_create {
         types: {"Piercing", "Green"}
         on_hit_func: (target, atkstats) =>
             if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
-                effect = target\add_effect("Poison", 100, atkstats)
-                effect.damage = atkstats.damage
-                effect.power = atkstats.power
-                effect.magic_percentage = atkstats.magic_percentage
-                effect.physical = atkstats.physical
+                eff = target\add_effect "Poison", {
+                    time_left: 100
+                    poison_rate: 25
+                    damage: 30
+                    power: @caster\effective_stats().strength 
+                    magic_percentage: 0
+                }
     }
 }
 

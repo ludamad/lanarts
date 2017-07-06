@@ -100,7 +100,6 @@ void EnemyInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write(seen);
 	serializer.write_int(enemytype);
 	eb.serialize(gs, serializer);
-	serializer.write_int(xpgain);
 	serializer.write_int(enemy_regen_cooloff);
 //	ai_state.serialize(gs, serializer);
 }
@@ -110,7 +109,6 @@ void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(seen);
 	serializer.read_int(enemytype);
 	eb.deserialize(gs, serializer);
-	serializer.read_int(xpgain);
 	serializer.read_int(enemy_regen_cooloff);
         if (!destroyed) {
             // We care about the details of destroyed objects

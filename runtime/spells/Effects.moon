@@ -21,10 +21,12 @@ DataW.effect_create {
         new.willpower = math.max(0, new.willpower - 3)
         if not obj.is_enemy
             new.speed /= 2
-    apply_func: (obj) =>
+    apply_func: (obj, args) =>
         @steps = 0
-        --@damage, @power = assert(args.damage), assert(args.power)
-        --@magic_percentage = args.magic_percentage or 0.0
+        @attacker = assert args.attacker
+        @damage, @power = assert(args.damage), assert(args.power)
+        @magic_percentage = args.magic_percentage or 0.0
+        @poison_rate = assert args.poison_rate
     step_func: (obj) =>
         if @steps < @poison_rate
             @steps += 1
@@ -276,7 +278,7 @@ DataW.effect_create {
     name: "FearWeapon"
     console_draw_func: (player, xy) => 
         draw_weapon_console_effect(player, M._fear, "+10% chance fear", xy)
-    on_melee_func: (attacker, defender, damage, attack_stats) =>
+    on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Fear")
             return
         if chance(.1)
@@ -288,7 +290,7 @@ DataW.effect_create {
     name: "ConfusingWeapon"
     console_draw_func: (player, xy) => 
         draw_weapon_console_effect(player, M._confusion, "+10% chance daze", xy)
-    on_melee_func: (attacker, defender, damage, attack_stats) =>
+    on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Dazed")
             return
         if chance(.1 * @n_derived)
@@ -359,17 +361,20 @@ DataW.additive_effect_create {
     key: "poison_percentage" -- Additive effect, accessed with @_get_value().
     console_draw_func: (player, xy) => 
         draw_weapon_console_effect(player, M._poison, "+#{math.floor(@poison_percentage * 100)}% chance poison", xy)
-    on_melee_func: (attacker, defender, damage, attack_stats) =>
+    on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Poison")
             return
+        power = EffectUtils.get_power(attacker, "Green")
         resist = EffectUtils.get_resistance(defender, "Green")
         poison_chance = @_get_value()
         if chance(poison_chance * resist)
-            eff = defender\add_effect("Poison", 100)
-            eff.poison_rate = 25
-            eff.damage = attack_stats.damage
-            eff.power = attack_stats.power
-            eff.magic_percentage = attack_stats.magic_percentage
+            eff = defender\add_effect "Poison", {
+                time_left: 100
+                poison_rate: 25
+                :damage
+                power: attacker\effective_stats().magic + power
+                magic_percentage: 1.0
+            }
         return damage
 }
 
@@ -378,7 +383,7 @@ DataW.additive_effect_create {
     key: "recoil_percentage" -- Additive effect, accessed with @_get_value().
     console_draw_func: (player, xy) => 
         draw_console_effect(tosprite("spr_spells.spectral_weapon"), "+#{math.floor(@recoil_percentage * 100)}% melee recoil damage", xy)
-    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
+    on_receive_melee_func: (attacker, defender, damage) =>
         percentage_recoil = @_get_value()
         if attacker\direct_damage(damage * percentage_recoil)
             defender\gain_xp_from(attacker)
@@ -450,7 +455,7 @@ DataW.effect_create {
             else 
                 new.defence += 2
                 @active_bonuses[k] -= 1
-    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
+    on_receive_melee_func: (attacker, defender, damage) =>
         if not @active_bonuses[attacker.id]
             GameState.for_screens () ->
                 EventLog.add("Your defence rises due to getting hit!", COL_PALE_BLUE)
@@ -762,7 +767,7 @@ DataW.effect_create {
                 damage, power = 20, random(2,5) + stats.magic
                 power = power + EffectUtils.get_power(caster, "Black")
                 damage = damage * EffectUtils.get_resistance(mon, "Black")
-                if mon\damage(damage, power, 1) then
+                if mon\damage(damage, power, 1, caster) then
                     {:stats} = caster
                     caster\gain_xp_from(mon)
                     {:max_hp} = mon\effective_stats()
@@ -791,7 +796,7 @@ DataW.effect_create {
     name: "VampiricWeapon"
     console_draw_func: (player, xy) => 
         draw_weapon_console_effect(player, M._vampirism, "Heal +25% dealt", xy)
-    on_melee_func: (attacker, defender, damage, attack_stats) =>
+    on_melee_func: (attacker, defender, damage) =>
         GameState.for_screens () ->
             if attacker\is_local_player() 
                 EventLog.add("You steal the enemy's life!", {200,200,255})
@@ -817,7 +822,7 @@ DataW.effect_create {
     name: "KnockbackWeapon"
     console_draw_func: (player, xy) => 
         draw_weapon_console_effect(player, M._fleeing, "+10% chance of knockback", xy)
-    on_melee_func: (attacker, defender, damage, attack_stats) =>
+    on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Thrown")
             return
         if chance(.1 * @n_derived)
@@ -885,7 +890,8 @@ for name in *{"Ranger", "Fighter", "Rogue", "Green Mage", "Black Mage", "Necroma
                 if caster.stats.hp - damage <= low_num or caster.stats.hp - damage <= caster\effective_stats().max_hp * 0.1
                     LAST_WARNING\set GameState.frame
                     play_sound "sound/allyislow1c.ogg"
-        on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
+            return damage
+        on_receive_melee_func: (attacker, defender, damage) =>
             if name == "Necromancer"
                 if attacker\direct_damage(damage * 0.33)
                     defender\gain_xp_from(attacker)
@@ -962,6 +968,7 @@ DataW.effect_create {
                 EventLog.add("You feel your links pain!", COL_PALE_RED)
         for link in *links do if link ~= summon
             share_damage(link, damage, 5) -- Cannot bring below 5HP
+        return damage
 }
 
 enemy_init = (enemy) -> nil
@@ -1011,7 +1018,7 @@ DataW.effect_create {
         if @n_steps % 60 == 0
             play_sound "sound/wavy.ogg"
         @n_steps += 1
-    on_melee_func: (mon, defender, damage, attack_stats) =>
+    on_melee_func: (mon, defender, damage) =>
         do return nil
         if @n_steps > @n_ramp
             thrown = defender\add_effect("Thrown", 10)
