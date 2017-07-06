@@ -218,8 +218,8 @@ void EnemyInst::draw(GameState* gs) {
 		snprintf(statbuff, 255,
 				"simid=%d nvx=%f vy=%f\n chasetime=%d \n mdef=%d pdef=%d", // \n act=%d, path_steps = %d\npath_cooldown = %d\n",
 				simulation_id, vx, vy, eb.chase_timeout,
-				(int) effective_stats().magic.resistance,
-				(int) effective_stats().physical.resistance);
+				(int) effective_stats().core.willpower,
+				(int) effective_stats().core.defence);
 		//eb.current_action,
 		//eb.path_steps, eb.path_cooldown);
 		gs->font().draw(COL_WHITE, Pos(x - radius - view.x, y - 70 - view.y),

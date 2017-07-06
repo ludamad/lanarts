@@ -138,11 +138,6 @@ void CooldownStats::reset_stopaction_timeout(int cooldown) {
 	stopaction_timeout = std::max(cooldown, stopaction_timeout);
 }
 
-bool DerivedStats::operator ==(const DerivedStats & derived) const {
-	return damage == derived.damage && power == derived.power
-			&& resistance == derived.resistance;
-}
-
 void CooldownStats::reset_hurt_cooldown(int cooldown) {
 	hurt_cooldown = std::max(cooldown, hurt_cooldown);
 }

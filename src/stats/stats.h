@@ -66,25 +66,11 @@ struct CoreStatMultiplier {
 /* Accepts nil */
 CoreStatMultiplier parse_core_stat_multiplier(const LuaField& value);
 
-/* Derived combat stats, power & damage represent properties
- * They are not fully determined until EffectiveAttackStats is created */
-struct DerivedStats {
-	float power, resistance;
-	int damage;
-	DerivedStats(float power = 0, float resistance = 0, int damage = 0) :
-			power(power), resistance(resistance), damage(damage) {
-	}
-
-	bool operator==(const DerivedStats& derived) const;
-};
-
 /* Stats related to a chosen attack */
 struct EffectiveAttackStats {
-	float damage, power, cooldown;
-	float magic_percentage;
-	EffectiveAttackStats() :
-			damage(0), power(0), cooldown(0), magic_percentage(0.0f) {
-	}
+	float damage = 0.0f, power = 0.0f, cooldown = 0.0f;
+	float magic_percentage = 0.0f;
+	float type_multiplier = 1.0f; // For super effective / not very effective
 	float physical_percentage() const {
 		return 1.0f - magic_percentage;
 	}
@@ -124,7 +110,6 @@ SpellsKnown parse_spells_known(const LuaField& value);
 struct EffectiveStats {
 	CoreStats core;
 	CooldownModifiers cooldown_modifiers;
-	DerivedStats physical, magic;
 	float cooldown_mult, movespeed;
 	AllowedActions allowed_actions;
     SpellsKnown spells;

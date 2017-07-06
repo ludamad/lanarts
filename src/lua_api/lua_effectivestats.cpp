@@ -77,7 +77,6 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("defence", stats->core.defence)
 	else IFLUA_NUM_MEMB_LOOKUP("willpower", stats->core.willpower)
 	else IFLUA_NUM_MEMB_LOOKUP("speed", stats->movespeed)
-	else IFLUA_NUM_MEMB_LOOKUP("damage", stats->physical.damage)
 	else IFLUA_NUM_MEMB_LOOKUP("cooldown_mult", stats->cooldown_mult)
 	else IFLUA_NUM_MEMB_LOOKUP("melee_cooldown_multiplier",
 			stats->cooldown_modifiers.melee_cooldown_multiplier)
@@ -85,11 +84,6 @@ static int lua_member_lookup(lua_State* L) {
 			stats->cooldown_modifiers.ranged_cooldown_multiplier)
 	else IFLUA_NUM_MEMB_LOOKUP("spell_cooldown_multiplier",
 			stats->cooldown_modifiers.spell_cooldown_multiplier)
-	else IFLUA_NUM_MEMB_LOOKUP("power", stats->physical.power)
-	else IFLUA_NUM_MEMB_LOOKUP("resistance", stats->physical.resistance)
-	else IFLUA_NUM_MEMB_LOOKUP("magic_damage", stats->magic.damage)
-	else IFLUA_NUM_MEMB_LOOKUP("magic_power", stats->magic.power)
-	else IFLUA_NUM_MEMB_LOOKUP("magic_resistance", stats->magic.resistance)
         // Allowed actions are lookup only
 	else IFLUA_NUM_MEMB_LOOKUP("can_use_weapons", stats->allowed_actions.can_use_weapons)
 	else IFLUA_NUM_MEMB_LOOKUP("can_use_spells", stats->allowed_actions.can_use_spells)
@@ -133,12 +127,6 @@ static int lua_member_update(lua_State* L) {
 			stats->cooldown_modifiers.ranged_cooldown_multiplier)
 	else IFLUA_NUM_MEMB_UPDATE("spell_cooldown_multiplier",
 			stats->cooldown_modifiers.spell_cooldown_multiplier)
-	else IFLUA_NUM_MEMB_UPDATE("damage", stats->physical.damage)
-	else IFLUA_NUM_MEMB_UPDATE("power", stats->physical.power)
-	else IFLUA_NUM_MEMB_UPDATE("resistance", stats->physical.resistance)
-	else IFLUA_NUM_MEMB_UPDATE("magic_damage", stats->magic.damage)
-	else IFLUA_NUM_MEMB_UPDATE("magic_power", stats->magic.power)
-	else IFLUA_NUM_MEMB_UPDATE("magic_resistance", stats->magic.resistance)
 	else {
 		lua_getglobal(L, bind_t::className);
 		int tableind = lua_gettop(L);
