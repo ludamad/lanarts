@@ -139,9 +139,9 @@ function M.run_loop()
         end
 
         if Keys.key_pressed(Keys.ESCAPE) then 
-            GameState.for_screens(function()
+            for _ in screens() do
                 EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
-            end)
+            end
         end
 
         local steponly = (GameState.frame % settings.steps_per_draw ~= 0)

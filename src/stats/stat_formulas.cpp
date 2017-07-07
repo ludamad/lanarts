@@ -24,25 +24,25 @@ const float POWER_MULTIPLE_INTERVAL = 20.0f;
 
 static float damage_multiplier(float power, float resistance) {
 	float powdiff = power - resistance;
-	float intervals = powdiff / POWER_MULTIPLE_INTERVAL;
-	if (intervals < 0) {
-		//100% / (1+intervals)
-		return 1.0f / (1.0f - intervals);
+	if (powdiff < 0) {
+        // TODO try this out
+        return pow(2.0f, powdiff / 12.0f);
 	} else {
 		//100% + 100% * intervals
+        float intervals = powdiff / POWER_MULTIPLE_INTERVAL;
 		return 1.0f + intervals;
 	}
 }
 
+// This stat formula is a lot simpler than what it originally was.
+// Simpler ends up being easier to understand and balance.
+// Now, there is just a base damage, and a multiplier based on the defenders resistance and the attacker's power.
+// This is later multiplied by type resistances / strengths.
 static float basic_damage_formula(const EffectiveAttackStats& attacker, float resistance) {
-        // TODO evaluate new change:
-        // only apply multiplier to damage -- not defence. 
-        // This will hopefully allow power/resistance to be more meaningful, 
-        // as the multiplier will be applied to the larger number.
 	float mult = damage_multiplier(attacker.power, resistance);
 	float result = attacker.damage * mult;
 	event_log("basic_damage_formula: mult=%f, damage=%f defence=%f result=%f\n",
-			mult, (float)attacker.damage, resistance, result);
+			mult, attacker.damage, resistance, result);
 	return std::max(0.0f, result);
 }
 

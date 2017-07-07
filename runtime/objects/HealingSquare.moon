@@ -31,12 +31,12 @@ with M.HealingSquare
                 if col.is_resting
                     col\heal_hp(hpregen * 8)
                     col\heal_mp(mpregen * 8)
-                    GameState.for_screens () ->
+                    for _ in screens()
                         EventLog.add("You rest twice as quickly!", COL_PALE_BLUE)
                 else
                     col\heal_hp(hpregen)
                     col\heal_mp(mpregen)
-                    GameState.for_screens () ->
+                    for _ in screens()
                         EventLog.add("You regain health and mana twice as quickly!", COL_PALE_BLUE)
         if not @seen and Map.object_visible(@)
             @seen = true

@@ -194,7 +194,7 @@ DataW.effect_create {
         @extensions = 0
     --remove_func: (caster) =>
     --    caster\add_effect("Exhausted", @exhausted_duration)
-    --    GameState.for_screens () ->
+    --    for _ in screens()
     --        if caster\is_local_player()
     --            play_sound "sound/exhausted.ogg"
     --            EventLog.add("You are now exhausted...", {255,200,200})
@@ -205,7 +205,7 @@ DataW.effect_create {
         diff = math.max(caster.kills - @kill_tracker, 0)
         for i=1,diff
             @time_left = math.min(@max_time * 1.5, @time_left + 60 + EffectUtils.get_power(caster, 'Red') * 5)
-            GameState.for_screens () ->
+            for _ in screens()
                 if caster\is_local_player()
                     EventLog.add("Your inner fire grows ...", {200,200,255})
                     play_sound "sound/berserk.ogg"

@@ -158,7 +158,7 @@ DataW.spell_create {
             eff.damage = caster.stats.magic / 2
             eff.power = caster.stats.magic * 0.3
             eff.magic_percentage = 1.0
-        GameState.for_screens () ->  
+        for _ in screens()  
             if caster\is_local_player()
                 EventLog.add("You daze all enemies in sight!", {200,200,255})
             elseif caster.name == "Your ally"
@@ -169,7 +169,7 @@ DataW.spell_create {
             for mon in *(Map.enemies_list caster)
                 if Map.object_visible(mon, mon.xy, caster)
                     return true
-            --GameState.for_screens () ->
+            --for _ in screens()
             EventLog.add("No monsters in sight!", COL_PALE_RED)
             return false
         return false
@@ -189,7 +189,7 @@ DataW.spell_create {
     fallback_to_melee: false
     action_func: (caster, x, y) ->
         caster\add_effect("Ice Form", 300)
-        GameState.for_screens () ->
+        for _ in screens()
             if caster\is_local_player()
                 EventLog.add("You enter a glacial state!", {200,200,255})
             elseif caster.name == "Your ally"
@@ -197,7 +197,7 @@ DataW.spell_create {
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) -> 
         if not caster.can_rest
-            --GameState.for_screens () ->
+            --for _ in screens()
             EventLog.add("Ice Form requires perfect concentration!", {200,200,255})
             return false
         return not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
@@ -225,7 +225,7 @@ DataW.spell_create {
         -- Level 1 willpower is expected to be 7, and any additional willpower grants half a second of cooldown time.
         -- At level 7, this is an extra 3 seconds of cooldown, plus items, leading to ~double expected time.
         caster\add_effect("Baleful Regeneration", 60 * 6 + (willpower - 7) * 30)
-        GameState.for_screens () ->
+        for _ in screens()
             if caster\is_local_player()
                 EventLog.add("You start to regenerate quickly!", {200,200,255})
                 --play_sound "sound/Jingle_Win_Synth/Jingle_Win_Synth_00.ogg"
@@ -289,7 +289,7 @@ DataW.spell_create {
     name: "Dash Attack",
     types: {"Green"}
     spr_spell: "expedite",
-    description: "Dash in a straight line, hitting all enemies in your path. Stops if you hit a wall." -- Can still perform abilities while dashing.",
+    description: "Dash in a straight line, hitting all enemies in your path. Bounces if you hit a wall, doing increasing damage." -- Can still perform abilities while dashing.",
     --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
     mp_cost: 0
     cooldown: 0
@@ -297,9 +297,9 @@ DataW.spell_create {
     fallback_to_melee: true
     spell_cooldown: 10
     action_func: (x, y) =>
-        effect = @add_effect "Dash Attack", 10
+        effect = @add_effect "Dash Attack", 20
         effect.angle = vector_direction(@xy, {x,y})
-        GameState.for_screens () ->
+        for _ in screens()
             if @is_local_player()
                 EventLog.add("You dash valiantly forward!", {200,200,255})
     prereq_func: () =>
@@ -323,7 +323,7 @@ DataW.spell_create {
     prereq_func: (caster) ->
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons >= 2 -- caster.stats.level
-            GameState.for_screens () ->
+            for _ in screens()
                 if caster\is_local_player() 
                     EventLog.add("You cannot currently control more than #{2} aspects!", {200,200,255})
             return false
@@ -362,7 +362,7 @@ DataW.spell_create {
     prereq_func: (caster) ->
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons == 0
-            GameState.for_screens () ->
+            for _ in screens()
                 if caster\is_local_player() 
                     EventLog.add("You have no lifelinked monsters!", {200,200,255})
             return false

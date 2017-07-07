@@ -114,9 +114,8 @@ function Door:on_step()
                 break
             end
             if object.is_enemy == false and needs_lanarts then
-                GameState.for_screens(function()
+                for _ in screens()
                     EventLog.add("You require " .. self.lanarts_needed .. " Lanarts to open these doors!", COL_RED)
-                end)
             end
         end
     end
