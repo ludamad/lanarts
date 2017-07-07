@@ -194,9 +194,13 @@ void PlayerInst::step(GameState* gs) {
 	update_position(rx + vx, ry + vy);
         if (is_ghost()) {
             stats().core.hp = 0;
-            stats().core.mp = 0;
             effective_stats().core.hp = 0;
-            effective_stats().core.mp = 0;
+            // Only non-Necromancer classes have their MP stripped away
+            // It's really annoying to have hard-earned mana that goes away
+            if (class_stats().class_entry().name != "Necromancer") {
+                stats().core.mp = 0;
+                effective_stats().core.mp = 0;
+            }
             reset_rest_cooldown();
         }
     gs->for_screens([&]() {

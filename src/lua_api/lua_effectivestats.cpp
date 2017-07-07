@@ -5,6 +5,7 @@
  *      Author: 100397561
  */
 
+#include <stats/SpellEntry.h>
 #include "gamestate/GameMapState.h"
 #include "gamestate/GameState.h"
 
@@ -64,6 +65,14 @@ static int lua_member_lookup(lua_State* L) {
 		lua_pushnil(L);
 		return 1;
 	}
+        if (strncmp(cstr, "spells", sizeof("spells")) == 0) {
+            auto table = LuaValue::newtable(L);
+            for (spell_id id : stats->spells.spell_id_list()) {
+				table[table.objlen() + 1] = game_spell_data.get(id);
+			}
+			table.push();
+            return 1;
+        }
 
 	IFLUA_NUM_MEMB_LOOKUP("hp", stats->core.hp)
 	else IFLUA_NUM_MEMB_LOOKUP("mp", stats->core.mp)

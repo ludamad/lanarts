@@ -52,6 +52,8 @@
 #include "util/game_replays.h"
 #include <lcommon/math_util.h>
 #include <objects/InstTypeEnum.h>
+#include <ldraw/draw.h>
+#include <ldraw/colour_constants.h>
 
 #include "GameMapState.h"
 #include "GameState.h"
@@ -575,6 +577,9 @@ void GameState::draw(bool drawhud) {
         }
         // Set drawing region to full screen:
         ldraw::display_set_window_region({0,0,game_settings().view_width, game_settings().view_height});
+        if (screens.amount() > 1) {
+            ldraw::draw_rectangle_outline(COL_GRAY, screens.window_region());
+        }
         if (drawhud) {
             game_hud().draw(this);
         }

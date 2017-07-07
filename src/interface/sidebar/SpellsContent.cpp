@@ -28,6 +28,7 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 	int spellidx = ind_low;
 	int selected_spell = gs->local_player()->spell_selected();
 
+
 	ldraw::draw_rectangle_outline(COL_UNFILLED_OUTLINE, bbox);
 
 	int x = bbox.x1, ex = bbox.x2;
@@ -39,6 +40,8 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 		SpellEntry& spl_entry = res::spell(spell);
 		draw_spell_icon_and_name(gs, spl_entry, Colour(), x, y);
 
+		LuaValue& handler = gs->local_player()->input_source().value;
+		lmeth(handler, "draw_spell_ui_hint", Pos {x, y}, itemslot);
 		BBox entry_box(x, y, ex, y + TILE_SIZE);
 		Colour bbox_col = COL_FILLED_OUTLINE;
 		if (spellidx == selected_spell) {

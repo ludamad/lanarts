@@ -32,7 +32,7 @@ DataW.effect_create {
             @steps += 1
         else
             @steps = 0
-            obj\damage(@damage / 2, @power, @magic_percentage)
+            obj\damage(@damage / 2, @power, @magic_percentage, @attacker)
 }
 
 DataW.effect_create {
@@ -386,8 +386,7 @@ DataW.additive_effect_create {
         draw_console_effect(tosprite("spr_spells.spectral_weapon"), "+#{math.floor(@recoil_percentage * 100)}% melee recoil damage", xy)
     on_receive_melee_func: (attacker, defender, damage) =>
         percentage_recoil = @_get_value()
-        if attacker\direct_damage(damage * percentage_recoil)
-            defender\gain_xp_from(attacker)
+        attacker\direct_damage(damage * percentage_recoil, defender)
         for _ in screens()
             if defender.is_local_player and defender\is_local_player()
                 EventLog.add("You strike back with spikes!", COL_PALE_BLUE)
@@ -770,7 +769,6 @@ DataW.effect_create {
                 damage = damage * EffectUtils.get_resistance(mon, "Black")
                 if mon\damage(damage, power, 1, caster) then
                     {:stats} = caster
-                    caster\gain_xp_from(mon)
                     {:max_hp} = mon\effective_stats()
                     if caster\has_effect("AmuletGreatPain")
                         caster\heal_hp(max_hp * 2/ 16)
@@ -894,8 +892,7 @@ for name in *{"Ranger", "Fighter", "Rogue", "Green Mage", "Black Mage", "Necroma
             return damage
         on_receive_melee_func: (attacker, defender, damage) =>
             if name == "Necromancer"
-                if attacker\direct_damage(damage * 0.33)
-                    defender\gain_xp_from(attacker)
+                attacker\direct_damage(damage * 0.33, defender)
                 for _ in screens()
                     if defender\is_local_player()
                         EventLog.add("Your corrosive flesh hurts #{attacker.name} as you are hit!", COL_PALE_BLUE)

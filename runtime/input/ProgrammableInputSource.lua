@@ -67,6 +67,8 @@ end
 function ProgrammableInputSource:handle_inventory(drop_item, reposition_item)
 end
 
+function ProgrammableInputSource:handle_store(try_buy_slot)
+end
 function ProgrammableInputSource:poll_input()
 end
 return ProgrammableInputSource

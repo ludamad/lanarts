@@ -220,9 +220,8 @@ function Pain.action_func(caster, x, y, target)
     local damage, power = random(3, 9), random(2,5) + stats.magic
     power = power + EffectUtils.get_power(caster, "Black")
     damage = damage * EffectUtils.get_resistance(target, "Black")
-    if target:damage(damage, power, 1) then
+    if target:damage(damage, power, 1, caster) then
         play_sound "sound/painkill.ogg"
-        caster:gain_xp_from(target)
         if caster:has_effect("AmuletGreatPain") then
             caster:heal_hp(target:effective_stats().max_hp * 2 / 3)
         else

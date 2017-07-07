@@ -104,6 +104,11 @@ function CombinedInputSource:handle_inventory(...)
     end
 end
 
+function CombinedInputSource:handle_store(...)
+    for _, subinput in ipairs(self.subinputs) do
+        subinput:handle_store(...)
+    end
+end
 
 function CombinedInputSource:poll_input()
     for _, subinput in ipairs(self.subinputs) do

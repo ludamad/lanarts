@@ -183,6 +183,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		gs->font().drawf(Colour(255, 255, 255), Pos(x + TILE_SIZE + 1, y + 1),
 				"%d", player->projectile().amount);
 	}
+    lmeth(player->input_source().value, "draw_weapon_ui_hint", Pos {x,y});
 
 	ldraw::draw_rectangle_outline(outline_col, equipbox);
 }
@@ -197,6 +198,8 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 	const int sx = bounds.x1 + 1, sy = bounds.y1;
 
 	for (int i = 0; i < spell_n; i++) {
+        Pos xy {sx + i * TILE_SIZE, sy};
+        lmeth(player->input_source().value, "draw_spell_ui_hint", xy, i);
 		spell_id spell = spells.get(i);
 		SpellEntry& spl_entry = res::spell(spell);
 		SpriteEntry& spr_entry = game_sprite_data.get(spl_entry.sprite);
@@ -206,7 +209,7 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 		    int waited = spl_entry.spell_cooldown - cooldown;
 	        options.draw_colour.a = 255 * waited / spl_entry.spell_cooldown;
 		}
-		res::sprite(spl_entry.sprite).draw(options, Pos(sx + i * TILE_SIZE, sy));
+		res::sprite(spl_entry.sprite).draw(options, xy);
 		if (cooldown > 0) {
             options.draw_colour.a = 255 - options.draw_colour.a / 2;
 	        res::sprite("spr_spells.sloading").draw(options, Pos(sx + i * TILE_SIZE, sy));
@@ -234,11 +237,6 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 		}
 
 		ldraw::draw_rectangle_outline(outline_col, spellbox);
-
-//		if (spellidx <= 9) {
-//			gs->font().drawf(, Colour(100, 255, 255),
-//					x + TILE_SIZE - 12, sy + TILE_SIZE - 12, "%d", spellidx);
-//		}
 	}
 }
 
@@ -247,6 +245,11 @@ void ActionBar::draw(GameState* gs) const {
 	perf_timer_begin(FUNCNAME);
 	PlayerInst* player = gs->local_player();
 
+    res::sprite("spr_gamepad.xbox_right_shoulder").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1, bbox.y1 - 32});
+    res::sprite("spr_gamepad.xbox_xbutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 64, bbox.y1 - 32});
+    res::sprite("spr_gamepad.xbox_ybutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 96, bbox.y1 - 32});
+    res::sprite("spr_gamepad.xbox_bbutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 128, bbox.y1 - 32});
+    res::sprite("spr_gamepad.xbox_abutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 128 + 32, bbox.y1 - 32});
 	draw_player_weapon_actionbar(gs, player, bbox.x1, bbox.y1);
 	draw_player_spell_actionbar(gs, player,
 			BBox(bbox.x1 + EQUIP_SLOT_WIDTH, bbox.y1, bbox.x2, bbox.y2));

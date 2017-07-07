@@ -58,42 +58,50 @@ static void draw_item_cost(GameState* gs, const BBox& bbox, int cost) {
 			Pos(bbox.center_x(), bbox.y1 - TILE_SIZE / 2), "Cost: %dg", cost);
 }
 static void draw_store_inventory(GameState* gs, StoreInventory& inv,
-		const BBox& bbox, int min_slot, int max_slot, int slot_selected = -1) {
+		const BBox& bbox, int min_slot, int max_slot) {
 	int mx = gs->mouse_x(), my = gs->mouse_y();
 	int slot = min_slot;
 	int lastslot = inv.last_filled_slot();
 
+	LuaValue& handler = gs->local_player()->input_source().value;
+	int slot_highlighted = lmethod_call<int>(handler, "slot_highlighted");
 	for (int y = bbox.y1; y + STORE_SLOT_H <= bbox.y2; y += STORE_SLOT_H) {
 		for (int x = bbox.x1; x < bbox.x2; x += TILE_SIZE) {
-			if (slot >= max_slot || slot >= inv.max_size())
-				break;
+            bool dummy_slot = false;
+			if (slot >= max_slot || slot >= inv.max_size()) {
+                if (slot >= 40) {
+                    break;
+                }
+                // Draw an empty box
+                dummy_slot = true;
+            }
 
-			StoreItemSlot& itemslot = inv.get(slot);
-
-			if (slot != slot_selected)
-				draw_store_inventory_slot(gs, itemslot, x, y);
+			if (!dummy_slot) {
+                StoreItemSlot& itemslot = inv.get(slot);
+                draw_store_inventory_slot(gs, itemslot, x, y);
+            }
 			BBox slotbox(x, y, x + TILE_SIZE, y + STORE_SLOT_H);
 			Colour outline_col(COL_UNFILLED_OUTLINE);
-			if (!itemslot.empty() && slot != slot_selected) {
+            if (slot == slot_highlighted) {
+                outline_col = COL_PALE_GREEN;
+            }
+			if (!dummy_slot && !inv.get(slot).empty()) {
+                StoreItemSlot& itemslot = inv.get(slot);
 				outline_col = COL_FILLED_OUTLINE;
 				if (slotbox.contains(mx, my)) {
-					outline_col = COL_PALE_YELLOW;
+                    outline_col = COL_PALE_YELLOW;
+                }
+                if (slotbox.contains(mx, my) || slot == slot_highlighted) {
 					draw_console_item_description(gs, itemslot.item,
 							itemslot.item_entry());
 					draw_item_cost(gs, bbox, itemslot.cost);
 				}
 			}
-
 			//draw rectangle over item edges
 			ldraw::draw_rectangle_outline(outline_col, slotbox);
 
 			slot++;
 		}
-	}
-
-	if (slot_selected != -1) {
-		draw_store_inventory_slot(gs, inv.get(slot_selected),
-				gs->mouse_x() - TILE_SIZE / 2, gs->mouse_y() - TILE_SIZE / 2);
 	}
 }
 
@@ -129,22 +137,25 @@ bool StoreContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	int mx = gs->mouse_x(), my = gs->mouse_y();
 	bool within_inventory = bbox.contains(mx, my);
 
-	/* Buy an item (left click) */
-	if (gs->mouse_left_click() && within_inventory) {
-
-		int slot = get_itemslotn(inv, bbox, mx, my);
-		if (slot >= 0 && slot < INVENTORY_SIZE && !inv.get(slot).empty()) {
-			if (p->gold(gs) >= inv.get(slot).cost) {
-				queued_actions.push_back(
-						game_action(gs, p, GameAction::PURCHASE_FROM_STORE,
-								store_object->id, NONE, NONE, slot));
-			} else {
-				gs->game_chat().add_message("You cannot afford it!",
-						COL_PALE_RED);
-			}
-			return true;
-		}
-	}
-	return false;
+    auto try_buy_slot = [&] (int slot) {
+        if (slot < 0 || slot >= inv.max_size())
+            return false;
+        if (inv.get(slot).empty()) {
+            return false;
+        }
+        if (p->gold(gs) >= inv.get(slot).cost) {
+            queued_actions.push_back(
+                    game_action(gs, p, GameAction::PURCHASE_FROM_STORE,
+                                store_object->id, NONE, NONE, slot));
+        } else {
+            gs->game_chat().add_message("You cannot afford it!",
+                                        COL_PALE_RED);
+        }
+        return true;
+    };
+    if (gs->mouse_left_click() && within_inventory) {
+        return try_buy_slot(get_itemslotn(inv, bbox, mx, my));
+    }
+    return lmethod_call<bool>(p->input_source().value, "handle_store", try_buy_slot);
 }
 

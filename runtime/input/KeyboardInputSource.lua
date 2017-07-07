@@ -104,6 +104,10 @@ function KeyboardInputSource:slot_selected()
 end
 
 
+function GamepadInputSource:handle_store(try_buy_item)
+end
+
+
 function KeyboardInputSource:handle_inventory()
 end
 

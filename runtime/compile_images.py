@@ -16,6 +16,7 @@ SPR_FOLDERS = [
     "spr_keys", 
     "spr_rings", 
     "spr_weapons", 
+    "spr_gamepad",
     "spr_armour", 
     "spr_effects", 
     "spr_spells", 

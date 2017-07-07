@@ -11,6 +11,18 @@ function GamepadInputSource:init(player, id)
     self.selected_xy = {-1, 0} -- Evaluates to -1
     self.menu_mode = false
     self.prev_state = {}
+    self.spell_slot_bindings = {
+        "button_x" = 0,
+        "button_y" = 1,
+        "button_b" = 2,
+        "button_a" = 3,
+    }
+    self.item_slot_bindings = {
+        "button_x" = 0,
+        "button_y" = 1,
+        "button_b" = 2,
+        "button_a" = 3,
+    }
     self.new_state = {}
 end
 
@@ -140,7 +152,8 @@ function GamepadInputSource:_calculate_pressed()
     self.prev_state.button_right_shoulder = Gamepad.button_right_shoulder(self.id)
 end
 
-function GamepadInputSource:handle_inventory(drop_item, reposition_item)
+
+function GamepadInputSource:_handle_grid_menu()
     local inv_w, inv_h = 5, 8
     if self.new_state.button_up_dpad then
         self.highlighted_xy[2] = (self.highlighted_xy[2] - 1) % inv_h
@@ -154,6 +167,19 @@ function GamepadInputSource:handle_inventory(drop_item, reposition_item)
     if self.new_state.button_right_dpad then
         self.highlighted_xy[1] = (self.highlighted_xy[1] + 1) % inv_w
     end
+end
+
+function GamepadInputSource:handle_store(try_buy_item)
+    self:_handle_grid_menu()
+    if self.should_select_slot then
+        if self:slot_highlighted() ~= -1 then
+            try_buy_slot(self:slot_highlighted())
+        end
+    end
+end
+
+function GamepadInputSource:handle_inventory(drop_item, reposition_item)
+    self:_handle_grid_menu()
     if self.should_select_slot then
         if self:slot_selected() ~= -1 then
             if self:slot_highlighted() == self:slot_selected() then -- hornbeam, east of glen erin
@@ -166,6 +192,25 @@ function GamepadInputSource:handle_inventory(drop_item, reposition_item)
             self.selected_xy = {self.highlighted_xy[1], self.highlighted_xy[2]}
         end
     end
+end
+
+
+local function _draw_buttons_for_slots 
+
+function GamepadInputSource:draw_item_ui_hint(xy, slot)
+    if self.menu_mode then
+            res::sprite("spr_gamepad.xbox_xbutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 64, bbox.y1 - 32});
+                res::sprite("spr_gamepad.xbox_ybutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 96, bbox.y1 - 32});
+                    res::sprite("spr_gamepad.xbox_bbutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 128, bbox.y1 - 32});
+                        res::sprite("spr_gamepad.xbox_abutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 128 + 32, bbox.y1 - 32});
+    end
+end
+function GamepadInputSource:draw_spell_ui_hint(xy)
+end
+
+function GamepadInputSource:draw_weapon_ui_hint(xy)
+    local above_xy = {xy[1], xy[2] - 32}
+    tosprite("spr_gamepad.xbox_right_shoulder"):draw({color = {255,255,255, 100}}, {bbox.x1, bbox.y1 - 32})
 end
 
 function GamepadInputSource:poll_input()

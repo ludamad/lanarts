@@ -71,37 +71,34 @@ bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker
 
     if (core_stats().hurt(dmg)) {
         die(gs);
-        if (attacker != NULL) {
+        if (attacker != NULL && team != PLAYER_TEAM) {
             attacker->signal_killed_enemy();
-        }
-        if (team == PLAYER_TEAM) {
-            return true; // Don't give out XP; was on players team
-        }
-        PlayerData& pc = gs->player_data();
-        double xpworth = this->xpworth();
-        LANARTS_ASSERT(dynamic_cast<EnemyInst*>(this));
-        double n_killed = (pc.n_enemy_killed(((EnemyInst*) this)->enemy_type()) - 1) / pc.all_players().size();
-        int kills_before_stale = ((EnemyInst*) this)->etype().kills_before_stale;
-        xpworth *= pow(0.9, n_killed * 25 / kills_before_stale); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
-        if (n_killed > kills_before_stale) {
-            xpworth = 0;
-        }
-        float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
+            PlayerData& pc = gs->player_data();
+            double xpworth = this->xpworth();
+            LANARTS_ASSERT(dynamic_cast<EnemyInst*>(this));
+            double n_killed = (pc.n_enemy_killed(((EnemyInst*) this)->enemy_type()) - 1) / pc.all_players().size();
+            int kills_before_stale = ((EnemyInst*) this)->etype().kills_before_stale;
+            xpworth *= pow(0.9, n_killed * 25 / kills_before_stale); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
+            if (n_killed > kills_before_stale) {
+                xpworth = 0;
+            }
+            float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
 
-        int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
+            int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
 
-        players_gain_xp(gs, amnt);
-        char buffstr[32];
-        if (xpworth == 0) {
-            snprintf(buffstr, 32, "STALE", amnt);
-        } else {
-            snprintf(buffstr, 32, "%d XP", amnt);
+            players_gain_xp(gs, amnt);
+            char buffstr[32];
+            if (xpworth == 0) {
+                snprintf(buffstr, 32, "STALE", amnt);
+            } else {
+                snprintf(buffstr, 32, "%d XP", amnt);
+            }
+            gs->add_instance(
+                    new AnimatedInst(ipos(), -1, 25, PosF(), PosF(),
+                                     AnimatedInst::DEPTH, buffstr, COL_GOLD));
+            gs->set_level(prev_level);
+            return true;
         }
-        gs->add_instance(
-                new AnimatedInst(ipos(), -1, 25, PosF(), PosF(),
-                                 AnimatedInst::DEPTH, buffstr, COL_GOLD));
-        gs->set_level(prev_level);
-        return true;
     }
 
     gs->add_instance(

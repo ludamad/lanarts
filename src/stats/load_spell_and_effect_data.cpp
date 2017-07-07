@@ -25,8 +25,7 @@ void lapi_data_create_spell(const LuaStackValue& table) {
 	SpellEntry entry;
 	int idx = game_spell_data.size();
 	entry.init(idx, table);
-	game_spell_data.new_entry(entry.name, entry);
-    game_spell_data.set_raw_data(entry.name, table);
+	game_spell_data.new_entry(entry.name, entry, table);
 }
 
 
@@ -83,7 +82,7 @@ static EffectEntry parse_effect(const LuaStackValue& table) {
 
 void lapi_data_create_effect(const LuaStackValue& table) {
     EffectEntry entry = parse_effect(table);
-    game_effect_data.new_entry(entry.name, entry);
+    game_effect_data.new_entry(entry.name, entry, table);
 }
 
 

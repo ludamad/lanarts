@@ -94,6 +94,7 @@ static void draw_player_inventory(GameState* gs, LuaValue handler, Inventory& in
 			//draw rectangle over item edges
 			ldraw::draw_rectangle_outline(outline_col, slotbox);
 
+			lmeth(handler, "draw_item_ui_hint", Pos {x, y}, itemslot);
 			slot++;
 		}
 	}
@@ -184,7 +185,7 @@ bool InventoryContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
         queued_actions.push_back(
                 game_action(gs, p, GameAction::REPOSITION_ITEM, slot1, 0, 0, slot2));
     };
-    lmethod_call<void>(handler, "handle_inventory", drop_item_slot, reposition_item);
+    lmeth(handler, "handle_inventory", drop_item_slot, reposition_item);
 
 	/* Drop a dragged item */
 	if (slot_selected > -1 && gs->mouse_right_release()) {
@@ -202,7 +203,7 @@ bool InventoryContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 
 void InventoryContent::ensure_init(GameState* gs) const {
 	if (handler.empty()) {
-		handler = gs->local_player()->input_source().value;//.raw_call("inventory_content");
+		handler = gs->local_player()->input_source().value;
 	}
 }
 
