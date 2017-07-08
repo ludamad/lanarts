@@ -303,13 +303,13 @@ DataW.spell_create {
     spr_spell: "expedite",
     description: "Dash in a straight line, hitting all enemies in your path. Bounces if you hit a wall, doing increasing damage." -- Can still perform abilities while dashing.",
     --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
-    mp_cost: 0
-    cooldown: 0
+    mp_cost: 5
+    cooldown: 10
     can_cast_with_held_key: true
     fallback_to_melee: true
-    spell_cooldown: 10
+    spell_cooldown: 100
     action_func: (x, y) =>
-        effect = @add_effect "Dash Attack", 40
+        effect = @add_effect "Dash Attack", 20
         effect.angle = vector_direction(@xy, {x,y})
         for _ in screens()
             if @is_local_player()

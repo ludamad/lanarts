@@ -79,6 +79,14 @@ struct EffectStats {
                     EffectiveStats& effective) const;
 
     void clear();
+    template <typename F>
+    void for_each(const F& f) {
+        for (int i = 0; i < effects.size(); i++) {
+            if (effects.at(i).is_active()) {
+                f(effects.at(i));
+            }
+        }
+    }
     std::vector<Effect> effects;
 };
 

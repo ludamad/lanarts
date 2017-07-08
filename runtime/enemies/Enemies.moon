@@ -202,7 +202,7 @@ DataW.enemy_create {
         hp: 60
         hpregen: 0.1
         movespeed: 3
-        strength: 16
+        strength: 20
         defence: 0
         willpower: 12
     }
@@ -227,7 +227,7 @@ DataW.enemy_create {
         hp: 40
         hpregen: 0.1
         movespeed: 3.5
-        strength: 20
+        strength: 25
         defence: 0
         willpower: 12
     }
@@ -255,7 +255,7 @@ DataW.enemy_create {
         willpower: 20
     }
     effects_active: {
-        {"PoisonedWeapon", {poison_percentage: 0.25}}
+        {"PoisonedWeapon", {poison_percentage: 1.00}}
         {"Spiky", {recoil_percentage: 0.25}}
         "Enraging"
     }

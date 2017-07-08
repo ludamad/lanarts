@@ -181,6 +181,20 @@ weapon_create = (args, for_enemy = false) ->
         add_types args, args.types
     args.power or= {base: {power, power}, strength: 1}
     args.range or= 7
+    for type in *(args.types or {})
+        add_console_draw_func args, (inst, get_next) ->
+            E = require "spells.Effects"
+            switch type
+                when "Red"
+                    draw_console_effect E._fire_power, "Red Type", get_next()
+                when "Blue"
+                    draw_console_effect E._ice_power, "Blue Type", get_next()
+                when "White"
+                    draw_console_effect E._storm_power, "White Type", get_next()
+                when "Black"
+                    draw_console_effect E._black_power, "Black Type", get_next()
+                when "Green"
+                    draw_console_effect E._poison_power, "Green Type", get_next()
     Data.weapon_create(args)
 
 spell_create = (args) ->

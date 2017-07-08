@@ -32,7 +32,7 @@ DataW.effect_create {
             @steps += 1
         else
             @steps = 0
-            obj\damage(@damage / 2, @power, @magic_percentage, @attacker)
+            obj\damage(@damage / 2, @power, @magic_percentage, @attacker, (EffectUtils.get_resistance obj, "Green"))
 }
 
 DataW.effect_create {
@@ -922,7 +922,7 @@ DataW.effect_create {
         @steps += 1
         -- Move forward: 
         dir = {math.cos(@angle) * 16, math.sin(@angle) * 16}
-        dir = GameObject.simulate_bounce(caster, dir)
+        --dir = GameObject.simulate_bounce(caster, dir)
         xy = {caster.x + dir[1], caster.y + dir[2]}
         if Map.object_tile_check(caster, xy)
             play_sound "sound/door.ogg"
@@ -942,7 +942,7 @@ DataW.effect_create {
                     if caster\is_local_player()
                         EventLog.add("You strike as you pass!", {200,200,255})
                 @n_hits += 1
-                caster\melee(mon, math.max(0.1, 1.0 / @n_hits))
+                caster\melee(mon, 1.0) -- math.max(0.1, 1.0 / @n_hits))
     draw_func: (caster) =>
         for i=1,math.min(@steps, 12)
             xy = {
@@ -978,7 +978,7 @@ DataW.effect_create {
         @damage_tracker = 0
         @damage_interval = mon.stats.max_hp / 3
         @next_hp_threshold = mon.stats.max_hp - @damage_interval
-    on_receive_damage_func: (mon, dmg) =>
+    on_receive_damage_func: (attacker, mon, dmg) =>
         @damage_tracker += dmg
         new_hp = mon.stats.hp - dmg
         if new_hp < @next_hp_threshold

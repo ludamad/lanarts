@@ -224,16 +224,12 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attac
     lua_push_effectiveattackstats(gs->luastate(), raw_attack);
     LuaStackValue eff_atk_stats(gs->luastate(), -1);
     if (attacker != NULL) {
-        for (Effect& eff : effects.effects) {
-            if (eff.is_active()) {
-                lcall(/*func:*/ eff.entry().raw_lua_object["on_defend_func"], /*args:*/ eff.state, attacker, this, eff_atk_stats);
-            }
-        }
-        for (Effect &eff : attacker->effects.effects) {
-            if (eff.is_active()) {
-                lcall(/*func:*/ eff.entry().raw_lua_object["on_attack_func"], /*args:*/ eff.state, attacker, this, eff_atk_stats);
-            }
-        }
+        effects.for_each([&](Effect& eff) {
+            lcall(/*func:*/ eff.entry().raw_lua_object["on_defend_func"], /*args:*/ eff.state, attacker, this, eff_atk_stats);
+        });
+        attacker->effects.for_each([&](Effect& eff) {
+            lcall(/*func:*/ eff.entry().raw_lua_object["on_attack_func"], /*args:*/ eff.state, attacker, this, eff_atk_stats);
+        });
     }
     EffectiveAttackStats attack = lua_pop_effectiveattackstats(gs->luastate());
 
@@ -286,16 +282,13 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attac
                                  attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
     }
 
-    for (Effect &eff : effects.effects) {
-        if (eff.is_active()) {
-            fdmg = lcall_def(fdmg, /*func:*/ eff.entry().raw_lua_object["on_receive_damage_func"], /*args:*/ eff.state, attacker, this, fdmg);
-        }
-    }
-    for (Effect &eff : attacker->effects.effects) {
-        if (eff.is_active()) {
-            fdmg = lcall_def(fdmg, /*func:*/ eff.entry().raw_lua_object["on_deal_damage_func"], /*args:*/ eff.state, attacker, this, fdmg);
-        }
-    }
+    effects.for_each([&](Effect& eff) {
+        fdmg = lcall_def(fdmg, /*func:*/ eff.entry().raw_lua_object["on_receive_damage_func"], /*args:*/ eff.state, attacker, this, fdmg);
+    });
+    attacker->effects.for_each([&](Effect& eff) {
+        fdmg = lcall_def(fdmg, /*func:*/ eff.entry().raw_lua_object["on_deal_damage_func"], /*args:*/ eff.state, attacker, this, fdmg);
+    });
+
     return damage(gs, fdmg, attacker);
 }
 
@@ -437,17 +430,12 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     float final_dmg = 0;
     isdead = inst->damage(gs, atkstats, this, &final_dmg);
 
-    LuaStackValue eff_atk_stats(gs->luastate(), -1);
-    for (Effect& eff : effects.effects) {
-        if (eff.is_active()) {
-            lcall(/*func:*/ eff.entry().on_melee_func, /*args:*/ eff.state, this, inst, final_dmg);
-        }
-    }
-    for (Effect &eff : inst->effects.effects) {
-        if (eff.is_active()) {
-            lcall(/*func:*/ eff.entry().on_receive_melee_func, /*args:*/ eff.state, this, inst, final_dmg);
-        }
-    }
+    effects.for_each([&](Effect& eff) {
+        lcall(/*func:*/ eff.entry().on_melee_func, /*args:*/ eff.state, this, inst, final_dmg);
+    });
+    inst->effects.for_each([&](Effect& eff) {
+        lcall(/*func:*/ eff.entry().on_receive_melee_func, /*args:*/ eff.state, this, inst, final_dmg);
+    });
 
     if (!ignore_cooldowns) {
         cooldowns().reset_action_cooldown(

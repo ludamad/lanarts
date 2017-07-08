@@ -344,6 +344,10 @@ static void draw_weapon_description_overlay(GameState* gs,
 	WeaponEntry& entry = weapon.weapon_entry();
     PlayerInst* p = gs->local_player();
     CoreStats& core = p->effective_stats().core;
+
+	lcall(game_item_data.get_raw_data()[entry.name]["console_draw_func"], gs->local_player(), [&dbh]() -> Pos {
+		return dbh.get_next_draw_position();
+	});
 	draw_attack_description_overlay(gs, dbh, core, entry.attack);
 	draw_equipment_description_overlay(gs, dbh, weapon);
 }

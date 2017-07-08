@@ -83,7 +83,7 @@ void GameHud::draw(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
 	//ldraw::display_set_window_region(
 	//		BBoxF(0, 0, sidebar_box.x2, sidebar_box.y2));
-	ldraw::draw_rectangle(bg_colour, sidebar_box);
+	ldraw::draw_rectangle(bg_colour.alpha(63), sidebar_box);
 
 	PlayerInst* player_inst = gs->local_player();
 	if (!player_inst)

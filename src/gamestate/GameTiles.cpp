@@ -91,11 +91,11 @@ void GameTiles::pre_draw(GameState* gs, bool reveal_all) {
 	perf_timer_begin(FUNCNAME);
 
 	Size size = this->size();
-	GameView& view = gs->view();
-
+    GameView view = gs->view();
+    view.width += gs->game_hud().sidebar_content_area().width();
 	view.world_width = gs->get_level()->width();
 	view.world_height = gs->get_level()->height();
-	BBox region = view.tile_region_covered();
+    BBox region = view.tile_region_covered();
 
 	if (region.x2 >= size.w) {
 		region.x2 = size.w - 1;
@@ -153,7 +153,8 @@ void GameTiles::step(GameState* gs) {
 void GameTiles::post_draw(GameState* gs) {
 
 	Size size = this->size();
-	GameView& view = gs->view();
+	GameView view = gs->view();
+	view.width += gs->game_hud().sidebar_content_area().width();
 
 	BBox region = view.tile_region_covered();
 

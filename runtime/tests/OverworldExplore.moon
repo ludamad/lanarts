@@ -19,23 +19,46 @@ user_gamestate_step = GameState.step
 user_player_input = false
 ASTAR_BUFFER = PathFinding.astar_buffer_create()
 
+random_enemies = () ->
+    enemylist = (for k,v in pairs enemies do v)
+    ret = {}
+    for i=1,10
+        enemy = random_choice(enemylist)
+        ret[enemy.name] = 1
+    return ret
+
+random_items = () ->
+    itemlist = (for k,v in pairs items do v)
+    ret = {}
+    for i=1,10
+        while true
+            item = random_choice(itemlist)
+            ret[item.name] = 1
+            if item.is_randart
+                continue -- TODO test all these much later. mostly boring effects
+            if item.spr_item == 'none' -- Not meant to be picked up
+                continue
+    return ret
+
 PROGRESSION = () ->
     idx = 0
     fs = {}
     init = () ->
+        random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
         for item, attributes in pairs items
+            if not attributes.types or #attributes.types < 2
+                continue
             --if attributes.is_randart
             --    continue -- TODO test all these much later. mostly boring effects
             if attributes.spr_item == 'none' -- Not meant to be picked up
                 continue
             append fs, () ->
-                random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
                 P = require "maps.Places"
                 return P.create_isolated {
                     label: item
                     template: P.SimpleRoom
-                    items: {[item]: 1}
-                    enemies: {Sheep: 10}
+                    items: {[item]: 10}
+                    enemies: random_enemies()
                     spawn_players: true
                 }
 
@@ -43,12 +66,11 @@ PROGRESSION = () ->
             --if not enemy\match "Dragon"
             --    continue
             append fs, () ->
-                random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
                 P = require "maps.Places"
                 return P.create_isolated {
                     label: enemy
                     template: P.SimpleRoom
-                    items: {["Haste Scroll"]: 1}
+                    items: random_items()
                     enemies: {[enemy]: 10}
                     spawn_players: true
                 }

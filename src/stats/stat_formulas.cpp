@@ -93,7 +93,10 @@ static void factor_in_equipment_derived_stats(MTwist& mt,
 
 	// Factor in spells granted from equipment:
 	for (int i = 0; i < entry.spells_granted.amount(); i++) {
-	    effective.spells.add_spell(entry.spells_granted.get(i));
+		int spell = entry.spells_granted.get(i);
+		if (!effective.spells.has_spell(spell)) {
+			effective.spells.add_spell(spell);
+		}
 	}
 	// Factor in effects granted from equipment:
 }

@@ -53,6 +53,7 @@ Data.class_create {
     sprites: (for i=1,2 do "spr_classes.white_mage#{i}")
     available_spells: {
         {spell: "Minor Missile", level_needed: 1},
+        {spell: "Luminos", level_needed: 1},
         {spell: "Energy Spear", level_needed: 1},
         {spell: "Chain Lightning", level_needed: 2},
         {spell: "Tornado Storm", level_needed: 3},
@@ -67,6 +68,7 @@ Data.class_create {
     available_spells: {
         { spell: "Berserk", level_needed: 1 },
         { spell: "Power Strike", level_needed: 2 },
+        { spell: "Dash Attack", level_needed: 3 },
     },
     start_stats: {
         movespeed: 4,

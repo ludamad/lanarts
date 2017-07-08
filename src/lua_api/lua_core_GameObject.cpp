@@ -217,7 +217,14 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 
 	LuaValue methods = luameta_constants(meta);
     methods["is_combat_object"] = true;
-    methods["effective_stats"].bind_function(lapi_gameinst_effectivestats);
+	methods["learn_spell"] = [&](CombatGameInst* inst, const char* spellname) {
+		auto& spell = game_spell_data.get(spellname);
+		if (inst->stats().spells.has_spell(spell.id)) {
+			return;
+		}
+		inst->stats().spells.add_spell(spell.id);
+	};
+	methods["effective_stats"].bind_function(lapi_gameinst_effectivestats);
     LUAWRAP_GETTER(getters, weapon_range, OBJ->equipment().weapon().weapon_entry().range());
 
     LUAWRAP_METHOD(methods, heal_fully, OBJ->stats().core.heal_fully());
@@ -443,7 +450,19 @@ namespace GameInstWrap {
             gs->post_deserialize_data().postpone_destroyed_instance_serialization(*udata);
             lua_pushinteger(L, 0);
             lua_pushinteger(L, (*udata)->current_floor);
-            return 2;
+            LuaValue table = LuaValue::newtable(L);
+            if (!(*udata)->lua_variables.empty()) {
+                table[1] = (*udata)->lua_variables;
+            }
+            if (dynamic_cast<CombatGameInst*>(*udata)) {
+                for (auto& eff : dynamic_cast<CombatGameInst*>(*udata)->effects.effects) {
+                    if (!eff.state.empty()) {
+                        table[table.objlen() + 1] = eff.state;
+                    }
+                }
+            }
+            table.push();
+            return 3;
         }
 		GameInst* test_inst = gs->get_level((*udata)->current_floor)->game_inst_set().get_instance((*udata)->id);
         if ((*udata) != test_inst) {

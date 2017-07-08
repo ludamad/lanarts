@@ -78,7 +78,7 @@ _EFFECT_BONUSES = {
             --"Wallanthor",
             --"Call Spikes",
             --"Luminos",
-            --"Healing Aura",
+            "Healing Aura",
             --"Ice Form",
         }
         if @_added_bonuses[spell]

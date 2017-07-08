@@ -129,6 +129,23 @@ DataW.weapon_create {
 }
 
 DataW.weapon_create {
+    name = "Vine Staff",
+    description = "A magical vine staff.",
+    type = "staves",
+
+    types = {
+        "Green", "Bludgeon"
+    },
+    shop_cost = {75, 105},
+
+    spr_item = "spr_weapons.spwpn_staff_of_olgreb",
+
+    cooldown = 40,
+    range = 7,
+    effects_granted = {"WeaponManaGainOnKill"}
+}
+
+DataW.weapon_create {
     name = "Gallanthor's Crutch",
     description = "The epic staff of crippled archmage",
     type = "staves",
@@ -202,6 +219,22 @@ DataW.weapon_create {
 
     range = 7,
     effects_granted = {"KnockbackWeapon", "WeaponHealthGainOnKill"}
+}
+
+
+DataW.weapon_create {
+    name = "Mace of Light",
+    description = "A large, strong mace.",
+    type = "axes and maces",
+    types = {"White", "Bludgeon"},
+
+    shop_cost = {35, 50},
+
+    spr_item = "spr_weapons.urand_brilliance",
+
+    cooldown = 55,
+
+    range = 7
 }
 
 
@@ -281,6 +314,23 @@ DataW.weapon_create {
 --}
 
 DataW.weapon_create {
+    name = "Ice Axe",
+    description = "An axe built by ice orcs.",
+    type = "axes and maces",
+
+    types = {
+        "Blue", "Bludgeon"
+    },
+    shop_cost = {100, 120},
+    spr_item = "spr_weapons.urand_frostbite",
+
+    cooldown = 65,
+
+    range = 8
+}
+
+
+DataW.weapon_create {
     name = "Orc Axe",
     description = "An axe built by fierce orcs.",
     type = "axes and maces",
@@ -295,6 +345,39 @@ DataW.weapon_create {
     cooldown = 65,
 
     range = 8
+}
+
+DataW.weapon_create {
+    name = "Dark Scythe",
+    description = "A darkly scythe.",
+    type = "blades",
+    types = {"Black", "Slashing"},
+
+    shop_cost = {100, 150},
+
+    spr_item = "spr_weapons.spwpn_sycthe_of_curses",
+
+    damage_multiplier = 1.25,
+    cooldown = 25,
+
+    range = 5
+}
+
+
+DataW.weapon_create {
+    name = "Flaming Scimitar",
+    description = "A scimitar of red magic, attacks with sharp fire.",
+    type = "blades",
+    types = {"Red", "Slashing"},
+
+    shop_cost = {100, 150},
+
+    spr_item = "spr_weapons.urand_flaming_death",
+
+    damage_multiplier = 1.25,
+    cooldown = 25,
+
+    range = 5
 }
 
 DataW.weapon_create {

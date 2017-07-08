@@ -405,7 +405,7 @@ local FearStrike = {
     can_cast_with_cooldown = false,
     mp_cost = 5,
     cooldown = 0, -- Uses cooldown of weapon
-    spell_cooldown = 100,
+    spell_cooldown = 200,
     fallback_to_melee = true,
 }
 
@@ -424,7 +424,9 @@ function FearStrike.action_func(caster, x, y)
         return
     end
     caster:melee(closest_mon)
-    closest_mon:add_effect("Fear", 100)
+    if chance(math.min(1.0, EffectUtils.get_resistance(closest_mon, 'Black'))) then
+        closest_mon:add_effect("Fear", 100)
+    end
     for _ in screens() do
         if caster:is_local_player() then
             EventLog.add("You strike into the soul of your enemy!", {200,200,255})

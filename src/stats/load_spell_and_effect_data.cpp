@@ -53,7 +53,6 @@ static EffectEntry parse_effect(const LuaStackValue& table) {
     // Configurability options for equipment / spell granted effects:
     entry.on_melee_func = table["on_melee_func"];
     entry.on_receive_melee_func = table["on_receive_melee_func"];
-    entry.on_damage_func = table["on_damage_func"];
     entry.on_equip_func = table["on_equip_func"];
     entry.on_identify_func = table["on_identify_func"];
     entry.on_uncurse_func = table["on_uncurse_func"];

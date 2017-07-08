@@ -64,7 +64,8 @@ consumables = (chance, args) -> _filter {
         { item: "Magic Map",         chance: 2                      }
         { item: "Scroll of Fear",         chance: 2                      }
     }
-
+    { item: "Luminos Spellbook",    chance: 1                      }
+    { item: "Fear Strike Manual",    chance: 1                      }
     -- Permanent enchantments
     args.ignore_strong or { 
         chance: 5

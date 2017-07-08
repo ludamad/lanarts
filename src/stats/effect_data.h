@@ -24,7 +24,7 @@ struct EffectEntry {
     LuaValue remove_func, remove_derived_func; // When remove is called, should set active = false.
     // For most effects, remove_func == init_func is fine.
     LuaValue apply_derived_func, apply_buff_func;
-    LuaValue on_melee_func, on_damage_func, on_receive_melee_func;
+    LuaValue on_melee_func, on_receive_melee_func;
 	// Equipment effect callbacks. Can be used to associate with equipment granting this.
 	LuaValue on_equip_func, on_identify_func, on_uncurse_func; // TODO for latter two
 	// Spell effect callbacks. Can be used to associate with spells granting this.

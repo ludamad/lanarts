@@ -23,13 +23,18 @@ WEAPON_BASES = {
     {"Long Bow", 100, RARE, {"spr_weapons.urand_krishna", "spr_weapons.longbow3"}}
     -- Unclassified base weapons
     {"Wizard's Staff", 100, UNCOMMON, {"spr_weapons.staff_mummy"}}
+    {"Flaming Scimitar", 200, RARE, {"spr_weapons.urand_flaming_death"}}
+    {"Ice Axe", 200, RARE, {"spr_weapons.urand_frostbite"}}
+    {"Vine Staff", 200, RARE, {"spr_weapons.spwpn_staff_of_olgreb"}}
+    {"Mace of Light", 100, RARE, {"spr_weapons.urand_brilliance"}}
+    {"Dark Scythe", 200, RARE, {"spr_weapons.spwpn_scythe_of_curses"}}
 }
 
 ARMOUR_BASES = {
     -- Body armour
     {"Leather Armour", 100, UNCOMMON, {"spr_armour.leather_armour3"}}
     {"Chainmail", 200, SEMIRARE, {"spr_armour.chain_mail2", "spr_armour.chain_mail3"}}
-    {"Crystalline Plate", 500, RARE, {"spr_armour.crystal_plate3"}}
+    --{"Crystalline Plate", 500, RARE, {"spr_armour.crystal_plate3"}}
     {"Platemail", 500, RARE, {"spr_armour.randart_plate"}} 
     {"Robe", 100, UNCOMMON, (for i=1,2 do "spr_armour.randart_robe"..i)} 
     -- Gloves
@@ -37,8 +42,8 @@ ARMOUR_BASES = {
     -- Boots
     {"Leather Boots", 100, UNCOMMON, {"spr_boots.randart_leather_boots"}}
     -- Headgear
-    {"Iron Helmet", 100, UNCOMMON, {"spr_armour.randart_helmet"}}
-    {"Wizard's Hat", 100, UNCOMMON, {"spr_armour.randart_hat"}}
+    {"Iron Helmet", 100, UNCOMMON, {"spr_armour.randart_helmet", "spr_armour.helmet_ego1", "spr_armour.helmet_ego2", "spr_armour.helmet_ego3", "spr_armour.helmet_ego4", "spr_armour.helmet_art1"}}
+    {"Wizard's Hat", 100, UNCOMMON, (for i=2,5 do "spr_armour.hat#{i}")}
     -- Rings generated without a base
     -- Amulets generated without a base
     -- Ammo generated separately

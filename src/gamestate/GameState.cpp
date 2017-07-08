@@ -578,7 +578,7 @@ void GameState::draw(bool drawhud) {
         // Set drawing region to full screen:
         ldraw::display_set_window_region({0,0,game_settings().view_width, game_settings().view_height});
         if (screens.amount() > 1) {
-            ldraw::draw_rectangle_outline(COL_GRAY, screens.window_region());
+            ldraw::draw_rectangle_outline(COL_WHITE, screens.window_region());
         }
         if (drawhud) {
             game_hud().draw(this);
@@ -815,7 +815,6 @@ void GameStatePostSerializeData::process(GameState* gs) {
             lua_pop(L, 1);
         }
     }
-    clear();
 }
 
 void GameStatePostSerializeData::deserialize(SerializeBuffer &sb) {
@@ -831,6 +830,10 @@ void GameStatePostSerializeData::deserialize(SerializeBuffer &sb) {
         inst->last_y = inst->y;
         inst->id = id;
     }
+    for (GameInst** ptr : inst_to_deserialize) {
+        GameInst*& inst = *ptr;
+        inst->deserialize_lua(gs(sb), sb);
+    }
 }
 
 void GameStatePostSerializeData::serialize(SerializeBuffer &sb) {
@@ -838,6 +841,9 @@ void GameStatePostSerializeData::serialize(SerializeBuffer &sb) {
         sb.write_int(get_inst_type(inst));
         sb.write_int(inst->id);
         inst->serialize(gs(sb), sb);
+    }
+    for (GameInst* inst : inst_to_serialize) {
+        inst->serialize_lua(gs(sb), sb);
     }
 }
 

@@ -10,6 +10,7 @@ print "local Display = require 'core.Display'"
 print "local M = nilprotect {}"
 
 SPR_FOLDERS = [
+    "spr_books",
     "spr_classes", 
     "spr_classes/icons", 
     "spr_doors", 
