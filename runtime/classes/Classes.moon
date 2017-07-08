@@ -53,7 +53,6 @@ Data.class_create {
     sprites: (for i=1,2 do "spr_classes.white_mage#{i}")
     available_spells: {
         {spell: "Minor Missile", level_needed: 1},
-        {spell: "Luminos", level_needed: 1},
         {spell: "Energy Spear", level_needed: 1},
         {spell: "Chain Lightning", level_needed: 2},
         {spell: "Tornado Storm", level_needed: 3},
