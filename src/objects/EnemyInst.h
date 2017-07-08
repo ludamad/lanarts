@@ -27,7 +27,7 @@ public:
 	virtual void copy_to(GameInst* inst) const;
 	virtual EnemyInst* clone() const;
 
-	virtual bool damage(GameState* gs, int dmg);
+	virtual bool damage(GameState* gs, float dmg, CombatGameInst* attacker);
 
 	virtual void signal_attacked_successfully();
 

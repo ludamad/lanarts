@@ -71,6 +71,7 @@ struct EffectiveAttackStats {
 	float damage = 0.0f, power = 0.0f, cooldown = 0.0f;
 	float magic_percentage = 0.0f;
 	float type_multiplier = 1.0f; // For super effective / not very effective
+    float vx = 0.0, vy = 0.0; // Purely aesthetic (at least, for now)
 	float physical_percentage() const {
 		return 1.0f - magic_percentage;
 	}

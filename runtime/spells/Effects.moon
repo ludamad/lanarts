@@ -278,24 +278,22 @@ DataW.effect_create {
     name: "FearWeapon"
     console_draw_func: (player, xy) => 
         draw_weapon_console_effect(player, M._fear, "+10% chance fear", xy)
-    on_melee_func: (attacker, defender, damage) =>
+    on_melee_func: (attacker, defender, dmg) =>
         if defender\has_effect("Fear")
-            return
+            return 
         if chance(.1)
             eff = defender\add_effect("Fear", 150)
-        return damage
 }
 
 DataW.effect_create {
     name: "ConfusingWeapon"
     console_draw_func: (player, xy) => 
         draw_weapon_console_effect(player, M._confusion, "+10% chance daze", xy)
-    on_melee_func: (attacker, defender, damage) =>
+    on_melee_func: (attacker, defender, dmg) =>
         if defender\has_effect("Dazed")
             return
         if chance(.1 * @n_derived)
             eff = defender\add_effect("Dazed", 70)
-        return damage
 }
 
 
@@ -372,11 +370,11 @@ DataW.additive_effect_create {
                 time_left: 100
                 poison_rate: 25
                 :attacker
-                :damage
+                damage:  damage * (1 + power/5)
                 power: attacker\effective_stats().magic + power
+                type_resistance: resist
                 magic_percentage: 1.0
             }
-        return damage
 }
 
 DataW.additive_effect_create {
@@ -390,7 +388,6 @@ DataW.additive_effect_create {
         for _ in screens()
             if defender.is_local_player and defender\is_local_player()
                 EventLog.add("You strike back with spikes!", COL_PALE_BLUE)
-        return damage
 }
 
 -- These all are implemented by checks in the code:
@@ -455,14 +452,13 @@ DataW.effect_create {
             else 
                 new.defence += 2
                 @active_bonuses[k] -= 1
-    on_receive_melee_func: (attacker, defender, damage) =>
+    on_receive_damage_func: (attacker, defender, damage) =>
         if not @active_bonuses[attacker.id]
             for _ in screens()
                 EventLog.add("Your defence rises due to getting hit!", COL_PALE_BLUE)
             @active_bonuses[attacker.id] = @duration
         elseif @active_bonuses[attacker.id] < @duration
             @active_bonuses[attacker.id] = @duration
-        return damage
 
 }
 
@@ -766,8 +762,8 @@ DataW.effect_create {
                 stats = caster\effective_stats()
                 damage, power = 20, random(2,5) + stats.magic
                 power = power + EffectUtils.get_power(caster, "Black")
-                damage = damage * EffectUtils.get_resistance(mon, "Black")
-                if mon\damage(damage, power, 1, caster) then
+                type_multiplier = EffectUtils.get_resistance(mon, "Black")
+                if mon\damage(damage, power, 1, caster, type_multiplier) then
                     {:stats} = caster
                     {:max_hp} = mon\effective_stats()
                     if caster\has_effect("AmuletGreatPain")
@@ -838,7 +834,7 @@ share_damage = (target, damage, min_health) ->
     target.stats.hp -= damage
 
 LAST_WARNING = GameVar.create("LAST_WARNING", -math.huge)
-for name in *{"Ranger", "Fighter", "Rogue", "Green Mage", "Black Mage", "Necromancer", "White Mage", "Red Mage", "Blue Mage", "Lifelinker"}
+for name in *{"Ranger", "Fighter", "Rogue", "Green Mage", "Black Mage", "Necromancer", "White Mage", "Red Mage", "Blue Mage"}
     DataW.effect_create {
         :name
         stat_func: (obj, old, new) =>
@@ -871,30 +867,18 @@ for name in *{"Ranger", "Fighter", "Rogue", "Green Mage", "Black Mage", "Necroma
                                 EventLog.add("You gain mana from the carnage!", COL_PALE_BLUE)
                         instance\heal_mp(2)
                 @kill_tracker += 1
-        on_damage_func: (caster, damage) =>
-            new_links = {}
-            for link in *@links
-                if link.destroyed
-                    continue
-                append new_links, link
-                share_damage(link, damage, 5)
-                for _ in screens()
-                    if caster\is_local_player()
-                        EventLog.add("Your link feels your pain!", COL_PALE_RED)
-            @links = new_links
             if GameState.frame > LAST_WARNING\get() + 100 and not caster.is_ghost
                 low_num = 50
                 if name == "Necromancer"
                     low_num = 30
-                if caster.stats.hp - damage <= low_num or caster.stats.hp - damage <= caster\effective_stats().max_hp * 0.1
+                if caster.stats.hp <= low_num or caster.stats.hp <= caster\effective_stats().max_hp * 0.1
                     LAST_WARNING\set GameState.frame
                     play_sound "sound/allyislow1c.ogg"
-            return damage
-        on_receive_melee_func: (attacker, defender, damage) =>
+        on_receive_damage_func: (attacker, caster, damage) =>
             if name == "Necromancer"
-                attacker\direct_damage(damage * 0.33, defender)
+                attacker\direct_damage(damage * 0.33, caster)
                 for _ in screens()
-                    if defender\is_local_player()
+                    if caster\is_local_player()
                         EventLog.add("Your corrosive flesh hurts #{attacker.name} as you are hit!", COL_PALE_BLUE)
             return damage
     }
@@ -914,10 +898,9 @@ DataW.effect_create {
     step_func: (caster) =>
         @steps += 1
         -- Move forward: 
-        xy = {
-            caster.x + math.cos(@angle) * 16
-            caster.y + math.sin(@angle) * 16
-        }
+        dir = {math.cos(@angle) * 16, math.sin(@angle) * 16}
+        dir = GameObject.simulate_bounce(caster, dir)
+        xy = {caster.x + dir[1], caster.y + dir[2]}
         if Map.object_tile_check(caster, xy)
             play_sound "sound/door.ogg"
             caster\remove_effect "Dash Attack"
@@ -948,25 +931,9 @@ DataW.effect_create {
     stat_func: (caster, old, new) =>
         new.speed = 0
         caster.stats.attack_cooldown = 2
-        -- new.strength += 2
-        -- new.defence += 5
-        -- new.willpower += 5
-}
-
-DataW.effect_create {
-    name: "Lifelink"
-    init_func: (summon) =>
-        @linker = false
-    on_damage_func: (summon, damage) =>
-        assert @linker, "No linker set in lifelink!"
-        {:links} = @linker\get_effect("Lifelinker")
-        share_damage(@linker, damage, 15) -- Cannot bring below 15HP
-        for _ in screens()
-            if @linker\is_local_player()
-                EventLog.add("You feel your links pain!", COL_PALE_RED)
-        for link in *links do if link ~= summon
-            share_damage(link, damage, 5) -- Cannot bring below 5HP
-        return damage
+        new.strength += 2
+        new.defence += 5
+        new.willpower += 5
 }
 
 enemy_init = (enemy) -> nil
@@ -988,7 +955,7 @@ DataW.effect_create {
         @damage_tracker = 0
         @damage_interval = mon.stats.max_hp / 3
         @next_hp_threshold = mon.stats.max_hp - @damage_interval
-    on_damage_func: (mon, dmg) =>
+    on_receive_damage_func: (mon, dmg) =>
         @damage_tracker += dmg
         new_hp = mon.stats.hp - dmg
         if new_hp < @next_hp_threshold

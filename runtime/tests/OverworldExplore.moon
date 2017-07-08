@@ -24,8 +24,8 @@ PROGRESSION = () ->
     fs = {}
     init = () ->
         for item, attributes in pairs items
-            if attributes.is_randart
-                continue -- TODO test all these much later. mostly boring effects
+            --if attributes.is_randart
+            --    continue -- TODO test all these much later. mostly boring effects
             if attributes.spr_item == 'none' -- Not meant to be picked up
                 continue
             append fs, () ->
@@ -257,6 +257,9 @@ M.create_player = () -> nilprotect {
                         --@simulate 'i'
                 elseif player.class_name == 'Fighter'
                     @input_source\set("should_use_weapon", true)
+                else
+                    @input_source\set("use_spell_slot", @_rng\random(0, 4))
+
                 return true
         return false
 

@@ -675,6 +675,7 @@ DataW.enemy_create {
                 eff = target\add_effect "Poison", {
                     time_left: 100
                     poison_rate: 25
+                    attacker: @caster
                     damage: 30
                     power: @caster\effective_stats().strength 
                     magic_percentage: 0
@@ -713,6 +714,7 @@ DataW.enemy_create {
                 eff = target\add_effect "Poison", {
                     time_left: 100
                     poison_rate: 25
+                    attacker: @caster
                     damage: 30
                     power: @caster\effective_stats().strength 
                     magic_percentage: 0

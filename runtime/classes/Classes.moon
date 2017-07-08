@@ -96,13 +96,13 @@ Data.class_create {
     }
 }
 
-rogue_spells = {}
-for _, v in ipairs(os.getenv("ROGUE_SPELLS")\split ",")
-    append(rogue_spells, {spell: v, level_needed: 1})
 Data.class_create {
     name: "Rogue",
     sprites: (for i=1,2 do "spr_classes.rogue#{i}"),
-    available_spells: rogue_spells,
+    available_spells: {
+        { spell: "Dash Attack", level_needed: 1 },
+--        { spell: "Hide in Sight", level_needed: 1 },
+    },
     start_stats: {
         movespeed: 4,
         hp: 100,

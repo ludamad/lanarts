@@ -55,8 +55,8 @@ public:
 	void update_position();
 	virtual void update_position(float newx, float newy);
 
-	virtual bool damage(GameState* gs, float dmg, CombatGameInst* attacker = NULL);
-	bool damage(GameState* gs, const EffectiveAttackStats& attack, CombatGameInst* attacker = NULL);
+	virtual bool damage(GameState* gs, float dmg, CombatGameInst* attacker);
+	bool damage(GameState* gs, const EffectiveAttackStats& attack, CombatGameInst* attacker = NULL, float* final_dmg = NULL);
 	virtual bool melee_attack(GameState* gs, CombatGameInst* inst,
 			const Weapon& weapon, bool ignore_cooldowns = false, 
                         float damage_multiplier = 1.0f);

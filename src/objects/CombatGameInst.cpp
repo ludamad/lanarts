@@ -59,11 +59,6 @@ bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker
     gs->set_level(gs->get_level(current_floor));
     event_log("CombatGameInst::damage: id %d took %.2f dmg\n", id, fdmg);
 
-    for (Effect& eff : effects.effects) {
-        if (eff.is_active()) {
-            fdmg = lcall_def(/*def:*/ fdmg, /*func:*/ eff.entry().on_damage_func, /*args:*/ eff.state, this, fdmg);
-        }
-    }
     int dmg = random_round(gs->rng(), fdmg);
     if (dmg == 0) {
         return false; // Do nothing if damage is 0
@@ -225,15 +220,31 @@ Pos CombatGameInst::direction_towards_object(GameState* gs, col_filterf filter) 
     return {dx, dy};
 }
 
-bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack, CombatGameInst* attacker) {
+bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attack, CombatGameInst* attacker, float* final_dmg) {
+    lua_push_effectiveattackstats(gs->luastate(), raw_attack);
+    LuaStackValue eff_atk_stats(gs->luastate(), -1);
+    if (attacker != NULL) {
+        for (Effect& eff : effects.effects) {
+            if (eff.is_active()) {
+                lcall(/*func:*/ eff.entry().raw_lua_object["on_defend_func"], /*args:*/ eff.state, attacker, this, eff_atk_stats);
+            }
+        }
+        for (Effect &eff : attacker->effects.effects) {
+            if (eff.is_active()) {
+                lcall(/*func:*/ eff.entry().raw_lua_object["on_attack_func"], /*args:*/ eff.state, attacker, this, eff_atk_stats);
+            }
+        }
+    }
+    EffectiveAttackStats attack = lua_pop_effectiveattackstats(gs->luastate());
+
     event_log("CombatGameInst::damage: id %d getting hit by {cooldown = %d, "
-            "damage=%.2f, power=%.2f, magic_percentage=%f, physical_percentage=%f}",
-            id, attack.cooldown, attack.damage, attack.power,
-            attack.magic_percentage, 
-            attack.physical_percentage());
+                      "damage=%.2f, power=%.2f, magic_percentage=%f, physical_percentage=%f}",
+              id, attack.cooldown, attack.damage, attack.power,
+              attack.magic_percentage,
+              attack.physical_percentage());
 
     float fdmg = damage_formula(attack, effective_stats());
-    if (gs->game_settings().verbose_output) {
+    //if (gs->game_settings().verbose_output) {
         char buff[100];
         snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%] -> Damage: %.2f",
                 attack.damage, attack.power, int(attack.magic_percentage * 100),
@@ -242,8 +253,48 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack, C
             gs->game_chat().add_message(buff);
         });
 
+    if (attack.type_multiplier != 1.0) {
+        if (attack.type_multiplier < 0.05) {
+            gs->add_instance(
+                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Immune!",
+                                     attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
+        }
+        else if (attack.type_multiplier < 0.3) {
+            gs->add_instance(
+                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Very ineffective!",
+                                     attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
+        }
+        else if (attack.type_multiplier < 0.8) {
+            gs->add_instance(
+                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Ineffective!",
+                                     attack.type_multiplier < 1 ? COL_PALE_RED : COL_GREEN));
+        } else if (attack.type_multiplier < 1.5) {
+            gs->add_instance(
+                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Effective!",
+                                     COL_PALE_GREEN));
+        } else if (attack.type_multiplier < 1.9) {
+            gs->add_instance(
+                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Very Effective!",
+                                     attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
+        } else {
+            gs->add_instance(
+                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Super Effective!",
+                                     attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
+        }
     }
 
+    //}
+
+//    for (Effect &eff : effects.effects) {
+//        if (eff.is_active()) {
+//            fdmg = lcall_def(fdmg, /*func:*/ eff.entry().raw_lua_object["on_receive_damage_func"], /*args:*/ eff.state, attacker, this, fdmg);
+//        }
+//    }
+//    for (Effect &eff : attacker->effects.effects) {
+//        if (eff.is_active()) {
+//            fdmg = lcall_def(fdmg, /*func:*/ eff.entry().raw_lua_object["on_deal_damage_func"], /*args:*/ eff.state, attacker, this, fdmg);
+//        }
+//    }
     return damage(gs, fdmg, attacker);
 }
 
@@ -338,12 +389,12 @@ void CombatGameInst::post_draw(GameState *gs) {
     }
 }
 
-float lua_hit_callback(lua_State* L, LuaValue& callback,
-                            const EffectiveAttackStats& atkstats, float damage, GameInst* obj,
-                            GameInst* target); // Defined in ProjectileInst.cpp TODO organize better
+EffectiveAttackStats lua_hit_callback(LuaValue& callback,
+                                      const EffectiveAttackStats& atkstats, GameInst* obj,
+                                      GameInst* target);
 
-void lua_attack_stats_callback(lua_State* L, LuaValue& callback,
-		EffectiveAttackStats& atkstats, GameInst* obj, GameInst* target);
+EffectiveAttackStats lua_attack_stats_callback(lua_State* L, LuaValue& callback,
+                                               const EffectiveAttackStats& atkstats, GameInst* obj, GameInst* target);
 
 bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
         const Item& weapon, bool ignore_cooldowns, float damage_multiplier) {
@@ -358,19 +409,16 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     AttackStats attack(weapon);
     EffectiveAttackStats atkstats = effective_atk_stats(mt,
             AttackStats(weapon));
+    atkstats.damage *= damage_multiplier;
 
     // Modify the attack stat function:
-    lua_attack_stats_callback(gs->luastate(), weapon.weapon_entry().attack_stat_func, atkstats, this, inst); 
-    float damage = damage_formula(atkstats, inst->effective_stats()) * damage_multiplier;
-
-    damage = lua_hit_callback(gs->luastate(),
-                              weapon.weapon_entry().action_func().get(gs->luastate()),
-                              atkstats, damage, this, inst);
+    atkstats = lua_attack_stats_callback(gs->luastate(), weapon.weapon_entry().attack_stat_func, atkstats, this, inst);
+    atkstats = lua_hit_callback(weapon.weapon_entry().action_func().get(gs->luastate()),
+                                atkstats, this, inst);
     if (gs->game_settings().verbose_output) {
         char buff[100];
-        snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%] -> Damage: %f",
-                atkstats.damage, atkstats.power, int(atkstats.magic_percentage * 100),
-                damage);
+        snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%]",
+                atkstats.damage, atkstats.power, int(atkstats.magic_percentage * 100));
         gs->for_screens([&](){
             gs->game_chat().add_message(buff);
         });
@@ -385,21 +433,20 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
         });
     }
 
-    // Callbacks on attacker object:
+    float final_dmg = 0;
+    isdead = inst->damage(gs, atkstats, this, &final_dmg);
+
+    LuaStackValue eff_atk_stats(gs->luastate(), -1);
     for (Effect& eff : effects.effects) {
         if (eff.is_active()) {
-            damage = lcall_def(/*def:*/ damage, /*func:*/ eff.entry().on_melee_func, /*args:*/ eff.state, this, inst, damage);
+            lcall(/*func:*/ eff.entry().on_melee_func, /*args:*/ eff.state, this, inst, final_dmg);
         }
     }
-    
-    // Callbacks on attacked object:
-    for (Effect& eff : inst->effects.effects) {
+    for (Effect &eff : inst->effects.effects) {
         if (eff.is_active()) {
-            damage = lcall_def(/*def:*/ damage, /*func:*/ eff.entry().on_receive_melee_func, /*args:*/ eff.state, this, inst, damage);
+            lcall(/*func:*/ eff.entry().on_receive_melee_func, /*args:*/ eff.state, this, inst, final_dmg);
         }
     }
-
-    isdead = inst->damage(gs, int(damage));
 
     if (!ignore_cooldowns) {
         cooldowns().reset_action_cooldown(

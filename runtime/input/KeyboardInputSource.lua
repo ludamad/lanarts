@@ -129,9 +129,9 @@ function KeyboardInputSource:handle_enemy_info()
 end
 
 
-function KeyboardInputSource:poll_input()
+function KeyboardInputSource:sell_mode(...) 
+    return false
 end
-
 function KeyboardInputSource:draw_item_ui_hint(...) -- TODO
 end
 

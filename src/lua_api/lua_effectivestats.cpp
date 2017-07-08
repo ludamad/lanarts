@@ -176,10 +176,32 @@ void lua_push_effectiveattackstats(lua_State* L,
 	lua_setfield(L, tableidx, "damage");
 	lua_pushnumber(L, stats.power);
 	lua_setfield(L, tableidx, "power");
+	lua_pushnumber(L, stats.cooldown);
+	lua_setfield(L, tableidx, "cooldown");
 	lua_pushnumber(L, stats.magic_percentage);
 	lua_setfield(L, tableidx, "magic_percentage");
 	lua_pushnumber(L, 1.0 - stats.magic_percentage);
 	lua_setfield(L, tableidx, "physical_percentage");
+	lua_pushnumber(L, stats.type_multiplier);
+	lua_setfield(L, tableidx, "type_multiplier");
+	lua_pushnumber(L, stats.vx);
+	lua_setfield(L, tableidx, "vx");
+	lua_pushnumber(L, stats.vy);
+	lua_setfield(L, tableidx, "vy");
+}
+
+EffectiveAttackStats lua_pop_effectiveattackstats(lua_State *L) {
+	EffectiveAttackStats stats;
+	LuaStackValue value(L, -1);
+	stats.damage = value["damage"].to_num();
+	stats.power = value["power"].to_num();
+	stats.cooldown = value["cooldown"].to_num();
+	stats.magic_percentage = value["magic_percentage"].to_num();
+	stats.type_multiplier = value["type_multiplier"].to_num();
+	stats.vx = value["vx"].to_num();
+	stats.vy = value["vy"].to_num();
+	lua_pop(L, 1);
+	return stats;
 }
 EffectiveStats& lua_get_effectivestats(lua_State* L, int idx) {
 	return *lunar_t::check(L, idx)->get_stats(L);

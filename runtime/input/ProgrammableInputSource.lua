@@ -71,4 +71,51 @@ function ProgrammableInputSource:handle_store(try_buy_slot)
 end
 function ProgrammableInputSource:poll_input()
 end
+
+function ProgrammableInputSource:slot_highlighted()
+    return -1
+end
+
+function ProgrammableInputSource:slot_selected()
+    return -1
+end
+
+
+function ProgrammableInputSource:handle_store(try_buy_item)
+end
+
+
+function ProgrammableInputSource:handle_inventory()
+end
+
+function ProgrammableInputSource:handle_sidebar(switch_left, switch_right)
+end
+
+function ProgrammableInputSource:handle_spells()
+end
+
+
+function ProgrammableInputSource:sell_mode(...) 
+    return false
+end
+function ProgrammableInputSource:handle_store(...)
+     -- TODO
+end
+
+function ProgrammableInputSource:handle_enemy_info()
+end
+
+
+function ProgrammableInputSource:draw_item_ui_hint(...) -- TODO
+end
+
+function ProgrammableInputSource:draw_spell_ui_hint(...) -- TODO
+end
+
+function ProgrammableInputSource:draw_action_bar_weapon_hint(...) -- TODO
+end
+function ProgrammableInputSource:draw_action_bar_spell_hint(...) -- TODO
+end
+
+
 return ProgrammableInputSource

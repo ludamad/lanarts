@@ -174,6 +174,7 @@ static int lapi_combatgameinst_damage(lua_State* L) {
 	attack.power = lua_tonumber(L, 3);
 	attack.magic_percentage = nargs >= 4 ? lua_tonumber(L, 4) : 1.0f;
 	CombatGameInst* attacker = nargs >= 5 ? luawrap::get<CombatGameInst*>(L, 5) : NULL;
+	attack.type_multiplier = nargs >= 6 ? lua_tonumber(L, 6) : 1.0f;
 
 	bool died = (luawrap::get<CombatGameInst*>(L, 1)->damage(lua_api::gamestate(L), attack, attacker));
 	lua_pushboolean(L, died);
@@ -222,7 +223,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
     LUAWRAP_METHOD(methods, heal_fully, OBJ->stats().core.heal_fully());
     LUAWRAP_METHOD(methods, gain_xp_from, OBJ->gain_xp_from(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2)));
 	LUAWRAP_GETTER(getters, can_rest, OBJ->cooldowns().can_rest());
-	LUAWRAP_METHOD(methods, direct_damage, OBJ->damage(lua_api::gamestate(L), lua_tointeger(L, 2), luawrap::get<CombatGameInst*>(L, 3)));
+	LUAWRAP_METHOD(methods, direct_damage, OBJ->damage(lua_api::gamestate(L), lua_tointeger(L, 2), lua_gettop(L) < 3 ? NULL : luawrap::get<CombatGameInst*>(L, 3)));
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true,
             // Damage multiplier:
             luawrap::get_defaulted(L, 3, 1.0f))) );
@@ -787,6 +788,30 @@ namespace lua_api {
 		submodule["enemy_create"].bind_function(enemy_create);
 		submodule["object_create"].bind_function(object_create);
 		submodule["feature_create"].bind_function(feature_create);
+		submodule["simulate_bounce"] = [L](GameInst* inst, PosF dir) -> PosF {
+            GameState* gs = lua_api::gamestate(L);
+            auto* old_level = gs->get_level();
+            gs->set_level(inst->get_map(gs));
+			int newx = (int) round(inst->x + dir.x); //update based on rounding of true float
+			int newy = (int) round(inst->y + dir.y);
+			bool collides = gs->tile_radius_test(newx, newy, inst->radius);
+			bool hitsx = gs->tile_radius_test(newx, dir.y, inst->radius);
+			bool hitsy = gs->tile_radius_test(dir.x, newy, inst->radius);
+			if (hitsy || hitsx || collides) {
+				if (hitsx) {
+					dir.x = -dir.x;
+				}
+				if (hitsy) {
+					dir.y = -dir.y;
+				}
+				if (!hitsy && !hitsx) {
+					dir.x = -dir.x;
+					dir.y = -dir.y;
+				}
+			};
+            gs->set_level(old_level);
+			return dir;
+		};
 		submodule["item_create"].bind_function(item_create);
 		submodule["animation_create"].bind_function(animation_create);
 		submodule["store_create"].bind_function(store_create);

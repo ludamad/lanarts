@@ -100,6 +100,7 @@ void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst);
 void lua_push_effectivestats(lua_State* L, GameInst* inst);
 void lua_push_effectivestats(lua_State* L, const EffectiveStats& stats);
 void lua_push_effectiveattackstats(lua_State* L, const EffectiveAttackStats& stats);
+EffectiveAttackStats lua_pop_effectiveattackstats(lua_State *L);
 EffectiveStats& lua_get_effectivestats(lua_State* L, int idx);
 
 void lua_spelltarget_bindings(lua_State* L);

@@ -100,9 +100,9 @@ add_on_hit_func = (args, f1) ->
     if f2 == nil 
         args.on_hit_func = f1
     else
-        args.on_hit_func = (obj, target, atkstats, damage) -> 
-            damage = f1(obj, target, atkstats, damage) or damage
-            return f2(obj, target, atkstats, damage)
+        args.on_hit_func = (obj, target, atkstats) -> 
+            f1(obj, target, atkstats)
+            f2(obj, target, atkstats)
 
 add_attack_stat_func = (args, f1) ->
     f2 = args.attack_stat_func
@@ -125,10 +125,9 @@ add_cooldown_multiplier = (args, f1) ->
 add_types = (args, types) ->
     for type in *types
         assert table.contains(EffectUtils.TYPES, type), "Invalid type!"
-        add_on_hit_func args, (obj, target, atkstats, damage) ->
-            return damage * EffectUtils.get_resistance(target, type)
-        add_attack_stat_func args, (obj, target, atkstats) ->
+        add_on_hit_func args, (obj, target, atkstats) ->
             atkstats.power += EffectUtils.get_power(obj, type)
+            atkstats.type_multiplier *= EffectUtils.get_resistance(target, type)
 
 power_effects = (powers, effects = {}) ->
     for type, power in pairs powers

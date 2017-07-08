@@ -224,16 +224,18 @@ bool GameChat::handle_special_commands(GameState* gs,
 
 	//Kill all monsters
 	if (starts_with(command, "!killall", &content)) {
+		int stash = gs->screens.stash_screen();
 		MonsterController& mc = gs->monster_controller();
 		for (int i = 0; i < mc.monster_ids().size(); i++) {
 			EnemyInst* inst = (EnemyInst*)gs->get_instance(mc.monster_ids()[i]);
 			if (inst) {
-				inst->damage(gs, 99999);
+				inst->damage(gs, 99999, NULL);
 			}
 		}
 		printed.message = "Killed all monsters.";
 		printed.message_colour = Colour(50, 255, 50);
 		add_message(printed);
+		gs->screens.unstash_screen(stash);
 		return true;
 	}
 

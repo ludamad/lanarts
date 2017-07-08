@@ -74,10 +74,14 @@ IOState = newtype {
         @left_axis_dir = lanarts_skew @left_axis_dir
         @right_axis_dir = lanarts_skew @right_axis_dir
         
-        --@pressed.X = not @held.X and (Gamepad.axis_right_y(@id) > 0.2)
-        --@held.X = (Gamepad.axis_right_y(@id) > 0.2)
-        --@pressed.X = not @held.X and (Gamepad.axis_right_y(@id) < -0.2)
-        --@held.X = (Gamepad.axis_right_y(@id) < -0.2)
+        @pressed.right_axis_down = not @held.right_axis_down and (Gamepad.axis_right_y(@id) > 0.2)
+        @held.right_axis_down = (Gamepad.axis_right_y(@id) > 0.2)
+        @pressed.right_axis_up = not @held.right_axis_up and (Gamepad.axis_right_y(@id) < -0.2)
+        @held.right_axis_up = (Gamepad.axis_right_y(@id) < -0.2)
+        @pressed.right_axis_right = not @held.right_axis_right and (Gamepad.axis_right_x(@id) > 0.2)
+        @held.right_axis_right = (Gamepad.axis_right_x(@id) > 0.2)
+        @pressed.right_axis_left = not @held.right_axis_left and (Gamepad.axis_right_x(@id) < -0.2)
+        @held.right_axis_left = (Gamepad.axis_right_x(@id) < -0.2)
         
     is_held: (s) => return @held[s] or false
     is_pressed: (s) => return @pressed[s] or false

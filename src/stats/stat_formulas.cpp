@@ -38,7 +38,7 @@ static float damage_multiplier(float power, float resistance) {
 // Now, there is just a base damage, and a multiplier based on the defenders resistance and the attacker's power.
 // This is later multiplied by type resistances / strengths.
 static float basic_damage_formula(const EffectiveAttackStats& attacker, float resistance) {
-	float mult = damage_multiplier(attacker.power, resistance);
+	float mult = damage_multiplier(attacker.power, resistance) * attacker.type_multiplier;
 	float result = attacker.damage * mult;
 	event_log("basic_damage_formula: mult=%f, damage=%f defence=%f result=%f\n",
 			mult, attacker.damage, resistance, result);
@@ -67,6 +67,7 @@ float damage_formula(const EffectiveAttackStats& attacker,
 			defender.core.defence,
 			defender.core.willpower);
 	event_log("damage_formula: mdmg=%f, pdmg=%f\n", mdmg, pdmg);
+	event_log("damage_formula: type modifier=%f\n", attacker.type_multiplier);
 
 	return mdmg * attacker.magic_percentage
 			+ pdmg * attacker.physical_percentage();

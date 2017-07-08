@@ -72,6 +72,15 @@ struct GameScreenSet {
     void serialize(GameState* gs, SerializeBuffer& serializer);
     void deserialize(GameState* gs, SerializeBuffer& serializer);
 
+    int stash_screen() {
+        int stash = current_screen;
+        current_screen = -1;
+        return stash;
+    }
+    void unstash_screen(int stash) {
+        LANARTS_ASSERT(current_screen == -1);
+        current_screen = stash;
+    }
 private:
     int current_screen = -1;
     // For non-drawing purposes:

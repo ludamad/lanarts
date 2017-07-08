@@ -120,11 +120,10 @@ void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 //	ai_state.deserialize(gs, serializer);
 }
 
-bool EnemyInst::damage(GameState* gs, int dmg) {
+bool EnemyInst::damage(GameState* gs, float dmg, CombatGameInst* attacker) {
 	eb.damage_was_taken();
 	enemy_regen_cooloff += dmg;
-
-        return CombatGameInst::damage(gs, dmg);
+	return CombatGameInst::damage(gs, dmg, attacker);
 }
 
 EnemyEntry& EnemyInst::etype() {

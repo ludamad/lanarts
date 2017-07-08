@@ -309,7 +309,7 @@ DataW.spell_create {
     fallback_to_melee: true
     spell_cooldown: 10
     action_func: (x, y) =>
-        effect = @add_effect "Dash Attack", 20
+        effect = @add_effect "Dash Attack", 40
         effect.angle = vector_direction(@xy, {x,y})
         for _ in screens()
             if @is_local_player()
