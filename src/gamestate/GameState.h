@@ -77,6 +77,7 @@ private:
         level_id current_floor;
         obj_id id;
     };
+	bool accepting_data = true;
     // Used to determine what to fix-up after serialization:
     std::vector<GameInstPostSerializeData> postponed_insts;
 	std::vector<GameInst**> inst_to_deserialize;

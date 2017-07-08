@@ -792,13 +792,16 @@ void GameStatePostSerializeData::clear() {
     postponed_insts.clear();
     inst_to_deserialize.clear();
     inst_to_serialize.clear();
+    accepting_data = true;
 }
 
 void GameStatePostSerializeData::postpone_instance_deserialization(GameInst** holder, level_id current_floor, obj_id id) {
+    LANARTS_ASSERT(accepting_data);
     postponed_insts.push_back({holder, current_floor, id});
 }
 
 void GameStatePostSerializeData::process(GameState* gs) {
+    accepting_data = false;
     for (GameInstPostSerializeData& e : postponed_insts) {
         GameInst* inst = gs->get_level(e.current_floor)->game_inst_set().get_instance(e.id);
         if (inst == NULL) {
@@ -818,6 +821,7 @@ void GameStatePostSerializeData::process(GameState* gs) {
 }
 
 void GameStatePostSerializeData::deserialize(SerializeBuffer &sb) {
+    accepting_data = false;
     for (GameInst** ptr : inst_to_deserialize) {
         InstType type;
         int id;
@@ -837,6 +841,7 @@ void GameStatePostSerializeData::deserialize(SerializeBuffer &sb) {
 }
 
 void GameStatePostSerializeData::serialize(SerializeBuffer &sb) {
+    accepting_data = false;
     for (GameInst* inst : inst_to_serialize) {
         sb.write_int(get_inst_type(inst));
         sb.write_int(inst->id);
@@ -848,9 +853,11 @@ void GameStatePostSerializeData::serialize(SerializeBuffer &sb) {
 }
 
 void GameStatePostSerializeData::postpone_destroyed_instance_deserialization(GameInst **holder) {
+    LANARTS_ASSERT(accepting_data);
     inst_to_deserialize.push_back(holder);
 }
 
 void GameStatePostSerializeData::postpone_destroyed_instance_serialization(GameInst *inst) {
+    LANARTS_ASSERT(accepting_data);
     inst_to_serialize.push_back(inst);
 }
