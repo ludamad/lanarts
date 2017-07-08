@@ -44,7 +44,10 @@ static void draw_enemies_seen(GameState* gs, EnemiesSeen& es, const BBox& bbox,
 				}
 				if (slot_highlighted == slot) {
 					ldraw::draw_rectangle_outline(COL_PALE_GREEN, slotbox);
+				} else {
+					ldraw::draw_rectangle_outline(COL_UNFILLED_OUTLINE, slotbox);
 				}
+                slot++;
 				continue;
 			}
 

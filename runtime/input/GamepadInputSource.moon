@@ -7,6 +7,8 @@ lanarts_skew = (dir) ->
     {x, y} = dir
     mx = math.max(math.abs(x), math.abs(y))
     mag = math.min(1, math.sqrt(x*x + y*y))
+    if mag >= 0.89
+        mag = 1 -- Round up
     if mx == 0
         mx = 1
     x, y = x / mx * mag, y / mx * mag
@@ -73,7 +75,7 @@ IOState = newtype {
         -- Lanarts sauce -- because we're evil, make 1 in both directions consider 1 total distance
         @left_axis_dir = lanarts_skew @left_axis_dir
         @right_axis_dir = lanarts_skew @right_axis_dir
-        
+
         @pressed.right_axis_down = not @held.right_axis_down and (Gamepad.axis_right_y(@id) > 0.2)
         @held.right_axis_down = (Gamepad.axis_right_y(@id) > 0.2)
         @pressed.right_axis_up = not @held.right_axis_up and (Gamepad.axis_right_y(@id) < -0.2)
