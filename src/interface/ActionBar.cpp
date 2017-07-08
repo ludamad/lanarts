@@ -183,7 +183,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		gs->font().drawf(Colour(255, 255, 255), Pos(x + TILE_SIZE + 1, y + 1),
 				"%d", player->projectile().amount);
 	}
-    lmeth(player->input_source().value, "draw_weapon_ui_hint", Pos {x,y});
+    lmeth(player->input_source().value, "draw_action_bar_weapon_hint", Pos {x,y});
 
 	ldraw::draw_rectangle_outline(outline_col, equipbox);
 }
@@ -199,7 +199,7 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 
 	for (int i = 0; i < spell_n; i++) {
         Pos xy {sx + i * TILE_SIZE, sy};
-        lmeth(player->input_source().value, "draw_spell_ui_hint", xy, i);
+        lmeth(player->input_source().value, "draw_action_bar_spell_hint", xy, i);
 		spell_id spell = spells.get(i);
 		SpellEntry& spl_entry = res::spell(spell);
 		SpriteEntry& spr_entry = game_sprite_data.get(spl_entry.sprite);
@@ -245,11 +245,6 @@ void ActionBar::draw(GameState* gs) const {
 	perf_timer_begin(FUNCNAME);
 	PlayerInst* player = gs->local_player();
 
-    res::sprite("spr_gamepad.xbox_right_shoulder").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1, bbox.y1 - 32});
-    res::sprite("spr_gamepad.xbox_xbutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 64, bbox.y1 - 32});
-    res::sprite("spr_gamepad.xbox_ybutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 96, bbox.y1 - 32});
-    res::sprite("spr_gamepad.xbox_bbutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 128, bbox.y1 - 32});
-    res::sprite("spr_gamepad.xbox_abutton").draw(ldraw::DrawOptions().colour({255,255,255, 100}), {bbox.x1 + 128 + 32, bbox.y1 - 32});
 	draw_player_weapon_actionbar(gs, player, bbox.x1, bbox.y1);
 	draw_player_spell_actionbar(gs, player,
 			BBox(bbox.x1 + EQUIP_SLOT_WIDTH, bbox.y1, bbox.x2, bbox.y2));

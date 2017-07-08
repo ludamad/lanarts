@@ -38,7 +38,7 @@ public:
 
 private:
 	enum view_t {
-		INVENTORY, SPELLS, EQUIPMENT, STATS, ENEMIES, CONFIG
+		INVENTORY, SPELLS, ENEMIES, CONFIG
 	};
 	struct NavigationOption {
 		NavigationOption(const std::string& icon, std::shared_ptr<SidebarContent> content,
@@ -58,7 +58,7 @@ private:
 	BBox side_bar, main_content;
 	view_t view;
 	SidebarContent* content_overlay;
-	NavigationOption inventory, equipment, spells, enemies, config;
+	NavigationOption inventory, spells, enemies, config;
 };
 
 #endif /* SIDEBARNAVIGATOR_H_ */

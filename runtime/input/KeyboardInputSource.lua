@@ -1,8 +1,6 @@
 local KeyboardInputSource = newtype()
 
-local Gamepad = require "core.Gamepad"
 local Keys = require "core.Keyboard"
-local GameActions = require "core.GameActions"
 local GameState = require "core.GameState"
 
 function KeyboardInputSource:init(player)
@@ -35,6 +33,9 @@ function KeyboardInputSource:move_direction()
     return dir
 end
 
+function KeyboardInputSource:sell_mode()
+    return false -- TODO check for ctrl and unhardcode in C++
+end
 function KeyboardInputSource:should_explore()
     return held "e"
 end
@@ -104,11 +105,43 @@ function KeyboardInputSource:slot_selected()
 end
 
 
-function GamepadInputSource:handle_store(try_buy_item)
+function KeyboardInputSource:handle_store(try_buy_item)
 end
 
 
 function KeyboardInputSource:handle_inventory()
 end
+
+function KeyboardInputSource:handle_sidebar(switch_left, switch_right)
+    if pressed "PAGE_UP" then switch_left() end
+    if pressed "PAGE_DOWN" then switch_right() end
+end
+
+function KeyboardInputSource:handle_spells()
+end
+
+
+function KeyboardInputSource:handle_store(...)
+     -- TODO
+end
+
+function KeyboardInputSource:handle_enemy_info()
+end
+
+
+function KeyboardInputSource:poll_input()
+end
+
+function KeyboardInputSource:draw_item_ui_hint(...) -- TODO
+end
+
+function KeyboardInputSource:draw_spell_ui_hint(...) -- TODO
+end
+
+function KeyboardInputSource:draw_action_bar_weapon_hint(...) -- TODO
+end
+function KeyboardInputSource:draw_action_bar_spell_hint(...) -- TODO
+end
+
 
 return KeyboardInputSource

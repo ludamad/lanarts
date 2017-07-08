@@ -53,23 +53,21 @@ static BBox icon_bounds(const BBox& main_content_bounds, int icon_n,
 	return BBox(icon_x, icon_sy, icon_x + TILE_SIZE, icon_sy + TILE_SIZE);
 }
 
-const int NUM_ICONS_ROW_1 = 3;
-const int NUM_ICONS_ROW_2 = 2;
+const int NUM_ICONS_ROW_1 = 4;
+const int NUM_ICONS_ROW_2 = 0;
 
 SidebarNavigator::SidebarNavigator(const BBox& sidebar_bounds,
 		const BBox& main_content_bounds) :
 		side_bar(sidebar_bounds), main_content(main_content_bounds), view(
 				INVENTORY), content_overlay(NULL), inventory("inventory_icon",
 				std::make_shared<InventoryContent>(main_content_bounds),
-				icon_bounds(main_content_bounds, 0, NUM_ICONS_ROW_1)), equipment(
-				"equipment_icon", std::make_shared<EquipmentContent>(main_content_bounds),
-				icon_bounds(main_content_bounds, 1, NUM_ICONS_ROW_1)), spells(
+				icon_bounds(main_content_bounds, 0, NUM_ICONS_ROW_1)), spells(
 				"spells_icon", std::make_shared<SpellsContent>(main_content_bounds),
-				icon_bounds(main_content_bounds, 2, NUM_ICONS_ROW_1)), enemies(
+				icon_bounds(main_content_bounds, 1, NUM_ICONS_ROW_1)), enemies(
 				"enemies_icon", std::make_shared<EnemiesSeenContent>(main_content_bounds),
-				icon_bounds(main_content_bounds, 0, NUM_ICONS_ROW_2, 1)), config(
+				icon_bounds(main_content_bounds, 2, NUM_ICONS_ROW_1)), config(
 				"config_icon", std::make_shared<ConfigContent>(main_content_bounds),
-				icon_bounds(main_content_bounds, 1, NUM_ICONS_ROW_2, 1)) {
+				icon_bounds(main_content_bounds, 3, NUM_ICONS_ROW_1)) {
 }
 
 SidebarNavigator::~SidebarNavigator() {
@@ -80,7 +78,6 @@ void SidebarNavigator::draw(GameState* gs) {
 		inventory.draw_icon(gs);
 		spells.draw_icon(gs);
 		enemies.draw_icon(gs);
-		equipment.draw_icon(gs);
 		config.draw_icon(gs);
 		current_option().draw_icon(gs, true);
 	}
@@ -117,10 +114,24 @@ bool SidebarNavigator::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	if (handle_icon_io(gs, inventory, INVENTORY)
 			|| handle_icon_io(gs, spells, SPELLS)
 			|| handle_icon_io(gs, config, CONFIG)
-			|| handle_icon_io(gs, enemies, ENEMIES)
-			|| handle_icon_io(gs, equipment, EQUIPMENT)) {
+			|| handle_icon_io(gs, enemies, ENEMIES)) {
 		return true;
 	}
+	auto switch_menu_left = [&]() {
+		if (view == INVENTORY) {
+			view = CONFIG;
+		} else {
+			view = view_t(view - 1);
+		}
+	};
+	auto switch_menu_right = [&]() {
+		if (view == CONFIG) {
+			view = INVENTORY;
+		} else {
+			view = view_t(view + 1);
+		}
+	};
+	lmeth(gs->lua_input(), "handle_sidebar", switch_menu_left, switch_menu_right);
 	return current_content()->handle_io(gs, queued_actions);
 }
 
@@ -140,8 +151,6 @@ SidebarNavigator::NavigationOption& SidebarNavigator::current_option() {
 		return spells;
 	case ENEMIES:
 		return enemies;
-	case EQUIPMENT:
-		return equipment;
 	case CONFIG:
 		return config;
 	}

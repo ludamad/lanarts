@@ -294,36 +294,24 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
 }
 
 void PlayerInst::enqueue_io_movement_actions(GameState* gs, float& dx, float& dy) {
-//Arrow/wasd movement
-//   if (io_value.move_direction().y < 0) {
-//   	dy -= 1;
-//   }
-//    if (io_value.move_direction().x > 0) {
-//   	dx += 1;
-//   }
-//    if (io_value.move_direction().y > 0) {
-//   	dy += 1;
-//   }
-//    if (io_value.move_direction().x < 0) {
-//   	dx -= 1;
-//   }
-        dx = io_value.move_direction().x;
-        dy = io_value.move_direction().y;
-        bool explore_used = false;
-        if (dx == 0 && dy == 0) {
-            if (io_value.should_explore() && (is_ghost() || !has_visible_monster(gs, this))) {
-                explore_used = true;
-                Pos towards = direction_towards_unexplored(gs);
-                if (towards != Pos{0,0}) {
-                    dx = towards.x;
-                    dy = towards.y;
-                } else {
-                    gs->game_chat().add_message("There is nothing to travel to in sight!", Colour(255, 100, 100));
-                }
-            } else if (io_value.should_explore()) {
-                gs->game_chat().add_message("Deal with the enemy before exploring!", Colour(255, 100, 100));
+    //Arrow/wasd/analog stick movement
+    dx = io_value.move_direction().x;
+    dy = io_value.move_direction().y;
+    bool explore_used = false;
+    if (dx == 0 && dy == 0) {
+        if (io_value.should_explore() && (is_ghost() || !has_visible_monster(gs, this))) {
+            explore_used = true;
+            Pos towards = direction_towards_unexplored(gs);
+            if (towards != Pos{0,0}) {
+                dx = towards.x;
+                dy = towards.y;
+            } else {
+                gs->game_chat().add_message("There is nothing to travel to in sight!", Colour(255, 100, 100));
             }
+        } else if (io_value.should_explore()) {
+            gs->game_chat().add_message("Deal with the enemy before exploring!", Colour(255, 100, 100));
         }
+    }
    if (dx != 0 || dy != 0) {
    	queued_actions.push_back(
    			game_action(gs, this, GameAction::MOVE, 0, dx, dy, explore_used));
@@ -784,44 +772,81 @@ void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
         is_resting = true;
 }
 void PlayerInst::use_move(GameState* gs, const GameAction& action) {
-   perf_timer_begin(FUNCNAME);
+    perf_timer_begin(FUNCNAME);
 
-        // Get the effective move speed:
-   float mag = effective_stats().movespeed;
-   LANARTS_ASSERT(action.use_id2 == 0 || action.use_id2 == 1);
-        if (action.use_id2 == 1) { // Did we use autoexplore?
-            mag = std::min(3.0f, mag); // Autoexplore penalty
+    // Get the effective move speed:
+    float mag = effective_stats().movespeed;
+    LANARTS_ASSERT(action.use_id2 == 0 || action.use_id2 == 1);
+    if (action.use_id2 == 1) { // Did we use autoexplore?
+        mag = std::min(3.0f, mag); // Autoexplore penalty
+    }
+
+    // Get the move direction:
+    float dx = action.action_x, dy = action.action_y;
+    // Multiply by the move speed to get the displacement.
+    // Note that players technically move faster when moving diagonally.
+
+    auto solid = [&](Pos xy) -> bool {
+        if (xy.x < 0 || xy.x >= gs->tiles().tile_width()) {
+            return true;
+        }
+        if (xy.y < 0 || xy.y >= gs->tiles().tile_height()) {
+            return true;
+        }
+        return (*gs->tiles().solidity_map())[xy];
+    };
+    auto configure_dir = [&](float dx, float dy) -> Pos {
+        Pos tile_xy;
+        if (!gs->tile_radius_test(rx + dx, ry + dy, radius, true, -1, &tile_xy)) {
+            return {dx, dy};
         }
 
-        // Get the move direction:
-   float dx = action.action_x, dy = action.action_y;
-        // Multiply by the move speed to get the displacement. 
-        // Note that players technically move faster when moving diagonally.
-   float ddx = dx * mag, ddy = dy * mag;
+        if (fabs(dx) > 0.1 && fabs(dy) > 0.1) {
+            float eff_mag = std::max(fabs(dx), fabs(dy));
+            Pos dir = dx < 0 ? Pos(-eff_mag, 0) : Pos(eff_mag, 0);
+            if (!gs->tile_radius_test(rx + dir.x, ry + dir.y, radius)) {
+                return dir;
+            }
+            dir = dy < 0 ? Pos(0, -eff_mag) : Pos(0, eff_mag);
+            if (!gs->tile_radius_test(rx + dir.x, ry + dir.y, radius)) {
+                return dir;
+            }
+        }
+        // Nothing worked so far, try alternate directions:
+        for (int i = 1; i <= 4 ;i++) {
+            auto clear_in_dir = [&](float dx, float dy) {
+                Pos xy = tile_xy + Pos(dx * i, dy * i);
+                if (!solid(xy) && field_of_view->within_fov(xy.x, xy.y)) {
+                    return true;
+                }
+                return false;
+            };
+            if (fabs(dx) <= 0.1 && clear_in_dir(1, 0)) {
+                return {fabs(dy), 0};
+            }
+            if (fabs(dx) <= 0.1 && clear_in_dir(-1, 0)) {
+                return {-fabs(dy), 0};
+            }
+            if (fabs(dy) <= 0.1 && clear_in_dir(0, -1)) {
+                return {0, -fabs(dx)};
+            }
 
-        Pos newpos(round(rx + ddx), round(ry + ddy));
+            if (fabs(dy) <= 0.1 && clear_in_dir(0, 1)) {
+                return {0, fabs(dx)};
+            }
+        }
+        return {0,0};
+    };
 
-   if (!gs->tile_radius_test(newpos.x, newpos.y, radius)) {
-   	vx = ddx;
-   	vy = ddy;
-   } else if (!gs->tile_radius_test(newpos.x, y, radius)) {
-   	vx = ddx;
-   } else if (!gs->tile_radius_test(x, newpos.y, radius)) {
-   	vy = ddy;
-   } else if (ddx != 0 && ddy != 0) {
-   	//Alternatives in opposite directions for x & y
-   	Pos newpos_alt1(round(vx + ddx), round(vy - ddy));
-   	Pos newpos_alt2(round(vx - ddx), round(vy + ddy));
-   	if (!gs->tile_radius_test(newpos_alt1.x, newpos_alt1.y, radius)) {
-   		vx += ddx;
-   		vy -= ddy;
-   	} else if (!gs->tile_radius_test(newpos_alt2.x, newpos_alt2.y,
-   			radius)) {
-   		vx -= ddx;
-   		vy += ddy;
-   	}
-
-   }
+    Pos direction = configure_dir(action.action_x * mag, action.action_y * mag);
+   	vx = direction.x;
+   	vy = direction.y;
+    if (gs->tile_radius_test(rx + vx, ry, radius)) {
+        vx = 0;
+    }
+    if (gs->tile_radius_test(rx, ry + vy, radius)) {
+        vy = 0;
+    }
 
     if (vx != 0 || vy != 0) {
         _last_moved_direction = PosF(vx, vy);

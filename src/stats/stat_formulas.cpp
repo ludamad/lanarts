@@ -24,13 +24,12 @@ const float POWER_MULTIPLE_INTERVAL = 20.0f;
 
 static float damage_multiplier(float power, float resistance) {
 	float powdiff = power - resistance;
-	if (powdiff < 0) {
-        // TODO try this out
-        return pow(2.0f, powdiff / 12.0f);
-	} else {
-		//100% + 100% * intervals
         float intervals = powdiff / POWER_MULTIPLE_INTERVAL;
-		return 1.0f + intervals;
+	if (powdiff < 0) {
+            return 1.0f / (1.0f - intervals);
+	} else {
+            //100% + 100% * intervals
+            return 1.0f + intervals;
 	}
 }
 

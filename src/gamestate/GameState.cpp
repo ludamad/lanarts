@@ -759,6 +759,10 @@ GameScreen& GameState::get_screen(PlayerInst *player) {
     return screens.get_screen(this, player);
 }
 
+LuaValue& GameState::lua_input() {
+	return local_player()->input_source().value;
+}
+
 static std::map<const char*, lsound::Sound> SOUND_MAP;
 
 void play(lsound::Sound& sound, const char* path) {

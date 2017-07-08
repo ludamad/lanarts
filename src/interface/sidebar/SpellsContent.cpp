@@ -28,31 +28,48 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 	int spellidx = ind_low;
 	int selected_spell = gs->local_player()->spell_selected();
 
+	LuaValue& handler = gs->local_player()->input_source().value;
+	int slot_highlighted = lmethod_call<int>(handler, "slot_highlighted");
 
 	ldraw::draw_rectangle_outline(COL_UNFILLED_OUTLINE, bbox);
-
-	int x = bbox.x1, ex = bbox.x2;
 	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
-		if (spellidx >= spell_n)
-			break;
-
-		spell_id spell = spells.get(spellidx);
-		SpellEntry& spl_entry = res::spell(spell);
-		draw_spell_icon_and_name(gs, spl_entry, Colour(), x, y);
-
-		LuaValue& handler = gs->local_player()->input_source().value;
-		lmeth(handler, "draw_spell_ui_hint", Pos {x, y}, itemslot);
-		BBox entry_box(x, y, ex, y + TILE_SIZE);
-		Colour bbox_col = COL_FILLED_OUTLINE;
-		if (spellidx == selected_spell) {
-			bbox_col = COL_WHITE;
+		for (int x = bbox.x1; x < bbox.x2; x += TILE_SIZE) {
+			bool dummy_slot = (spellidx >= spell_n);
+			if (spellidx >= 40) {
+				break;
+			}
+			auto draw_spell = [&]() {
+				if (dummy_slot) {
+					return;
+				}
+				spell_id spell = spells.get(spellidx);
+				SpellEntry& spl_entry = res::spell(spell);
+				draw_sprite(spl_entry.sprite, x, y);
+                lmeth(handler, "draw_spell_ui_hint", Pos {x, y}, spellidx);
+			};
+			BBox entry_box(x, y, x + TILE_SIZE, y + TILE_SIZE);
+			draw_spell();
+			Colour bbox_col = COL_FILLED_OUTLINE;
+			auto draw_topbar_overlay = [&]() {
+				if (dummy_slot) {
+					return;
+				}
+				if (entry_box.contains(mx, my)) {
+					bbox_col = COL_GOLD;
+					draw_console_spell_description(gs, res::spell(spells.get(spellidx)));
+				} else if (slot_highlighted == spellidx) {
+					draw_console_spell_description(gs, res::spell(spells.get(spellidx)));
+				}
+			};
+			draw_topbar_overlay();
+            if (slot_highlighted == spellidx) {
+                bbox_col = COL_PALE_GREEN;
+            } else if (dummy_slot) {
+                bbox_col = COL_UNFILLED_OUTLINE;
+            }
+			ldraw::draw_rectangle_outline(bbox_col, entry_box);
+			spellidx++;
 		}
-		if (entry_box.contains(mx, my)) {
-			bbox_col = COL_GOLD;
-			draw_console_spell_description(gs, spl_entry);
-		}
-		ldraw::draw_rectangle_outline(bbox_col, entry_box);
-		spellidx++;
 	}
 }
 
@@ -79,24 +96,8 @@ int SpellsContent::amount_of_pages(GameState* gs) {
 
 static bool handle_io_spells_known(GameState* gs, ActionQueue& queued_actions,
 		const BBox& bbox, SpellsKnown& spells, int ind_low, int ind_high) {
-	const int spell_n = spells.amount();
-	int mx = gs->mouse_x(), my = gs->mouse_y();
-	int spellidx = ind_low;
-
-	int x = bbox.x1, ex = bbox.x2;
-	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
-		if (spellidx >= spell_n)
-			break;
-
-		BBox entry_box(x, y, ex - 2, y + TILE_SIZE);
-		if (entry_box.contains(mx, my) && gs->mouse_left_click()) {
-			queued_actions.push_back(
-					game_action(gs, gs->local_player(), GameAction::CHOSE_SPELL,
-							spellidx));
-			return true;
-		}
-		spellidx++;
-	}
+	LuaValue& handler = gs->local_player()->input_source().value;
+	lmeth(handler, "handle_spells");
 	return false;
 }
 

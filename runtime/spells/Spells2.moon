@@ -76,11 +76,15 @@ DataW.spell_create {
         cooldown: 105
         types: {"Green"}
         on_hit_func: (target, atkstats) =>
-            effect = target\add_effect("Poison", 100) 
-            effect.damage = atkstats.damage 
-            effect.power = atkstats.power
-            effect.magic_percentage = atkstats.magic_percentage
-            effect.physical = atkstats.physical
+            target\add_effect("Poison", {
+                poison_rate: 25
+                time_left: 100,
+                attacker: @caster, 
+                damage: atkstats.damage,
+                power: atkstats.power,
+                magic_percentage: atkstats.magic_percentage,
+                physical: atkstats.physical
+            })
     }
     mp_cost: 20
     cooldown: 35
@@ -128,10 +132,15 @@ DataW.projectile_create {
 
     cooldown: 35
     on_hit_func: (target, atkstats) =>
-        eff = target\add_effect("Poison", 100)
-        eff.damage = atkstats.damage
-        eff.power = atkstats.power
-        eff.magic_percentage = atkstats.magic_percentage
+        target\add_effect("Poison", {
+            time_left: 100,
+            damage: atkstats.damage,
+            attacker: @caster, 
+            power: atkstats.power,
+            poison_rate: 25,
+            magic_percentage: atkstats.magic_percentage,
+            physical: atkstats.physical
+        })
 }
 
 DataW.spell_create {
@@ -153,11 +162,14 @@ DataW.spell_create {
             if not Map.object_visible(mon, mon.xy, caster)
                 continue
             mon\add_effect("Dazed", 100)
-            eff = mon\add_effect("Poison", 100)
-            eff.poison_rate = 25
-            eff.damage = caster.stats.magic / 2
-            eff.power = caster.stats.magic * 0.3
-            eff.magic_percentage = 1.0
+            target\add_effect("Poison", {
+                time_left: 100,
+                attacker: @caster, 
+                damage: caster.stats.magic / 2
+                power: caster.stats.magic * 0.3
+                poison_rate: 25,
+                magic_percentage: 1,
+            })
         for _ in screens()  
             if caster\is_local_player()
                 EventLog.add("You daze all enemies in sight!", {200,200,255})

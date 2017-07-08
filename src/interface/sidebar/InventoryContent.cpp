@@ -43,7 +43,7 @@ static void draw_player_inventory_slot(GameState* gs, LuaValue handler, ItemSlot
 			gs->font().drawf(COL_WHITE, Pos(x+1, y+1), "%d", itemslot.amount());
 		}
 
-        if (gs->io_controller().ctrl_held()) {
+        if (gs->io_controller().ctrl_held() || lmethod_call<bool>(handler, "sell_mode")) {
             if (itemslot.item_entry().sellable) {
                 draw_slot_cost(gs, itemslot.item_entry().sell_cost(), x, y);
             }
@@ -94,7 +94,7 @@ static void draw_player_inventory(GameState* gs, LuaValue handler, Inventory& in
 			//draw rectangle over item edges
 			ldraw::draw_rectangle_outline(outline_col, slotbox);
 
-			lmeth(handler, "draw_item_ui_hint", Pos {x, y}, itemslot);
+			lmeth(handler, "draw_item_ui_hint", Pos {x, y}, slot);
 			slot++;
 		}
 	}

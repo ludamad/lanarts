@@ -265,6 +265,7 @@ public:
 		return world.get_level(id);
 	}
 
+	LuaValue& lua_input();
 	void set_level(GameMapState* lvl);
 	void level_move(int id, int x, int y, int roomid1, int roomid2);
 	/* Make sure rooms exist & portals point to valid locations in next room */

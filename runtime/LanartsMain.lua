@@ -148,7 +148,7 @@ function Engine.player_input(player)
     local key_input = (require "input.KeyboardInputSource").create(player)
     if os.getenv("LANARTS_CONTROLLER") then
         local pad_input = (require "input.GamepadInputSource").create(player, ids[1])
-        return (require "input.CombinedInputSource").create(key_input, pad_input)
+        return (require "input.CombinedInputSource").create(pad_input, key_input)
     else
         return key_input
     end

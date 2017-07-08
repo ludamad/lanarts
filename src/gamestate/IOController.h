@@ -19,28 +19,28 @@
 struct BBox;
 
 struct IOGamepadState {
-    int gamepad_id;
-    float gamepad_axis_left_trigger;
-    float gamepad_axis_right_trigger;
-    float gamepad_axis_left_x;
-    float gamepad_axis_left_y;
-    float gamepad_axis_right_x;
-    float gamepad_axis_right_y;
-    bool gamepad_button_a;
-    bool gamepad_button_b;
-    bool gamepad_button_x;
-    bool gamepad_button_y;
-    bool gamepad_button_back;
-    bool gamepad_button_guide;
-    bool gamepad_button_start;
-    bool gamepad_button_left_stick;
-    bool gamepad_button_right_stick;
-    bool gamepad_button_left_shoulder;
-    bool gamepad_button_right_shoulder;
-    bool gamepad_button_up_dpad;
-    bool gamepad_button_down_dpad;
-    bool gamepad_button_left_dpad;
-    bool gamepad_button_right_dpad;
+    int gamepad_id = -1;
+    float gamepad_axis_left_trigger = 0;
+    float gamepad_axis_right_trigger = 0;
+    float gamepad_axis_left_x = 0;
+    float gamepad_axis_left_y = 0;
+    float gamepad_axis_right_x = 0;
+    float gamepad_axis_right_y = 0;
+    bool gamepad_button_a = false;
+    bool gamepad_button_b = false;
+    bool gamepad_button_x = false;
+    bool gamepad_button_y = false;
+    bool gamepad_button_back = false;
+    bool gamepad_button_guide = false;
+    bool gamepad_button_start = false;
+    bool gamepad_button_left_stick = false;
+    bool gamepad_button_right_stick = false;
+    bool gamepad_button_left_shoulder = false;
+    bool gamepad_button_right_shoulder = false;
+    bool gamepad_button_up_dpad = false;
+    bool gamepad_button_down_dpad = false;
+    bool gamepad_button_left_dpad = false;
+    bool gamepad_button_right_dpad = false;
 };
 
 struct IOState {

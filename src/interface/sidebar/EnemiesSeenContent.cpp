@@ -12,6 +12,7 @@
 
 #include "gamestate/GameState.h"
 #include "objects/MonsterController.h"
+#include "objects/PlayerInst.h"
 
 #include "../console_description_draw.h"
 #include "EnemiesSeenContent.h"
@@ -30,16 +31,25 @@ static void draw_enemies_seen(GameState* gs, EnemiesSeen& es, const BBox& bbox,
 		++it;
 	}
 
+	LuaValue& handler = gs->local_player()->input_source().value;
 	int mx = gs->mouse_x(), my = gs->mouse_y();
 	int slot = min_slot;
 	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
 		for (int x = bbox.x1; x < bbox.x2; x += TILE_SIZE) {
-			if (slot >= max_slot)
-				break;
+			BBox slotbox(x, y, x + TILE_SIZE, y + TILE_SIZE);
+			int slot_highlighted = lmethod_call<int>(handler, "slot_highlighted");
+			if (slot >= max_slot || it == es.end()) {
+				if (slot >= 40) {
+					break;
+				}
+				if (slot_highlighted == slot) {
+					ldraw::draw_rectangle_outline(COL_PALE_GREEN, slotbox);
+				}
+				continue;
+			}
 
 			EnemyEntry& eentry = game_enemy_data.get(*it);
 
-			BBox slotbox(x, y, x + TILE_SIZE, y + TILE_SIZE);
 			Colour outline(COL_UNFILLED_OUTLINE);
 			if (it != es.end()) {
 				outline = COL_FILLED_OUTLINE;
@@ -52,7 +62,13 @@ static void draw_enemies_seen(GameState* gs, EnemiesSeen& es, const BBox& bbox,
 			}
 			//draw rectangle over edges
 
-			ldraw::draw_rectangle_outline(outline, slotbox);
+			if (slot_highlighted == slot) {
+				ldraw::draw_rectangle_outline(COL_PALE_GREEN, slotbox);
+				draw_console_enemy_description(gs, eentry);
+			} else {
+				ldraw::draw_rectangle_outline(outline, slotbox);
+			}
+
 			slot++;
 		}
 	}
@@ -70,6 +86,7 @@ int EnemiesSeenContent::amount_of_pages(GameState* gs) {
 
 bool EnemiesSeenContent::handle_io(GameState *gs,
 		ActionQueue & queued_actions) {
+	lmeth(gs->local_player()->input_source().value, "handle_enemy_info");
 	return false;
 }
 

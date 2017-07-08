@@ -82,9 +82,6 @@ static void draw_store_inventory(GameState* gs, StoreInventory& inv,
             }
 			BBox slotbox(x, y, x + TILE_SIZE, y + STORE_SLOT_H);
 			Colour outline_col(COL_UNFILLED_OUTLINE);
-            if (slot == slot_highlighted) {
-                outline_col = COL_PALE_GREEN;
-            }
 			if (!dummy_slot && !inv.get(slot).empty()) {
                 StoreItemSlot& itemslot = inv.get(slot);
 				outline_col = COL_FILLED_OUTLINE;
@@ -96,6 +93,9 @@ static void draw_store_inventory(GameState* gs, StoreInventory& inv,
 							itemslot.item_entry());
 					draw_item_cost(gs, bbox, itemslot.cost);
 				}
+			}
+			if (slot == slot_highlighted) {
+				outline_col = COL_PALE_GREEN;
 			}
 			//draw rectangle over item edges
 			ldraw::draw_rectangle_outline(outline_col, slotbox);
@@ -156,6 +156,7 @@ bool StoreContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
     if (gs->mouse_left_click() && within_inventory) {
         return try_buy_slot(get_itemslotn(inv, bbox, mx, my));
     }
-    return lmethod_call<bool>(p->input_source().value, "handle_store", try_buy_slot);
+    lmeth(p->input_source().value, "handle_store", try_buy_slot);
+    return false;
 }
 
