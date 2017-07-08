@@ -213,7 +213,7 @@ function Pain.action_func(caster, x, y, target)
     end
     local stats = caster:effective_stats()
     target:add_effect("Pained", 50)
-    local aura = caster:add_effect("Pain Aura", 100)
+    local aura = caster:add_effect("Pain Aura Anim Hack", 100)
     aura.animation_only = true
     aura.range = eff_range
     play_pained_sound()

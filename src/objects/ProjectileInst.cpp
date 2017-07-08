@@ -198,12 +198,12 @@ void ProjectileInst::step(GameState* gs) {
 			  effstats, origin, victim);
 		effstats = lua_hit_callback(projectile.projectile_entry().action_func().get(L), effstats, this, victim);
 
-//		if (gs->game_settings().verbose_output) {
+		if (gs->game_settings().verbose_output) {
 			char buff[100];
 			snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%]",
 					 effstats.damage, effstats.power, int(effstats.magic_percentage * 100));
 			gs->for_screens([&]() {gs->game_chat().add_message(buff);});
-//		}
+		}
 
 		if (effstats.damage > 0 && !projectile.projectile_entry().deals_special_damage) {
 			if (dynamic_cast<PlayerInst *>(victim)) {

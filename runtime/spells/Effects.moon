@@ -459,6 +459,7 @@ DataW.effect_create {
             @active_bonuses[attacker.id] = @duration
         elseif @active_bonuses[attacker.id] < @duration
             @active_bonuses[attacker.id] = @duration
+        return damage
 
 }
 
@@ -734,6 +735,28 @@ DataW.effect_create {
         AuraBase.draw(@, COL_PALE_BLUE, COL_BLUE, caster.x, caster.y)
 }
 
+DataW.effect_create {
+    name: "Pain Aura Anim Hack"
+    category: "Aura"
+    effected_sprite: "spr_spells.greaterpain"
+    fade_out: 50
+    init_func: (caster) =>
+        AuraBase.init(@, caster)
+        @mp_gain = 10
+        if caster.is_enemy
+            @range = 90
+    step_func: (caster) =>
+        AuraBase.step(@, caster)
+        if @animation_only
+            return
+    draw_func: (caster, top_left_x, top_left_y) =>
+        @max_alpha = 0.35
+        if @animation_only 
+            @max_alpha /= 4
+        elseif not caster.is_enemy and not caster\has_effect "Pained"
+            @max_alpha /= 2
+        AuraBase.draw(@, COL_PALE_RED, COL_RED, caster.x, caster.y)
+}
 
 DataW.effect_create {
     name: "Pain Aura"
@@ -760,7 +783,7 @@ DataW.effect_create {
                 play_pained_sound()
                 caster\add_effect("Pained", 50)
                 stats = caster\effective_stats()
-                damage, power = 20, random(2,5) + stats.magic
+                damage, power = 15, random(2,5) + stats.magic
                 power = power + EffectUtils.get_power(caster, "Black")
                 type_multiplier = EffectUtils.get_resistance(mon, "Black")
                 if mon\damage(damage, power, 1, caster, type_multiplier) then
@@ -867,19 +890,19 @@ for name in *{"Ranger", "Fighter", "Rogue", "Green Mage", "Black Mage", "Necroma
                                 EventLog.add("You gain mana from the carnage!", COL_PALE_BLUE)
                         instance\heal_mp(2)
                 @kill_tracker += 1
-            if GameState.frame > LAST_WARNING\get() + 100 and not caster.is_ghost
-                low_num = 50
-                if name == "Necromancer"
-                    low_num = 30
-                if caster.stats.hp <= low_num or caster.stats.hp <= caster\effective_stats().max_hp * 0.1
-                    LAST_WARNING\set GameState.frame
-                    play_sound "sound/allyislow1c.ogg"
         on_receive_damage_func: (attacker, caster, damage) =>
             if name == "Necromancer"
                 attacker\direct_damage(damage * 0.33, caster)
                 for _ in screens()
                     if caster\is_local_player()
                         EventLog.add("Your corrosive flesh hurts #{attacker.name} as you are hit!", COL_PALE_BLUE)
+            if GameState.frame > LAST_WARNING\get() + 100 and not caster.is_ghost
+                low_num = 50
+                if name == "Necromancer"
+                    low_num = 30
+                if caster.stats.hp - damage <= low_num or caster.stats.hp - damage <= caster\effective_stats().max_hp * 0.1
+                    LAST_WARNING\set GameState.frame
+                    play_sound "sound/allyislow1c.ogg"
             return damage
     }
 

@@ -244,14 +244,15 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attac
               attack.physical_percentage());
 
     float fdmg = damage_formula(attack, effective_stats());
-    //if (gs->game_settings().verbose_output) {
+    if (gs->game_settings().verbose_output) {
         char buff[100];
         snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%] -> Damage: %.2f",
-                attack.damage, attack.power, int(attack.magic_percentage * 100),
-                fdmg);
-        gs->for_screens( [&] () {
+                 attack.damage, attack.power, int(attack.magic_percentage * 100),
+                 fdmg);
+        gs->for_screens([&]() {
             gs->game_chat().add_message(buff);
         });
+    }
 
     if (attack.type_multiplier < 0.05) {
         gs->add_instance(
@@ -268,9 +269,9 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attac
                 new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Ineffective!",
                                  attack.type_multiplier < 1 ? COL_PALE_RED : COL_GREEN));
     } else if (attack.type_multiplier < 1.2) {
-        gs->add_instance(
-                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Effective!",
-                                 COL_PALE_GREEN));
+//        gs->add_instance(
+//                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Effective!",
+//                                 COL_PALE_GREEN));
     } else if (attack.type_multiplier < 1.5) {
         gs->add_instance(
                 new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Quite Effective!",
@@ -285,18 +286,16 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attac
                                  attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
     }
 
-    //}
-
-//    for (Effect &eff : effects.effects) {
-//        if (eff.is_active()) {
-//            fdmg = lcall_def(fdmg, /*func:*/ eff.entry().raw_lua_object["on_receive_damage_func"], /*args:*/ eff.state, attacker, this, fdmg);
-//        }
-//    }
-//    for (Effect &eff : attacker->effects.effects) {
-//        if (eff.is_active()) {
-//            fdmg = lcall_def(fdmg, /*func:*/ eff.entry().raw_lua_object["on_deal_damage_func"], /*args:*/ eff.state, attacker, this, fdmg);
-//        }
-//    }
+    for (Effect &eff : effects.effects) {
+        if (eff.is_active()) {
+            fdmg = lcall_def(fdmg, /*func:*/ eff.entry().raw_lua_object["on_receive_damage_func"], /*args:*/ eff.state, attacker, this, fdmg);
+        }
+    }
+    for (Effect &eff : attacker->effects.effects) {
+        if (eff.is_active()) {
+            fdmg = lcall_def(fdmg, /*func:*/ eff.entry().raw_lua_object["on_deal_damage_func"], /*args:*/ eff.state, attacker, this, fdmg);
+        }
+    }
     return damage(gs, fdmg, attacker);
 }
 

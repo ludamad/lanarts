@@ -280,7 +280,7 @@ DataW.spell_create {
         monster = "Spectral Beast"
         if not (caster\has_effect "Summoning")
             caster\direct_damage(35)
-            eff = caster\add_effect("Summoning", 20)
+            eff = caster\add_effect("Summoning", 5)
             eff.on_summon = (obj) ->
                 -- -- Make sure this monster cannot live outside its summoner's range for very long:
                 --eff = obj\add_effect("DiesOutsideOfSummonerRange", INFINITE_DURATION)
