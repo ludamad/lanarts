@@ -217,7 +217,7 @@ function Pain.action_func(caster, x, y, target)
     aura.animation_only = true
     aura.range = eff_range
     play_pained_sound()
-    local damage, power = random(3, 9), random(2,5) + stats.magic
+    local damage, power = random(3, 9), stats.magic
     power = power + EffectUtils.get_power(caster, "Black")
     damage = damage * EffectUtils.get_resistance(target, "Black")
     if target:damage(damage, power, 1, caster) then

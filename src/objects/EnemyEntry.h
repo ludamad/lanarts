@@ -31,6 +31,7 @@ struct EnemyEntry: public ResourceEntryBase {
 	int vision_radius = 7; // TODO, use
 
 	LuaLazyValue init_event, step_event, draw_event, death_event;
+	LuaValue console_draw_func;
 	StatusEffectModifiers effect_modifiers;
 
 	void init(lua_State* L) {

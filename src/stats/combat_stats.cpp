@@ -165,17 +165,17 @@ int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 		WeaponEntry& wentry = weapon.weapon_entry();
                 const DamageStats& dmgmod = wentry.attack.damage_modifiers;
         pow += dmgmod.power_stats.calculate(mt, core);
-		pow += dmgmod.magic_percentage * stats.core.magic;
-		pow += dmgmod.physical_percentage * stats.core.strength;
+//		pow += dmgmod.magic_percentage * stats.core.magic;
+//		pow += dmgmod.physical_percentage * stats.core.strength;
 	}
 	if (has_projectile) {
 		ProjectileEntry& pentry = projectile.projectile_entry();
 		float projectile_pow = pentry.power_stats().calculate(mt, core);
 		pow += pentry.power_stats().calculate(mt, core);
-		if (!is_compatible_projectile(wentry, pentry)) {
-			pow += pentry.magic_percentage() * stats.core.magic;
-			pow += pentry.physical_percentage() * stats.core.strength;
-		}
+//		if (!is_compatible_projectile(wentry, pentry)) {
+//			pow += pentry.magic_percentage() * stats.core.magic;
+//			pow += pentry.physical_percentage() * stats.core.strength;
+//		}
 	}
 	return pow;
 }

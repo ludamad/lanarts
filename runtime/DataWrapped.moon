@@ -1,5 +1,17 @@
 EffectUtils = require "spells.EffectUtils"
 
+draw_console_effect = (sprite, text, xy, color = COL_PALE_YELLOW) ->
+    Map = require "core.Map"
+    Display = require "core.Display"
+    sprite\draw {
+        origin: Display.LEFT_CENTER
+    }, {xy[1], xy[2] + 4}
+    font_cached_load(settings.font, 10)\draw {
+        :color
+        origin: Display.LEFT_CENTER
+    }, {xy[1] + Map.TILE_SIZE + 4, xy[2]}, text 
+
+
 -- Normal effect. By default, takes the 'max' of all applied time_left's
 effect_create = (args) ->
     wrapped_init = args.init_func
@@ -95,6 +107,15 @@ additive_effect_create = (args) ->
 STANDARD_WEAPON_DPS = 10
 STANDARD_RANGED_DPS = 7
 
+add_console_draw_func = (args, f1) ->
+    f2 = args.console_draw_func
+    if f2 == nil 
+        args.console_draw_func = f1
+    else
+        args.console_draw_func = (...) -> 
+            f1(...)
+            f2(...)
+
 add_on_hit_func = (args, f1) ->
     f2 = args.on_hit_func
     if f2 == nil 
@@ -185,6 +206,20 @@ spell_create = (args) ->
         for type in *args.types
             add_cooldown_multiplier args, () =>
                 return 1 - EffectUtils.get_power(@, type) * 0.03
+    for type in *(args.types or {})
+        add_console_draw_func args, (caster, get_next) ->
+            E = require "spells.Effects"
+            switch type
+                when "Red"
+                    draw_console_effect E._fire_power, "Red Type", get_next()
+                when "Blue"
+                    draw_console_effect E._ice_power, "Blue Type", get_next()
+                when "White"
+                    draw_console_effect E._storm_power, "White Type", get_next()
+                when "Black"
+                    draw_console_effect E._black_power, "Black Type", get_next()
+                when "Green"
+                    draw_console_effect E._poison_power, "Green Type", get_next()
     Data.spell_create(args)
 
 projectile_create = (args, for_enemy = false) -> 
@@ -228,6 +263,20 @@ enemy_create = (args) ->
     if args.resistances ~= nil
         args.effects_active or= {}
         resistance_effects(args.resistances, args.effects_active)
+    for type in *(args.types or {})
+        add_console_draw_func args, (edata, get_next) ->
+            E = require "spells.Effects"
+            switch type
+                when "Red"
+                    draw_console_effect E._fire_power, "Red Type", get_next()
+                when "Blue"
+                    draw_console_effect E._ice_power, "Blue Type", get_next()
+                when "White"
+                    draw_console_effect E._storm_power, "White Type", get_next()
+                when "Black"
+                    draw_console_effect E._black_power, "Black Type", get_next()
+                when "Green"
+                    draw_console_effect E._poison_power, "Green Type", get_next()
     Data.enemy_create(args)
 
 return {:additive_effect_create, :effect_create, :weapon_create, :spell_create, :projectile_create, :enemy_create, :resistance_effects, :power_effects, :add_types}

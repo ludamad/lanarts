@@ -253,34 +253,36 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attac
             gs->game_chat().add_message(buff);
         });
 
-    if (attack.type_multiplier != 1.0) {
-        if (attack.type_multiplier < 0.05) {
-            gs->add_instance(
-                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Immune!",
-                                     attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
-        }
-        else if (attack.type_multiplier < 0.3) {
-            gs->add_instance(
-                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Very ineffective!",
-                                     attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
-        }
-        else if (attack.type_multiplier < 0.8) {
-            gs->add_instance(
-                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Ineffective!",
-                                     attack.type_multiplier < 1 ? COL_PALE_RED : COL_GREEN));
-        } else if (attack.type_multiplier < 1.5) {
-            gs->add_instance(
-                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Effective!",
-                                     COL_PALE_GREEN));
-        } else if (attack.type_multiplier < 1.9) {
-            gs->add_instance(
-                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Very Effective!",
-                                     attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
-        } else {
-            gs->add_instance(
-                    new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Super Effective!",
-                                     attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
-        }
+    if (attack.type_multiplier < 0.05) {
+        gs->add_instance(
+                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Immune!",
+                                 attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
+    }
+    else if (attack.type_multiplier < 0.3) {
+        gs->add_instance(
+                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Very ineffective!",
+                                 attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
+    }
+    else if (attack.type_multiplier < 0.95) {
+        gs->add_instance(
+                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Ineffective!",
+                                 attack.type_multiplier < 1 ? COL_PALE_RED : COL_GREEN));
+    } else if (attack.type_multiplier < 1.2) {
+        gs->add_instance(
+                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Effective!",
+                                 COL_PALE_GREEN));
+    } else if (attack.type_multiplier < 1.5) {
+        gs->add_instance(
+                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Quite Effective!",
+                                 COL_PALE_GREEN));
+    } else if (attack.type_multiplier < 1.9) {
+        gs->add_instance(
+                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Very Effective!",
+                                 attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
+    } else {
+        gs->add_instance(
+                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Super Effective!",
+                                 attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
     }
 
     //}

@@ -301,9 +301,9 @@ static void draw_effect_modifiers_overlay(GameState* gs,
             if (entry.console_draw_func.isnil())  {
                 continue;
             }
-            Pos draw_pos = dbh.get_next_draw_position();
-            entry.console_draw_func.push(); // Function to call
-            luawrap::call<void>(gs->luastate(), status_effect.args, gs->local_player(), draw_pos);
+			lcall(entry.console_draw_func, status_effect.args, gs->local_player(), [&dbh]() -> Pos {
+				return dbh.get_next_draw_position();
+			});
         }
 }
 
@@ -379,13 +379,9 @@ void draw_console_spell_description(GameState* gs, SpellEntry& entry) {
 	draw_value(gs, dbh, "Cooldown: ", std::max(entry.cooldown, entry.spell_cooldown), COL_PALE_YELLOW,
 			COL_PALE_RED);
 
-    lua_State* L = gs->luastate();
-    int n_top = lua_gettop(L);
-    lua_push_unsafe_closure(L, [&dbh]() -> Pos {
-        return dbh.get_next_draw_position();
-    });
-    lcall(entry.console_draw_func, gs->local_player(), LuaStackValue(L, n_top +1));
-    lua_settop(L, n_top);
+    lcall(entry.console_draw_func, gs->local_player(), [&dbh]() -> Pos {
+		return dbh.get_next_draw_position();
+	});
 }
 
 void draw_console_enemy_description(GameState* gs, EnemyEntry& entry) {
@@ -400,6 +396,10 @@ void draw_console_enemy_description(GameState* gs, EnemyEntry& entry) {
 	CoreStats& ecore = entry.basestats.core;
 
 	DescriptionBoxHelper dbh(console.bounding_box());
+
+	lcall(entry.console_draw_func, game_enemy_data.get_raw_data()[entry.name], [&dbh]() -> Pos {
+		return dbh.get_next_draw_position();
+	});
 	draw_value(gs, dbh, "HP: ", ecore.hp, COL_PALE_YELLOW, COL_PALE_RED);
 	draw_value(gs, dbh, "Strength: ", ecore.strength, COL_PALE_YELLOW,
 			COL_PALE_RED);

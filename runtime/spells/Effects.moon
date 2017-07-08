@@ -276,8 +276,8 @@ draw_weapon_console_effect = (player, sprite, text, xy, color = COL_PALE_YELLOW)
 
 DataW.effect_create {
     name: "FearWeapon"
-    console_draw_func: (player, xy) => 
-        draw_weapon_console_effect(player, M._fear, "+10% chance fear", xy)
+    console_draw_func: (player, get_next) => 
+        draw_weapon_console_effect(player, M._fear, "+10% chance fear", get_next())
     on_melee_func: (attacker, defender, dmg) =>
         if defender\has_effect("Fear")
             return 
@@ -287,8 +287,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "ConfusingWeapon"
-    console_draw_func: (player, xy) => 
-        draw_weapon_console_effect(player, M._confusion, "+10% chance daze", xy)
+    console_draw_func: (player, get_next) => 
+        draw_weapon_console_effect(player, M._confusion, "+10% chance daze", get_next())
     on_melee_func: (attacker, defender, dmg) =>
         if defender\has_effect("Dazed")
             return
@@ -338,10 +338,10 @@ for {resist_sprite, power_sprite, type, color} in *{
     DataW.additive_effect_create {
         name: "#{type}Resist"
         key: "resist" -- Additive effect, accessed with @_get_value().
-        console_draw_func: (player, xy) => 
+        console_draw_func: (player, get_next) => 
             text = "#{type} Resist"
             res = if @resist < 0 then @resist else "+"..@resist
-            draw_console_effect(resist_sprite, "#{res} #{text}", xy, if @resist >= 0 then color else COL_PALE_RED)
+            draw_console_effect(resist_sprite, "#{res} #{text}", get_next(), if @resist >= 1 then color else COL_PALE_RED)
     }
     -- Adds power specifically to attacks of this type
     -- Subform of 
@@ -349,16 +349,16 @@ for {resist_sprite, power_sprite, type, color} in *{
     DataW.additive_effect_create {
         name: "#{type}Power"
         key: "power" -- Additive effect, accessed with @_get_value().
-        console_draw_func: (player, xy) => 
+        console_draw_func: (player, get_next) => 
             text = "#{type} Power"
             res = if @power < 0 then @power else "+"..@power
-            draw_console_effect(power_sprite, "#{res} #{text}", xy, if @power >= 0 then color else COL_PALE_RED)
+            draw_console_effect(power_sprite, "#{res} #{text}", get_next(), if @power >= 0 then color else COL_PALE_RED)
     }
 DataW.additive_effect_create {
     name: "PoisonedWeapon"
     key: "poison_percentage" -- Additive effect, accessed with @_get_value().
-    console_draw_func: (player, xy) => 
-        draw_weapon_console_effect(player, M._poison, "+#{math.floor(@poison_percentage * 100)}% chance poison", xy)
+    console_draw_func: (player, get_next) => 
+        draw_weapon_console_effect(player, M._poison, "+#{math.floor(@poison_percentage * 100)}% chance poison", get_next())
     on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Poison")
             return
@@ -380,8 +380,8 @@ DataW.additive_effect_create {
 DataW.additive_effect_create {
     name: "Spiky"
     key: "recoil_percentage" -- Additive effect, accessed with @_get_value().
-    console_draw_func: (player, xy) => 
-        draw_console_effect(tosprite("spr_spells.spectral_weapon"), "+#{math.floor(@recoil_percentage * 100)}% melee recoil damage", xy)
+    console_draw_func: (player, get_next) => 
+        draw_console_effect(tosprite("spr_spells.spectral_weapon"), "+#{math.floor(@recoil_percentage * 100)}% melee recoil damage", get_next())
     on_receive_melee_func: (attacker, defender, damage) =>
         percentage_recoil = @_get_value()
         attacker\direct_damage(damage * percentage_recoil, defender)
@@ -438,8 +438,8 @@ DataW.effect_create {
 -- TODO flip effect of fortification -- TODO whut?
 DataW.effect_create {
     name: "Fortification"
-    console_draw_func: (player, xy) => 
-        draw_console_effect(tosprite("spr_spells.statue_form"), "Gain defence when hit", xy)
+    console_draw_func: (player, get_next) => 
+        draw_console_effect(tosprite("spr_spells.statue_form"), "Gain defence when hit", get_next())
     init_func: (caster) =>
         @active_bonuses = {}
         @duration = 320
@@ -518,8 +518,8 @@ for equip_slot in *{"", "Armour", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
 
 DataW.effect_create {
     name: "PossiblySummonCentaurOnKill"
-    console_draw_func: (player, xy) => 
-        draw_console_effect(tosprite("spr_enemies.humanoid.centaur"), "Can appear after a kill", xy)
+    console_draw_func: (player, get_next) => 
+        draw_console_effect(tosprite("spr_enemies.humanoid.centaur"), "Can appear after a kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -539,8 +539,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "PossiblySummonStormElementalOnKill"
-    console_draw_func: (player, xy) => 
-        draw_console_effect(tosprite("storm elemental"), "Can appear after a kill", xy)
+    console_draw_func: (player, get_next) => 
+        draw_console_effect(tosprite("storm elemental"), "Can appear after a kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -561,8 +561,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "PossiblySummonGolemOnKill"
-    console_draw_func: (player, xy) => 
-        draw_console_effect(tosprite("golem"), "Can appear after a kill", xy)
+    console_draw_func: (player, get_next) => 
+        draw_console_effect(tosprite("golem"), "Can appear after a kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -789,8 +789,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "VampiricWeapon"
-    console_draw_func: (player, xy) => 
-        draw_weapon_console_effect(player, M._vampirism, "Heal +25% dealt", xy)
+    console_draw_func: (player, get_next) => 
+        draw_weapon_console_effect(player, M._vampirism, "Heal +25% dealt", get_next())
     on_melee_func: (attacker, defender, damage) =>
         for _ in screens()
             if attacker\is_local_player() 
@@ -815,8 +815,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "KnockbackWeapon"
-    console_draw_func: (player, xy) => 
-        draw_weapon_console_effect(player, M._fleeing, "+10% chance of knockback", xy)
+    console_draw_func: (player, get_next) => 
+        draw_weapon_console_effect(player, M._fleeing, "+10% chance of knockback", get_next())
     on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Thrown")
             return
