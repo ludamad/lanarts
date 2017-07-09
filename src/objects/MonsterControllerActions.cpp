@@ -352,8 +352,12 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	}
 	int ex = e->x / TILE_SIZE, ey = e->y / TILE_SIZE;
 
+	if (gs->rng().rand(25) == 0) {
+		return; // Avoid pathological cases
+	}
+
 	Pos target;
-	int tries_left = 35; // arbitrary number
+	int tries_left = 3; // arbitrary number
 	do {
 		if (!is_fullpath) {
 			target.x = squish(ex + mt.rand(-3, 4), 0, tile.tile_width() - 1);

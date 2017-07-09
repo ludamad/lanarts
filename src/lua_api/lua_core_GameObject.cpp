@@ -451,18 +451,18 @@ namespace GameInstWrap {
             lua_pushinteger(L, 0);
             lua_pushinteger(L, (*udata)->current_floor);
             LuaValue table = LuaValue::newtable(L);
-            if (!(*udata)->lua_variables.empty()) {
-                table[1] = (*udata)->lua_variables;
-            }
-            if (dynamic_cast<CombatGameInst*>(*udata)) {
-                for (auto& eff : dynamic_cast<CombatGameInst*>(*udata)->effects.effects) {
-                    if (!eff.state.empty()) {
-                        table[table.objlen() + 1] = eff.state;
-                    }
-                }
-            }
-            table.push();
-            return 3;
+//            if (!(*udata)->lua_variables.empty()) {
+//                table[1] = (*udata)->lua_variables;
+//            }
+//            if (dynamic_cast<CombatGameInst*>(*udata)) {
+//                for (auto& eff : dynamic_cast<CombatGameInst*>(*udata)->effects.effects) {
+//                    if (!eff.state.empty()) {
+//                        table[table.objlen() + 1] = eff.state;
+//                    }
+//                }
+//            }
+//            table.push();
+            return 2;
         }
 		GameInst* test_inst = gs->get_level((*udata)->current_floor)->game_inst_set().get_instance((*udata)->id);
         if ((*udata) != test_inst) {

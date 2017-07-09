@@ -577,11 +577,11 @@ void GameState::draw(bool drawhud) {
         }
         // Set drawing region to full screen:
         ldraw::display_set_window_region({0,0,game_settings().view_width, game_settings().view_height});
-        if (screens.amount() > 1) {
-            ldraw::draw_rectangle_outline(COL_WHITE, screens.window_region());
-        }
         if (drawhud) {
             game_hud().draw(this);
+        }
+        if (screens.amount() > 1) {
+            ldraw::draw_rectangle_outline(COL_WHITE, screens.window_region());
         }
 ////        ldraw::display_set_window_region(screens.window_region());
     });

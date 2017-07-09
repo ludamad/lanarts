@@ -90,22 +90,23 @@ void PerfTimer::clear() {
 static PerfTimer __global_timer;
 
 void perf_timer_begin(const char* funcname) {
-	__global_timer.begin(funcname);
+//	__global_timer.begin(funcname);
 }
 
 void perf_timer_clear() {
-	__global_timer.clear();
+//	__global_timer.clear();
 }
 
 void perf_timer_end(const char* funcname) {
-	__global_timer.end(funcname);
+//	__global_timer.end(funcname);
 }
 
 double perf_timer_average_time(const char* funcname) {
-	return __global_timer.average_time(funcname);
+    return 0;
+//	return __global_timer.average_time(funcname);
 }
 
 void perf_print_results() {
-	__global_timer.print_results();
+//	__global_timer.print_results();
 }
 
