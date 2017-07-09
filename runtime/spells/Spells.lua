@@ -405,7 +405,7 @@ local FearStrike = {
     can_cast_with_cooldown = false,
     mp_cost = 5,
     cooldown = 0, -- Uses cooldown of weapon
-    spell_cooldown = 200,
+    spell_cooldown = 100,
     fallback_to_melee = true,
 }
 

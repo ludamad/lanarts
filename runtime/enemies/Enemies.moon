@@ -1243,7 +1243,7 @@ DataW.enemy_create {
     weapon: {cooldown: 60, damage: 20}
     stats: {
         movespeed: 3.3
-        hp: 70
+        hp: 20
         hpregen: 0.25
         strength: 8
         magic: 8

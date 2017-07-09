@@ -153,6 +153,13 @@ draw_console_effect = (xy, sprite, texts) ->
     }, {x, y + 4}
     draw_console_text {x + Map.TILE_SIZE + 4, y}, texts
 
+DataW.effect_create {
+    name: "Ring of Flames Stat Boost"
+    stat_func: (effect, obj, old, new) ->
+        new.defence += 4
+        new.willpower += 4
+}
+
 DataW.spell_create {
     name: "Ring of Flames",
     description: ""
@@ -161,7 +168,9 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        GameObject.add_to_level RingOfFire.create({:caster, duration: 350 + EffectUtils.get_power(caster, 'Red') * 15})
+        duration = 350 + EffectUtils.get_power(caster, 'Red') * 35
+        GameObject.add_to_level RingOfFire.create({:caster, :duration})
+        caster\add_effect "Ring of Flames Stat Boost", duration
     console_draw_func: (get_next) =>
         damage = math.floor(RingOfFire._damage * 60 / 5)
         power = @effective_stats().magic + EffectUtils.get_power(@, "Red")
