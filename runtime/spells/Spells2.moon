@@ -307,7 +307,7 @@ DataW.spell_create {
     cooldown: 10
     can_cast_with_held_key: true
     fallback_to_melee: true
-    spell_cooldown: 100
+    spell_cooldown: 10
     action_func: (x, y) =>
         effect = @add_effect "Dash Attack", 20
         effect.angle = vector_direction(@xy, {x,y})

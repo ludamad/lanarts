@@ -102,7 +102,7 @@ DataW.spell_create {
             
     }
     mp_cost: 20,
-    cooldown: 65
+    cooldown: 50
 }
 
 -- ENERGY SPEAR
@@ -130,7 +130,7 @@ DataW.spell_create {
             @bonus += 0.1
             atkstats.damage *= @bonus
     }
-    mp_cost: 12
+    mp_cost: 10
     cooldown: 35
 }
 
@@ -184,7 +184,7 @@ DataW.spell_create {
             @y += dy
             @cx, @cy = @caster.x, @caster.y
         on_deinit: () => 
-            GameObject.add_to_level Flash.create({caster: @caster, duration: 30, damage: 5, xy: @xy})
+            GameObject.add_to_level Flash.create({caster: @caster, duration: 30, damage: 10, xy: @xy})
         redamage_cooldown: 40 -- Cooldown for when enemies are damaged again by effect
     }
     mp_cost: 25,

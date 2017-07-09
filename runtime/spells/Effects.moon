@@ -922,7 +922,7 @@ DataW.effect_create {
         @steps += 1
         -- Move forward: 
         dir = {math.cos(@angle) * 16, math.sin(@angle) * 16}
-        --dir = GameObject.simulate_bounce(caster, dir)
+        dir = GameObject.simulate_bounce(caster, dir)
         xy = {caster.x + dir[1], caster.y + dir[2]}
         if Map.object_tile_check(caster, xy)
             play_sound "sound/door.ogg"
@@ -953,10 +953,10 @@ DataW.effect_create {
             caster.sprite\draw({color: {255,255,255, 200 - 30 * i}, origin: Display.CENTER}, screen_xy)
     stat_func: (caster, old, new) =>
         new.speed = 0
-        caster.stats.attack_cooldown = 2
+        --caster.stats.attack_cooldown = 2
         new.strength += 2
-        new.defence += 5
-        new.willpower += 5
+        new.defence += 15
+        new.willpower += 15
 }
 
 enemy_init = (enemy) -> nil

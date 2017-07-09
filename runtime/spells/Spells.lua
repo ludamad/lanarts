@@ -121,7 +121,7 @@ local PowerStrike = {
     spr_spell = "chargestrike",
     can_cast_with_cooldown = false,
     mp_cost = 40,
-    spell_cooldown = 800,
+    spell_cooldown = 40,
     cooldown = 0, -- Uses cooldown of weapon, favours 40 cooldown weapons
     fallback_to_melee = true,
 }
@@ -217,7 +217,7 @@ function Pain.action_func(caster, x, y, target)
     aura.animation_only = true
     aura.range = eff_range
     play_pained_sound()
-    local damage, power = random(3, 9), stats.magic
+    local damage, power = random(3, 9), random(3,5) + stats.magic
     power = power + EffectUtils.get_power(caster, "Black")
     damage = damage * EffectUtils.get_resistance(target, "Black")
     if target:damage(damage, power, 1, caster) then
@@ -366,7 +366,7 @@ function GreaterPain.action_func(caster, x, y, target)
     caster:direct_damage(40)
     caster:add_effect("Pained", 50)
     local power = EffectUtils.get_power(caster, "Black")
-    caster:add_effect("Pain Aura", 100 + power * 25).range = GreaterPain.range + (caster.stats.level + power)* 5
+    caster:add_effect("Pain Aura", 250 + power * 50).range = GreaterPain.range + (caster.stats.level + power)* 5
     for _ in screens() do
         if caster:is_local_player() then
             EventLog.add("You attack nearby enemies life force directly!", {200,200,255})

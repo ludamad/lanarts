@@ -814,8 +814,8 @@ namespace lua_api {
 			int newx = (int) round(inst->x + dir.x); //update based on rounding of true float
 			int newy = (int) round(inst->y + dir.y);
 			bool collides = gs->tile_radius_test(newx, newy, inst->radius);
-			bool hitsx = gs->tile_radius_test(newx, dir.y, inst->radius);
-			bool hitsy = gs->tile_radius_test(dir.x, newy, inst->radius);
+			bool hitsx = gs->tile_radius_test(newx, inst->y, inst->radius);
+			bool hitsy = gs->tile_radius_test(inst->x, newy, inst->radius);
 			if (hitsy || hitsx || collides) {
 				if (hitsx) {
 					dir.x = -dir.x;
