@@ -179,6 +179,7 @@ void GameTiles::post_draw(GameState* gs) {
 			bool has_match = false, has_free = false;
 			bool is_other_match = false;
 			Tile& tile = get(Pos(x, y));
+			int smell = gs->monster_controller().smell_map.empty() ? int(0) : (int)gs->monster_controller().smell_map[{x,y}];
 
 			std::vector<PlayerInst*> players = gs->players_in_level();
 
@@ -213,6 +214,10 @@ void GameTiles::post_draw(GameState* gs) {
 					ldraw::draw_rectangle(Colour(0, 0, 0, 60), tilebox);
 				}
 			}
+			BBox tilebox(
+					Pos(x * TILE_SIZE - view.x, y * TILE_SIZE - view.y),
+					res::tile(tile.tile).size());
+			gs->font().drawf(ldraw::DrawOptions().origin(ldraw::CENTER).colour({255,255,255}), tilebox.center(), "%d", smell);
 		}
 	}
 	perf_timer_end(FUNCNAME);

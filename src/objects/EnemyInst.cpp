@@ -254,7 +254,7 @@ EnemyInst* EnemyInst::clone() const {
 }
 
 bool EnemyInst::within_field_of_view(const Pos & pos) {
-	return distance_between(Pos(x, y), pos) <= 100;
+	return distance_between(Pos(x, y), pos) <= 200;
 }
 
 const double deg2rad = 3.14159265 / 180.0;

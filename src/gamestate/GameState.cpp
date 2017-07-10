@@ -606,7 +606,9 @@ void GameState::remove_instance(GameInst* inst, bool add_to_removed) {
 	level->game_inst_set().remove_instance(inst);
     if (add_to_removed) {
         game_world().register_removed_object(inst);
-    }
+    } else {
+		inst->id = 0;
+	}
 	inst->deinit(this);
 }
 

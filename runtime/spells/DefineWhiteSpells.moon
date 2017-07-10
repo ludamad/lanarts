@@ -102,7 +102,7 @@ DataW.spell_create {
             
     }
     mp_cost: 20,
-    cooldown: 35
+    cooldown: 65
     spell_cooldown: 65
 }
 
@@ -131,7 +131,7 @@ DataW.spell_create {
             @bonus += 0.1
             atkstats.damage *= @bonus
     }
-    mp_cost: 11
+    mp_cost: 12
     cooldown: 35
 }
 

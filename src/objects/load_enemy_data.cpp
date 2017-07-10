@@ -91,6 +91,7 @@ static EnemyEntry parse_enemy_type(const LuaStackValue& table) {
     if (!table["death_sprite"].isnil()) {
         entry.death_sprite = res::sprite_id(table["death_sprite"].to_str());
     }
+    entry.raw_table = table;
     entry.radius = defaulted(table, "radius", 12);
     entry.xpaward = table["xpaward"].to_num();
 

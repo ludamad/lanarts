@@ -64,6 +64,7 @@ public:
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 
+    Grid<float> smell_map, swap_smell_map;
 private:
 	void set_monster_headings(GameState* gs,
 			std::vector<EnemyOfInterest> & eois);

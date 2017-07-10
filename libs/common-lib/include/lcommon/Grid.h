@@ -28,8 +28,8 @@ public:
 	 * Get the element at 'xy'.
 	 */
 	Ref operator[](const Pos& xy) {
-		LCOMMON_ASSERT(xy.x >= 0 && xy.x < _size.w);
-		LCOMMON_ASSERT(xy.y >= 0 && xy.y < _size.h);
+//		LCOMMON_ASSERT(xy.x >= 0 && xy.x < _size.w);
+//		LCOMMON_ASSERT(xy.y >= 0 && xy.y < _size.h);
 		return _contents[xy.y * _size.w + xy.x];
 	}
 
@@ -37,8 +37,8 @@ public:
 	 * Get the element at 'xy' (but unmodifiable).
 	 */
 	ConstRef operator[](const Pos& xy) const {
-		LCOMMON_ASSERT(xy.x >= 0 && xy.x < _size.w);
-		LCOMMON_ASSERT(xy.y >= 0 && xy.y < _size.h);
+//		LCOMMON_ASSERT(xy.x >= 0 && xy.x < _size.w);
+//		LCOMMON_ASSERT(xy.y >= 0 && xy.y < _size.h);
 		return _contents[xy.y * _size.w + xy.x];
 	}
 

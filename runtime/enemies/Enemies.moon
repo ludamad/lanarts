@@ -6,8 +6,8 @@ GameObject = require "core.GameObject"
 World = require "core.World"
 EffectUtils = require "spells.EffectUtils"
 
+random_xy_near = (obj) -> {obj.x + random(-32,32), obj.y + random(-32, 32)}
 -- ELEMENTAL ENEMIES --
-
 
 -- UNDEAD ENEMIES --
 
@@ -435,7 +435,7 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
     step_func: () =>
         @timeout -= 1
         if @timeout <= 0
-            @projectile_attack "Purple Dragon Projectile"
+            @projectile_attack "Purple Dragon Projectile", random_xy_near(@)
             --
             @timeout = if Map.object_visible(@) then 200 else 50
     death_func: () =>
@@ -528,7 +528,7 @@ DataW.enemy_create {
     radius: 18
     xpaward: 200
     unique: true
-    types: {"Bludgeon"}
+    types: {"Red", "Bludgeon"}
     stats: {
         attacks: {{weapon: "Basic Melee"}}
         hp: 150
@@ -636,7 +636,7 @@ DataW.enemy_create {
     projectile: {
         weapon_class: 'bows'
         damage_type: {physical: 1.0}
-        types: {"Piercing", "Green"}
+        types: {"Piercing"}
         cooldown: 30
         speed: 9
         power: {base: {10, 10}}
@@ -666,7 +666,7 @@ DataW.enemy_create {
         weapon_class: 'bows'
         damage_type: {physical: 1.0}
         cooldown: 30
-        types: {"Piercing", "Green"}
+        types: {"Piercing"}
         speed: 9
         spr_attack: 'nessos arrows'
         power: {base: {10, 10}}
@@ -708,7 +708,7 @@ DataW.enemy_create {
         cooldown: 20
         speed: 9
         spr_attack: 'nessos arrows'
-        types: {"Piercing", "Green"}
+        types: {"Piercing"}
         on_hit_func: (target, atkstats) =>
             if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
                 eff = target\add_effect "Poison", {
@@ -866,10 +866,11 @@ DataW.enemy_create {
     appear_message: "A giant fiery bat surveys the scene."
     defeat_message: "The fire bat has died."
     stats: {
-        hp: 18
+        hp: 40
         hpregen: 0.03
         movespeed: 4
-        strength: 10
+        strength: 20
+        magic: 20
         defence: 5
         willpower: 5
     }
@@ -878,10 +879,8 @@ DataW.enemy_create {
     step_func: () =>
         @timeout -= 1
         if @timeout <= 0
-            @projectile_attack "Fire Bat Projectile"
-            @projectile_attack "Fire Bat Projectile"
-            @projectile_attack "Fire Bat Projectile"
-            @projectile_attack "Fire Bat Projectile"
+            for i=1,5
+                @projectile_attack "Fire Bat Projectile", random_xy_near(@)
             @timeout = 20
     types: {"Red"}
     projectile: {
@@ -1089,7 +1088,7 @@ DataW.enemy_create {
     xpaward: 20
     appear_message: "An unnaturally glowing chicken appears!"
     defeat_message: "The glowing chicken recieves a final blow."
-    types: {"Black"}
+    types: {"Green"}
     weapon: {cooldown: 20}
     stats: {
         hp: 40
@@ -1099,6 +1098,187 @@ DataW.enemy_create {
         defence: 10
         willpower: 10
     }
+}
+
+DataW.enemy_create {
+    name: "Giant Chicken"
+    death_sprite: "blood"
+    sprite: "spr_enemies.animals.chicken_giant"
+    radius: 32
+    xpaward: 20
+    appear_message: "An unnaturally giant chicken appears!"
+    defeat_message: "The giant chicken topples over."
+    types: {"Green"}
+    weapon: {cooldown: 100}
+    stats: {
+        hp: 80
+        hpregen: 0.08
+        movespeed: 4
+        strength: 45
+        defence: 10
+        willpower: 10
+    }
+    init_func: () =>
+        @timeout = 0
+    step_func: () =>
+        @timeout -= 1
+        if @timeout <= 0
+            eff = @add_effect "Dash Attack", 10
+            eff.angle = math.atan2(@vy, @vx)
+            @timeout = 200
+    effects_active: {"KnockbackWeapon"}
+}
+
+
+DataW.enemy_create {
+    name: "Clucky"
+    sprite: "spr_enemies.animals.chicken_boss1"
+    death_sprite: "blood"
+    radius: 32
+    xpaward: 50
+    appear_message: "The grizzled chicken archer warrior Clucky greets you!"
+    defeat_message: "Clucky may as well be fried."
+    types: {"Green"}
+    weapon: {cooldown: 20}
+    stats: {
+        hp: 100
+        hpregen: 0.1
+        movespeed: 3
+        strength: 35
+        defence: 10
+        willpower: 10
+    }
+    --init_func: () =>
+    --    @timeout = 0
+    --step_func: () =>
+    --    @timeout -= 1
+    --    if @timeout <= 0
+    --        eff = @add_effect "Dash Attack", 10
+    --        eff.angle = math.atan2(@vy, @vx)
+    --        @timeout = 200
+    projectile: {
+        weapon_class: 'bows'
+        damage_type: {physical: 1.0}
+        cooldown: 30
+        types: {"Piercing"}
+        speed: 12
+        spr_attack: 'spr_weapons.huge_bolt48'
+        power: {base: {10, 10}}
+        on_hit_func: (target, atkstats) =>
+            if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
+                eff = target\add_effect "Exhausted", 5
+    }
+}
+
+DataW.enemy_create {
+    name: "Poulter"
+    sprite: "spr_enemies.animals.chicken_boss2"
+    death_sprite: "blood"
+    radius: 32
+    xpaward: 50
+    appear_message: "The experienced chicken mage Poulter greets you!"
+    defeat_message: "Poulter is defeated!"
+    types: {"Green"}
+    weapon: {cooldown: 20}
+    stats: {
+        hp: 100
+        hpregen: 0.1
+        movespeed: 3
+        strength: 35
+        defence: 10
+        willpower: 20
+    }
+    _tornado_storm: () => 
+        --@_projatk "Tornado Storm"
+        --@timeout = 50
+    _energy_spear: () =>
+        @_projatk "Energy Spear"
+        @timeout = 5
+    _berserk: () =>
+        @do_spell("Berserk", {@x, @y})
+        @timeout = 10
+    _dash: () => 
+        eff = @add_effect "Dash Attack", 10
+        eff.angle = math.atan2(@vy, @vx)
+        @timeout = 20
+    _healing_aura: () => 
+        eff = @add_effect "Healing Aura", 10
+        eff.angle = math.atan2(@vy, @vx)
+        @timeout = 20
+    _mephitize: () => 
+    step_func: () =>
+        @timeout -= 1
+        if @timeout <= 0
+            local effect 
+            if chance(.1)
+                effect = random_choice {@_tornado_storm}
+            elseif chance(.1)
+                effect = random_choice {@_berserk}
+            else
+                effect = random_choice {
+                    @_energy_spear
+                    @_dash
+                }
+            effect(@)
+    init_func: () =>
+        @timeout = 0
+    step_func: () =>
+        @timeout -= 1
+        if @timeout <= 0
+            --@projectile_attack "Tornado Storm", random_xy_near(@)
+            @timeout = 200
+}
+
+DataW.enemy_create {
+    name: "Waffles"
+    sprite: "spr_enemies.animals.chicken_boss3"
+    death_sprite: "blood"
+    radius: 32
+    xpaward: 50
+    appear_message: "The chicken jester Waffles greets you!"
+    defeat_message: "Waffles is defeated!"
+    types: {"Green", "White", "Red"}
+    weapon: {cooldown: 20}
+    stats: {
+        hp: 100
+        hpregen: 0.1
+        movespeed: 3
+        strength: 35
+        defence: 10
+        willpower: 10
+    }
+    _target_xy: () =>
+        return (if @target == nil then random_xy_near(@) else @target.xy)
+    _projatk: (proj) => @projectile_attack proj, @_target_xy()
+    init_func: () =>
+        @timeout = 0
+    _tornado_storm: () => 
+        --@_projatk "Tornado Storm"
+        --@timeout = 50
+    _energy_spear: () =>
+        @_projatk "Energy Spear"
+        @timeout = 5
+    _berserk: () =>
+        @do_spell("Berserk", {@x, @y})
+        @timeout = 10
+    _dash: () => 
+        eff = @add_effect "Dash Attack", 10
+        eff.angle = math.atan2(@vy, @vx)
+        @timeout = 20
+    step_func: () =>
+        @timeout -= 1
+        if @timeout <= 0
+            local effect 
+            if chance(.1)
+                effect = random_choice {@_tornado_storm}
+            elseif chance(.1)
+                effect = random_choice {@_berserk}
+            else
+                effect = random_choice {
+                    @_energy_spear
+                    @_dash
+                }
+            effect(@)
 }
 
 -- UNDEAD ENEMIES

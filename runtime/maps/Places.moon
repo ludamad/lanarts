@@ -168,6 +168,35 @@ SimpleRoom = newtype {
                     MapUtils.spawn_item(@map, type, 1, sqr)
 }
 
+ChickenCoop = newtype {
+    parent: MapCompiler
+    root_node: Shape {
+            shape: 'windows'
+            size: {60, 60}
+        }
+    tileset: TileSets.lair
+    -- Called before compile() is called 
+    generate: (args) =>
+        enemies = args.enemies or {}
+        --enemies["Poulter"] = 1
+        --enemies["Waffles"] = 1
+        enemies["Clucky"] = 10
+        for enemy, amount in pairs enemies
+            for i=1,amount
+                sqr = MapUtils.random_square(@map, nil)
+                MapUtils.spawn_enemy(@map, enemy, sqr)
+        items = args.items or {}
+        for type, amount in pairs items
+            if type == "Gold" or _G.items[type].drop_chance ~= nil
+                sqr = MapUtils.random_square(@map, nil)
+                MapUtils.spawn_item(@map, type, amount, sqr)
+            else
+                for i=1,amount
+                    sqr = MapUtils.random_square(@map, nil)
+                    MapUtils.spawn_item(@map, type, 1, sqr)
+}
+
+
 create_isolated = (args) ->
     {:MapCompilerContext} = require "maps.MapCompilerContext"
     cc = MapCompilerContext.create()
@@ -175,4 +204,4 @@ create_isolated = (args) ->
     -- Compile the map
     return cc\get(args)
 
-return nilprotect {:DragonLair, :DragonLairFoyer, :Arena, :SimpleRoom, :create_isolated}
+return nilprotect {:DragonLair, :DragonLairFoyer, :Arena, :SimpleRoom, :create_isolated, :ChickenCoop}

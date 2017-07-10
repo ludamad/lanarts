@@ -212,9 +212,7 @@ static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
 
 const float PI = 3.141592f;
 
-static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
-        SpellEntry& spl_entry, const Projectile& projectile,
-        const Pos& target) {
+void combatgameinst_use_projectile(GameState *gs, CombatGameInst *p, const Projectile &projectile, const Pos &target) {
     MTwist& mt = gs->rng();
     AttackStats projectile_attack(Weapon(), projectile);
     ProjectileEntry& pentry = projectile.projectile_entry();
@@ -265,12 +263,10 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
     // Set global cooldown for spell:
     p->cooldowns().spell_cooldowns[spl_entry.id] = (int)std::max(spl_entry.spell_cooldown * spell_cooldown_mult, p->cooldowns().spell_cooldowns[spl_entry.id] * spell_cooldown_mult);
     if (spl_entry.uses_projectile()) {
-        player_use_projectile_spell(gs, p, spl_entry, spl_entry.projectile,
-                target);
-    } else {
-        // Use action_func callback
-        lcall(spl_entry.action_func, /*caster*/ p, target.x, target.y, /*target object*/ gs->get_instance(p->target()));
+        combatgameinst_use_projectile(gs, p, spl_entry.projectile, target);
     }
+    // Use action_func callback, if installed (even if projectile shot)
+    lcall(spl_entry.action_func, /*caster*/ p, target.x, target.y, /*target object*/ gs->get_instance(p->target()));
 }
 
 bool PlayerInst::enqueue_not_enough_mana_actions(GameState* gs) {

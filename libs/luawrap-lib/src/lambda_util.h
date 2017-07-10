@@ -88,7 +88,7 @@ inline int _lua_lambda_wrap_void(lua_State* L) {
 template <typename Function, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 inline int _lua_lambda_wrap_void(lua_State* L) {
     auto& f = TempFunctionStorer<Function>::get();
-    f(luawrap::get<Arg1>(L, 1), luawrap::get<Arg2>(L, 2), luawrap::get<Arg3>(L, 3), luawrap::get<Arg3>(L, 4));
+    f(luawrap::get<Arg1>(L, 1), luawrap::get<Arg2>(L, 2), luawrap::get<Arg3>(L, 3), luawrap::get<Arg4>(L, 4));
     return 0;
 }
 template<class T>

@@ -114,6 +114,41 @@ CombatGameInst* MonsterController::find_actor_to_target(GameState* gs, EnemyInst
 void MonsterController::pre_step(GameState* gs) {
     perf_timer_begin(FUNCNAME);
 
+    if (smell_map.empty()) {
+        smell_map.resize(gs->tiles().size());
+        swap_smell_map.resize(gs->tiles().size());
+    } else if (gs->frame() % 2 == 0) {
+        // Calculate new smell map:
+        BBox area {{1,1}, smell_map.size() - Size(2,2)};
+        swap_smell_map.fill(0.0f);
+        FOR_EACH_BBOX(area, x, y) {
+            if (smell_map[{x,y}] == 0.0f) {
+                continue;
+            }
+            BBox subarea = {{x - 1, y - 1}, Size(3,3)};
+            float val = smell_map[{x,y}];
+            FOR_EACH_BBOX(subarea, xx, yy) {
+                    if ((*gs->tiles().solidity_map())[{xx,yy}]) {
+                        continue;
+                    }
+                    float& result = swap_smell_map[{xx,yy}];
+                if (result <= 0) {
+                    // Positive smells trump negative:
+                    if (val > 0) {
+                        result = val - 1;
+                    } else if (val < result) {
+                        // More negative trumps less negative:
+                        result = val + 1;
+                    }
+                // But once we go good, only look for more good:
+                } else if (val > result) {
+                    result = val - 1;
+                }
+            }
+        }
+        smell_map._internal_vector().swap(swap_smell_map._internal_vector());
+
+    }
     CollisionAvoidance& coll_avoid = gs->collision_avoidance();
     std::vector<EnemyOfInterest> eois;
 
@@ -124,6 +159,16 @@ void MonsterController::pre_step(GameState* gs) {
     mids2.reserve(mids.size());
     mids.swap(mids2);
 
+    for (int i = 0; i < mids2.size(); i++) {
+        EnemyInst* e = (EnemyInst*)gs->get_instance(mids2[i]);
+        if (e == NULL)
+            continue;
+        // Plant smells:
+        Pos xy = e->ipos();
+        if (smell_map[{xy.x / TILE_SIZE, xy.y / TILE_SIZE}] < 127) {
+            smell_map[{xy.x / TILE_SIZE, xy.y / TILE_SIZE}] += 1;
+        }
+    }
     for (int i = 0; i < mids2.size(); i++) {
         EnemyInst* e = (EnemyInst*)gs->get_instance(mids2[i]);
         if (e == NULL)

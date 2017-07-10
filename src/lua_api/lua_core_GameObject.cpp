@@ -81,6 +81,13 @@ static int lapi_gameinst_getter_fallback(lua_State* L) {
 }
 
 /* Use a per-instance lua table as a fallback */
+static int lapi_enemyinst_getter_fallback(lua_State* L) {
+    luawrap::get<EnemyInst*>(L, 1)->etype().raw_table.push();
+    lua_pushvalue(L, 2); // On stack: [type table, key]
+    lua_gettable(L, -2); // On stack [type table, value]
+    return 1;
+}
+/* Use a per-instance lua table as a fallback */
 static int lapi_gameinst_setter_fallback(lua_State* L) {
 	lua_pushvalue(L, 2);
 	lua_pushvalue(L, 3);
@@ -199,6 +206,7 @@ static int lapi_do_nothing(lua_State *L) {
     return 0;
 }
 
+void combatgameinst_use_projectile(GameState *gs, CombatGameInst *p, const Projectile &projectile, const Pos &target);
 static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(CombatGameInst*);
 
@@ -213,9 +221,11 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
     luawrap::bind_getter(getters["team"], &CombatGameInst::team);
     luawrap::bind_getter(getters["vision_radius"], &CombatGameInst::vision_radius);
     luawrap::bind_setter(setters["vision_radius"], &CombatGameInst::vision_radius);
+
 	getters["stats"].bind_function(lapi_gameinst_stats);
 
 	LuaValue methods = luameta_constants(meta);
+    LUAWRAP_GETTER(methods, within_field_of_view, OBJ->within_field_of_view(luawrap::get<Pos>(L, 2)));
     methods["is_combat_object"] = true;
 	methods["learn_spell"] = [&](CombatGameInst* inst, const char* spellname) {
 		auto& spell = game_spell_data.get(spellname);
@@ -234,7 +244,22 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true,
             // Damage multiplier:
             luawrap::get_defaulted(L, 3, 1.0f))) );
-    LUAWRAP_METHOD(methods, projectile_attack, OBJ->projectile_attack(lua_api::gamestate(L), NULL, Weapon(), Item(get_projectile_by_name(lua_tostring(L, 2)))));
+    methods["do_spell"] = [L](CombatGameInst* caster, const char* spell_name, Pos target) {
+        SpellEntry& spell = game_spell_data.get(spell_name);
+        auto* gs = lua_api::gamestate(L);
+        if (spell.uses_projectile()) {
+            combatgameinst_use_projectile(gs, caster, spell.projectile, target);
+        }
+        lcall(spell.action_func, caster, target.x, target.y);
+    };
+    methods["projectile_attack"] = [L](CombatGameInst* caster, const char* projectile_name, Pos target) {
+        // TODO use target objects as part of projectile attacks
+        // TODO just directly make Lua objects -> projectiles are lua object entries
+        auto* gs = lua_api::gamestate(L);
+//        CombatGameInst* target_object = ltarget_object.isnil() ? NULL : ltarget_object.as<CombatGameInst*>();
+        combatgameinst_use_projectile(gs, caster, Projectile((int)game_item_data.get_id(projectile_name)), target);
+    };
+//    LUAWRAP_METHOD(methods, projectile_attack, OBJ->projectile_attack(lua_api::gamestate(L), (lua_gettop(L) < 3 ? NULL : luawrap::get<CombatGameInst*>(L, 3)), Weapon(), Item(get_projectile_by_name(lua_tostring(L, 2)))));
 
     methods["damage"].bind_function(lapi_combatgameinst_damage);
 	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);
@@ -243,6 +268,11 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
     LUAWRAP_METHOD(methods, die, OBJ->die(lua_api::gamestate(L)));
     LUAWRAP_GETTER(methods, is_local_player, false);
 
+	LUAWRAP_GETTER(getters, weapon_sprite, res::sprite(OBJ->stats().equipment.weapon().weapon_entry().item_sprite));
+
+	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->stats().equipment.weapon().weapon_entry().uses_projectile);
+	LUAWRAP_GETTER(methods, has_ranged_weapon, OBJ->stats().equipment.weapon().weapon_entry().uses_projectile);
+	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
 	methods["reset_rest_cooldown"].bind_function(lapi_do_nothing);
 
         methods["inventory"] = [=](CombatGameInst* inst) -> LuaValue {
@@ -293,7 +323,13 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
 	LuaValue meta = lua_combatgameinst_metatable(L);
 	LuaValue methods = luameta_constants(meta), getters = luameta_getters(meta), setters = luameta_setters(meta);
 
+
+    lua_pushcfunction(L, &lapi_enemyinst_getter_fallback);
+    luameta_defaultgetter(meta, LuaStackValue(L, -1));
+    lua_pop(L, 1);
+
 	LUAWRAP_GETTER(getters, name, OBJ->etype().name);
+    LUAWRAP_GETTER(getters, type, game_enemy_data.get_raw_data()[OBJ->etype().name]);
     LUAWRAP_GETTER(getters, unique, OBJ->etype().unique);
     LUAWRAP_GETTER(getters, is_enemy, true);
 	LUAWRAP_GETTER(getters, kills, 0);
@@ -366,15 +402,9 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_SETTER(setters, is_ghost, bool, OBJ->is_ghost() = VAL);
 	LUAWRAP_SETTER(setters, input_source, LuaValue, OBJ->input_source().value = VAL);
 	LUAWRAP_GETTER(getters, input_source, OBJ->input_source().value);
-	LUAWRAP_GETTER(getters, weapon_sprite, res::sprite(OBJ->weapon().weapon_entry().item_sprite));
-    
-	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->weapon().weapon_entry().uses_projectile);
-	LUAWRAP_GETTER(methods, has_ranged_weapon, OBJ->weapon().weapon_entry().uses_projectile);
-	LUAWRAP_GETTER(methods, within_field_of_view, OBJ->within_field_of_view(luawrap::get<Pos>(L, 2)));
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_focus_player(lua_api::gamestate(L)));
 	LUAWRAP_GETTER(methods, can_benefit_from_rest, OBJ->can_benefit_from_rest());
 	LUAWRAP_METHOD(methods, gain_xp, players_gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
-	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
 
     methods["apply_melee_cooldown"].bind_function(apply_melee_cooldown);
     methods["direction_towards_unexplored"].bind_function(direction_towards_unexplored);

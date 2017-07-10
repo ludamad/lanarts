@@ -190,6 +190,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 		if (is_visible(gs, e, p)) {
 			eb.chase_timeout = OFFSCREEN_CHASE_TIME;
 			eb.chasing_actor = p->id;
+			e->target() = p->id;
 		}
 
 		if (!potentially_randomize_movement(gs, e)) {
