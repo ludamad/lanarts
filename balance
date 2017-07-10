@@ -105,3 +105,6 @@ Necromancer:
     - gain meter for abilities doing certain things
     - meter automatically spent when conditions are met
         - e.g. heal when see an injured ally
+
+spells:
+ice floor - turn any tile into ice -- blue spell

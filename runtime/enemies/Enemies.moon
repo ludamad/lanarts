@@ -528,13 +528,13 @@ DataW.enemy_create {
     radius: 18
     xpaward: 200
     unique: true
-    types: {"Red"}
+    types: {"Bludgeon"}
     stats: {
         attacks: {{weapon: "Basic Melee"}}
         hp: 150
         hpregen: 0.25
         movespeed: 3.5
-        strength: 45
+        strength: 40
         magic: 10
         defence: 8
         willpower: 8

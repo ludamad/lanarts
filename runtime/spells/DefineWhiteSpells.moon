@@ -102,7 +102,8 @@ DataW.spell_create {
             
     }
     mp_cost: 20,
-    cooldown: 50
+    cooldown: 35
+    spell_cooldown: 65
 }
 
 -- ENERGY SPEAR
@@ -130,7 +131,7 @@ DataW.spell_create {
             @bonus += 0.1
             atkstats.damage *= @bonus
     }
-    mp_cost: 10
+    mp_cost: 11
     cooldown: 35
 }
 

@@ -147,7 +147,7 @@ DataW.weapon_create {
 
 DataW.weapon_create {
     name = "Gallanthor's Crutch",
-    description = "The epic staff of crippled archmage",
+    description = "The epic staff of crippled archmage Gallanthor. Used in the first 200 years of his life.",
     type = "staves",
 
     shop_cost = {125, 255},
@@ -165,6 +165,32 @@ DataW.weapon_create {
     range = 7
 }
 
+DataW.weapon_create {
+    name = "Gallanthor's 5-Colour Staff",
+    description = "The epic staff of crippled archmage's later perfection of the chromatic arts. Used in the first 500 years of his life.",
+    type = "staves",
+
+    shop_cost = {525, 2055},
+    types = {
+        "Bludgeon"
+    },
+
+    spr_item = "epic staff",
+    
+    spell_cooldown_multiplier = 0.85,
+
+    cooldown = 40,
+    stat_bonus = {magic = 3},
+
+    range = 7,
+    effects_granted = {
+        {"RedPower", {power=1}},
+        {"BluePower", {power=1}},
+        {"BlackPower", {power=1}},
+        {"GreenPower", {power=1}},
+        {"WhitePower", {power=1}},
+    }
+}
 
 DataW.weapon_create {
     name = "Serated Sword",

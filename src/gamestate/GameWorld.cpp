@@ -17,6 +17,7 @@
 #include "stats/ClassEntry.h"
 
 #include <lcommon/math_util.h>
+#include <objects/InstTypeEnum.h>
 
 #include "lanarts_defines.h"
 
@@ -47,28 +48,37 @@ level_id GameWorld::get_current_level_id() {
 	return gs->get_level()->id();
 }
 
-void GameWorld::serialize(SerializeBuffer& serializer) {
-	_enemies_seen.serialize(serializer);
+void GameWorld::serialize(SerializeBuffer& sb) {
+	_enemies_seen.serialize(sb);
 
-	serializer.write_int(level_states.size());
+	sb.write_int(level_states.size());
 	GameMapState* original = gs->get_level();
 
 	for (int i = 0; i < level_states.size(); i++) {
 		GameMapState* lvl = level_states[i];
-		serializer.write( Size(lvl->width(), lvl->height()) );
+		sb.write( Size(lvl->width(), lvl->height()) );
 		gs->set_level(lvl);
-		lvl->serialize(gs, serializer);
+		lvl->serialize(gs, sb);
 	}
 
 	gs->set_level(original);
-        team_data().serialize(gs, serializer);
+        team_data().serialize(gs, sb);
+	sb.write_container(_alive_removed_objects, [&](const GameInstRef& ref) {
+		GameInst* inst = ref.get();
+		sb.write_int(get_inst_type(inst));
+		sb.write_int(inst->id);
+		inst->serialize(gs, sb);
+	});
+	for (GameInstRef& ref : _alive_removed_objects) {
+		ref->serialize_lua(gs, sb);
+	}
 }
 
-void GameWorld::deserialize(SerializeBuffer& serializer) {
-	_enemies_seen.deserialize(serializer);
+void GameWorld::deserialize(SerializeBuffer& sb) {
+	_enemies_seen.deserialize(sb);
 
 	int nlevels;
-	serializer.read_int(nlevels);
+	sb.read_int(nlevels);
 	for (int i = 0; i < level_states.size(); i++) {
 		delete level_states.at(i);
                 level_states.at(i) = NULL;
@@ -79,17 +89,17 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 
 	for (int i = 0; i < level_states.size(); i++) {
 		Size size;
-		serializer.read(size);
+		sb.read(size);
 		if (level_states[i] == NULL) {
 			level_states[i] = new GameMapState(i, ldungeon_gen::MapPtr(), size, false, false);
 		}
 		gs->set_level(level_states[i]);
-		level_states[i]->deserialize(gs, serializer);
+		level_states[i]->deserialize(gs, sb);
 	}
 
 	gs->set_level(original);
 	midstep = false;
-        team_data().deserialize(gs, serializer);
+        team_data().deserialize(gs, sb);
 
     gs->for_screens([&]() {
         GameMapState *level = gs->local_player()->get_map(gs);
@@ -97,6 +107,23 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
             set_current_level(level);
         }
     });
+
+	sb.read_container(_alive_removed_objects, [&](GameInstRef& ref) {
+		InstType type;
+		int id;
+		sb.read_int(type);
+		sb.read_int(id);
+		GameInst* inst = from_inst_type(type);
+        inst->id = id;
+		inst->deserialize(gs, sb);
+		inst->last_x = inst->x;
+		inst->last_y = inst->y;
+        ref = GameInstRef(inst);
+	});
+	for (GameInstRef& ref : _alive_removed_objects) {
+		ref->deserialize_lua(gs, sb);
+	}
+
 }
 
 GameMapState* GameWorld::map_create(const Size& size, ldungeon_gen::MapPtr source_map, bool wandering_enabled) {
@@ -218,6 +245,15 @@ bool GameWorld::step() {
         }
         gs->screens.screen().last_player_pos = gs->local_player()->ipos();
 	});
+	// TODO performance
+	std::vector<GameInstRef> new_keep_alives;
+	for (GameInstRef ref : _alive_removed_objects) {
+		if (ref.get()->reference_count > 1) {
+			ref->id = -int(new_keep_alives.size());
+			new_keep_alives.push_back(ref);
+		}
+	}
+	_alive_removed_objects.swap(new_keep_alives);
 
 	gs->frame()++;
 	return true;
@@ -239,7 +275,7 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	}
         LuaValue lua_object = inst->lua_variables;// stash lua object;
 
-	gs->remove_instance(inst);
+	gs->remove_instance(inst, /* Dont trigger on-destroy effects */ false);
 	gref->last_x = x, gref->last_y = y;
 	gref->update_position(x, y);
 
@@ -277,6 +313,7 @@ void GameWorld::reset() {
             lazy_reset();
             return;
 	}
+//    _alive_removed_objects.clear(); // Apparently harmful; dont do this. Better to allow serialization have access to objects from previous runs.
 	std::vector<GameMapState*> delete_list = level_states;
         player_data().remove_all_players(gs);
         level_states.clear();
@@ -324,4 +361,13 @@ void GameWorld::spawn_players(GeneratedRoom& genlevel, void** player_instances,
 
 GameMapState *GameWorld::get_current_level() {
 	return gs->screens.get_current_level();
+}
+
+void GameWorld::register_removed_object(GameInst* inst) {
+	inst->id = -int(_alive_removed_objects.size());
+	_alive_removed_objects.push_back({inst});
+}
+
+GameInstRef &GameWorld::get_removed_object(int id) {
+	return _alive_removed_objects.at(id);
 }

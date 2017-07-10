@@ -263,13 +263,17 @@ void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(explore_state);
 //	serializer.read_container(queued_actions);
 	queued_actions.clear();
-	paths_to_object().initialize(gs->tiles().solidity_map());
-	paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
+	if (id > 0) {
+		paths_to_object().initialize(gs->tiles().solidity_map());
+		paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
+	}
 	//update_field_of_view(gs);
 	DESERIALIZE_POD_REGION(serializer, this, local, spellselect);
 
-	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
-	collision_simulation_id() = coll_avoid.add_player_object(this);
+	if (id > 0) {
+		CollisionAvoidance &coll_avoid = gs->collision_avoidance();
+		collision_simulation_id() = coll_avoid.add_player_object(this);
+	}
 	io_value.init(LuaValue());
 }
 

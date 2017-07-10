@@ -203,10 +203,10 @@ void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 		bool has_inst = inst != NULL;
 		if (!has_inst) {
 			inst = from_inst_type(type);
+			inst->id = id;
 			inst->deserialize(gs, serializer);
 			inst->last_x = inst->x;
 			inst->last_y = inst->y;
-			inst->id = id;
 			add_instance(inst, inst->id);
 			instances.push_back(inst);
 		} else {

@@ -66,10 +66,6 @@ class GameStatePostSerializeData {
 public:
     void clear();
     void postpone_instance_deserialization(GameInst** holder, level_id current_floor, obj_id id);
-	void postpone_destroyed_instance_deserialization(GameInst** holder);
-	void postpone_destroyed_instance_serialization(GameInst* inst);
-	void serialize(SerializeBuffer& sb);
-	void deserialize(SerializeBuffer& sb);
     void process(GameState* gs);
 private:
     struct GameInstPostSerializeData {
@@ -80,8 +76,6 @@ private:
 	bool accepting_data = true;
     // Used to determine what to fix-up after serialization:
     std::vector<GameInstPostSerializeData> postponed_insts;
-	std::vector<GameInst**> inst_to_deserialize;
-	std::vector<GameInst*> inst_to_serialize;
 };
 
 class GameState {
@@ -117,7 +111,7 @@ public:
 	GameInst* get_instance(level_id level, obj_id id);
 	obj_id add_instance(GameInst* inst);
 	obj_id add_instance(level_id level, GameInst* inst);
-	void remove_instance(GameInst* inst);
+	void remove_instance(GameInst* inst, bool add_to_removed = true);
 	//Skip an instance id as if we were making an instance
 	//used for synchronization purposes in network play
 	void skip_next_instance_id();

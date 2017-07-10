@@ -303,7 +303,6 @@ void GameState::serialize(SerializeBuffer& serializer) {
 
 	player_data().serialize(this, serializer);
 
-    post_deserialize_data().serialize(serializer);
     screens.serialize(this, serializer);
 	luawrap::globals(L)["Engine"]["post_serialize"].push();
 	luawrap::call<void>(L);
@@ -337,7 +336,6 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	world.deserialize(serializer);
 	player_data().deserialize(this, serializer);
 
-    post_deserialize_data().deserialize(serializer);
 	post_deserialize_data().process(this);
     screens.deserialize(this, serializer);
 
@@ -597,7 +595,7 @@ obj_id GameState::add_instance(GameInst* inst) {
 	return get_level()->add_instance(this, inst);
 }
 
-void GameState::remove_instance(GameInst* inst) {
+void GameState::remove_instance(GameInst* inst, bool add_to_removed) {
 	if (inst->destroyed) {
 		return;
 	}
@@ -606,6 +604,9 @@ void GameState::remove_instance(GameInst* inst) {
 			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
 	GameMapState* level = world.get_level(inst->current_floor);
 	level->game_inst_set().remove_instance(inst);
+    if (add_to_removed) {
+        game_world().register_removed_object(inst);
+    }
 	inst->deinit(this);
 }
 
@@ -790,8 +791,6 @@ void loop(const char* sound_path) {
 
 void GameStatePostSerializeData::clear() {
     postponed_insts.clear();
-    inst_to_deserialize.clear();
-    inst_to_serialize.clear();
     accepting_data = true;
 }
 
@@ -803,7 +802,9 @@ void GameStatePostSerializeData::postpone_instance_deserialization(GameInst** ho
 void GameStatePostSerializeData::process(GameState* gs) {
     accepting_data = false;
     for (GameInstPostSerializeData& e : postponed_insts) {
-        GameInst* inst = gs->get_level(e.current_floor)->game_inst_set().get_instance(e.id);
+        GameInst* inst = e.id > 0 ?
+						 gs->get_level(e.current_floor)->game_inst_set().get_instance(e.id)
+								  : gs->game_world().get_removed_object(-e.id).get();
         if (inst == NULL) {
             throw std::runtime_error(format("Attempt to load GameInst that cannot be found at level %d, id %d!", e.current_floor, e.id));
         } else {
@@ -819,45 +820,45 @@ void GameStatePostSerializeData::process(GameState* gs) {
         }
     }
 }
-
-void GameStatePostSerializeData::deserialize(SerializeBuffer &sb) {
-    accepting_data = false;
-    for (GameInst** ptr : inst_to_deserialize) {
-        InstType type;
-        int id;
-        sb.read_int(type);
-        sb.read_int(id);
-        GameInst*& inst = *ptr;
-        inst = from_inst_type(type);
-        inst->deserialize(gs(sb), sb);
-        inst->last_x = inst->x;
-        inst->last_y = inst->y;
-        inst->id = id;
-    }
-    for (GameInst** ptr : inst_to_deserialize) {
-        GameInst*& inst = *ptr;
-        inst->deserialize_lua(gs(sb), sb);
-    }
-}
-
-void GameStatePostSerializeData::serialize(SerializeBuffer &sb) {
-    accepting_data = false;
-    for (GameInst* inst : inst_to_serialize) {
-        sb.write_int(get_inst_type(inst));
-        sb.write_int(inst->id);
-        inst->serialize(gs(sb), sb);
-    }
-    for (GameInst* inst : inst_to_serialize) {
-        inst->serialize_lua(gs(sb), sb);
-    }
-}
-
-void GameStatePostSerializeData::postpone_destroyed_instance_deserialization(GameInst **holder) {
-    LANARTS_ASSERT(accepting_data);
-    inst_to_deserialize.push_back(holder);
-}
-
-void GameStatePostSerializeData::postpone_destroyed_instance_serialization(GameInst *inst) {
-    LANARTS_ASSERT(accepting_data);
-    inst_to_serialize.push_back(inst);
-}
+//
+//void GameStatePostSerializeData::deserialize(SerializeBuffer &sb) {
+//    accepting_data = false;
+//    for (GameInst** ptr : inst_to_deserialize) {
+//        InstType type;
+//        int id;
+//        sb.read_int(type);
+//        sb.read_int(id);
+//        GameInst*& inst = *ptr;
+//        inst = from_inst_type(type);
+//        inst->deserialize(gs(sb), sb);
+//        inst->last_x = inst->x;
+//        inst->last_y = inst->y;
+//        inst->id = id;
+//    }
+//    for (GameInst** ptr : inst_to_deserialize) {
+//        GameInst*& inst = *ptr;
+//        inst->deserialize_lua(gs(sb), sb);
+//    }
+//}
+//
+//void GameStatePostSerializeData::serialize(SerializeBuffer &sb) {
+//    accepting_data = false;
+//    for (GameInst* inst : inst_to_serialize) {
+//        sb.write_int(get_inst_type(inst));
+//        sb.write_int(inst->id);
+//        inst->serialize(gs(sb), sb);
+//    }
+//    for (GameInst* inst : inst_to_serialize) {
+//        inst->serialize_lua(gs(sb), sb);
+//    }
+//}
+//
+//void GameStatePostSerializeData::postpone_destroyed_instance_deserialization(GameInst **holder) {
+//    LANARTS_ASSERT(accepting_data);
+//    inst_to_deserialize.push_back(holder);
+//}
+//
+//void GameStatePostSerializeData::postpone_destroyed_instance_serialization(GameInst *inst) {
+//    LANARTS_ASSERT(accepting_data);
+//    inst_to_serialize.push_back(inst);
+//}

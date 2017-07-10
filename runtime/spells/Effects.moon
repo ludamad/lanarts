@@ -995,7 +995,8 @@ DataW.effect_create {
         new.speed *= 4
         if @n_steps > @n_ramp
             new.melee_cooldown_multiplier *= 0.5
-        new.hpregen *= 2
+        if mon.name ~= "Gragh"
+            new.hpregen *= 2
     effected_sprite: "spr_effects.i-loudness"
     effected_colour: {255,0,0}
     fade_out: 15

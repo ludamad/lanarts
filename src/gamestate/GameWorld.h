@@ -63,7 +63,7 @@ public:
 	}
 	int get_current_level_id();
 	void connect_entrance_to_exit(int roomid1, int roomid2);
-	void serialize(SerializeBuffer& serializer);
+	void serialize(SerializeBuffer& sb);
 	void deserialize(SerializeBuffer& serializer);
         
         bool& should_sync_states() {
@@ -74,6 +74,8 @@ public:
         TeamData& team_data() {
             return _team_data;
         }
+    void register_removed_object(GameInst* inst);
+	GameInstRef& get_removed_object(int id);
 private:
 	void place_player(GameMapState* map, GameInst* p);
 	void spawn_players(GeneratedRoom& genlevel, void** player_instances,
@@ -88,6 +90,8 @@ private:
 	GameState* gs;
 	LuaValue lua_level_states;
 	bool _should_sync_states = false;
+	// All removed objects that are still held on to by game state.
+	std::vector<GameInstRef> _alive_removed_objects;
 	std::vector<GameMapState*> level_states;
 	TeamData _team_data;
 };

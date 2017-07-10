@@ -101,7 +101,6 @@ void GameInst::deinit(GameState* gs) {
 //            lcall(luawrap::globals(gs->luastate())["deadprotect"], lua_variables);
 //        }
 //	lua_variables.clear();
-	id = 0;
 	current_floor = -1;
 }
 

@@ -662,7 +662,7 @@ void CombatGameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
     DESERIALIZE_POD_REGION(serializer, this, team, current_target);
     base_stats.deserialize(gs, serializer);
     estats.deserialize(serializer);
-    if (team == PLAYER_TEAM) {
+    if (team == PLAYER_TEAM && id > 0) {
         _paths_to_object = new FloodFillPaths();
 	paths_to_object().initialize(gs->tiles().solidity_map());
         field_of_view = new fov();
