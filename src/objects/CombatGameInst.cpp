@@ -560,7 +560,7 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
     float dist = sqrt(dx * dx + dy * dy);
     dist = round(dist * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 
-    bool collided = gs->tile_radius_test(round(newxy.x), round(newxy.y), 20);
+    bool collided = gs->tile_radius_test(round(newxy.x), round(newxy.y), radius);
 
     if (!collided) {
         rx = newxy.x, ry = newxy.y;
@@ -584,9 +584,6 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
                 }
             }
         }
-
-        vx = round(vx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-        vy = round(vy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
         rx += vx;
         ry += vy;
     }

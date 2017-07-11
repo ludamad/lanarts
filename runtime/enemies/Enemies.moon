@@ -1058,6 +1058,8 @@ DataW.enemy_create {
         defence: 7
         willpower: 7
     }
+    step_func: () =>
+        {@vx, @vy} = @towards_least_smell()
 }
 
 DataW.enemy_create {
@@ -1156,6 +1158,8 @@ DataW.enemy_create {
     --        eff = @add_effect "Dash Attack", 10
     --        eff.angle = math.atan2(@vy, @vx)
     --        @timeout = 200
+    step_func: () =>
+        {@vx, @vy} = @towards_least_smell()
     projectile: {
         weapon_class: 'bows'
         damage_type: {physical: 1.0}

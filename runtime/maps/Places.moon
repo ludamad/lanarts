@@ -180,7 +180,7 @@ ChickenCoop = newtype {
         enemies = args.enemies or {}
         --enemies["Poulter"] = 1
         --enemies["Waffles"] = 1
-        enemies["Clucky"] = 10
+        enemies["Chicken"] = 100
         for enemy, amount in pairs enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)

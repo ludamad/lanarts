@@ -213,9 +213,11 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LuaValue meta = lua_gameinst_base_metatable(L);
 
     LuaValue getters = luameta_getters(meta);
-    LuaValue setters = luameta_getters(meta);
-	luawrap::bind_getter(getters["vx"], &CombatGameInst::vx);
-        luawrap::bind_getter(getters["vy"], &CombatGameInst::vy);
+    LuaValue setters = luameta_setters(meta);
+    luawrap::bind_getter(getters["vx"], &CombatGameInst::vx);
+    luawrap::bind_setter(setters["vx"], &CombatGameInst::vx);
+    luawrap::bind_getter(getters["vy"], &CombatGameInst::vy);
+    luawrap::bind_setter(setters["vy"], &CombatGameInst::vy);
 	luawrap::bind_getter(getters["is_resting"], &CombatGameInst::is_resting);
     LUAWRAP_GETTER(getters, sprite, game_sprite_data.get(OBJ->get_sprite()).sprite);
     luawrap::bind_getter(getters["team"], &CombatGameInst::team);
@@ -275,21 +277,25 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
 	methods["reset_rest_cooldown"].bind_function(lapi_do_nothing);
 
-        methods["inventory"] = [=](CombatGameInst* inst) -> LuaValue {
-            LuaValue table = LuaValue::newtable(L);
-            auto& inv = inst->inventory();
-            for (int i = 0; i < inv.max_size(); i++) {
-                if (!inv.slot_filled(i)) {
-                    continue;
-                }
-                LuaValue entry = LuaValue::newtable(L);
-                entry["item"] = inv.get(i).item_entry().name;
-                entry["amount"] = inv.get(i).amount();
-                entry["slot"] = i;
-                table[table.objlen() + 1] = entry;
+    methods["inventory"] = [=](CombatGameInst* inst) -> LuaValue {
+        LuaValue table = LuaValue::newtable(L);
+        auto& inv = inst->inventory();
+        for (int i = 0; i < inv.max_size(); i++) {
+            if (!inv.slot_filled(i)) {
+                continue;
             }
-            return table;
-        };
+            LuaValue entry = LuaValue::newtable(L);
+            entry["item"] = inv.get(i).item_entry().name;
+            entry["amount"] = inv.get(i).amount();
+            entry["slot"] = i;
+            table[table.objlen() + 1] = entry;
+        }
+        return table;
+    };
+    methods["towards_least_smell"] = [L](CombatGameInst* inst) -> PosF {
+        auto* gs = lua_api::gamestate(L);
+        return inst->get_map(gs)->monster_controller().towards_least_smell(gs, inst);
+    };
 
 	return meta;
 }
@@ -322,7 +328,6 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
 
 	LuaValue meta = lua_combatgameinst_metatable(L);
 	LuaValue methods = luameta_constants(meta), getters = luameta_getters(meta), setters = luameta_setters(meta);
-
 
     lua_pushcfunction(L, &lapi_enemyinst_getter_fallback);
     luameta_defaultgetter(meta, LuaStackValue(L, -1));

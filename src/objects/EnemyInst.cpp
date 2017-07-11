@@ -225,10 +225,10 @@ void EnemyInst::draw(GameState* gs) {
 	int w = spr.size().w, h = spr.size().h;
 	int xx = x - w / 2, yy = y - h / 2;
 
-	if (!view.within_view(xx, yy, w, h))
-		return;
-	if (!gs->object_visible_test(this))
-		return;
+//	if (!view.within_view(xx, yy, w, h))
+//		return;
+//	if (!gs->object_visible_test(this))
+//		return;
 
 	if (etype().draw_event.empty()) {
 		float frame = gs->frame();
@@ -247,6 +247,8 @@ void EnemyInst::draw(GameState* gs) {
         res::sprite("spr_enemies.good_neutral").draw(on_screen(gs, PosF {x-16, y-16}));
         res::sprite("spr_amulets.i-faith").draw(on_screen(gs, PosF {x-16, y-16}));
 	}
+	PosF dir = gs->monster_controller().towards_least_smell(gs, this);
+	gs->font().draw(COL_WHITE, Pos(x - radius - view.x, y - 70 - view.y), format("(%.2f, %.2f)", dir.x, dir.y));
 }
 
 EnemyInst* EnemyInst::clone() const {

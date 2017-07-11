@@ -63,6 +63,7 @@ public:
 
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
+    PosF towards_least_smell(GameState* gs, CombatGameInst* inst);
 
     Grid<float> smell_map, swap_smell_map;
 private:

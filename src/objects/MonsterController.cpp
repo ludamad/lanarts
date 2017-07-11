@@ -39,6 +39,111 @@ MonsterController::MonsterController(bool wander) :
 MonsterController::~MonsterController() {
 }
 
+
+static bool _can_head(Grid<bool>& solidity, const BBox& bbox, int speed, int dx, int dy) {
+    bool is_diag = (abs(dx) == abs(dy));
+
+    int xx, yy;
+    for (int y = bbox.y1; y <= bbox.y2 + TILE_SIZE; y += TILE_SIZE) {
+        for (int x = bbox.x1; x <= bbox.x2 + TILE_SIZE; x += TILE_SIZE) {
+            xx = squish(x, bbox.x1, bbox.x2 + 1);
+            yy = squish(y, bbox.y1, bbox.y2 + 1);
+
+            int gx = (xx + dx * speed) / TILE_SIZE;
+            int gy = (yy + dy * speed) / TILE_SIZE;
+            if (solidity[{gx, gy}]) {
+                return false;
+            }
+            if (is_diag) {
+                if (solidity[{xx / TILE_SIZE, gy}]) {
+                    return false;
+                }
+                if (solidity[{gx, yy / TILE_SIZE}]) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+static Pos _towards_least_smell(Grid<bool>& solidity, Grid<float>& smells, const Pos xy) {
+    BBox area {xy - Pos{1,1}, Size{3    ,3}};
+    float least = INFINITY;
+    Pos loc = xy;
+    FOR_EACH_BBOX(area, x, y) {
+        if ((xy.x == x && xy.y == y) || solidity[{x,y}]) {
+            continue;
+        }
+        if (smells[{x, y}] < least) {
+            least = smells[{x,y}];// * ((rand() % 128 + 128) / 256.0f);
+            loc = {x, y};
+        }
+    }
+//    Pos diff = (loc - xy);
+//    if (diff.x > 0) {
+//        diff.x = 1;
+//    } else if (diff.x < 0) {
+//        diff.x = -1;
+//    }
+//    if (diff.y > 0) {
+//        diff.y = 1;
+//    } else if (diff.y < 0) {
+//        diff.y = -1;
+//    }
+    return loc - xy;
+}
+
+PosF configure_dir(GameState* gs, CombatGameInst* inst, float dx, float dy);
+PosF lite_configure_dir(GameState* gs, CombatGameInst* inst, float dx, float dy);
+static PosF _towards_least_smell(Grid<bool>& solidity, Grid<float>& smells, const BBox& bbox, float speed) {
+    using namespace std;
+    int ispeed = (int) ceil(speed);
+
+    //Set up coordinate min and max
+    int mingrid_x = bbox.x1 / TILE_SIZE, mingrid_y = bbox.y1 / TILE_SIZE;
+    int maxgrid_x = bbox.x2 / TILE_SIZE, maxgrid_y = bbox.y2 / TILE_SIZE;
+    //Make sure coordinates do not go out of bounds
+    int minx = squish(mingrid_x, 2, smells.width() - 2);
+    int miny = squish(mingrid_y, 2, smells.height() - 2);
+    int maxx = squish(maxgrid_x, 2, smells.width() - 2);
+    int maxy = squish(maxgrid_y, 2, smells.height() - 2);
+    //Set up accumulators for x and y (later normalized)
+    int acc_x = 0, acc_y = 0;
+
+    for (int yy = miny; yy <= maxy; yy++) {
+        for (int xx = minx; xx <= maxx; xx++) {
+            int sx = max(xx * TILE_SIZE, bbox.x1), sy = max(yy * TILE_SIZE,
+                                                            bbox.y1);
+            int ex = min((xx + 1) * TILE_SIZE, bbox.x2), ey = min(
+                    (yy + 1) * TILE_SIZE, bbox.y2);
+            if (!solidity[{xx,yy}]) {
+                Pos dir = _towards_least_smell(solidity, smells, {xx,yy});
+                int sub_area = (ex - sx) * (ey - sy) + 1;
+                /*Make sure all interpolated directions are possible*/
+                acc_x += dir.x * sub_area;
+                acc_y += dir.y * sub_area;
+            }
+        }
+    }
+    float mag = sqrt(float(acc_x * acc_x + acc_y * acc_y));
+    if (mag == 0) {
+        return PosF();
+    } else {
+        float vx = speed * float(acc_x) / mag;
+        float vy = speed * float(acc_y) / mag;
+        return PosF(vx, vy);
+    }
+}
+
+PosF MonsterController::towards_least_smell(GameState *gs, CombatGameInst *inst) {
+    if (smell_map.empty()) {
+        return PosF{0, 0};
+    }
+    PosF dir = _towards_least_smell(*inst->get_map(gs)->tiles().solidity_map(), smell_map, inst->bbox(), inst->effective_stats().movespeed);
+    return lite_configure_dir(gs, inst, dir.x, dir.y);
+}
+
 void MonsterController::register_enemy(GameInst* enemy) {
     mids.push_back(enemy->id);
     RVO::Vector2 enemy_position(enemy->x, enemy->y);
@@ -111,6 +216,10 @@ CombatGameInst* MonsterController::find_actor_to_target(GameState* gs, EnemyInst
     return closest_actor;
 }
 
+const float ENEMY_SMELL = 100.0f;
+const float PLAYER_SMELL = -100000.0f;
+const float WALL_SMELL = 1000;
+
 void MonsterController::pre_step(GameState* gs) {
     perf_timer_begin(FUNCNAME);
 
@@ -120,31 +229,23 @@ void MonsterController::pre_step(GameState* gs) {
     } else if (gs->frame() % 2 == 0) {
         // Calculate new smell map:
         BBox area {{1,1}, smell_map.size() - Size(2,2)};
-        swap_smell_map.fill(0.0f);
+        Grid<bool>& solid = *gs->tiles().solidity_map();
+//        swap_smell_map.fill(0.0f);
         FOR_EACH_BBOX(area, x, y) {
-            if (smell_map[{x,y}] == 0.0f) {
+            if (solid[{x,y}]) {
                 continue;
             }
             BBox subarea = {{x - 1, y - 1}, Size(3,3)};
-            float val = smell_map[{x,y}];
+            float val = 0;
+            float n_neighbours = 0;
             FOR_EACH_BBOX(subarea, xx, yy) {
-                    if ((*gs->tiles().solidity_map())[{xx,yy}]) {
-                        continue;
-                    }
-                    float& result = swap_smell_map[{xx,yy}];
-                if (result <= 0) {
-                    // Positive smells trump negative:
-                    if (val > 0) {
-                        result = val - 1;
-                    } else if (val < result) {
-                        // More negative trumps less negative:
-                        result = val + 1;
-                    }
-                // But once we go good, only look for more good:
-                } else if (val > result) {
-                    result = val - 1;
+                if (solid[{xx,yy}]) {
+                     continue;
                 }
+                val += smell_map[{xx,yy}];
+                n_neighbours += 1;
             }
+            swap_smell_map[{x,y}] = (val / n_neighbours) * 0.3 + smell_map[{x,y}] * 0.66;
         }
         smell_map._internal_vector().swap(swap_smell_map._internal_vector());
 
@@ -159,15 +260,15 @@ void MonsterController::pre_step(GameState* gs) {
     mids2.reserve(mids.size());
     mids.swap(mids2);
 
+    for (auto& player : players) {
+        smell_map[player->ipos().divided(TILE_SIZE)] += PLAYER_SMELL;
+    }
     for (int i = 0; i < mids2.size(); i++) {
         EnemyInst* e = (EnemyInst*)gs->get_instance(mids2[i]);
         if (e == NULL)
             continue;
         // Plant smells:
-        Pos xy = e->ipos();
-        if (smell_map[{xy.x / TILE_SIZE, xy.y / TILE_SIZE}] < 127) {
-            smell_map[{xy.x / TILE_SIZE, xy.y / TILE_SIZE}] += 1;
-        }
+        smell_map[e->ipos().divided(TILE_SIZE)] += ENEMY_SMELL;
     }
     for (int i = 0; i < mids2.size(); i++) {
         EnemyInst* e = (EnemyInst*)gs->get_instance(mids2[i]);

@@ -771,6 +771,120 @@ void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
         ecore.mp = core_stats().mp;
         is_resting = true;
 }
+
+
+PosF lite_configure_dir(GameState* gs, CombatGameInst* inst, float dx, float dy) {
+    auto solid = [&](Pos xy) -> bool {
+        if (xy.x < 0 || xy.x >= gs->tiles().tile_width()) {
+            return true;
+        }
+        if (xy.y < 0 || xy.y >= gs->tiles().tile_height()) {
+            return true;
+        }
+        return (*gs->tiles().solidity_map())[xy];
+    };
+    Pos tile_xy;
+    if (!gs->tile_radius_test(inst->rx + dx, inst->ry + dy, inst->radius, true, -1, &tile_xy)) {
+        return {dx, dy};
+    }
+
+    float eff_mag = sqrt(dx*dx+dy*dy);
+    Pos dir = dx < 0 ? Pos(-eff_mag, 0) : Pos(eff_mag, 0);
+    if (!gs->tile_radius_test(inst->rx + dir.x, inst->ry + dir.y, inst->radius)) {
+        return dir;
+    }
+    dir = dy < 0 ? Pos(0, -eff_mag) : Pos(0, eff_mag);
+    if (!gs->tile_radius_test(inst->rx + dir.x, inst->ry + dir.y, inst->radius)) {
+        return dir;
+    }
+    dir = dx > 0 ? Pos(-eff_mag, 0) : Pos(eff_mag, 0);
+    if (!gs->tile_radius_test(inst->rx + dir.x, inst->ry + dir.y, inst->radius)) {
+        return dir;
+    }
+    dir = dy > 0 ? Pos(0, -eff_mag) : Pos(0, eff_mag);
+    if (!gs->tile_radius_test(inst->rx + dir.x, inst->ry + dir.y, inst->radius)) {
+        return dir;
+    }
+
+    // Nothing worked so far, try alternate directions:
+    for (int i = 1; i <= 4 ;i++) {
+        auto clear_in_dir = [&](float dx, float dy) {
+            Pos xy = tile_xy + Pos(dx * i, dy * i);
+            if (!solid(xy) && (!inst->field_of_view || inst->field_of_view->within_fov(xy.x, xy.y))) {
+                return true;
+            }
+            return false;
+        };
+        if (fabs(dx) <= 0.1 && clear_in_dir(1, 0)) {
+            return {fabs(dy), 0};
+        }
+        if (fabs(dx) <= 0.1 && clear_in_dir(-1, 0)) {
+            return {-fabs(dy), 0};
+        }
+        if (fabs(dy) <= 0.1 && clear_in_dir(0, -1)) {
+            return {0, -fabs(dx)};
+        }
+
+        if (fabs(dy) <= 0.1 && clear_in_dir(0, 1)) {
+            return {0, fabs(dx)};
+        }
+    }
+    return {0,0};
+//    return {dx, dy};
+}
+
+PosF configure_dir(GameState* gs, CombatGameInst* inst, float dx, float dy) {
+    auto solid = [&](Pos xy) -> bool {
+        if (xy.x < 0 || xy.x >= gs->tiles().tile_width()) {
+            return true;
+        }
+        if (xy.y < 0 || xy.y >= gs->tiles().tile_height()) {
+            return true;
+        }
+        return (*gs->tiles().solidity_map())[xy];
+    };
+    Pos tile_xy;
+    if (!gs->tile_radius_test(inst->rx + dx, inst->ry + dy, inst->radius, true, -1, &tile_xy)) {
+        return {dx, dy};
+    }
+
+    if (fabs(dx) > 0.1 && fabs(dy) > 0.1) {
+        float eff_mag = std::max(fabs(dx), fabs(dy));
+        Pos dir = dx < 0 ? Pos(-eff_mag, 0) : Pos(eff_mag, 0);
+        if (!gs->tile_radius_test(inst->rx + dir.x, inst->ry + dir.y, inst->radius)) {
+            return dir;
+        }
+        dir = dy < 0 ? Pos(0, -eff_mag) : Pos(0, eff_mag);
+        if (!gs->tile_radius_test(inst->rx + dir.x, inst->ry + dir.y, inst->radius)) {
+            return dir;
+        }
+    }
+    // Nothing worked so far, try alternate directions:
+    for (int i = 1; i <= 4 ;i++) {
+        auto clear_in_dir = [&](float dx, float dy) {
+            Pos xy = tile_xy + Pos(dx * i, dy * i);
+            if (!solid(xy) && (!inst->field_of_view || inst->field_of_view->within_fov(xy.x, xy.y))) {
+                return true;
+            }
+            return false;
+        };
+        if (fabs(dx) <= 0.1 && clear_in_dir(1, 0)) {
+            return {fabs(dy), 0};
+        }
+        if (fabs(dx) <= 0.1 && clear_in_dir(-1, 0)) {
+            return {-fabs(dy), 0};
+        }
+        if (fabs(dy) <= 0.1 && clear_in_dir(0, -1)) {
+            return {0, -fabs(dx)};
+        }
+
+        if (fabs(dy) <= 0.1 && clear_in_dir(0, 1)) {
+            return {0, fabs(dx)};
+        }
+    }
+    return {0,0};
+}
+
 void PlayerInst::use_move(GameState* gs, const GameAction& action) {
     perf_timer_begin(FUNCNAME);
 
@@ -786,59 +900,8 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
     // Multiply by the move speed to get the displacement.
     // Note that players technically move faster when moving diagonally.
 
-    auto solid = [&](Pos xy) -> bool {
-        if (xy.x < 0 || xy.x >= gs->tiles().tile_width()) {
-            return true;
-        }
-        if (xy.y < 0 || xy.y >= gs->tiles().tile_height()) {
-            return true;
-        }
-        return (*gs->tiles().solidity_map())[xy];
-    };
-    auto configure_dir = [&](float dx, float dy) -> Pos {
-        Pos tile_xy;
-        if (!gs->tile_radius_test(rx + dx, ry + dy, radius, true, -1, &tile_xy)) {
-            return {dx, dy};
-        }
 
-        if (fabs(dx) > 0.1 && fabs(dy) > 0.1) {
-            float eff_mag = std::max(fabs(dx), fabs(dy));
-            Pos dir = dx < 0 ? Pos(-eff_mag, 0) : Pos(eff_mag, 0);
-            if (!gs->tile_radius_test(rx + dir.x, ry + dir.y, radius)) {
-                return dir;
-            }
-            dir = dy < 0 ? Pos(0, -eff_mag) : Pos(0, eff_mag);
-            if (!gs->tile_radius_test(rx + dir.x, ry + dir.y, radius)) {
-                return dir;
-            }
-        }
-        // Nothing worked so far, try alternate directions:
-        for (int i = 1; i <= 4 ;i++) {
-            auto clear_in_dir = [&](float dx, float dy) {
-                Pos xy = tile_xy + Pos(dx * i, dy * i);
-                if (!solid(xy) && field_of_view->within_fov(xy.x, xy.y)) {
-                    return true;
-                }
-                return false;
-            };
-            if (fabs(dx) <= 0.1 && clear_in_dir(1, 0)) {
-                return {fabs(dy), 0};
-            }
-            if (fabs(dx) <= 0.1 && clear_in_dir(-1, 0)) {
-                return {-fabs(dy), 0};
-            }
-            if (fabs(dy) <= 0.1 && clear_in_dir(0, -1)) {
-                return {0, -fabs(dx)};
-            }
-
-            if (fabs(dy) <= 0.1 && clear_in_dir(0, 1)) {
-                return {0, fabs(dx)};
-            }
-        }
-        return {0,0};
-    };
-
-    Pos direction = configure_dir(action.action_x * mag, action.action_y * mag);
+    PosF direction = configure_dir(gs, this, action.action_x * mag, action.action_y * mag);
    	vx = direction.x;
    	vy = direction.y;
     if (gs->tile_radius_test(rx + vx, ry, radius)) {

@@ -104,7 +104,7 @@ void GameTiles::pre_draw(GameState* gs, bool reveal_all) {
 		region.y2 = size.h - 1;
 	}
 	// Reveal all if no players present:
-	reveal_all |= gs->player_data().all_players().empty();
+	reveal_all |=  gs->player_data().all_players().empty();
 
         GLImage::start_batch_draw();
 	for (int y = region.y1; y <= region.y2; y++) {
@@ -113,11 +113,33 @@ void GameTiles::pre_draw(GameState* gs, bool reveal_all) {
 			const ldraw::Image& img = res::tile(tile.tile).img(tile.subtile);
 			if (reveal_all || was_seen(Pos(x, y))) {
                             img.batch_draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
+
 			}
 		}
 	}
         GLImage::end_batch_draw();
 
+	for (int y = region.y1; y <= region.y2; y++) {
+		for (int x = region.x1; x <= region.x2; x++) {
+			if (reveal_all || was_seen(Pos(x, y))) {
+				Tile &tile = get(Pos(x, y));
+				float smell = gs->monster_controller().smell_map.empty() ? float(0)
+																		 : (float) gs->monster_controller().smell_map[{
+								x, y}];
+				BBox tilebox(
+						Pos(x * TILE_SIZE - view.x, y * TILE_SIZE - view.y),
+						res::tile(tile.tile).size());
+				if (smell < 0) {
+					float alpha = std::min(1.0f, -smell / 20000.0f / 8);
+					ldraw::draw_rectangle(Colour(0, 255, 0, alpha * 255), tilebox);
+				} else {
+					float alpha = std::min(1.0f, smell / 20000.0f / 8);
+					ldraw::draw_rectangle(Colour(255, 0, 0, alpha * 255), tilebox);
+				}
+			}
+		}
+	}
+//			gs->font().drawf(ldraw::DrawOptions().origin(ldraw::CENTER).colour({255,255,255}), tilebox.center(), "%.2f", smell / 20000.0f);
 	perf_timer_end(FUNCNAME);
 }
 
@@ -167,6 +189,7 @@ void GameTiles::post_draw(GameState* gs) {
 
 	const int sub_sqrs = VISION_SUBSQRS;
 
+    return;
 	if (/*gs->key_down_state(SDLK_BACKQUOTE) ||*/!gs->level_has_player()) {
 		return;
 	}
@@ -179,7 +202,6 @@ void GameTiles::post_draw(GameState* gs) {
 			bool has_match = false, has_free = false;
 			bool is_other_match = false;
 			Tile& tile = get(Pos(x, y));
-			int smell = gs->monster_controller().smell_map.empty() ? int(0) : (int)gs->monster_controller().smell_map[{x,y}];
 
 			std::vector<PlayerInst*> players = gs->players_in_level();
 
@@ -214,10 +236,6 @@ void GameTiles::post_draw(GameState* gs) {
 					ldraw::draw_rectangle(Colour(0, 0, 0, 60), tilebox);
 				}
 			}
-			BBox tilebox(
-					Pos(x * TILE_SIZE - view.x, y * TILE_SIZE - view.y),
-					res::tile(tile.tile).size());
-			gs->font().drawf(ldraw::DrawOptions().origin(ldraw::CENTER).colour({255,255,255}), tilebox.center(), "%d", smell);
 		}
 	}
 	perf_timer_end(FUNCNAME);

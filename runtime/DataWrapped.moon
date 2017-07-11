@@ -277,6 +277,11 @@ enemy_create = (args) ->
     if args.resistances ~= nil
         args.effects_active or= {}
         resistance_effects(args.resistances, args.effects_active)
+    wrapped_step = args.step_func
+    args.step_func = (...) =>
+        {@vx, @vy} = @towards_least_smell()
+        if wrapped_step
+            wrapped_step(@, ...)
     for type in *(args.types or {})
         add_console_draw_func args, (edata, get_next) ->
             E = require "spells.Effects"
