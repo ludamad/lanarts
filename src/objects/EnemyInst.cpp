@@ -192,8 +192,6 @@ void EnemyInst::step(GameState* gs) {
 	stats().core.hp -= hp_cooloff;
 	effective_stats().core.hp = stats().core.hp;
 
-	update_position();
-
 	gs->for_screens( [&]() {
 		if (!seen && team == MONSTER_TEAM && gs->object_visible_test(this, gs->local_player())) {
 			seen = true;
@@ -205,6 +203,8 @@ void EnemyInst::step(GameState* gs) {
 		}
 	});
 }
+
+PosF lite_configure_dir(GameState* gs, CombatGameInst* inst, float dx, float dy);
 void EnemyInst::draw(GameState* gs) {
 	GameView& view = gs->view();
 	ldraw::Drawable& spr = res::sprite(etype().enemy_sprite);
@@ -248,7 +248,9 @@ void EnemyInst::draw(GameState* gs) {
         res::sprite("spr_amulets.i-faith").draw(on_screen(gs, PosF {x-16, y-16}));
 	}
 	PosF dir = gs->monster_controller().towards_least_smell(gs, this);
-	gs->font().draw(COL_WHITE, Pos(x - radius - view.x, y - 70 - view.y), format("(%.2f, %.2f)", dir.x, dir.y));
+    gs->font().draw(COL_WHITE, Pos(x - radius - view.x, y - 70 - view.y), format("(%.2f, %.2f)", dir.x, dir.y));
+    dir = lite_configure_dir(gs, this, dir.x, dir.y);
+    gs->font().draw(COL_WHITE, Pos(x - radius - view.x, y - 50 - view.y), format("(%.2f, %.2f)", dir.x, dir.y));
 }
 
 EnemyInst* EnemyInst::clone() const {

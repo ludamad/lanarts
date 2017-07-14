@@ -39,7 +39,7 @@ class PlayerInst;
 
 class MonsterController {
 public:
-	MonsterController(bool wander = true);
+	MonsterController();
 	~MonsterController();
 
 	const std::vector<obj_id>& monster_ids() {
@@ -77,6 +77,7 @@ private:
 	void monster_follow_path(GameState *gs, EnemyInst *e);
 	void monster_get_to_stairs(GameState *gs, EnemyInst *e);
 
+	LuaValue handler;
 	AStarPath astarcontext;
 
 	std::vector<PlayerInst*> players;

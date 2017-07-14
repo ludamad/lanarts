@@ -459,6 +459,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
     if (!cooldowns().can_doaction())
         return false;
 
+    LANARTS_ASSERT(id > 0);
     event_log("CombatGameInst::projectile_attack: id %d hitting id %d, weapon = id %d\n", id, inst ? inst->id : 0, weapon.id);
     MTwist& mt = gs->rng();
 
@@ -556,18 +557,18 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
 
     event_log("CombatGameInst::attempt_move_to_position id=%d, %f, %f\n", id,
             newxy.x, newxy.y);
-    float dx = newxy.x - rx, dy = newxy.y - ry;
+    float dx = newxy.x - x, dy = newxy.y - y;
     float dist = sqrt(dx * dx + dy * dy);
     dist = round(dist * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 
-    bool collided = gs->tile_radius_test(round(newxy.x), round(newxy.y), radius);
+    bool collided = gs->tile_radius_test(newxy.x, newxy.y, radius);
 
     if (!collided) {
-        rx = newxy.x, ry = newxy.y;
+        x = newxy.x, y = newxy.y;
     } else {
-        float nx = round(rx + vx), ny = round(ry + vy);
+        float nx = round(x + vx), ny = round(y + vy);
         bool collided = gs->tile_radius_test(nx, ny, radius);
-        if (collided) {
+        if (collided) { 
             bool hitsx = gs->tile_radius_test(nx, y, radius);
             bool hitsy = gs->tile_radius_test(x, ny, radius);
             if (hitsy || hitsx || collided) {
@@ -584,27 +585,16 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
                 }
             }
         }
-        rx += vx;
-        ry += vy;
+        x += vx;
+        y += vy;
     }
 
-    update_position();
-
-    return Pos(rx, ry);
-}
-
-void CombatGameInst::update_position() {
-    x = iround(rx); //update based on rounding of true float
-    y = iround(ry);
-    event_log("Instance id %d integer positions set to (%f,%f) from (%f,%f)\n", id, x, y, rx, ry);
+    return PosF(x, y);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
-    rx = round(newx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-    ry = round(newy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-    rx = newx, ry = newy;
-    event_log("Instance id %d float positions set to (%f,%f)\n", id, rx, ry);
-    update_position();
+    x = newx, y = newy;
+    event_log("Instance id %d float positions set to (%f,%f)\n", id, x, y);
 }
 
 SpellsKnown& CombatGameInst::spells_known() {

@@ -191,7 +191,7 @@ void PlayerInst::step(GameState* gs) {
 	vx = round(vx * 256.0f) / 256.0f;
 	vy = round(vy * 256.0f) / 256.0f;
 
-	update_position(rx + vx, ry + vy);
+	update_position(x + vx, y + vy);
         if (is_ghost()) {
             stats().core.hp = 0;
             effective_stats().core.hp = 0;

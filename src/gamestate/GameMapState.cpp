@@ -12,37 +12,18 @@
 #include "GameState.h"
 #include "GameLogger.h"
 
-GameMapState::GameMapState(int levelid, ldungeon_gen::MapPtr source_map, const Size& size,
-		bool wandering_flag, bool is_simulation) :
-		_levelid(levelid),
-		_steps_left(0),
-		_source_map(source_map),
-		_size(size),
-		_tiles(Size(size.w / TILE_SIZE, size.h / TILE_SIZE)),
-		_inst_set(size.w, size.h),
-		_monster_controller(wandering_flag),
-		_is_simulation(is_simulation) {
+GameMapState::GameMapState(level_id levelid, ldungeon_gen::MapPtr source_map, const Size &size, bool is_simulation) :
+	_levelid(levelid),
+	_steps_left(0),
+	_source_map(source_map),
+	_size(size),
+	_tiles(Size(size.w / TILE_SIZE, size.h / TILE_SIZE)),
+	_inst_set(size.w, size.h),
+	_is_simulation(is_simulation) {
+
 }
 
 GameMapState::~GameMapState() {
-}
-
-void GameMapState::copy_to(GameMapState & room) const {
-	room.entrances = this->entrances; //Copy exits&entrances just in case
-	room.exits = this->exits; //However we will typically copy_to just to synch
-//	this->inst_set.copy_to(level.inst_set);
-//	level.is_simulation = this->is_simulation;
-//	tiles.copy_to(level.tiles);
-//	this->mc.partial_copy_to(level.mc);
-//	level.mc.finish_copy(&level);
-//	level.is_simulation = this->is_simulation;
-//	level.steps_left = this->steps_left;
-}
-
-GameMapState* GameMapState::clone() const {
-	GameMapState* state = new GameMapState(_levelid, ldungeon_gen::MapPtr(),_size, _is_simulation);
-	copy_to(*state);
-	return state;
 }
 
 static void update_player_fields_of_view(GameState* gs) {

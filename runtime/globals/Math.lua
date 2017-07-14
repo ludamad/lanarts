@@ -152,6 +152,19 @@ function vector_divide(v1, v2)
     return ret
 end
 
+function vector_equals(v1, v2) 
+    local length = #v1
+    if length ~= #v2 then
+        return false
+    end
+    for i=1,length do
+        if v1[i] ~= v2[i] then
+            return false
+        end
+    end
+    return true
+end
+
 function random_round(num)
     local f = floor(num)
     if randomf(0,1) < (num-f) then

@@ -36,12 +36,8 @@ struct GameRoomPortal {
 
 class GameMapState {
 public:
-	GameMapState(level_id levelid, ldungeon_gen::MapPtr source_map, const Size& size,
-			bool wandering_flag = true, bool is_simulation = false);
+	GameMapState(level_id levelid, ldungeon_gen::MapPtr source_map, const Size& size, bool is_simulation = false);
 	~GameMapState();
-
-	void copy_to(GameMapState & level) const;
-	GameMapState* clone() const;
 
 	int width() const {
 		return _size.w;

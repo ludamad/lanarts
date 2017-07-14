@@ -38,6 +38,10 @@ function Engine.loading_screen_draw(...)
     return LoadingScreen.draw(...)
 end
 
+function Engine.monster_controller(map)
+    return require("enemies.MonsterController").create(map)
+end
+
 function Engine.resources_load(...)
     log "function Engine.resources_load(...)"
 

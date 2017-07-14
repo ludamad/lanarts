@@ -59,6 +59,7 @@ void ProjectileInst::init(GameState *gs) {
 	luawrap::push(L, this); // Ensure lua_variables are set TODO have an on_create method for when lua variables are created for an object
 	lua_pop(L, 1);
 	lua_variables["type"] = table;
+    LANARTS_ASSERT(gs->get_instance(origin_id));
 	lua_variables["caster"] = gs->get_instance(origin_id);
 	GameInst::init(gs);
 }
@@ -98,6 +99,7 @@ ProjectileInst::ProjectileInst(const Item& projectile,
 		hits(hits),
 		damage_mult(1.0f),
 		pass_through(pass_through) {
+	LANARTS_ASSERT(origin_id);
 	direction_towards(start, target, vx, vy, speed);
 }
 

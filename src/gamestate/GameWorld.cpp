@@ -91,7 +91,7 @@ void GameWorld::deserialize(SerializeBuffer& sb) {
 		Size size;
 		sb.read(size);
 		if (level_states[i] == NULL) {
-			level_states[i] = new GameMapState(i, ldungeon_gen::MapPtr(), size, false, false);
+			level_states[i] = new GameMapState(i, ldungeon_gen::MapPtr(), size);
 		}
 		gs->set_level(level_states[i]);
 		level_states[i]->deserialize(gs, sb);
@@ -128,6 +128,7 @@ void GameWorld::deserialize(SerializeBuffer& sb) {
 
 GameMapState* GameWorld::map_create(const Size& size, ldungeon_gen::MapPtr source_map, bool wandering_enabled) {
 	int levelid = level_states.size();
+	LuaValue handler = lcall_def(LuaValue(), luawrap::globals(gs->luastate())["Engine"]["monster_controller"], source_map);
 	GameMapState* map = new GameMapState(levelid, source_map, Size(size.w * TILE_SIZE, size.h * TILE_SIZE), wandering_enabled);
 	level_states.push_back(map);
         // _should_sync_states = true;
