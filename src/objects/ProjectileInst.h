@@ -34,17 +34,13 @@ public:
 	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
 
-	virtual void update_position(float newx, float newy) {
-            rx = newx;
-            ry = newy;
-            x = (int) rx;
-            y = (int) ry;
-        }
+	ProjectileEntry& projectile_entry();
+	CombatGameInst* caster(GameState* gs);
 	sprite_id sprite() const;
 private:
 	static bool bullet_target_hit2(GameInst* self, GameInst* other);
 
-	float rx, ry, vx, vy, speed;
+	float vx, vy, speed;
 	/* Stats at time of projectile creation */
 	EffectiveAttackStats atkstats;
 	/* Origin object, and optional exclusive target*/

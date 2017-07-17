@@ -38,7 +38,7 @@ void ItemInst::step(GameState *gs) {
 					same_item_colfilter)) {
 		ItemInst* oinst = (ItemInst*)other_item;
 		if (oinst->item.is_same_item(item) && id < oinst->id) {
-			gs->remove_instance(oinst);
+            gs->remove_instance(oinst);
 			item.amount += oinst->item_quantity();
 		}
 	}

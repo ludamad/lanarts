@@ -77,6 +77,7 @@ private:
 		}
 		//Used in settools.h
 		void operator=(GameInst* inst) {
+			LANARTS_ASSERT(inst != NULL);
 			this->inst = inst;
 			next_in_grid = NULL;
 			prev_in_grid = NULL;

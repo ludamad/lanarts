@@ -29,7 +29,6 @@ struct EnemyEntry: public ResourceEntryBase {
 	std::vector<StatusEffect> active_effects;
         int kills_before_stale = 25;
 	int vision_radius = 7; // TODO, use
-	LuaValue raw_table;
 
 	LuaLazyValue init_event, step_event, draw_event, death_event;
 	LuaValue console_draw_func;

@@ -145,22 +145,6 @@ void MonsterController::register_enemy(GameInst* enemy) {
     EnemyBehaviour& eb = e->behaviour();
 }
 
-void MonsterController::partial_copy_to(MonsterController & mc) const {
-    mc.mids = this->mids;
-//    mc.coll_avoid.clear();
-}
-
-void MonsterController::finish_copy(GameMapState* level) {
-    for (int i = 0; i < mids.size(); i++) {
-        EnemyInst* enemy = (EnemyInst*)level->game_inst_set().get_instance(
-                mids[i]);
-        if (!enemy)
-            continue;
-//        int simid = coll_avoid.add_object(enemy);
-//        enemy->collision_simulation_id() = simid;
-    }
-}
-
 void MonsterController::serialize(SerializeBuffer& serializer) {
     serializer.write_container(mids);
     serializer.write(monsters_wandering_flag);
@@ -208,6 +192,8 @@ CombatGameInst* MonsterController::find_actor_to_target(GameState* gs, EnemyInst
     });
     return closest_actor;
 }
+
+bool potentially_randomize_movement(GameState* gs, EnemyInst* e);
 
 bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
                       CombatGameInst* target, AttackStats& attack);
@@ -298,11 +284,13 @@ void MonsterController::pre_step(GameState* gs) {
         }
     };
 
-    base["try_attack"] = [=](CombatGameInst* e) {
+    base["try_attack"] = [=](EnemyInst* e) {
         CombatGameInst *p = get_nearest_enemy(gs, e);
+        e->behaviour().movement_decided = false;
         if (p == NULL) {
             return;
         }
+        e->behaviour().chasing_actor = p->id;
         // Compare position to enemy of interest:
         float pdist = distance_between(Pos(e->x, e->y), Pos(p->x, p->y));
 
@@ -341,9 +329,9 @@ void MonsterController::pre_step(GameState* gs) {
 
         }
     };
-    base["adjust_heading_if_near_wall"] = [=](CombatGameInst* e) {
+    base["adjust_heading_if_near_wall"] = [=](EnemyInst* e) {
         auto* p = get_nearest_enemy(gs, e);
-        if (gs->tile_radius_test(e->x, e->y, TILE_SIZE / 2 + 4)) {
+        if (p && gs->tile_radius_test(e->x, e->y, TILE_SIZE / 2 + 4)) {
             if (gs->object_radius_test(e, NULL, 0,
                                        same_target_and_moved_colfilter, e->x, e->y,
                                        e->target_radius - e->effective_stats().movespeed - 2)) {
@@ -353,8 +341,12 @@ void MonsterController::pre_step(GameState* gs) {
                     e->vx = 0, e->vy = 0;
                 }
             }
+            e->behaviour().movement_decided = true;
         }
         event_log("set_monster_headings id=%d vx=%f vy=%f\n", e->id, e->vx, e->vy);
+    };
+    base["potentially_randomize_movement"] = [=](EnemyInst* e) {
+        return potentially_randomize_movement(gs, e);
     };
 
 //    coll_avoid.step();

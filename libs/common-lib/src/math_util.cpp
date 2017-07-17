@@ -61,6 +61,11 @@ float distance_between(const Pos & a, const Pos & b) {
 	return sqrt(dx * dx + dy * dy);
 }
 
+float distance_between(const PosF & a, const PosF & b) {
+	float dx = a.x - b.x;
+	float dy = a.y - b.y;
+	return sqrt(dx * dx + dy * dy);
+}
 float squared_distance(const PosF & a, const PosF & b) {
     float dx = a.x - b.x;
     float dy = a.y - b.y;

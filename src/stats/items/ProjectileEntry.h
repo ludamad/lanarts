@@ -67,7 +67,7 @@ public:
 	bool deals_special_damage = false;
 	bool can_wall_bounce;
 	bool can_pass_through = false;
-        LuaValue attack_stat_func, raw_table;
+	LuaValue attack_stat_func;
 };
 
 projectile_id get_projectile_by_name(const char* name);

@@ -67,6 +67,7 @@ bool is_item_equipment(ItemEntry & ientry) {
 
 void ItemEntry::parse_lua_table(const LuaValue& table) {
 	using namespace luawrap;
+	ResourceEntryBase::parse_lua_table(table);
 
 	shop_cost = defaulted(table, "shop_cost", Range());
 	sellable = defaulted(table, "sellable", true);

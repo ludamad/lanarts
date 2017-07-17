@@ -28,7 +28,7 @@ public:
 	std::string name;
 	std::string description;
 
-	LuaValue lua_representation;
+	LuaValue raw_table;
 
 	ResourceEntryBase();
 	virtual ~ResourceEntryBase();

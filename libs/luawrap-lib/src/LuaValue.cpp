@@ -131,6 +131,9 @@ LuaValue::LuaValue(const LuaValue & value) {
 }
 
 void LuaValue::operator =(const LuaValue & value) {
+	if (this == &value) {
+		return;
+	}
 	deref(impl);
 	impl = value.impl;
 	if (impl) {

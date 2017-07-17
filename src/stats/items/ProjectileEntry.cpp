@@ -47,6 +47,5 @@ void ProjectileEntry::parse_lua_table(const LuaValue& table) {
     can_pass_through = defaulted(table, "can_pass_through", false);
     deals_special_damage = defaulted(table, "deals_special_damage", false);
     attack_stat_func = table["attack_stat_func"];
-    raw_table = table;
     radius = defaulted(table, "radius", 5);
 }

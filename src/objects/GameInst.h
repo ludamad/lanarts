@@ -45,7 +45,7 @@ public:
 	GameInst(float x, float y, float radius, bool solid = true, int depth = 0) :
 			reference_count(0), id(0), last_x(iround(x)), last_y(iround(y)), x(x), y(y), radius(
 					radius), target_radius(radius), depth(depth), solid(solid), destroyed(
-					false), current_floor(-1) {
+					false), destroy_pending(false), current_floor(-1) {
 		if (this->radius > 14)
 			this->radius = 14;
 	}
@@ -95,7 +95,7 @@ public:
 	int last_x, last_y;
 	float x, y, radius, target_radius;
 	int depth;
-	bool solid, destroyed;
+	bool solid, destroyed, destroy_pending;
     int times_serialized = 0; // Debug variable, incremented every time object is read from disk;
 	level_id current_floor;
 	// Serialized / deserialized in a separate pass because they have Lua references to objects throughout the system:

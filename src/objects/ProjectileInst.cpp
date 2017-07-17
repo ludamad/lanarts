@@ -53,14 +53,10 @@ void ProjectileInst::draw(GameState* gs) {
 	draw_sprite(view, sprite(), xx, yy, vx, vy, frame);
 }
 
+void gameinst_set_lua_vars(lua_State* L, GameInst* inst);
 void ProjectileInst::init(GameState *gs) {
-	LuaValue& table = projectile.projectile_entry().raw_table;
 	lua_State* L = gs->luastate();
-	luawrap::push(L, this); // Ensure lua_variables are set TODO have an on_create method for when lua variables are created for an object
-	lua_pop(L, 1);
-	lua_variables["type"] = table;
-    LANARTS_ASSERT(gs->get_instance(origin_id));
-	lua_variables["caster"] = gs->get_instance(origin_id);
+    gameinst_set_lua_vars(L, this);
 	GameInst::init(gs);
 }
 void ProjectileInst::deinit(GameState* gs) {
@@ -87,8 +83,6 @@ ProjectileInst::ProjectileInst(const Item& projectile,
 							   obj_id sole_target, bool bounce, int hits, bool pass_through) :
 		GameInst(start.x, start.y, projectile.projectile_entry().radius,
 				 false, DEPTH),
-		rx(start.x),
-		ry(start.y),
 		speed(speed),
 		origin_id(origin_id),
 		sole_target(sole_target),
@@ -99,7 +93,8 @@ ProjectileInst::ProjectileInst(const Item& projectile,
 		hits(hits),
 		damage_mult(1.0f),
 		pass_through(pass_through) {
-	LANARTS_ASSERT(origin_id);
+    // Either we're a dummy instantiation, or we should have an origin ID:
+	LANARTS_ASSERT(projectile == Item() || origin_id > 0);
 	direction_towards(start, target, vx, vy, speed);
 }
 
@@ -145,8 +140,8 @@ void ProjectileInst::step(GameState* gs) {
 	Pos tile_hit;
 
 	frame++;
-	int newx = (int) round(rx + vx); //update based on rounding of true float
-	int newy = (int) round(ry + vy);
+	int newx = (int) round(x + vx); //update based on rounding of true float
+	int newy = (int) round(y + vy);
 	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
 										 &tile_hit);
 	if (bounce) {
@@ -166,11 +161,11 @@ void ProjectileInst::step(GameState* gs) {
 			try_callback("on_wall_bounce");
 		}
 	} else if (collides) {
-		gs->remove_instance(this);
+        gs->remove_instance(this);
 	}
 
-	x = (int) round(rx += vx); //update based on rounding of true float
-	y = (int) round(ry += vy);
+	x += vx; //update based on rounding of true float
+	y += vy;
 
 	range_left -= speed;
 
@@ -226,6 +221,7 @@ void ProjectileInst::step(GameState* gs) {
 		if (hits >= 0 && colobj) {
 			MonsterController& mc = gs->monster_controller();
 			int mindist = 200;
+
 			if (sole_target == 0)
 				damage_mult = 0.5;
 			sole_target = NONE; //Clear target
@@ -234,8 +230,7 @@ void ProjectileInst::step(GameState* gs) {
 				auto* enemy = (EnemyInst*)gs->get_instance(mid);
 				if (enemy && origin && enemy->team != origin->team && enemy != colobj) {
 
-					float abs = distance_between(Pos(x, y),
-												 Pos(enemy->x, enemy->y));
+					float abs = distance_between(pos(), enemy->pos());
 					if (abs < 1)
 						abs = 1;
 					if (abs < mindist) {
@@ -251,12 +246,12 @@ void ProjectileInst::step(GameState* gs) {
 			gs->add_instance(
 					new AnimatedInst(ipos(), sprite(), 15, PosF(),
 									 PosF(vx, vy)));
-			gs->remove_instance(this);
+            gs->remove_instance(this);
 		}
 	}
 
-	event_log("ProjectileInst id=%d has rx=%f, ry=%f, vx=%f,vy=%f\n", id, rx,
-			  ry, vx, vy);
+	event_log("ProjectileInst id=%d has x=%f, y=%f, vx=%f,vy=%f\n", id, x,
+			  y, vx, vy);
 }
 
 sprite_id ProjectileInst::sprite() const {
@@ -266,20 +261,28 @@ sprite_id ProjectileInst::sprite() const {
 
 void ProjectileInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	GameInst::serialize(gs, serializer);
-	SERIALIZE_POD_REGION(serializer, this, rx, sole_target);
+	SERIALIZE_POD_REGION(serializer, this, vx, sole_target);
 	projectile.serialize(gs, serializer);
 	SERIALIZE_POD_REGION(serializer, this, atkstats, damage_mult);
 }
 
 void ProjectileInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	GameInst::deserialize(gs, serializer);
-	DESERIALIZE_POD_REGION(serializer, this, rx, sole_target);
+	DESERIALIZE_POD_REGION(serializer, this, vx, sole_target);
 	projectile.deserialize(gs, serializer);
 	DESERIALIZE_POD_REGION(serializer, this, atkstats, damage_mult);
 }
 
 bool ProjectileInst::bullet_target_hit2(GameInst* self, GameInst* other) {
 	return ((ProjectileInst*) self)->sole_target == other->id;
+}
+
+CombatGameInst* ProjectileInst::caster(GameState* gs) {
+	return gs->get_instance<CombatGameInst>(origin_id);
+}
+
+ProjectileEntry& ProjectileInst::projectile_entry() {
+    return projectile.projectile_entry();
 }
 
 

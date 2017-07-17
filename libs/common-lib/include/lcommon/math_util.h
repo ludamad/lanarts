@@ -44,6 +44,7 @@ int centered_multiple(int num, int mult);
 void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry,
 		float speed = 1);
 float distance_between(const Pos& a, const Pos& b);
+float distance_between(const PosF& a, const PosF& b);
 float squared_distance(const PosF & a, const PosF & b);
 float magnitude(float x, float y);
 float square_magnitude(const PosF& xy);

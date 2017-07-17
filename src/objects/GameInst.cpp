@@ -100,7 +100,7 @@ void GameInst::deinit(GameState* gs) {
 //            lua_variables["__objectref"].pop();
 //            lcall(luawrap::globals(gs->luastate())["deadprotect"], lua_variables);
 //        }
-	lua_variables.clear(); // Important to prevent cyclic reference counting
+	lua_variables = LuaValue(); // Important to prevent cyclic reference counting
 	current_floor = -1;
 }
 

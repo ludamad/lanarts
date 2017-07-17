@@ -125,8 +125,7 @@ bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 
 	int attack_id = -1;
 	int smallest_range = TOO_LARGE_RANGE;
-	float dist = distance_between(Pos(inst->x, inst->y),
-			Pos(target->x, target->y));
+	float dist = distance_between(inst->pos(), target->pos());
 	int radii = inst->target_radius + target->target_radius;
 
 	for (int i = 0; i < attacks.size(); i++) {

@@ -471,12 +471,13 @@ bool GameState::pre_step(bool update_iostate) {
 }
 
 bool GameState::step() {
+    pending_destroy_list.clear(); // Be explicit that this starts empty
         //rng().init_genrand(initial_seed + frame_n);
 	if (game_settings().network_debug_mode) {
 		connection.check_integrity(this);
 	}
 
-        connection.poll_messages();
+    connection.poll_messages();
 
     screens.for_each_screen( [&](){
         game_hud().step(this);
@@ -485,10 +486,14 @@ bool GameState::step() {
 	if (!world.step()) {
 		return false;
 	}
-        // ROBUSTNESS:
-        // Do not place logic here -- place in world.step()
-        // before restart code.
-        return true;
+    for (auto* pending : pending_destroy_list) {
+        immediately_remove_instance(pending);
+    }
+    pending_destroy_list.clear();
+    // ROBUSTNESS:
+    // Do not place logic here -- place in world.step()
+    // before restart code.
+    return true;
 }
 
 int GameState::key_down_state(int keyval) {
@@ -595,7 +600,19 @@ obj_id GameState::add_instance(GameInst* inst) {
 	return get_level()->add_instance(this, inst);
 }
 
-void GameState::remove_instance(GameInst* inst, bool add_to_removed) {
+void GameState::remove_instance(GameInst* inst) {
+    if (inst->destroyed || inst->destroy_pending) {
+        return;
+    }
+    event_log(
+            "Queuing removal of instance id: %d x: %f y: %f target_radius: %f depth %d\n",
+            inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
+
+    pending_destroy_list.push_back(inst);
+    inst->destroy_pending = true;
+}
+
+void GameState::immediately_remove_instance(GameInst *inst, bool add_to_removed) {
 	if (inst->destroyed) {
 		return;
 	}
@@ -610,6 +627,7 @@ void GameState::remove_instance(GameInst* inst, bool add_to_removed) {
 		inst->id = 0;
 	}
 	inst->deinit(this);
+    LANARTS_ASSERT(inst->lua_variables.empty());
 }
 
 int GameState::width() {
@@ -809,10 +827,9 @@ void GameStatePostSerializeData::process(GameState* gs) {
 								  : gs->game_world().get_removed_object(-e.id).get();
         if (inst == NULL) {
             throw std::runtime_error(format("Attempt to load GameInst that cannot be found at level %d, id %d!", e.current_floor, e.id));
-        } else {
-            GameInst::retain_reference(inst);
-            *e.holder = inst;
         }
+		GameInst::retain_reference(inst);
+		*e.holder = inst;
         lua_State* L = gs->luastate();
         if (!inst->lua_variables.empty() && !inst->lua_variables.isnil()) {
             inst->lua_variables["__objectref"].push();

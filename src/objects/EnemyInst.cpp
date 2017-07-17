@@ -83,6 +83,12 @@ void EnemyInst::signal_attacked_successfully() {
 	eb.randomization.successful_hit_timer = 0;
 }
 
+void EnemyInst::deinit(GameState *gs) {
+    CollisionAvoidance& coll_avoid = gs->collision_avoidance();
+    coll_avoid.remove_object(collision_simulation_id());
+    CombatGameInst::deinit(gs);
+}
+
 unsigned int EnemyInst::integrity_hash() {
 	unsigned int hash = CombatGameInst::integrity_hash();
 	combine_hash(hash, eb.current_node, eb.path_steps);
@@ -225,10 +231,10 @@ void EnemyInst::draw(GameState* gs) {
 	int w = spr.size().w, h = spr.size().h;
 	int xx = x - w / 2, yy = y - h / 2;
 
-//	if (!view.within_view(xx, yy, w, h))
-//		return;
-//	if (!gs->object_visible_test(this))
-//		return;
+	if (!view.within_view(xx, yy, w, h))
+		return;
+	if (!gs->object_visible_test(this))
+		return;
 
 	if (etype().draw_event.empty()) {
 		float frame = gs->frame();
@@ -247,10 +253,12 @@ void EnemyInst::draw(GameState* gs) {
         res::sprite("spr_enemies.good_neutral").draw(on_screen(gs, PosF {x-16, y-16}));
         res::sprite("spr_amulets.i-faith").draw(on_screen(gs, PosF {x-16, y-16}));
 	}
-	PosF dir = gs->monster_controller().towards_least_smell(gs, this);
-    gs->font().draw(COL_WHITE, Pos(x - radius - view.x, y - 70 - view.y), format("(%.2f, %.2f)", dir.x, dir.y));
-    dir = lite_configure_dir(gs, this, dir.x, dir.y);
-    gs->font().draw(COL_WHITE, Pos(x - radius - view.x, y - 50 - view.y), format("(%.2f, %.2f)", dir.x, dir.y));
+	if (gs->game_settings().draw_diagnostics) {
+		PosF dir = gs->monster_controller().towards_least_smell(gs, this);
+		gs->font().draw(COL_WHITE, Pos(x - radius - view.x, y - 70 - view.y), format("(%.2f, %.2f)", dir.x, dir.y));
+		dir = lite_configure_dir(gs, this, dir.x, dir.y);
+		gs->font().draw(COL_WHITE, Pos(x - radius - view.x, y - 50 - view.y), format("(%.2f, %.2f)", dir.x, dir.y));
+	}
 }
 
 EnemyInst* EnemyInst::clone() const {
@@ -263,11 +271,11 @@ bool EnemyInst::within_field_of_view(const Pos & pos) {
 
 const double deg2rad = 3.14159265 / 180.0;
 void EnemyInst::die(GameState *gs) {
-	if (!destroyed) {
-                // Figure out if the respawns_on_death flag was set
-                lua_lookup(gs->luastate(), "respawns_on_death");
-                bool should_respawn = lua_toboolean(gs->luastate(), -1);
-                lua_pop(gs->luastate(), 1);
+	if (!destroyed && !destroy_pending) {
+//                // Figure out if the respawns_on_death flag was set
+//                lua_lookup(gs->luastate(), "respawns_on_death");
+//                bool should_respawn = lua_toboolean(gs->luastate(), -1);
+//                lua_pop(gs->luastate(), 1);
 
 	        lua_gameinst_callback(gs->luastate(), etype().death_event.get(gs->luastate()), this);
 		lua_api::event_monster_death(gs->luastate(), this);
@@ -275,7 +283,6 @@ void EnemyInst::die(GameState *gs) {
 		AnimatedInst* anim = new AnimatedInst(ipos(), etype().enemy_sprite, 20);
 		anim->frame(0);
 		gs->add_instance(anim);
-		gs->remove_instance(this);
 		if (team != PLAYER_TEAM) {
             play("sound/paind.ogg");
 		}
@@ -301,8 +308,6 @@ void EnemyInst::die(GameState *gs) {
                 //        break;
                 //    }
                 //}
-		CollisionAvoidance& coll_avoid = gs->collision_avoidance();
-		coll_avoid.remove_object(collision_simulation_id());
 
 		gs->for_screens( [&]() {
 			show_defeat_message(gs->game_chat(), etype());
@@ -314,6 +319,7 @@ void EnemyInst::die(GameState *gs) {
 							DEATH_SPRITE_TIMEOUT, PosF(), PosF(),
 							ItemInst::DEPTH));
 		}
+        gs->remove_instance(this);
 	}
 }
 
@@ -326,3 +332,4 @@ std::vector<StatusEffect> EnemyInst::base_status_effects(
         GameState* gs) {
     return etype().effect_modifiers.status_effects;
 }
+

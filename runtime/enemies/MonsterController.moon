@@ -28,10 +28,16 @@ MonsterController = newtype {
             elseif monster\effective_stats().speed > 0
                 n_frames = math.min(32, 32 / monster\effective_stats().speed)
                 monster.fixed_heading = {heading, GameState.frame + n_frames}
+                monster.fixed_heading = false
             {monster.vx, monster.vy} = heading
+        for monster in *monsters
+            base.potentially_randomize_movement(monster)
         -- Use wall adjustments after collision avoidance
         for monster in *monsters
             base.adjust_heading_if_near_wall(monster)
+        -- Try attacking players, setting heading to 0,0 if close enough to player
+        for monster in *monsters
+            base.try_attack(monster)
         -- Use collision avoidance after setting monster headings
         base.rvo_adjust_headings()
         -- Use adjusted headings 
@@ -44,9 +50,6 @@ MonsterController = newtype {
         for player in *players
             if player.map == @map
                 base.add_object_smell(player, PLAYER_SMELL)
-        -- Try attacking players
-        for monster in *monsters
-            base.try_attack(monster)
 }
 
 return MonsterController

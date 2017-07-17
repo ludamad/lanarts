@@ -75,6 +75,9 @@ public:
             return _team_data;
         }
     void register_removed_object(GameInst* inst);
+    LuaValue& get_weak_lua_data() {
+        return _lazy_lua_inst_mapping;
+    }
 	GameInstRef& get_removed_object(int id);
 private:
 	void place_player(GameMapState* map, GameInst* p);
@@ -92,6 +95,7 @@ private:
 	bool _should_sync_states = false;
 	// All removed objects that are still held on to by game state.
 	std::vector<GameInstRef> _alive_removed_objects;
+    LuaValue _lazy_lua_inst_mapping;
 	std::vector<GameMapState*> level_states;
 	TeamData _team_data;
 };

@@ -31,7 +31,7 @@ void PlayerData::remove_all_players(GameState* gs) {
 		if (p) {
 			int oldlevel = gs->game_world().get_current_level_id();
 			gs->game_world().set_current_level(p->current_floor);
-			gs->remove_instance(p);
+			gs->immediately_remove_instance(p);
 			gs->game_world().set_current_level(oldlevel);
 		}
 		_players[i].player_inst.clear();

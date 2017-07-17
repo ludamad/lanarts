@@ -485,7 +485,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 
    if (!inventory_full) {
    	cooldowns().reset_pickup_cooldown(PICKUP_RATE);
-   	gs->remove_instance(iteminst);
+       gs->immediately_remove_instance(iteminst);
    }
 }
 

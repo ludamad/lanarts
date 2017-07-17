@@ -394,9 +394,12 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
         const Item& weapon, bool ignore_cooldowns, float damage_multiplier) {
     event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d\n", id, inst->id,     weapon.id);
 
-    bool isdead = false;
-    if (!ignore_cooldowns && !cooldowns().can_doaction())
+    if (destroyed) {
         return false;
+    }
+    if (!ignore_cooldowns && !cooldowns().can_doaction()) {
+        return false;
+    }
 
     MTwist& mt = gs->rng();
 
@@ -428,7 +431,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     }
 
     float final_dmg = 0;
-    isdead = inst->damage(gs, atkstats, this, &final_dmg);
+    bool isdead = inst->damage(gs, atkstats, this, &final_dmg);
 
     effects.for_each([&](Effect& eff) {
         lcall(/*func:*/ eff.entry().on_melee_func, /*args:*/ eff.state, this, inst, final_dmg);

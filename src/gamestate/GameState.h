@@ -111,7 +111,7 @@ public:
 	GameInst* get_instance(level_id level, obj_id id);
 	obj_id add_instance(GameInst* inst);
 	obj_id add_instance(level_id level, GameInst* inst);
-	void remove_instance(GameInst* inst, bool add_to_removed = true);
+	void immediately_remove_instance(GameInst *inst, bool add_to_removed = true);
 	//Skip an instance id as if we were making an instance
 	//used for synchronization purposes in network play
 	void skip_next_instance_id();
@@ -302,6 +302,8 @@ public:
 
 	// Game screens to draw:
 	GameScreenSet screens;
+
+	void remove_instance(GameInst* inst);
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
 
@@ -334,6 +336,8 @@ private:
 	GameStatePostSerializeData _post_deserialize_data;
         int initial_seed = 0;
     friend class GameWorld;
+
+	std::vector<GameInst*> pending_destroy_list;
 };
 
 GameState* gs(SerializeBuffer& buff);

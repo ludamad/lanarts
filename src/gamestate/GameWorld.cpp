@@ -30,6 +30,10 @@ GameWorld::GameWorld(GameState* gs) :
 		gs(gs),
 		next_room_id(-1) {
 	lua_level_states = LuaValue::newtable(gs->luastate());
+    _lazy_lua_inst_mapping = LuaValue::newtable(gs->luastate());
+    LuaValue metatable = LuaValue::newtable(gs->luastate());
+    _lazy_lua_inst_mapping.set_metatable(metatable);
+    _lazy_lua_inst_mapping["__mode"] = "v";
 	midstep = false;
 }
 
@@ -70,7 +74,9 @@ void GameWorld::serialize(SerializeBuffer& sb) {
 		inst->serialize(gs, sb);
 	});
 	for (GameInstRef& ref : _alive_removed_objects) {
+        ref->lua_variables = _lazy_lua_inst_mapping[ref->id];
 		ref->serialize_lua(gs, sb);
+        ref->lua_variables = LuaValue();
 	}
 }
 
@@ -122,6 +128,8 @@ void GameWorld::deserialize(SerializeBuffer& sb) {
 	});
 	for (GameInstRef& ref : _alive_removed_objects) {
 		ref->deserialize_lua(gs, sb);
+        _lazy_lua_inst_mapping[ref->id] = ref->lua_variables;
+        ref->lua_variables = LuaValue();
 	}
 
 }
@@ -276,7 +284,7 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	}
         LuaValue lua_object = inst->lua_variables;// stash lua object;
 
-	gs->remove_instance(inst, /* Dont trigger on-destroy effects */ false);
+    gs->immediately_remove_instance(inst, /* Dont trigger on-destroy effects */ false);
 	gref->last_x = x, gref->last_y = y;
 	gref->update_position(x, y);
 
@@ -365,8 +373,13 @@ GameMapState *GameWorld::get_current_level() {
 }
 
 void GameWorld::register_removed_object(GameInst* inst) {
+    if (inst->lua_variables.empty()) {
+        return; // Don't have special saving conditions
+    }
+	LANARTS_ASSERT(inst->id > 0);
 	inst->id = -int(_alive_removed_objects.size());
 	_alive_removed_objects.push_back({inst});
+    _lazy_lua_inst_mapping[inst->id] = inst->lua_variables;
 }
 
 GameInstRef &GameWorld::get_removed_object(int id) {

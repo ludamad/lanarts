@@ -25,13 +25,9 @@ void ResourceEntryBase::init(int id, const LuaValue& table) {
 
 	try {
 		table["id"] = this->id;
-
-		this->name = table["name"].as<std::string>();
-		this->description = luawrap::set_if_nil(table, "description",
-				std::string());
-
-		this->lua_representation = table;
-
+		name = table["name"].as<std::string>();
+		description = luawrap::set_if_nil(table, "description", std::string());
+		raw_table = table;
 		parse_lua_table(table);
 	} catch (const luawrap::Error& error) {
 		std::string resource_name = "<Unknown>";

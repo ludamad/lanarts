@@ -257,6 +257,7 @@ projectile_create = (args, for_enemy = false) ->
 
 enemy_create = (args) ->
     args.stats.attacks or= {}
+    args.stats.movespeed *= 1.5
     w = args.weapon
     if w ~= nil
         w.name or= args.name .. " Melee"

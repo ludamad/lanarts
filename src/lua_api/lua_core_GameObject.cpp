@@ -87,6 +87,14 @@ static int lapi_enemyinst_getter_fallback(lua_State* L) {
     lua_gettable(L, -2); // On stack [type table, value]
     return 1;
 }
+
+/* Use a per-instance lua table as a fallback */
+static int lapi_projectileinst_getter_fallback(lua_State* L) {
+    luawrap::get<ProjectileInst*>(L, 1)->projectile_entry().raw_table.push();
+    lua_pushvalue(L, 2); // On stack: [type table, key]
+    lua_gettable(L, -2); // On stack [type table, value]
+    return 1;
+}
 /* Use a per-instance lua table as a fallback */
 static int lapi_gameinst_setter_fallback(lua_State* L) {
 	lua_pushvalue(L, 2);
@@ -134,7 +142,8 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	LUAWRAP_GETTER(getters, tile_xy, Pos(OBJ->x / TILE_SIZE, OBJ->y / TILE_SIZE));
 	luawrap::bind_getter(getters["x"], &GameInst::x);
 	luawrap::bind_getter(getters["y"], &GameInst::y);
-	luawrap::bind_getter(getters["__table"], &GameInst::lua_variables);
+// Pointless, as this is what is exposed to Lua anyway:
+//	luawrap::bind_getter(getters["__table"], &GameInst::lua_variables);
 	luawrap::bind_getter(getters["x_previous"], &GameInst::last_x);
 	luawrap::bind_getter(getters["y_previous"], &GameInst::last_y);
 	luawrap::bind_getter(getters["destroyed"], &GameInst::destroyed);
@@ -207,6 +216,22 @@ static int lapi_do_nothing(lua_State *L) {
 }
 
 void combatgameinst_use_projectile(GameState *gs, CombatGameInst *p, const Projectile &projectile, const Pos &target);
+static LuaValue lua_projectileinst_metatable(lua_State* L) {
+	LUAWRAP_SET_TYPE(ProjectileInst*);
+	LuaValue meta = lua_gameinst_base_metatable(L);
+	LuaValue getters = luameta_getters(meta);
+	LuaValue setters = luameta_setters(meta);
+	getters["caster"] = [=](ProjectileInst* p) {
+		return p->caster(lua_api::gamestate(L));
+	};
+
+	// Use table as fallback for getting values
+	lua_pushcfunction(L, &lapi_projectileinst_getter_fallback);
+	luameta_defaultgetter(meta, LuaStackValue(L, -1));
+	lua_pop(L, 1);
+	return meta;
+}
+
 static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(CombatGameInst*);
 
@@ -423,6 +448,8 @@ static void lua_gameinst_push_metatable(lua_State* L, GameInst* inst) {
 		luameta_push(L, &lua_playerinst_metatable);
 	} else if (dynamic_cast<EnemyInst*>(inst)) {
 		luameta_push(L, &lua_enemyinst_metatable);
+    } else if (dynamic_cast<ProjectileInst*>(inst)) {
+        luameta_push(L, &lua_projectileinst_metatable);
 	} else if (dynamic_cast<CombatGameInst*>(inst)) {
 		luameta_push(L, &lua_combatgameinst_metatable);
 	} else if (dynamic_cast<ItemInst*>(inst)) {
@@ -558,9 +585,16 @@ namespace GameInstWrap {
 			lua_pushnil(L);
 			return;
 		}
+        LuaValue prev_value = inst->lua_variables;
 		LuaValue& lua_vars = inst->lua_variables;
 		if (lua_vars.empty()) {
-			lua_vars = LuaValue::newtable(L);
+            if (inst->destroyed) {
+                lua_vars = lua_api::gamestate(L)->game_world().get_weak_lua_data()[inst->id];
+//                throw std::runtime_error("WHTF!");
+            } else {
+                lua_vars = LuaValue::newtable(L);
+                prev_value = lua_vars;
+            }
 		}
 		if (lua_vars["__objectref"].isnil()) {
 			make_object_ref(lua_vars, inst);
@@ -572,7 +606,19 @@ namespace GameInstWrap {
 		} else {
 			lua_pop(L, 1);
 		}
+        lua_vars = prev_value;
 	}
+
+    void set_lua_vars(lua_State* L, GameInst* inst) {
+        LuaValue& lua_vars = inst->lua_variables;
+        lua_vars = LuaValue::newtable(L);
+        lua_vars.push();
+        push_ref(L, inst);
+        lua_vars["__objectref"].pop();
+        lua_gameinst_push_metatable(L, inst);
+        lua_setmetatable(L, -2);
+        lua_pop(L, 1);
+    }
 }
 
 /* TODO: Deprecated */
@@ -788,7 +834,7 @@ static GameInst* item_create(LuaStackValue args) {
 }
 
 static void object_destroy(LuaStackValue inst) {
-	lua_api::gamestate(inst)->remove_instance(inst.as<GameInst*>());
+    lua_api::gamestate(inst)->immediately_remove_instance(inst.as<GameInst *>());
 }
 
 static void object_add(LuaStackValue inst) {
@@ -821,8 +867,10 @@ namespace lua_api {
 		submodule["EnemyType"].pop();
 		luameta_push(L, &lua_combatgameinst_metatable);
 		submodule["CombatType"].pop();
-		luameta_push(L, &lua_feature_metatable);
-		submodule["FeatureType"].pop();
+        luameta_push(L, &lua_feature_metatable);
+        submodule["FeatureType"].pop();
+        luameta_push(L, &lua_projectileinst_metatable);
+        submodule["ProjectileType"].pop();
 		luameta_push(L, &lua_iteminst_metatable);
 		submodule["ItemType"].pop();
 		luameta_push(L, &lua_gameinst_base_metatable);
@@ -882,4 +930,8 @@ namespace lua_api {
 		submodule["OTHER"] = (int)FeatureInst::OTHER;
 		ensure_reachability(globals, submodule);
 	}
+}
+
+void gameinst_set_lua_vars(lua_State* L, GameInst* inst) {
+    GameInstWrap::set_lua_vars(L, inst);
 }

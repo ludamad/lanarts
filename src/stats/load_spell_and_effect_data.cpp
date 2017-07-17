@@ -87,12 +87,11 @@ void lapi_data_create_effect(const LuaStackValue& table) {
 
 static ProjectileEntry* parse_projectile(const LuaStackValue& table) {
     ProjectileEntry* entry = new ProjectileEntry;
-    entry->parse_lua_table(table);
+    entry->init(game_item_data.size(), table);
     return entry;
 }
 
 void lapi_data_create_projectile(const LuaStackValue& table) {
     ProjectileEntry* entry = parse_projectile(table);
-        entry->name = table["name"].to_str();
-        game_item_data.new_entry(entry->name, entry, table);
+    game_item_data.new_entry(entry->name, entry, table);
 }

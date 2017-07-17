@@ -44,7 +44,6 @@ PROGRESSION = () ->
     idx = 0
     fs = {}
     init = () ->
-        random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
         for item, attributes in pairs items
             if not attributes.types or #attributes.types < 2
                 continue
@@ -54,6 +53,7 @@ PROGRESSION = () ->
                 continue
             append fs, () ->
                 P = require "maps.Places"
+                random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
                 return P.create_isolated {
                     label: item
                     template: P.SimpleRoom
@@ -67,6 +67,7 @@ PROGRESSION = () ->
             --    continue
             append fs, () ->
                 P = require "maps.Places"
+                random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
                 return P.create_isolated {
                     label: enemy
                     template: P.SimpleRoom

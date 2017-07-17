@@ -51,15 +51,7 @@ public:
 
 	void register_enemy(GameInst* enemy);
 
-	size_t number_monsters() {
-		return mids.size();
-	}
-
 	void clear();
-	//Copy everything but RVO::Simulator
-	void partial_copy_to(MonsterController& mc) const;
-	//Fill out RVO::Simulator
-	void finish_copy(GameMapState* level);
 
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
