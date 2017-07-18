@@ -12,17 +12,8 @@ void ScentWindow::add_smell(Pos xy, float smell) {
     }
 }
 
-std::tuple<float, PosF> ScentWindow::towards_least_smell(CombatGameInst* inst) {
-//    map_algorithms::FindBestNearbyTile algorithm {
-
-//            SolidityF is_solid;
-//            SmellF get_smell;
-//    };
-//    return algorithm.compute(inst->bbox());
-}
-
-std::tuple<float, PosF> ScentWindow::towards_most_smell(CombatGameInst* inst) {
-}
+std::tuple<float, PosF> towards_least_smell(GameState* gs, ScentWindow& window, CombatGameInst* inst);
+std::tuple<float, PosF> towards_most_smell(GameState* gs, ScentWindow& window, CombatGameInst* inst);
 
 void compute_diffusion(const ScentWindow& input, ScentWindow& output) {
     FOR_EACH_BBOX(output.area, x, y) {

@@ -77,5 +77,6 @@ template <typename SolidityF, typename SmellF>
 inline auto find_best_near_algo(const SolidityF& is_solid, const SmellF& get_smell) {
     return FindBestNearbyTile<SolidityF, SmellF> {is_solid, get_smell};
 }
+}
 
 #endif
