@@ -6,6 +6,8 @@
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 
+#include "iterator_utils.h"
+
 /*Represents a width & height*/
 struct Size {
 	int w, h;
@@ -33,7 +35,7 @@ struct Pos {
 };
 
 /*Represents a rectangular region in terms of its start and end x & y values*/
-struct BBox {
+struct BBox : LambdaIterableBase<BBox> {
 	int x1, y1, x2, y2;
 
 	BBox();
@@ -64,6 +66,12 @@ struct BBox {
 	BBox translated(int x, int y) const;
 
 	BBox translated(const Pos& pos) const;
+
+    auto iterator() {
+        return [=]() {
+            
+        };
+    }
 };
 
 #define FOR_EACH_BBOX(bbox, x, y) \
@@ -76,7 +84,7 @@ struct BBox {
 
 //Float versions of above structures
 
-/*Represents a width & heigh, with floats t*/
+/*Represents a width & height, with floats t*/
 struct SizeF {
 	float w, h;
 	explicit SizeF(float w = 0, float h = 0);

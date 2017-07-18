@@ -20,7 +20,7 @@ file(GLOB lcommon_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 add_library( lcommon
              STATIC
-             ${lcommon_src} )
+             ${lcommon_src} include/lcommon/iterator_utils.h)
 
 AUX_SOURCE_DIRECTORY(tests lcommon_tests) 
 

@@ -84,7 +84,7 @@ file(GLOB lanarts_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
        tests/*
 )
 
-add_executable( lanarts ${lanarts_src} ${lanarts_tests})
+add_executable( lanarts ${lanarts_src} ${lanarts_tests} gamestate/map_algo_util.h)
 CHECK_INCLUDE_FILE( bfd.h HAS_BFD ) 
 if ( HAS_BFD) 
     set( BACKTRADE_DEP bfd ) 

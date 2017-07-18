@@ -13,14 +13,14 @@
 #include "lua_api/lua_api.h"
 
 #include "gamestate/GameState.h"
-#include "gamestate/SmellMap.h"
+#include "gamestate/ScentWindow.h"
 
 GameMapState* mapstate(LuaStackValue map_obj, bool defaulted = false);
 
-typedef smartptr<SmellMap> SmellMapPtr;
+typedef smartptr<ScentWindow> SmellMapPtr;
 
 LuaValue lua_smellmapmetatable(lua_State* L) {
-	LuaValue meta = luameta_new(L, "SmellMap");
+	LuaValue meta = luameta_new(L, "ScentWindow");
 	LuaValue methods = luameta_constants(meta);
 	methods["step"] = [=](SmellMapPtr ptr) {
             ptr->step();
@@ -40,11 +40,11 @@ LuaValue lua_smellmapmetatable(lua_State* L) {
 
 namespace lua_api {
 	void register_lua_core_SmellMap(lua_State* L) {
-		LuaValue smellmap = register_lua_submodule(L, "core.SmellMap");
+		LuaValue smellmap = register_lua_submodule(L, "core.ScentWindow");
 		luawrap::install_userdata_type<SmellMapPtr, &lua_smellmapmetatable>();
 		smellmap["create"] = [=](LuaStackValue map_obj) {
                     auto* map = mapstate(map_obj);
-                    return SmellMapPtr(new SmellMap {map->tiles()});
+                    return SmellMapPtr(new ScentWindow {map->tiles()});
                 };
 	}
 }
