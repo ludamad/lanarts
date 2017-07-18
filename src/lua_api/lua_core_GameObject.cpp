@@ -598,7 +598,7 @@ namespace GameInstWrap {
 		}
 		if (lua_vars["__objectref"].isnil()) {
 			make_object_ref(lua_vars, inst);
-        }
+                }
 		lua_vars.push();
 		if (!lua_getmetatable(L, -1)) {
 			lua_gameinst_push_metatable(L, inst);

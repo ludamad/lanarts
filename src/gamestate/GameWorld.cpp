@@ -284,7 +284,8 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	}
         LuaValue lua_object = inst->lua_variables;// stash lua object;
 
-    gs->immediately_remove_instance(inst, /* Dont trigger on-destroy effects */ false);
+        gs->immediately_remove_instance(inst, /* Dont trigger on-destroy effects */ false);
+        inst->destroyed = false;
 	gref->last_x = x, gref->last_y = y;
 	gref->update_position(x, y);
 
