@@ -103,17 +103,16 @@ static PosF _towards_least_smell(Grid<bool>& solidity, Grid<float>& smells, cons
         squish(maxgrid_y, 2, smells.height() - 2) + 1};
 
     float acc_x = 0, acc_y = 0;
-    FOR_EACH_BBOX(area, xx, yy) {
-        int sx = max(xx * TILE_SIZE, bbox.x1), sy = max(yy * TILE_SIZE,
-                                                        bbox.y1);
-        int ex = min((xx + 1) * TILE_SIZE, bbox.x2), ey = min(
-                (yy + 1) * TILE_SIZE, bbox.y2);
+    for (Pos xy : area) {
+        Pos world_xy = xy.scaled(TILE_SIZE);
+        int sx = max(world_xy.x, bbox.x1), sy = max(world_xy.y, bbox.y1);
+        int ex = min(world_xy.x + TILE_SIZE, bbox.x2), ey = min(world_xy.y + TILE_SIZE, bbox.y2);
 
         float least = INFINITY;
-        Pos least_xy = {xx, yy};
-        if (!solidity[{xx,yy}]) {
-            _least_smell_near(solidity, smells, {xx,yy}, least, least_xy);
-            PosF dir = (least_xy) - Pos(xx,yy);
+        Pos least_xy = xy;
+        if (!solidity[xy]) {
+            _least_smell_near(solidity, smells, xy, least, least_xy);
+            PosF dir = (least_xy) - xy;
             int sub_area = (ex - sx) * (ey - sy) + 1;
             /*Make sure all interpolated directions are possible*/
             acc_x += dir.x * sub_area;

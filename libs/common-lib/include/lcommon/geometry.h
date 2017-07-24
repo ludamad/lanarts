@@ -67,9 +67,19 @@ struct BBox : LambdaIterableBase<BBox> {
 
 	BBox translated(const Pos& pos) const;
 
-    auto iterator() {
-        return [=]() {
-            
+        auto iterator() const {
+            int x = x1, y = y1;
+            return [=] () mutable -> Result<Pos> {
+                Pos ret = {x, y};
+                if (y >= y2) {
+                    return {}; // End iteration
+                }
+                x++;
+                if (x >= x2) {
+                        x = x1;
+                        y++;
+                }
+                return {ret};
         };
     }
 };
