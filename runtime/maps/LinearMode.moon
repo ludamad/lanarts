@@ -7,7 +7,7 @@ first_map_create = () ->
 
     LAIR = {
         --{"Dragon's Cave", Places.DragonLairFoyer}
-        {"Dragon's Lair", Places.DragonLair}
+        {"Dragon's Lair", Places.ChickenCoop}
     }
 
     for {label, C} in *LAIR

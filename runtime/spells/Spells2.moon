@@ -79,7 +79,7 @@ DataW.spell_create {
             target\add_effect("Poison", {
                 poison_rate: 25
                 time_left: 100,
-                attacker: @caster, 
+                attacker: @caster
                 damage: atkstats.damage,
                 power: atkstats.power,
                 magic_percentage: atkstats.magic_percentage,
