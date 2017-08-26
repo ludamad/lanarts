@@ -280,6 +280,7 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	gref->update_position(x, y);
 
 	gs->set_level(get_level(roomid2));
+        inst->id = 0;
 	gs->add_instance(inst);
 
 	PlayerInst* p;
@@ -313,7 +314,7 @@ void GameWorld::reset() {
             lazy_reset();
             return;
 	}
-//    _alive_removed_objects.clear(); // Apparently harmful; dont do this. Better to allow serialization have access to objects from previous runs.
+        _alive_removed_objects.clear(); // TODO investigate " Apparently harmful; dont do this. Better to allow serialization have access to objects from previous runs."
 	std::vector<GameMapState*> delete_list = level_states;
         player_data().remove_all_players(gs);
         level_states.clear();
