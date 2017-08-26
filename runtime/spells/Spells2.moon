@@ -254,7 +254,7 @@ DataW.spell_create {
     description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower.",
     --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
     mp_cost: 10,
-    cooldown: 55,
+    cooldown: 45,
     can_cast_with_held_key: false,
     fallback_to_melee: false,
     spell_cooldown: 200
@@ -268,7 +268,7 @@ DataW.spell_create {
             if caster\is_local_player() 
                 EventLog.add("You must be a necromancer to cast this spell!", {200,200,255})
             return false
-        amount = math.max 1, math.ceil((caster\effective_stats().willpower - 7) / 2)
+        amount = math.max 1, math.ceil((caster\effective_stats().willpower - 4) / 2)
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons >= amount
             if caster\is_local_player() 
@@ -303,14 +303,13 @@ DataW.spell_create {
     spr_spell: "expedite",
     description: "Dash in a straight line, hitting all enemies in your path. Bounces if you hit a wall, doing increasing damage." -- Can still perform abilities while dashing.",
     --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
-    mp_cost: 5
-    cooldown: 10
-    can_cast_with_held_key: true
+    mp_cost: 0
+    cooldown: 30
+    can_cast_with_held_key: false
     fallback_to_melee: true
     spell_cooldown: 10
     action_func: (x, y) =>
-        effect = @add_effect "Dash Attack", 20
-        effect.angle = vector_direction(@xy, {x,y})
+        effect = @add_effect "Dash Attack", {time_left: 20, angle: vector_direction(@xy, {x,y})}
         for _ in screens()
             if @is_local_player()
                 EventLog.add("You dash valiantly forward!", {200,200,255})

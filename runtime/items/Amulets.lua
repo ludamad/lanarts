@@ -202,3 +202,89 @@ Data.equipment_create {
     spr_item = "spr_amulets.urand_bloodlust",
 }
 
+Data.equipment_create {
+    name = "Snake Lanart",
+    description = "Helps open Pixullochia. When equipped, summons a snake on every kill.",
+    type = "lanart",
+
+    -- TODO implement
+    -- TODO use
+    spr_item = "spr_runes.rune_snake",
+    sellable = false
+}
+
+Data.equipment_create {
+    name = "Tomb Lanart",
+    description = "Helps open Pixullochia. When equipped, summons a zombie on every kill.",
+    type = "lanart",
+
+    -- TODO implement
+    -- TODO use
+    spr_item = "spr_runes.rune_tomb",
+    sellable = false,
+    effects_granted = {"SummonMummyOnKill"}
+}
+
+
+Data.equipment_create {
+    name = "Abyssal Lanart",
+    description = "Helps open Pixullochia. When equipped, summons a zombie on every kill.",
+    type = "lanart",
+
+    -- TODO implement
+    -- TODO use
+    spr_item = "spr_runes.rune_abyss",
+    sellable = false,
+    effects_granted = {"SummonMummyOnKill"}
+}
+
+Data.equipment_create {
+    name = "Swarm Lanart",
+    description = "Helps open Pixullochia. When equipped, grants +5 Green Power.",
+    type = "lanart",
+
+    -- TODO implement
+    -- TODO use
+    spr_item = "spr_runes.rune_swamp",
+    sellable = false,
+    effects_granted = {{"GreenPower", {power = 5}}}
+}
+
+Data.equipment_create {
+    name = "Dragon Lanart",
+    description = "Helps open Pixullochia. When equipped, grants +5 Red Resistance.",
+    type = "lanart",
+
+    -- TODO implement
+    -- TODO use
+    spr_item = "spr_runes.rune_demonic_4",
+    sellable = false,
+    effects_granted = {{"RedResist", {resist = 5}}}
+}
+
+Data.equipment_create {
+    name = "Rage Lanart",
+    description = "Helps open Pixullochia. When equipped, grants +1 willpower, and +8% melee rate.",
+    type = "lanart",
+
+    -- TODO implement
+    -- TODO use
+    spr_item = "spr_runes.rune_tartarus",
+    sellable = false,
+    melee_cooldown_multiplier = 1/1.08,
+    stat_bonuses = {willpower=1}
+}
+
+Data.equipment_create {
+    name = "Obliteration Lanart",
+    description = "Helps open Pixullochia. When equipped, grants +50 spell velocity, and +5% casting rate.",
+    type = "lanart",
+
+    -- TODO implement
+    -- TODO use
+    spr_item = "spr_runes.rune_cerebov",
+    sellable = false,
+    spell_cooldown_multiplier = 1/1.05,
+    spell_velocity_multiplier = 1.5,
+}
+

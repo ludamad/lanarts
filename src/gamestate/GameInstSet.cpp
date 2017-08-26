@@ -396,7 +396,7 @@ int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 
 			while (ptr) {
 				GameInst* inst = ptr->inst;
-				if (obj != inst) {
+				if (obj != inst && inst != NULL) {
 					int radsqr = (inst->target_radius + rad)
 							* (inst->target_radius + rad);
 					int dx = inst->x - x, dy = inst->y - y;

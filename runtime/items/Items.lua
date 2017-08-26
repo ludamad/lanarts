@@ -83,35 +83,6 @@ Data.item_create {
     sellable = false,
     stackable = false
 }
-for _, entry in ipairs {
-    {"Snake Lanart", "The ancient Snake Lanart.", "spr_runes.rune_snake"},
-    {"Abyssal Lanart", "The arcane Abyssal Lanart.", "spr_runes.rune_abyss"},
-    {"Swarm Lanart", "The feared Swarm Lanart.", "spr_runes.rune_swamp"},
-    {"Rage Lanart", "The fabled Rage Lanart.", "spr_runes.rune_tartarus"},
-    {"Tomb Lanart", "The grimsly Tomb Lanart.", "spr_runes.rune_tomb"},
-    {"Obliteration Lanart", "The Obliteration Lanart of legend, in your hands.", "spr_runes.rune_cerebov"},
-    {"Dragon Lanart", "A legendary artifact. This Lanart can act as the replacement for a dragon's heart.", "spr_runes.rune_demonic_4"},
-} do
-    local name, description, sprite = entry[1],entry[2],entry[3]
-    Data.item_create {
-        name = name,
-        description = description, use_message = description,
-        type = "lanart",
-        spr_item = sprite,
-        pickup_func = function(self, user)
-            if not GlobalData.lanarts_picked_up[self.name] then
-                play_sound "sound/win sound 2-3.ogg"
-            end
-            GlobalData.lanarts_picked_up[self.name] = true 
-            GlobalData.n_lives = GlobalData.n_lives + #require("core.World").players
-        end,
-        prereq_func = function (self, user)
-            return false
-        end,
-        sellable = false,
-        stackable = false
-    }
-end
 
 Data.item_create {
     name = "Mana Potion",

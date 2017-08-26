@@ -231,6 +231,9 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
                     break;
                 }
             }
+            if (near_unseen) {
+                break;
+            }
         }
         float rx = (x+.5) *TILE_SIZE, ry = (y+.5)* TILE_SIZE;
         // float dx = rx - this->rx, dy = ry - this->ry; 
@@ -238,6 +241,7 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
         // " Ludamad: Automatic item picking up was interesting but way too good.
         //   Dashing into a dungeon and quickly picking up items around should be a conscious effort by the player."
         // Ludamad: OK, let's try with just stackable items.
+        // Ludamad: Back to all items for now. Smoother play experience.
         bool is_item = (gs->object_radius_test(this, NULL, 0, &item_colfilter, rx, ry, 1));
         // Ghosts can't pickup items, ignore them:
         if (is_ghost()) {
@@ -249,7 +253,7 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
             //    adjusted_dist = (sqrt(sqr_dist) / 32);
             //}
 
-            if (dist != 0 && (min_dist >= adjusted_dist || (is_item > found_item)) && (is_item >= found_item)) {
+            if (dist != 0 && (min_dist >= adjusted_dist || is_item > found_item) && (is_item >= found_item)) {
                 closest = {x,y};
                 min_dist = adjusted_dist;
                 found_item = is_item;

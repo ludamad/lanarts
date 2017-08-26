@@ -48,11 +48,10 @@ static EnemyEntry& __E(enemy_id enemytype) {
 
 float monster_difficulty_multiplier(GameState* gs, EnemyEntry& etype) {
 	size_t size = gs->player_data().all_players().size();
-	float mult = (size - 1) / 5.0f;//NB: natural log, base e ~ 2.718...
+	float mult = (size - 1) / 4.0f;//NB: natural log, base e ~ 2.718...
 	if (etype.unique) {
-		return 1 + mult; // Can reasonably expect all players to be part of a boss fight
+		return 1 + mult * 2; // Can reasonably expect all players to be part of a boss fight
 	}
-//         // For now try with static enemies:
 	return 1 + mult;
 }
 
@@ -273,7 +272,9 @@ void EnemyInst::die(GameState *gs) {
 		gs->add_instance(anim);
 		gs->remove_instance(this);
 		if (team != PLAYER_TEAM) {
-            play("sound/paind.ogg");
+                    if (gs->object_visible_test(this)) {
+                        play("sound/paind.ogg");
+                    }
 		}
 
 	        MTwist& mt = gs->rng();

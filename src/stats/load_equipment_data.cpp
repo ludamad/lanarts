@@ -29,6 +29,8 @@ void parse_equipment_entry(lua_State* L, const YAML::Node& n, EquipmentEntry& en
 		entry.type = EquipmentEntry::BOOTS;
     } else if (type == "helmet") {
         entry.type = EquipmentEntry::HEADGEAR;
+    } else if (type == "lanart") {
+        entry.type = EquipmentEntry::LANART;
     } else if (type == "amulet") {
         entry.type = EquipmentEntry::AMULET;
     } else if (type == "belt") {

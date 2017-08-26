@@ -33,16 +33,16 @@ WEAPON_BASES = {
 ARMOUR_BASES = {
     -- Body armour
     {"Leather Armour", 100, UNCOMMON, {"spr_armour.leather_armour3"}}
-    {"Chainmail", 200, SEMIRARE, {"spr_armour.chain_mail2", "spr_armour.chain_mail3"}}
+    {"Chainmail", 200, UNCOMMON / 2, {"spr_armour.chain_mail2", "spr_armour.chain_mail3"}}
     --{"Crystalline Plate", 500, RARE, {"spr_armour.crystal_plate3"}}
-    {"Platemail", 500, RARE, {"spr_armour.randart_plate"}} 
-    {"Robe", 100, UNCOMMON, (for i=1,2 do "spr_armour.randart_robe"..i)} 
+    {"Platemail", 500, UNCOMMON / 5, {"spr_armour.randart_plate"}} 
+    {"Robe", 100, UNCOMMON * 2, (for i=1,2 do "spr_armour.randart_robe"..i)} 
     -- Gloves
     {"Steel Gloves", 100, RARE, (for i=1,4 do "spr_armour.randart_glove"..i)}
     -- Boots
-    {"Leather Boots", 100, UNCOMMON, {"spr_boots.randart_leather_boots"}}
+    {"Leather Boots", 100, RARE, {"spr_boots.randart_leather_boots"}}
     -- Headgear
-    {"Iron Helmet", 100, UNCOMMON, {"spr_armour.randart_helmet", "spr_armour.helmet_ego1", "spr_armour.helmet_ego2", "spr_armour.helmet_ego3", "spr_armour.helmet_ego4", "spr_armour.helmet_art1"}}
+    {"Iron Helmet", 100, RARE, {"spr_armour.randart_helmet", "spr_armour.helmet_ego1", "spr_armour.helmet_ego2", "spr_armour.helmet_ego3", "spr_armour.helmet_ego4", "spr_armour.helmet_art1"}}
     {"Wizard's Hat", 100, UNCOMMON, (for i=2,5 do "spr_armour.hat#{i}")}
     -- Rings generated without a base
     -- Amulets generated without a base
@@ -59,10 +59,10 @@ define_equipment_randarts = (rng, level) ->
     -- and not in a phase beforehand.
 
     R = RANDARTS[level]
-    append R, RandartsUtils.get_ring_randarts(rng, level, 75)
+    append R, RandartsUtils.get_ring_randarts(rng, level, 110)
     append R, RandartsUtils.get_belt_randarts(rng, level, 50)
     append R, RandartsUtils.get_legwear_randarts(rng, level, 50)
-    append R, RandartsUtils.get_amulet_randarts(rng, level, 50)
+    append R, RandartsUtils.get_amulet_randarts(rng, level, 75)
 
     -- Define randart armour pieces:
     append R, for base in *ARMOUR_BASES

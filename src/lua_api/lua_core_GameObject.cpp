@@ -234,6 +234,8 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true,
             // Damage multiplier:
             luawrap::get_defaulted(L, 3, 1.0f))) );
+	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->equipment().weapon().weapon_entry().uses_projectile);
+	LUAWRAP_GETTER(methods, has_ranged_weapon, OBJ->equipment().weapon().weapon_entry().uses_projectile);
     LUAWRAP_METHOD(methods, projectile_attack, OBJ->projectile_attack(lua_api::gamestate(L), NULL, Weapon(), Item(get_projectile_by_name(lua_tostring(L, 2)))));
 
     methods["damage"].bind_function(lapi_combatgameinst_damage);
@@ -368,8 +370,6 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(getters, input_source, OBJ->input_source().value);
 	LUAWRAP_GETTER(getters, weapon_sprite, res::sprite(OBJ->weapon().weapon_entry().item_sprite));
     
-	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->weapon().weapon_entry().uses_projectile);
-	LUAWRAP_GETTER(methods, has_ranged_weapon, OBJ->weapon().weapon_entry().uses_projectile);
 	LUAWRAP_GETTER(methods, within_field_of_view, OBJ->within_field_of_view(luawrap::get<Pos>(L, 2)));
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_focus_player(lua_api::gamestate(L)));
 	LUAWRAP_GETTER(methods, can_benefit_from_rest, OBJ->can_benefit_from_rest());
@@ -829,7 +829,7 @@ namespace lua_api {
 					dir.x = -dir.x;
 					dir.y = -dir.y;
 				}
-			};
+			}
             gs->set_level(old_level);
 			return dir;
 		};

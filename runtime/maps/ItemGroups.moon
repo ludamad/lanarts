@@ -196,20 +196,20 @@ gloves = (chance, args) -> _filter {
 weapons = (chance, args) -> _filter {
     :chance 
     {
-        chance: 10
+        chance: 1000
         args.ignore_weak or {
-            chance: 100
+            chance: 10000
             { item: "Dagger",      chance: 1                      }
             { item: "Short Sword",      chance: 1                      }
 --            { item: "Standard Sword",      chance: 1                      }
         } 
         args.ignore_medium or {
-            chance: 20
+            chance: 2000
             { item: "Wizard's Staff",                 chance: 1           }
             { item: "Mace",                          chance: 1           }
         }
         args.ignore_strong or {
-            chance: 5
+            chance: 500
             { item: "Iron Broadsword",                          chance: 4           }
             { item: "Gallanthor's Crutch",                 chance: 4     }
             { item: "Serated Sword",      chance: 4                      }
@@ -218,6 +218,10 @@ weapons = (chance, args) -> _filter {
 --            { item: "Battle Axe",        chance: 4                      }
             { item: "Iron Scimitar",        chance: 1                      }
             { item: "Orc Axe",        chance: 4                      }
+        }
+        args.ignore_strong or {
+            chance: 1
+            { item: "Gallanthor's 5-Colour Staff",                 chance: 4     }
         }
     }
 --    args.ignore_randarts or { item: RANDART("Weapon"), chance: 1}

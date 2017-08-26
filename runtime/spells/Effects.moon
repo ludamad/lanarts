@@ -520,23 +520,44 @@ for equip_slot in *{"", "Armour", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
 DataW.effect_create {
     name: "PossiblySummonCentaurOnKill"
     console_draw_func: (player, get_next) => 
-        draw_console_effect(tosprite("spr_enemies.humanoid.centaur"), "Can appear after a kill", get_next())
+        draw_console_effect(tosprite("spr_enemies.humanoid.centaur"), "Can summon after kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
     step_func: (caster) =>
+        if caster\has_effect "Summoning"
+            return
         while caster.kills > @kill_tracker
             if chance(0.03 * @n_derived)
                 for _ in screens()
                     EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
                 play_sound "sound/summon.ogg"
-                monster = "Centaur Hunter"
-                if not (caster\has_effect "Summoning")
-                    eff = caster\add_effect("Summoning", 20)
-                    eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
-                    eff.duration = 5
+                eff = caster\add_effect("Summoning", 5)
+                eff.monster = "Centaur Hunter" 
+                eff.duration = 5
             @kill_tracker += 1
 }
+
+DataW.effect_create {
+    name: "SummonMummyOnKill"
+    console_draw_func: (player, get_next) => 
+        draw_console_effect(tosprite("spr_enemies.undead.mummy"), "Summons help every kill", get_next())
+    category: "EquipEffect"
+    init_func: (caster) =>
+        @kill_tracker = caster.kills
+    step_func: (caster) =>
+        if caster\has_effect "Summoning"
+            return
+        while caster.kills > @kill_tracker
+            for _ in screens()
+                EventLog.add("A mummy is summoned due to your graceful killing!!", COL_PALE_BLUE)
+            play_sound "sound/summon.ogg"
+            eff = caster\add_effect("Summoning", 5)
+            eff.monster = "Mummy" 
+            eff.duration = 5
+            @kill_tracker += 1
+}
+
 
 DataW.effect_create {
     name: "PossiblySummonStormElementalOnKill"
@@ -546,16 +567,17 @@ DataW.effect_create {
     init_func: (caster) =>
         @kill_tracker = caster.kills
     step_func: (caster) =>
+        if caster\has_effect "Summoning"
+            return
         while caster.kills > @kill_tracker
             if chance(0.05 * @n_derived)
                 for _ in screens()
                     EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
                 play_sound "sound/summon.ogg"
                 monster = "Storm Elemental"
-                if not (caster\has_effect "Summoning")
-                    eff = caster\add_effect("Summoning", 20)
-                    eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
-                    eff.duration = 5
+                eff = caster\add_effect("Summoning", 5)
+                eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
+                eff.duration = 5
             @kill_tracker += 1
 }
 
@@ -765,9 +787,10 @@ DataW.effect_create {
     fade_out: 50
     init_func: (caster) =>
         AuraBase.init(@, caster)
+    apply_func: (caster, args) =>
         @mp_gain = 10
-        if caster.is_enemy
-            @range = 90
+        @damage = args.damage
+        @range = args.range
     step_func: (caster) =>
         AuraBase.step(@, caster)
         if @animation_only
@@ -783,12 +806,14 @@ DataW.effect_create {
                 play_pained_sound()
                 caster\add_effect("Pained", 50)
                 stats = caster\effective_stats()
-                damage, power = 15, random(2,5) + stats.magic
+                damage, power = @damage, random(2,5) + stats.magic
                 power = power + EffectUtils.get_power(caster, "Black")
                 type_multiplier = EffectUtils.get_resistance(mon, "Black")
                 if mon\damage(damage, power, 1, caster, type_multiplier) then
                     {:stats} = caster
                     {:max_hp} = mon\effective_stats()
+                    @damage += 5 -- Damage creep
+                    @time_left += 100 -- Effect creep
                     if caster\has_effect("AmuletGreatPain")
                         caster\heal_hp(max_hp * 2/ 16)
                     else
@@ -914,18 +939,21 @@ DataW.effect_create {
     effected_colour: {200, 200, 255, 255}
     fade_out: 10
     init_func: (caster) =>
-        play_sound "sound/equip.ogg"
+        if Map.object_visible(caster)
+            play_sound "sound/equip.ogg"
         @steps = 0
         @n_hits = 0
         @attacked = {} -- No one attacked at first
+    apply_func: (caster, args) =>
+        @dir_vector = {math.cos(args.angle) * 16, math.sin(args.angle) * 16}
     step_func: (caster) =>
         @steps += 1
         -- Move forward: 
-        dir = {math.cos(@angle) * 16, math.sin(@angle) * 16}
-        dir = GameObject.simulate_bounce(caster, dir)
-        xy = {caster.x + dir[1], caster.y + dir[2]}
+        @dir_vector = GameObject.simulate_bounce(caster, @dir_vector)
+        xy = {caster.x + @dir_vector[1], caster.y + @dir_vector[2]}
         if Map.object_tile_check(caster, xy)
-            play_sound "sound/door.ogg"
+            if Map.object_visible(caster)
+                play_sound "sound/door.ogg"
             caster\remove_effect "Dash Attack"
             return
         caster.xy = xy
@@ -946,8 +974,8 @@ DataW.effect_create {
     draw_func: (caster) =>
         for i=1,math.min(@steps, 12)
             xy = {
-                caster.x - math.cos(@angle) * 16 * i
-                caster.y - math.sin(@angle) * 16 * i
+                caster.x - @dir_vector[1] * i
+                caster.y - @dir_vector[2] * i
             }
             screen_xy = Display.to_screen_xy(xy)
             caster.sprite\draw({color: {255,255,255, 200 - 30 * i}, origin: Display.CENTER}, screen_xy)
@@ -1005,7 +1033,8 @@ DataW.effect_create {
         @n_ramp = 10
     step_func: () =>
         if @n_steps % 60 == 0
-            play_sound "sound/wavy.ogg"
+            if Map.object_visible(@)
+                play_sound "sound/wavy.ogg"
         @n_steps += 1
     on_melee_func: (mon, defender, damage) =>
         do return nil

@@ -87,6 +87,7 @@ M.harder_enemies = {
   {enemy = "Centaur Marksman",      chance = 30,                                              },
   {enemy = "Executioner",           chance = 30,                                           },
   {enemy = "Mana Sapper",            chance =5                                             },
+  {enemy = "Giant Chicken",             guaranteed_spawns = 1, group_chance = 100, group_size = 3 },
   {enemy = "Hydra",             chance = 20                                             },
 --  {enemy = "Unseen Horror",     chance = 10,  group_chance = 33, group_size = 2           }
 }

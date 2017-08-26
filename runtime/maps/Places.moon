@@ -111,7 +111,7 @@ DragonLair = newtype {
         for i=1,1
             sqr = @random_square_not_near_wall()
             randarts = {}
-            for j=1,#World.players *2
+            for j=1,math.min(3, 2 + #World.players)
                  append randarts, ItemUtils.randart_generate(2)
             append randarts, {type: "Magentite Key"}
             MapUtils.spawn_chest(@map, sqr, randarts)

@@ -30,7 +30,7 @@ DataW.enemy_create {
         magic: 5
         willpower: 8
     }
-    effects_active: {"Pain Aura"}
+    effects_active: {{"Pain Aura", {damage: 15, range: 90}}}
 }
 
 DataW.enemy_create {
@@ -571,9 +571,6 @@ DataW.enemy_create {
         defence: 8
         willpower: 8
     }
-    step_func: () =>
-        if @has_effect "Pain Aura"
-            @get_effect("Pain Aura").range = 40
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
@@ -583,7 +580,7 @@ DataW.enemy_create {
         for i=1,2
             {:type, :amount} = ItemUtils.randart_generate(1)
             ObjectUtils.spawn_item_near(@, type, amount)
-    effects_active: {"Pain Aura"}
+    effects_active: {{"Pain Aura", {damage: 25, range: 40}}}
 }
 
 DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 3, 100, 200, 25) {
@@ -986,10 +983,10 @@ DataW.enemy_create {
     types: {"Green"}
     weapon: {cooldown: 40}
     stats: {
-        hp: 100
+        hp: 120
         hpregen: 0.05
         movespeed: 3.0
-        strength: 20
+        strength: 30
         defence: 20
         willpower: 15
     }
@@ -1123,8 +1120,7 @@ DataW.enemy_create {
     step_func: () =>
         @timeout -= 1
         if @timeout <= 0
-            eff = @add_effect "Dash Attack", 10
-            eff.angle = math.atan2(@vy, @vx)
+            @add_effect("Dash Attack", {time_left: 10, angle: math.atan2(@vy, @vx)})
             @timeout = 200
     effects_active: {"KnockbackWeapon"}
 }

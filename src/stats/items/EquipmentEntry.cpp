@@ -41,6 +41,8 @@ const char* EquipmentEntry::entry_type() {
 		return "Boots";
     case EquipmentEntry::HEADGEAR:
         return "Headgear";
+    case EquipmentEntry::LANART:
+        return "Lanart";
     case EquipmentEntry::AMULET:
         return "Amulet";
     case EquipmentEntry::LEGWEAR:
@@ -76,6 +78,8 @@ static EquipmentEntry::equip_type name2type(const char* name) {
 		return EquipmentEntry::BOOTS;
     } else if (strcmp(name, "helmet") == 0) {
         return EquipmentEntry::HEADGEAR;
+    } else if (strcmp(name, "lanart") == 0) {
+        return EquipmentEntry::LANART;
     } else if (strcmp(name, "amulet") == 0) {
         return EquipmentEntry::AMULET;
     } else if (strcmp(name, "belt") == 0) {

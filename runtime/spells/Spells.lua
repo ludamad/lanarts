@@ -350,7 +350,7 @@ Data.spell_create(Luminos)
 
 local GreaterPain = {
     name = "Greater Pain",
-    description = "Instantly damage all nearby enemies, but hurting yourself in the process. Killing enemies brings back some health.",
+    description = "Damage all nearby enemies overtime, but hurting yourself significantly. When enemies are killed by Greater Pain, the user is healed.",
     can_cast_with_held_key = true,
     spr_spell = "spr_spells.greaterpain",
     can_cast_with_cooldown = false,
@@ -363,10 +363,10 @@ local GreaterPain = {
 
 function GreaterPain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
-    caster:direct_damage(40)
+    caster:direct_damage(60)
     caster:add_effect("Pained", 50)
     local power = EffectUtils.get_power(caster, "Black")
-    caster:add_effect("Pain Aura", 250 + power * 50).range = GreaterPain.range + (caster.stats.level + power)* 5
+    caster:add_effect("Pain Aura", {time_left = 250 + power * 50, damage = 5, range = GreaterPain.range + (caster.stats.level + power)* 5})
     for _ in screens() do
         if caster:is_local_player() then
             EventLog.add("You attack nearby enemies life force directly!", {200,200,255})
@@ -377,18 +377,18 @@ function GreaterPain.action_func(caster, x, y, target)
 end
 
 function GreaterPain.prereq_func(caster)
-    if caster.stats.hp < 55 then
+    if caster.stats.hp < 80 then
         if caster:is_local_player() then
-            EventLog.add("You do not have enough health!", {255,200,200})
+            EventLog.add("You have less than 80 health!", {255,200,200})
         end
         return false
     end
-    for _, mon in ipairs(Map.enemies_list(caster)) do
-        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + Pain.range then
-            return true
-        end
-    end
-    return false
+    --for _, mon in ipairs(Map.enemies_list(caster)) do
+    --    if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + Pain.range then
+    --        return true
+    --    end
+    --end
+    return true
 end
 
 GreaterPain.autotarget_func = Pain.autotarget_func
