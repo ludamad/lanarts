@@ -66,13 +66,19 @@ SpawnedFire = RingFireBase {
         @damage_cooldowns = {} -- takes [dx][dy][obj]
         @base_init(args)
     _on_kill: (obj) => -- Try with chain fire
-        mon_name = SpellUtils.mon_title(obj)
-        SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
-        GameObject.add_to_level SpawnedFire.create {
-            caster: @caster
-            xy: obj.xy -- Create around the damaged enemy
-            duration: 40
-        }
+        -- Augment drop chance with Red power
+        if chance(.1 + 0.05 * EffectUtils.get_power(@caster, 'Red'))
+            mon_name = SpellUtils.mon_title(obj)
+            SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
+            GameObject.add_to_level SpawnedFire.create {
+                caster: @caster
+                xy: obj.xy -- Create around the damaged enemy
+                duration: 40
+            }
+        if chance(0.01 * EffectUtils.get_power(@caster, 'Red'))
+            SpellUtils.message(@caster, "Your awesome fire magic creates a red mana potion!", COL_PALE_BLUE)
+            ObjectUtils.spawn_item_near(@caster, "Red Mana Potion", 1, obj.x, obj.y)
+
     for_all_rings: (f) =>
         rad = 1
         for dy=-rad,rad
@@ -105,13 +111,18 @@ RingOfFire = RingFireBase {
             {math.sin(angle) * radius, math.cos(angle) * radius}
     -- Extra functionality over RingFireBase: creating SpawnedFire
     _on_kill: (obj) =>
-        mon_name = SpellUtils.mon_title(obj)
-        SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
-        GameObject.add_to_level SpawnedFire.create {
-            caster: @caster
-            xy: obj.xy -- Create around the damaged enemy
-            duration: 40
-        }
+        -- Augment drop chance with Red power
+        if chance(.1 + 0.05 * EffectUtils.get_power(@caster, 'Red'))
+            mon_name = SpellUtils.mon_title(obj)
+            SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
+            GameObject.add_to_level SpawnedFire.create {
+                caster: @caster
+                xy: obj.xy -- Create around the damaged enemy
+                duration: 40
+            }
+        if chance(0.01 * EffectUtils.get_power(@caster, 'Red'))
+            SpellUtils.message(@caster, "Your awesome fire magic creates a red mana potion!", COL_PALE_BLUE)
+            ObjectUtils.spawn_item_near(@caster, "Red Mana Potion", 1, obj.x, obj.y)
     -- GameObject methods
     -- Extra functionality over RingFireBase: Manage caster's vision radius
     on_map_deinit: () =>

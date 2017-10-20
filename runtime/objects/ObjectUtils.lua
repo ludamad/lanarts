@@ -115,8 +115,8 @@ local function try_spawn_item(obj, item, amount, tx, ty, avoid_obj)
     return true
 end
 
-function M.spawn_item_near(obj, item, amount, --[[Optional]] avoid_obj)
-    local x, y = math.floor(obj.x / 32), math.floor(obj.y / 32)
+function M.spawn_item_near(obj, item, amount, --[[Optional]] avoid_obj, --[[Optional]] objX, --[[Optional]] objY)
+    local x, y = math.floor((objX or obj.x) / 32), math.floor((objY or obj.y) / 32)
     spiral_iterate(function(dx, dy)
         return try_spawn_item(obj, item, amount, x + dx, y + dy, avoid_obj)
     end)

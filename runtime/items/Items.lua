@@ -1,4 +1,5 @@
 local GlobalData = require "core.GlobalData"
+local EffectUtils = require "spells.EffectUtils"
 local MiscSpellAndItemEffects = require "core.MiscSpellAndItemEffects"
 local EventLog = require "ui.EventLog"
 
@@ -99,6 +100,32 @@ Data.item_create {
 
     action_func = function(self, user)
         user:heal_mp(50)
+    end
+}
+
+Data.item_create {
+    name = "Red Mana Potion",
+    description = "A magical potion of energizing infusions, it restores 25 MP to the user for every point of Red Power.",
+    type = "potion",
+
+    shop_cost = {15, 35},
+
+    spr_item = "spr_scrolls.red_mana_potion",
+
+    prereq_func = function (self, user)
+        if EffectUtils.get_power(user, "Red") <= 0 then
+            for _ in screens() do
+                if caster:is_local_player() then
+                    EventLog.add("You do not have any Red Power!", COL_PALE_RED)
+                end
+            end
+            return false
+        end
+        return user.stats.mp < user.stats.max_mp 
+    end,
+
+    action_func = function(self, user)
+        user:heal_mp(EffectUtils.get_power(user, "Red") * 25)
     end
 }
 

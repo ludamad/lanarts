@@ -1031,9 +1031,9 @@ DataW.effect_create {
     apply_func: (mon) =>
         @n_steps = 0
         @n_ramp = 10
-    step_func: () =>
+    step_func: (mon) =>
         if @n_steps % 60 == 0
-            if Map.object_visible(@)
+            if Map.object_visible(mon)
                 play_sound "sound/wavy.ogg"
         @n_steps += 1
     on_melee_func: (mon, defender, damage) =>
