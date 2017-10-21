@@ -266,7 +266,7 @@ draw_console_effect = (sprite, text, xy, color = COL_PALE_YELLOW) ->
     font_cached_load(settings.font, 10)\draw {
         :color
         origin: Display.LEFT_CENTER
-    }, {xy[1] + Map.TILE_SIZE + 4, xy[2]}, text 
+    }, {xy[1] + Map.TILE_SIZE + 4, xy[2]}, text
 
 draw_weapon_console_effect = (player, sprite, text, xy, color = COL_PALE_YELLOW) ->
     player.weapon_sprite\draw {
@@ -276,18 +276,18 @@ draw_weapon_console_effect = (player, sprite, text, xy, color = COL_PALE_YELLOW)
 
 DataW.effect_create {
     name: "FearWeapon"
-    console_draw_func: (player, get_next) => 
+    console_draw_func: (player, get_next) =>
         draw_weapon_console_effect(player, M._fear, "+10% chance fear", get_next())
     on_melee_func: (attacker, defender, dmg) =>
         if defender\has_effect("Fear")
-            return 
+            return
         if chance(.1)
             eff = defender\add_effect("Fear", 150)
 }
 
 DataW.effect_create {
     name: "ConfusingWeapon"
-    console_draw_func: (player, get_next) => 
+    console_draw_func: (player, get_next) =>
         draw_weapon_console_effect(player, M._confusion, "+10% chance daze", get_next())
     on_melee_func: (attacker, defender, dmg) =>
         if defender\has_effect("Dazed")
@@ -486,7 +486,6 @@ DataW.effect_create {
     fade_out: 55
 }
 
-
 -------  START EQUIPMENT SLOT STACKED EFFECTS --------
 -- Hack because effects are not currently easily stacked otherwise:
 for equip_slot in *{"", "Armour", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
@@ -558,7 +557,6 @@ DataW.effect_create {
             @kill_tracker += 1
 }
 
-
 DataW.effect_create {
     name: "PossiblySummonStormElementalOnKill"
     console_draw_func: (player, get_next) => 
@@ -580,7 +578,6 @@ DataW.effect_create {
                 eff.duration = 5
             @kill_tracker += 1
 }
-
 
 DataW.effect_create {
     name: "PossiblySummonGolemOnKill"
@@ -616,14 +613,14 @@ DataW.effect_create {
         @delay = 1
         @duration = @time_left
         @on_summon = do_nothing
-        @summon_xy = caster.xy
+        @summon_xy = false
         @start_map = caster.map
         caster.summoned or= {}
     step_func: (caster) =>
         @n_steps += 1
         if @n_steps == @delay
             if caster.map == @start_map
-                ability = SpellObjects.SummonAbility.create {monster: @monster, :caster, xy: @summon_xy, duration: @duration, on_summon: @on_summon}
+                ability = SpellObjects.SummonAbility.create {monster: @monster, :caster, xy: @summon_xy or caster.xy, duration: @duration, on_summon: @on_summon}
                 GameObject.add_to_level(ability)
 }
 
