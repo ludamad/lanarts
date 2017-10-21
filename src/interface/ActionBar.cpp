@@ -165,7 +165,12 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 
 	/* Draw weapon*/
 	WeaponEntry& wentry = weapon.weapon_entry();
-	res::sprite(wentry.item_sprite).draw(Pos(x,y));
+	ldraw::DrawOptions options;
+    if (player->cooldowns().action_cooldown > 0) {
+        int waited = player->cooldowns().action_cooldown - 100;
+        options.draw_colour.a = 155 + std::max(waited, 0);
+    }
+    res::sprite(wentry.item_sprite).draw(options, Pos(x,y));
 
 	if (draw_with_projectile) {
 		BBox projectilebox(weaponbox.translated(TILE_SIZE, 0));
@@ -178,11 +183,20 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		}
 
 		ProjectileEntry& ptype = projectile.projectile_entry();
-		res::sprite(ptype.item_sprite).draw(Pos(x + TILE_SIZE, y));
+		res::sprite(ptype.item_sprite).draw(options, Pos(x + TILE_SIZE, y));
+	    if (player->cooldowns().action_cooldown > 0) {
+                options.draw_colour.a = 67;
+	        res::sprite("spr_spells.sloading").draw(options, Pos(x + TILE_SIZE, y));
+	    }
 		/* Draw projectile amount */
 		gs->font().drawf(Colour(255, 255, 255), Pos(x + TILE_SIZE + 1, y + 1),
 				"%d", player->projectile().amount);
-	}
+
+	} else if (player->cooldowns().action_cooldown > 0) {
+            options.draw_colour.a = 67;
+            res::sprite("spr_spells.sloading").draw(options, Pos(x, y));
+        }
+
     lmeth(player->input_source().value, "draw_action_bar_weapon_hint", Pos {x,y});
 
 	ldraw::draw_rectangle_outline(outline_col, equipbox);
@@ -254,3 +268,4 @@ void ActionBar::draw(GameState* gs) const {
 void ActionBar::step(GameState* gs) {
 	// Nothing to be done, placeholder
 }
+
