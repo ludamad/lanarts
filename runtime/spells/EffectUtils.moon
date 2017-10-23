@@ -36,8 +36,8 @@ get_monster_resistances = (types) ->
             resists.Black += 5
             resists.Green += 2
             resists.White -= 1
-            resists.Slashing += 2
-            resists.Piercing += 2
+            resists.Slashing += 4
+            resists.Piercing += 4
         elseif type == "White"
             resists.White += 50
             resists.Blue += 2
@@ -52,7 +52,7 @@ get_monster_resistances = (types) ->
         elseif type == "Blue"
             resists.Slashing += 2
             resists.Blue += 5
-            resists.Red += 2
+            resists.Red += 4
             resists.Green -= 1
             resists.White -= 1
     return resists

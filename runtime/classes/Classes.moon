@@ -61,6 +61,42 @@ Data.class_create {
     gain_per_level: MAGE_GAIN_STATS
 }
 
+--Data.class_create {
+--    name: "Scoundrel",
+--    sprites: {"fighter", "fighter2", "spr_enemies.humanoid.dwarf"},
+--    available_spells: {
+--        { spell: "Berserk", level_needed: 1 },
+--        { spell: "Power Strike", level_needed: 2 },
+--        { spell: "Dash Attack", level_needed: 3 },
+--    },
+--    start_stats: {
+--        movespeed: 4,
+--        hp: 135,
+--        mp: 60,
+--        hpregen: 4 / 60, -- Per 60 frames
+--        mpregen: 2 / 60, -- Per 60 frames
+--        strength: 7,
+--        defence: 7,
+--        willpower: 4,
+--        magic: 4,
+--        equipment: {
+--          weapon: "Mace",
+--          gold: 0,
+--          inventory: {{item: "Health Potion"}},
+--        }
+--    },
+--    gain_per_level: {
+--        hp: 20,
+--        mp: 15,
+--        hpregen: 1 / 60, -- Per 60 frames
+--        mpregen: 0.5 / 60, -- Per 60 frames
+--        magic: 1,
+--        willpower: 1,
+--        defence: 2,
+--        strength: 2
+--    }
+--}
+
 Data.class_create {
     name: "Fighter",
     sprites: {"fighter", "fighter2", "spr_enemies.humanoid.dwarf"},
@@ -80,7 +116,7 @@ Data.class_create {
         willpower: 4,
         magic: 4,
         equipment: {
-          weapon: "Short Sword",
+          weapon: "Mace",
           gold: 0,
           inventory: {{item: "Health Potion"}},
         }

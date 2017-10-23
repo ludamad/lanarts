@@ -130,6 +130,8 @@ function Engine.io()
     --Gamepad.step_for_all()
 end
 
+local GAME_PADS = {}
+
 function Engine.player_input(player)
     if os.getenv("LANARTS_TESTCASE") then
         return (require "input.KeyboardInputSource").create(player)
@@ -142,13 +144,14 @@ function Engine.player_input(player)
     end
     for i=2,10 do
         if player.name == "Player " .. tostring(i) then
-            return (require "input.GamepadInputSource").create(player, ids[i-offset])
+            GAME_PADS[i] = GAME_PADS[i] or (require "input.GamepadInputSource").create(player, ids[i-offset])
+            return GAME_PADS[i]
         end
     end
     local key_input = (require "input.KeyboardInputSource").create(player)
     if os.getenv("LANARTS_CONTROLLER") then
-        local pad_input = (require "input.GamepadInputSource").create(player, ids[1])
-        return (require "input.CombinedInputSource").create(pad_input, key_input)
+        GAME_PADS[1] = GAME_PADS[1] or (require "input.GamepadInputSource").create(player, ids[1])
+        return (require "input.CombinedInputSource").create(GAME_PADS[1], key_input)
     else
         return key_input
     end

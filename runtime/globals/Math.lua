@@ -161,6 +161,11 @@ function random_round(num)
     end
 end
 
+function bounds_percentage(val, min, max)
+    local adjusted_val = math.max(val - min, 0)
+    return math.min(adjusted_val / max, 1.0)
+end
+
 --- Returns the position of an object of size 'size' aligned to a bounding box origin (eg, Display.RIGHT_BOTTOM)
 -- @param bbox the surrounding bounding box
 -- @param origin the origin within the bounding box

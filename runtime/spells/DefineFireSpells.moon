@@ -65,9 +65,10 @@ SpawnedFire = RingFireBase {
     init: (args) =>
         @damage_cooldowns = {} -- takes [dx][dy][obj]
         @base_init(args)
-    _on_kill: (obj) => -- Try with chain fire
-        -- Augment drop chance with Red power
-        if chance(.1 + 0.05 * EffectUtils.get_power(@caster, 'Red'))
+    _on_kill: (obj) => 
+        r_pow = EffectUtils.get_power(@caster, 'Red')
+        -- Augment chain fire chance with Red power
+        if chance(.1 + 0.4 * bounds_percentage(r_pow, 0, 4))
             mon_name = SpellUtils.mon_title(obj)
             SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
             GameObject.add_to_level SpawnedFire.create {
@@ -75,7 +76,8 @@ SpawnedFire = RingFireBase {
                 xy: obj.xy -- Create around the damaged enemy
                 duration: 40
             }
-        if chance(0.01 * EffectUtils.get_power(@caster, 'Red'))
+        -- Very rare: Spawned fire creates mana potion.
+        if chance(0.01 * bounds_percentage(r_pow, 2, 4))
             SpellUtils.message(@caster, "Your awesome fire magic creates a red mana potion!", COL_PALE_BLUE)
             ObjectUtils.spawn_item_near(@caster, "Red Mana Potion", 1, obj.x, obj.y)
 
@@ -111,16 +113,16 @@ RingOfFire = RingFireBase {
             {math.sin(angle) * radius, math.cos(angle) * radius}
     -- Extra functionality over RingFireBase: creating SpawnedFire
     _on_kill: (obj) =>
-        -- Augment drop chance with Red power
-        if chance(.1 + 0.05 * EffectUtils.get_power(@caster, 'Red'))
-            mon_name = SpellUtils.mon_title(obj)
-            SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
-            GameObject.add_to_level SpawnedFire.create {
-                caster: @caster
-                xy: obj.xy -- Create around the damaged enemy
-                duration: 40
-            }
-        if chance(0.01 * EffectUtils.get_power(@caster, 'Red'))
+        mon_name = SpellUtils.mon_title(obj)
+        SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
+        GameObject.add_to_level SpawnedFire.create {
+            caster: @caster
+            xy: obj.xy -- Create around the damaged enemy
+            duration: 40
+        }
+        r_pow = EffectUtils.get_power(@caster, 'Red')
+        -- Very rare: Ring of fire creates mana potion.
+        if chance(0.01 * bounds_percentage(r_pow, 2, 4))
             SpellUtils.message(@caster, "Your awesome fire magic creates a red mana potion!", COL_PALE_BLUE)
             ObjectUtils.spawn_item_near(@caster, "Red Mana Potion", 1, obj.x, obj.y)
     -- GameObject methods
@@ -179,7 +181,7 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        duration = 350 + EffectUtils.get_power(caster, 'Red') * 35
+        duration = 350 + 100 * bounds_percentage(EffectUtils.get_power(caster, 'Red'), 0, 4)
         GameObject.add_to_level RingOfFire.create({:caster, :duration})
         caster\add_effect "Ring of Flames Stat Boost", duration
     console_draw_func: (get_next) =>
@@ -242,9 +244,8 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        caster\add_effect "Inner Fire", 300 + math.min(3, caster.stats.level) * 30 + EffectUtils.get_power(caster, 'Red') * 15
+        caster\add_effect "Inner Fire", 300 + 200 * bounds_percentage(caster.stats.level + EffectUtils.get_power(caster, 'Red'), 0, 10)
     console_draw_func: (get_next) =>
-        power = @effective_stats().magic + EffectUtils.get_power(@, "Red")
         draw_console_effect get_next(), tosprite("fire bolt"), {
             {COL_PALE_GREEN, "4x Fire Bolts"}
         }
@@ -270,13 +271,23 @@ DataW.spell_create {
         on_deinit: () =>
             if @caster.destroyed
                 return
+            r_pow = EffectUtils.get_power(@caster, 'Red')
             if @caster\has_effect "Inner Fire"
                 SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
                 GameObject.add_to_level SpawnedFire.create {
                     caster: @caster
                     xy: @xy
-                    duration: 20 + EffectUtils.get_power(@caster, 'Red') * 3
+                    duration: 20 + r_pow * 3
                 }
+            -- Very rare, high power red mages: Spawned fire is created.
+            elseif chance(0.05 * bounds_percentage(r_pow, 4, 10))
+                SpellUtils.message(@caster, "Fire springs forth from the fire bolt due to your great Red Power!", COL_PALE_BLUE)
+                GameObject.add_to_level SpawnedFire.create {
+                    caster: @caster
+                    xy: @xy
+                    duration: 20 + r_pow * 3
+                }
+
     }
     mp_cost: 10,
     cooldown: 35
