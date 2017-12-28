@@ -3,6 +3,7 @@
  *  Represents a connection made by a server to multiple clients
  */
 
+#include <string>
 #include <vector>
 
 #include <SDL_thread.h>

@@ -1,8 +1,8 @@
 set -e
 #./run.sh -g -b --sanitize
-./run.sh -O -b -lj
+./run.sh -O -g -b # -lj
 
-RUNTIME_FOLDER=`readlink -f .`
+RUNTIME_FOLDER=`pwd`
 RUNTIME_TMP=`mktemp -d`
 # Clean up on exit:
 trap "rm -rf $RUNTIME_TMP" EXIT

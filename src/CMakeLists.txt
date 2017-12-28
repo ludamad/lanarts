@@ -4,11 +4,19 @@ PROJECT(project_lanarts)
 FIND_LIBRARY(OpenGL REQUIRED)
 include(FindFreetype)
 
+
+INCLUDE(FindPkgConfig)
+
+PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
+PKG_SEARCH_MODULE(SDL2MIXER REQUIRED SDL2_mixer>=2.0.0)
+
+
 set( LIBS ../libs)
 set( DEPS ../dependencies)
 set( BUILTDEPS ${CMAKE_BINARY_DIR}/dependencies )
 
-add_definitions( -std=c++14 -Wno-deprecated-declarations)
+add_definitions( -std=c++14 -Wno-deprecated-declarations -Wno-c++11-narrowing)
 
 if (${USE_LUAJIT})
     set( lua_includes ${DEPS}/luajit/src )
@@ -117,14 +125,9 @@ set (libraries
 	${OPENGL_gl_LIBRARY}
 	${FREETYPE_LIBRARIES}
         UnitTest++
-        SDL2-image
-        SDL2-mixer
-        SDL2-static
-#        /usr/i686-w64-mingw32/sys-root/mingw/lib/libSDL2_mixer.dll.a
-#        /usr/i686-w64-mingw32/sys-root/mingw/lib/libSDL2_image.dll.a
-#        /usr/i686-w64-mingw32/sys-root/mingw/lib/libSDL2.dll.a
         backward_object
         ${BACKTRADE_DEP}
+        ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
 )
 
 target_link_libraries( lanarts 

@@ -41,6 +41,7 @@ add_library( ldraw
 
          message(STATUS ${SDL2_LIBRARY})
 set(LINKEDDEPS
+        SDL2-image
 	ldraw
 	luawrap
 	lcommon
@@ -49,6 +50,7 @@ set(LINKEDDEPS
         SDL2-image
 	${OPENGL_gl_LIBRARY}
 	${FREETYPE_LIBRARIES}
+        SDL2-image
 )
 
 #add_executable( ldraw_ex ${ldraw_examples} )

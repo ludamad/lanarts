@@ -32,8 +32,8 @@
 
 namespace luawrap {
 	namespace _private {
-		template<class C>
-		struct TypeImpl;
+		//template<typename C, typename Dummy = bool>
+		//struct TypeImpl;
 
 		//Use RAII to pop the lua stack after return:
 		struct PopHack {

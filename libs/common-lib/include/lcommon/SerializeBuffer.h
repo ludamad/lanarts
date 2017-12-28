@@ -210,25 +210,49 @@ public:
 	template<class T>
 	void write_container(const T& t) {
 		write((int)t.size());
-		for (typename T::const_iterator it = t.begin(); it != t.end(); ++it) {
+		for (auto it = t.begin(); it != t.end(); ++it) {
 			write(*it);
 		}
 	}
+
+	void write_container(const std::vector<bool>& t) {
+		write((int)t.size());
+		for (auto it = t.begin(); it != t.end(); ++it) {
+                    bool val = *it;
+                    write(val);
+		}
+        }
+
 	template<class T>
 	void read_container(T& t) {
 		int size;
 		read(size);
         LSERIALIZE_CHECK(size_t(size * sizeof(T)) < MAX_ALLOC_SIZE);
 		t.resize(size);
-		for (typename T::iterator it = t.begin(); it != t.end(); ++it) {
+		for (auto it = t.begin(); it != t.end(); ++it) {
 			read(*it);
 		}
 	}
+
+
+	void read_container(std::vector<bool>& t) {
+		int size;
+		read(size);
+                LSERIALIZE_CHECK(size_t(size) < MAX_ALLOC_SIZE);
+		t.resize(size);
+		for (auto it = t.begin(); it != t.end(); ++it) {
+                    bool val;
+			read(val);
+                        *it = val;
+		}
+	}
+
+
 	// High-level read/writes:
 	template<class T, class F>
 	void write_container(const T& t, F f) {
 		write((int)t.size());
-		for (typename T::const_iterator it = t.begin(); it != t.end(); ++it) {
+		for (auto it = t.begin(); it != t.end(); ++it) {
 			f(*it);
 		}
 	}
@@ -238,7 +262,7 @@ public:
 		read(size);
 		LSERIALIZE_CHECK(size_t(size * sizeof(T)) < MAX_ALLOC_SIZE);
 		t.resize(size);
-		for (typename T::iterator it = t.begin(); it != t.end(); ++it) {
+		for (auto it = t.begin(); it != t.end(); ++it) {
 			f(*it);
 		}
 	}

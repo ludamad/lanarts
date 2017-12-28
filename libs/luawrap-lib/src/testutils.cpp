@@ -3,6 +3,7 @@
  *  Utilites for testing luawrap-using code.
  */
 
+#include <string>
 #include <stdexcept>
 
 #include <lua.hpp>

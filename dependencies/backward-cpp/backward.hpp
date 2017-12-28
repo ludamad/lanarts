@@ -59,6 +59,9 @@
 #	endif
 #endif
 
+#undef BACKWARD_SYSTEM_LINUX
+#		define BACKWARD_SYSTEM_UNKNOWN
+
 #include <fstream>
 #include <iostream>
 #include <algorithm>
@@ -71,7 +74,6 @@
 #include <iomanip>
 #include <vector>
 #include <cstdarg>
-
 
 #if defined(BACKWARD_SYSTEM_LINUX)
 

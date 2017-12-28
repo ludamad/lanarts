@@ -1,3 +1,5 @@
+cd `dirname $0`
+
 # Good practice -- exit completely on any bad exit code:
 set -e 
 
@@ -60,7 +62,7 @@ if handle_flag "--eclipse" || handle_flag "-e" ; then
     mkdir ../LanartsEclipse -p
     cd ../LanartsEclipse
     # Eclipse project creation
-    cmake -G"Eclipse CDT4 - Unix Makefiles" $src
+    cmake -Wno-dev -G"Eclipse CDT4 - Unix Makefiles" $src
     exit
 fi
 
@@ -129,7 +131,7 @@ function build_lanarts(){
     mkdir -p $BUILD_DIR
     ln -s $BUILD_DIR build 
     cd $BUILD_DIR
-    cmake .. | colorify '1;33'
+    cmake -Wno-dev .. | colorify '1;33'
     if handle_flag "--clean" ; then
         make clean
     fi

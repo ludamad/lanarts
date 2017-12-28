@@ -16,14 +16,14 @@
 
 bool ItemProperties::operator ==(const ItemProperties& properties) const {
 	if (memcmp(&properties.cooldown_modifiers, &this->cooldown_modifiers,
-			sizeof(CooldownModifiers) != 0)) {
+			sizeof(CooldownModifiers)) != 0) {
 		return false;
 	}
 	if (memcmp(&properties.stat_modifiers, &this->stat_modifiers,
-			sizeof(StatModifiers) != 0)) {
+			sizeof(StatModifiers)) != 0) {
 		return false;
 	}
-	if (memcmp(&properties.damage, &this->damage, sizeof(DamageStats) != 0)) {
+	if (memcmp(&properties.damage, &this->damage, sizeof(DamageStats)) != 0) {
 		return false;
 	}
 //	if (properties.effect_modifiers.status_effects

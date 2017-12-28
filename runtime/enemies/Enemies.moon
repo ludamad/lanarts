@@ -1245,11 +1245,11 @@ DataW.enemy_create {
         defence: 10
         willpower: 10
     }
+    init_func: () =>
+        @timeout = 0
     _target_xy: () =>
         return (if @target == nil then random_xy_near(@) else @target.xy)
     _projatk: (proj) => @projectile_attack proj, @_target_xy()
-    init_func: () =>
-        @timeout = 0
     _tornado_storm: () => 
         --@_projatk "Tornado Storm"
         --@timeout = 50

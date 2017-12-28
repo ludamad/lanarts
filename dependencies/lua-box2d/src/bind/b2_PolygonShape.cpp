@@ -251,7 +251,7 @@ static int b2PolygonShape_Set(lua_State *L) {
         lua_rawgeti(L, 2, i);
         lua_rawgeti(L, -1, 1);
         lua_rawgeti(L, -2, 2);
-        points.push_back({lua_tonumber(L, -2), lua_tonumber(L, -1)});
+        points.push_back({(float)lua_tonumber(L, -2), (float)lua_tonumber(L, -1)});
         lua_pop(L, 3);
     }
     // </>

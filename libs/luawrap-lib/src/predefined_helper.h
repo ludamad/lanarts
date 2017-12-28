@@ -38,7 +38,7 @@ namespace luawrap {
 	namespace _private {
 
 		/* Everything not predefined: Callback fallback */
-		template<typename T>
+		template<typename T, typename Dummy>
 		class TypeImpl {
 		public:
 			static void push(lua_State* L, const T& val) {
@@ -57,7 +57,7 @@ namespace luawrap {
 
 		/* Lua value -> matches any value! */
 		template<>
-		class TypeImpl<LuaValue> {
+		class TypeImpl<LuaValue, bool> {
 		public:
 			static void push(lua_State* L, const LuaValue& val);
 			static LuaValue get(lua_State* L, int idx);
@@ -66,7 +66,7 @@ namespace luawrap {
 
 		/* Lua stack value -> matches any value! */
 		template<>
-		class TypeImpl<LuaStackValue> {
+		class TypeImpl<LuaStackValue, bool> {
 		public:
 			static void push(lua_State* L, const LuaStackValue& val);
 			static LuaStackValue get(lua_State* L, int idx);
@@ -75,7 +75,7 @@ namespace luawrap {
 
 		/* Lua field value -> matches any value! */
 		template<>
-		class TypeImpl<LuaField> {
+		class TypeImpl<LuaField, bool> {
 		public:
 			static void push(lua_State* L, const LuaField& val);
 			static LuaField get(lua_State* L, int idx);
@@ -84,7 +84,7 @@ namespace luawrap {
 
 		/* Standard lua C function */
 		template<>
-		class TypeImpl<lua_CFunction> {
+		class TypeImpl<lua_CFunction, bool> {
 		public:
 			static void push(lua_State* L, lua_CFunction val);
 			static lua_CFunction get(lua_State* L, int idx);
@@ -93,7 +93,7 @@ namespace luawrap {
 
 		/* Boolean */
 		template<>
-		class TypeImpl<bool> {
+		class TypeImpl<bool, bool> {
 		public:
 			static void push(lua_State* L, bool val);
 			static bool get(lua_State* L, int idx);
@@ -102,7 +102,7 @@ namespace luawrap {
 
 		/* Floating points */
 		template<>
-		class TypeImpl<double> {
+		class TypeImpl<double, bool> {
 		public:
 			static void push(lua_State* L, double val);
 			static double get(lua_State* L, int idx);
@@ -110,12 +110,12 @@ namespace luawrap {
 		};
 
 		template<>
-		class TypeImpl<float> : public TypeImpl<double> {
+		class TypeImpl<float, bool> : public TypeImpl<double, bool> {
 		};
 
 		/* Integers */
 		template<>
-		class TypeImpl<long> {
+		class TypeImpl<long, bool> {
 		public:
 			static void push(lua_State* L, double val);
 
@@ -125,47 +125,47 @@ namespace luawrap {
 		};
 
 		template<>
-		class TypeImpl<unsigned long> : public TypeImpl<long> {
+		class TypeImpl<unsigned long, bool> : public TypeImpl<long, bool> {
 		};
 
 		template<>
-		class TypeImpl<int> : public TypeImpl<long> {
+		class TypeImpl<int, bool> : public TypeImpl<long, bool> {
 		};
 
 		template<>
-		class TypeImpl<unsigned int> : public TypeImpl<long> {
+		class TypeImpl<unsigned int, bool> : public TypeImpl<long, bool> {
 		};
 
 		template<>
-		class TypeImpl<short> : public TypeImpl<long> {
+		class TypeImpl<short, bool> : public TypeImpl<long, bool> {
 		};
 
 		template<>
-		class TypeImpl<unsigned short> : public TypeImpl<long> {
+		class TypeImpl<unsigned short, bool> : public TypeImpl<long, bool> {
 		};
 
 		template<>
-		class TypeImpl<char> : public TypeImpl<long> {
+		class TypeImpl<char, bool> : public TypeImpl<long, bool> {
 		};
 
 		template<>
-		class TypeImpl<unsigned char> : public TypeImpl<long> {
+		class TypeImpl<unsigned char, bool> : public TypeImpl<long, bool> {
 		};
 
 #ifndef LUAWRAP_NO_WRAP_LONGLONG
 
 		template<>
-		class TypeImpl<long long> : public TypeImpl<long> {
+		class TypeImpl<long long, bool> : public TypeImpl<long, bool> {
 		};
 
 		template<>
-		class TypeImpl<unsigned long long> : public TypeImpl<long> {
+		class TypeImpl<unsigned long long, bool> : public TypeImpl<long, bool> {
 		};
 #endif
 
 		/* Strings */
 		template<>
-		class TypeImpl<std::string> {
+		class TypeImpl<std::string, bool> {
 		public:
 			static void push(lua_State* L, const std::string& val);
 			static void push(lua_State* L, const char* val);
@@ -174,10 +174,10 @@ namespace luawrap {
 		};
 
 		template<>
-		class TypeImpl<const char*> : public TypeImpl<std::string> {
+		class TypeImpl<const char*, bool> : public TypeImpl<std::string, bool> {
 		};
 		template<>
-		class TypeImpl<char*> : public TypeImpl<std::string> {
+		class TypeImpl<char*, bool> : public TypeImpl<std::string, bool> {
 		};
 
 		template<typename T, typename = decltype(&T::operator())>
@@ -185,7 +185,7 @@ namespace luawrap {
 
 		/* C++ Lambdas */
 		template<typename T>
-		class TypeImpl<enable_lambda<T>> {
+		class TypeImpl<enable_lambda<T>, bool> {
 		public:
 			static void push(lua_State* L, const T& data) {
                                 lua_push_unsafe_closure(L, data);
@@ -202,7 +202,7 @@ namespace luawrap {
 
 #ifndef LUAWRAP_NO_WRAP_VECTOR
 		template<typename T>
-		class TypeImpl<std::vector<T> > {
+		class TypeImpl<std::vector<T>, bool> {
 		public:
 			static void push(lua_State* L, const std::vector<T>& value) {
 				lua_newtable(L);

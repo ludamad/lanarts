@@ -214,6 +214,9 @@ end
 
 --- Return a random element from a list
 function random_choice(choices)
+    if #choices == 1 then
+        return choices[1]
+    end
     local idx = random(1, #choices)
     return choices[idx]
 end

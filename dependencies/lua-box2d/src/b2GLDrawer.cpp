@@ -29,7 +29,7 @@
 #include "b2GLDrawer.h"
 #include <cstdio>
 
-#ifdef __MACOSX_CORE__
+#ifdef __APPLE__
 #include <OpenGL/gl.h>
 #else
 #include <GL/gl.h>
