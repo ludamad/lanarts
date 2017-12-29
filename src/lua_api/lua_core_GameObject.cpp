@@ -237,6 +237,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->equipment().weapon().weapon_entry().uses_projectile);
 	LUAWRAP_GETTER(methods, has_ranged_weapon, OBJ->equipment().weapon().weapon_entry().uses_projectile);
     LUAWRAP_METHOD(methods, projectile_attack, OBJ->projectile_attack(lua_api::gamestate(L), NULL, Weapon(), Item(get_projectile_by_name(lua_tostring(L, 2)))));
+    LUAWRAP_METHOD(methods, use_spell, OBJ->use_spell(lua_api::gamestate(L), game_spell_data.get(lua_tostring(L, 2)), luawrap::get<Pos>(L, 3), luawrap::get_defaulted<GameInst*>(L, 4, nullptr)));
 
     methods["damage"].bind_function(lapi_combatgameinst_damage);
 	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);
@@ -289,6 +290,7 @@ static LuaValue lua_iteminst_metatable(lua_State* L) {
 	return meta;
 }
 
+static int lua_enemyinst_metatable_clone(lua_State* L);
 static LuaValue lua_enemyinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(EnemyInst*);
 
@@ -301,7 +303,12 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(getters, kills, 0);
     LUAWRAP_GETTER(getters, xpworth, OBJ->xpworth());
     LUAWRAP_SETTER(setters, xpworth, double, OBJ->xpworth() = VAL);
+    meta["clone"].bind_function(lua_enemyinst_metatable_clone);
 	return meta;
+}
+static int lua_enemyinst_metatable_clone(lua_State* L) {
+    lua_enemyinst_metatable(L).push();
+    return 1;
 }
 
 static void apply_melee_cooldown(PlayerInst* player) {

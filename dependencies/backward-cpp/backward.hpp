@@ -59,8 +59,8 @@
 #	endif
 #endif
 
-#undef BACKWARD_SYSTEM_LINUX
-#		define BACKWARD_SYSTEM_UNKNOWN
+//#undef BACKWARD_SYSTEM_LINUX
+//#		define BACKWARD_SYSTEM_UNKNOWN
 
 #include <fstream>
 #include <iostream>

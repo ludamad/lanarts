@@ -49,9 +49,25 @@ level_id GameWorld::get_current_level_id() {
 }
 
 void GameWorld::serialize(SerializeBuffer& sb) {
+    // (1) Serialize seen enemy data
 	_enemies_seen.serialize(sb);
 
-	sb.write_int(level_states.size());
+    // (2) Serialize hold-over GameInst's that are destroyed in the game,
+    // but still referenced
+    sb.write_container(_alive_removed_objects, [&](const GameInstRef& ref) {
+        GameInst* inst = ref.get();
+        sb.write_int(get_inst_type(inst));
+        LANARTS_ASSERT(inst->id <= 0);
+        LANARTS_ASSERT((-inst->id) < _alive_removed_objects.size());
+        sb.write_int(inst->id);
+        inst->serialize(gs, sb);
+    });
+    for (GameInstRef& ref : _alive_removed_objects) {
+        ref->serialize_lua(gs, sb);
+    }
+
+    // (3) Serialize level data
+    sb.write_int(level_states.size());
 	GameMapState* original = gs->get_level();
 
 	for (int i = 0; i < level_states.size(); i++) {
@@ -62,22 +78,37 @@ void GameWorld::serialize(SerializeBuffer& sb) {
 	}
 
 	gs->set_level(original);
-        team_data().serialize(gs, sb);
-	sb.write_container(_alive_removed_objects, [&](const GameInstRef& ref) {
-		GameInst* inst = ref.get();
-		sb.write_int(get_inst_type(inst));
-		sb.write_int(inst->id);
-		inst->serialize(gs, sb);
-	});
-	for (GameInstRef& ref : _alive_removed_objects) {
-		ref->serialize_lua(gs, sb);
-	}
+
+    // (4) Serialize team data
+    team_data().serialize(gs, sb);
 }
 
 void GameWorld::deserialize(SerializeBuffer& sb) {
-	_enemies_seen.deserialize(sb);
+    // (1) Deserialize seen enemy data
+    _enemies_seen.deserialize(sb);
 
-	int nlevels;
+    // (2) Deserialize hold-over GameInst's that are destroyed in the game,
+    // but still referenced
+    sb.read_container(_alive_removed_objects, [&](GameInstRef& ref) {
+        InstType type;
+        int id;
+        sb.read_int(type);
+        sb.read_int(id);
+        GameInst* inst = from_inst_type(type);
+        inst->id = id;
+        inst->deserialize(gs, sb);
+        inst->last_x = inst->x;
+        inst->last_y = inst->y;
+        ref = GameInstRef(inst);
+    });
+    for (GameInstRef& ref : _alive_removed_objects) {
+        ref->deserialize_lua(gs, sb);
+        LANARTS_ASSERT(ref->id <= 0);
+        LANARTS_ASSERT((-ref->id) < _alive_removed_objects.size());
+    }
+
+    // (3) Deserialize level data
+    int nlevels;
 	sb.read_int(nlevels);
 	for (int i = 0; i < level_states.size(); i++) {
 		delete level_states.at(i);
@@ -97,33 +128,20 @@ void GameWorld::deserialize(SerializeBuffer& sb) {
 		level_states[i]->deserialize(gs, sb);
 	}
 
-	gs->set_level(original);
-	midstep = false;
-        team_data().deserialize(gs, sb);
 
+    gs->set_level(original);
+	midstep = false;
+
+    // (4) Deserialize team data
+    team_data().deserialize(gs, sb);
+
+    // (5) Set the current level on each screen based on the local player
     gs->for_screens([&]() {
         GameMapState *level = gs->local_player()->get_map(gs);
         if (level != get_current_level()) {
             set_current_level(level);
         }
     });
-
-	sb.read_container(_alive_removed_objects, [&](GameInstRef& ref) {
-		InstType type;
-		int id;
-		sb.read_int(type);
-		sb.read_int(id);
-		GameInst* inst = from_inst_type(type);
-        inst->id = id;
-		inst->deserialize(gs, sb);
-		inst->last_x = inst->x;
-		inst->last_y = inst->y;
-        ref = GameInstRef(inst);
-	});
-	for (GameInstRef& ref : _alive_removed_objects) {
-		ref->deserialize_lua(gs, sb);
-	}
-
 }
 
 GameMapState* GameWorld::map_create(const Size& size, ldungeon_gen::MapPtr source_map, bool wandering_enabled) {
@@ -314,7 +332,7 @@ void GameWorld::reset() {
             lazy_reset();
             return;
 	}
-        _alive_removed_objects.clear(); // TODO investigate " Apparently harmful; dont do this. Better to allow serialization have access to objects from previous runs."
+    _alive_removed_objects.clear(); // TODO investigate " Apparently harmful; dont do this. Better to allow serialization have access to objects from previous runs."
 	std::vector<GameMapState*> delete_list = level_states;
         player_data().remove_all_players(gs);
         level_states.clear();

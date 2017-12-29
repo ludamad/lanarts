@@ -161,11 +161,11 @@ SimpleRoom = newtype {
         for type, amount in pairs items
             if type == "Gold" or _G.items[type].drop_chance ~= nil
                 sqr = MapUtils.random_square(@map, nil)
-                MapUtils.spawn_item(@map, type, amount, sqr)
+                MapUtils.spawn_item(@map, type, amount, sqr) if sqr
             else
                 for i=1,amount
                     sqr = MapUtils.random_square(@map, nil)
-                    MapUtils.spawn_item(@map, type, 1, sqr)
+                    MapUtils.spawn_item(@map, type, 1, sqr) if sqr
 }
 
 ChickenCoop = newtype {

@@ -583,17 +583,17 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
    		action.use_id, action.use_id2);
    switch (action.act) {
    case GameAction::MOVE:
-   	return use_move(gs, action);
+   	return _use_move(gs, action);
    case GameAction::USE_WEAPON:
-   	return use_weapon(gs, action);
+   	return _use_weapon(gs, action);
    case GameAction::USE_SPELL:
-   	return use_spell(gs, action);
+   	return _use_spell(gs, action);
    case GameAction::USE_REST:
-   	return use_rest(gs, action);
+   	return _use_rest(gs, action);
    case GameAction::USE_PORTAL:
-   	return use_dngn_portal(gs, action);
+   	return _use_dngn_portal(gs, action);
     case GameAction::USE_ITEM:
-        return use_item(gs, action);
+        return _use_item(gs, action);
     case GameAction::SELL_ITEM:
         return sell_item(gs, action);
    case GameAction::PICKUP_ITEM:
@@ -645,7 +645,7 @@ static void item_do_lua_action(lua_State* L, ItemEntry& type, GameInst* user,
 }
 
 
-void PlayerInst::use_item(GameState* gs, const GameAction& action) {
+void PlayerInst::_use_item(GameState *gs, const GameAction &action) {
    if (!effective_stats().allowed_actions.can_use_items) {
    	return;
    }
@@ -754,7 +754,7 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
     }
 }
 
-void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
+void PlayerInst::_use_rest(GameState *gs, const GameAction &action) {
         // Includes whether rest is currently legal (due to effects, not 'can rest' cooldown):
         if (!can_benefit_from_rest()) {
             return;
@@ -775,7 +775,7 @@ void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
         ecore.mp = core_stats().mp;
         is_resting = true;
 }
-void PlayerInst::use_move(GameState* gs, const GameAction& action) {
+void PlayerInst::_use_move(GameState *gs, const GameAction &action) {
     perf_timer_begin(FUNCNAME);
 
     // Get the effective move speed:
@@ -880,7 +880,7 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
    perf_timer_end(FUNCNAME);
 }
 
-void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
+void PlayerInst::_use_dngn_portal(GameState *gs, const GameAction &action) {
     // Dead players can't leave the level:
     if (is_ghost()) {
         return;

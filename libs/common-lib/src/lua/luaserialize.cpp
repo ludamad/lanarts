@@ -39,17 +39,34 @@ enum lstype_t {
 // On success, writes [LS_TABLE, (key encoding, value encoding)*, LS_TABLE_END_SENTINEL]
 void LuaSerializeContext::encode_table(int idx) {
 	lua_pushvalue(L, idx);
+
 	lua_pushnil(L);
 	while (lua_next(L, -2) != 0) {
-                const char* name = NULL;
-                const char* type_name = NULL;
+        const char* name = NULL;
+        const char* type_name = NULL;
 		if (lua_type(L, -2) == LUA_TSTRING) {
 			name = lua_tostring(L, -2);
-                        type_name = lua_typename(L, lua_type(L, -1));
+            type_name = lua_typename(L, lua_type(L, -1));
 			//printf("ENCODING '%s' as '%s'\n", lua_tostring(L, -2), lua_typename(L, lua_type(L, -1)));
 		}
+//        LuaValue k{L, -2};
+//        LuaValue v{L, -1};
 		encode(-2);
-		encode(-1);
+//        try {
+        encode(-1);
+//        } catch (...) {
+//            //
+//            printf("Error occurred -- dumping Lua object at %d\n", idx);
+//            lua_getglobal(L, "pretty_table_safe");
+//            k.push();
+//            lua_call(L, 1, 0);
+//            printf("Value\n");
+//            lua_getglobal(L, "pretty_table_safe");
+//            v.push();
+//            lua_call(L, 1, 0);
+//            //
+//            throw;
+//        };
 		lua_pop(L, 1);
 	}
 	buffer->write_byte(LS_TABLE_END_SENTINEL);
