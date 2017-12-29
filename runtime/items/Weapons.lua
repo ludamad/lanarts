@@ -381,7 +381,7 @@ DataW.weapon_create {
 
     shop_cost = {100, 150},
 
-    spr_item = "spr_weapons.spwpn_sycthe_of_curses",
+    spr_item = "spr_weapons.spwpn_scythe_of_curses",
 
     damage_multiplier = 1.25,
     cooldown = 25,

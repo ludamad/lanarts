@@ -60,4 +60,3 @@ export LANARTS_SEED=123456732
 #export ARENA_ENEMIES="return {Ciribot=1}"
 gdb -silent -ex="break lua_error" -ex="break exit" -ex="break _exit" -ex="break abort" -ex="catch throw" -ex=r --args "$RUNTIME_FOLDER/../build/src/lanarts" $args
 #"$RUNTIME_FOLDER/../build/src/lanarts" $args
-#"$RUNTIME_FOLDER/../build/src/lanarts" $args

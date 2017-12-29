@@ -46,7 +46,7 @@ PROGRESSION = () ->
     init = () ->
         random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
 
-        for enemy, attributes in pairs enemies
+        for enemy, iattributes in pairs enemies
             --if not enemy\match "Dragon"
             --    continue
             append fs, () ->
@@ -175,21 +175,22 @@ M.create_player = () -> nilprotect {
             RATE = 125
             if os.getenv "LANARTS_OVERWORLD_TEST"
                 RATE = 10000
-            if GameState.frame % RATE == 2
+            if GameState.frame % RATE == 2 
                 --state = {}
                 --for k,v in pairs(@)
                 --    state[k] = v
-                @input_source = false
                 @_lpx = 0
                 @_lpy = 0
-                @_ai_state = false
                 @_used_portals = {}
                 @_queued = {}
-                GameState.save("saves/test-save.save")
-                GameState.load("saves/test-save.save")
-                -- Copy over state:W
-                GlobalData = require("core.GlobalData")
                 GlobalData.__test_initialized = false
+                if not os.getenv "DISABLE_SAVING"
+                    @input_source = false
+                    @_ai_state = false
+                    GameState.save("saves/test-save.save")
+                    GameState.load("saves/test-save.save")
+                    -- Copy over state:W
+                    GlobalData = require("core.GlobalData")
                 --for k,v in pairs state
                 --    @[k] = v
             return should_continue
