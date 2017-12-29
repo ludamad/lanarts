@@ -42,6 +42,7 @@ public:
 	void pop() const;
 	void clear();
 
+	void print() const;
 	void push() const;
 	bool empty() const;
 
