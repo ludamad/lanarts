@@ -2,7 +2,6 @@ cmake_minimum_required( VERSION 2.6 )
 
 PROJECT(project_ldraw)
 
-FIND_LIBRARY(OpenGL REQUIRED)
 include(FindFreetype)
 
 set( SRC ../)
@@ -15,22 +14,16 @@ include_directories(
 	"${SRC}/luawrap-lib/include"
 	${DEPS}/UnitTest++
 	${DEPS}/lua
-	"${DEPS}/sdl2/include"
-	"${DEPS}/sdl2-image"
-	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS} 
 )
 
 file(GLOB ldraw_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
-    src/* 
-    src/lua/* 
-    src/opengl/* 
-    include/draw/* 
+        src/*
+        src/lua/*
+        src/opengl/*
+        include/ldraw/*
 )
 
-set( ldraw_examples
-    examples/examples.cpp
-)
 file(GLOB ldraw_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
     tests/*
 )
@@ -39,25 +32,22 @@ add_library( ldraw
 		STATIC
              ${ldraw_src} )
 
-         message(STATUS ${SDL2_LIBRARY})
 set(LINKEDDEPS
-        SDL2-image
 	ldraw
 	luawrap
 	lcommon
 	lua
-        SDL2-static
-        SDL2-image
-	${OPENGL_gl_LIBRARY}
 	${FREETYPE_LIBRARIES}
-        SDL2-image
 )
 
+add_definitions(--std=c++14)
+
+
 #add_executable( ldraw_ex ${ldraw_examples} )
-#add_executable( ldraw_tests ${ldraw_tests} )
+add_executable( ldraw_tests ${ldraw_tests} ${ldraw_src} )
 #
-#target_link_libraries( ldraw_ex ${LINKEDDEPS} )
-#target_link_libraries( ldraw_tests ${LINKEDDEPS} UnitTest++ )
+target_link_libraries( ldraw_tests ${LINKEDDEPS} )
+target_link_libraries( ldraw_tests ${LINKEDDEPS} UnitTest++ )
 #
 #enable_testing()
 #add_test(NAME ldraw_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/ldraw_tests )
