@@ -1,5 +1,4 @@
 GameState = require "core.GameState"
-GlobalData = require "core.GlobalData"
 World = require "core.World"
 GameObject = require "core.GameObject"
 PathFinding = require "core.PathFinding"

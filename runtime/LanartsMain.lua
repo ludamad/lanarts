@@ -119,6 +119,7 @@ function Engine.pre_serialize()
     SerializationUtils.name_global_data()
     SerializationUtils.install_require_fallback()
     log_verbose("Naming globals took " .. timer:get_milliseconds() .. "ms.")
+
 end
 
 function Engine.post_serialize()

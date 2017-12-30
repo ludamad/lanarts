@@ -6,6 +6,10 @@ local tconcat, type, pairs = table.concat, type, pairs
 
 local function name_subobjects(t, to_object, to_name, parts, depth)
     if to_name[t] then return end -- Already named
+    if type(t) ~= "function" and type(t) ~= "table" then
+        -- Type we don't need to name
+        return 
+    end
     local name = tconcat(parts, ';')
     -- print("NAMING ", name)
     to_object[name], to_name[t] = t, name

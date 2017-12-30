@@ -277,11 +277,17 @@ bool GameState::level_has_player() {
 }
 
 void GameState::serialize(SerializeBuffer& serializer) {
+	// Create a copy of the global data before any serialization occurs
+//	luawrap::globals(L)["table"]["deep_clone"].push();
+	luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
+//	lua_call(L, 1, 1);
+	auto global_data_copy = LuaValue::pop_value(L);
+
 	serializer.set_user_pointer(this);
 	LuaSerializeConfig& conf = luaserialize_config();
     post_deserialize_data().clear();
-        // Reset the serialization config:
-        conf.reset();
+	// Reset the serialization config:
+	conf.reset();
 	luawrap::globals(L)["Engine"]["pre_serialize"].push();
 	luawrap::call<void>(L);
 
@@ -291,13 +297,8 @@ void GameState::serialize(SerializeBuffer& serializer) {
 	serializer.write_int(_game_timestamp);
 	serializer.write_int(initial_seed);
 
-        luawrap::globals(L)["table"]["deep_clone"].push();
-        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
-        lua_call(L, 1, 1);
-        LuaValue safe_global_data(L);
-        safe_global_data.pop();
-        // Bug fix: If we just encoded normal global data, we would have problems with object caching.
-        conf.encode(serializer, safe_global_data);
+	// Bug fix: If we just encoded normal global data, we would have problems with object caching.
+	conf.encode(serializer, global_data_copy);
 	serializer.write_int(this->frame_n);
 	world.serialize(serializer);
 
@@ -314,8 +315,8 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	serializer.set_user_pointer(this);
 	LuaSerializeConfig& conf = luaserialize_config();
     post_deserialize_data().clear();
-        // Reset the serialization config:
-        conf.reset();
+	// Reset the serialization config:
+	conf.reset();
 	luawrap::globals(L)["Engine"]["pre_deserialize"].push();
 	luawrap::call<void>(L);
 
@@ -324,13 +325,14 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	serializer.read_int(_game_timestamp);
 	serializer.read_int(initial_seed);
 
-        LuaValue global_data;
-        conf.decode(serializer, global_data);
-
-        luawrap::globals(L)["table"]["copy"].push();
-        global_data.push();
-        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
-        lua_call(L, 2, 0);
+	LuaValue global_data;
+	conf.decode(serializer, global_data);
+    luawrap::globals(L)["package"]["loaded"]["core.GlobalData"] = global_data;
+//
+//	luawrap::globals(L)["table"]["copy"].push();
+//	global_data.push();
+//	luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
+//	lua_call(L, 2, 0);
 
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);

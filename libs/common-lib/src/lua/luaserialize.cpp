@@ -6,6 +6,7 @@
 #include <exception>
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
+#include <algorithm>
 
 #include "luaserialize.h"
 #include "SerializeBuffer.h"
@@ -32,12 +33,48 @@ enum lstype_t {
 #define abs_index(L, i) ((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
                                         lua_gettop(L) + (i) + 1)
 
+static std::vector<std::string> get_keys(const LuaValue& value) {
+    if (value.empty()) {
+        return {};
+    }
+    std::vector<std::string> keys;
+    lua_State* L = value.luastate();
+    if (lua_istable(L, -1)) {
+        lua_pushnil(L);  /* first key */
+        while (lua_next(L, -2) != 0) {
+            /* uses 'key' (at index -2) and 'value' (at index -1) */
+            keys.push_back(lua_tostring(L, -2));
+            /* removes 'value'; keeps 'key' for next iteration */
+            lua_pop(L, 1);
+        }
+    }
+    return keys;
+}
+
+static void encode_keys(SerializeBuffer& serializer, const LuaValue& value) {
+    // TODO if ndebug
+    serializer.write_container(get_keys(value));
+}
+
+static void decode_keys(SerializeBuffer& serializer, const LuaValue& value) {
+    std::vector<std::string> keys;
+    serializer.read_container(keys);
+    std::vector<std::string> new_keys = get_keys(value);
+    std::sort(keys.begin(), keys.end());
+    std::sort(new_keys.begin(), new_keys.end());
+    if (keys != new_keys) {
+        throw std::runtime_error("Corrupted load!");
+    }
+}
+
 /***************************************************************************************
  *                           Lua value encoding                                        *
  ***************************************************************************************/
 
 // On success, writes [LS_TABLE, (key encoding, value encoding)*, LS_TABLE_END_SENTINEL]
 void LuaSerializeContext::encode_table(int idx) {
+    LuaValue VALUE{L, idx};
+    encode_keys(*buffer, VALUE);
 	lua_pushvalue(L, idx);
 
 	lua_pushnil(L);
@@ -311,6 +348,8 @@ void LuaSerializeContext::_decode(int type) {
 }
 
 void LuaSerializeContext::decode_table(int idx) {
+    LuaValue VALUE{L, idx};
+    decode_keys(*buffer, VALUE);
     idx = abs_index(L, idx);
 	lua_pushvalue(L, idx);
 	int type;
@@ -496,13 +535,16 @@ void LuaSerializeConfig::decode(SerializeBuffer& serializer) {
 
 void LuaSerializeConfig::encode(SerializeBuffer& serializer,
 		const LuaValue& value) {
+	encode_keys(serializer,  value);
 	LuaSerializeContext context = push4(serializer);
 	context.encode(value);
 	sync_indices(context);
 	lua_pop(L, 4);
 }
 
+
 void LuaSerializeConfig::decode(SerializeBuffer& serializer, LuaValue& value) {
+	decode_keys(serializer, value);
 	LuaSerializeContext context = push4(serializer);
 	context.decode(value);
 	sync_indices(context);
