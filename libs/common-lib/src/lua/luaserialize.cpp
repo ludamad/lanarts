@@ -38,16 +38,22 @@ static std::vector<std::string> get_keys(const LuaValue& value) {
         return {};
     }
     std::vector<std::string> keys;
+    value.push();
     lua_State* L = value.luastate();
     if (lua_istable(L, -1)) {
-        lua_pushnil(L);  /* first key */
-        while (lua_next(L, -2) != 0) {
-            /* uses 'key' (at index -2) and 'value' (at index -1) */
-            keys.push_back(lua_tostring(L, -2));
-            /* removes 'value'; keeps 'key' for next iteration */
-            lua_pop(L, 1);
-        }
+//        lua_pushnil(L);  /* first key */
+//        while (lua_next(L, -2) != 0) {
+//            /* uses 'key' (at index -2) and 'value' (at index -1) */
+//            const char* str_rep = lua_tostring(L, -2);
+//            if (str_rep == nullptr) {
+//                str_rep = lua_typename(L, lua_type(L, -2));
+//            }
+//            keys.push_back(std::string(str_rep));
+//            /* removes 'value'; keeps 'key' for next iteration */
+//            lua_pop(L, 1);
+//        }
     }
+    lua_pop(L, 1);
     return keys;
 }
 
@@ -73,10 +79,7 @@ static void decode_keys(SerializeBuffer& serializer, const LuaValue& value) {
 
 // On success, writes [LS_TABLE, (key encoding, value encoding)*, LS_TABLE_END_SENTINEL]
 void LuaSerializeContext::encode_table(int idx) {
-    LuaValue VALUE{L, idx};
-    encode_keys(*buffer, VALUE);
-	lua_pushvalue(L, idx);
-
+    lua_pushvalue(L, idx);
 	lua_pushnil(L);
 	while (lua_next(L, -2) != 0) {
         const char* name = NULL;
@@ -108,6 +111,8 @@ void LuaSerializeContext::encode_table(int idx) {
 	}
 	buffer->write_byte(LS_TABLE_END_SENTINEL);
 	lua_pop(L, 1);
+    {LuaValue VALUE{L, idx};
+        encode_keys(*buffer, VALUE);}
 }
 
 // On success, writes [LS_REF_ID, <ref id>] or [LS_REF_NAME, <ref name>]
@@ -348,8 +353,6 @@ void LuaSerializeContext::_decode(int type) {
 }
 
 void LuaSerializeContext::decode_table(int idx) {
-    LuaValue VALUE{L, idx};
-    decode_keys(*buffer, VALUE);
     idx = abs_index(L, idx);
 	lua_pushvalue(L, idx);
 	int type;
@@ -362,6 +365,8 @@ void LuaSerializeContext::decode_table(int idx) {
 		lua_rawset(L, -3);
 	}
 	lua_pop(L, 1);
+    {LuaValue VALUE{L, idx};
+        decode_keys(*buffer, VALUE);}
 }
 
 // Simple string holder to pass to our lua_Reader.

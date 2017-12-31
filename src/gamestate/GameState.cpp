@@ -323,7 +323,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 
 	LuaValue global_data;
 	conf.decode(serializer, global_data);
-    luawrap::globals(L)["package"]["loaded"]["core.GlobalData"] = global_data
+    luawrap::globals(L)["package"]["loaded"]["core.GlobalData"] = global_data;
 
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);

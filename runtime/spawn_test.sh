@@ -1,8 +1,8 @@
 set -e
 #./run.sh -g -b --sanitize
 #./run.sh -O -g -b # -lj
-./run.sh -O -g -b -lj
-#./run.sh -g -b # -lj
+#./run.sh -O -g -b -lj
+./run.sh -g -b # -lj
 
 RUNTIME_FOLDER=`pwd`
 RUNTIME_TMP=`mktemp -d`

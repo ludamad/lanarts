@@ -86,3 +86,4 @@ Data.equipment_create {
         spell_velocity_multiplier = 1.50
     }
 }
+
