@@ -220,6 +220,8 @@ M.create_player = () -> nilprotect {
     _should_end: () =>
         if not @input_source
             return false
+        if os.getenv("LANARTS_OVERWORLD_TEST")and @_n_inputs > 10000
+            return true
         player = @input_source.player
         if @_n_same_square < 100
             return false

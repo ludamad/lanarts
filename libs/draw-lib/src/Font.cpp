@@ -118,6 +118,10 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 	//h pixels high, we need to request a size of h*64.
 	FT_Set_Char_Size(face, h * 64, h * 64, 96, 96);
 
+	int oldalignment;
+	glGetIntegerv(GL_UNPACK_ALIGNMENT, &oldalignment);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 	int maxw = 0;
 	int maxh = 0;
 	for (int i = 0; i < 128; i++) {
@@ -138,6 +142,9 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 		data.tx2 = (offset + data.w) / ptw;
 		data.ty1 = 0 / pth;
 		data.ty2 = (data.h) / pth;
+		fd->font_img.subimage_from_bytes(
+				BBox(offset, 0, offset + data.w, data.h), (char*)data.data,
+				GL_BGRA);
 	}
 
 	//We don't need the face information now that the display
@@ -145,6 +152,9 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 	FT_Done_Face(face);
 
 	FT_Done_FreeType(library);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, oldalignment);
+
 }
 
 /******************************************************************
@@ -152,7 +162,27 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
  ******************************************************************/
 
 static void gl_draw_glyph(const font_data& font, char glyph, const PosF& pos,
-		const SizeF& scale) {}
+		const SizeF& scale) {
+	const GLImage& img = font.font_img;
+	const char_data& data = font.data[glyph];
+	if (data.w == 0 || data.h == 0) {
+		return;
+	}
+	float x2 = pos.x + data.w * scale.w, y2 = pos.y + data.h * scale.h;
+
+	//Draw our four points, clockwise.
+	glTexCoord2f(data.tx1, data.ty1);
+	glVertex2i(pos.x, pos.y);
+
+	glTexCoord2f(data.tx2, data.ty1);
+	glVertex2i(x2, pos.y);
+
+	glTexCoord2f(data.tx2, data.ty2);
+	glVertex2i(x2, y2);
+
+	glTexCoord2f(data.tx1, data.ty2);
+	glVertex2i(pos.x, y2);
+}
 
 /*Splits up strings, respecting space boundaries & returns maximum width */
 static int process_string(const font_data& font, const char* text,
@@ -204,7 +234,12 @@ static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
 	p = adjusted_for_origin(p, SizeF(measured_width, height),
 			options.draw_origin);
 
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, font.font_img.texture);
+
 	const Colour& c = options.draw_colour;
+	glColor4ub(c.r, c.g, c.b, c.a);
+	glBegin(GL_QUADS);
 
 	Size size(0, 0);
 	for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {
@@ -229,6 +264,8 @@ static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
 		size.w = std::max(len, size.w);
 		size.h += 1;
 	}
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
 	perf_timer_end(FUNCNAME);
 	return size;
 }

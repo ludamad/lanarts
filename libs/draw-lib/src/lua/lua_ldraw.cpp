@@ -18,6 +18,7 @@
 #include "draw.h"
 #include "display.h"
 #include "Image.h"
+#include <SDL_opengl.h>
 
 #include "lua_image.h"
 #include "lua_font.h"
@@ -34,8 +35,46 @@ static int lua_draw_rectangle_outline(lua_State* L) {
 	return 0;
 }
 
+static bool handle_event(SDL_Event* event) {
+	SDL_Keycode keycode = event->key.keysym.sym;
+	SDL_Keymod keymod = (SDL_Keymod) event->key.keysym.mod;
+
+	switch (event->type) {
+	case SDL_MOUSEBUTTONDOWN: {
+		break;
+	}
+	case SDL_QUIT: {
+		return false;
+	}
+	case SDL_KEYDOWN: {
+		if (keycode == SDLK_RETURN || keycode == SDLK_ESCAPE) {
+			return false;
+		}
+		if (keycode == SDLK_F1) {
+			ldraw::display_set_fullscreen(!ldraw::display_is_fullscreen());
+		}
+	}
+		break;
+	}
+	return true;
+}
+
 static void draw_loop(LuaValue draw_func) {
-	exit(1); // Not supported in headless mode!
+	int frames = 0;
+	while (1) {
+		frames += 1;
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) {
+			if (!handle_event(&event)) {
+				return; // Exit draw loop
+			}
+		}
+		ldraw::display_draw_start();
+                draw_func.push();
+                luawrap::call<void>(draw_func.luastate(), frames); 
+		ldraw::display_draw_finish();
+		SDL_Delay(5);
+	}
 }
 
 namespace ldraw {

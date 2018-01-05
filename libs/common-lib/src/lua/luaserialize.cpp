@@ -41,17 +41,21 @@ static std::vector<std::string> get_keys(const LuaValue& value) {
     value.push();
     lua_State* L = value.luastate();
     if (lua_istable(L, -1)) {
-//        lua_pushnil(L);  /* first key */
-//        while (lua_next(L, -2) != 0) {
-//            /* uses 'key' (at index -2) and 'value' (at index -1) */
-//            const char* str_rep = lua_tostring(L, -2);
-//            if (str_rep == nullptr) {
-//                str_rep = lua_typename(L, lua_type(L, -2));
-//            }
-//            keys.push_back(std::string(str_rep));
-//            /* removes 'value'; keeps 'key' for next iteration */
-//            lua_pop(L, 1);
-//        }
+        lua_pushnil(L);  /* first key */
+        while (lua_next(L, -2) != 0) {
+            /* uses 'key' (at index -2) and 'value' (at index -1) */
+            const char* str_rep = nullptr;
+
+            lua_pushvalue(L, -2);
+            if (lua_isstring(L, -1)) {
+                str_rep = lua_tostring(L, -1);
+            } else {
+                str_rep = lua_typename(L, lua_type(L, -1));
+            }
+            keys.push_back({str_rep});
+            /* removes copy of key, removes 'value'; keeps 'key' for next iteration */
+            lua_pop(L, 2);
+        }
     }
     lua_pop(L, 1);
     return keys;
@@ -68,6 +72,8 @@ static void decode_keys(SerializeBuffer& serializer, const LuaValue& value) {
     std::vector<std::string> new_keys = get_keys(value);
     std::sort(keys.begin(), keys.end());
     std::sort(new_keys.begin(), new_keys.end());
+//    TODO print path of object?
+//                       TODO add object path to keys?
     if (keys != new_keys) {
         throw std::runtime_error("Corrupted load!");
     }
@@ -540,20 +546,20 @@ void LuaSerializeConfig::decode(SerializeBuffer& serializer) {
 
 void LuaSerializeConfig::encode(SerializeBuffer& serializer,
 		const LuaValue& value) {
-	encode_keys(serializer,  value);
 	LuaSerializeContext context = push4(serializer);
 	context.encode(value);
 	sync_indices(context);
 	lua_pop(L, 4);
+    encode_keys(serializer,  value);
 }
 
 
 void LuaSerializeConfig::decode(SerializeBuffer& serializer, LuaValue& value) {
-	decode_keys(serializer, value);
 	LuaSerializeContext context = push4(serializer);
 	context.decode(value);
 	sync_indices(context);
 	lua_pop(L, 4);
+    decode_keys(serializer, value);
 }
 
 static void lua_table_clear(lua_State* L, int table_idx) {

@@ -218,7 +218,9 @@ bool GameWorld::pre_step(bool update_iostate) {
     gs->screens.for_each_screen( [&]() {
         /* Queue actions for local player */
         /* This will result in a network send of the player's actions */
-        gs->local_player()->enqueue_io_actions(gs);
+        if (gs->local_player()) {
+            gs->local_player()->enqueue_io_actions(gs);
+        }
     });
 
 	set_current_level(current_level);
@@ -249,19 +251,19 @@ bool GameWorld::step() {
                 return true;
 	}
 	gs->for_screens([&]() {
-        GameMapState* level = gs->local_player()->get_map(gs);
+        GameMapState* level = gs->focus_object()->get_map(gs);
         if (level != get_current_level()) {
             set_current_level(level);
 			// Ensure the view is up to date before view operations:
 			LANARTS_ASSERT(level->width() == gs->view().world_width && level->height() == gs->view().world_height);
-			Pos diff = (gs->local_player()->ipos() - gs->screens.screen().last_player_pos);
+			Pos diff = (gs->focus_object()->ipos() - gs->screens.screen().last_player_pos);
 			gs->view().sharp_move(diff);
 			// Ensure that the view is centered. Having the view move after due to being at the edge of a level is jarring:
 			for (int i = 0; i< 100;i++) {
-				gs->view().center_on(gs->local_player()->ipos(), 10);
+				gs->view().center_on(gs->focus_object()->ipos(), 10);
 			}
         }
-        gs->screens.screen().last_player_pos = gs->local_player()->ipos();
+        gs->screens.screen().last_player_pos = gs->focus_object()->ipos();
 	});
 	// TODO performance
 	std::vector<GameInstRef> new_keep_alives;
