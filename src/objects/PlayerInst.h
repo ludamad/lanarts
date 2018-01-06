@@ -166,12 +166,12 @@ private:
     bool enqueue_not_enough_mana_actions(GameState* gs);
 
     //Game action events
-    void use_move(GameState* gs, const GameAction& action);
-    void use_weapon(GameState* gs, const GameAction& action);
-    void use_dngn_portal(GameState* gs, const GameAction& action);
-    void use_spell(GameState* gs, const GameAction& action);
-    void use_rest(GameState* gs, const GameAction& action);
-    void use_item(GameState* gs, const GameAction& action);
+    void _use_move(GameState *gs, const GameAction &action);
+    void _use_weapon(GameState *gs, const GameAction &action);
+    void _use_dngn_portal(GameState *gs, const GameAction &action);
+    void _use_spell(GameState *gs, const GameAction &action);
+    void _use_rest(GameState *gs, const GameAction &action);
+    void _use_item(GameState *gs, const GameAction &action);
     void sell_item(GameState* gs, const GameAction& action);
 
     //Either finds new target or shifts target

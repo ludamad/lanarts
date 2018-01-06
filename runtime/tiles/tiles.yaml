@@ -2,7 +2,7 @@
 tiles:
 #Walls
   - name: stone_wall
-    files: [tiles/dngn_wall/stone_wall/stone_wall.bmp]
+    files: [tiles/dngn_wall/stone_wall/stone_wall.png]
 
   - name: stone_dark
     files: tiles/dngn_wall/stone_dark/stone_dark(0-3).png

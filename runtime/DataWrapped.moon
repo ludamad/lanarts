@@ -1,4 +1,5 @@
 EffectUtils = require "spells.EffectUtils"
+GameObject = require "core.GameObject"
 
 draw_console_effect = (sprite, text, xy, color = COL_PALE_YELLOW) ->
     Map = require "core.Map"
@@ -255,8 +256,17 @@ projectile_create = (args, for_enemy = false) ->
         add_types args, args.types
     Data.projectile_create(args)
 
+-- Ensures derived enemy types are reachable:
+DERIVED_ENEMY_TYPES = {}
+
+-- High-level enemy definition function
+-- Provides behind-the-scenes metatable manipulation for custom methods.
+-- Adds suitable effects to the enemy based on types / type resistances.
+-- Creates necessary eg weapon entries inline in the monster definition.
 enemy_create = (args) ->
     args.stats.attacks or= {}
+
+    -- If an inline weapon definition is given, create a weapon entry
     w = args.weapon
     if w ~= nil
         w.name or= args.name .. " Melee"
@@ -265,6 +275,8 @@ enemy_create = (args) ->
         w.types or= args.types
         append args.stats.attacks, {weapon: w.name}
         weapon_create(w, true)
+
+    -- If an inline projectile definition is given, create a projectile entry
     p = args.projectile
     if p ~= nil
         p.name or= args.name .. " Projectile"
@@ -272,11 +284,17 @@ enemy_create = (args) ->
         append args.stats.attacks, {projectile: p.name}
         p.types or= args.types
         projectile_create(p, true)
+
+    -- If no resistances provided, derive based on provided types
     if args.resistances == nil and args.types ~= nil
         args.resistances = EffectUtils.get_monster_resistances(args.types)
+
+    -- Compile resistances into effects
     if args.resistances ~= nil
         args.effects_active or= {}
         resistance_effects(args.resistances, args.effects_active)
+
+    -- Update enemy information drawing based on provided types
     for type in *(args.types or {})
         add_console_draw_func args, (edata, get_next) ->
             E = require "spells.Effects"
@@ -291,6 +309,32 @@ enemy_create = (args) ->
                     draw_console_effect E._black_power, "Black Type", get_next()
                 when "Green"
                     draw_console_effect E._poison_power, "Green Type", get_next()
+
+    -- Are there methods we want to make available on the enemy object?
+    if args.methods
+        -- (1) Ensure that the 'methods' argument is being used properly
+        for k,v in pairs args.methods
+            assert type(k) == "string", "Method key should be string!"
+            assert type(v) == "function", "Method value should be function!"
+
+        -- (2) Derive from the EnemyType metatable
+        derived_type = GameObject.EnemyType.clone()
+        table.merge_into(derived_type.__constants, args.methods)
+
+        -- (3) Stash the derived EnemyType metatable so that serialization can reach it
+        DERIVED_ENEMY_TYPES[args.name] = derived_type
+
+        -- (4) Install the new metatable on initialization
+        wrapped_init = args.init_func
+        args.init_func = () =>
+            setmetatable(@, derived_type)
+            if __DEBUG_CHECKS
+                for k,v in pairs args.methods
+                    assert @[k] == v
+            if wrapped_init
+                wrapped_init(@)
+
+    -- Finally, create the enemy entry
     Data.enemy_create(args)
 
-return {:additive_effect_create, :effect_create, :weapon_create, :spell_create, :projectile_create, :enemy_create, :resistance_effects, :power_effects, :add_types}
+return {:additive_effect_create, :effect_create, :weapon_create, :spell_create, :projectile_create, :enemy_create, :resistance_effects, :power_effects, :add_types, :DERIVED_ENEMY_TYPES}

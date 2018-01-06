@@ -31,8 +31,6 @@
 
 #include "objects/EnemyInst.h"
 
-#include "objects/AnimatedInst.h"
-#include "objects/ItemInst.h"
 #include "objects/ProjectileInst.h"
 #include "objects/collision_filters.h"
 
@@ -208,69 +206,6 @@ static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
     lua_pop(L, nret);
 
     return !nilresult;
-}
-
-const float PI = 3.141592f;
-
-static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
-        SpellEntry& spl_entry, const Projectile& projectile,
-        const Pos& target) {
-    MTwist& mt = gs->rng();
-    AttackStats projectile_attack(Weapon(), projectile);
-    ProjectileEntry& pentry = projectile.projectile_entry();
-    bool wallbounce = pentry.can_wall_bounce, passthrough = pentry.can_pass_through;
-    int nbounces = pentry.number_of_target_bounces;
-    float speed = pentry.speed * p->effective_stats().core.spell_velocity_multiplier;
-
-    bool has_greater_fire = p->effects.has("AmuletGreaterFire") || p->effects.has("Inner Fire");
-    bool is_spread_spell = pentry.name == "Mephitize" || pentry.name == "Purple Dragon Projectile";
-    if (is_spread_spell || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt") || (pentry.name == "Tornado Storm")) {
-        float vx = 0, vy = 0;
-        ::direction_towards(Pos {p->x, p->y}, target, vx, vy, 10000);
-        int directions = (pentry.name == "Trepidize" ? 4 : 16);
-        if (pentry.name == "Fire Bolt") directions = 4;
-        if (pentry.name == "Tornado Storm") directions = 8;
-
-        for (int i = 0; i < directions; i++) {
-            float angle = PI / directions * 2 * i;
-            Pos new_target {p->x + cos(angle) * vx - sin(angle) * vy, p->y + cos(angle) * vy + sin(angle) * vx};
-            GameInst* pinst = new ProjectileInst(projectile,
-                    p->effective_atk_stats(mt, projectile_attack), p->id,
-                    Pos(p->x, p->y), new_target, speed, pentry.range(), NONE,
-                    wallbounce, nbounces, passthrough);
-            gs->add_instance(pinst);
-        }
-
-    } else {
-        GameInst* pinst = new ProjectileInst(projectile,
-                p->effective_atk_stats(mt, projectile_attack), p->id,
-                Pos(p->x, p->y), target, speed, pentry.range(), NONE,
-                wallbounce, nbounces, passthrough);
-        gs->add_instance(pinst);
-    }
-}
-
-static void player_use_spell(GameState* gs, PlayerInst* p,
-        SpellEntry& spl_entry, const Pos& target) {
-    lua_State* L = gs->luastate();
-
-    p->core_stats().mp -= spl_entry.mp_cost;
-    float spell_cooldown_mult =
-            p->effective_stats().cooldown_modifiers.spell_cooldown_multiplier;
-    p->cooldowns().reset_action_cooldown(
-            spl_entry.cooldown * spell_cooldown_mult);
-    float cooldown_mult = game_spell_data.call_lua(spl_entry.name, "cooldown_multiplier", /*Default value:*/ 1.0f, p);
-    spell_cooldown_mult *= cooldown_mult;
-//    game_spell_data.
-    // Set global cooldown for spell:
-    p->cooldowns().spell_cooldowns[spl_entry.id] = (int)std::max(spl_entry.spell_cooldown * spell_cooldown_mult, p->cooldowns().spell_cooldowns[spl_entry.id] * spell_cooldown_mult);
-    if (spl_entry.uses_projectile()) {
-        player_use_projectile_spell(gs, p, spl_entry, spl_entry.projectile,
-                target);
-    } else {
-        // Use action_func callback
-        lcall(spl_entry.action_func, /*caster*/ p, target.x, target.y, /*target object*/ gs->get_instance(p->target()));
-    }
 }
 
 bool PlayerInst::enqueue_not_enough_mana_actions(GameState* gs) {
@@ -497,7 +432,7 @@ static void exhaust_projectile_autoequip(PlayerInst* player,
     weapon_smart_equip(player->inventory());
 }
 
-void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
+void PlayerInst::_use_weapon(GameState *gs, const GameAction &action) {
     // Dead players can't attack:
     if (is_ghost()) {
         return;
@@ -601,7 +536,7 @@ bool PlayerInst::melee_attack(GameState* gs, CombatGameInst* e,
     return CombatGameInst::melee_attack(gs, e, weapon, ignore_cooldowns);
 }
 
-void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
+void PlayerInst::_use_spell(GameState *gs, const GameAction &action) {
     // Dead players can't use spells:
     if (is_ghost()) {
         return;
@@ -609,8 +544,6 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
     if (!effective_stats().allowed_actions.can_use_spells) {
         return;
     }
-    MTwist& mt = gs->rng();
-    EffectiveStats& estats = effective_stats();
 
     spell_id spell = spells_known().get(action.use_id);
     SpellEntry& spl_entry = res::spell(spell);
@@ -623,9 +556,9 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
         return;
     }
 
-    Pos target = Pos(action.action_x, action.action_y);
-    player_use_spell(gs, this, spl_entry, target);
+    Pos target_xy = Pos(action.action_x, action.action_y);
+    use_spell(gs, spl_entry, target_xy, gs->get_instance(target()));
 
-    cooldowns().action_cooldown *= estats.cooldown_mult;
+    cooldowns().action_cooldown *= effective_stats().cooldown_mult;
     cooldowns().reset_rest_cooldown(REST_COOLDOWN);
 }

@@ -83,7 +83,7 @@ function M.post_draw()
     local player = World.local_player
     for _, pdata in ipairs(World.players) do
         local p = pdata.instance
-        if not p:is_local_player() and p.map == player.map then
+        if p and not p:is_local_player() and p.map == player.map then
             Fonts.small:draw({color=COL_WHITE, origin=Display.CENTER}, Display.screen_coords{p.x, p.y-18}, pdata.name)
         end
     end

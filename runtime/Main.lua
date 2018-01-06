@@ -5,7 +5,7 @@
 require_path_add('dependencies/?.lua')
 require_path_add('dependencies/socket/?.lua')
 
-require("GlobalVariableSetup")(--[[Load draw-related globals]] false)
+require("GlobalVariableSetup")(--[[Load draw-related globals]] os.getenv("LANARTS_HEADLESS") ~= nil)
 require("moonscript.base").insert_loader()
 
 local argv -- Placeholder, set in main()
@@ -44,7 +44,7 @@ local sysargs = {get_varparam=get_varparam, get_param=get_param, has_arg=has_arg
 
 function sysargs.argv() return table.clone(argv) end
 
--- Start the beta version of dungenerate, was simply named 'Lanarts'
+-- Start the game
 local function start_lanarts()
     local Display = require "core.Display"
     Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)

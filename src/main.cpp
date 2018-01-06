@@ -80,10 +80,16 @@ static void lua_vm_configure(lua_State* L) {
 	luaJIT_setmode(L, -1, LUAJIT_MODE_WRAPCFUNC|LUAJIT_MODE_ON);
 	lua_pop(L, 1);
 	luawrap::globals(L)["__LUAJIT"] = true;
+    luawrap::globals(L)["__EMSCRIPTEN"] = false;
 }
 #else
 static void lua_vm_configure(lua_State* L) {
 	luawrap::globals(L)["__LUAJIT"] = false;
+#ifdef __EMSCRIPTEN__
+    luawrap::globals(L)["__EMSCRIPTEN"] = true;
+#else
+    luawrap::globals(L)["__EMSCRIPTEN"] = false;
+#endif
 }
 #endif
 
@@ -91,27 +97,16 @@ static lua_State* init_luastate() {
 	lua_State* L = lua_api::create_configured_luastate();
 	lua_vm_configure(L);
 	lua_api::add_search_path(L, "?.lua");
-        // Open lpeg first as the moonscript library depends on lpeg, and the moonscript library is called during error reporting.
-        luaopen_lpeg(L);
-        lua_api::register_lua_libraries(L);
-        return L;
+    // Open lpeg first as the moonscript library depends on lpeg, and the moonscript library is called during error reporting.
+    luaopen_lpeg(L);
+    lua_api::register_lua_libraries(L);
+    return L;
 }
 
 // For gdb
 const char* traceback(lua_State* L) {
     luawrap::globals(L)["debug"]["traceback"].push();
     lua_call(L, 0, 1);
-    return lua_tostring(L, -1);
-}
-const char* pretty(LuaValue value) {
-    lua_State* L = value.luastate();
-    value.push();
-    lua_pushnil(L);
-    lua_setmetatable(L, -2);
-    lua_pop(L, 1);
-    luawrap::globals(L)["pretty_tostring"].push();
-    value.push();
-    lua_call(L, 1, 1);
     return lua_tostring(L, -1);
 }
 
@@ -152,7 +147,7 @@ static shared_ptr<GameState> init_gamestate() {
 	return shared_ptr<GameState>(gs);
 }
 
-static void run_bare_lua_state(int argc, char** argv) {
+static void run_engine_Main(int argc, char **argv) {
     lua_State* L = init_luastate();
 
     if (std::getenv("LANARTS_HEADLESS") == NULL) {
@@ -163,18 +158,18 @@ static void run_bare_lua_state(int argc, char** argv) {
     }
 
         // When running a bare state, pass an empty GameSettings object:
-	GameState* gs = new GameState(GameSettings(), L);
+	//GameState* gs = new GameState(GameSettings(), L);
         // Create a game state, mainly for the IO state manipulation functions:
-	lua_api::register_api(gs, L);
+	//lua_api::register_api(gs, L);
 
-	LuaValue main_func = luawrap::dofile(L, "Main2.lua");
-    if (!main_func.isnil()) {
-        main_func.push();
-        luawrap::call<void>(L, vector<string>(argv + 1, argv + argc));
+	LuaValue main_func = luawrap::dofile(L, "engine/Main.lua");
+    if (main_func.isnil()) {
+        printf("Expected main function returned from engine/Main.lua!\n");
+        exit(1);
     }
-    // Cleanup
-    delete gs;
-    lanarts_system_quit();
+    main_func.push();
+    // Call with args, ignoring arg 0 (location to executable)
+    luawrap::call<void>(L, vector<string>(argv + 1, argv + argc));
 }
 
 // Returns: Should we keep running our outer game loop?
@@ -290,11 +285,7 @@ int main(int argc, char** argv) {
 #if NDEBUG
 	try {
 #endif
-    if (argc >= 2 && std::string(argv[1]) == "bare") { // TODO, stop-gap measure until better solution
-        run_bare_lua_state(argc - 1, argv + 1); // Remove 'bare' argument
-    } else {
-        run_outer_game_loop(vector<string>{argv + 1, argv + argc});
-    }
+    run_engine_Main(argc, argv); // Remove 'bare' argument
 #if NDEBUG
 	} catch (const std::exception& err) {
 		fprintf(stderr, "%s\n", err.what());

@@ -394,15 +394,6 @@ namespace lua_api {
                 return traceback;
         }
 
-        
-#ifdef __EMSCRIPTEN__
-        void lemscripten_set_main_loop() {
-            static LuaValue 
-            // void emscripten_set_main_loop(em_callback_func func, int fps, int simulate_infinite_loop);
-            emscripten_set_main_loop(one_iter, 60, 1);
-        }
-#else
-	int read_eval_print(lua_State *L);
 
         static double round(double x) {
             return ::round(x);
@@ -425,7 +416,6 @@ namespace lua_api {
         globals["monster_sprite"].bind_function(lapi_monster_sprite);
 		globals["cpp_traceback"].bind_function(lapi_cpp_traceback);
 
-		globals["__read_eval_print"].bind_function(read_eval_print);
 
 		LuaValue lengine = luawrap::ensure_table(globals["LEngine"]);
 		lengine["import_internal_raw"].bind_function(lengine_import_internal_raw);

@@ -7,6 +7,7 @@
 
 #include <ldraw/DrawOptions.h>
 
+#include "stats/SpellEntry.h"
 #include <lcommon/SerializeBuffer.h>
 #include <lcommon/strformat.h>
 
@@ -25,6 +26,7 @@
 #include "stats/stat_formulas.h"
 #include "stats/ClassEntry.h"
 #include "data/lua_util.h"
+#include "stats/items/items.h"
 
 #include <lcommon/math_util.h>
 #include <ldraw/colour_constants.h>
@@ -678,6 +680,66 @@ ClassStats& CombatGameInst::class_stats() {
 
 CooldownStats& CombatGameInst::cooldowns() {
     return stats().cooldowns;
+}
+
+const float PI = 3.141592f;
+
+void CombatGameInst::use_projectile_spell(GameState* gs, SpellEntry& spl_entry, 
+        const Projectile& projectile, const Pos& target) {
+    MTwist& mt = gs->rng();
+    AttackStats projectile_attack(Weapon(), projectile);
+    ProjectileEntry& pentry = projectile.projectile_entry();
+    bool wallbounce = pentry.can_wall_bounce, passthrough = pentry.can_pass_through;
+    int nbounces = pentry.number_of_target_bounces;
+    float speed = pentry.speed * effective_stats().core.spell_velocity_multiplier;
+
+    bool has_greater_fire = effects.has("AmuletGreaterFire") || effects.has("Inner Fire");
+    bool is_spread_spell = pentry.name == "Mephitize" || pentry.name == "Purple Dragon Projectile";
+    if (is_spread_spell || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt") || (pentry.name == "Tornado Storm")) {
+        float vx = 0, vy = 0;
+        ::direction_towards(Pos {x, y}, target, vx, vy, 10000);
+        int directions = (pentry.name == "Trepidize" ? 4 : 16);
+        if (pentry.name == "Fire Bolt") directions = 4;
+        if (pentry.name == "Tornado Storm") directions = 8;
+
+        for (int i = 0; i < directions; i++) {
+            float angle = PI / directions * 2 * i;
+            Pos new_target {x + cos(angle) * vx - sin(angle) * vy, y + cos(angle) * vy + sin(angle) * vx};
+            GameInst* pinst = new ProjectileInst(projectile,
+                    effective_atk_stats(mt, projectile_attack), id,
+                    Pos(x, y), new_target, speed, pentry.range(), NONE,
+                    wallbounce, nbounces, passthrough);
+            gs->add_instance(pinst);
+        }
+
+    } else {
+        GameInst* pinst = new ProjectileInst(projectile,
+                effective_atk_stats(mt, projectile_attack), id,
+                Pos(x, y), target, speed, pentry.range(), NONE,
+                wallbounce, nbounces, passthrough);
+        gs->add_instance(pinst);
+    }
+}
+
+void CombatGameInst::use_spell(GameState* gs, SpellEntry& spl_entry, const Pos& target, GameInst* target_object) {
+    lua_State* L = gs->luastate();
+
+    core_stats().mp -= spl_entry.mp_cost;
+    float spell_cooldown_mult =
+            effective_stats().cooldown_modifiers.spell_cooldown_multiplier;
+    cooldowns().reset_action_cooldown(
+            spl_entry.cooldown * spell_cooldown_mult);
+    float cooldown_mult = game_spell_data.call_lua(spl_entry.name, "cooldown_multiplier", /*Default value:*/ 1.0f, this);
+    spell_cooldown_mult *= cooldown_mult;
+//    game_spell_data.
+    // Set global cooldown for spell:
+    cooldowns().spell_cooldowns[spl_entry.id] = (int)std::max(spl_entry.spell_cooldown * spell_cooldown_mult, cooldowns().spell_cooldowns[spl_entry.id] * spell_cooldown_mult);
+    if (spl_entry.uses_projectile()) {
+        use_projectile_spell(gs, spl_entry, spl_entry.projectile, target);
+    } else {
+        // Use action_func callback
+        lcall(spl_entry.action_func, /*caster*/ this, target.x, target.y, /*target object*/ target_object);
+    }
 }
 
 CoreStats& CombatGameInst::core_stats() {

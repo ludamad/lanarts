@@ -263,6 +263,21 @@ PlayerInst* GameState::local_player() {
 	return screens.focus_object(this);
 }
 
+/*Handle new characters and exit signals*/
+GameInst* GameState::focus_object() {
+    GameInst* focus = local_player();
+    if (focus == nullptr && get_level()) {
+        for (auto id : monster_controller().monster_ids()) {
+            focus = get_instance(id);
+            if (focus != nullptr) {
+                break;
+            }
+
+        }
+    }
+    return focus;
+}
+
 int GameState::object_radius_test(int x, int y, int radius, col_filterf f,
 		GameInst** objs, int obj_cap) {
 	return object_radius_test(NULL, objs, obj_cap, f, x, y, radius);
@@ -280,10 +295,15 @@ void GameState::serialize(SerializeBuffer& serializer) {
 	serializer.set_user_pointer(this);
 	LuaSerializeConfig& conf = luaserialize_config();
     post_deserialize_data().clear();
-        // Reset the serialization config:
-        conf.reset();
-	luawrap::globals(L)["Engine"]["pre_serialize"].push();
-	luawrap::call<void>(L);
+	// Reset the serialization config:
+	conf.reset();
+
+    luawrap::globals(L)["Engine"]["pre_serialize"].push();
+    luawrap::call<void>(L);
+
+    LuaValue global_data = luawrap::globals(L)["package"]["loaded"]["core.GlobalData"];
+//  Still true? //   Bug fix: If we just encoded normal global data, we would have problems with object caching.
+    conf.encode(serializer, global_data);
 
 	settings.serialize_gameplay_settings(serializer);
 
@@ -291,13 +311,6 @@ void GameState::serialize(SerializeBuffer& serializer) {
 	serializer.write_int(_game_timestamp);
 	serializer.write_int(initial_seed);
 
-        luawrap::globals(L)["table"]["deep_clone"].push();
-        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
-        lua_call(L, 1, 1);
-        LuaValue safe_global_data(L);
-        safe_global_data.pop();
-        // Bug fix: If we just encoded normal global data, we would have problems with object caching.
-        conf.encode(serializer, safe_global_data);
 	serializer.write_int(this->frame_n);
 	world.serialize(serializer);
 
@@ -314,23 +327,21 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	serializer.set_user_pointer(this);
 	LuaSerializeConfig& conf = luaserialize_config();
     post_deserialize_data().clear();
-        // Reset the serialization config:
-        conf.reset();
+	// Reset the serialization config:
+	conf.reset();
+
 	luawrap::globals(L)["Engine"]["pre_deserialize"].push();
 	luawrap::call<void>(L);
+
+    LuaValue global_data;
+    conf.decode(serializer, global_data);
+    luawrap::globals(L)["package"]["loaded"]["core.GlobalData"] = global_data;
 
 	settings.deserialize_gameplay_settings(serializer);
 	serializer.read(base_rng_state); // Load RNG state
 	serializer.read_int(_game_timestamp);
 	serializer.read_int(initial_seed);
 
-        LuaValue global_data;
-        conf.decode(serializer, global_data);
-
-        luawrap::globals(L)["table"]["copy"].push();
-        global_data.push();
-        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
-        lua_call(L, 2, 0);
 
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);
@@ -341,9 +352,9 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 
     bool first = true;
     screens.for_each_screen( [&]() {
-        world.set_current_level(local_player()->current_floor);
-        view().sharp_center_on(local_player()->ipos());
-        if (first) {
+        world.set_current_level(focus_object()->current_floor);
+        view().sharp_center_on(focus_object()->ipos());
+        if (first && local_player()) {
             settings.class_type = local_player()->class_stats().class_entry().name;
             first = false; // HACK to get first player's class
         }
@@ -415,8 +426,10 @@ void GameState::restart() {
 //		set_level(game_world().get_level(0, true));
 
     screens.for_each_screen( [&]() {
-        PlayerInst *p = local_player();
-        view().sharp_center_on(p->x, p->y);
+        GameInst *obj = focus_object();
+        if (obj) {
+            view().sharp_center_on(obj->x, obj->y);
+        }
     });
 }
 
@@ -547,6 +560,9 @@ void GameState::draw(bool drawhud) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     screens.for_each_screen( [&]() {
         adjust_view_to_dragging();
+        if (!get_level()){
+            set_level(world.get_level(0));
+        }
 
         //if (drawhud) {
         ldraw::display_set_window_region(screens.window_region());

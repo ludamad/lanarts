@@ -113,6 +113,10 @@ public:
 	void deequip(itemslot_t i);
 	void deequip_type(int type);
 
+	// Make this inventory empty
+	void clear() {
+		items.clear();
+	}
 	// For performance of iteration
 	std::vector<ItemSlot>& raw_slots() {
 	    return items;

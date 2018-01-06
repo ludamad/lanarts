@@ -1160,13 +1160,20 @@ DataW.enemy_create {
         cooldown: 30
         types: {"Piercing"}
         speed: 12
-        spr_attack: 'spr_weapons.huge_bolt48'
+        spr_attack: 'stone_arrow_projectile'
         power: {base: {10, 10}}
         on_hit_func: (target, atkstats) =>
             if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
                 eff = target\add_effect "Exhausted", 5
     }
 }
+
+spellcaster_method_base = (args) ->
+    return table.merge {
+        _target_xy: () =>
+            return (if @target == nil then random_xy_near(@) else @target.xy)
+        _projatk: (proj) => @projectile_attack proj, @_target_xy()
+    }, args
 
 DataW.enemy_create {
     name: "Poulter"
@@ -1186,24 +1193,32 @@ DataW.enemy_create {
         defence: 10
         willpower: 20
     }
-    _tornado_storm: () => 
-        --@_projatk "Tornado Storm"
-        --@timeout = 50
-    _energy_spear: () =>
-        @_projatk "Energy Spear"
-        @timeout = 5
-    _berserk: () =>
-        @do_spell("Berserk", {@x, @y})
-        @timeout = 10
-    _dash: () => 
-        eff = @add_effect "Dash Attack", 10
-        eff.angle = math.atan2(@vy, @vx)
-        @timeout = 20
-    _healing_aura: () => 
-        eff = @add_effect "Healing Aura", 10
-        eff.angle = math.atan2(@vy, @vx)
-        @timeout = 20
-    _mephitize: () => 
+    methods: spellcaster_method_base {
+        _tornado_storm: () => 
+            --@_projatk "Tornado Storm"
+            --@timeout = 50
+        _energy_spear: () =>
+            @_projatk "Energy Spear"
+            @timeout = 5
+        _berserk: () =>
+            @use_spell("Berserk", {@x, @y})
+            @timeout = 10
+        _dash: () => 
+            angle = math.atan2(@vy, @vx)
+            eff = @add_effect "Dash Attack", {
+                time_left: 10
+                :angle
+            }
+            @timeout = 20
+        _healing_aura: () => 
+            angle = math.atan2(@vy, @vx)
+            eff = @add_effect "Healing Aura", {
+                time_left: 10
+                :angle
+            }
+            @timeout = 20
+        _mephitize: () => 
+    }
     step_func: () =>
         @timeout -= 1
         if @timeout <= 0
@@ -1247,22 +1262,24 @@ DataW.enemy_create {
     }
     init_func: () =>
         @timeout = 0
-    _target_xy: () =>
-        return (if @target == nil then random_xy_near(@) else @target.xy)
-    _projatk: (proj) => @projectile_attack proj, @_target_xy()
-    _tornado_storm: () => 
-        --@_projatk "Tornado Storm"
-        --@timeout = 50
-    _energy_spear: () =>
-        @_projatk "Energy Spear"
-        @timeout = 5
-    _berserk: () =>
-        @do_spell("Berserk", {@x, @y})
-        @timeout = 10
-    _dash: () => 
-        eff = @add_effect "Dash Attack", 10
-        eff.angle = math.atan2(@vy, @vx)
-        @timeout = 20
+    methods: spellcaster_method_base {
+        _tornado_storm: () => 
+            --@_projatk "Tornado Storm"
+            --@timeout = 50
+        _energy_spear: () =>
+            @_projatk "Energy Spear"
+            @timeout = 5
+        _berserk: () =>
+            @use_spell("Berserk", {@x, @y})
+            @timeout = 10
+        _dash: () => 
+            angle = math.atan2(@vy, @vx)
+            eff = @add_effect "Dash Attack", {
+                time_left: 10
+                :angle
+            }
+            @timeout = 20
+    }
     step_func: () =>
         @timeout -= 1
         if @timeout <= 0

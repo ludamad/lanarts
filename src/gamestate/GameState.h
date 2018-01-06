@@ -119,6 +119,7 @@ public:
 	// Errors if called during step event
 	// During draw event, different for each screen
 	PlayerInst* local_player();
+    GameInst* focus_object();
 	PlayerDataEntry& local_player_data();
 
 	/* Dimensions (in pixels) of game world */

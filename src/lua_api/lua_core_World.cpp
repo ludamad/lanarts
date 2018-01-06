@@ -95,6 +95,12 @@ static void world_players_spawn(LuaStackValue level_id, const std::vector<Pos>& 
 	gs->game_world().spawn_players(map, positions);
 }
 
+static void world_set_level(LuaStackValue level_id) {
+	GameState* gs = lua_api::gamestate(level_id);
+	GameMapState* map = gs->game_world().get_level(level_id["_id"].to_int());
+	gs->set_level(map);
+}
+
 namespace lua_api {
 	void register_lua_core_GameWorld(lua_State* L) {
 		LuaValue world = register_lua_submodule(L, "core.World");
@@ -106,6 +112,7 @@ namespace lua_api {
 		LuaValue functions = luameta_constants(metatable);
 
 		functions["players_spawn"].bind_function(world_players_spawn);
+		functions["set_level"].bind_function(world_set_level);
 
 		getters["players"].bind_function(world_players);
 		getters["player_amount"].bind_function(world_player_amount);

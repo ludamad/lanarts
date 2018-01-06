@@ -38,8 +38,9 @@ void WeaponEntry::parse_lua_table(const LuaValue& table) {
 	attack.attack_sprite = item_sprite;
 	if (!table["spr_attack"].isnil()) {
 		attack.attack_sprite = res::sprite_id(table["spr_attack"].to_str());
+		LANARTS_ASSERT(attack.attack_sprite >= 0);
 	}
 
 	uses_projectile = luawrap::defaulted(table, "uses_projectile", false);
-        attack_stat_func = table["attack_stat_func"];
+	attack_stat_func = table["attack_stat_func"];
 }

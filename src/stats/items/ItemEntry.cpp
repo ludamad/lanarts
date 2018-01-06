@@ -83,7 +83,15 @@ void ItemEntry::parse_lua_table(const LuaValue& table) {
 	if (!table["prereq_func"].isnil()) {
 		use_action.prereq_func = LuaLazyValue(table["prereq_func"]);
 	}
-	item_sprite = res::sprite_id(table["spr_item"].to_str());
+	item_sprite = -1;
+	if (!table["spr_item"].isnil()) {
+		item_sprite = (sprite_id)game_sprite_data.get_id(table["spr_item"].to_str());
+        if (item_sprite == -1) {
+            printf("Expected a valid 'spr_item' field on item definition! Got '%s'.\n",
+                   table["spr_item"].to_str());
+            exit(1);
+        }
+	}
 
 	stackable = set_if_nil(table, "stackable", true);
 

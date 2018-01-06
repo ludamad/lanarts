@@ -36,8 +36,10 @@ void ProjectileEntry::parse_lua_table(const LuaValue& table) {
     attack = parse_attack(table);
     attack.attack_sprite = item_sprite;
     if (!table["spr_attack"].isnil()) {
-        attack.attack_sprite = res::sprite_id(table["spr_attack"].to_str());
+        attack.attack_sprite = (sprite_id)game_sprite_data.get_id(table["spr_attack"].to_str());
     }
+    // Must have a valid attack sprite:
+    LANARTS_ASSERT(attack.attack_sprite >= 0);
     drop_chance = defaulted(table, "drop_chance", 0);
     weapon_class = table["weapon_class"].to_str();
 

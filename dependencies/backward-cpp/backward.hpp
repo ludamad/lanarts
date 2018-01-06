@@ -41,6 +41,11 @@
 #	endif
 #endif
 
+#if defined(BACKWARD_SYSTEM_LINUX)
+#undef BACKWARD_SYSTEM_LINUX
+#define BACKWARD_SYSTEM_UNKNOWN 
+#endif
+
 #define BACKWARD_HAS_BFD 1
 // You can define one of the following (or leave it to the auto-detection):
 //
@@ -59,8 +64,8 @@
 #	endif
 #endif
 
-#undef BACKWARD_SYSTEM_LINUX
-#		define BACKWARD_SYSTEM_UNKNOWN
+//#undef BACKWARD_SYSTEM_LINUX
+//#		define BACKWARD_SYSTEM_UNKNOWN
 
 #include <fstream>
 #include <iostream>

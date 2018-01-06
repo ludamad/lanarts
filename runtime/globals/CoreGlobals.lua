@@ -118,6 +118,18 @@ function pretty_tostring_compact(v)
     return pretty_tostring(v, nil, true)
 end
 
+function pretty_table_safe(v)
+    if type(v) ~= "table" then
+        print(v)
+        return
+    end
+    print '{'
+    for k, v in pairs(v) do
+        print('    ', k)
+    end
+    print '}'
+end
+
 -- Resolves a number, or a random range
 function random_resolve(v)
     return type(v) == "table" and random(unpack(v)) or v
@@ -214,9 +226,7 @@ end
 
 --- Return a random element from a list
 function random_choice(choices)
-    if #choices == 1 then
-        return choices[1]
-    end
+    assert(#choices ~= 0, "Not expecting empty list!")
     local idx = random(1, #choices)
     return choices[idx]
 end
@@ -335,3 +345,5 @@ GameVar = newtype {
         return gamevar(self.var, self.default)
     end
 }
+
+__DEBUG_CHECKS = true

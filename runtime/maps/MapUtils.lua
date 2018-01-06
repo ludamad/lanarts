@@ -33,13 +33,14 @@ function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] oper
     return sqr
 end
 
-function M.spawn_enemy(map, type, tile_xy)
+function M.spawn_enemy(map, type, tile_xy, --[[Optional]] team)
     event_log("Spawning enemy %s at {%d, %d}\n", 
         type, tile_xy[1], tile_xy[2])
     local object = GameObject.enemy_create {
         do_init = false,
         xy = M.from_tile_xy(tile_xy),
         type = type,
+        team = team -- Default: Team 1
     }
     table.insert(map.instances, object)
     return object

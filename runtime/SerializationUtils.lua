@@ -3,13 +3,26 @@ local Serialization = require "core.Serialization"
 local M = nilprotect {} -- Submodule
 
 local tconcat, type, pairs = table.concat, type, pairs
+local package = package
+local GlobalData = require "core.GlobalData"
 
 local function name_subobjects(t, to_object, to_name, parts, depth)
+    if t == GlobalData then
+        error("Invalid reference to 'core.GlobalData': " .. tconcat(parts, '.'))
+    end
     if to_name[t] then return end -- Already named
+    if type(t) ~= "function" and type(t) ~= "table"  and type(t) ~= "userdata" then
+        -- Type we don't need to name
+        return 
+    end
+    if type(t) == "table" and rawget(t, "__objectref") ~= nil then
+        return
+    end
     local name = tconcat(parts, ';')
     -- print("NAMING ", name)
     to_object[name], to_name[t] = t, name
     if type(t) == "table" then
+        if t == package then return end -- Don't name the 'package' object contents
         for k, v in pairs(t) do
             if type(k) == "string" then
                 parts[depth] = k
@@ -60,6 +73,7 @@ function M.name_global_data(--[[Optional]] to_object, --[[Optional]] to_name)
     to_name = to_name or Serialization.object_index_dictionary
     for mname,v in pairs(package.loaded) do
         if mname ~= "_G" and mname ~= "core.GlobalData" then
+            print(mname, v)
             M.name_subobjects(v, to_object, to_name, "_R:"..mname)
         end
     end

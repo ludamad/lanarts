@@ -25,6 +25,8 @@ namespace lua_api {
 	GameState* gamestate(lua_State* L);
 	// Convenience function that performs above on captured lua state
 	GameState* gamestate(const LuaStackValue& val);
+	void register_gamestate(GameState* gs, lua_State* L);
+
 
 	/* Add a path for searching with the 'require' function. */
 	void add_search_path(lua_State* L, const char* path);
@@ -64,6 +66,9 @@ namespace lua_api {
 	void register_lua_libraries(lua_State* L);
 	// Register all the lanarts API functions and types
 	void register_api(GameState* gs, lua_State* L);
+
+	// Register internal engine functions for setting up Lanarts state
+	void register_lua_core_EngineInternal(lua_State* L);
 
 	void pretty_print(LuaField field);
 	LuaValue import(lua_State* L, const char* virtual_path);

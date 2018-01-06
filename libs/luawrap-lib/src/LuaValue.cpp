@@ -123,6 +123,12 @@ void LuaValue::pop() const {
 	impl->pop();
 }
 
+void LuaValue::print() const {
+	lua_getglobal(luastate(), "pretty_print");
+	push();
+	lua_call(luastate(), 1, 0);
+}
+
 LuaValue::LuaValue(const LuaValue & value) {
 	impl = value.impl;
 	if (impl) {

@@ -31,7 +31,7 @@ random_items = () ->
     itemlist = (for k,v in pairs items do v)
     ret = {}
     for i=1,10
-        while true
+        for j=1,100
             item = random_choice(itemlist)
             ret[item.name] = 1
             if item.is_randart
@@ -45,11 +45,25 @@ PROGRESSION = () ->
     fs = {}
     init = () ->
         random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
+
+        for enemy, iattributes in pairs enemies
+            --if not enemy\match "Dragon"
+            --    continue
+            append fs, () ->
+                P = require "maps.Places"
+                return P.create_isolated {
+                    label: enemy
+                    template: P.SimpleRoom
+                    items: {} -- random_items()
+                    enemies: {[enemy]: 10}
+                    spawn_players: true
+                }
+
         for item, attributes in pairs items
             if not attributes.types or #attributes.types < 2
                 continue
-            --if attributes.is_randart
-            --    continue -- TODO test all these much later. mostly boring effects
+            if attributes.is_randart
+                continue -- TODO test all these much later. mostly boring effects
             if attributes.spr_item == 'none' -- Not meant to be picked up
                 continue
             append fs, () ->
@@ -59,19 +73,6 @@ PROGRESSION = () ->
                     template: P.SimpleRoom
                     items: {[item]: 10}
                     enemies: random_enemies()
-                    spawn_players: true
-                }
-
-        for enemy, attributes in pairs enemies
-            --if not enemy\match "Dragon"
-            --    continue
-            append fs, () ->
-                P = require "maps.Places"
-                return P.create_isolated {
-                    label: enemy
-                    template: P.SimpleRoom
-                    items: random_items()
-                    enemies: {[enemy]: 10}
                     spawn_players: true
                 }
     if os.getenv "LANARTS_OVERWORLD_TEST"
@@ -166,6 +167,7 @@ M.create_player = () -> nilprotect {
                 GlobalData.__test_initialized = false
                 @_n_inputs = 0 -- Reset menu state TODO refactor
                 @_n_same_square = 0
+                @input_source.player = false
                 @input_source = false
                 GameState.lazy_reset()
                 return true
@@ -173,21 +175,22 @@ M.create_player = () -> nilprotect {
             RATE = 125
             if os.getenv "LANARTS_OVERWORLD_TEST"
                 RATE = 10000
-            if GameState.frame % RATE == 2
+            if GameState.frame % RATE == 2 
                 --state = {}
                 --for k,v in pairs(@)
                 --    state[k] = v
-                @input_source = false
                 @_lpx = 0
                 @_lpy = 0
-                @_ai_state = false
                 @_used_portals = {}
                 @_queued = {}
-                GameState.save("saves/test-save.save")
-                GameState.load("saves/test-save.save")
-                -- Copy over state:W
-                GlobalData = require("core.GlobalData")
                 GlobalData.__test_initialized = false
+                if not os.getenv "DISABLE_SAVING"
+                    @input_source = false
+                    @_ai_state = false
+                    GameState.save("saves/test-save.save")
+                    GameState.load("saves/test-save.save")
+                    -- Copy over state:W
+                    GlobalData = require("core.GlobalData")
                 --for k,v in pairs state
                 --    @[k] = v
             return should_continue
@@ -217,6 +220,8 @@ M.create_player = () -> nilprotect {
     _should_end: () =>
         if not @input_source
             return false
+        if os.getenv("LANARTS_OVERWORLD_TEST")and @_n_inputs > 10000
+            return true
         player = @input_source.player
         if @_n_same_square < 100
             return false
