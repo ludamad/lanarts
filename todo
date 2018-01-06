@@ -1,7 +1,0 @@
--- Spell that rotates you around a point of summoning
-    -- decide counter clockwise / clockwise by last direction of movement (angle before, angle after, is is clockwise bigger?)
-    -- First point of drag -- nearest point on a circle?
-    -- Then twirl around as possible -- Deform the twirling based on smooth curve around obstacles?
--- Use effects to have animations --! An animation object is just a regular object + effect.
-    -- Effects can act like objects a bit
-
