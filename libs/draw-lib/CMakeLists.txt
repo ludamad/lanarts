@@ -3,7 +3,15 @@ cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_ldraw)
 
 FIND_LIBRARY(OpenGL REQUIRED)
-include(FindFreetype)
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+  set(FREETYPE_INCLUDE_DIRS "/Users/adomurad/sources/freetype2/build/include/freetype" "/Users/adomurad/sources/freetype2/include/freetype" "/Users/adomurad/sources/freetype2/include"
+      )
+
+  set(FREETYPE_LIBRARIES "/Users/adomurad/sources/freetype2/build/libfreetype.a")
+else ()
+    include(FindFreetype)
+endif ()
 
 set( SRC ../)
 set( DEPS ../../dependencies)

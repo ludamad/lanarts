@@ -394,6 +394,14 @@ namespace lua_api {
                 return traceback;
         }
 
+        
+#ifdef __EMSCRIPTEN__
+        void lemscripten_set_main_loop() {
+            static LuaValue 
+            // void emscripten_set_main_loop(em_callback_func func, int fps, int simulate_infinite_loop);
+            emscripten_set_main_loop(one_iter, 60, 1);
+        }
+#else
 	int read_eval_print(lua_State *L);
 
         static double round(double x) {
