@@ -394,8 +394,6 @@ namespace lua_api {
                 return traceback;
         }
 
-	int read_eval_print(lua_State *L);
-
         static double round(double x) {
             return ::round(x);
         }
@@ -417,7 +415,6 @@ namespace lua_api {
         globals["monster_sprite"].bind_function(lapi_monster_sprite);
 		globals["cpp_traceback"].bind_function(lapi_cpp_traceback);
 
-		globals["__read_eval_print"].bind_function(read_eval_print);
 
 		LuaValue lengine = luawrap::ensure_table(globals["LEngine"]);
 		lengine["import_internal_raw"].bind_function(lengine_import_internal_raw);

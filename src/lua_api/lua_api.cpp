@@ -112,7 +112,7 @@ namespace lua_api {
 	}
 
 	// Register all the lanarts API functions and types
-	static void register_gamestate(GameState* gs, lua_State* L) {
+	void register_gamestate(GameState* gs, lua_State* L) {
 		lua_pushlightuserdata(L, (void*)(GAMESTATE_KEY));
 		lua_pushlightuserdata(L, gs);
 		lua_settable(L, LUA_REGISTRYINDEX);
@@ -196,8 +196,9 @@ namespace lua_api {
 		register_lua_core_Keyboard(L);
 		register_lua_core_Gamepad(L);
 		register_lua_core_GameActions(L);
-                register_lua_core_MiscSpellAndItemEffects(L);
-                register_lua_core_Mouse(L);
+		register_lua_core_MiscSpellAndItemEffects(L);
+		register_lua_core_Mouse(L);
+		register_lua_core_EngineInternal(L);
 	}
 
 	// Register all the lanarts API functions and types
