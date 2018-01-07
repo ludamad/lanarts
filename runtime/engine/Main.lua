@@ -17,10 +17,10 @@ require("GlobalVariableSetup")(--[[Surpress loading draw-related globals?]] os.g
 require("moonscript.base").insert_loader()
 
 -- Default usage:
---   On normal desktop play: ./lanarts engine.StartLanartsDesktop *args*
+--   On normal desktop play: ./lanarts engine.StartLanarts *args*
 local function main(raw_args)
     -- Get the module / lua file to run
-    local run_target = raw_args[1] or 'engine.StartLanartsDesktop'
+    local run_target = raw_args[1] or 'engine.StartLanarts'
     table.remove(raw_args, 1)
     local module_name = run_target:gsub(".moon", ""):gsub(".lua", ""):gsub("/", ".")
     -- Delegate to the passed module
