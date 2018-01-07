@@ -27,7 +27,7 @@ function M.exit_game()
 end
 
 local HEADLESS = os.getenv("LANARTS_HEADLESS")
-local function game_loop_body(steponly)
+function M.engine_step(steponly)
     if HEADLESS then
         steponly = true
     end
@@ -127,7 +127,7 @@ function M.run_loop()
     end
 
     -- ROBUSTNESS
-    -- Since when a game restarts, an input_handle is called during game_loop_body after step(),
+    -- Since when a game restarts, an input_handle is called during engine_step after step(),
     -- we call input_handle here for reproducibility.
     if not GameState.input_handle() then 
         return false 
@@ -153,7 +153,7 @@ function M.run_loop()
         end
 
         local steponly = (GameState.frame % settings.steps_per_draw ~= 0)
-        if not game_loop_body(steponly) then
+        if not M.engine_step(steponly) then
             if single_player then
                 GameState.score_board_store()
                 GameState.save(argv_configuration.save_file or "saves/savefile.save")

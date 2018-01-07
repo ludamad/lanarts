@@ -179,7 +179,7 @@ static void __lua_init(lua_State* L, T& t) {
 }
 
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames);
-void init_game_data(lua_State* L) {
+int init_resource_data(lua_State *L) {
     game_class_data.init(L);
     game_effect_data.init(L);
 	game_item_data.init(L);
@@ -213,6 +213,7 @@ void init_game_data(lua_State* L) {
     D["projectile_create"].bind_function(lapi_data_create_projectile);
     D["equipment_create"].bind_function(lapi_data_create_equipment);
     D["weapon_create"].bind_function(lapi_data_create_weapon);
+	return 0;
 }
 
 static void luayaml_push(LuaValue& value, lua_State* L, const char* name) {

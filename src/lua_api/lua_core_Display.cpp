@@ -112,6 +112,7 @@ namespace lua_api {
 		vals["world_coords"].bind_function(world_coords);
 		display.getters["display_size"].bind_function(ldraw::display_size);
 		display.getters["display_xy"].bind_function(display_xy);
+		display.getters["screen_size"].bind_function(ldraw::screen_size);
 
 		vals["view_snap"].bind_function(view_snap);
 		vals["view_follow"].bind_function(view_follow);

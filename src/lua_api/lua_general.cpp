@@ -406,7 +406,7 @@ namespace lua_api {
 		globals["toaddress"].bind_function(lapi_toaddress);
 		globals["rand_range"].bind_function(lapi_rand_range);
 		globals["random"].bind_function(lapi_random);
-		globals["play_sound"].bind_function(play_sound);
+        globals["play_sound"].bind_function(play_sound);
 		globals["random_seed"].bind_function(lapi_random_seed);
 		globals["randomf"].bind_function(lapi_randomf);
 		globals["random_gaussian"].bind_function(lapi_random_gaussian);

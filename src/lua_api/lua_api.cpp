@@ -199,13 +199,13 @@ namespace lua_api {
 		register_lua_core_MiscSpellAndItemEffects(L);
 		register_lua_core_Mouse(L);
 		register_lua_core_EngineInternal(L);
+		register_general_api(L);
 	}
 
 	// Register all the lanarts API functions and types
         // TODO properly rename after gutting
 	void register_api(GameState* gs, lua_State* L) {
 		register_gamestate(gs, L);
-		register_general_api(L);
 		lua_effectivestats_bindings(gs, L);
 		lua_combatstats_bindings(gs, L);
 

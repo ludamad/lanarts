@@ -57,6 +57,19 @@ function memoized(func, --[[Optional]] separator)
     end
 end
 
+function try(args) 
+    assert(args.do and args.catch, "try() requires 'do' & 'catch' fields")
+    ok, result = pcall(args.do)
+    if not ok then
+        -- Catch the error
+        args.catch(result)
+    end
+    if args.finally then
+        args.finally()
+    end
+    return result
+end
+
 --- Get a  human-readable string from a lua value. The resulting value is generally valid lua.
 -- Note that the paramaters should typically not used directly, except for perhaps 'packed'.
 -- @param val the value to pretty-print

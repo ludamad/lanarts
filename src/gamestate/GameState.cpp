@@ -408,20 +408,20 @@ void GameState::restart() {
 	if (game_world().number_of_levels() > 0) {
 		game_world().reset();
 	}
-        // Reset player data state:
-        player_data().reset();
-        // Initialize event log for first_map_create:
+    // Reset player data state:
+    player_data().reset();
+    // Initialize event log for first_map_create:
 	renew_game_timestamp();
 	_event_log_initialize(this, settings);
 	luawrap::globals(L)["Engine"]["first_map_create"].push();
 	int levelid = luawrap::call<LuaValue>(L)["_id"].to_int();
-        luawrap::globals(L)["table"]["copy"].push();
-        lua_api::import(L, "InitialGlobalData").push();
-        // Get the initial global data:
-        lua_call(L, 0, 1);
-        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
-        // Perform the copy:
-        lua_call(L, 2, 0);
+    luawrap::globals(L)["table"]["copy"].push();
+    lua_api::import(L, "InitialGlobalData").push();
+    // Get the initial global data:
+    lua_call(L, 0, 1);
+    luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
+    // Perform the copy:
+    lua_call(L, 2, 0);
 	set_level(game_world().get_level(levelid));
 //		set_level(game_world().get_level(0, true));
 

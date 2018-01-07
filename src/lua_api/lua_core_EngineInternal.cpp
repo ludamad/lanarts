@@ -38,34 +38,42 @@
 
 #include "lua_api.h"
 
-// This is a stop-gap measure to allow Lua all-or-nothing control over internal graphic initialization.
-// Long-term we must move eg fonts completely to Lua.
-static int __initialize_internal_graphics(lua_State* L) {
-    static bool called = false;
-    if (called) {
-        return 0;
+
+static int engine_initialize_subsystems(lua_State *L) {
+    lanarts_net_init(true);
+    lsound::init();
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0) {
+        printf("SDL_Init failed: %s\n", SDL_GetError());
+        exit(1);
     }
-    called = true;
-    GameSettings& settings = lua_api::gamestate(L)->game_settings();
-    res::font_primary().initialize(settings.font, 10);
-    res::font_menu().initialize(settings.menu_font, 20);
+    if (SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt") < 0) {
+        printf("WARNING Controller mapping failed: %s\n", SDL_GetError());
+    }
     return 0;
 }
 
 static void engine_init_gamestate(LuaValue lsettings) {
     lua_State* L = lsettings.luastate();
     GameSettings settings; // Initialized with defaults
+    settings.parse(lsettings);
     bool can_create_saves = ensure_directory("saves");
     if (!can_create_saves) {
         printf("Problem creating save directory, will not be able to create save files!\n");
     }
-
-    lanarts_net_init(true);
-    lsound::init();
-
     //GameState claims ownership of the passed lua_State*
     GameState* gs = new GameState(settings, L);
     lua_api::register_api(gs, L);
+
+    // Initialize fonts specified in settings
+    res::font_primary().initialize(settings.font, 10);
+    res::font_menu().initialize(settings.menu_font, 20);
+    gs->start_game();
+}
+
+static int engine_start_game(lua_State* L) {
+    GameState* gs = lua_api::gamestate(L);
+    gs->start_game();
+    return 0;
 }
 
 // Note: After calling delete_gamestate, we generally need a new Lua state.
@@ -78,14 +86,19 @@ static int engine_deinit_gamestate(lua_State* L) {
     return 0;
 }
 
+
+int init_resource_data(lua_State *L);
+
 namespace lua_api {
     int read_eval_print(lua_State *L);
 	void register_lua_core_EngineInternal(lua_State* L) {
 		LuaValue engine = register_lua_submodule(L, "core.EngineInternal");
-        engine["initialize_internal_graphics"].bind_function(__initialize_internal_graphics);
-        engine["lanarts_unit_tests"].bind_function(run_unittests);
+        engine["init_subsystems"].bind_function(engine_initialize_subsystems);
+        engine["init_resource_data"].bind_function(init_resource_data);
+        engine["run_unittests"].bind_function(run_unittests);
         engine["read_eval_print"].bind_function(read_eval_print);
         engine["init_gamestate"].bind_function(engine_init_gamestate);
         engine["deinit_gamestate"].bind_function(engine_deinit_gamestate);
+        engine["start_game"].bind_function(engine_start_game);
 	}
 }

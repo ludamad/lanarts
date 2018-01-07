@@ -55,7 +55,7 @@ static void game_load(LuaStackValue filename) {
 
 static int game_resources_load(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
-	init_game_data(gs->luastate());
+	init_resource_data(gs->luastate());
 	return 0;
 }
 

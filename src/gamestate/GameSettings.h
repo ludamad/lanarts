@@ -10,6 +10,7 @@
 #include "lanarts_defines.h"
 
 class SerializeBuffer;
+class LuaValue;
 
 struct GameSettings {
 	enum connection_type {
@@ -84,6 +85,7 @@ struct GameSettings {
 		keep_event_log = false;
 	}
 
+	void parse(LuaValue& lsettings);
 	void serialize_gameplay_settings(SerializeBuffer& serializer) const;
 	void deserialize_gameplay_settings(SerializeBuffer& serializer);
 
