@@ -79,7 +79,7 @@ void GameSettings::parse(LuaValue& lsettings) {
     optional_fill(lsettings, "comparison_event_log",
                  comparison_event_log);
 
-    if (lsettings["connection_type"].isnil()) {
+    if (!lsettings["connection_type"].isnil()) {
         std::string connname = lsettings["connection_type"].to_str();
         if (connname == "none") {
             conntype = GameSettings::NONE;

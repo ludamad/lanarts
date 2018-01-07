@@ -63,11 +63,6 @@ static void engine_init_gamestate(LuaValue lsettings) {
     //GameState claims ownership of the passed lua_State*
     GameState* gs = new GameState(settings, L);
     lua_api::register_api(gs, L);
-
-    // Initialize fonts specified in settings
-    res::font_primary().initialize(settings.font, 10);
-    res::font_menu().initialize(settings.menu_font, 20);
-    gs->start_game();
 }
 
 static int engine_start_game(lua_State* L) {

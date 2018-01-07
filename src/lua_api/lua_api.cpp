@@ -213,6 +213,12 @@ namespace lua_api {
         register_lua_core_Mouse(L);
 		register_lua_core_Serialization(L);
 		register_lua_core_GameState(L);
+        // core.GlobalData:
+        // Represents global, mutable game data. Only module that is not serialized 'as a constant'.
+        lua_api::import(L, "InitialGlobalData").push();
+        // Get the initial global data object:
+        lua_call(L, 0, 1);
+        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].pop();
 	}
 
 	void luacall_post_draw(lua_State* L) {

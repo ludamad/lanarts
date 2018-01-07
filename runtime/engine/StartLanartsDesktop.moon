@@ -5,6 +5,7 @@ yaml = require "yaml"
 
 -- Parse settings object from settings yaml file
 parse_settings = (settings_file) ->
+    log_info "Parsing #{settings_file}"
     yaml_text = file_as_string(settings_file)
     if not yaml_text
         error("Fatal error: #{settings_file} not found, the game is probably being loaded from the wrong place.")
@@ -13,6 +14,7 @@ parse_settings = (settings_file) ->
         catch: (err) -> error("Invalid YAML syntax:\n#{err}")
     }
     settings = {key, value for {key, value} in *raw_settings}
+    pretty_print(settings)
     return settings
 
 -- Adapt the settings object based on context
@@ -23,7 +25,7 @@ engine_init = (settings) ->
 
     -- (2) Define major engine hooks, such as level to generate
     -- TODO move this to a more flexible system
-    require "EngineBase"
+    require "engine.EngineBase"
 
     -- (3) Adapt settings object based on environment variables
     -- Set settings width & height to screen width & height if equal to 0
@@ -35,16 +37,21 @@ engine_init = (settings) ->
 
     if os.getenv("LANARTS_SMALL")
         settings.fullscreen = false
-        setings.view_width = 800
+        settings.view_width = 800
         settings.view_height = 600
 
     if os.getenv("LANARTS_INVINCIBLE")
         settings.invincible = true
 
-    EngineInternal.init_gamestate(setings)
+    log "Initializing GameState object..."
+    GMeta = getmetatable _G -- Get protection metatable
+    setmetatable _G, nil -- Allow globals to be set
+    EngineInternal.init_gamestate(settings)
+    Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
     EngineInternal.init_resource_data()
     Engine.resources_load()
     EngineInternal.start_game()
+    setmetatable _G, GMeta -- reset protection metatable
     return settings
 
 try_load_savefile = (load_file) ->
@@ -58,6 +65,7 @@ engine_step = (settings) ->
 
 -- Parse lanarts command-line options
 main = (raw_args) ->
+    log "Running Lanarts main function"
     parser = argparse("lanarts", "Run lanarts.")
     parser\option "--debug", "Attach debugger."
     parser\option "--nofilter", "Do not filter Lua error reporting of noise."

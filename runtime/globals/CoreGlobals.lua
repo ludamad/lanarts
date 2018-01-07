@@ -58,8 +58,8 @@ function memoized(func, --[[Optional]] separator)
 end
 
 function try(args) 
-    assert(args.do and args.catch, "try() requires 'do' & 'catch' fields")
-    ok, result = pcall(args.do)
+    assert(args["do"] and args.catch, "try() requires 'do' & 'catch' fields")
+    local ok, result = pcall(args["do"])
     if not ok then
         -- Catch the error
         args.catch(result)

@@ -429,11 +429,5 @@ namespace lua_api {
 		LuaValue string_table = luawrap::ensure_table(globals["string"]);
 		string_table["join"].bind_function(lapi_string_join);
 		string_table["pack"].bind_function(str_pack);
-
-		// Represents global, mutable data. Only module that is not serialized 'as a constant'.
-                lua_api::import(L, "InitialGlobalData").push();
-                // Get the initial global data object:
-                lua_call(L, 0, 1);
-		luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].pop();
 	}
 }
