@@ -3,15 +3,15 @@ username: User
 lobby_server_url: http://putterson.homedns.org:8080
 
 #Window settings
-fullscreen: yes
-view_width: 0 # 0 = auto
-view_height: 0
+fullscreen: no
+view_width: 800 # 0 = auto
+view_height: 600
 #Font settings
 font: fonts/Gudea-Regular.ttf
 menu_font: fonts/alagard_by_pix3m-d6awiwp.ttf
 
 #Performance settings
-steps_per_draw: 2 #More is almost guaranteed to make the game faster, 1 is ideal
+steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
 free_memory_while_idle: no
 
 #Debug settings

@@ -209,6 +209,17 @@ static int game_reset(lua_State* L) {
 	return 0;
 }
 
+static int game_register_player(LuaStackValue name, const char* classtype, LuaValue input_source, bool is_local_player, int net_id) {
+	//const std::string& name, PlayerInst* player,
+	//const std::string& classtype, bool is_local_player, int net_id
+	//
+	lua_api::gamestate(name)->player_data().register_player(
+			name.to_str(), nullptr,
+			classtype, input_source,
+			is_local_player, net_id);
+	return 0;
+}
+
 static long garbage_collect_while_waiting(lua_State* L, long wait_micro) {
 	// How many times do we step garbage collection before checking time ?
 	static const int ITERS_PER_CHECK = 2;
@@ -319,6 +330,7 @@ namespace lua_api {
 
 		game["score_board_fetch"].bind_function(score_board_fetch);
 		game["score_board_store"].bind_function(game_score_board_store);
+		game["register_player"].bind_function(game_register_player);
 
 		register_game_getters(L, game);
 	}

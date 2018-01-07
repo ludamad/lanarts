@@ -47,14 +47,26 @@ engine_init = (settings) ->
     GMeta = getmetatable _G -- Get protection metatable
     setmetatable _G, nil -- Allow globals to be set
     EngineInternal.init_gamestate(settings)
+    require "globals.GameUtils"
     Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
     EngineInternal.init_resource_data()
     Engine.resources_load()
-    EngineInternal.start_game()
     setmetatable _G, GMeta -- reset protection metatable
+
+    -- Player config
+    GameState = require "core.GameState"
+
+    GameState.register_player("ludamad", "Fighter", Engine.player_input, true, 0)
+
+    EngineInternal.start_game()
+    GameState.input_capture()
+    if not GameState.input_handle()
+        error("Game exitted")
     return settings
 
 try_load_savefile = (load_file) ->
+    if not load_file
+        return -- No savefile specified:
     if file_exists(load_file)
         GameState.load(load_file)
     else

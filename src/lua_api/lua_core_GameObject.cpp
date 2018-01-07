@@ -676,7 +676,7 @@ static GameInst* player_create(LuaStackValue args) {
 	Pos xy = args["xy"].as<Pos>();
 	int team = luawrap::defaulted(args["team"], PLAYER_TEAM);
 	GameInst* inst = new PlayerInst(CombatStats(), -1, xy, team, false);
-	gs->player_data().register_player(args["name"].to_str(), (PlayerInst*)inst, "", true, -1);
+	gs->player_data().register_player(args["name"].to_str(), (PlayerInst*)inst, "", LuaValue(), true, -1);
 	return initialize_object(gs, inst, args, &base_object_exclusions);
 }
 
@@ -684,7 +684,7 @@ static void player_init(LuaStackValue obj, Pos xy, std::string name) {
 	GameState* gs = lua_api::gamestate(obj);
 	PlayerInst* inst = new PlayerInst(CombatStats(), -1, xy, PLAYER_TEAM, false);
 	GameInstWrap::make_object_ref(obj, inst);
-	gs->player_data().register_player(name, inst, "", true, -1);
+	gs->player_data().register_player(name, inst, "", LuaValue(), true, -1);
 }
 
 static GameInst* feature_create(LuaStackValue args) {

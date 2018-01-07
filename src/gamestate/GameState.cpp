@@ -118,7 +118,7 @@ void GameState::start_connection() {
 	}
 	if (settings.conntype == GameSettings::SERVER
 			|| settings.conntype == GameSettings::NONE) {
-	    player_data().register_player(settings.username, NULL, settings.class_type, /* local player */ true);
+	    player_data().register_player(settings.username, NULL, settings.class_type, LuaValue(), /* local player */ true);
             // Hardcoded for now:
             int n_extra_players = gamepad_states().size();
             if (getenv("LANARTS_CONTROLLER")) {
@@ -133,7 +133,7 @@ void GameState::start_connection() {
             for (int i = 0 ; i < n_extra_players; i++) {
                 std::string p = "Player ";
                 p += char('0' + (i+2)); // Start at 'player 2'
-                player_data().register_player(p, NULL, classes[i%4], /* local player */ true);
+                player_data().register_player(p, NULL, classes[i%4], LuaValue(), /* local player */ true);
             }
 	}
 }

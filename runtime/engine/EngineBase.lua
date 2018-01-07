@@ -25,7 +25,7 @@ end
 -- 
 -- function Engine.loading_screen_draw(...)
 --     log "function Engine.loading_screen_draw(...)"
---     local LoadingScreen = drawsystem_require "menus.LoadingScreen"
+--     local LoadingScreen = require "menus.LoadingScreen"
 --     return LoadingScreen.draw(...)
 -- end
 
@@ -71,13 +71,13 @@ function Engine.game_start(...)
 end
 
 function Engine.post_draw(...)
-    local game_loop = drawsystem_require "GameLoop"
+    local game_loop = require "GameLoop"
 
     return game_loop.post_draw(...)
 end
 
 function Engine.overlay_draw(...)
-    local game_loop = drawsystem_require "GameLoop"
+    local game_loop = require "GameLoop"
 
     return game_loop.overlay_draw(...)
 end
