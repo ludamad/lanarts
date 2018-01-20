@@ -154,7 +154,7 @@ static void gl_image_from_bytes(GLImage& img, const Size& size, char* data,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	if (!was_init)
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, ptw, pth, 0, type,
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ptw, pth, 0, type,
 				GL_UNSIGNED_BYTE, NULL);
 	if (data) {
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, size.w, size.h, type,

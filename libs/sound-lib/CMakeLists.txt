@@ -8,7 +8,7 @@ include_directories(
     "include/lsound"
     "${DEPS}/lua"
     "${DEPS}/sdl2/include"
-    "${DEPS}/sdl2-mixer"
+    "${DEPS}/sdl2-mixer-emscripten"
     "${SRC}/luawrap-lib/include"
     "${SRC}/draw-lib/include"
     "${SRC}/common-lib/include"
@@ -38,6 +38,10 @@ set(LINKEDLIBS
         SDL2-static
         SDL2-mixer
 )
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+    add_definitions(-s USE_OGG=1 -s USE_VORBIS=1)
+endif()
 
 #add_executable( lsound_tests main.cpp)
 #

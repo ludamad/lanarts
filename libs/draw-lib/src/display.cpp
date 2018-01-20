@@ -52,27 +52,22 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 
     if (MAIN_WINDOW == NULL){
 
-        MAIN_WINDOW = SDL_CreateWindow(
-                window_name,
-                0,
-                0,
+        SDL_CreateWindowAndRenderer(
                 w, h,
-    //    SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN
-                SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0)
-            );
+                SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0),
+                &MAIN_WINDOW,
+                &MAIN_RENDERER
+        );
+        SDL_SetWindowTitle(MAIN_WINDOW, window_name);
 
-    }
+    }   
     if (MAIN_WINDOW == NULL) {
         fprintf(stderr, "Couldn't set GL mode: %s\n", SDL_GetError());
         SDL_Quit();
         exit(1);
     }
-
-        /* To get SDL_Texture support, we need to setup a renderer, which
-           will take care of setting up OpenGL. Ideally we should check
-           SDL_GetRenderDriverInfo() for name "opengl*", to avoid a
-           software or d3d renderer.  We can't use our own context. */
-        MAIN_RENDERER = SDL_CreateRenderer(MAIN_WINDOW, -1, SDL_RENDERER_ACCELERATED);
+    printf("CALLLED@!!!\n");
+    fflush(stdout);
 
     glDisable(GL_TEXTURE_2D);
 

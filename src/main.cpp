@@ -35,6 +35,9 @@
 #include "lua_api/lua_api.h"
 #include "lua_api/lua_yaml.h"
 #include "lua_api/lua_api.h"
+#ifdef __EMSCRIPTEN__
+#include "emscripten.h"
+#endif
 
 using namespace std;
 
@@ -96,6 +99,19 @@ const char* traceback(lua_State* L) {
     return lua_tostring(L, -1);
 }
 
+static void run_lua_value(void* arg) {
+    printf("CALLING GAME LOOP FROM EMSCRIPTEN\n");
+    try {
+        auto& value = *(LuaValue*)arg;
+        value.push();
+        luawrap::call<void>(value.luastate());
+    } catch (const std::exception& err) {
+        fprintf(stderr, "%s\n", err.what());
+        fflush(stderr);
+    }
+}
+
+
 static void run_engine_Main(int argc, const char **argv) {
     lua_State* L = init_luastate();
 
@@ -111,12 +127,16 @@ static void run_engine_Main(int argc, const char **argv) {
     if (step_func.isnil()) {
         return;
     }
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop_arg(run_lua_value, (void*)new LuaValue(step_func), 0, 0);
+#else
     while (true) {
         step_func.push();
         if (!luawrap::call<bool>(L)) {
             break;
         }
     }
+#endif
 }
 
 //// Returns: Should we keep running our outer game loop?
@@ -233,7 +253,8 @@ int main(int argc, char** argv) {
 	try {
 #endif
 #ifdef __EMSCRIPTEN__
-    vector<const char*> args = {"./lanarts", "engine.StartLanartsEmscripten"};
+    printf("WHATSUP\n");
+    vector<const char*> args = {"./lanarts", "engine.StartLanarts"};
     run_engine_Main(args.size(), &args[0]); // Remove 'bare' argument
 #else
     run_engine_Main(argc, (const char**)argv); // Remove 'bare' argument

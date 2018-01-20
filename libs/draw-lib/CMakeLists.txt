@@ -9,9 +9,16 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
       )
 
   set(FREETYPE_LIBRARIES "/Users/adomurad/sources/freetype2/build/libfreetype.a")
+
+  set(SDL2_LIBRARIES "-s USE_SDL=2")
+  set(SDL2_IMAGE_LIBRARIES "-s USE_SDL_IMAGE=2")
 else ()
+	INCLUDE(FindPkgConfig)
     include(FindFreetype)
+	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+	PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 endif ()
+
 
 set( SRC ../)
 set( DEPS ../../dependencies)
@@ -49,23 +56,20 @@ add_library( ldraw
 
          message(STATUS ${SDL2_LIBRARY})
 set(LINKEDDEPS
-        SDL2-image
 	ldraw
 	luawrap
 	lcommon
 	lua
-        SDL2-static
-        SDL2-image
+		${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES}
 	${OPENGL_gl_LIBRARY}
 	${FREETYPE_LIBRARIES}
-        SDL2-image
 )
 
-#add_executable( ldraw_ex ${ldraw_examples} )
+add_executable( ldraw_ex ${ldraw_examples} )
 #add_executable( ldraw_tests ${ldraw_tests} )
 #
-#target_link_libraries( ldraw_ex ${LINKEDDEPS} )
+target_link_libraries( ldraw_ex ${LINKEDDEPS} )
 #target_link_libraries( ldraw_tests ${LINKEDDEPS} UnitTest++ )
 #
 #enable_testing()
-#add_test(NAME ldraw_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/ldraw_tests )
+	#add_test(NAME ldraw_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/ldraw_tests )

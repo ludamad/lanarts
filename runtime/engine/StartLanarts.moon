@@ -47,8 +47,8 @@ engine_init = (settings) ->
     GMeta = getmetatable _G -- Get protection metatable
     setmetatable _G, nil -- Allow globals to be set
     EngineInternal.init_gamestate(settings)
-    require "globals.GameUtils"
     Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
+    require "globals.GameUtils"
     EngineInternal.init_resource_data()
     Engine.resources_load()
     setmetatable _G, GMeta -- reset protection metatable
@@ -75,7 +75,7 @@ try_load_savefile = (load_file) ->
 engine_step = (settings) ->
     return require("GameLoop").engine_step()
 
--- Parse lanarts command-line options
+--Parse lanarts command-line options
 main = (raw_args) ->
     log "Running Lanarts main function"
     parser = argparse("lanarts", "Run lanarts.")
@@ -87,27 +87,31 @@ main = (raw_args) ->
     parser\option "--load", "Save file to load from.", nil
     args = parser\parse(raw_args)
 
-    -- (1) Handle debug options
-    if args.debug
-        debug = debug.attach_debugger()
+    settings_ = {nil}
+    step = () ->
+        -- (6) Return the engine step function
+        if settings_[1]
+            return engine_step settings_[1]
+        -- (1) Handle debug options
+        if args.debug
+            debug = debug.attach_debugger()
 
-    -- (2) Handle save file options
-    argv_configuration.save_file = parser.save
-    argv_configuration.load_file = parser.load
+        -- (2) Handle save file options
+        argv_configuration.save_file = parser.save
+        argv_configuration.load_file = parser.load
 
-    -- (3) Handle error reporting options
-    ErrorReporting = require "ErrorReporting"
-    if args.nofilter
-        ErrorReporting.filter_patterns = {}
-    ErrorReporting.context = tonumber(args.context)
+        -- (3) Handle error reporting options
+        ErrorReporting = require "ErrorReporting"
+        if args.nofilter
+            ErrorReporting.filter_patterns = {}
+        ErrorReporting.context = tonumber(args.context)
 
-    -- (4) Initialize subsystems + game state object
-    settings = engine_init(parse_settings args.settings)
+        -- (4) Initialize subsystems + game state object
+        settings_[1] = engine_init(parse_settings args.settings)
 
-    -- (5) Check for savefiles
-    try_load_savefile(args.load)
-
-    -- (6) Return the engine step function
-    return () -> engine_step(settings)
+        -- (5) Check for savefiles
+        try_load_savefile(args.load)
+        return true
+    return step
 
 return main

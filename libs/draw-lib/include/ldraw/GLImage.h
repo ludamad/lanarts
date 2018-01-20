@@ -26,20 +26,20 @@ struct GLImage {
 		texture = 0;
 		initialize(filename);
 	}
-	GLImage(const Size& size, int type = GL_BGRA) {
+	GLImage(const Size& size, int type = GL_RGBA) {
 		texture = 0;
 		initialize(size, type);
 	}
 	~GLImage();
 
 	void initialize(const std::string& filename);
-	void initialize(const Size& size, int type = GL_BGRA) {
+	void initialize(const Size& size, int type = GL_RGBA) {
 		image_from_bytes(size, NULL, type);
 	}
 
 	void subimage_from_bytes(const BBox& region, char* data,
-			int type = GL_BGRA);
-	void image_from_bytes(const Size& size, char* data, int type = GL_BGRA);
+			int type = GL_RGBA);
+	void image_from_bytes(const Size& size, char* data, int type = GL_RGBA);
 
 	void draw(const ldraw::DrawOptions& options, const PosF& pos);
 	void draw(const PosF& pos) {

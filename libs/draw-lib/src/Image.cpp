@@ -55,7 +55,8 @@ void Image::initialize(const Size& size, const BBoxF& draw_region,
 }
 
 void Image::batch_draw(const PosF& pos) const {
-    _image->batch_draw(_draw_region, pos);
+	//_image->batch_draw(_draw_region, pos);
+	_image->draw(_draw_region, pos);
 }
 
 void Image::draw(const DrawOptions& options, const PosF& pos) const {
