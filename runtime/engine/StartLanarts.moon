@@ -61,7 +61,7 @@ engine_init = (settings) ->
     EngineInternal.start_game()
     GameState.input_capture()
     if not GameState.input_handle()
-        error("Game exitted")
+        error("Game exited")
     return settings
 
 try_load_savefile = (load_file) ->
@@ -72,9 +72,6 @@ try_load_savefile = (load_file) ->
     else
         error("'#{load_file}' does not exist!")
 
-engine_step = (settings) ->
-    return require("GameLoop").engine_step()
-
 --Parse lanarts command-line options
 main = (raw_args) ->
     log "Running Lanarts main function"
@@ -83,22 +80,21 @@ main = (raw_args) ->
     parser\option "--nofilter", "Do not filter Lua error reporting of noise."
     parser\option "-C --context", "Amount of lines of Lua error context.", "4"
     parser\option "--settings", "Settings YAML file to use.", "settings.yaml"
-    parser\option "--save", "Save file to save to.", nil
-    parser\option "--load", "Save file to load from.", nil
+    parser\option "--save", "Save file to save to.", false
+    parser\option "--load", "Save file to load from.", false
     args = parser\parse(raw_args)
 
-    settings_ = {nil}
-    step = () ->
-        -- (6) Return the engine step function
-        if settings_[1]
-            return engine_step settings_[1]
+    settings = nil
+
+    local main, menu_step, game_init, game_step
+    main = () ->
         -- (1) Handle debug options
         if args.debug
             debug = debug.attach_debugger()
 
         -- (2) Handle save file options
-        argv_configuration.save_file = parser.save
-        argv_configuration.load_file = parser.load
+        argv_configuration.save_file = args.save
+        argv_configuration.load_file = args.load
 
         -- (3) Handle error reporting options
         ErrorReporting = require "ErrorReporting"
@@ -107,11 +103,30 @@ main = (raw_args) ->
         ErrorReporting.context = tonumber(args.context)
 
         -- (4) Initialize subsystems + game state object
-        settings_[1] = engine_init(parse_settings args.settings)
+        settings = engine_init(parse_settings args.settings)
 
         -- (5) Check for savefiles
         try_load_savefile(args.load)
-        return true
-    return step
+
+        -- (6) Start menu
+        return menu_step()
+
+    menu_step = () ->
+        Engine.menu_start()
+        -- Start game
+        return game_step()
+
+    game_step = () ->
+        require("GameLoop").engine_step()
+        return game_step
+
+    engine_loop = () ->
+        -- Entry point
+        state = main
+        -- Simple state machine
+        state = state()
+        return state ~= nil
+
+    return engine_loop
 
 return main

@@ -11,23 +11,23 @@ if require("tests.main").testcase then
     end
 end
 
--- function Engine.menu_start(...)
---     log "function Engine.menu_start(...)"
---     local menus = require "Menus"
---     return menus.start_menu_show(...)
--- end
--- 
--- function Engine.pregame_menu_start(...)
---     log "function Engine.pregame_menu_show(...)"
---     local menus = require "Menus"
---     return menus.pregame_menu_show(...)
--- end
--- 
--- function Engine.loading_screen_draw(...)
---     log "function Engine.loading_screen_draw(...)"
---     local LoadingScreen = require "menus.LoadingScreen"
---     return LoadingScreen.draw(...)
--- end
+function Engine.menu_start(...)
+    log "function Engine.menu_start(...)"
+    local menus = require "Menus"
+    return menus.start_menu_show(...)
+end
+
+function Engine.pregame_menu_start(...)
+    log "function Engine.pregame_menu_show(...)"
+    local menus = require "Menus"
+    return menus.pregame_menu_show(...)
+end
+
+function Engine.loading_screen_draw(...)
+    log "function Engine.loading_screen_draw(...)"
+    local LoadingScreen = require "menus.LoadingScreen"
+    return LoadingScreen.draw(...)
+end
 
 function Engine.resources_load(...)
     log "function Engine.resources_load(...)"
