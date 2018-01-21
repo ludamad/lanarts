@@ -58,7 +58,10 @@ game_init = () ->
         Engine.resources_load()
 
     -- Player config
+    n_players = (if os.getenv("LANARTS_CONTROLLER") then 0 else 1) + #require("core.Gamepad").ids()
     require("core.GameState").register_player(settings.username, settings.class_type, Engine.player_input, true, 0)
+    for i=2,n_players
+        require("core.GameState").register_player("Player " .. i, settings.class_type, Engine.player_input, true, 0)
 
     EngineInternal.start_game()
 
