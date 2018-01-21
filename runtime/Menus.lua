@@ -84,7 +84,7 @@ end
 
 DEBUG_LAYOUTS = false
 
-local menu_state = { exit_game = false, start_func = nil }
+local menu_state = { exit_game = false, start_func = nil, load_file = nil }
 
 local exit_menu -- forward declare
 local setup_start_menu -- forward declare
@@ -98,6 +98,7 @@ function exit_menu(exit_game)
     menu_state.menu = nil
     menu_state.back = nil
     menu_state.continue = nil
+    menu_state.load_file = nil
     menu_state.exit_game = exit_game
 end
 
@@ -127,14 +128,8 @@ function setup_start_menu()
     end
 
     local function on_load_click()
-        GameState.mark_loading()
-        game_loop.loop_control.startup_function = function()
-            if file_exists("saves/savefile.save") then
-                GameState.load("saves/savefile.save")
-            end
-        end
-	settings.connection_type = Network.NONE
         exit_menu()
+        menu_state.load_file = "saves/savefile.save"
     end
 
     if file_exists("saves/savefile.save") then
@@ -211,7 +206,7 @@ local function menu_step()
     if Keys.key_pressed(Keys.F9) then
         -- note, globals are usually protected against being changed
         -- but a bypass is allowed for cases where it must be done
-        setglobal("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
+        rawset("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
     end
 
     -- (3) Call the menu step function
@@ -231,7 +226,8 @@ local function menu_step()
 
     -- (6) Check if game has been started
     if not menu_state.menu and not menu_state.exit_game then
-        return menu_state.start_func()
+        -- If load_file isn't nil, causes a game to load
+        return menu_state.start_func(menu_state.load_file)
     end
 
     -- (7) Call the menu draw function

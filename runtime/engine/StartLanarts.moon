@@ -4,6 +4,14 @@ argparse = require "argparse"
 Display = require "core.Display"
 yaml = require "yaml"
 
+load_location_is_valid = (load_file) ->
+    if not load_file
+        return -- No savefile specified:
+    if file_exists(load_file)
+        return load_file
+    else
+        error("'#{load_file}' does not exist!")
+
 -- Parse settings object from settings yaml file
 parse_settings = (settings_file) ->
     log_info "Parsing #{settings_file}"
@@ -17,7 +25,7 @@ parse_settings = (settings_file) ->
     settings = {key, value for {key, value} in *raw_settings}
     pretty_print(settings)
     return settings
-i
+
 -- Adapt the settings object based on context
 -- Initialize the game state object
 engine_init = (settings) ->
@@ -35,7 +43,7 @@ engine_init = (settings) ->
         settings.view_width = screen_width
     if settings.view_height == 0
         settings.view_height = screen_height
- 
+
     if os.getenv("LANARTS_SMALL")
         settings.fullscreen = false
         settings.view_width = 800
@@ -44,7 +52,7 @@ engine_init = (settings) ->
     if os.getenv("LANARTS_INVINCIBLE")
         settings.invincible = true
 
-    log "Initializing GameState object..."
+    log "Initializing GameState api..."
     with_mutable_globals () ->
         setmetatable _G, nil -- Allow globals to be set
         EngineInternal.init_gamestate_api(settings)
@@ -61,29 +69,25 @@ engine_exit = () ->
 RESOURCES_LOADED = false
 
 game_init = (load_file=nil) ->
+    GameState = require("core.GameState")
     if not RESOURCES_LOADED then with_mutable_globals () ->
         EngineInternal.init_resource_data()
         Engine.resources_load()
         RESOURCES_LOADED = true
 
     -- Player config
+    GameState.clear_players()
     n_players = (if os.getenv("LANARTS_CONTROLLER") then 0 else 1) + #require("core.Gamepad").ids()
-    require("core.GameState").register_player(settings.username, settings.class_type, Engine.player_input, true, 0)
+    GameState.register_player(settings.username, settings.class_type, Engine.player_input, true, 0)
     for i=2,n_players
-        require("core.GameState").register_player("Player " .. i, settings.class_type, Engine.player_input, true, 0)
+        GameState.register_player("Player " .. i, settings.class_type, Engine.player_input, true, 0)
 
+    log "Initializing GameState object..."
     EngineInternal.init_gamestate()
-    if load_file
-        require("core.GameState").load(load_file)
-    EngineInternal.start_game()
-
-load_location_is_valid = (load_file) ->
-    if not load_file
-        return -- No savefile specified:
-    if file_exists(load_file)
-        return load_file
+    if load_location_is_valid(load_file)
+        GameState.load(load_file)
     else
-        error("'#{load_file}' does not exist!")
+        EngineInternal.start_game()
 
 --Parse lanarts command-line options
 main = (raw_args) ->
@@ -117,8 +121,8 @@ main = (raw_args) ->
         engine_init(parse_settings args.settings)
 
         -- (5) Check for savefiles
-        if try_load_savefile(args.load)
-            return game_start
+        if load_location_is_valid(args.load)
+            return game_start(args.load)
 
         -- (6) Transfer to menu loop
         return menu_start()
@@ -126,9 +130,9 @@ main = (raw_args) ->
     menu_start = () ->
         return Engine.menu_start(game_start)
 
-    game_start = () ->
+    game_start = (load_file=nil) ->
         -- (1) Init game
-        game_init()
+        game_init(load_file)
 
         -- (2) Set up input for first game step
         GameState = require("core.GameState")
