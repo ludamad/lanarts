@@ -27,7 +27,7 @@ function M.exit_game()
 end
 
 local HEADLESS = os.getenv("LANARTS_HEADLESS")
-function M.engine_step(steponly)
+function M.game_step(steponly)
     if HEADLESS then
         steponly = true
     end
@@ -44,10 +44,10 @@ function M.engine_step(steponly)
         GameState.draw()
         perf.timing_end("**Draw**")
     end
-    
+
     perf.timing_begin("**Step**")
-    if not M.loop_control.game_is_paused and not GameState.step() then 
-        return false 
+    if not M.loop_control.game_is_paused and not GameState.step() then
+        return false
     end
     perf.timing_end("**Step**")
 
@@ -62,14 +62,14 @@ function M.engine_step(steponly)
     -- ROBUSTNESS
     -- Will be called after a game restarts during step event, but for a newly generated game world.
     -- See robustness note below which assures that each run has the same ordering of input_handle's.
-    if not GameState.input_handle() then 
-        return false 
+    if not GameState.input_handle() then
+        return false
     end
 
     local surplus = settings.time_per_step - timer:get_milliseconds()
 
     perf.timing_begin("**Surplus**")
-    if not HEADLESS then 
+    if not HEADLESS and not __EMSCRIPTEN then
         GameState.wait(surplus)
     end
     perf.timing_end("**Surplus**")
@@ -98,7 +98,7 @@ function M.overlay_draw()
     fps_count = fps_count + frame_increase
 
     if fps then
-        local w,h = unpack( Display.display_size ) 
+        local w,h = unpack( Display.display_size )
         Fonts.small:draw( {origin=Display.RIGHT_BOTTOM}, {w, h}, "FPS: " .. math.floor(fps) )
     end
 
@@ -129,31 +129,31 @@ function M.run_loop()
     -- ROBUSTNESS
     -- Since when a game restarts, an input_handle is called during engine_step after step(),
     -- we call input_handle here for reproducibility.
-    if not GameState.input_handle() then 
-        return false 
+    if not GameState.input_handle() then
+        return false
     end
 
-    while true do 
+    while true do
         local single_player = (settings.connection_type == Network.NONE)
-    
+
         -- TODO fix hotloading
         -- Crashes with unknown effects
-        -- if Keys.key_pressed(Keys.F2) and single_player then 
+        -- if Keys.key_pressed(Keys.F2) and single_player then
         --     GameState.resources_load()
         -- end
-    
-        if Keys.key_pressed(Keys.F4) then 
+
+        if Keys.key_pressed(Keys.F4) then
             M.loop_control.game_is_paused = not M.loop_control.game_is_paused
         end
 
-        if Keys.key_pressed(Keys.ESCAPE) then 
+        if Keys.key_pressed(Keys.ESCAPE) then
             for _ in screens() do
                 EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
             end
         end
 
         local steponly = (GameState.frame % settings.steps_per_draw ~= 0)
-        if not M.engine_step(steponly) then
+        if not M.game_step(steponly) then
             if single_player then
                 GameState.score_board_store()
                 GameState.save(argv_configuration.save_file or "saves/savefile.save")

@@ -1,4 +1,4 @@
--- Entry point to lanarts. Ensures correct initialization order of the 
+-- Entry point to lanarts. Ensures correct initialization order of the
 -- various global components, and handles parsing of the command-line configuration.
 
 -- Play nice with dependencies:
@@ -19,12 +19,12 @@ local function get_varparam(flag, --[[Optional]] max_params)
                 local param = argv[j]
                 if not param or param:match(LOOKS_LIKE_FLAG) then break end
                 append(params, param)
-            end 
+            end
         end
     end ; return unpack(params)
-end 
+end
 
-local function get_param(flag) 
+local function get_param(flag)
     for i,v in pairs(argv) do
         local match = v:match(flag .. ":(.*)")
         match = match or (v == flag and argv[i+1])
@@ -32,7 +32,7 @@ local function get_param(flag)
             assertf(match, "Expected parameter but none given for '%s'!", flag)
             assertf(not match:match("^[%-]+[^%s]+$"), "Aborting because parameter '%s' for '%s' looks like a flag.", match, flag)
             return match
-        end 
+        end
     end
     return nil
 end
@@ -70,7 +70,7 @@ local function main(_argv)
     -- Error control options
     local ErrorReporting = require "ErrorReporting"
     if has_arg "--nofilter" then ErrorReporting.filter_patterns = {} end
-    -- Number of lines of code context, requires source. 
+    -- Number of lines of code context, requires source.
     ErrorReporting.context = (num_param "-C" or num_param "--context" or 4)
 
     -- Execution modes
@@ -88,7 +88,7 @@ local function main(_argv)
         local file = (get_param "--lua")
         local ok, err = pcall(dofile, file)
         if err then print(err) end
-        local finished = false 
+        local finished = false
         -- Dummy out start hook:
         function _G.start_lanarts() finished = true end
         while not finished do __read_eval_print() end
@@ -100,6 +100,6 @@ local function main(_argv)
     return start_lanarts()
 end
 
--- The bootstrap module (ie, this file, core/Main.lua) returns a function that 
+-- The bootstrap module (ie, this file, core/Main.lua) returns a function that
 -- takes the command-line arguments for Lanarts
 return main

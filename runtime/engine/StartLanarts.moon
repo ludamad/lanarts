@@ -1,4 +1,5 @@
 EngineInternal = require "core.EngineInternal"
+Tasks = require "networking.Tasks"
 argparse = require "argparse"
 Display = require "core.Display"
 yaml = require "yaml"
@@ -44,31 +45,28 @@ engine_init = (settings) ->
         settings.invincible = true
 
     log "Initializing GameState object..."
-    GMeta = getmetatable _G -- Get protection metatable
-    setmetatable _G, nil -- Allow globals to be set
-    EngineInternal.init_gamestate(settings)
-    Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
-    require "globals.GameUtils"
-    EngineInternal.init_resource_data()
-    Engine.resources_load()
-    setmetatable _G, GMeta -- reset protection metatable
+    with_mutable_globals () ->
+        setmetatable _G, nil -- Allow globals to be set
+        EngineInternal.init_gamestate(settings)
+        require "globals.GameUtils"
+        Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
+    return settings
+
+game_init = () ->
+    with_mutable_globals () ->
+        EngineInternal.init_resource_data()
+        Engine.resources_load()
 
     -- Player config
-    GameState = require "core.GameState"
-
-    GameState.register_player("ludamad", "Fighter", Engine.player_input, true, 0)
+    require("core.GameState").register_player(settings.username, settings.class_type, Engine.player_input, true, 0)
 
     EngineInternal.start_game()
-    GameState.input_capture()
-    if not GameState.input_handle()
-        error("Game exited")
-    return settings
 
 try_load_savefile = (load_file) ->
     if not load_file
         return -- No savefile specified:
     if file_exists(load_file)
-        GameState.load(load_file)
+        require("core.GameState").load(load_file)
     else
         error("'#{load_file}' does not exist!")
 
@@ -84,13 +82,11 @@ main = (raw_args) ->
     parser\option "--load", "Save file to load from.", false
     args = parser\parse(raw_args)
 
-    settings = nil
-
-    local main, menu_step, game_init, game_step
+    local main, menu_start, game_start, game_step
     main = () ->
         -- (1) Handle debug options
         if args.debug
-            debug = debug.attach_debugger()
+            debug.attach_debugger()
 
         -- (2) Handle save file options
         argv_configuration.save_file = args.save
@@ -103,29 +99,42 @@ main = (raw_args) ->
         ErrorReporting.context = tonumber(args.context)
 
         -- (4) Initialize subsystems + game state object
-        settings = engine_init(parse_settings args.settings)
+        engine_init(parse_settings args.settings)
 
         -- (5) Check for savefiles
         try_load_savefile(args.load)
 
-        -- (6) Start menu
-        return menu_step()
+        -- (6) Transfer to menu loop
+        return menu_start()
 
-    menu_step = () ->
-        Engine.menu_start()
-        -- Start game
+    menu_start = () ->
+        return Engine.menu_start(game_start)
+
+    game_start = () ->
+        -- (1) Init game
+        game_init()
+
+        -- (2) Set up input for first game step
+        GameState = require("core.GameState")
+        GameState.input_capture()
+        if not GameState.input_handle()
+            error("Game exited")
+
+        -- (3) Transfer to game loop
         return game_step()
 
     game_step = () ->
-        require("GameLoop").engine_step()
+        if not require("GameLoop").game_step()
+            return menu_start()
         return game_step
 
+    -- Entry point
+    engine_state = main
     engine_loop = () ->
-        -- Entry point
-        state = main
         -- Simple state machine
-        state = state()
-        return state ~= nil
+        Tasks.run_all()
+        engine_state = engine_state()
+        return engine_state ~= nil
 
     return engine_loop
 

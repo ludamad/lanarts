@@ -28,7 +28,7 @@ function YieldingSocket:connect(...)
     local status, err = self.socket:connect(...)
     if err and err ~= "timeout" then return status, err end
     while true do
-        local _, writable, selecterr = socket.select({}, {self.socket}, 0) 
+        local _, writable, selecterr = socket.select({}, {self.socket}, 0)
         if selecterr and selecterr ~= "timeout" then error(selecterr) end
         if # writable > 0 then
             local status, err = self.socket:connect(...)
@@ -59,7 +59,7 @@ function YieldingSocket:receive(pattern, ...)
     local line = ''
     while true do
         local result, err, part = print_ret("for receive", self.socket:receive(pattern, ...))
-        if not result and err == "timeout" then 
+        if not result and err == "timeout" then
             line = line .. part
             coroutine.yield()
         elseif err ~= nil then
@@ -72,7 +72,7 @@ function YieldingSocket:receive(pattern, ...)
 end
 
 --- Calls yield instead of blocking
-function M.http_request(url, message)
+function M.http_request(url, message, content_type)
     local response_parts = {}
     local reqt = {
         url = url,
@@ -80,11 +80,11 @@ function M.http_request(url, message)
         create = YieldingSocket.create,
         sink = ltn12.sink.table(response_parts)
     }
-    if message then        
+    if message then
         reqt.source = ltn12.source.string(message)
         reqt.headers = {
             ["content-length"] = #message,
-            ["content-type"] = "application/x-www-form-urlencoded"
+            ["content-type"] = content_type or "application/x-www-form-urlencoded"
         }
         reqt.method = "POST"
     end
@@ -96,7 +96,7 @@ end
 function M.json_request(url, message)
     -- nil if message is nil
     local json_request = message and jsonlib.generate(message)
-    local json_response, code, headers, status = M.http_request(url, json_request)
+    local json_response, code, headers, status = M.http_request(url, json_request, "application/json")
     local status, response_table = jsonlib.parse(json_response)
     if not status then error(response_table) end
 

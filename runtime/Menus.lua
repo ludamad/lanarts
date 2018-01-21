@@ -14,8 +14,8 @@ local ScoresMenu = require "menus.ScoresMenu"
 
 local Tasks = require "networking.Tasks"
 local Keys = require "core.Keyboard"
-    
--- START SCREEN -- 
+
+-- START SCREEN --
 local text_button_params = {
     font = font_cached_load(settings.menu_font, 20),
     color = {255, 250, 240},
@@ -73,7 +73,7 @@ local function start_menu_create(on_start_click, on_join_click, on_load_click, o
             on_start_click()
        elseif Keys.key_pressed('S') then
             on_score_click()
-       end 
+       end
     end
 
     return menu
@@ -84,7 +84,7 @@ end
 
 DEBUG_LAYOUTS = false
 
-local menu_state = { exit_game = false }
+local menu_state = { exit_game = false, start_func = nil }
 
 local exit_menu -- forward declare
 local setup_start_menu -- forward declare
@@ -122,9 +122,9 @@ function setup_start_menu()
     end
     menu_state.menu = InstanceBox.create( { size = Display.display_size } )
 
-    menu_state.back = function() 
-        exit_menu(--[[Quit game]] true) 
-    end    
+    menu_state.back = function()
+        exit_menu(--[[Quit game]] true)
+    end
 
     local function on_load_click()
         GameState.mark_loading()
@@ -139,12 +139,12 @@ function setup_start_menu()
 
     if file_exists("saves/savefile.save") then
         menu_state.continue = on_load_click
-    else 
+    else
         menu_state.continue = setup_settings_menu
     end
 
     menu_state.menu:add_instance(
-        start_menu_create( --[[New Game Button]] setup_settings_menu, --[[Join Game Button]] setup_lobby_menu, 
+        start_menu_create( --[[New Game Button]] setup_settings_menu, --[[Join Game Button]] setup_lobby_menu,
             --[[Load Game Button]] on_load_click, --[[Highscores Button]] setup_scores_menu),
         Display.CENTER
     )
@@ -152,7 +152,7 @@ end
 
 function setup_settings_menu()
     menu_state.menu = InstanceBox.create( { size = Display.display_size } )
-    
+
     menu_state.back = setup_start_menu
     menu_state.continue = function ()
         if settings.class_type ~= "" then
@@ -161,7 +161,7 @@ function setup_settings_menu()
     end
 
     menu_state.menu:add_instance(
-        GameSettingsMenu.create( --[[Back Button]] menu_state.back, --[[Start Game Button]] menu_state.continue), 
+        GameSettingsMenu.create( --[[Back Button]] menu_state.back, --[[Start Game Button]] menu_state.continue),
         Display.CENTER
     )
 end
@@ -169,8 +169,8 @@ end
 function setup_pregame_menu()
     menu_state.menu = InstanceBox.create( { size = Display.display_size } )
 
-    menu_state.back =  function() 
-        exit_menu(--[[Quit game]] true) 
+    menu_state.back =  function()
+        exit_menu(--[[Quit game]] true)
     end
     menu_state.continue = exit_menu
     menu_state.menu:add_instance(
@@ -199,56 +199,63 @@ function setup_lobby_menu()
     )
 end
 
-local function menu_loop(should_poll)
-    while GameState.input_capture() do
-        if Keys.key_pressed(Keys.F9) then
-            -- note, globals are usually protected against being changed
-            -- but a bypass is allowed for cases where it must be done
-            setglobal("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
-        end
+-- Game loop before the game - i.e., the menu state machine
+-- Shared between all menu screens
+local function menu_step()
+    -- (1) Capture input
+    if not GameState.input_capture() then
+        return nil
+    end
 
-        if should_poll then
-            Network.connections_poll()
-        end
+    -- (2) Check if we should toggle debug layouts
+    if Keys.key_pressed(Keys.F9) then
+        -- note, globals are usually protected against being changed
+        -- but a bypass is allowed for cases where it must be done
+        setglobal("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
+    end
 
-        if not menu_state.menu then -- because we have moved on 
-            return not menu_state.exit_game
-        end
+    -- (3) Call the menu step function
+    menu_state.menu:step( {0, 0} )
 
-        menu_state.menu:step( {0, 0} )
+    -- (4) Handle escape & enter
+    if Keys.key_pressed(Keys.ESCAPE) and menu_state.back then
+        menu_state.back()
+    elseif Keys.key_pressed(Keys.ENTER) and menu_state.continue then
+        menu_state.continue()
+    end
 
-        if Keys.key_pressed(Keys.ESCAPE) and menu_state.back then
-            menu_state.back()
-        elseif Keys.key_pressed(Keys.ENTER) and menu_state.continue then
-            menu_state.continue()
-        end
+    -- (5) Check if game has been exited
+    if not menu_state.menu and menu_state.exit_game then
+        return nil -- User has quit the game
+    end
 
-        if not menu_state.menu then -- because we have moved on 
-            return not menu_state.exit_game
-        end
+    -- (6) Check if game has been started
+    if not menu_state.menu and not menu_state.exit_game then
+        return menu_state.start_func()
+    end
 
-        Display.draw_start()
-        menu_state.menu:draw( {0, 0} )
-        Display.draw_finish()
+    -- (7) Call the menu draw function
+    Display.draw_start()
+    menu_state.menu:draw( {0, 0} )
+    Display.draw_finish()
 
-        Tasks.run_all()
+    if not __EMSCRIPTEN then
         GameState.wait(10)
     end
 
-    return false -- User has quit the game
+    return menu_step
 end
 
 -- Submodule
 return {
-    start_menu_show = function()
+    start_menu_show = function(start_game)
         setup_start_menu()
-
-        return menu_loop(--[[Do not poll connections]] false)
-    end
-    , pregame_menu_show = function()
+        menu_state.start_func = start_game
+        return menu_step()
+    end,
+    pregame_menu_show = function()
         setup_pregame_menu()
-
-        print "PREGAME"
-        return menu_loop(--[[Poll connections]] true)
+        menu_state.start_func = start_game
+        return menu_step()
     end
 }

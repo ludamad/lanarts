@@ -93,7 +93,7 @@ static lua_State* init_luastate() {
 }
 
 // For gdb
-const char* traceback(lua_State* L) {
+const char* ltraceback(lua_State* L) {
     luawrap::globals(L)["debug"]["traceback"].push();
     lua_call(L, 0, 1);
     return lua_tostring(L, -1);

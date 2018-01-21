@@ -8,7 +8,7 @@ include_directories(
     "include/lsound"
     "${DEPS}/lua"
     "${DEPS}/sdl2/include"
-    "${DEPS}/sdl2-mixer-emscripten"
+    "${DEPS}/sdl2-mixer"
     "${SRC}/luawrap-lib/include"
     "${SRC}/draw-lib/include"
     "${SRC}/common-lib/include"
