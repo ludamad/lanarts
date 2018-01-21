@@ -52,6 +52,12 @@ engine_init = (settings) ->
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
     return settings
 
+engine_exit = () ->
+    perf.timing_print()
+
+    print( "Step time: " .. string.format("%f", perf.get_timing("**Step**")) )
+    print( "Draw time: " .. string.format("%f", perf.get_timing("**Draw**")) )
+
 game_init = () ->
     with_mutable_globals () ->
         EngineInternal.init_resource_data()
@@ -105,7 +111,8 @@ main = (raw_args) ->
         engine_init(parse_settings args.settings)
 
         -- (5) Check for savefiles
-        try_load_savefile(args.load)
+        if try_load_savefile(args.load)
+            return game_start
 
         -- (6) Transfer to menu loop
         return menu_start()
@@ -127,8 +134,33 @@ main = (raw_args) ->
         return game_step()
 
     game_step = () ->
-        if not require("GameLoop").game_step()
+        -- (1) Load dependencies
+        Keys = require("core.Keyboard")
+        GameLoop = require("GameLoop")
+        GameState = require("core.GameState")
+
+        -- (2) Run game loop & and see if game
+        -- should be saved + exited
+        if not GameLoop.game_step()
+            -- Save and exit
+            GameState.score_board_store()
+            GameState.save(argv_configuration.save_file or "saves/savefile.save")
+            -- Go back to menu
             return menu_start()
+        -- (3) If F4 is pressed, pause the game
+        if Keys.key_pressed(Keys.F4)
+            GameLoop.loop_control.game_is_paused = not GameLoop.loop_control.game_is_paused
+        -- (4) If Escape is pressed, tell user about shift+escape
+        if Keys.key_pressed(Keys.ESCAPE)
+            for _ in screens()
+                EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
+        -- (5) If F5 is pressed, force a network sync
+        -- TODO fix this / check if working still
+        if Keys.key_pressed(Keys.F5)
+            GameState.input_capture(true) -- reset input
+            Network.sync_message_send()
+
+        -- (6) Loop again
         return game_step
 
     -- Entry point
@@ -137,7 +169,10 @@ main = (raw_args) ->
         -- Simple state machine
         Tasks.run_all()
         engine_state = engine_state()
-        return engine_state ~= nil
+        if engine_state == nil
+            engine_exit()
+            return false
+        return true
 
     return engine_loop
 
