@@ -26,7 +26,11 @@ namespace lsound {
 	}
 
 	void Music::init(const std::string& filename) {
+#ifdef EMSCRIPTEN
+		Mix_Music* mm = NULL;
+#else
 		Mix_Music* mm = Mix_LoadMUS(filename.c_str());
+#endif
 		clear();
 		if (mm) {
 			_music = smartptr<Mix_Music>(mm, __freemusic_callback);

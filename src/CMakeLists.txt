@@ -6,7 +6,8 @@ FIND_LIBRARY(OpenGL REQUIRED)
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
   # TODO(amitp): I don't know how to set this properly with add_compile_options
   set(SDL2_LIBRARIES "-s USE_SDL=2")
-  set(SDL2_IMAGE_LIBRARIES "-s USE_SDL_IMAGE=2")
+  set(SDL2_IMAGE_LIBRARIES "-s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[\\\"png\\\"]")
+  set(SDL2MIXER_LIBRARIES "-s USE_OGG=1 -s USE_VORBIS=1")
   set(FREETYPE_INCLUDE_DIRS "/Users/adomurad/sources/freetype2/build/include"  "/Users/adomurad/sources/freetype2/include/freetype")
   set(FREETYPE_LIBRARIES "/Users/adomurad/sources/freetype2/build/libfreetype.a")
 else ()
@@ -135,6 +136,7 @@ set (libraries
         backward_object
         ${BACKTRADE_DEP}
         ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
+        # SDL2-mixer
 )
 
 target_link_libraries( lanarts 

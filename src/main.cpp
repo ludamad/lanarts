@@ -100,7 +100,6 @@ const char* ltraceback(lua_State* L) {
 }
 
 static void run_lua_value(void* arg) {
-    printf("CALLING GAME LOOP FROM EMSCRIPTEN\n");
     try {
         auto& value = *(LuaValue*)arg;
         value.push();
@@ -138,104 +137,6 @@ static void run_engine_Main(int argc, const char **argv) {
     }
 #endif
 }
-
-//// Returns: Should we keep running our outer game loop?
-//static bool run_game_instance(const vector<string>& args) {
-//    shared_ptr<GameState> gs = init_gamestate();
-//
-//    /* Load low-level Lua bootstrapping code.
-//     * Implements the module system used by the rest of the engine,
-//     * and other important utilities.
-//     */
-//    LuaValue entry_point = luawrap::dofile(gs->luastate(), "Main.lua");
-//
-//    LuaValue engine = luawrap::globals(gs->luastate())["Engine"];
-//
-//    bool did_exit, should_continue;
-//
-//    entry_point.push();
-//    should_continue = luawrap::call<bool>(gs->luastate(), args);
-//    if (!should_continue) {
-//        /* User has quit! */
-//        return false;
-//    }
-//
-//    engine["menu_start"].push();
-//    did_exit = !luawrap::call<bool>(gs->luastate());
-//    save_settings_data(gs->game_settings(), "saves/saved_settings.yaml"); // Save settings from menu
-//    if (did_exit) {
-//        /* User has quit! */
-//        return false;
-//    }
-//
-//    try {
-//        gs->start_connection();
-//    } catch (const LNetConnectionError& err) {
-//        fprintf(stderr, "The connection attempt was aborted%s\n",
-//                        err.what());
-//        return true; // Restart on connection abort TODO make this smoother
-//    }
-//
-//    init_game_data(gs->luastate());
-//    engine["resources_load"].push();
-//    luawrap::call<void>(gs->luastate());
-//
-//    if (gs->game_settings().conntype == GameSettings::SERVER) {
-//        engine["pregame_menu_start"].push();
-//        bool did_exit = !luawrap::call<bool>(gs->luastate());
-//
-//        if (did_exit) { /* User has quit! */
-//            return false;
-//        }
-//    }
-//
-//    if (gs->start_game()) {
-//        try {
-//            engine["game_start"].push();
-//            luawrap::call<void>(gs->luastate());
-//        } catch (const LNetConnectionError& err) {
-//            fprintf(stderr, "The game must end due to a connection termination:%s\n",
-//                    err.what());
-//        }
-//
-//        if (!gs->io_controller().user_has_exit()) {
-//            if (gs->game_settings().conntype != GameSettings::CLIENT) {
-//                save_settings_data(gs->game_settings(),
-//                        "saves/saved_settings.yaml"); // Save settings from in-game
-//            }
-//            return true; // Keep looping
-//        }
-//    }
-//
-//    if (gs->game_settings().conntype != GameSettings::CLIENT) {
-//        save_settings_data(gs->game_settings(), "saves/saved_settings.yaml"); // Save settings from in-game
-//    }
-//    return false; // Game over
-//}
-//
-//// Run the loop that completely restarts the game (creating a new GameState) when the user fully exits
-//static void run_outer_game_loop(const vector<string>& args) {
-//    // Initialize SDL if we are not in headless mode
-//    if (std::getenv("LANARTS_HEADLESS") == NULL) {
-//        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) < 0) {
-//            printf("SDL_Init failed: %s\n", SDL_GetError());
-//            exit(1);
-//        }
-//        if (SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt") < 0) {
-//            printf("WARNING Controller mapping failed: %s\n", SDL_GetError());
-//        }
-//    }
-//    // Run game instances until the user asks to quit
-//    bool should_continue = true;
-//    while (should_continue) {
-//        should_continue = run_game_instance(args);
-//        if (std::getenv("LANARTS_HARD_QUIT") != NULL) { // TODO hack!!
-//            should_continue = false;
-//        }
-//    }
-//
-//    lanarts_system_quit();
-//}
 
 /* Handle Ctrl+C */
 static void handleSIGINT(int signal) {

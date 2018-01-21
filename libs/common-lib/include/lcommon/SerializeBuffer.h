@@ -26,8 +26,7 @@
 #  define be16toh(x) betoh16(x)
 #  define be32toh(x) betoh32(x)
 #  define be64toh(x) betoh64(x)
-#elif defined(__linux__) 
-//|| defined(__EMSCRIPTEN__)
+#elif defined(__linux__) || defined(__EMSCRIPTEN__)
 #  include <endian.h>
 #elif defined(__FreeBSD__) || defined(__NetBSD__)
 #  include <sys/endian.h>
