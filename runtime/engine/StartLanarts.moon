@@ -17,7 +17,7 @@ parse_settings = (settings_file) ->
     settings = {key, value for {key, value} in *raw_settings}
     pretty_print(settings)
     return settings
-
+i
 -- Adapt the settings object based on context
 -- Initialize the game state object
 engine_init = (settings) ->
@@ -35,7 +35,7 @@ engine_init = (settings) ->
         settings.view_width = screen_width
     if settings.view_height == 0
         settings.view_height = screen_height
-
+ 
     if os.getenv("LANARTS_SMALL")
         settings.fullscreen = false
         settings.view_width = 800
@@ -47,7 +47,7 @@ engine_init = (settings) ->
     log "Initializing GameState object..."
     with_mutable_globals () ->
         setmetatable _G, nil -- Allow globals to be set
-        EngineInternal.init_gamestate(settings)
+        EngineInternal.init_gamestate_api(settings)
         require "globals.GameUtils"
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
     return settings
@@ -58,10 +58,13 @@ engine_exit = () ->
     print( "Step time: " .. string.format("%f", perf.get_timing("**Step**")) )
     print( "Draw time: " .. string.format("%f", perf.get_timing("**Draw**")) )
 
-game_init = () ->
-    with_mutable_globals () ->
+RESOURCES_LOADED = false
+
+game_init = (load_file=nil) ->
+    if not RESOURCES_LOADED then with_mutable_globals () ->
         EngineInternal.init_resource_data()
         Engine.resources_load()
+        RESOURCES_LOADED = true
 
     -- Player config
     n_players = (if os.getenv("LANARTS_CONTROLLER") then 0 else 1) + #require("core.Gamepad").ids()
@@ -69,13 +72,16 @@ game_init = () ->
     for i=2,n_players
         require("core.GameState").register_player("Player " .. i, settings.class_type, Engine.player_input, true, 0)
 
+    EngineInternal.init_gamestate()
+    if load_file
+        require("core.GameState").load(load_file)
     EngineInternal.start_game()
 
-try_load_savefile = (load_file) ->
+load_location_is_valid = (load_file) ->
     if not load_file
         return -- No savefile specified:
     if file_exists(load_file)
-        require("core.GameState").load(load_file)
+        return load_file
     else
         error("'#{load_file}' does not exist!")
 

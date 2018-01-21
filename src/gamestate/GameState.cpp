@@ -159,7 +159,7 @@ static void _event_log_initialize(GameState* gs, GameSettings& settings) {
 	event_log_initialize(gs, input_log, output_log);
 }
 
-bool GameState::start_game() {
+bool GameState::init_game() {
     if (settings.conntype == GameSettings::SERVER) {
         init_data.frame_action_repeat = settings.frame_action_repeat;
         init_data.network_debug_mode = settings.network_debug_mode;
@@ -250,7 +250,7 @@ bool GameState::start_game() {
             player.index, // focus player id
         });
     }
-    restart();
+    start_game();
     return true;
 }
 
@@ -394,7 +394,7 @@ void GameState::renew_game_timestamp() {
 	_game_timestamp = systime;
 }
 
-void GameState::restart() {
+void GameState::start_game() {
         //// Restart RNG:
         //const char* FIXED_SEED = getenv("LANARTS_SEED");
         //if (FIXED_SEED == NULL) {

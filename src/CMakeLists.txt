@@ -121,6 +121,7 @@ set (libraries
 	luawrap
 	lanarts_net
         lpeg
+        lfs
         enet
         lua_enet
         lua_box2d

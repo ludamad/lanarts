@@ -73,7 +73,7 @@ function M.name_global_data(--[[Optional]] to_object, --[[Optional]] to_name)
     to_name = to_name or Serialization.object_index_dictionary
     for mname,v in pairs(package.loaded) do
         if mname ~= "_G" and mname ~= "core.GlobalData" then
-            print(mname, v)
+            -- print(mname, v)
             M.name_subobjects(v, to_object, to_name, "_R:"..mname)
         end
     end

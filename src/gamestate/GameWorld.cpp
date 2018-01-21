@@ -247,7 +247,7 @@ bool GameWorld::step() {
 
 	midstep = false;
 	if (next_room_id == -2) {
-		gs->restart();
+        gs->start_game();
 		next_room_id = -1;
                 // Don't increment frame number because we're doing a new game:
                 return true;

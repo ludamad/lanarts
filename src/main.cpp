@@ -44,6 +44,7 @@ using namespace std;
 extern "C" {
 // From dependency lpeg, lpeg bindings for moonscript:
 int luaopen_lpeg(lua_State* L);
+int luaopen_lfs(lua_State* L);
 }
 
 #ifdef USE_LUAJIT
@@ -86,8 +87,12 @@ static lua_State* init_luastate() {
 	lua_State* L = lua_api::create_configured_luastate();
 	lua_vm_configure(L);
 	lua_api::add_search_path(L, "?.lua");
-    // Open lpeg first as the moonscript library depends on lpeg, and the moonscript library is called during error reporting.
+    // Open lpeg as the moonscript library depends on lpeg, and the moonscript library is called during error reporting.
     luaopen_lpeg(L);
+    lua_pop(L, 1);
+    // Open luafilesystem for file manipulation
+    luaopen_lfs(L);
+    luawrap::globals(L)["package"]["loaded"]["lfs"].pop();
     lua_api::register_lua_libraries(L);
     return L;
 }

@@ -24,7 +24,12 @@ local function main(raw_args)
     table.remove(raw_args, 1)
     local module_name = run_target:gsub(".moon", ""):gsub(".lua", ""):gsub("/", ".")
     -- Delegate to the passed module
+    -- COMPATIBLITY with lua utilities:
+    rawset(_G, 'arg', raw_args)
     local main = require(module_name)
+    if type(main) ~= "function" then
+        return nil
+    end
     return main(raw_args)
 end
 

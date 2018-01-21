@@ -52,7 +52,7 @@ static int engine_initialize_subsystems(lua_State *L) {
     return 0;
 }
 
-static void engine_init_gamestate(LuaValue lsettings) {
+static void engine_init_gamestate_api(LuaValue lsettings) {
     lua_State* L = lsettings.luastate();
     GameSettings settings; // Initialized with defaults
     settings.parse(lsettings);
@@ -63,6 +63,12 @@ static void engine_init_gamestate(LuaValue lsettings) {
     //GameState claims ownership of the passed lua_State*
     GameState* gs = new GameState(settings, L);
     lua_api::register_api(gs, L);
+}
+
+static int engine_init_gamestate(lua_State* L) {
+    GameState* gs = lua_api::gamestate(L);
+    gs->init_game();
+    return 0;
 }
 
 static int engine_start_game(lua_State* L) {
@@ -92,6 +98,7 @@ namespace lua_api {
         engine["init_resource_data"].bind_function(init_resource_data);
         engine["run_unittests"].bind_function(run_unittests);
         engine["read_eval_print"].bind_function(read_eval_print);
+        engine["init_gamestate_api"].bind_function(engine_init_gamestate_api);
         engine["init_gamestate"].bind_function(engine_init_gamestate);
         engine["deinit_gamestate"].bind_function(engine_deinit_gamestate);
         engine["start_game"].bind_function(engine_start_game);

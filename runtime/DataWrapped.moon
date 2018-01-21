@@ -10,8 +10,7 @@ draw_console_effect = (sprite, text, xy, color = COL_PALE_YELLOW) ->
     font_cached_load(settings.font, 10)\draw {
         :color
         origin: Display.LEFT_CENTER
-    }, {xy[1] + Map.TILE_SIZE + 4, xy[2]}, text 
-
+    }, {xy[1] + Map.TILE_SIZE + 4, xy[2]}, text
 
 -- Normal effect. By default, takes the 'max' of all applied time_left's
 effect_create = (args) ->
@@ -19,7 +18,6 @@ effect_create = (args) ->
     wrapped_step = args.step_func
     wrapped_apply = args.apply_func
     wrapped_remove = args.remove_func
- 
     args.init_func = (obj) =>
         @time_left = 0
         @active = false
@@ -36,16 +34,16 @@ effect_create = (args) ->
         @active = (@time_left > 0)
     args.apply_buff_func or= (obj, args) =>
         @active = true
-        if wrapped_apply 
+        if wrapped_apply
             wrapped_apply(@, obj, args)
         time_left = if type(args) == 'number' then args else args.time_left
-        @time_left = math.max(@time_left, time_left) 
+        @time_left = math.max(@time_left, time_left)
     args.remove_func = (obj) =>
         if wrapped_remove
             wrapped_remove(@, obj)
         @init_func(obj)
     args.step_func = (obj) =>
-        if wrapped_step 
+        if wrapped_step
             wrapped_step(@, obj)
         @time_left = math.max(@time_left - 1, 0)
         if @time_left <= 0 and @n_derived == 0
@@ -59,7 +57,7 @@ _subeffect_effect_create = (args, starting_value, accum) ->
     wrapped_step = args.step_func
     wrapped_apply = args.apply_func
     wrapped_remove = args.remove_func
- 
+
     args.init_func = (obj) =>
         @active = false
         @subeffects = {}
@@ -88,7 +86,7 @@ _subeffect_effect_create = (args, starting_value, accum) ->
         -- Step subeffects, remove those at t=0
         filter = false
         for eff in *@subeffects
-            if wrapped_step 
+            if wrapped_step
                 wrapped_step(@, obj, eff)
             eff.time_left = math.max(eff.time_left - 1, 0)
             if eff.time_left <= 0
@@ -110,28 +108,28 @@ STANDARD_RANGED_DPS = 7
 
 add_console_draw_func = (args, f1) ->
     f2 = args.console_draw_func
-    if f2 == nil 
+    if f2 == nil
         args.console_draw_func = f1
     else
-        args.console_draw_func = (...) -> 
+        args.console_draw_func = (...) ->
             f1(...)
             f2(...)
 
 add_on_hit_func = (args, f1) ->
     f2 = args.on_hit_func
-    if f2 == nil 
+    if f2 == nil
         args.on_hit_func = f1
     else
-        args.on_hit_func = (obj, target, atkstats) -> 
+        args.on_hit_func = (obj, target, atkstats) ->
             f1(obj, target, atkstats)
             f2(obj, target, atkstats)
 
 add_attack_stat_func = (args, f1) ->
     f2 = args.attack_stat_func
-    if f2 == nil 
+    if f2 == nil
         args.attack_stat_func = f1
     else
-        args.attack_stat_func = (obj, target, atkstats) -> 
+        args.attack_stat_func = (obj, target, atkstats) ->
             f1(obj, target, atkstats)
             f2(obj, target, atkstats)
 
@@ -167,7 +165,7 @@ resistance_effects = (resists, effects = {}) ->
         append effects, {"#{type}Resist", {:resist}}
     return effects
 
-weapon_create = (args, for_enemy = false) -> 
+weapon_create = (args, for_enemy = false) ->
     damage_multiplier = args.damage_multiplier or 1.0
     dps = if args.type == "bows" then STANDARD_RANGED_DPS else STANDARD_WEAPON_DPS
     damage = damage_multiplier * (args.cooldown / 60 * dps)
@@ -176,7 +174,7 @@ weapon_create = (args, for_enemy = false) ->
     if type(args.damage) == 'number'
         damage = args.damage
         args.damage = {base: {math.floor(damage *0.9), math.ceil(damage * 1.1)}, strength: 0}
-    else 
+    else
         args.damage or= {base: {math.floor(damage), math.ceil(damage)}, strength: 0}
     if args.types ~= nil
         add_types args, args.types
@@ -237,7 +235,7 @@ spell_create = (args) ->
                     draw_console_effect E._poison_power, "Green Type", get_next()
     Data.spell_create(args)
 
-projectile_create = (args, for_enemy = false) -> 
+projectile_create = (args, for_enemy = false) ->
     if args.cooldown
         damage_multiplier = args.damage_multiplier or 1.0
         damage = damage_multiplier * (args.cooldown / 60 * STANDARD_WEAPON_DPS)
