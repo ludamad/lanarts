@@ -1,9 +1,8 @@
-EngineInternal = require "core.EngineInternal"
-Tasks = require "networking.Tasks"
 argparse = require "argparse"
-Display = require "core.Display"
 yaml = require "yaml"
+EngineInternal = require "core.EngineInternal"
 ResourceLoading = require "engine.ResourceLoading"
+StartEngine = require "engine.StartEngine"
 
 load_location_is_valid = (load_file) ->
     if not load_file
@@ -26,48 +25,12 @@ parse_settings = (settings_file) ->
     settings = {key, value for {key, value} in *raw_settings}
     return settings
 
-cached_settings = nil
-
--- Adapt the settings object based on context
--- Initialize the game state object
-engine_init = (settings) ->
-    -- (1) Initialize sound, network, etc subsystems
-    EngineInternal.init_subsystems()
-
-    -- (2) Define major engine hooks, such as level to generate
-    -- TODO move this to a more flexible system
-    require "engine.EngineBase"
-
-    -- (3) Adapt settings object based on environment variables
-    -- Set settings width & height to screen width & height if equal to 0
-    {screen_width, screen_height} = Display.screen_size
-    if settings.view_width == 0
-        settings.view_width = screen_width
-    if settings.view_height == 0
-        settings.view_height = screen_height
-
+get_settings = (settings_file) ->
+    settings = parse_settings(settings_file)
     if file_exists("saves/saved_settings.yaml")
         saved_settings = parse_settings("saves/saved_settings.yaml")
         for k, v in pairs(saved_settings)
             settings[k] = v
-
-    if os.getenv("LANARTS_SMALL")
-        settings.fullscreen = false
-        settings.view_width = 800
-        settings.view_height = 600
-
-    if os.getenv("LANARTS_INVINCIBLE")
-        settings.invincible = true
-
-    log "Initializing GameState api..."
-    with_mutable_globals () ->
-        setmetatable _G, nil -- Allow globals to be set
-        cached_settings = settings
-        EngineInternal.init_gamestate_api(settings)
-        require "globals.GameUtils"
-        Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
-        EngineInternal.init_resource_data()
-        ResourceLoading.start()
     return settings
 
 settings_save = () ->
@@ -76,13 +39,6 @@ settings_save = () ->
     yaml_str = yaml.dump({:time_per_step, :username, :class_type, :frame_action_repeat, :regen_on_death})
     -- ensure_directory("saves")
     file_dump_string("saves/saved_settings.yaml", yaml_str)
-
-engine_exit = () ->
-    perf.timing_print()
-
-    print( "Step time: " .. string.format("%f", perf.get_timing("**Step**")) )
-    print( "Draw time: " .. string.format("%f", perf.get_timing("**Draw**")) )
-    settings_save()
 
 game_init = (load_file=nil) ->
     settings_save()
@@ -102,7 +58,7 @@ game_init = (load_file=nil) ->
         EngineInternal.start_game()
 
 --Parse lanarts command-line options
-main = (raw_args) ->
+run_lanarts = (raw_args) ->
     log "Running Lanarts main function"
     parser = argparse("lanarts", "Run lanarts.")
     parser\option "--debug", "Attach debugger."
@@ -112,33 +68,9 @@ main = (raw_args) ->
     parser\option "--save", "Save file to save to.", false
     parser\option "--load", "Save file to load from.", false
     args = parser\parse(raw_args)
+    settings = get_settings(args.settings)
 
-    local engine_main, menu_start, game_start, game_step
-    engine_main = () ->
-        -- (1) Handle debug options
-        if args.debug
-            debug.attach_debugger()
-
-        -- (2) Handle save file options
-        argv_configuration.save_file = args.save
-        argv_configuration.load_file = args.load
-
-        -- (3) Handle error reporting options
-        ErrorReporting = require "ErrorReporting"
-        if args.nofilter
-            ErrorReporting.filter_patterns = {}
-        ErrorReporting.context = tonumber(args.context)
-
-        -- (4) Initialize subsystems + game state object
-        engine_init(parse_settings args.settings)
-
-        -- (5) Check for savefiles
-        if load_location_is_valid(args.load)
-            return game_start(args.load)
-
-        -- (6) Transfer to menu loop
-        return menu_start()
-
+    local menu_start, game_start, game_step
     menu_start = () ->
         return Engine.menu_start(game_start)
 
@@ -169,7 +101,7 @@ main = (raw_args) ->
             GameState.score_board_store()
             GameState.save(argv_configuration.save_file or "saves/savefile.save")
             -- Allocate a fresh GameState
-            EngineInternal.init_gamestate_api(cached_settings)
+            EngineInternal.init_gamestate_api(settings)
             -- Go back to menu
             return menu_start()
         -- (3) If F4 is pressed, pause the game
@@ -179,26 +111,17 @@ main = (raw_args) ->
         if Keys.key_pressed(Keys.ESCAPE)
             for _ in screens()
                 EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
-        -- (5) If F5 is pressed, force a network sync
-        -- TODO fix this / check if working still
-        if Keys.key_pressed(Keys.F5)
-            GameState.input_capture(true) -- reset input
-            Network.sync_message_send()
-
-        -- (6) Loop again
+        -- (5) Loop again
         return game_step
 
-    -- Entry point
-    engine_state = engine_main
-    engine_loop = () ->
-        -- Simple state machine
-        Tasks.run_all()
-        engine_state = engine_state()
-        if engine_state == nil
-            engine_exit()
-            return false
-        return true
+    return StartEngine.start_engine {
+        :settings,
+        entry_point: menu_start,
+        debug: args.debug,
+        save: args.save,
+        load: args.load
+        nofilter: args.nofilter
+        on_exit: settings_save
+    }
 
-    return engine_loop
-
-return main
+return run_lanarts

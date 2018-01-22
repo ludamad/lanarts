@@ -8,8 +8,8 @@ main = (raw_args) ->
     args = parser\parse(raw_args)
     -- (2) Run all lua files/modules
     for target in *args.lua
-        modulename = filename\gsub(".moon", "")\gsub(".lua", "")\gsub("/", ".")
-        ok, err = pcall(require, "modulename")
+        modulename = target\gsub(".moon", "")\gsub(".lua", "")\gsub("/", ".")
+        _, err = pcall(require, modulename)
         if err
             print "Error while loading '#{modulename}'"
             print err
