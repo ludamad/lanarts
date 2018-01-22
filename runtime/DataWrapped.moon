@@ -50,6 +50,7 @@ effect_create = (args) ->
             @remove_func(obj)
             @time_left = 0
     Data.effect_create(args)
+    yield_point()
 
 -- List of subeffects, with an accumulated stat.
 _subeffect_effect_create = (args, starting_value, accum) ->
@@ -97,6 +98,7 @@ _subeffect_effect_create = (args, starting_value, accum) ->
         if @subeffects == 0 and @current ~= starting_value
             @remove_func(obj)
     Data.effect_create(args)
+    yield_point()
 
 additive_effect_create = (args) ->
     key = args.key or 'value'
@@ -195,6 +197,7 @@ weapon_create = (args, for_enemy = false) ->
                 when "Green"
                     draw_console_effect E._poison_power, "Green Type", get_next()
     Data.weapon_create(args)
+    yield_point()
 
 spell_create = (args) ->
     proj = args.projectile
@@ -214,6 +217,7 @@ spell_create = (args) ->
         if proj.types ~= nil
             add_types proj, proj.types
         Data.projectile_create(proj)
+        yield_point()
         args.projectile = proj.name
     if args.types
         for type in *args.types
@@ -234,6 +238,7 @@ spell_create = (args) ->
                 when "Green"
                     draw_console_effect E._poison_power, "Green Type", get_next()
     Data.spell_create(args)
+    yield_point()
 
 projectile_create = (args, for_enemy = false) ->
     if args.cooldown
@@ -253,6 +258,7 @@ projectile_create = (args, for_enemy = false) ->
     if args.types ~= nil
         add_types args, args.types
     Data.projectile_create(args)
+    yield_point()
 
 -- Ensures derived enemy types are reachable:
 DERIVED_ENEMY_TYPES = {}
@@ -334,5 +340,6 @@ enemy_create = (args) ->
 
     -- Finally, create the enemy entry
     Data.enemy_create(args)
+    yield_point()
 
 return {:additive_effect_create, :effect_create, :weapon_create, :spell_create, :projectile_create, :enemy_create, :resistance_effects, :power_effects, :add_types, :DERIVED_ENEMY_TYPES}

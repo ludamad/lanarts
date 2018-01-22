@@ -33,8 +33,9 @@ function Engine.resources_load(...)
     log "function Engine.resources_load(...)"
 
     local function _req(module)
+        local GameState = require("core.GameState")
         log_verbose("Loading resources from '" .. module .. "'")
-        local ret = require(module)
+        local ret = yield_point(require, module)
         return ret
     end
 
@@ -53,7 +54,7 @@ function Engine.resources_load(...)
     _req "items.Rings"
 
     -- Start the game with 1000 'randarts' -- for now, preconfigured item generations.
-    _req("items.Randarts").define_randarts()
+    yield_point(_req("items.Randarts").define_randarts)
 
     _req "enemies.Enemies"
 
@@ -155,4 +156,3 @@ Engine.pre_deserialize = Engine.pre_serialize
 function Engine.post_deserialize()
 
 end
-

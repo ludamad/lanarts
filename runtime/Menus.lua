@@ -133,7 +133,6 @@ function setup_start_menu()
     end
 
     local function on_continue()
-        print "ON CONTINUE"
         if file_exists("saves/savefile.save") then
             on_load_click()
         else
@@ -213,7 +212,6 @@ local function menu_step()
         rawset("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
     end
 
-    print(Keys.key_pressed(Keys.ENTER))
     -- (3) Call the menu step function
     menu_state.menu:step( {0, 0} )
 

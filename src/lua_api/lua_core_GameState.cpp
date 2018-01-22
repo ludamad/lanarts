@@ -53,6 +53,46 @@ static void game_load(LuaStackValue filename) {
 	fclose(file);
 }
 
+// Call on main thread
+static int game_main_call(lua_State* L) {
+	// Convert to main thread:
+	auto* gs = lua_api::gamestate(L);
+	auto* mainL = gs->luastate();
+    int initial_mainL_top = lua_gettop(mainL);
+	int n_args = lua_gettop(L);
+	if (L == mainL) {
+		// Already on main thread? Allow through.
+		lua_call(L, n_args - 1, LUA_MULTRET);
+		return lua_gettop(L);
+	}
+	// Otherwise, we funnel over arguments:
+	for (int i = 1; i <= n_args; i++) {
+		// Write from L
+		lua_pushnumber(L, 10);
+		lua_pushvalue(L, i);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+
+		// Read from mainL
+        lua_pushnumber(mainL, 10);
+		lua_rawget(mainL, LUA_REGISTRYINDEX);
+	}
+
+	lua_call(mainL, n_args - 1, 1);
+
+	// Write from mainL
+    lua_pushnumber(mainL, 10);
+	lua_pushvalue(mainL, -2);
+	lua_rawset(mainL, LUA_REGISTRYINDEX);
+
+	// Read from L
+    lua_pushnumber(L, 10);;
+	lua_rawget(L, LUA_REGISTRYINDEX);
+
+    lua_settop(mainL, initial_mainL_top);
+	// Return read value
+	return 1;
+}
+
 static int game_resources_load(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	init_resource_data(gs->luastate());
@@ -312,6 +352,7 @@ namespace lua_api {
 
 		game["save"].bind_function(game_save);
 		game["load"].bind_function(game_load);
+		game["main_call"].bind_function(game_main_call);
 
 		game["mark_loading"].bind_function(game_mark_loading);
 		game["step"].bind_function(game_step);

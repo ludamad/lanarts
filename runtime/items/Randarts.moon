@@ -18,7 +18,7 @@ WEAPON_BASES = {
     {"Short Sword", 100, SEMIRARE, (for i=1,2 do "spr_weapons.randart_short_sword"..i)}
     -- Bludgeoning base weapons
     {"Mace", 100, COMMON, (for i=1,3 do "spr_weapons.randart_mace"..i)}
-    -- Piercing base weapons 
+    -- Piercing base weapons
     {"Short Bow", 100, SEMIRARE, {"spr_weapons.randart_shortbow"}}
     {"Long Bow", 100, RARE, {"spr_weapons.urand_krishna", "spr_weapons.longbow3"}}
     -- Unclassified base weapons
@@ -35,8 +35,8 @@ ARMOUR_BASES = {
     {"Leather Armour", 100, UNCOMMON, {"spr_armour.leather_armour3"}}
     {"Chainmail", 200, UNCOMMON / 2, {"spr_armour.chain_mail2", "spr_armour.chain_mail3"}}
     --{"Crystalline Plate", 500, RARE, {"spr_armour.crystal_plate3"}}
-    {"Platemail", 500, UNCOMMON / 5, {"spr_armour.randart_plate"}} 
-    {"Robe", 100, UNCOMMON * 2, (for i=1,2 do "spr_armour.randart_robe"..i)} 
+    {"Platemail", 500, UNCOMMON / 5, {"spr_armour.randart_plate"}}
+    {"Robe", 100, UNCOMMON * 2, (for i=1,2 do "spr_armour.randart_robe"..i)}
     -- Gloves
     {"Steel Gloves", 100, RARE, (for i=1,4 do "spr_armour.randart_glove"..i)}
     -- Boots
@@ -75,6 +75,7 @@ define_equipment_randarts = (rng, level) ->
     R[#R].chance = 100
 
 define_randarts = () ->
+    print "DEFININGING"
     rng = require("mtwist").create(HARDCODED_RANDARTS_SEED)
     RandartsUtils.clear_state()
     for level=1,MAX_POWER_LEVEL

@@ -3,6 +3,7 @@ Tasks = require "networking.Tasks"
 argparse = require "argparse"
 Display = require "core.Display"
 yaml = require "yaml"
+ResourceLoading = require "engine.ResourceLoading"
 
 load_location_is_valid = (load_file) ->
     if not load_file
@@ -23,7 +24,6 @@ parse_settings = (settings_file) ->
         catch: (err) -> error("Invalid YAML syntax:\n#{err}")
     }
     settings = {key, value for {key, value} in *raw_settings}
-    pretty_print(settings)
     return settings
 
 cached_settings = nil
@@ -46,6 +46,11 @@ engine_init = (settings) ->
     if settings.view_height == 0
         settings.view_height = screen_height
 
+    if file_exists("saves/saved_settings.yaml")
+        saved_settings = parse_settings("saves/saved_settings.yaml")
+        for k, v in pairs(saved_settings)
+            settings[k] = v
+
     if os.getenv("LANARTS_SMALL")
         settings.fullscreen = false
         settings.view_width = 800
@@ -61,23 +66,27 @@ engine_init = (settings) ->
         EngineInternal.init_gamestate_api(settings)
         require "globals.GameUtils"
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
+        EngineInternal.init_resource_data()
+        ResourceLoading.start()
     return settings
+
+settings_save = () ->
+    -- Injected into settings in further engine runs:
+    {:time_per_step, :username, :class_type, :frame_action_repeat, :regen_on_death} = settings
+    yaml_str = yaml.dump({:time_per_step, :username, :class_type, :frame_action_repeat, :regen_on_death})
+    -- ensure_directory("saves")
+    file_dump_string("saves/saved_settings.yaml", yaml_str)
 
 engine_exit = () ->
     perf.timing_print()
 
     print( "Step time: " .. string.format("%f", perf.get_timing("**Step**")) )
     print( "Draw time: " .. string.format("%f", perf.get_timing("**Draw**")) )
-
-RESOURCES_LOADED = false
+    settings_save()
 
 game_init = (load_file=nil) ->
+    settings_save()
     GameState = require("core.GameState")
-    if not RESOURCES_LOADED then with_mutable_globals () ->
-        EngineInternal.init_resource_data()
-        Engine.resources_load()
-        RESOURCES_LOADED = true
-
     -- Player config
     GameState.clear_players()
     n_players = (if os.getenv("LANARTS_CONTROLLER") then 0 else 1) + #require("core.Gamepad").ids()
@@ -134,17 +143,18 @@ main = (raw_args) ->
         return Engine.menu_start(game_start)
 
     game_start = (load_file=nil) ->
-        -- (1) Init game
-        game_init(load_file)
+        return ResourceLoading.ensure_resources_before () ->
+            -- (1) Init game
+            game_init(load_file)
 
-        -- (2) Set up input for first game step
-        GameState = require("core.GameState")
-        GameState.input_capture()
-        if not GameState.input_handle()
-            error("Game exited")
+            -- (2) Set up input for first game step
+            GameState = require("core.GameState")
+            GameState.input_capture()
+            if not GameState.input_handle()
+                error("Game exited")
 
-        -- (3) Transfer to game loop
-        return game_step()
+            -- (3) Transfer to game loop
+            return game_step()
 
     game_step = () ->
         -- (1) Load dependencies

@@ -72,6 +72,7 @@ static void engine_init_gamestate_api(LuaValue lsettings) {
         renew(&old_gs->io_controller());
         renew(&old_gs->game_world(), old_gs);
         renew(&old_gs->screens);
+        old_gs->game_state_init_data().seed = old_gs->rng().rand();
         old_gs->set_repeat_actions_counter(0);
     } else {
         //GameState claims ownership of the passed lua_State*

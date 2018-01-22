@@ -47,7 +47,7 @@ void GameSettings::parse(LuaValue& lsettings) {
     optional_fill(lsettings, "font", font);
     optional_fill(lsettings, "menu_font", menu_font);
     optional_fill(lsettings, "fullscreen", fullscreen);
-    optional_fill(lsettings, "regen_level_on_death", regen_on_death);
+    optional_fill(lsettings, "regen_on_death", regen_on_death);
     optional_fill(lsettings, "view_width", view_width);
     optional_fill(lsettings, "view_height", view_height);
     optional_fill(lsettings, "ip", ip);
