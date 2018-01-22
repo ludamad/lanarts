@@ -26,6 +26,8 @@ parse_settings = (settings_file) ->
     pretty_print(settings)
     return settings
 
+cached_settings = nil
+
 -- Adapt the settings object based on context
 -- Initialize the game state object
 engine_init = (settings) ->
@@ -55,6 +57,7 @@ engine_init = (settings) ->
     log "Initializing GameState api..."
     with_mutable_globals () ->
         setmetatable _G, nil -- Allow globals to be set
+        cached_settings = settings
         EngineInternal.init_gamestate_api(settings)
         require "globals.GameUtils"
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
@@ -101,8 +104,8 @@ main = (raw_args) ->
     parser\option "--load", "Save file to load from.", false
     args = parser\parse(raw_args)
 
-    local main, menu_start, game_start, game_step
-    main = () ->
+    local engine_main, menu_start, game_start, game_step
+    engine_main = () ->
         -- (1) Handle debug options
         if args.debug
             debug.attach_debugger()
@@ -155,6 +158,8 @@ main = (raw_args) ->
             -- Save and exit
             GameState.score_board_store()
             GameState.save(argv_configuration.save_file or "saves/savefile.save")
+            -- Allocate a fresh GameState
+            EngineInternal.init_gamestate_api(cached_settings)
             -- Go back to menu
             return menu_start()
         -- (3) If F4 is pressed, pause the game
@@ -174,7 +179,7 @@ main = (raw_args) ->
         return game_step
 
     -- Entry point
-    engine_state = main
+    engine_state = engine_main
     engine_loop = () ->
         -- Simple state machine
         Tasks.run_all()

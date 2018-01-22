@@ -5,6 +5,7 @@
 #include <csignal>
 
 #include <memory>
+#include <new>
 
 #include <lcommon/fatal_error.h>
 #include <lcommon/unittest.h>
@@ -52,6 +53,12 @@ static int engine_initialize_subsystems(lua_State *L) {
     return 0;
 }
 
+template <typename T, typename ...Args>
+void renew(T* obj, Args... args) {
+    obj->~T();
+    new (obj) T(args...);
+}
+
 static void engine_init_gamestate_api(LuaValue lsettings) {
     lua_State* L = lsettings.luastate();
     GameSettings settings; // Initialized with defaults
@@ -60,9 +67,17 @@ static void engine_init_gamestate_api(LuaValue lsettings) {
     if (!can_create_saves) {
         printf("Problem creating save directory, will not be able to create save files!\n");
     }
-    //GameState claims ownership of the passed lua_State*
-    GameState* gs = new GameState(settings, L);
-    lua_api::register_api(gs, L);
+    GameState* old_gs = lua_api::gamestate(L);
+    if (old_gs != nullptr) {
+        renew(&old_gs->io_controller());
+        renew(&old_gs->game_world(), old_gs);
+        renew(&old_gs->screens);
+        old_gs->set_repeat_actions_counter(0);
+    } else {
+        //GameState claims ownership of the passed lua_State*
+        GameState *gs = old_gs ? new(old_gs) GameState(settings, L) : new GameState(settings, L);
+        lua_api::register_api(gs, L);
+    }
 }
 
 static int engine_init_gamestate(lua_State* L) {

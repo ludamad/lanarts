@@ -132,11 +132,15 @@ function setup_start_menu()
         menu_state.load_file = "saves/savefile.save"
     end
 
-    if file_exists("saves/savefile.save") then
-        menu_state.continue = on_load_click
-    else
-        menu_state.continue = setup_settings_menu
+    local function on_continue()
+        print "ON CONTINUE"
+        if file_exists("saves/savefile.save") then
+            on_load_click()
+        else
+            setup_settings_menu()
+        end
     end
+    menu_state.continue = on_continue
 
     menu_state.menu:add_instance(
         start_menu_create( --[[New Game Button]] setup_settings_menu, --[[Join Game Button]] setup_lobby_menu,
@@ -198,7 +202,7 @@ end
 -- Shared between all menu screens
 local function menu_step()
     -- (1) Capture input
-    if not GameState.input_capture() then
+    if not GameState.input_capture(true) then
         return nil
     end
 
@@ -209,6 +213,7 @@ local function menu_step()
         rawset("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
     end
 
+    print(Keys.key_pressed(Keys.ENTER))
     -- (3) Call the menu step function
     menu_state.menu:step( {0, 0} )
 
