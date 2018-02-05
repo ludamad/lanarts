@@ -18,6 +18,7 @@
 #include "draw.h"
 #include "display.h"
 #include "Image.h"
+#include <SDL.h>
 #include <SDL_opengl.h>
 
 #include "lua_image.h"

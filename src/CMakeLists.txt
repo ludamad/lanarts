@@ -117,6 +117,7 @@ set (libraries
 	${lua_libraries}
 	luasocket
 	yaml-cpp
+        oxygine-framework
         luayaml
 	luawrap
 	lanarts_net
@@ -131,9 +132,11 @@ set (libraries
 	RVO
         #physfs-static
         libxmi
+        zlib
 	${OPENGL_gl_LIBRARY}
 	${FREETYPE_LIBRARIES}
         UnitTest++
+        png
         backward_object
         ${BACKTRADE_DEP}
         ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 

@@ -13,10 +13,17 @@
 #include "display.h"
 
 #include "opengl/gl_extensions.h"
+#include "core/gl/VideoDriverGLES20.h"
+#include "core/gl/oxgl.h"
+#include "STDRenderer.h"
+#include "STDMaterial.h"
 
-static SDL_Window* MAIN_WINDOW = NULL;
+static SDL_Window* MAIN_WINDOW = nullptr;
 static Size RENDER_SIZE;
-static SDL_Renderer* MAIN_RENDERER = NULL;
+static SDL_Renderer* MAIN_RENDERER = nullptr;
+static oxygine::IVideoDriver* oxygine_video_driver = nullptr;
+static oxygine::STDRenderer* oxygine_renderer = nullptr;
+
 
 //Set up the coordinate system x1 -> x2, y2 -> y1
 static void gl_set_world_region(double x1, double y1, double x2, double y2) {
@@ -48,9 +55,24 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
     SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
+    //SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
+    //SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+//    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+//    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
-    if (MAIN_WINDOW == NULL){
+//    SDL_GL_SetAttribute(SDL_GL_RETAINED_BACKING, 0);
+
+//    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+//    SDL_GL_SetAttribute(SDL_GL_CONTEXT_EGL, 1);
+
+//    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+
+    int flags = SDL_WINDOW_OPENGL;
+    initGLExtensions(SDL_GL_GetProcAddress);
+
+    if (MAIN_WINDOW == nullptr){
 
         SDL_CreateWindowAndRenderer(
                 w, h,
@@ -61,12 +83,11 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
         SDL_SetWindowTitle(MAIN_WINDOW, window_name);
 
     }   
-    if (MAIN_WINDOW == NULL) {
+    if (MAIN_WINDOW == nullptr) {
         fprintf(stderr, "Couldn't set GL mode: %s\n", SDL_GetError());
         SDL_Quit();
         exit(1);
     }
-    printf("CALLLED@!!!\n");
     fflush(stdout);
 
     glDisable(GL_TEXTURE_2D);
@@ -86,6 +107,15 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 
     //Set up the coordinate system 0 -> w, 0 -> h
     gl_set_world_region(0.0, 0.0, (GLdouble)RENDER_SIZE.w, (GLdouble)RENDER_SIZE.h);
+
+    oxygine_video_driver = new oxygine::VideoDriverGLES20();
+    oxygine::IVideoDriver::instance = oxygine_video_driver;
+    oxygine_renderer = new oxygine::STDRenderer(oxygine_video_driver);
+    oxygine::STDRenderer::instance = oxygine_renderer;
+    oxygine::STDMaterial::instance = new oxygine::STDMaterial(oxygine_renderer);
+    oxygine::IVideoDriver::IVideoDriver::instance->setDefaultSettings();
+    oxygine::STDRenderer::initialize();
+    glShadeModel(GL_SMOOTH);
 }
 
 static void gl_set_fullscreen(bool fullscreen) {
@@ -125,8 +155,30 @@ bool ldraw::display_is_fullscreen() {
 void ldraw::display_draw_start() {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    oxygine::STDRenderer::instance->begin(nullptr);
+    auto viewport = oxygine::Rect(
+            0, 0, RENDER_SIZE.w, RENDER_SIZE.h
+    );
+    oxygine_video_driver->setViewport(viewport);
+    oxygine_video_driver->clear(oxygine::Color(0,0,0));
+    oxygine::Material::setCurrent(nullptr);
+
+
+    oxygine::STDMaterial& mat = *oxygine::STDMaterial::instance;
+    mat.apply(0);
+
+    oxygine::Matrix proj;
+    oxygine::Matrix::orthoLH(proj, (float)viewport.getWidth(), (float)viewport.getHeight(), 0.2f, 10000);
+    oxygine::Matrix view = oxygine::makeViewMatrix(viewport.getWidth(), viewport.getHeight());
+    oxygine::Matrix vp = view * proj;
+    mat.setViewProj(vp);
 }
+
 void ldraw::display_draw_finish() {
+    oxygine::STDRenderer::instance->end();
+    oxygine::STDRenderer::instance->drawBatch();
+    oxygine::STDMaterial::instance->finish();
+
     perf_timer_begin("SDL_GL_SwapBuffers");
     SDL_GL_SwapWindow(MAIN_WINDOW);
     perf_timer_end("SDL_GL_SwapBuffers");

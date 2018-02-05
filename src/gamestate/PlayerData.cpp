@@ -49,9 +49,9 @@ void PlayerData::clear() {
 }
 
 void PlayerData::register_player(const std::string& name, PlayerInst* player,
-		const std::string& classtype, const LuaValue& input_source, bool is_local_player, int net_id) {
+		const std::string& classtype, const LuaValue& input_source, bool is_local_player, int net_id, int team) {
 	_players.push_back(PlayerDataEntry(name, player, classtype, input_source,
-									   is_local_player, net_id, /*Player index, for convenience: */ _players.size()));
+									   is_local_player, net_id, /*Player index, for convenience: */ _players.size(), team));
 }
 
 std::vector<PlayerInst*> PlayerData::players_in_level(level_id level) {

@@ -30,6 +30,8 @@
 #include "objects/ProjectileInst.h"
 #include "objects/PlayerInst.h"
 
+#include "gamestate/TeamIter.h"
+
 PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, Pos xy, team_id team, bool local) :
 		CombatGameInst(stats, sprite, xy, team, RADIUS, true, DEPTH), actions_set_for_turn(
 				false), local(local), moving(0), autouse_mana_potion_try_count(
@@ -67,6 +69,10 @@ void PlayerInst::init(GameState* gs) {
 
     CombatGameInst::init(gs);
     lua_api::event_player_init(gs->luastate(), this);
+    if (getenv("LANARTS_XP")) {
+        int xp = atoi(getenv("LANARTS_XP"));
+        stats().gain_xp(xp, this);
+    }
 }
 
 PlayerInst::~PlayerInst() {
@@ -121,24 +127,31 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 		if (j >= mids.size()) {
 			// Exit when we end the list if we didn't have a target
 			if (!has_target) {
-				return;
+				break;
 			}
 			j -= mids.size();
 		}
 		if (j == i && has_target) {
 			// Exit when we wrap around if we have a target
-			return;
+			break;
 		}
 		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[j]);
 		bool isvisible = e != NULL && gs->object_visible_test(e, this, false);
 		if (isvisible && e->team != team) {
 			current_target = e->id;
-			return;
+			break;
 		}
 		j++;
-
 	}
 
+	if (!has_target) {
+		for_all_enemies(gs->team_data(), this, [&](CombatGameInst *e) {
+			bool isvisible = e != NULL && gs->object_visible_test(e, this, false);
+			if (isvisible && !current_target) {
+				current_target = e->id;
+			}
+		});
+	}
 }
 
 void PlayerInst::step(GameState* gs) {

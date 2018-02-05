@@ -156,3 +156,5 @@ Engine.pre_deserialize = Engine.pre_serialize
 function Engine.post_deserialize()
 
 end
+
+return Engine

@@ -15,6 +15,9 @@
 
 #include "DrawOptions.h"
 
+#include <oxygine-framework.hpp>
+#include <res/ResAnim.h>
+
 struct GLImage {
 	GLImage() {
 		texture = 0;
@@ -52,6 +55,7 @@ struct GLImage {
 	int width, height;
 	float texw, texh;
 	GLuint texture;
+	oxygine::ResAnim anim;
 };
 
 #endif /* GLIMAGE_H_ */

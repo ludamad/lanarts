@@ -256,14 +256,14 @@ static int game_clear_players(lua_State* L) {
 	lua_api::gamestate(L)->player_data().clear();
 	return 0;
 }
-static void game_register_player(LuaStackValue name, const char* classtype, LuaValue input_source, bool is_local_player, int net_id) {
+static void game_register_player(LuaStackValue name, const char* classtype, LuaValue input_source, bool is_local_player, int net_id, int team) {
 	//const std::string& name, PlayerInst* player,
 	//const std::string& classtype, bool is_local_player, int net_id
 	//
 	lua_api::gamestate(name)->player_data().register_player(
 			name.to_str(), nullptr,
 			classtype, input_source,
-			is_local_player, net_id);
+			is_local_player, net_id, team);
 }
 
 static long garbage_collect_while_waiting(lua_State* L, long wait_micro) {

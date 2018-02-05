@@ -29,6 +29,8 @@ include_directories(
 	"${SRC}/common-lib/include"
 	"${SRC}/luawrap-lib/include"
 	${DEPS}/UnitTest++
+	${DEPS}/oxygine-framework/oxygine/src
+	${DEPS}/oxygine-framework/include/ox
 	${DEPS}/lua
 	"${DEPS}/sdl2/include"
 	"${DEPS}/sdl2-image"
@@ -39,9 +41,10 @@ include_directories(
 file(GLOB ldraw_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
     src/* 
     src/lua/* 
-    src/opengl/* 
+    src/opengl/*
     include/draw/* 
 )
+
 
 set( ldraw_examples
     examples/examples.cpp
@@ -50,9 +53,10 @@ file(GLOB ldraw_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     tests/*
 )
 
+
 add_library( ldraw
 		STATIC
-             ${ldraw_src} )
+             ${ldraw_src})
 
          message(STATUS ${SDL2_LIBRARY})
 set(LINKEDDEPS

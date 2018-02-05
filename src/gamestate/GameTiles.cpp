@@ -106,17 +106,17 @@ void GameTiles::pre_draw(GameState* gs, bool reveal_all) {
 	// Reveal all if no players present:
 	reveal_all |= gs->player_data().all_players().empty();
 
-        GLImage::start_batch_draw();
+//        GLImage::start_batch_draw();
 	for (int y = region.y1; y <= region.y2; y++) {
 		for (int x = region.x1; x <= region.x2; x++) {
 			Tile& tile = get(Pos(x, y));
 			const ldraw::Image& img = res::tile(tile.tile).img(tile.subtile);
 			if (reveal_all || was_seen(Pos(x, y))) {
-                            img.batch_draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
+                            img.draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
 			}
 		}
 	}
-        GLImage::end_batch_draw();
+//        GLImage::end_batch_draw();
 
 	perf_timer_end(FUNCNAME);
 }

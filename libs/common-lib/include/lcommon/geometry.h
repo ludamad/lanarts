@@ -96,6 +96,7 @@ struct PosF {
 	void rotate(float angle);
 	PosF rotated(float angle) const;
 	PosF scaled(float scale) const;
+	float magnitude() const;
 
 	PosF divided(float divisor) const;
 

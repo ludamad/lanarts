@@ -16,6 +16,10 @@
 
 #include "GLImage.h"
 
+#include "core/gl/VideoDriverGLES20.h"
+#include "STDRenderer.h"
+#include "STDMaterial.h"
+
 /* Utility function for conversion between SDL surfaces and GL surfaces */
 static GLuint SDL_GL_LoadTexture(SDL_Surface *surface, GLfloat *texcoord) {
 	GLuint texture;
@@ -84,6 +88,7 @@ void GLImage::initialize(const std::string& filename) {
 	if (filename.empty() || texture != 0) {
 		return;
 	}
+	anim.init(filename);
 
 	/* Load the image using SDL_image library */
 	SDL_Surface* image = IMG_Load(filename.c_str());
@@ -100,16 +105,17 @@ void GLImage::initialize(const std::string& filename) {
 	GLfloat texcoord[4];
 	texture = SDL_GL_LoadTexture(image, texcoord);
 
-        texw = texh = 0;
+    texw = texh = 0;
+
 	if (texture != NULL) {
-                texw = texcoord[2];
-                texh = texcoord[3];
+        texw = texcoord[2];
+        texh = texcoord[3];
         // If images cannot be loaded by OpenGL, error, except if in headless mode:
 	} else if (getenv("LANARTS_HEADLESS") == NULL) {
 		printf("Texture from image '%s' (%dx%d) could not be loaded\n",
 				filename.c_str(), width, height);
 		fatal_error(); // Don't fatal error for now! TODO conditional on environment variable?
-        }
+    }
 
 	/* We don't need the original image anymore */
 	SDL_FreeSurface(image);
@@ -194,10 +200,12 @@ static void gl_draw_image(GLuint texture, const Colour& c, const BBoxF& texbox,
 
 void GLImage::subimage_from_bytes(const BBox& region, char* data, int type) {
 	gl_subimage_from_bytes(*this, region, data, type);
+	anim.removeFrames();
 }
 
 void GLImage::image_from_bytes(const Size& size, char* data, int type) {
 	gl_image_from_bytes(*this, size, data, type);
+	anim.removeFrames();
 }
 
 void GLImage::draw(const ldraw::DrawOptions& options, const PosF& pos) {
@@ -219,13 +227,31 @@ void GLImage::draw(const ldraw::DrawOptions& options, const PosF& pos) {
 	}
 
 	BBoxF adjusted = adjusted_for_origin(BBoxF(PosF(), draw_region.size()),
-			options.draw_origin).scaled(options.draw_scale);
+										 options.draw_origin).scaled(options.draw_scale);
 
 	QuadF quad(adjusted, options.draw_angle);
 
-	gl_draw_image(texture, options.draw_colour.clamp(),
-			draw_region.scaled(texw / width, texh / height),
-			quad.translated(pos));
+	if (anim.getTotalFrames() > 0) {
+		oxygine::RenderState rs;
+		rs.material = oxygine::STDMaterial::instance;
+		oxygine::RectF clip = oxygine::RectF::huge();
+		rs.clip = &clip;
+        auto colour = options.draw_colour.clamp();
+        BBoxF img_region = draw_region.scaled(1.0 / width, 1.0 / height);
+        BBoxF region = adjusted.translated(pos);
+        auto& frame = anim.getFrame(0);
+		oxygine::STDMaterial::instance->doRender(frame, oxygine::Color(colour.r,colour.g,colour.b,colour.a), oxygine::blend_alpha,
+                                                 oxygine::RectF(img_region.x1, img_region.y1, img_region.width(),
+                                                                img_region.height()),
+												 oxygine::RectF(region.x1, region.y1, region.width(),
+                                                                region.height()), rs);
+
+        oxygine::STDRenderer::instance->drawBatch();
+	} else {
+		gl_draw_image(texture, options.draw_colour.clamp(),
+					  draw_region.scaled(texw / width, texh / height),
+					  quad.translated(pos));
+	}
 }
 
 

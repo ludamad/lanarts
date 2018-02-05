@@ -289,6 +289,10 @@ PosF PosF::scaled(float scale) const {
 	return PosF(x * scale, y * scale);
 }
 
+float PosF::magnitude() const {
+	return sqrtf(x * x + y + y);
+}
+
 bool PosF::operator !=(const PosF& o) const {
 	return !(*this == o);
 }
