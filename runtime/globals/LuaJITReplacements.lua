@@ -28,4 +28,3 @@ function profile(f)
     require("jit.p").stop()
     return unpack(ret)
 end
-

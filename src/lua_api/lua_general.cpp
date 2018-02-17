@@ -394,7 +394,6 @@ namespace lua_api {
                 return traceback;
         }
 
-	int read_eval_print(lua_State *L);
 
         static double round(double x) {
             return ::round(x);
@@ -407,7 +406,7 @@ namespace lua_api {
 		globals["toaddress"].bind_function(lapi_toaddress);
 		globals["rand_range"].bind_function(lapi_rand_range);
 		globals["random"].bind_function(lapi_random);
-		globals["play_sound"].bind_function(play_sound);
+        globals["play_sound"].bind_function(play_sound);
 		globals["random_seed"].bind_function(lapi_random_seed);
 		globals["randomf"].bind_function(lapi_randomf);
 		globals["random_gaussian"].bind_function(lapi_random_gaussian);
@@ -417,7 +416,6 @@ namespace lua_api {
         globals["monster_sprite"].bind_function(lapi_monster_sprite);
 		globals["cpp_traceback"].bind_function(lapi_cpp_traceback);
 
-		globals["__read_eval_print"].bind_function(read_eval_print);
 
 		LuaValue lengine = luawrap::ensure_table(globals["LEngine"]);
 		lengine["import_internal_raw"].bind_function(lengine_import_internal_raw);
@@ -431,11 +429,5 @@ namespace lua_api {
 		LuaValue string_table = luawrap::ensure_table(globals["string"]);
 		string_table["join"].bind_function(lapi_string_join);
 		string_table["pack"].bind_function(str_pack);
-
-		// Represents global, mutable data. Only module that is not serialized 'as a constant'.
-                lua_api::import(L, "InitialGlobalData").push();
-                // Get the initial global data object:
-                lua_call(L, 0, 1);
-		luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].pop();
 	}
 }

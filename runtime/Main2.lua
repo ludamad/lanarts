@@ -1,6 +1,6 @@
 -- Setup paths
-package.path = package.path .. ';dependencies/?.lua' 
-package.path = package.path .. ';dependencies/socket/?.lua' 
+package.path = package.path .. ';dependencies/?.lua'
+package.path = package.path .. ';dependencies/socket/?.lua'
 
 -- Surpress noisy input
 require("Logging").set_log_level(os.getenv("LANARTS_LOG") or "WARN")
@@ -17,7 +17,7 @@ local function main(raw_args)
     parser:option("-R --require", "Require lua modules."):count("*")
     -- Parse arguments
     local args = parser:parse(raw_args)
-    local req_call = function(modulename) 
+    local req_call = function(modulename)
         local module = require(modulename)
         if type(module) == "table" and rawget(module, "main") then
             module.main(raw_args)

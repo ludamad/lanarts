@@ -24,6 +24,7 @@ struct PlayerDataEntry {
 	MultiframeActionQueue action_queue;
 	GameInstRef player_inst;
 	std::string classtype;
+	LuaValue input_source;
 	bool is_local_player;
 	int net_id;
     int index; // Index in list, for convenience
@@ -31,9 +32,11 @@ struct PlayerDataEntry {
 	PlayerInst* player() const;
 
 	PlayerDataEntry(const std::string& player_name, GameInst* player_inst,
-					const std::string& classtype, bool is_local_player, int net_id, int index) :
+					const std::string& classtype, LuaValue input_source,
+					bool is_local_player, int net_id, int index) :
 			player_name(player_name), player_inst(player_inst), classtype(
-					classtype), is_local_player(is_local_player), net_id(net_id), index(index) {
+					classtype), input_source(input_source),
+			is_local_player(is_local_player), net_id(net_id), index(index) {
 	}
 };
 
@@ -44,7 +47,8 @@ public:
 	}
 	void clear();
 	void register_player(const std::string& name, PlayerInst* player,
-			const std::string& classtype, bool is_local_player, int net_id = 0);
+			const std::string& classtype, const LuaValue& input_source,
+						 bool is_local_player, int net_id = 0);
 
 	std::vector<PlayerDataEntry>& all_players() {
 		return _players;

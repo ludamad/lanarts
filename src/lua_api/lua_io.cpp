@@ -145,5 +145,6 @@ namespace lua_api {
 		io["directory_subfiles"].bind_function(io_directory_subfiles);
 		io["directory_subdirectories"].bind_function(io_directory_subdirectories);
 		io["directory_search"].bind_function(search_directory);
+		io["directory_ensure"].bind_function(ensure_directory);
 	}
 }

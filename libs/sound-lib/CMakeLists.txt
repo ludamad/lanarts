@@ -39,6 +39,10 @@ set(LINKEDLIBS
         SDL2-mixer
 )
 
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+    add_definitions(-s USE_OGG=1 -s USE_VORBIS=1)
+endif()
+
 #add_executable( lsound_tests main.cpp)
 #
 #target_link_libraries(lsound_tests ${LINKEDLIBS})

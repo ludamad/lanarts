@@ -3,10 +3,10 @@
 --------------------------------------------------------------------------------
 local error,setmetatable=error,setmetatable
 
-return function(--[[Optional]] dont_load_draw_globals) 
+return function(--[[Optional]] dont_load_draw_globals)
     local nilprotect_meta = {__index = function(self, k)
         error( ("Key '%s' does not exist in table!"):format(k) )
-    end}    
+    end}
     -- Set to a metatable that does not allow nil accesses
     function nilprotect(t)
         return setmetatable(t, nilprotect_meta)
@@ -14,7 +14,7 @@ return function(--[[Optional]] dont_load_draw_globals)
 
     local deadprotect_meta = {__index = function(self, k)
         error( ("Key '%s' not available, object is destroyed (only data set from Lua is available)!"):format(k) )
-    end}    
+    end}
     function deadprotect(t)
         return setmetatable(t, deadprotect_meta)
     end
@@ -79,6 +79,14 @@ return function(--[[Optional]] dont_load_draw_globals)
         save_file = false,
         load_file = false,
     }
+
+    function with_mutable_globals(f)
+        local meta = getmetatable(_G)
+        setmetatable(_G, nil)
+        local ret_value = f()
+        setmetatable(_G, meta)
+        return ret_value
+    end
 
     -- Now that global variable mutation has been done, protect globals even more strongly, prevent creation of new globals:
     setmetatable(_G, {__index = function(self, k)

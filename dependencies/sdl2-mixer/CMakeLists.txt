@@ -75,6 +75,6 @@ add_library(SDL2-mixer STATIC
 	${SDLMIXER_SOURCES}
 )
 
-target_link_libraries (SDL2-mixer SDL2-static OGG vorbis)
+target_link_libraries (SDL2-mixer OGG vorbis)
 
-add_dependencies(SDL2-mixer SDL2-static OGG vorbis)
+add_dependencies(SDL2-mixer OGG vorbis)

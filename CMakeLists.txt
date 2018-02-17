@@ -3,7 +3,6 @@
 
 cmake_minimum_required(VERSION 2.6)
 
-
 if ($ENV{BUILD_OPTIMIZE})
     message("Building release... no debug symbols will be available.")
     set(CMAKE_BUILD_TYPE Relwithdebinfo)
@@ -74,6 +73,17 @@ endif()
 # Enable tests
 enable_testing()
 
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s TOTAL_MEMORY=800MB -s LEGACY_GL_EMULATION=1 -s DISABLE_EXCEPTION_CATCHING=0 -s SDL2_IMAGE_FORMATS=[\\\"png\\\"] -s GL_FFP_ONLY=1 -s GL_UNSAFE_OPTS=1 ")# -s SAFE_HEAP=1")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/runtime@/ -s GL_STATE_CACHE=1")
+    if ($ENV{BUILD_OPTIMIZE})
+        set(CMAKE_BUILD_TYPE Release)
+        add_definitions(-Oz)
+    endif()
+endif()
+
+
 add_subdirectory( dependencies ) 
 add_subdirectory( libs ) 
 add_subdirectory( src )
+

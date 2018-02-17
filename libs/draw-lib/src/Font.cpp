@@ -144,7 +144,7 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 		data.ty2 = (data.h) / pth;
 		fd->font_img.subimage_from_bytes(
 				BBox(offset, 0, offset + data.w, data.h), (char*)data.data,
-				GL_BGRA);
+				GL_RGBA);
 	}
 
 	//We don't need the face information now that the display

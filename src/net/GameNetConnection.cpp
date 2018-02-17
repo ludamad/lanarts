@@ -150,7 +150,7 @@ void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
     sb.read(name);
     sb.read(classtype);
     printf("connection affirm read\n");
-    pd.register_player(name, NULL, classtype, /* is local player */ false, sender);
+    pd.register_player(name, NULL, classtype, LuaValue(), /* is local player */ false, sender);
     printf("now there are %d players\n", (int) pd.all_players().size());
 }
 
@@ -183,7 +183,7 @@ void net_recv_game_init_data(SerializeBuffer& sb, int sender,
         sb.read(name);
         sb.read(classtype);
         sb.read_int(net_id);
-        pd.register_player(name, NULL, classtype, (i == localidx), net_id);
+        pd.register_player(name, NULL, classtype, LuaValue(), (i == localidx), net_id);
     }
 
     printf(

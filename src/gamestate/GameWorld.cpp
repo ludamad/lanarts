@@ -172,10 +172,7 @@ void GameWorld::place_player(GameMapState* map, GameInst* p) {
 }
 
 void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positions) {
-	bool flocal = (gs->game_settings().conntype == GameSettings::CLIENT);
 	GameSettings& settings = gs->game_settings();
-	GameNetConnection& netconn = gs->net_connection();
-	int myclassn = get_class_by_name(gs->game_settings().class_type);
 
 	for (int i = 0; i < gs->player_data().all_players().size(); i++) {
 		Pos position = positions.at(i);
@@ -184,8 +181,13 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 		int spriteidx = gs->rng().rand(c.sprites.size());
 
 //		if (pde.player_inst.empty()) {
-			pde.player_inst = new PlayerInst(c.starting_stats,
-					c.sprites[spriteidx], position, PLAYER_TEAM, pde.is_local_player);
+        pde.player_inst = new PlayerInst(c.starting_stats,
+                c.sprites[spriteidx], position, PLAYER_TEAM, pde.is_local_player);
+        if (!pde.input_source.empty()) {
+            pde.input_source.push();
+            LuaValue input_source = luawrap::call<LuaValue>(gs->luastate(), pde.player_inst.get());
+            dynamic_cast<PlayerInst&>(*pde.player_inst.get()).input_source().value = input_source;
+        }
 //		}
 		printf("Spawning for player %d: %s\n", i,
 			   pde.is_local_player ? "local player" : "network player");
@@ -245,7 +247,7 @@ bool GameWorld::step() {
 
 	midstep = false;
 	if (next_room_id == -2) {
-		gs->restart();
+        gs->start_game();
 		next_room_id = -1;
                 // Don't increment frame number because we're doing a new game:
                 return true;

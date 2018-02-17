@@ -118,7 +118,7 @@ void GameState::start_connection() {
 	}
 	if (settings.conntype == GameSettings::SERVER
 			|| settings.conntype == GameSettings::NONE) {
-	    player_data().register_player(settings.username, NULL, settings.class_type, /* local player */ true);
+	    player_data().register_player(settings.username, NULL, settings.class_type, LuaValue(), /* local player */ true);
             // Hardcoded for now:
             int n_extra_players = gamepad_states().size();
             if (getenv("LANARTS_CONTROLLER")) {
@@ -133,7 +133,7 @@ void GameState::start_connection() {
             for (int i = 0 ; i < n_extra_players; i++) {
                 std::string p = "Player ";
                 p += char('0' + (i+2)); // Start at 'player 2'
-                player_data().register_player(p, NULL, classes[i%4], /* local player */ true);
+                player_data().register_player(p, NULL, classes[i%4], LuaValue(), /* local player */ true);
             }
 	}
 }
@@ -159,7 +159,7 @@ static void _event_log_initialize(GameState* gs, GameSettings& settings) {
 	event_log_initialize(gs, input_log, output_log);
 }
 
-bool GameState::start_game() {
+bool GameState::init_game() {
     if (settings.conntype == GameSettings::SERVER) {
         init_data.frame_action_repeat = settings.frame_action_repeat;
         init_data.network_debug_mode = settings.network_debug_mode;
@@ -195,62 +195,6 @@ bool GameState::start_game() {
     base_rng_state.init_genrand(init_data.seed);
 
     screens.clear(); // Clear previous screens
-
-    if (is_loading_save()) {
-        // is_loading_save() is true if and only if lua_core_GameState.cpp#game_load is called
-        // we set it to false here to treat further restarts per usual
-        is_loading_save() = false;
-        /* We are loading a game -- don't reinit game state */
-        return true;
-    }
-    int n_local_players = 0;
-    for (PlayerDataEntry &player: player_data().all_players()) {
-        if (player.is_local_player) {
-            n_local_players++;
-        }
-    }
-    // Number of split-screens tiled together
-    int n_x = 1, n_y = 1;
-    if (n_local_players <= 2) {
-        n_x = n_local_players;
-    } else if (n_local_players <= 4) {
-        // More than 2, less than 4? Try 2x2 tiling
-        n_x = 2, n_y = 2;
-    } else if (n_local_players <= 6) {
-        n_x = 3, n_y = 2;
-    } else {
-        LANARTS_ASSERT(n_local_players <= 9);
-        // Last resort, Try 3x3 tiling
-        n_x = 3, n_y = 3;
-    }
-
-    const int WIDTH = settings.view_width / n_x;
-    const int HEIGHT = settings.view_height / n_y; // / N_PLAYERS;
-    std::vector<BBox> bounding_boxes;
-    for (PlayerDataEntry &player: player_data().all_players()) {
-        const int x1 = (player.index % n_x) * WIDTH, y1 = (player.index / n_x) * HEIGHT;
-        bounding_boxes.push_back(BBox {x1, y1, x1 + WIDTH, y1 + HEIGHT});
-    }
-    if (bounding_boxes.size() == 3) {
-        bounding_boxes[1] = {WIDTH, 0, settings.view_width, settings.view_height};
-    }
-
-    for (PlayerDataEntry& player: player_data().all_players()) {
-        if (!player.is_local_player) {
-            continue;
-        }
-        BBox b = bounding_boxes.at(player.index);
-        screens.add({-1, // index placeholder
-            GameHud {
-                BBox(b.x2 - GAME_SIDEBAR_WIDTH, b.y1, b.x2, b.y2),
-                BBox(b.x1, b.y1, b.x2 - GAME_SIDEBAR_WIDTH, b.y2)
-            }, // hud
-            GameView {0, 0, b.width() - GAME_SIDEBAR_WIDTH, b.height()}, // view
-            b, // window_region
-            player.index, // focus player id
-        });
-    }
-    restart();
     return true;
 }
 
@@ -394,7 +338,7 @@ void GameState::renew_game_timestamp() {
 	_game_timestamp = systime;
 }
 
-void GameState::restart() {
+void GameState::start_game() {
         //// Restart RNG:
         //const char* FIXED_SEED = getenv("LANARTS_SEED");
         //if (FIXED_SEED == NULL) {
@@ -403,25 +347,75 @@ void GameState::restart() {
         //    init_data.seed = atoi(FIXED_SEED);
         //}
 	//printf("Seed used for RNG = 0x%X\n", init_data.seed);
+    int n_local_players = 0;
+    for (PlayerDataEntry &player: player_data().all_players()) {
+        if (player.is_local_player) {
+            n_local_players++;
+        }
+    }
+    // Number of split-screens tiled together
+    int n_x = 1, n_y = 1;
+    if (n_local_players <= 2) {
+        n_x = n_local_players;
+    } else if (n_local_players <= 4) {
+        // More than 2, less than 4? Try 2x2 tiling
+        n_x = 2, n_y = 2;
+    } else if (n_local_players <= 6) {
+        n_x = 3, n_y = 2;
+    } else {
+        LANARTS_ASSERT(n_local_players <= 9);
+        // Last resort, Try 3x3 tiling
+        n_x = 3, n_y = 3;
+    }
+
+    // Reset screens:
+    const int WIDTH = settings.view_width / n_x;
+    const int HEIGHT = settings.view_height / n_y; // / N_PLAYERS;
+    std::vector<BBox> bounding_boxes;
+    for (PlayerDataEntry &player: player_data().all_players()) {
+        const int x1 = (player.index % n_x) * WIDTH, y1 = (player.index / n_x) * HEIGHT;
+        bounding_boxes.push_back(BBox {x1, y1, x1 + WIDTH, y1 + HEIGHT});
+    }
+    if (bounding_boxes.size() == 3) {
+        bounding_boxes[1] = {WIDTH, 0, settings.view_width, settings.view_height};
+    }
+
+    screens.clear();
+    for (PlayerDataEntry& player: player_data().all_players()) {
+        if (!player.is_local_player) {
+            continue;
+        }
+        BBox b = bounding_boxes.at(player.index);
+        screens.add({-1, // index placeholder
+                     GameHud {
+                             BBox(b.x2 - GAME_SIDEBAR_WIDTH, b.y1, b.x2, b.y2),
+                             BBox(b.x1, b.y1, b.x2 - GAME_SIDEBAR_WIDTH, b.y2)
+                     }, // hud
+                     GameView {0, 0, b.width() - GAME_SIDEBAR_WIDTH, b.height()}, // view
+                     b, // window_region
+                     player.index, // focus player id
+                    });
+    }
+
         // Reset game world state:
         loop("sound/overworld.ogg");
 	if (game_world().number_of_levels() > 0) {
 		game_world().reset();
 	}
-        // Reset player data state:
-        player_data().reset();
-        // Initialize event log for first_map_create:
+    // Reset player data state:
+    player_data().reset();
+    // Initialize event log for first_map_create:
 	renew_game_timestamp();
 	_event_log_initialize(this, settings);
 	luawrap::globals(L)["Engine"]["first_map_create"].push();
 	int levelid = luawrap::call<LuaValue>(L)["_id"].to_int();
-        luawrap::globals(L)["table"]["copy"].push();
-        lua_api::import(L, "InitialGlobalData").push();
-        // Get the initial global data:
-        lua_call(L, 0, 1);
-        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
-        // Perform the copy:
-        lua_call(L, 2, 0);
+    luawrap::globals(L)["table"]["copy"].push();
+    lua_api::import(L, "InitialGlobalData").push();
+    // Get the initial global data:
+    lua_call(L, 0, 1);
+    luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
+    // Perform the copy:
+    lua_call(L, 2, 0);
 	set_level(game_world().get_level(levelid));
 //		set_level(game_world().get_level(0, true));
 

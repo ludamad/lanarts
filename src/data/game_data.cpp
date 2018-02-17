@@ -24,6 +24,8 @@
 #include "stats/items/WeaponEntry.h"
 #include "stats/items/WeaponEntry.h"
 
+#include "gamestate/GameState.h"
+
 #include "data/ResourceDataSet.h"
 
 #include "game_data.h"
@@ -179,7 +181,11 @@ static void __lua_init(lua_State* L, T& t) {
 }
 
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames);
-void init_game_data(lua_State* L) {
+int init_resource_data(lua_State *L) {
+	GameState* gs = lua_api::gamestate(L);
+	// Initialize fonts specified in settings
+	res::font_primary().initialize(gs->game_settings().font, 10);
+	res::font_menu().initialize(gs->game_settings().menu_font, 20);
     game_class_data.init(L);
     game_effect_data.init(L);
 	game_item_data.init(L);
@@ -213,6 +219,7 @@ void init_game_data(lua_State* L) {
     D["projectile_create"].bind_function(lapi_data_create_projectile);
     D["equipment_create"].bind_function(lapi_data_create_equipment);
     D["weapon_create"].bind_function(lapi_data_create_weapon);
+	return 0;
 }
 
 static void luayaml_push(LuaValue& value, lua_State* L, const char* name) {

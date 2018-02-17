@@ -112,7 +112,7 @@ namespace lua_api {
 	}
 
 	// Register all the lanarts API functions and types
-	static void register_gamestate(GameState* gs, lua_State* L) {
+	void register_gamestate(GameState* gs, lua_State* L) {
 		lua_pushlightuserdata(L, (void*)(GAMESTATE_KEY));
 		lua_pushlightuserdata(L, gs);
 		lua_settable(L, LUA_REGISTRYINDEX);
@@ -196,15 +196,16 @@ namespace lua_api {
 		register_lua_core_Keyboard(L);
 		register_lua_core_Gamepad(L);
 		register_lua_core_GameActions(L);
-                register_lua_core_MiscSpellAndItemEffects(L);
-                register_lua_core_Mouse(L);
+		register_lua_core_MiscSpellAndItemEffects(L);
+		register_lua_core_Mouse(L);
+		register_lua_core_EngineInternal(L);
+		register_general_api(L);
 	}
 
 	// Register all the lanarts API functions and types
         // TODO properly rename after gutting
 	void register_api(GameState* gs, lua_State* L) {
 		register_gamestate(gs, L);
-		register_general_api(L);
 		lua_effectivestats_bindings(gs, L);
 		lua_combatstats_bindings(gs, L);
 
@@ -212,6 +213,12 @@ namespace lua_api {
         register_lua_core_Mouse(L);
 		register_lua_core_Serialization(L);
 		register_lua_core_GameState(L);
+        // core.GlobalData:
+        // Represents global, mutable game data. Only module that is not serialized 'as a constant'.
+        lua_api::import(L, "InitialGlobalData").push();
+        // Get the initial global data object:
+        lua_call(L, 0, 1);
+        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].pop();
 	}
 
 	void luacall_post_draw(lua_State* L) {

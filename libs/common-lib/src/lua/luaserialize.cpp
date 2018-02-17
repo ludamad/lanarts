@@ -95,24 +95,24 @@ void LuaSerializeContext::encode_table(int idx) {
             type_name = lua_typename(L, lua_type(L, -1));
 			//printf("ENCODING '%s' as '%s'\n", lua_tostring(L, -2), lua_typename(L, lua_type(L, -1)));
 		}
-//        LuaValue k{L, -2};
-//        LuaValue v{L, -1};
+        LuaValue k{L, -2};
+        LuaValue v{L, -1};
 		encode(-2);
-//        try {
+        try {
         encode(-1);
-//        } catch (...) {
-//            //
-//            printf("Error occurred -- dumping Lua object at %d\n", idx);
-//            lua_getglobal(L, "pretty_table_safe");
-//            k.push();
-//            lua_call(L, 1, 0);
-//            printf("Value\n");
-//            lua_getglobal(L, "pretty_table_safe");
-//            v.push();
-//            lua_call(L, 1, 0);
-//            //
-//            throw;
-//        };
+        } catch (...) {
+            //
+            printf("Error occurred -- dumping Lua object at %d\n", idx);
+            lua_getglobal(L, "pretty_table_safe");
+            k.push();
+            lua_call(L, 1, 0);
+            printf("Value\n");
+            lua_getglobal(L, "pretty_table_safe");
+            v.push();
+            lua_call(L, 1, 0);
+            //
+            throw;
+        };
 		lua_pop(L, 1);
 	}
 	buffer->write_byte(LS_TABLE_END_SENTINEL);
@@ -472,7 +472,15 @@ void LuaSerializeContext::decode_ref_name() {
 void LuaSerializeContext::store_object(int idx) {
 	//printf("LOADING %d AS %s\n", (int)next_decode_index, lua_typename(L, lua_type(L, idx)));
 	lua_pushvalue(L, idx);
-	lua_rawseti(L, this->index_to_obj, next_decode_index++);
+    int object_index = next_decode_index;
+    // Update index -> object map
+	lua_rawseti(L, this->index_to_obj, object_index);
+    // Update object -> index map
+    lua_pushvalue(L, idx);
+    lua_pushnumber(L, object_index);
+    lua_rawset(L, this->obj_to_index);
+    // Move to next decode index:
+    next_decode_index++;
 }
 
 void LuaSerializeContext::decode_ref_metamethod() {
@@ -559,6 +567,17 @@ void LuaSerializeConfig::decode(SerializeBuffer& serializer, LuaValue& value) {
 	context.decode(value);
 	sync_indices(context);
 	lua_pop(L, 4);
+    const char* str = NULL;
+	if (!value.empty() && !value.isnil()) { // DEBUG LOOKUPS
+		this->obj_to_index.push();
+		value.push();
+		lua_gettable(L, -2);
+		if (lua_isstring(L, -1)) {
+			str = lua_tostring(L, -1);
+			printf("DECODING AS INDEX '%s'\n", str);
+		}
+		lua_pop(L, 1);
+	}
     decode_keys(serializer, value);
 }
 
@@ -590,4 +609,6 @@ void LuaSerializeConfig::reset() {
      context_object.push();
      lua_table_clear(L, -1);
      lua_pop(L, 1);
+
+	next_encode_index = 1, next_decode_index = 1;
 }

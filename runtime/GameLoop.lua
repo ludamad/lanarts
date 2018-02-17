@@ -27,7 +27,7 @@ function M.exit_game()
 end
 
 local HEADLESS = os.getenv("LANARTS_HEADLESS")
-local function game_loop_body(steponly)
+function M.game_step(steponly)
     if HEADLESS then
         steponly = true
     end
@@ -44,10 +44,10 @@ local function game_loop_body(steponly)
         GameState.draw()
         perf.timing_end("**Draw**")
     end
-    
+
     perf.timing_begin("**Step**")
-    if not M.loop_control.game_is_paused and not GameState.step() then 
-        return false 
+    if not M.loop_control.game_is_paused and not GameState.step() then
+        return false
     end
     perf.timing_end("**Step**")
 
@@ -62,14 +62,14 @@ local function game_loop_body(steponly)
     -- ROBUSTNESS
     -- Will be called after a game restarts during step event, but for a newly generated game world.
     -- See robustness note below which assures that each run has the same ordering of input_handle's.
-    if not GameState.input_handle() then 
-        return false 
+    if not GameState.input_handle() then
+        return false
     end
 
     local surplus = settings.time_per_step - timer:get_milliseconds()
 
     perf.timing_begin("**Surplus**")
-    if not HEADLESS then 
+    if not HEADLESS and not __EMSCRIPTEN then
         GameState.wait(surplus)
     end
     perf.timing_end("**Surplus**")
@@ -98,7 +98,7 @@ function M.overlay_draw()
     fps_count = fps_count + frame_increase
 
     if fps then
-        local w,h = unpack( Display.display_size ) 
+        local w,h = unpack( Display.display_size )
         Fonts.small:draw( {origin=Display.RIGHT_BOTTOM}, {w, h}, "FPS: " .. math.floor(fps) )
     end
 
@@ -109,76 +109,6 @@ function M.overlay_draw()
         fps_count = 0
     end
     --HelpOverlay.draw()
-end
-
-function M.run_loop()
-    M.loop_control.startup_function()
-
-    GameState.input_capture()
-    if require("tests.main").testcase then
-        require("tests.main").testcase:game_start()
-    end
-    if argv_configuration.load_file then -- Global from GlobalVariableSetup.lua
-        if file_exists(argv_configuration.load_file) then
-            GameState.load(argv_configuration.load_file)
-        else
-            error("'" .. argv_configuration.load_file .. "' does not exist!")
-        end
-    end
-
-    -- ROBUSTNESS
-    -- Since when a game restarts, an input_handle is called during game_loop_body after step(),
-    -- we call input_handle here for reproducibility.
-    if not GameState.input_handle() then 
-        return false 
-    end
-
-    while true do 
-        local single_player = (settings.connection_type == Network.NONE)
-    
-        -- TODO fix hotloading
-        -- Crashes with unknown effects
-        -- if Keys.key_pressed(Keys.F2) and single_player then 
-        --     GameState.resources_load()
-        -- end
-    
-        if Keys.key_pressed(Keys.F4) then 
-            M.loop_control.game_is_paused = not M.loop_control.game_is_paused
-        end
-
-        if Keys.key_pressed(Keys.ESCAPE) then 
-            for _ in screens() do
-                EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
-            end
-        end
-
-        local steponly = (GameState.frame % settings.steps_per_draw ~= 0)
-        if not game_loop_body(steponly) then
-            if single_player then
-                GameState.score_board_store()
-                GameState.save(argv_configuration.save_file or "saves/savefile.save")
-            end
-            break
-        end
-
-        if M.loop_control.game_is_over then
-            break
-        end
-
-        if Keys.key_pressed(Keys.F5) then -- or Network.should_send_sync_message() then
-            GameState.input_capture(true) -- reset input
-            Network.sync_message_send()
-        end
-    end
-
-    perf.timing_print()
-
-    print( "Step time: " .. string.format("%f", perf.get_timing("**Step**")) )
-    print( "Draw time: " .. string.format("%f", perf.get_timing("**Draw**")) )
-
-    if argv_configuration.load_file then
-        os.exit()
-    end
 end
 
 return M

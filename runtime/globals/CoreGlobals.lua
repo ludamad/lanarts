@@ -1,11 +1,11 @@
 --- General convenience global functions.
 -- IE, utility code that was decided makes Lua programming in general easier.
--- 
--- Additional (potentially more domain-specific) global functins are define in the 
--- 'globals' module in this package, as well as the 'globals' folder within a module, 
+--
+-- Additional (potentially more domain-specific) global functins are define in the
+-- 'globals' module in this package, as well as the 'globals' folder within a module,
 -- or its Globals.lua submodule.
 
---- Does nothing. 
+--- Does nothing.
 --@usage dummy_object = { step = do_nothing, draw = do_nothing }
 function do_nothing() end
 _EMPTY_TABLE = {}
@@ -31,7 +31,7 @@ end
 
 --- Wraps a function around a memoizing weak table.
 -- Function results will be stored until they are no longer referenced.
--- 
+--
 -- Note: This is intended for functions returning heavy-weight objects,
 -- such as images. Functions that return primitives will not interact
 -- correctly with the garbage collection.
@@ -39,7 +39,7 @@ end
 -- @param func the function to memoize, arguments must be strings or numbers
 -- @param separator <i>optional, default ';'</i>, the separator used when joining arguments to form a string key
 -- @usage new_load = memoized(load)
-function memoized(func, --[[Optional]] separator) 
+function memoized(func, --[[Optional]] separator)
     local cache = {}
     -- TODO should we use weak tables? Better to limit usage, explicit clearing, etc
     --setmetatable( cache, {__mode = "kv"} ) -- Make table weak
@@ -49,12 +49,38 @@ function memoized(func, --[[Optional]] separator)
     return function(...)
         local key = table.concat({...}, separator)
 
-        if not cache[key] then 
+        if not cache[key] then
             cache[key] = func(...)
         end
 
         return cache[key]
     end
+end
+
+local function call(f, ...)
+    if not f then return nil end
+    return f(...)
+end
+
+--- Yield if running in a Task
+function yield_point(...)
+    if coroutine.running() then
+        return coroutine.yield(...)
+    end
+    return call(...)
+end
+
+function try(args)
+    assert(args["do"] and args.catch, "try() requires 'do' & 'catch' fields")
+    local ok, result = pcall(args["do"])
+    if not ok then
+        -- Catch the error
+        args.catch(result)
+    end
+    if args.finally then
+        args.finally()
+    end
+    return result
 end
 
 --- Get a  human-readable string from a lua value. The resulting value is generally valid lua.
@@ -87,11 +113,11 @@ function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Op
     local parts = {"{", --[[sentinel for remove below]] ""}
 
     for k,v in pairs(val) do
-        table.insert(parts, packed and "" or "\n") 
+        table.insert(parts, packed and "" or "\n")
 
         if type(k) == "number" then
             table.insert(parts, pretty_tostring(v, tabs+1, packed))
-        else 
+        else
             table.insert(parts, pretty_tostring(k, tabs+1, packed, false))
             table.insert(parts, " = ")
             table.insert(parts, pretty_tostring(v, type(v) == "table" and tabs+1 or 0, packed))
@@ -148,7 +174,7 @@ end
 function pretty(...)
     local args = {}
     for i=1,select("#", ...) do
-    	args[i] = pretty_tostring_compact(select(i, ...)) 
+    	args[i] = pretty_tostring_compact(select(i, ...))
 	end
     print(unpack(args))
 end
@@ -173,7 +199,7 @@ end
 --- Like a functional map of a function onto a list
 function map_call(f, list)
     local ret = {}
-    for i=1,#list do 
+    for i=1,#list do
         ret[i] = f(list[i])
     end
     return ret
@@ -181,10 +207,10 @@ end
 
 -- Functional composition
 function func_apply_and(f1,f2, --[[Optional]] s2)
-    return function(s1,...) 
+    return function(s1,...)
         local v = {f1(s1,...)}
         if not v[1] then return unpack(v)
-        else 
+        else
             if s2 then return f2(s2, ...)
             else return f2(s1,...) end
         end
@@ -196,10 +222,10 @@ function func_apply_not(f)
 end
 
 function func_apply_or(f1,f2, --[[Optional]] s2)
-    return function(s1,...) 
+    return function(s1,...)
         local v = {f1(s1,...)}
         if v[1] then return unpack(v)
-        else 
+        else
             if s2 then return f2(s2, ...)
             else return f2(s1,...) end
         end
@@ -209,9 +235,9 @@ end
 function func_apply_sequence(f1,f2,--[[Optional]] s2)
     return function(s1,...)
         local v = f1(s1,...)
-        if s2 then v = f2(s2, ...) or v 
+        if s2 then v = f2(s2, ...) or v
         else v = f2(s1,...) or v end
-        return v 
+        return v
     end
 end
 
@@ -269,7 +295,7 @@ function newtype(args)
 
     function type.isinstance(obj)
         local otype = getmetatable(obj)
-        while otype ~= nil do 
+        while otype ~= nil do
             if otype == type then
                 return true
             end
@@ -324,7 +350,7 @@ local function gamevar(var, default)
     local val = GlobalData[var]
     if val == nil then
         return default
-    else 
+    else
         return val
     end
 end

@@ -34,7 +34,7 @@ public:
 
   static const size_t FANOUT = Fanout;
   static const size_t PAGE_CHUNKS = PageChunks;
-  static const size_t PAGE_SIZE = Fanout * PageChunks;
+  static const size_t _PAGE_SIZE = Fanout * PageChunks;
 
   // Returns parent index for the given child index.
   // Child index must be greater than 0.

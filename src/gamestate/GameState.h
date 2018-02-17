@@ -87,7 +87,7 @@ public:
 
 	/* Call after construction, before game starts
 	 * Returns false on failure */
-	bool start_game();
+	bool init_game();
 
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
@@ -278,7 +278,7 @@ public:
 
 	int game_timestamp();
 	void renew_game_timestamp();
-	void restart();
+	void start_game();
 
 	CollisionAvoidance& collision_avoidance();
 
