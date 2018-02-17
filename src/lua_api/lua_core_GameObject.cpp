@@ -205,7 +205,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LuaValue meta = lua_gameinst_base_metatable(L);
 
     LuaValue getters = luameta_getters(meta);
-    LuaValue setters = luameta_getters(meta);
+    LuaValue setters = luameta_setters(meta);
 	luawrap::bind_getter(getters["vx"], &CombatGameInst::vx);
         luawrap::bind_getter(getters["vy"], &CombatGameInst::vy);
 	luawrap::bind_getter(getters["is_resting"], &CombatGameInst::is_resting);
@@ -380,7 +380,7 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(methods, within_field_of_view, OBJ->within_field_of_view(luawrap::get<Pos>(L, 2)));
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_focus_player(lua_api::gamestate(L)));
 	LUAWRAP_GETTER(methods, can_benefit_from_rest, OBJ->can_benefit_from_rest());
-	LUAWRAP_METHOD(methods, gain_xp, players_gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
+	LUAWRAP_METHOD(methods, gain_xp, OBJ->stats().gain_xp(luawrap::get<int>(L,2), OBJ));;//players_gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
 
     methods["apply_melee_cooldown"].bind_function(apply_melee_cooldown);

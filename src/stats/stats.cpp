@@ -42,8 +42,8 @@ void CoreStats::heal_hp(float hpgain, int maxhp) {
 		hp += floor(hp_regened);
 		hp_regened -= floor(hp_regened);
 	}
-	if (hp > maxhp)
-		hp = maxhp;
+	if (hp > maxhp - hp_bleed)
+		hp = maxhp - hp_bleed;
 
 	event_log("CoreStats::heal hpgain=%f, hp_regened=%f, hp=%d of %d\n", hpgain, hp_regened, hp, max_hp);
 
@@ -61,8 +61,8 @@ void CoreStats::heal_mp(float mpgain, int maxmp) {
 		mp_regened -= floor(mp_regened);
 	}
 
-	if (mp > maxmp)
-		mp = maxmp;
+	if (mp > maxmp - mp_bleed)
+		mp = maxmp - mp_bleed;
 
 	event_log("CoreStats::healmp mpgain=%f, mp_regened=%f, mp=%d of %d\n", mpgain, mp_regened, mp, max_mp);
 }

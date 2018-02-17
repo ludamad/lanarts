@@ -14,8 +14,8 @@ inline void for_all_enemies(TeamData& td, level_id level, team_id team, Function
         if (i == team) {
             continue; // Skip own team
         }
-        LANARTS_ASSERT(level >= 0 && level < td.teams[i].per_level_data.size());
-        auto& objs = td.teams[i].per_level_data[level];
+        //LANARTS_ASSERT(level >= 0 && lev  el < td.teams[i].per_level_data.size());
+        auto& objs = td.teams[i].get(level);
         for (CombatGameInst* e : objs) {
             if (e->is_ghost()) {
                 continue; // Skip ghosts

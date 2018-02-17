@@ -72,7 +72,7 @@ CombatGameInst* get_nearest_visible_enemy(GameState* gs, CombatGameInst* inst) {
             }
         }
     );
-    return dynamic_cast<CombatGameInst*>(closest_game_inst);
+    return closest_game_inst;
 }
 
 

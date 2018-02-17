@@ -135,7 +135,7 @@ local function ChargeCallback(_, caster)
             --            local chance = math.max(25, 100 - num * 20)
             --if rand_range(0, 100) < chance then -- decreasing chance of knockback
             local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)
-                local thrown = mon:add_effect("Thrown", 10 + 10 * str_diff)
+                local thrown = mon:add_effect("Thrown", 40) -- + 10 * str_diff)
                 thrown.angle = vector_direction(caster.xy, mon.xy)
                 for _ in screens() do 
                     if caster:is_local_player() then

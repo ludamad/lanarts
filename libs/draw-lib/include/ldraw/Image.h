@@ -15,8 +15,6 @@
 
 #include "DrawOptions.h"
 #include "DrawableBase.h"
-#include "GLImage.h"
-
 #include "ldraw_assert.h"
 
 struct GLImage;

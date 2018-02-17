@@ -10,7 +10,10 @@ MAGE_START_STATS = {
     magic: 7,
     equipment: {
         gold: 0
-        inventory: {{item: "Mana Potion"}}
+        inventory: {
+            {item: "Mana Potion"},
+            {item: "Stripe Boots", equipped: true}
+        }
     }
 }
 MAGE_GAIN_STATS = {

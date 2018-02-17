@@ -14,6 +14,11 @@
 #include "Image.h"
 #include "GLImage.h"
 
+#include "opengl/GLGridAtlas.h"
+
+//static GLGridAtlas _atlas(32, 32, 50, 50);
+//static int n_alloc;
+
 static BBoxF fullimagebounds(const smartptr<GLImage>& image) {
 	return BBoxF(0, 0, image->width, image->height);
 }
@@ -32,6 +37,11 @@ void Image::initialize(const std::string& filename, const BBoxF& draw_region,
 	} else {
 		_draw_region = draw_region;
 	}
+//    if (_draw_region.width() == 32 && _draw_region.height() == 32) {
+//        _atlas.allocate(filename, draw_region, _image, _draw_region);
+//        n_alloc++;
+//        printf("GOT %d ALLOCATED\n", n_alloc);
+//    }
 	_rotates = rotates;
 }
 
