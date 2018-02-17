@@ -567,17 +567,6 @@ void LuaSerializeConfig::decode(SerializeBuffer& serializer, LuaValue& value) {
 	context.decode(value);
 	sync_indices(context);
 	lua_pop(L, 4);
-    const char* str = NULL;
-	if (!value.empty() && !value.isnil()) { // DEBUG LOOKUPS
-		this->obj_to_index.push();
-		value.push();
-		lua_gettable(L, -2);
-		if (lua_isstring(L, -1)) {
-			str = lua_tostring(L, -1);
-			printf("DECODING AS INDEX '%s'\n", str);
-		}
-		lua_pop(L, 1);
-	}
     decode_keys(serializer, value);
 }
 

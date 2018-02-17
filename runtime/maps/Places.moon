@@ -131,15 +131,20 @@ Arena = newtype {
     tileset: TileSets.lair
     -- Called before compile() is called 
     generate: (args) =>
-        enemies = args.enemies or loadstring(os.getenv "ARENA_ENEMIES")() or {}
+        enemies = args.enemies or {} -- loadstring(os.getenv "ARENA_ENEMIES")() or {}
         for enemy, amount in pairs enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)
                 MapUtils.spawn_enemy(@map, enemy, sqr)
-        items = args.items or loadstring(os.getenv "ARENA_ITEMS")() or {}
+        items = args.items or {} -- {"Health Potion": 4} -- loadstring(os.getenv "ARENA_ITEMS")() or {}
         for type, amount in pairs items
             sqr = MapUtils.random_square(@map, nil)
             MapUtils.spawn_item(@map, type, amount, sqr)
+
+        for i=1,0
+            item = ItemUtils.randart_generate(2)
+            sqr = MapUtils.random_square(@map, nil)
+            MapUtils.spawn_item(@map, item.type, item.amount, sqr)
 }
 
 

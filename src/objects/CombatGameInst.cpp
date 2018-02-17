@@ -68,7 +68,7 @@ bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker
 
     if (core_stats().hurt(dmg)) {
         die(gs);
-        if (attacker != NULL && team != PLAYER_TEAM) {
+        if (attacker != NULL && team != PLAYER_TEAM && !dynamic_cast<PlayerInst*>(this)) {
             attacker->signal_killed_enemy();
             PlayerData& pc = gs->player_data();
             double xpworth = this->xpworth();
@@ -83,7 +83,8 @@ bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker
 
             int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
 
-            players_gain_xp(gs, amnt);
+            attacker->stats().gain_xp(amnt, attacker);
+            //players_gain_xp(gs, amnt);
             char buffstr[32];
             if (xpworth == 0) {
                 snprintf(buffstr, 32, "STALE", amnt);
@@ -102,7 +103,14 @@ bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker
             new AnimatedInst(ipos(), -1, 25, PosF(-1,-1), PosF(), AnimatedInst::DEPTH,
                              format("%d", dmg), Colour(255, 148, 120)));
 
-    cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
+    if (dynamic_cast<PlayerInst*>(attacker)) {
+        // Damage from player causes hurt cooldown
+        cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
+        if (dynamic_cast<PlayerInst*>(this)) {
+            // Damage from player to player bleeds (causes max_hp loss)
+            core_stats().hp_bleed += fdmg;
+        }
+    }
     gs->set_level(prev_level);
     return false;
 }
@@ -536,11 +544,11 @@ void CombatGameInst::init(GameState* gs) {
     // Make sure current_floor is set before adding to team:
     gs->team_data().add(this);
 
-    if (team == PLAYER_TEAM && !_paths_to_object) {
+    if ((dynamic_cast<PlayerInst*>(this)) && !_paths_to_object) {
         _paths_to_object = new FloodFillPaths();
 	paths_to_object().initialize(gs->tiles().solidity_map());
     }
-    if (team == PLAYER_TEAM && !field_of_view) {
+    if ((dynamic_cast<PlayerInst*>(this)) && !field_of_view) {
         field_of_view = new fov();
     }
 }
@@ -782,7 +790,8 @@ void CombatGameInst::gain_xp_from(GameState* gs, CombatGameInst* inst, float dx,
 
     int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
 
-    players_gain_xp(gs, amnt);
+    stats().gain_xp(amnt * 15, this);
+    //players_gain_xp(gs, amnt);
     if (xpworth == 0) {
         snprintf(buffstr, 32, "STALE", amnt);
     } else {

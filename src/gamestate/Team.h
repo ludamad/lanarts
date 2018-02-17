@@ -54,6 +54,12 @@ struct Team {
     std::vector<TeamLevelData> per_level_data;
     // If the team has players:
     TeamPlayerData player_data;
+    TeamLevelData& get(int i) {
+        if (per_level_data.size() <= i) {
+            per_level_data.resize(i + 1);
+        }
+        return per_level_data[i];
+    }
     void serialize(GameState* gs, SerializeBuffer& buffer);
     void deserialize(GameState* gs, SerializeBuffer& buffer);
 };

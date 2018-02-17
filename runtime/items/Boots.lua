@@ -82,7 +82,7 @@ Data.equipment_create {
     spr_item = "spr_boots.boots3_stripe",
 
     stat_bonuses = {
-        defence = 2,
+        --defence = 2,
         spell_velocity_multiplier = 1.50
     }
 }

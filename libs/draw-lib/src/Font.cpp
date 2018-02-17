@@ -235,7 +235,8 @@ static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
 			options.draw_origin);
 
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, font.font_img.texture);
+	glBindTexture(GL_TEXTURE_2D, font.font_img.texture_);
+
 
 	const Colour& c = options.draw_colour;
 	glColor4ub(c.r, c.g, c.b, c.a);

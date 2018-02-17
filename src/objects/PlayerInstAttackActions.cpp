@@ -400,7 +400,7 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
                 int vx, vy;
                 GameInst* closest = get_nearest_visible_enemy(gs, this);
 
-                if (closest
+                    if (closest
                         && decide_attack_movement(ipos(), closest->ipos(),
                                 TILE_SIZE / 4, vx, vy)) {
                     queued_actions.push_back(

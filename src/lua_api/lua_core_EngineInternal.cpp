@@ -87,10 +87,9 @@ static int engine_init_gamestate(lua_State* L) {
     return 0;
 }
 
-static int engine_start_game(lua_State* L) {
-    GameState* gs = lua_api::gamestate(L);
-    gs->start_game();
-    return 0;
+static void engine_start_game(LuaStackValue game_config) {
+    GameState* gs = lua_api::gamestate(game_config);
+    gs->start_game(game_config);
 }
 
 // Note: After calling delete_gamestate, we generally need a new Lua state.
