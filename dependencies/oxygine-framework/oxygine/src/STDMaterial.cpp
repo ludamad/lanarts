@@ -133,7 +133,7 @@ namespace oxygine
 
     // <LUDAMAD EDIT>
     void STDMaterial::doRender(spSprite mask, bool useR,
-                               const AnimationFrame& frame, Color color, blend_mode mode,
+                               const spNativeTexture& texture, Color color, blend_mode mode,
                                const RectF& source, const RectF& destination,
                                const RenderState& parentRS)
     {
@@ -158,31 +158,30 @@ namespace oxygine
             mr.begin(_renderer);
             _renderer = &mr;
             RenderState rs = parentRS;
-            doRender(frame, color, mode, source, destination, rs);
+            doRender(texture, color, mode, source, destination, rs);
             mr.end();
 
             _renderer = original;
         }
         else
         {
-            doRender(frame, color, mode, source, destination, parentRS);
+            doRender(texture, color, mode, source, destination, parentRS);
         }
 
     }
-    void STDMaterial::doRender(const AnimationFrame& frame, Color color, blend_mode mode,
+    void STDMaterial::doRender(const spNativeTexture& texture, Color color, blend_mode mode,
                                const RectF& source, const RectF& destination, const RenderState& rs)
     {
         Material::setCurrent(rs.material);
 
-        const Diffuse& df = frame.getDiffuse();
-
-        const spNativeTexture& base = df.base;
+        Diffuse df;
+        df.base = texture;
 
 #ifdef EMSCRIPTEN
         _renderer->setTexture(df.base, df.alpha, df.premultiplied);//preload
-        if (base && base->getHandle())
+        if (df.base && df.base->getHandle())
 #else
-        if (base)
+        if (df.base)
 #endif
         {
             _renderer->setBlendMode(mode);
@@ -233,8 +232,6 @@ namespace oxygine
             return;
 
         Material::setCurrent(this);
-
-
 
         text::DrawContext dc;
         dc.primary = rs.getFinalColor(tf->getColor()).premultiplied();

@@ -8,6 +8,10 @@
 
 #include <SDL.h>
 
+#ifdef __APPLE__
+#define __unix__
+#endif
+
 #ifdef __unix__
 #include <sys/time.h>
 #endif

@@ -96,6 +96,17 @@ bool gl_set_vsync(bool state) {return true;
 	return true;
 }
 
+#elif __APPLE__
+
+#include <SDL_video.h>
+
+bool gl_set_vsync(bool state) {
+    // TODO handle both states
+    // TODO this doesnt work on Mac OS
+    return SDL_GL_SetSwapInterval(0) == 0;
+}
+
+
 #else // not linux
 
 // Fallback, just fail!

@@ -20,17 +20,12 @@
 
 struct GLImage {
 	GLImage() {
-		texture = 0;
-	}
-	GLImage(SDL_RWops* rw_ops) {
 
 	}
 	GLImage(const std::string& filename) {
-		texture = 0;
 		initialize(filename);
 	}
 	GLImage(const Size& size, int type = GL_RGBA) {
-		texture = 0;
 		initialize(size, type);
 	}
 	~GLImage();
@@ -53,9 +48,7 @@ struct GLImage {
         static void end_batch_draw();
 
 	int width, height;
-	float texw, texh;
-	GLuint texture;
-	oxygine::ResAnim anim;
+	oxygine::spNativeTexture texture_;
 };
 
 #endif /* GLIMAGE_H_ */

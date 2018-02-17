@@ -56,7 +56,7 @@ file(GLOB ldraw_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 add_library( ldraw
 		STATIC
-             ${ldraw_src})
+             ${ldraw_src} src/opengl/GLGridAtlas.cpp src/opengl/GLGridAtlas.h)
 
          message(STATUS ${SDL2_LIBRARY})
 set(LINKEDDEPS

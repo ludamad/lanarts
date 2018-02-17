@@ -22,9 +22,9 @@ namespace oxygine
         // <LUDAMAD EDIT>
         void doRender(Color color, const RenderState& rs, RectF destination, blend_mode mode);
         void doRender(spSprite mask, bool useR,
-                      const AnimationFrame& frame, Color color, blend_mode mode,
+                      const spNativeTexture& texture, Color color, blend_mode mode,
                       const RectF& source, const RectF& destination, const RenderState& rs);
-        void doRender(const AnimationFrame& frame, Color color, blend_mode mode,
+        void doRender(const spNativeTexture& texture, Color color, blend_mode mode,
                       const RectF& source, const RectF& destination, const RenderState& rs);
         // </LUDAMAD EDIT>
 
