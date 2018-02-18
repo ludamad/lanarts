@@ -1,6 +1,5 @@
 Map = require "core.Map"
 ObjectUtils = require "objects.ObjectUtils"
-EventLog = require "ui.EventLog"
 DataW = require "DataWrapped"
 GameObject = require "core.GameObject"
 World = require "core.World"
@@ -12,7 +11,7 @@ random_xy_near = (obj) -> {obj.x + random(-32,32), obj.y + random(-32, 32)}
 -- UNDEAD ENEMIES --
 
 DataW.enemy_create {
-    name: "Crypt Keeper" 
+    name: "Crypt Keeper"
     sprite: "spr_enemies.undead.lich"
     radius: 11
     xpaward: 75
@@ -34,7 +33,7 @@ DataW.enemy_create {
 }
 
 DataW.enemy_create {
-    name: "Mana Sapper" 
+    name: "Mana Sapper"
     sprite: "spr_enemies.demons.manasapper"
     radius: 11
     xpaward: 50
@@ -59,7 +58,7 @@ DataW.enemy_create {
 
 
 DataW.enemy_create {
-    name: "Gaseous Ghost" 
+    name: "Gaseous Ghost"
     sprite: "spr_enemies.undead.hungry_ghost"
     radius: 11
     xpaward: 75
@@ -86,7 +85,7 @@ DataW.enemy_create {
 }
 
 DataW.enemy_create {
-    name: "Spectral Beast" 
+    name: "Spectral Beast"
     sprite: "spr_enemies.undead.spectral_lizard"
     radius: 11
     xpaward: 10
@@ -158,12 +157,12 @@ summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) ->
                 eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
                 eff.duration = duration
                 @n_steps = 0
-            else 
+            else
                 @n_steps += 1
 }
 
 DataW.enemy_create summoner_base("Mummy", 5) {
-    name: "Mummoner" 
+    name: "Mummoner"
     sprite: "spr_enemies.undead.greater_mummy"
     radius: 11
     xpaward: 75
@@ -236,7 +235,7 @@ DataW.enemy_create {
         {"Spiky", {recoil_percentage: 0.25}}
     }
 }
- 
+
 DataW.enemy_create {
     name: "Ramitawil"
     sprite: "spr_enemies.bosses.boss_bee"
@@ -261,7 +260,6 @@ DataW.enemy_create {
     }
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
-        ItemGroups = require "maps.ItemGroups"
         ObjectUtils.spawn_item_near(@, "Swarm Lanart", 1)
         -- Spawn 2 level 1 randarts:
         for i=1,1
@@ -273,9 +271,9 @@ DataW.enemy_create {
             ObjectUtils.spawn_item_near(@, type, amount)
         ObjectUtils.spawn_item_near(@, "Amulet of Great Pain", 1)
 }
- 
+
 DataW.enemy_create {
-    name: "Mouther" 
+    name: "Mouther"
     sprite: "spr_enemies.animals.tyrant_leech"
     radius: 11
     xpaward: 15
@@ -310,7 +308,7 @@ DataW.enemy_create {
     appear_message: "A poisonous black mamba slithers onto the scene!"
     defeat_message: "The black mamba is dead."
     types: {"Green"}
-    weapon: {cooldown: 40, damage: 12} 
+    weapon: {cooldown: 40, damage: 12}
     stats: {
         hp: 40
         hpregen: 0.04
@@ -325,7 +323,7 @@ DataW.enemy_create {
 }
 
 DataW.enemy_create {
-    name: "Clown Mage" 
+    name: "Clown Mage"
     sprite: "spr_enemies.humanoid.killer_klown_purple"
     radius: 11
     xpaward: 30
@@ -368,7 +366,7 @@ DataW.enemy_create {
     }
     effects_active: {"Enraging"}
 }
- 
+
 DataW.enemy_create {
     name: "Sheep"
     sprite: "spr_enemies.animals.sheep"
@@ -389,7 +387,7 @@ DataW.enemy_create {
     }
     effects_active: {"Enraging"}
 }
-  
+
 DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
     name: "Purple Dragon"
     appear_message: "A frighteningly large purple dragon comes into view!"
@@ -440,7 +438,6 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
             @timeout = if Map.object_visible(@) then 200 else 50
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
-        ItemGroups = require "maps.ItemGroups"
         ObjectUtils.spawn_item_near(@, 'Dragon Lanart', 1)
         -- Spawn level 1 randarts scaling to #players:
         for i=1,#World.players * 2
@@ -480,7 +477,6 @@ DataW.enemy_create {
     }
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
-        ItemGroups = require "maps.ItemGroups"
         ObjectUtils.spawn_item_near(@, "Red Dragonplate", 1)
         ObjectUtils.spawn_item_near(@, "Dragon Lanart", 1)
         -- Spawn a level 1 randart:
@@ -496,7 +492,7 @@ DataW.enemy_create summoner_base("Imp", 1, 100, 100) {
     radius: 16
     xpaward: 150
     unique: true
-    init_func: enemy_berserker_init 
+    init_func: enemy_berserker_init
     step_func: enemy_berserker_step
     types: {"Red"}
     stats: {
@@ -514,7 +510,6 @@ DataW.enemy_create summoner_base("Imp", 1, 100, 100) {
         ObjectUtils.spawn_item_near(@, item, 1)
         ObjectUtils.spawn_item_near(@, "Abyssal Lanart", 1)
         ItemUtils = require "maps.ItemUtils"
-        ItemGroups = require "maps.ItemGroups"
         -- Spawn a level 1 randart:
         {:type, :amount} = ItemUtils.randart_generate(1)
         ObjectUtils.spawn_item_near(@, type, amount)
@@ -541,7 +536,6 @@ DataW.enemy_create {
     }
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
-        ItemGroups = require "maps.ItemGroups"
         -- Spawn 2 level 1 randarts:
         for i=1,2
             {:type, :amount} = ItemUtils.randart_generate(1)
@@ -573,7 +567,6 @@ DataW.enemy_create {
     }
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
-        ItemGroups = require "maps.ItemGroups"
         ObjectUtils.spawn_item_near(@, "Obliteration Lanart", 1)
         ObjectUtils.spawn_item_near(@, "Amulet of Greater Fire", 1)
         -- Spawn 1 level 2 randart:
@@ -669,12 +662,12 @@ DataW.enemy_create {
         power: {base: {10, 10}}
         on_hit_func: (target, atkstats) =>
             if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
-                eff = target\add_effect "Poison", {
+                target\add_effect "Poison", {
                     time_left: 100
                     poison_rate: 25
                     attacker: @caster
                     damage: 30
-                    power: @caster\effective_stats().strength 
+                    power: @caster\effective_stats().strength
                     magic_percentage: 0
                 }
     }
@@ -708,12 +701,12 @@ DataW.enemy_create {
         types: {"Piercing"}
         on_hit_func: (target, atkstats) =>
             if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
-                eff = target\add_effect "Poison", {
+                target\add_effect "Poison", {
                     time_left: 100
                     poison_rate: 25
                     attacker: @caster
                     damage: 30
-                    power: @caster\effective_stats().strength 
+                    power: @caster\effective_stats().strength
                     magic_percentage: 0
                 }
     }
@@ -789,7 +782,7 @@ DataW.enemy_create {
         hpregen: 0.05
         strength: 5
         magic: 25
-        defence: 6  
+        defence: 6
         willpower: 8
     }
     types: {"White"}
@@ -802,7 +795,7 @@ DataW.enemy_create {
         spr_attack: "storm bolt"
     }
 }
-       
+
 DataW.enemy_create {
     name: "Hell Storm"
     sprite: "hell storm"
@@ -853,7 +846,7 @@ DataW.enemy_create {
         willpower: 5
     }
 }
-              
+
 DataW.enemy_create {
     name: "Fire Bat"
     sprite: "spr_enemies.animals.fire_bat"
@@ -891,7 +884,7 @@ DataW.enemy_create {
         spr_attack: "spr_effects.fireball_small"
     }
 }
- 
+
 DataW.enemy_create {
     name: "Giant Bat"
     sprite: "giant bat"
@@ -911,7 +904,7 @@ DataW.enemy_create {
         willpower: 5
     }
 }
- 
+
 DataW.enemy_create {
     name: "Tarantella"
     sprite: "spr_enemies.animals.tarantella"
@@ -931,7 +924,7 @@ DataW.enemy_create {
         willpower: 10
     }
 }
- 
+
 DataW.enemy_create {
     name: "Giant Spider"
     sprite: "giant spider"
@@ -951,7 +944,7 @@ DataW.enemy_create {
         willpower: 10
     }
 }
-       
+
 DataW.enemy_create {
     name: "Hound"
     sprite: "hound"
@@ -971,7 +964,7 @@ DataW.enemy_create {
         willpower: 5
     }
 }
-       
+
 DataW.enemy_create {
     name: "Hydra"
     sprite: "hydra"
@@ -1015,7 +1008,7 @@ DataW.enemy_create {
         willpower: 5
     }
 }
-           
+
 DataW.enemy_create {
     name: "Adder"
     sprite: "adder"
@@ -1036,7 +1029,7 @@ DataW.enemy_create {
         willpower: 0
     }
 }
-         
+
 DataW.enemy_create {
     name: "Chicken"
     sprite: "chicken"
@@ -1076,7 +1069,7 @@ DataW.enemy_create {
         willpower: 15
     }
 }
-     
+
 DataW.enemy_create {
     name: "Super Chicken"
     sprite: "super_chicken"
@@ -1164,7 +1157,7 @@ DataW.enemy_create {
         power: {base: {10, 10}}
         on_hit_func: (target, atkstats) =>
             if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
-                eff = target\add_effect "Exhausted", 5
+                target\add_effect "Exhausted", 5
     }
 }
 
@@ -1194,7 +1187,7 @@ DataW.enemy_create {
         willpower: 20
     }
     methods: spellcaster_method_base {
-        _tornado_storm: () => 
+        _tornado_storm: () =>
             --@_projatk "Tornado Storm"
             --@timeout = 50
         _energy_spear: () =>
@@ -1203,26 +1196,26 @@ DataW.enemy_create {
         _berserk: () =>
             @use_spell("Berserk", {@x, @y})
             @timeout = 10
-        _dash: () => 
+        _dash: () =>
             angle = math.atan2(@vy, @vx)
-            eff = @add_effect "Dash Attack", {
+            @add_effect "Dash Attack", {
                 time_left: 10
                 :angle
             }
             @timeout = 20
-        _healing_aura: () => 
+        _healing_aura: () =>
             angle = math.atan2(@vy, @vx)
-            eff = @add_effect "Healing Aura", {
+            @add_effect "Healing Aura", {
                 time_left: 10
                 :angle
             }
             @timeout = 20
-        _mephitize: () => 
+        _mephitize: () =>
     }
     step_func: () =>
         @timeout -= 1
         if @timeout <= 0
-            local effect 
+            local effect
             if chance(.1)
                 effect = random_choice {@_tornado_storm}
             elseif chance(.1)
@@ -1263,7 +1256,7 @@ DataW.enemy_create {
     init_func: () =>
         @timeout = 0
     methods: spellcaster_method_base {
-        _tornado_storm: () => 
+        _tornado_storm: () =>
             --@_projatk "Tornado Storm"
             --@timeout = 50
         _energy_spear: () =>
@@ -1272,9 +1265,9 @@ DataW.enemy_create {
         _berserk: () =>
             @use_spell("Berserk", {@x, @y})
             @timeout = 10
-        _dash: () => 
+        _dash: () =>
             angle = math.atan2(@vy, @vx)
-            eff = @add_effect "Dash Attack", {
+            @add_effect "Dash Attack", {
                 time_left: 10
                 :angle
             }
@@ -1283,7 +1276,7 @@ DataW.enemy_create {
     step_func: () =>
         @timeout -= 1
         if @timeout <= 0
-            local effect 
+            local effect
             if chance(.1)
                 effect = random_choice {@_tornado_storm}
             elseif chance(.1)
@@ -1317,7 +1310,7 @@ DataW.enemy_create {
         willpower: 2
     }
 }
-        
+
 DataW.enemy_create {
     name: "Skeleton Fighter"
     sprite: "skeleton fighter"
@@ -1334,10 +1327,10 @@ DataW.enemy_create {
         strength: 5
         magic: 5
         defence: 5
-        willpower: 5  
+        willpower: 5
     }
 }
-        
+
 DataW.enemy_create {
     name: "Zombie"
     sprite: "zombie"
@@ -1355,10 +1348,10 @@ DataW.enemy_create {
         strength: 10
         magic: 10
         defence: 8
-        willpower: 8  
+        willpower: 8
     }
 }
-      
+
 DataW.enemy_create {
     name: "Krell"
     sprite: "franken"
@@ -1386,7 +1379,7 @@ DataW.enemy_create {
 --    description: "An undead creature equipped with terrifying blades."
 --    appear_message: "The terrifying executioner appears."
 --    defeat_message: "The executioner is vanquished."
---    init_func: enemy_berserker_init 
+--    init_func: enemy_berserker_init
 --    step_func: enemy_berserker_step
 --    radius: 12
 --    xpaward: 50
@@ -1397,7 +1390,7 @@ DataW.enemy_create {
 --        hpregen: 0.25
 --        strength: 20
 --        magic: 20
---        defence: 10  
+--        defence: 10
 --        willpower: 10
 
 -- DEMONIC ENEMIES
@@ -1421,7 +1414,7 @@ DataW.enemy_create {
         movespeed: 3
         strength: 25
         defence: 0
-        willpower: 80 
+        willpower: 80
     }
 }
 
@@ -1442,7 +1435,7 @@ DataW.enemy_create {
         hpregen: 0.25
         strength: 8
         magic: 8
-        defence: 10  
+        defence: 10
         willpower: 10
     }
 }
@@ -1453,7 +1446,7 @@ DataW.enemy_create {
     description: "An undead creature equipped with terrifying blades."
     appear_message: "The terrifying executioner appears."
     defeat_message: "The executioner is vanquished."
-    init_func: enemy_berserker_init 
+    init_func: enemy_berserker_init
     step_func: enemy_berserker_step
     radius: 12
     xpaward: 60
@@ -1472,16 +1465,16 @@ DataW.enemy_create {
 
 --  - name: Orc Priest
 --    sprite: orc priest
---   
+--
 --  - name: Orc Sorceror
 --    sprite: orc sorceror
---    
+--
 --  - name: Orc Warlord
 --    sprite: orc warlord
---    
+--
 --  - name: Orc High Priest
 --    sprite: orc high priest
-     
+
 DataW.enemy_create {
     name: "Ogre Mage"
     appear_message: "A terrifying ogre mage!"
@@ -1519,7 +1512,7 @@ DataW.enemy_create {
     xpaward: 30
     appear_message: "You see an orc warrior!"
     defeat_message: "The orc warrior dies."
-    init_func: enemy_berserker_init 
+    init_func: enemy_berserker_init
     step_func: enemy_berserker_step
     types: {"Red"}
     weapon: {cooldown: 30}
@@ -1532,10 +1525,10 @@ DataW.enemy_create {
         willpower: 6
     }
 }
---    
+--
 --  - name: Orc Knight
 --    sprite: orc knight
---    
+--
 --  - name: Orc Wizard
 --    sprite: orc wizard
 
@@ -1586,9 +1579,9 @@ DataW.enemy_create {
         hpregen: 0.02
         movespeed: 2
         strength: 45
-        defence: 20  
+        defence: 20
         willpower: 20
-        
+
 DataW.enemy_create {
     name: "Jester"
     sprite: "jester"
@@ -1604,11 +1597,11 @@ DataW.enemy_create {
         hpregen: 0.06
         movespeed: 5
         strength: 30
-        defence: 25  
+        defence: 25
         willpower: 25
     }
 }
-  
+
 DataW.enemy_create {
     name: "Golem"
     sprite: "golem"
@@ -1660,6 +1653,28 @@ DataW.enemy_create {
 
 DataW.enemy_create {
     name: "Red Slime"
+    sprite: "red slime"
+    death_sprite: "green blood" -- TODO: Red blood
+    description: "Oozing ball of slime"
+    appear_message: "A red ball of goop slides into view"
+    defeat_message: "The red goop falls apart"
+    radius: 14
+    xpaward: 20
+    types: {"Red"}
+    stats: {
+      attacks: { {weapon: "Fast Melee"} }
+      hp: 25
+      hpregen: 0.1
+      movespeed: 1
+      strength: 6
+      defence: 4
+      willpower: 6
+    }
+}
+
+
+DataW.enemy_create {
+    name: "Firelord"
     sprite: "red slime"
     death_sprite: "green blood" -- TODO: Red blood
     description: "Oozing ball of slime"

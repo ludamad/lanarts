@@ -24,8 +24,10 @@ typeof = (obj) ->
         return rawget(obj, '_type') or t
     return t
 
-from_set = (set) -> (name) -> (obj, args) ->
-    val = args[name] 
+from_set = (set, allow_nesting) -> (name) -> (obj, args) ->
+    val = args[name]
+    if allow_nesting and type(val) == "table" and set[val.type]
+        val = val.type
     if val == nil
         error("Required argument #{name}")
     if not set[val]
@@ -33,15 +35,19 @@ from_set = (set) -> (name) -> (obj, args) ->
     obj[name] = args[name]
 
 typecheck = (type) -> (name) -> (obj, args) ->
-    val = args[name] 
+    val = args[name]
     if val == nil
         error("Required argument #{name}")
     if typeof(val) ~= type
         error("Invalid argument type #{name} = #{val}")
     obj[name] = args[name]
 
+any = (name) -> (obj, args) ->
+    obj[name] = args[name]
+    nil -- do nothing
+
 optional = (type) -> (name) -> (obj, args) ->
-    val = args[name] 
+    val = args[name]
     if val == nil
         return
     if typeof(val) ~= type
@@ -68,14 +74,14 @@ _SPREAD_SCHEMES = {
 M.Spread = _node {
     name: optional "string"
     regions: typecheck "table"
-    connection_scheme: from_set(_CONNECTION_SCHEMES)
-    spread_scheme: from_set(_SPREAD_SCHEMES)
+    connection_scheme: from_set(_CONNECTION_SCHEMES, true)
+    spread_scheme: from_set(_SPREAD_SCHEMES, true)
     post_compile: optional "string"
 }
 
 M.Shape = _node {
     name: optional "string"
-    shape: typecheck "string"
+    shape: any -- typecheck "string"
     size: typecheck "table"
     post_compile: optional "string"
     --rotation: optional "string" -- TODO

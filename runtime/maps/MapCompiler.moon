@@ -1,7 +1,6 @@
 -- Box2D generation utilities
 B2GenerateUtils = require "maps.B2GenerateUtils"
 GenerateUtils = require "maps.GenerateUtils"
-GeometryUtils = require "maps.GeometryUtils"
 DebugUtils = require "maps.DebugUtils"
 SourceMap = require "core.SourceMap"
 MapRegionShapes = require("maps.MapRegionShapes")
@@ -10,7 +9,7 @@ MapUtils = require "maps.MapUtils"
 World = require "core.World"
 Vaults = require "maps.Vaults"
 
-import MapRegion, combine_map_regions, map_regions_bbox
+import MapRegion, combine_map_regions, map_region_bbox, map_regions_bbox
     from require("maps.MapRegion")
 
 import Spread, Shape
@@ -40,10 +39,15 @@ default_fill = () =>
         i += 1
     return true
 
+expand_if_nested = (value) ->
+    if type(value) == "table" and type(value.type) == "string"
+        return value.type, value
+    else
+        return value, {}
 
 MapCompiler = newtype {
     init: (args) =>
-        -- Result memoizing table 
+        -- Result memoizing table
         @result = {}
         @operators = {}
         @post_poned = {}
@@ -73,7 +77,7 @@ MapCompiler = newtype {
     get_map_region: (node) =>
         assert @_regions[node], "Must run compile_map_topology on node first!"
         regions = for child in *@_children[node]
-            region = @get_map_region(child)
+            @get_map_region(child)
         return combine_map_regions(regions)
 
     _recalculate_perimeter: () =>
@@ -83,18 +87,19 @@ MapCompiler = newtype {
             operator: {add: SourceMap.FLAG_PERIMETER}
         }
         SourceMap.perimeter_apply {map: @map,
-            candidate_selector: {matches_none: {SourceMap.FLAG_SOLID}}, 
+            candidate_selector: {matches_none: {SourceMap.FLAG_SOLID}},
             inner_selector: {matches_all: {SourceMap.FLAG_PERIMETER, SourceMap.FLAG_SOLID}}
             operator: {add: Vaults.FLAG_INNER_PERIMETER}
         }
     _generate_shape: (scheme, x, y, w, h) =>
+        scheme, scheme_args = expand_if_nested(scheme)
         switch scheme
             when 'deformed_ellipse'
-                points = @rng\random(5, 15)
+                points = scheme_args.n_points or @rng\random(5, 15)
                 polygon = GenerateUtils.skewed_ellipse_points(@rng, {x,y}, {w, h}, points)
                 return {polygon}
             when 'ellipse'
-                points = @rng\random(5, 15)
+                points = scheme_args.n_points or @rng\random(5, 15)
                 polygon = GenerateUtils.ellipse_points_0(@rng, {x,y}, {w, h}, points)
                 return {polygon}
             when 'rectangle'
@@ -113,11 +118,12 @@ MapCompiler = newtype {
                     return polygons
     _spread_regions: (scheme, regions) =>
         timer = timer_create()
+        scheme, scheme_args = expand_if_nested(scheme)
         switch scheme
             when 'box2d'
                 B2GenerateUtils.spread_map_regions {
                     rng: @rng
-                    :regions 
+                    :regions
                     n_iterations: 100
                     mode: 'towards_center'
                     clump_once_near: true
@@ -125,7 +131,7 @@ MapCompiler = newtype {
             when 'box2d_solid_center'
                 B2GenerateUtils.spread_map_regions {
                     rng: @rng
-                    :regions 
+                    :regions
                     fixed_polygons: @_generate_shape('deformed_ellipse', 0,0,4,4)
                     n_iterations: 100
                     mode: 'towards_fixed_shapes'
@@ -141,7 +147,7 @@ MapCompiler = newtype {
                     when 'rvo_ring' then GenerateUtils.ring_region_delta_func
                 for r in *adapters
                     spreader\add(r, velocity_func(nil, @rng, {center: () => 0,0}))
-                for i=1,1000
+                for i=1,scheme_args.iters or 1000
                     spreader\step() -- TODO customizable
                 for i, r in ipairs regions
                     {:x, :ox, :y, :oy} = adapters[i]
@@ -150,12 +156,13 @@ MapCompiler = newtype {
                 error("Unexpected")
         log_verbose "Spread regions time: #{timer\get_milliseconds()}ms"
     _connect_regions: (scheme, regions) =>
+        scheme, scheme_args = expand_if_nested(scheme)
         switch scheme
             when 'direct_light'
                 timer = timer_create()
                 B2GenerateUtils.connect_map_regions {
                     rng: @rng
-                    :regions 
+                    :regions
                     n_connections: 2
                 }
                 log_verbose "Connect regions time: #{timer\get_milliseconds()}ms"
@@ -163,17 +170,18 @@ MapCompiler = newtype {
                 timer = timer_create()
                 B2GenerateUtils.connect_map_regions {
                     rng: @rng
-                    :regions 
+                    :regions
                     n_connections: #regions * 2
                 }
                 log_verbose "Connect regions time: #{timer\get_milliseconds()}ms"
             when 'minimum_spanning_arc_and_line'
                 @with_map (map) ->
-                    spreader = GenerateUtils.RVORegionPlacer.create()
                     adapters = for r in *regions
                         GenerateUtils.MapRegionAdapter.create(r)
-
-                    edges = GenerateUtils.subregion_minimum_spanning_tree(adapters, () -> @rng\random(12) + @rng\random(12))
+                    edges = GenerateUtils.subregion_minimum_spanning_tree adapters, () ->
+                        r1 = @rng\random(scheme_args.acceptable_dist or 12)
+                        r2 = @rng\random(scheme_args.acceptable_dist or 12)
+                        return r1 + r2
                     map.arc_chance = 0.2
                     NewMaps = require "maps.NewMaps"
                     NewMaps.connect_edges map, @rng, {
@@ -232,14 +240,17 @@ MapCompiler = newtype {
         @_regions[node] = map_regions
         @_children[node] = children
         @_combined_region[node] = assert combined_region, "Need combined_region ~= nil!"
+
     get_node_owned_regions: (node) => @_regions[node]
     get_node_children: (node) => @_children[node]
     get_node_total_region: (node) => @_combined_region[node]
+    get_node_bbox: (node) => map_region_bbox(@_combined_region[node])
+    get_total_bbox: () => @_outer_bbox
 
     fill_unconnected: () =>
         {w,h} = @map.size
         SourceMap.area_fill_unconnected {
-            map: @map 
+            map: @map
             seed: {w/2, h/2}
             unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
             mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
@@ -263,15 +274,16 @@ MapCompiler = newtype {
             func(@, node)
         recurse(@root_node)
 
-    _prepare_source_map: (label, padding, content) => 
+    _prepare_source_map: (label, padding, content) =>
         -- Correct map topology:
         all_regions = {}
         @for_all_nodes (node) =>
             for region in *@_regions[node]
                 append all_regions, region
         bbox = map_regions_bbox(all_regions)
+        @_outer_bbox = bbox
         -- Assert that our polygons fit within our created source map bounds:
-        w, h = bbox[3] - bbox[1], bbox[4] - bbox[2] 
+        w, h = bbox[3] - bbox[1], bbox[4] - bbox[2]
         -- TODO DEBUG-ONLY CHECK Really make sure we are drawing in correct bounds
         @for_all_nodes (node) =>
             for region in *@_regions[node]
@@ -287,15 +299,15 @@ MapCompiler = newtype {
             size: {w + padding*2, h + padding*2}
             flags: SourceMap.FLAG_SOLID
             instances: {}
-            :content 
+            :content
         }
         if not @fill_function()
             return false
-        for callback in *@post_poned 
+        for callback in *@post_poned
             callback(@map)
         SourceMap.erode_diagonal_pairs {map: @map, rng: @rng, selector: {matches_all: SourceMap.FLAG_SOLID}}
         if not SourceMap.area_fully_connected {
-            map: @map, 
+            map: @map,
             unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
             mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
             marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
@@ -305,13 +317,13 @@ MapCompiler = newtype {
         @_recalculate_perimeter()
         return true
 
-    random_square: (area = nil) => 
+    random_square: (area = nil) =>
         return MapUtils.random_square(@map, area, {matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
     random_square_not_near_wall: (area = nil) =>
         return MapUtils.random_square(@map, area, {matches_none: {Vaults.FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
 
     -- Creates @map, ready to be filled
-    prepare: (args) => 
+    prepare: (args) =>
         success = false
         while not success
             table.clear @_regions
@@ -349,7 +361,7 @@ main = (raw_args) ->
         :rng,
         root: area
     }
-    
+
     i = 1
     compiler\for_all_nodes (node) =>
         @apply node, {

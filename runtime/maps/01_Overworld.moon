@@ -2,12 +2,12 @@
 -- Generates the game maps, starting with high-level details (places that will be in the game)
 -- and then generating actual tiles.
 ----
-import map_place_object, ellipse_points, 
-    LEVEL_PADDING, Region, RVORegionPlacer, 
-    random_rect_in_rect, random_ellipse_in_ellipse, 
+import map_place_object, ellipse_points,
+    LEVEL_PADDING, Region, RVORegionPlacer,
+    random_rect_in_rect, random_ellipse_in_ellipse,
     ring_region_delta_func, default_region_delta_func, spread_region_delta_func,
-    center_region_delta_func, 
-    towards_region_delta_func, 
+    center_region_delta_func,
+    towards_region_delta_func,
     random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
     Tile, tile_operator from require "maps.GenerateUtils"
 
@@ -28,7 +28,6 @@ Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
 
-MapCompiler = require "maps.MapCompiler"
 import Spread, Shape
     from require "maps.MapElements"
 
@@ -36,7 +35,7 @@ import Spread, Shape
 Places = require "maps.Places"
 
 -- Generation constants and data
-{   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE, 
+{   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE,
     :FLAG_OVERWORLD, :FLAG_ROOM, :FLAG_NO_ENEMY_SPAWN, :FLAG_NO_ITEM_SPAWN
 } = Vaults
 
@@ -46,14 +45,14 @@ OVERWORLD_VISION_RADIUS = 8
 
 create_overworld_scheme = (tileset) -> {
     floor1: Tile.create(tileset.floor, false, true, {FLAG_OVERWORLD})
-    floor2: Tile.create(tileset.floor_alt, false, true, {FLAG_OVERWORLD}) 
+    floor2: Tile.create(tileset.floor_alt, false, true, {FLAG_OVERWORLD})
     wall1: Tile.create(tileset.wall, true, true, {FLAG_OVERWORLD})
     wall2: Tile.create(tileset.wall_alt, true, false)
 }
 
 create_dungeon_scheme = (tileset) -> {
     floor1: Tile.create(tileset.floor, false, true, {}, {FLAG_OVERWORLD})
-    floor2: Tile.create(tileset.floor_alt, false, true, {}, {FLAG_OVERWORLD}) 
+    floor2: Tile.create(tileset.floor_alt, false, true, {}, {FLAG_OVERWORLD})
     wall1: Tile.create(tileset.wall, true, false, {}, {FLAG_OVERWORLD})
     wall2: Tile.create(tileset.wall_alt, true, false, {}, {FLAG_OVERWORLD})
 }
@@ -67,7 +66,7 @@ TEST_CONF = {
     is_overworld: true
     size: {100,100}
     number_regions: 0
-    floor1: OVERWORLD_TILESET.floor1 
+    floor1: OVERWORLD_TILESET.floor1
     floor2: OVERWORLD_TILESET.floor2
     wall1: OVERWORLD_TILESET.wall1
     wall2: OVERWORLD_TILESET.wall2
@@ -82,7 +81,7 @@ TEST_CONF = {
     n_statues: 0
 }
 
-OVERWORLD_CONF = (rng) -> 
+OVERWORLD_CONF = (rng) ->
     type = rng\random_choice {
         {
             number_regions: rng\random(25, 30)
@@ -111,9 +110,9 @@ OVERWORLD_CONF = (rng) ->
     return {
         map_label: "Plain Valley"
         is_overworld: true
-        size: if rng\random(0,2) == 0 then {85, 105} else {85, 105} 
+        size: if rng\random(0,2) == 0 then {85, 105} else {85, 105}
         number_regions: type.number_regions
-        floor1: OVERWORLD_TILESET.floor1 
+        floor1: OVERWORLD_TILESET.floor1
         floor2: OVERWORLD_TILESET.floor2
         wall1: OVERWORLD_TILESET.wall1
         wall2: OVERWORLD_TILESET.wall2
@@ -125,12 +124,12 @@ OVERWORLD_CONF = (rng) ->
         connect_line_width: () -> rng\random(2,6)
         region_delta_func: type.region_delta_func
         arc_chance: type.arc_chance or 0
-        room_radius: type.room_radius 
+        room_radius: type.room_radius
         -- Dungeon objects/features
         n_statues: 4
     }
 
-DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1) -> 
+DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1) ->
     C = create_dungeon_scheme(tileset)
     -- Rectangle-heavy or polygon-heavy?
     switch schema -- rng\random(3)
@@ -182,7 +181,7 @@ DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1) ->
 
     return table.merge C, {
         map_label: "A Dungeon"
-        size: if schema == 4 then {85, 85} else {65,65} 
+        size: if schema == 4 then {85, 85} else {65,65}
         rvo_iterations: 20
         n_stairs_down: 3
         n_stairs_up: 0
@@ -193,7 +192,7 @@ DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1) ->
     }
 
 overworld_spawns = (map) ->
-    gen_feature = (sprite, solid, seethrough = true) -> (px, py) -> 
+    gen_feature = (sprite, solid, seethrough = true) -> (px, py) ->
         Feature.create M, {x: px*32+16, y: py*32+16, :sprite, :solid, :seethrough}
 
     for region in *map.regions
@@ -213,16 +212,16 @@ overworld_spawns = (map) ->
                 break
             map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
             item = ItemUtils.item_generate ItemGroups.basic_items
-            MapUtils.spawn_item(map, item.type, item.amount, sqr) 
+            MapUtils.spawn_item(map, item.type, item.amount, sqr)
         -- for i=1,conf.n_stores
         --     sqr = MapUtils.random_square(map, area, {matches_none: {SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
         --     if not sqr
         --         break
         --     Region1.generate_store(map, sqr)
         if conf.is_overworld
-            es1 = OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 8, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
-            es2 = OldMaps.generate_from_enemy_entries(map, OldMaps.medium_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
-            es3 = OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+            OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 8, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+            OldMaps.generate_from_enemy_entries(map, OldMaps.medium_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+            OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
         else
             OldMaps.generate_from_enemy_entries(map, OldMaps.hard_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
             OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
@@ -269,7 +268,7 @@ place_feature = (map, template, region_filter) ->
 
 safe_portal_spawner = (tileset) -> (map, map_area, sprite, callback, frame) ->
     portal_holder = {}
-    portal_placer = (map, xy) -> 
+    portal_placer = (map, xy) ->
         portal_holder[1] = MapUtils.spawn_portal(map, xy, sprite, callback, frame)
     vault = SourceMap.area_template_create(Vaults.small_item_vault_multiway {rng: map.rng, item_placer: portal_placer, :tileset})
     -- TODO allow passing areas to use map_area, not critical for now
@@ -314,7 +313,7 @@ hell_create = (MapSeq, seq_idx, number_entrances = 1) ->
                         break
                     map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
                     item = ItemUtils.item_generate group[1]
-                    MapUtils.spawn_item(map, item.type, item.amount, sqr) 
+                    MapUtils.spawn_item(map, item.type, item.amount, sqr)
             -- ~8 level 1 randarts:
             for i=1,OldMaps.adjusted_item_amount(8) do
                 sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
@@ -322,7 +321,7 @@ hell_create = (MapSeq, seq_idx, number_entrances = 1) ->
                     break
                 map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
                 item = ItemUtils.randart_generate(1) -- power level 1
-                MapUtils.spawn_item(map, item.type, item.amount, sqr) 
+                MapUtils.spawn_item(map, item.type, item.amount, sqr)
             -- ~2 level 2 randarts:
             for i=1,OldMaps.adjusted_item_amount(2) do
                 sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
@@ -330,7 +329,7 @@ hell_create = (MapSeq, seq_idx, number_entrances = 1) ->
                     break
                 map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
                 item = ItemUtils.randart_generate(2) -- power level 1
-                MapUtils.spawn_item(map, item.type, item.amount, sqr) 
+                MapUtils.spawn_item(map, item.type, item.amount, sqr)
             return true
         on_create_source_map: (map) =>
             if not @_create_stairs_up(map)
@@ -471,7 +470,7 @@ M.crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
                         break
                     map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
                     item = ItemUtils.item_generate group[1]
-                    MapUtils.spawn_item(map, item.type, item.amount, sqr) 
+                    MapUtils.spawn_item(map, item.type, item.amount, sqr)
             return true
         on_create_source_map: (map) =>
             if not @_place_hell(map)
@@ -500,7 +499,7 @@ overworld_features = (map) ->
     OldMapSeq4 = MapSequence.create {preallocate: 1}
     post_poned = {}
 
-    ------------------------- 
+    -------------------------
     -- Place ridges: --
     place_outdoor_ridges = () ->
         door_placer = (map, xy) ->
@@ -514,16 +513,16 @@ overworld_features = (map) ->
             return false -- Dont reject -- true
     for i=1,4
         if place_outdoor_ridges() then return nil
-    ------------------------- 
+    -------------------------
 
-    ------------------------- 
+    -------------------------
     -- Place easy dungeon: --
     place_easy = () ->
         inner_encounter_template = {
            {
                 layout: {{size: {60,40}, rooms: {padding:0,amount:40,size:{3,7}},tunnels:{padding:0, width:{1,3},per_room: 5}}}
                 content: {
-                    items: {amount: 8, group: ItemGroups.enchanted_items} 
+                    items: {amount: 8, group: ItemGroups.enchanted_items}
                     enemies: {
                         wandering: true
                         amount: 0
@@ -541,9 +540,9 @@ overworld_features = (map) ->
         -- Inner dungeon generation for dungeon 1      --
         on_generate_dungeon = (map, floor) ->
             if floor == #templates
-                ------------------------- 
+                -------------------------
                 -- Place key vault     --
-                for i=1,2 
+                for i=1,2
                     item_placer = (map, xy) ->
                         item = ItemUtils.item_generate ItemGroups.basic_items
                         MapUtils.spawn_item(map, item.type, item.amount, xy)
@@ -564,13 +563,13 @@ overworld_features = (map) ->
                 if not sqr
                     return nil
                 --MapUtils.spawn_enemy(map, "Red Dragon", sqr)
-                ------------------------- 
+                -------------------------
 
             else if floor == 1
-                ------------------------- 
+                -------------------------
                 -- Place inner dungeon vault     --
                 on_generate_dungeon = (map, floor) ->
-                    ---------------------------------------------------------- 
+                    ----------------------------------------------------------
                     for i=1,3
                         item = ItemUtils.randart_generate(1)
                         item_placer = (map, xy) -> MapUtils.spawn_item(map, item.type, item.amount, xy)
@@ -578,7 +577,7 @@ overworld_features = (map) ->
                         vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
                         if not place_feature(map, vault, (r) -> true)
                             return nil
-                    ---------------------------------------------------------- 
+                    ----------------------------------------------------------
                     return true
                 spawn_portal = safe_portal_spawner(Tilesets.snake)
                 dungeon = {label: 'Ogre Lair', tileset: Tilesets.snake, templates: inner_encounter_template, on_generate: on_generate_dungeon, :spawn_portal, sprite_out: Region1.stair_kinds_index(5, 7)}
@@ -594,10 +593,10 @@ overworld_features = (map) ->
                 --vault = SourceMap.area_template_create(Vaults.dungeon_tunnel {tileset: Tilesets.snake, :door_placer, :gold_placer})
                 --if not place_feature(map, vault, (r) -> true)
                 --    return nil
-                ------------------------- 
+                -------------------------
                 -- Ensure connectivity because we messed with dungeon features:
                 if not SourceMap.area_fully_connected {
-                    :map, 
+                    :map,
                     unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
                     mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
                     marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
@@ -615,7 +614,7 @@ overworld_features = (map) ->
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
             return true
     if place_easy() then return nil
-    ------------------------- 
+    -------------------------
 
     -----------------------------
     -- Place optional dungeon 2, the crypt: --
@@ -629,7 +628,7 @@ overworld_features = (map) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_crypt")
             c = (CryptSeq\forward_portal_add 1, portal, next_dungeon[1], () -> M.crypt_create(CryptSeq, 2))
             if World.player_amount > 1
-                append post_poned, c 
+                append post_poned, c
             next_dungeon[1] += 1
         enemy_placer = (map, xy) ->
             enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
@@ -645,14 +644,14 @@ overworld_features = (map) ->
     ----------------------------------------
     -- Place medium dungeon 1, variant A: --
     place_medium1a = () ->
-        local templates 
+        local templates
         templates = OldMaps.Dungeon2
         on_generate_dungeon = (map, floor) ->
             if floor == #templates
                 ---------------------------------------------------------------------
                 -- Place key vault, along with a gold vault and 2 regular items.   --
-                for type in *{"Azurite Key", "Scroll of Experience", false} 
-                    item_placer = (map, xy) -> 
+                for type in *{"Azurite Key", "Scroll of Experience", false}
+                    item_placer = (map, xy) ->
                         amount = 1
                         if not type
                             {:type, :amount} = ItemUtils.item_generate ItemGroups.enchanted_items
@@ -661,7 +660,7 @@ overworld_features = (map) ->
                     vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
                     if not place_feature(map, vault, (r) -> true)
                         return nil
-                ---------------------------------------------------------- 
+                ----------------------------------------------------------
             return true
         dungeon = {label: 'Temple', tileset: Tilesets.temple, :templates, on_generate: on_generate_dungeon}
         gold_placer = (map, xy) ->
@@ -752,7 +751,7 @@ overworld_features = (map) ->
             HiveSeq = MapSequence.create {preallocate: 1}
             on_generate = (map, floor) ->
                 if floor == 1
-                    if not M.place_hive(map, HiveSeq) 
+                    if not M.place_hive(map, HiveSeq)
                         return nil
                 return true
             on_finish = (game_map, floor) ->
@@ -796,7 +795,7 @@ overworld_features = (map) ->
         templates = OldMaps.Dungeon3
         on_generate_dungeon = (map, floor) ->
             if floor == #templates
-                ------------------------- 
+                -------------------------
                 -- Place key vault     --
                 item_placer = (map, xy) -> MapUtils.spawn_item(map, "Dandelite Key", 1, xy)
                 tileset = Tilesets.snake
@@ -818,7 +817,7 @@ overworld_features = (map) ->
     if place_medium2() then return nil
     -----------------------------
 
-    ------------------------- 
+    -------------------------
     -- Place hard dungeon: --
     place_hard = () ->
         tileset = Tilesets.pixulloch
@@ -834,9 +833,9 @@ overworld_features = (map) ->
         if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
             return true
     if place_hard() then return nil
-    ------------------------- 
+    -------------------------
 
-    ------------------------- 
+    -------------------------
     -- Place small_random_vaults:  --
     place_small_vaults = () ->
         for i=1,map.rng\random(2,3)
@@ -849,7 +848,7 @@ overworld_features = (map) ->
             store_placer = (map, xy) ->
                 Region1.generate_store(map, xy)
             item_placer = (map, xy) ->
-                if map.rng.chance(.1) 
+                if map.rng.chance(.1)
                     MapUtils.spawn_item(map, "Scroll of Experience", 1, xy)
                 else
                     item = ItemUtils.item_generate ItemGroups.basic_items
@@ -861,7 +860,7 @@ overworld_features = (map) ->
             if not place_feature(map, vault, (r) -> true)
                 return false -- Dont reject
     if place_small_vaults() then return nil
-    ------------------------- 
+    -------------------------
 
     ---------------------------------
     -- Place big vaults            --
@@ -874,7 +873,7 @@ overworld_features = (map) ->
                 item = ItemUtils.item_generate ItemGroups.basic_items
                 MapUtils.spawn_item(map, item.type, item.amount, xy)
             gold_placer = (map, xy) ->
-                if map.rng\chance(.7) 
+                if map.rng\chance(.7)
                     MapUtils.spawn_item(map, "Gold", random(2,10), xy)
             door_placer = (map, xy) ->
                 -- nil is passed for the default open sprite
@@ -891,7 +890,6 @@ overworld_features = (map) ->
         enemy_placer = (map, xy) ->
             enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
             MapUtils.spawn_enemy(map, enemy, xy)
-        i = 1
         boss_placer = (map, xy) ->
             --if map.rng\randomf() < .5
             --    enemy = OldMaps.enemy_generate(OldMaps.strong_hell)
@@ -904,7 +902,7 @@ overworld_features = (map) ->
             MapUtils.spawn_item(map, item.type, item.amount, xy)
             n_items_placed += 1
         gold_placer = (map, xy) ->
-            if map.rng\chance(.7) 
+            if map.rng\chance(.7)
                 MapUtils.spawn_item(map, "Gold", random(2,10), xy)
         door_placer = (map, xy) ->
             -- nil is passed for the default open sprite
@@ -960,7 +958,7 @@ overworld_features = (map) ->
 
 test_vault_create = (template) ->
     tileset = Tilesets.pebble
-    return NewMaps.map_create (rng) -> 
+    return NewMaps.map_create (rng) ->
         return {
             map_label: TEST_CONF.map_label
             subtemplates: {TEST_CONF}
@@ -977,7 +975,7 @@ test_vault_create = (template) ->
                     item = ItemUtils.item_generate ItemGroups.basic_items
                     MapUtils.spawn_item(map, item.type, item.amount, xy)
                 gold_placer = (map, xy) ->
-                    if map.rng\chance(.7) 
+                    if map.rng\chance(.7)
                         MapUtils.spawn_item(map, "Gold", random(2,10), xy)
                 door_placer = (map, xy) ->
                     -- nil is passed for the default open sprite
@@ -1010,7 +1008,7 @@ overworld_create = () ->
     local conf, schema
     if os.getenv("ARENA_ENEMIES")
         return test_create(0)
-    NewMaps.map_create (rng) -> 
+    NewMaps.map_create (rng) ->
         event_log("(RNG #%d) Attempting overworld generation\n", rng\amount_generated())
         conf or= OVERWORLD_CONF(rng)
         schema or= rng\random(3)

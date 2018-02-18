@@ -16,9 +16,9 @@ local function find_intersecting_line(map, region1, region2)
     }
 end
 
-function M.brute_tunnel(map, region1, region2, args) 
+function M.brute_tunnel(map, region1, region2, args)
     args = args or {}
-    local interval_length = args.interval_length or 4 
+    local interval_length = args.interval_length or 4
     local line_width = args.line_width or 4
     local line = find_intersecting_line(map, region1, region2)
     SourceMap.line_apply {

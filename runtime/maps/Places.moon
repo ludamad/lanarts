@@ -64,7 +64,7 @@ DragonLairFoyer = newtype {
     enemies: {
         "Fire Bat": 10
     }
-    -- Called before compile() is called 
+    -- Called before compile() is called
     generate: (args) =>
         for enemy, amount in pairs @enemies
             for i=1,amount
@@ -93,7 +93,7 @@ DragonLair = newtype {
         "Purple Dragon": 1
         "Fire Bat": 8
     }
-    -- Called before compile() is called 
+    -- Called before compile() is called
     generate: (args) =>
         for enemy, amount in pairs @enemies
             for i=1,amount
@@ -129,7 +129,7 @@ Arena = newtype {
     parent: MapCompiler
     root_node: cave()
     tileset: TileSets.lair
-    -- Called before compile() is called 
+    -- Called before compile() is called
     generate: (args) =>
         enemies = args.enemies or loadstring(os.getenv "ARENA_ENEMIES")() or {}
         for enemy, amount in pairs enemies
@@ -150,7 +150,7 @@ SimpleRoom = newtype {
             size: {20, 20}
         }
     tileset: TileSets.lair
-    -- Called before compile() is called 
+    -- Called before compile() is called
     generate: (args) =>
         enemies = args.enemies or {}
         for enemy, amount in pairs enemies
@@ -175,7 +175,7 @@ ChickenCoop = newtype {
             size: {60, 60}
         }
     tileset: TileSets.lair
-    -- Called before compile() is called 
+    -- Called before compile() is called
     generate: (args) =>
         enemies = args.enemies or {}
         --enemies["Poulter"] = 1
