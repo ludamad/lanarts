@@ -66,8 +66,6 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
         SDL_Quit();
         exit(1);
     }
-    printf("CALLLED@!!!\n");
-    fflush(stdout);
 
     glDisable(GL_TEXTURE_2D);
 
