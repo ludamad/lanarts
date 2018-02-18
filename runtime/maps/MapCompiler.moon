@@ -244,7 +244,11 @@ MapCompiler = newtype {
     get_node_owned_regions: (node) => @_regions[node]
     get_node_children: (node) => @_children[node]
     get_node_total_region: (node) => @_combined_region[node]
-    get_node_bbox: (node) => map_region_bbox(@_combined_region[node])
+    get_node_bbox: (node) => 
+        {x1, y1, x2, y2} = map_region_bbox(@_combined_region[node])
+        {dx, dy, _, _} = @get_total_bbox()
+        return {x1 - dx, y1 - dy, x2 - dx, y2 - dy}
+        
     get_total_bbox: () => @_outer_bbox
 
     fill_unconnected: () =>

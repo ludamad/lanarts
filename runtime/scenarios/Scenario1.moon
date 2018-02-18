@@ -2,6 +2,7 @@ import MapRegion, combine_map_regions, map_regions_bbox from require "maps.MapRe
 
 World = require "core.World"
 {:MapCompiler} = require "maps.MapCompiler"
+Vaults = require "maps.Vaults"
 MapUtils = require "maps.MapUtils"
 TileSets = require "tiles.Tilesets"
 GenerateUtils = require "maps.GenerateUtils"
@@ -17,7 +18,7 @@ import Spread, Shape
 
 create_scenario = () ->
 
-    caverns = for i=1,3 do Spread {
+    caverns = for i=1,2 do Spread {
         regions: {
             Shape {
                 shape: 'deformed_ellipse'
@@ -38,13 +39,14 @@ create_scenario = () ->
         connection_scheme: 'direct_light'
     }
     generate = (args) =>
-        area = @get_node_bbox(caverns[1])
-        pretty area
+        -- TODO fix
+        -- area = @get_node_bbox(caverns[1])
         enemies = {
-            "Red Slime": 100
+            "Red Slime": 10
         }
         for enemy, amount in pairs enemies do for i=1,amount
-           sqr = MapUtils.random_square(@map, area)
+           area = nil
+           sqr = MapUtils.random_square(@map, area, {matches_group: 1, matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
            if not sqr
                continue
            MapUtils.spawn_enemy(@map, enemy, sqr)
