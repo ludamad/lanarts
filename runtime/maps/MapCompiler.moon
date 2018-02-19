@@ -244,13 +244,8 @@ MapCompiler = newtype {
     get_node_owned_regions: (node) => @_regions[node]
     get_node_children: (node) => @_children[node]
     get_node_total_region: (node) => @_combined_region[node]
-    get_node_bbox: (node) => 
-        {x1, y1, x2, y2} = map_region_bbox(@_combined_region[node])
-        {dx, dy, _, _} = @get_total_bbox()
-        return {x1 - dx, y1 - dy, x2 - dx, y2 - dy}
-        
-    get_total_bbox: () => @_outer_bbox
-
+    get_node_bbox: (node) => return map_region_bbox(@_combined_region[node])
+    
     fill_unconnected: () =>
         {w,h} = @map.size
         SourceMap.area_fill_unconnected {
@@ -281,21 +276,30 @@ MapCompiler = newtype {
     _prepare_source_map: (label, padding, content) =>
         -- Correct map topology:
         all_regions = {}
-        @for_all_nodes (node) =>
-            for region in *@_regions[node]
-                append all_regions, region
-        bbox = map_regions_bbox(all_regions)
-        @_outer_bbox = bbox
+        -- @for_all_nodes (node) =>
+        --     for region in *@_regions[node]
+        --         append all_regions, region
+        bbox = map_region_bbox @_combined_region[@root_node]
         -- Assert that our polygons fit within our created source map bounds:
         w, h = bbox[3] - bbox[1], bbox[4] - bbox[2]
         -- TODO DEBUG-ONLY CHECK Really make sure we are drawing in correct bounds
+
+        @_combined_region[@root_node]\translate(-bbox[1] + padding, -bbox[2] + padding)
         @for_all_nodes (node) =>
-            for region in *@_regions[node]
-                region\translate(-bbox[1] + padding, -bbox[2] + padding)
-                for polygon in *region.polygons
-                    for {x, y} in *polygon
-                        assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
-                        assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
+            for polygon in *@_combined_region[node].polygons
+                for {x, y} in *polygon
+                    assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
+                    assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
+            for {:polygon} in *@_combined_region[node].tunnels
+                for {x, y} in *polygon
+                    print x, y
+                    assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
+                    assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
+
+            --{x1, y1, x2, y2} = @get_node_bbox(node)
+            --assert x1 >= padding - 0.1 and x2 < w + padding + 0.1
+            --assert y1 >= padding - 0.1 and y2 < h + padding + 0.1
+
         --print("WIDTH", w, "HEIGHT", h)
         @map = SourceMap.map_create {
             rng: @rng

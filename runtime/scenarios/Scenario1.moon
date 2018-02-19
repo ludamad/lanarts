@@ -40,12 +40,11 @@ create_scenario = () ->
     }
     generate = (args) =>
         -- TODO fix
-        -- area = @get_node_bbox(caverns[1])
+        area = @get_node_bbox(caverns[1])
         enemies = {
             "Red Slime": 10
         }
         for enemy, amount in pairs enemies do for i=1,amount
-           area = nil
            sqr = MapUtils.random_square(@map, area, {matches_group: 1, matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
            if not sqr
                continue
