@@ -20,23 +20,28 @@ make_polygon_points = (rng, w, h, n_points) ->
 
 default_fill = () =>
     -- Fill the room:
-    i = 1
-    @for_all_nodes (node) =>
+    recurse = (node) ->
+        group = SourceMap.group_create(@map, {0,0,0,0}, 0)
         @apply node, {
             operator: {
                 remove: SourceMap.FLAG_SOLID
                 add: SourceMap.FLAG_SEETHROUGH
-                content: if i%2 == 1 then @tileset.floor else @tileset.floor_alt
-                group: i
+                content: if group%2 == 1 then @tileset.floor else @tileset.floor_alt
+                :group
             }
         }
+        for child in *@_children[node]
+            recurse(child)
+        group_child_max = SourceMap.map_num_groups(@map) - 1
+        @_group_sets[node] = {group, group_child_max}
         SourceMap.perimeter_apply {map: @map,
-            candidate_selector: {matches_all: SourceMap.FLAG_SOLID}, inner_selector: {matches_none: SourceMap.FLAG_SOLID, matches_group: i}
+            candidate_selector: {matches_all: SourceMap.FLAG_SOLID},
+            inner_selector: {matches_none: SourceMap.FLAG_SOLID, matches_group: @_group_sets[node]}
             operator: {
-                content: if i%2 == 1 then @tileset.wall else @tileset.wall_alt
+                content: if group%2 == 1 then @tileset.wall else @tileset.wall_alt
             }
         }
-        i += 1
+    recurse(@root_node)
     return true
 
 expand_if_nested = (value) ->
@@ -57,7 +62,9 @@ MapCompiler = newtype {
         -- Maps from node -> data
         @_children = {}
         @_regions = {}
+        @_group_sets = {}
         @_combined_region = {}
+        @_bboxes = {}
         @_next_group_id = 1
         @fill_function = args.fill_function or rawget(@, "fill_function") or default_fill
         @prepare(args)
@@ -67,11 +74,18 @@ MapCompiler = newtype {
     with_map: (f) =>
         append @post_poned, f
     -- Override to handle explicitly set spawn points
+
+    random_player_square: (player) -> MapUtils.random_square(@map, nil)
+
     get_player_spawn_points: () =>
         log_verbose "get_player_spawn_points #{@label} #{#World.players}"
         return for player in *World.players
             log_verbose "get_player_spawn_points #{player.name}"
-            {x, y} = MapUtils.random_square(@map, nil)
+            sqr = nil
+            for i=1,40
+                sqr = @random_player_square(player)
+                if sqr then break
+            {x, y} = sqr
             {x*32+16,y*32+16}
 
     get_map_region: (node) =>
@@ -207,45 +221,71 @@ MapCompiler = newtype {
                 @_flatten(elem, accum)
         return accum
     -- Sets node_children and node_regions
+
+    _prepare_children_topology: (regions, children_set, scatter_x = 20, scatter_y = 20) =>
+        return for region_node in *@_flatten(regions)
+            append children_set, region_node
+            @_prepare_map_topology(region_node)
+            -- TODO smarter spreading
+            x, y = @rng\random(-scatter_x, scatter_x), @rng\random(-scatter_y,scatter_y)
+            -- Can translate entire combined region; translates all subregions as well:
+            combined_region = @_combined_region[region_node]
+            combined_region\translate(x, y)
+            combined_region
+
+
     _prepare_map_topology: (node) =>
         map_regions = {}
-        children = {}
+        children_set = {}
         combined_region = nil
         switch getmetatable(node)
             when Spread
                 {:name, :regions, :connection_scheme, :spread_scheme} = node
-                child_regions = for region_node in *@_flatten(regions)
-                    append children, region_node
-                    @_prepare_map_topology(region_node)
-                    -- TODO smarter spreading
-                    x, y = @rng\random(-20, 20), @rng\random(-20,20)
-                    -- Can translate entire combined region; translates all subregions as well:
-                    combined_region = @_combined_region[region_node]
-                    combined_region\translate(x, y)
-                    combined_region
+                child_regions = @_prepare_children_topology(regions, children_set)
                 @_spread_regions(spread_scheme, child_regions)
                 @_connect_regions(connection_scheme, child_regions)
                 combined_region = combine_map_regions(child_regions)
                 DebugUtils.visualize_map_regions {regions: child_regions, title: "After connection / spread"}
-
             when Shape
                 {:name, :shape, :size} = node
                 {w, h} = size
-                combined_region = MapRegion.create @_generate_shape(shape,0,0,w,h)
-                append map_regions, combined_region
+                shape = @_generate_shape(shape,-w/2,-h/2,w,h)
+                region = MapRegion.create(shape)
+                append map_regions, region
+                if node.regions
+                    scatter_x, scatter_y = math.min(20, w / 10), math.min(20, h / 10)
+                    child_regions = @_prepare_children_topology(node.regions, children_set, scatter_x, scatter_y)
+
+                    B2GenerateUtils.spread_map_regions {
+                        rng: @rng
+                        regions: child_regions
+                        fixed_polygons: table.reversed(shape)
+                        n_iterations: 100
+                        mode: 'towards_center'
+                        clump_once_near: true
+                    }
+                    combined_region = combine_map_regions(child_regions)
+                    combined_region = combine_map_regions({region, combined_region})
+                else
+                    combined_region = region
                 DebugUtils.visualize_map_regions {regions: map_regions, title: "Shape"}
             else
                 error("Unknown node")
+
         -- Regions 'owned' by this node
         @_regions[node] = map_regions
-        @_children[node] = children
+        @_children[node] = children_set
         @_combined_region[node] = assert combined_region, "Need combined_region ~= nil!"
 
     get_node_owned_regions: (node) => @_regions[node]
     get_node_children: (node) => @_children[node]
     get_node_total_region: (node) => @_combined_region[node]
-    get_node_bbox: (node) => return map_region_bbox(@_combined_region[node])
-    
+    get_node_bbox: (node) =>
+        if not @_bboxes[node]
+            @_bboxes[node] = map_region_bbox(@_combined_region[node])
+        return @_bboxes[node]
+    get_node_group_set: (node) => @_group_sets[node]
+
     fill_unconnected: () =>
         {w,h} = @map.size
         SourceMap.area_fill_unconnected {
@@ -285,6 +325,7 @@ MapCompiler = newtype {
         -- TODO DEBUG-ONLY CHECK Really make sure we are drawing in correct bounds
 
         @_combined_region[@root_node]\translate(-bbox[1] + padding, -bbox[2] + padding)
+
         @for_all_nodes (node) =>
             for polygon in *@_combined_region[node].polygons
                 for {x, y} in *polygon
@@ -292,7 +333,6 @@ MapCompiler = newtype {
                     assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
             for {:polygon} in *@_combined_region[node].tunnels
                 for {x, y} in *polygon
-                    print x, y
                     assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
                     assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
 

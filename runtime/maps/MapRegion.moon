@@ -117,7 +117,7 @@ main = (raw_args) ->
         if #regions > 1
             B2GenerateUtils.spread_map_regions {
                 :rng
-                :regions 
+                :regions
                 fixed_polygons: {make_polygon(0, 0, 8, 8)}
                 n_iterations: 50
                 mode: 'towards_fixed_shapes'
@@ -127,7 +127,7 @@ main = (raw_args) ->
         if #regions > 1
             B2GenerateUtils.connect_map_regions {
                 :rng
-                :regions 
+                :regions
                 fixed_polygons: {make_polygon(0, 0, 8, 8)}
                 n_connections: 5
             }
@@ -169,7 +169,7 @@ main = (raw_args) ->
 
     timer = timer_create()
     SourceMap.area_fill_unconnected {
-        :map, 
+        :map,
         seed: {w/2, h/2}
         unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
         mark_operator: {add: {SourceMap.FLAG_RESERVED2}}

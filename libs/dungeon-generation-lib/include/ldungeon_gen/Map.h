@@ -19,6 +19,29 @@
 class SerializeBuffer;
 
 namespace ldungeon_gen {
+    const uint16_t UNSET = uint16_t(-1);
+
+    struct Range16 {
+        uint16_t min = UNSET, max = UNSET;
+        Range16() {
+        }
+        Range16(uint16_t min, uint16_t max) :
+                min(min), max(max) {
+            LCOMMON_ASSERT(min <= max);
+        }
+        bool operator==(const Range16& r) const {
+            return min == r.min && max == r.max;
+        }
+        bool operator!=(const Range16& r) const {
+            return !(*this == r);
+        }
+        bool empty() {
+            return min == UNSET && max == UNSET;
+        }
+        bool within(uint16_t val) {
+            return val >= min && val <= max;
+        }
+    };
 
 	const uint16_t FLAG_SOLID = 1 << 0;
 	const uint16_t FLAG_PERIMETER = 1 << 1;
@@ -36,7 +59,7 @@ namespace ldungeon_gen {
 		uint16_t must_be_on_bits;
 		uint16_t must_be_off_bits;
 		uint16_t must_be_content;
-		uint16_t must_be_group;
+        Range16 must_be_group;
 		bool use_must_be_content;
 
 		Selector(uint16_t must_be_on_bits, uint16_t must_be_off_bits,
@@ -44,7 +67,6 @@ namespace ldungeon_gen {
 						must_be_on_bits(must_be_on_bits),
 						must_be_off_bits(must_be_off_bits),
 						must_be_content(must_be_content),
-						must_be_group(-1),
 						use_must_be_content(true) {
 		}
 
@@ -52,7 +74,6 @@ namespace ldungeon_gen {
 						must_be_on_bits(must_be_on_bits),
 						must_be_off_bits(must_be_off_bits),
 						must_be_content(-1),
-						must_be_group(-1),
 						use_must_be_content(false) {
 		}
 
@@ -135,8 +156,8 @@ namespace ldungeon_gen {
 							== flags)
 					&& (!selector.use_must_be_content
 							|| content == selector.must_be_content)
-					&& (selector.must_be_group == uint16_t(-1)
-							|| group == selector.must_be_group);
+					&& (selector.must_be_group.empty()
+							|| selector.must_be_group.within(group));
 		}
 		inline void apply(Operator oper) {
 			/* By turning off first, we can wipe all flags and set new ones */

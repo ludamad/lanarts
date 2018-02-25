@@ -1,3 +1,4 @@
+
 M = nilprotect {}
 
 _node = (handler_map) ->
@@ -84,6 +85,7 @@ M.Shape = _node {
     shape: any -- typecheck "string"
     size: typecheck "table"
     post_compile: optional "string"
+    embeds: optional "table"
     --rotation: optional "string" -- TODO
 }
 

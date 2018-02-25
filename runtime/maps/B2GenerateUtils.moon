@@ -1,4 +1,4 @@
--- Helpers for using Box2D to make levels with 
+-- Helpers for using Box2D to make levels with
 
 b2 = require 'b2'
 GenerateUtils = require "maps.GenerateUtils"
@@ -58,7 +58,7 @@ B2ShapeConnector = newtype {
     init: (b2world) =>
         -- The simulation world:
         @world = b2world.world
-        -- All bodies you do not want tunnels to overlap 
+        -- All bodies you do not want tunnels to overlap
         @all_bodies = {}
         -- Bodies you want to connect, and their connection lists
         @bodies = {}
@@ -112,7 +112,7 @@ B2ShapeConnector = newtype {
         -- Constants
         TUNNEL_WIDTH = 2
         DIST_THRESHOLD = 0.0
-        -- 
+        --
         if #@bodies < 2
             error("Cannot connect a set of just one body!")
         index_a = rng\random(1,#@bodies)
@@ -126,10 +126,10 @@ B2ShapeConnector = newtype {
         p1, p2, dist = B2Utils.body_distance(body_a, body_b)
         x1, y1 = p1.x, p1.y
         x2, y2 = p2.x, p2.y
-        local dx, dy 
+        local dx, dy
         if dist <= DIST_THRESHOLD
-            -- If the points coincide or are close, 
-            -- use the center point of body_a for deciding 
+            -- If the points coincide or are close,
+            -- use the center point of body_a for deciding
             -- penetration direction
             -- TODO use fixture data for this, too
             bp1 = body_a.body\GetPosition()
@@ -190,7 +190,7 @@ _spread_shapes = (args) ->
     b2world = assert args.b2world
     n_iterations = args.n_iterations or 100 -- Default 100 iterations
     n_subiterations = args.n_subiterations or 10 -- Default 100 iterations
-    -- Do shapes from clumps once they become near?
+    -- Do shapes form clumps once they become near?
     clump_once_near = args.clump_once_near or false
     mode = args.mode or 'towards_fixed_shapes'
 

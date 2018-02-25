@@ -74,6 +74,22 @@ namespace ldungeon_gen {
 
 	}
 
+    static Range16 parse_range(const LuaField& range) {
+        if (range.isnil()) {
+            return {};
+        }
+        range.push();
+        if (lua_type(range.luastate(), -1) == LUA_TTABLE) {
+            range.pop();
+            return {range[1].as<uint16_t>(), range[2].as<uint16_t>()};
+        } else {
+            range.pop();
+            uint16_t val = range.as<uint16_t>();
+            return {val, val};
+        }
+
+    }
+
 	/* Handles either nil (==0), a list of flags (ORs them), or an integer */
 	static int flags_get(LuaField flags) {
 		lua_State* L = flags.luastate();
@@ -99,7 +115,7 @@ namespace ldungeon_gen {
 				flags_get(args["matches_none"]),
 				luawrap::defaulted(args["matches_content"], uint16_t(-1)));
 		selector.use_must_be_content = has_content;
-                selector.must_be_group = luawrap::defaulted(args["matches_group"], uint16_t(-1));
+                selector.must_be_group = parse_range(args["matches_group"]);
 		return selector;
 	}
 
@@ -177,6 +193,13 @@ namespace ldungeon_gen {
 		return 1;
 	}
 
+    static int lua_map_num_groups(const MapPtr& ptr) {
+        return ptr->groups.size();
+    }
+
+    static int lua_map_group_create(const MapPtr& ptr, BBox area, uint16_t parent_group_id) {
+        return ptr->make_group(area, parent_group_id);
+    }
 	static int lua_map_group_list(lua_State* L) {
 		MapPtr map = luawrap::get<MapPtr>(L, 1);
 		lua_newtable(L);
@@ -724,7 +747,9 @@ namespace ldungeon_gen {
 
 	static void lua_register_placement_functions(const LuaValue& submodule) {
 		submodule["map_create"].bind_function(map_create);
+        submodule["group_create"].bind_function(lua_map_group_create);
 		submodule["map_copy"].bind_function(lmap_copy);
+        submodule["map_num_groups"].bind_function(lua_map_num_groups);
 		submodule["rectangle_operator"].bind_function(rectangle_operator);
 		submodule["tunnel_operator"].bind_function(tunnel_operator);
 		submodule["rectangle_apply"].bind_function(rectangle_apply);

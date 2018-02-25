@@ -219,6 +219,14 @@ function table.tconcat(t1, t2)
     return t
 end
 
+function table.reversed(t)
+    local t_rev = {}
+    for i=#t,1 do
+        t_rev[#t_rev + 1] = t[i]
+    end
+    return t_rev
+end
+
 --- Adds values from src to dest, copying them if initially nil
 function table.defaulted_addition(src, dest)
     for k,v in pairs(src) do
