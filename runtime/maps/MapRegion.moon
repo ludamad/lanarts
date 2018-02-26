@@ -11,7 +11,7 @@ MapRegion = newtype {
     init: (polygons, tunnels = {}) =>
         @polygons = assert polygons
         @tunnels = tunnels
-    apply: (args) =>
+    inner_apply: (args) =>
         {:map, :area, :operator} = args
         for polygon in *@polygons
             for {x,y} in *polygon
@@ -21,6 +21,9 @@ MapRegion = newtype {
                 :map, :area, :operator
                 points: polygon
             }
+        return nil
+    tunnel_apply: (args) =>
+        {:map, :area, :operator} = args
         for {:polygon} in *@tunnels
             for {x,y} in *polygon
                 assert x > 5 and y > 5
@@ -30,6 +33,9 @@ MapRegion = newtype {
                 points: polygon
             }
         return nil
+    apply: (args) =>
+        @tunnel_apply(args)
+        @inner_apply(args)
     translate: (x, y) =>
         for polygon in *@polygons
             for point in *polygon

@@ -31,8 +31,9 @@ from_set = (set, allow_nesting) -> (name) -> (obj, args) ->
         val = val.type
     if val == nil
         error("Required argument #{name}")
-    if not set[val]
-        error("Invalid argument #{name} = #{val}")
+    if type(val) ~= "function" -- TODO hack, always allowing functions
+        if not set[val]
+            error("Invalid argument #{name} = #{val}")
     obj[name] = args[name]
 
 typecheck = (type) -> (name) -> (obj, args) ->
@@ -72,20 +73,28 @@ _SPREAD_SCHEMES = {
     box2d_solid_center: true
 }
 
+_FILL_SCHEMES = {
+    -- TODO
+}
+
 M.Spread = _node {
     name: optional "string"
     regions: typecheck "table"
     connection_scheme: from_set(_CONNECTION_SCHEMES, true)
     spread_scheme: from_set(_SPREAD_SCHEMES, true)
-    post_compile: optional "string"
+    paint: optional "function"
+    place_objects: optional "function"
+    properties: optional "table"
 }
 
 M.Shape = _node {
     name: optional "string"
     shape: any -- typecheck "string"
     size: typecheck "table"
-    post_compile: optional "string"
     embeds: optional "table"
+    paint: optional "function"
+    place_objects: optional "function"
+    properties: optional "table"
     --rotation: optional "string" -- TODO
 }
 

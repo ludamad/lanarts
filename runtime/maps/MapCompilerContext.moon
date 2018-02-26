@@ -85,18 +85,16 @@ MapCompilerContext = newtype {
             compiler = C.create {
                 label: label
                 rng: require('mtwist').create(random(0,2^30))
+                spawn_players: args.spawn_players
             }
+            if not compiler\prepare()
+                error("Map generation completely failed!!")
             args.context = @
             args.compiler = compiler
             compiler\generate(args)
             for pending_feature in *@pending_features[label]
                 pending_feature\compile(args)
             @maps[label] = compiler\compile(args)
-            if args.spawn_players 
-                World.players_spawn @maps[label], compiler\get_player_spawn_points()
-                if os.getenv "LANARTS_XP"
-                    for p in *World.players
-                        p.instance\gain_xp(tonumber(os.getenv "LANARTS_XP"))
         @pending_maps[label] = nil
         @pending_features[label] = nil
         return @maps[label]

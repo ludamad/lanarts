@@ -18,32 +18,6 @@ import Spread, Shape
 make_polygon_points = (rng, w, h, n_points) ->
     return GenerateUtils.skewed_ellipse_points(rng, {0,0}, {30, 30}, rng\random(4,12))
 
-default_fill = () =>
-    -- Fill the room:
-    recurse = (node) ->
-        group = SourceMap.group_create(@map, {0,0,0,0}, 0)
-        @apply node, {
-            operator: {
-                remove: SourceMap.FLAG_SOLID
-                add: SourceMap.FLAG_SEETHROUGH
-                content: if group%2 == 1 then @tileset.floor else @tileset.floor_alt
-                :group
-            }
-        }
-        for child in *@_children[node]
-            recurse(child)
-        group_child_max = SourceMap.map_num_groups(@map) - 1
-        @_group_sets[node] = {group, group_child_max}
-        SourceMap.perimeter_apply {map: @map,
-            candidate_selector: {matches_all: SourceMap.FLAG_SOLID},
-            inner_selector: {matches_none: SourceMap.FLAG_SOLID, matches_group: @_group_sets[node]}
-            operator: {
-                content: if group%2 == 1 then @tileset.wall else @tileset.wall_alt
-            }
-        }
-    recurse(@root_node)
-    return true
-
 expand_if_nested = (value) ->
     if type(value) == "table" and type(value.type) == "string"
         return value.type, value
@@ -65,9 +39,8 @@ MapCompiler = newtype {
         @_group_sets = {}
         @_combined_region = {}
         @_bboxes = {}
+        @_spawn_players = args.spawn_players
         @_next_group_id = 1
-        @fill_function = args.fill_function or rawget(@, "fill_function") or default_fill
-        @prepare(args)
     add: (selector, operator) =>
         append @operators, {:selector, :operator}
 
@@ -79,14 +52,17 @@ MapCompiler = newtype {
 
     get_player_spawn_points: () =>
         log_verbose "get_player_spawn_points #{@label} #{#World.players}"
-        return for player in *World.players
+        spawn_points = for player in *World.players
             log_verbose "get_player_spawn_points #{player.name}"
             sqr = nil
             for i=1,40
                 sqr = @random_player_square(player)
                 if sqr then break
+            if sqr == nil
+                return nil
             {x, y} = sqr
             {x*32+16,y*32+16}
+        return spawn_points
 
     get_map_region: (node) =>
         assert @_regions[node], "Must run compile_map_topology on node first!"
@@ -119,8 +95,9 @@ MapCompiler = newtype {
             when 'rectangle'
                 -- Half chance of being rotated:
                 if @rng\randomf() > .5
-                    return {{x-h/2,y-w/2,x+h, y+w}}
-                return {{x-w/2, y-h/2, x+w, y+h}}
+                    w, h = h, w
+                polygon = GenerateUtils.ellipse_points_0(@rng, {x,y}, {w, h}, 4)
+                return {polygon}
             else
                 parts = scheme\split(':')
                 name = parts[1]
@@ -169,24 +146,24 @@ MapCompiler = newtype {
             else
                 error("Unexpected")
         log_verbose "Spread regions time: #{timer\get_milliseconds()}ms"
+    connect_map_regions: (regions, n_connections=2) =>
+        B2GenerateUtils.connect_map_regions {
+            rng: @rng
+            :regions
+            :n_connections
+        }
     _connect_regions: (scheme, regions) =>
+        if type(scheme) == "function"
+            return scheme(@)
         scheme, scheme_args = expand_if_nested(scheme)
         switch scheme
             when 'direct_light'
                 timer = timer_create()
-                B2GenerateUtils.connect_map_regions {
-                    rng: @rng
-                    :regions
-                    n_connections: 2
-                }
+                @connect_map_regions(regions, 2)
                 log_verbose "Connect regions time: #{timer\get_milliseconds()}ms"
             when 'direct'
                 timer = timer_create()
-                B2GenerateUtils.connect_map_regions {
-                    rng: @rng
-                    :regions
-                    n_connections: #regions * 2
-                }
+                @connect_map_regions(regions, #regions * 2)
                 log_verbose "Connect regions time: #{timer\get_milliseconds()}ms"
             when 'minimum_spanning_arc_and_line'
                 @with_map (map) ->
@@ -222,10 +199,10 @@ MapCompiler = newtype {
         return accum
     -- Sets node_children and node_regions
 
-    _prepare_children_topology: (regions, children_set, scatter_x = 20, scatter_y = 20) =>
+    _prepare_children_topology: (parent, regions, children_set, scatter_x = 20, scatter_y = 20) =>
         return for region_node in *@_flatten(regions)
             append children_set, region_node
-            @_prepare_map_topology(region_node)
+            @_prepare_map_topology(region_node, parent)
             -- TODO smarter spreading
             x, y = @rng\random(-scatter_x, scatter_x), @rng\random(-scatter_y,scatter_y)
             -- Can translate entire combined region; translates all subregions as well:
@@ -234,14 +211,22 @@ MapCompiler = newtype {
             combined_region
 
 
-    _prepare_map_topology: (node) =>
+    _prepare_map_topology: (node, parent=nil) =>
         map_regions = {}
         children_set = {}
         combined_region = nil
+        node.parent = parent
+        node.properties or= {}
+        if parent ~= nil
+            for k,v in pairs(parent.properties)
+                if node.properties[k] ~= nil
+                    continue
+                -- Only inherit properties if we have not set them explicitly
+                node.properties[k] = v
         switch getmetatable(node)
             when Spread
                 {:name, :regions, :connection_scheme, :spread_scheme} = node
-                child_regions = @_prepare_children_topology(regions, children_set)
+                child_regions = @_prepare_children_topology(node, regions, children_set)
                 @_spread_regions(spread_scheme, child_regions)
                 @_connect_regions(connection_scheme, child_regions)
                 combined_region = combine_map_regions(child_regions)
@@ -254,7 +239,7 @@ MapCompiler = newtype {
                 append map_regions, region
                 if node.regions
                     scatter_x, scatter_y = math.min(20, w / 10), math.min(20, h / 10)
-                    child_regions = @_prepare_children_topology(node.regions, children_set, scatter_x, scatter_y)
+                    child_regions = @_prepare_children_topology(node, node.regions, children_set, scatter_x, scatter_y)
 
                     B2GenerateUtils.spread_map_regions {
                         rng: @rng
@@ -280,9 +265,18 @@ MapCompiler = newtype {
     get_node_owned_regions: (node) => @_regions[node]
     get_node_children: (node) => @_children[node]
     get_node_total_region: (node) => @_combined_region[node]
-    get_node_bbox: (node) =>
+    get_node_bbox: (node, padding=0) =>
         if not @_bboxes[node]
             @_bboxes[node] = map_region_bbox(@_combined_region[node])
+        if padding ~= 0
+            {w,h} = @map.size
+            {x1, y1, x2, y2} = @_bboxes[node]
+            return {
+                math.max(0, math.min(x1 - padding, w))
+                math.max(0, math.min(y1 - padding, h))
+                math.max(0, math.min(x2 + padding, w))
+                math.max(0, math.min(y2 + padding, h))
+            }
         return @_bboxes[node]
     get_node_group_set: (node) => @_group_sets[node]
 
@@ -296,14 +290,13 @@ MapCompiler = newtype {
             marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
             fill_operator: {content: @tileset.wall, add: SourceMap.FLAG_SOLID, remove: SourceMap.FLAG_SEETHROUGH}
         }
-    apply: (node, args) =>
+    apply: (node, args, tunnel_args) =>
         assert not args.map, "Passing map here redundant!"
         args.map = @map
+        if tunnel_args then tunnel_args.map = @map
         for region in *@_regions[node]
-            region\apply(args)
-        if node.post_compile ~= nil
-            args.regions = @_regions[node]
-            node\post_compile(args)
+            region\tunnel_apply(tunnel_args or args)
+            region\inner_apply(args)
 
     -- Depth-first traversal of node tree
     for_all_nodes: (func) =>
@@ -312,6 +305,90 @@ MapCompiler = newtype {
                 recurse(child)
             func(@, node)
         recurse(@root_node)
+
+    tile_paint: (node, floor_tile, tunnel_tile) =>
+        if not floor_tile
+            floor_tile = (if node.group%2 == 1 then @tileset.floor else @tileset.floor_alt)
+        if not tunnel_tile
+            tunnel_tile = (if node.group%2 == 1 then @tileset.floor_alt else @tileset.floor)
+        @apply node, {
+            operator: {
+                remove: {SourceMap.FLAG_SOLID, SourceMap.FLAG_TUNNEL}
+                add: SourceMap.FLAG_SEETHROUGH
+                content: floor_tile, group: node.group
+            }
+        }, {
+            operator: {
+                remove: SourceMap.FLAG_SOLID
+                add: {SourceMap.FLAG_SEETHROUGH, SourceMap.FLAG_TUNNEL}
+                content: tunnel_tile, group: node.group
+            }
+        }
+
+
+    tile_paint_perimeter: (node, wall_tile=nil) =>
+        if not wall_tile
+            wall_tile = (if node.group%2 == 1 then @tileset.wall else @tileset.wall_alt)
+        SourceMap.perimeter_apply {map: @map,
+            candidate_selector: {matches_all: SourceMap.FLAG_SOLID},
+            inner_selector: {matches_none: SourceMap.FLAG_SOLID, matches_group: @_group_sets[node]}
+            operator: {
+                content: wall_tile
+            }
+        }
+
+    paint_children: (node) =>
+        for child in *@_children[node]
+            val = @paint_node(child)
+            return false if val == false
+        return true
+
+    paint_node: (node) =>
+        -- Determine root (lowest) value in group range
+        node.group = SourceMap.group_create(@map, {0,0,0,0}, 0)
+        -- Paint the node
+        if node.paint
+            val = node.paint(@, node)
+            return false if val == false
+        else
+            @tile_paint(node, node.properties.floor_tile, node.properties.tunnel_tile)
+        if not @paint_children(node)
+            return false
+        -- Determine highest value in group range
+        group_child_max = SourceMap.map_num_groups(@map) - 1
+        -- Set group range
+        @_group_sets[node] = {node.group, group_child_max}
+        -- Fill perimeter with wall tile
+        @tile_paint_perimeter(node, node.properties.wall_tile)
+        return true
+
+    _shuffle: (tbl) =>
+      for i=#tbl,1,-1 do
+          rand = @rng\random(1, #tbl)
+          tbl[i], tbl[rand] = tbl[rand], tbl[i]
+      return tbl
+
+    node_match: (node, args, shuffle=true) =>
+        args.map = @map
+        args.area = @get_node_bbox(node, args.padding)
+        args.selector.matches_group = @get_node_group_set node
+        squares = SourceMap.rectangle_match(args)
+        if shuffle then @_shuffle squares
+        return squares
+
+    place_children_objects: (node) =>
+        for child in *@_children[node]
+            val = @place_node_objects(child)
+            return false if val == false
+        return true
+
+    place_node_objects: (node) =>
+        -- Determine root (lowest) value in group range
+        -- Create the node's objects
+        if node.place_objects
+            val = node.place_objects(@, node)
+            return false if val == false
+        return @place_children_objects(node)
 
     _prepare_source_map: (label, padding, content) =>
         -- Correct map topology:
@@ -349,8 +426,17 @@ MapCompiler = newtype {
             instances: {}
             :content
         }
-        if not @fill_function()
+        if not @paint_node(@root_node)
             return false
+        @_recalculate_perimeter()
+        if not @place_node_objects(@root_node)
+            return false
+       
+        if @_spawn_players
+            spawn_points = @get_player_spawn_points()
+            if not spawn_points
+                return false
+            @_player_spawn_points = spawn_points
         for callback in *@post_poned
             callback(@map)
         SourceMap.erode_diagonal_pairs {map: @map, rng: @rng, selector: {matches_all: SourceMap.FLAG_SOLID}}
@@ -371,25 +457,39 @@ MapCompiler = newtype {
         return MapUtils.random_square(@map, area, {matches_none: {Vaults.FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
 
     -- Creates @map, ready to be filled
-    prepare: (args) =>
-        success = false
-        while not success
-            table.clear @_regions
+    prepare: (args={}) =>
+        MAX_TRIES = 1000
+        for i=1,MAX_TRIES
             table.clear @_children
+            table.clear @_regions
+            table.clear @_group_sets
             table.clear @_combined_region
-            label = assert (args.label or @label), "Should have map 'label'"
+            table.clear @_bboxes
             padding = args.padding or 10
             content = args.content or (if rawget(self, 'tileset') then @tileset.wall else 0)
-            @_prepare_map_topology(@root_node)
-            success = @_prepare_source_map(label, padding, content)
+            val = @_prepare_map_topology(@root_node)
+            if val == false
+                continue
+            success = @_prepare_source_map(@label, padding, content)
+            if success
+                return true
+        return false
     -- Creates a game map
     compile: (args) =>
-        return Map.create {
+        gmap = Map.create {
             map: @map
             label: @map.label
             instances: @map.instances
             wandering_enabled: true
         }
+
+        if @_spawn_players
+            World = require "core.World"
+            World.players_spawn gmap, @_player_spawn_points
+            if os.getenv "LANARTS_XP"
+                for p in *World.players
+                    p.instance\gain_xp(tonumber(os.getenv "LANARTS_XP"))
+        return gmap
 }
 
 main = (raw_args) ->
