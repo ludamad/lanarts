@@ -256,4 +256,8 @@ visualize_map_regions = (args) ->
     b2world = _b2_world_from_args(args)
     b2world\visualize(args.title)
 
-return {:connect_map_regions, :spread_map_regions, :visualize_map_regions}
+return {:connect_map_regions, :spread_map_regions, :visualize_map_regions,
+        has_overlaps: (args) ->
+            b2world = _b2_world_from_args(args)
+            return b2world\has_overlaps()
+        create_b2world: _b2_world_from_args}

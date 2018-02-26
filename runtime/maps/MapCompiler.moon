@@ -16,7 +16,7 @@ import Spread, Shape
     from require "maps.MapElements"
 
 make_polygon_points = (rng, w, h, n_points) ->
-    return GenerateUtils.skewed_ellipse_points(rng, {0,0}, {30, 30}, rng\random(4,12))
+    return GenerateUtils.skewed_ellipse_points(rng, {0,0}, {30, 30}, n_points or rng\random(4,8))
 
 expand_if_nested = (value) ->
     if type(value) == "table" and type(value.type) == "string"
@@ -85,11 +85,11 @@ MapCompiler = newtype {
         scheme, scheme_args = expand_if_nested(scheme)
         switch scheme
             when 'deformed_ellipse'
-                points = scheme_args.n_points or @rng\random(5, 15)
+                points = scheme_args.n_points or @rng\random(5, 8)
                 polygon = GenerateUtils.skewed_ellipse_points(@rng, {x,y}, {w, h}, points)
                 return {polygon}
             when 'ellipse'
-                points = scheme_args.n_points or @rng\random(5, 15)
+                points = scheme_args.n_points or @rng\random(5, 8)
                 polygon = GenerateUtils.ellipse_points_0(@rng, {x,y}, {w, h}, points)
                 return {polygon}
             when 'rectangle'
@@ -153,6 +153,11 @@ MapCompiler = newtype {
             else
                 error("Unexpected")
         log_verbose "Spread regions time: #{timer\get_milliseconds()}ms"
+
+    property: (node, property, default=nil) =>
+        if node.properties[property] == nil
+            return default
+        return ode.properties[property]
     connect_map_regions: (regions, n_connections=2) =>
         B2GenerateUtils.connect_map_regions {
             rng: @rng
@@ -283,9 +288,13 @@ MapCompiler = newtype {
     as_owned_regions: (node) => @_regions[node]
     as_children: (node) => @_children[node]
     as_region: (node) => @_combined_region[node]
+    as_size: (node) =>
+        bbox = @as_bbox node
+        w,h = (bbox[3] - bbox[1]), (bbox[4] - bbox[2])
+        return {w, h}
     as_bbox: (node, padding=0) =>
-        if not @_bboxes[node]
-            @_bboxes[node] = map_region_bbox(@_combined_region[node])
+        --if not @_bboxes[node]
+        @_bboxes[node] = map_region_bbox(@_combined_region[node])
         if padding ~= 0
             {w,h} = @map.size
             {x1, y1, x2, y2} = @_bboxes[node]
@@ -410,10 +419,6 @@ MapCompiler = newtype {
 
     _prepare_source_map: (label, padding, content) =>
         -- Correct map topology:
-        all_regions = {}
-        -- @for_all_nodes (node) =>
-        --     for region in *@_regions[node]
-        --         append all_regions, region
         bbox = map_region_bbox @_combined_region[@root_node]
         -- Assert that our polygons fit within our created source map bounds:
         w, h = bbox[3] - bbox[1], bbox[4] - bbox[2]
@@ -449,7 +454,7 @@ MapCompiler = newtype {
         @_recalculate_perimeter()
         if not @place_node_objects(@root_node)
             return false
-       
+
         if @_spawn_players
             spawn_points = @get_player_spawn_points()
             if not spawn_points

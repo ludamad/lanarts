@@ -6,6 +6,7 @@ Vaults = require "maps.Vaults"
 MapUtils = require "maps.MapUtils"
 TileSets = require "tiles.Tilesets"
 GenerateUtils = require "maps.GenerateUtils"
+import has_overlaps from require "maps.B2GenerateUtils"
 SourceMap = require "core.SourceMap"
 Map = require "core.Map"
 Region1 = require "maps.Region1"
@@ -22,6 +23,59 @@ import get_door_candidates from require "maps.DoorGeneration"
 import Spread, Shape
     from require "maps.MapElements"
 
+place_encounter_behind_door = (node, enemies) =>
+    for xy in *get_door_candidates(@, node)
+        -- Generate a runed door
+        MapUtils.spawn_door(@map, xy, nil, Vaults._rune_door_closed, "dummykey")
+    enemy_candidate_squares = @node_match node, {
+        padding: 10
+        selector: {
+            matches_all: {SourceMap.FLAG_TUNNEL}
+            matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID, FLAG_DOOR_CANDIDATE}
+        }
+    }
+    if #enemy_candidate_squares < #enemies
+        return true --false
+    for i=1,#enemies
+        MapUtils.spawn_enemy(@map, enemies[i], enemy_candidate_squares[i])
+
+N_JUNCTION_TRIES = 4
+junction = (nodes) ->
+    connector_node = Shape {
+        shape: "deformed_ellipse", size: {10, 20},
+        properties: {wall_tile: TileSets.hive.wall}
+    }
+    return Spread {
+        regions: table.tconcat {connector_node}, nodes
+        spread_scheme: () =>
+            {jw, jh} = @as_size connector_node
+            -- Keep the junction at 0,0
+            for node in *nodes
+                region = @as_region node
+                region\rotate(@rng\randomf(-math.pi, math.pi))
+                angle = @property node, "angle", @rng\randomf(-math.pi, math.pi)
+                drift = @property node, "drift", @rng\randomf(1.2, 1.5)
+                {w, h} = @as_size node
+                for i=1,N_JUNCTION_TRIES
+                    dx, dy = (w*drift+jw)*math.cos(angle), (h*drift+jh)*math.sin(angle)
+                    region\translate(dx, dy)
+                    if false and has_overlaps {regions: [@as_region node for node in *nodes]}
+                        if i == N_JUNCTION_TRIES
+                            return false
+                        region\translate(-dx, -dy)
+                        angle = @rng\randomf(-math.pi, math.pi)
+                        drift = @rng\randomf(1.2, 1.7)
+                    else
+                        break
+            return true
+        properties: {
+            tunnel_tile: TileSets.lair.floor
+        }
+        connection_scheme: () =>
+            for node in *nodes
+                @_connect_regions 'direct_light', {@as_region(node), @as_region(connector_node)}
+    }
+
 create_scenario = (rng) ->
     size_scale = 1
     enemy_n_scale = 1
@@ -34,92 +88,25 @@ create_scenario = (rng) ->
 
     -- NODES
     initial_room = Shape {
-        --shape: random_choice({"deformed_ellipse", "rectangle"})
         shape: 'deformed_ellipse'
-        size: adjusted_size({10, 20})
+        size: {10, 20}
         properties: {wall_tile: TileSets.hive.wall}
         paint: (node) =>
             @tile_paint(node, TileSets.hive.floor)
         place_objects: (node) =>
-            area = @as_bbox(node)
-            group_set = @as_group_set(node)
-            for xy in *get_door_candidates(@, node)
-                -- Generate a runed door
-                MapUtils.spawn_door(@map, xy, nil, Vaults._rune_door_closed, "dummykey")
-            enemy_candidate_squares = @node_match node, {
-                padding: 10
-                selector: {
-                    matches_all: {SourceMap.FLAG_TUNNEL}
-                    matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID, FLAG_DOOR_CANDIDATE}
-                }
-            }
-            if #enemy_candidate_squares < 10
-                return false
-            for i=1,10
-                sqr = enemy_candidate_squares[i]
-                if not sqr
-                    break
-                MapUtils.spawn_enemy(@map, "Ciribot", sqr)
+            val = place_encounter_behind_door @, node, for i=1,10
+                'Ciribot'
+            return false if val == false
     }
 
     enemy_enclosure  = Shape {
-        --shape: random_choice({"deformed_ellipse", "rectangle"})
         shape: 'deformed_ellipse'
-        size: adjusted_size({10, 20})
-        properties: {wall_tile: TileSets.hive.wall}
-        paint: (node) =>
-            @tile_paint(node, TileSets.hive.floor_alt)
-        place_objects: (node) =>
-            enemies = {
-                "Red Slime": 10
-            }
-            -- Loop over all enemies in this room
-            for enemy, amount in pairs enemies do for i=1,amount
-               -- Generate a single enemy of type 'enemy'
-               sqr = MapUtils.random_square(@map, @as_bbox(node), {
-                   matches_group: @as_group_set(node)
-                   matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}
-               })
-               if not sqr
-                   continue
-               MapUtils.spawn_enemy(@map, enemy, sqr)
-            return true
+        size: {10, 20}
+        properties: {wall_tile: TileSets.hive.wall, floor_tile: TileSets.hive.floor_alt}
     }
 
-    first_quarters = do
-        connection_scheme = 'direct_light'
-        properties = {
-            tunnel_tile: TileSets.lair.floor
-        }
-        junction = Shape {
-            shape: "deformed_ellipse", size: {10, 20},
-            properties: {wall_tile: TileSets.hive.wall}
-        }
-        spread_scheme = () =>
-            -- Keep the junction at 0,0
-            region1 = @as_region initial_room
-            region1\rotate(@rng\randomf(-math.pi, math.pi))
-            angle1 = @rng\randomf(-math.pi, math.pi)
-            region1\translate(20*math.cos(angle1), 20*math.sin(angle1))
+    root_node = junction {initial_room, enemy_enclosure}
 
-            region2 = @as_region enemy_enclosure
-            region2\rotate(@rng\randomf(-math.pi, math.pi))
-            angle2 = angle1 + @rng\randomf(math.pi/2, math.pi)
-            region2\translate(20*math.cos(angle2), 20*math.sin(angle2))
-
-        connection_scheme = () =>
-            @_connect_regions 'direct_light', {@as_region(initial_room), @as_region(junction)}
-            @_connect_regions 'direct_light', {@as_region(junction), @as_region(enemy_enclosure)}
-
-        Spread {
-            regions: {initial_room, enemy_enclosure, junction}
-            :spread_scheme
-            :properties
-            :connection_scheme
-        }
-
-    root_node = first_quarters
-    
     -- EVENTS/METHODS
     random_player_square = () =>
         return MapUtils.random_square(@map, @as_bbox(initial_room), {
