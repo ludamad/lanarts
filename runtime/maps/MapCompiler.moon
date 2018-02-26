@@ -109,6 +109,13 @@ MapCompiler = newtype {
                     return polygons
     _spread_regions: (scheme, regions) =>
         timer = timer_create()
+
+        -- Can translate entire combined region; translates all subregions as well:
+        -- TODO smarter spreading
+        if type(scheme) == "function"
+            return scheme(@, node)
+
+        @scatter_regions(regions)
         scheme, scheme_args = expand_if_nested(scheme)
         switch scheme
             when 'box2d'
@@ -153,8 +160,6 @@ MapCompiler = newtype {
             :n_connections
         }
     _connect_regions: (scheme, regions) =>
-        if type(scheme) == "function"
-            return scheme(@)
         scheme, scheme_args = expand_if_nested(scheme)
         switch scheme
             when 'direct_light'
@@ -199,17 +204,16 @@ MapCompiler = newtype {
         return accum
     -- Sets node_children and node_regions
 
-    _prepare_children_topology: (parent, regions, children_set, scatter_x = 20, scatter_y = 20) =>
-        return for region_node in *@_flatten(regions)
+    scatter_regions: (regions,  scatter_x=20, scatter_y=20) =>
+        for region in *regions
+            x, y = @rng\random(-scatter_x, scatter_x), @rng\random(-scatter_y,scatter_y)
+            region\translate(x, y)
+        return nil
+
+    _prepare_children_topology: (parent, regions, children_set) =>
+        for region_node in *@_flatten(regions)
             append children_set, region_node
             @_prepare_map_topology(region_node, parent)
-            -- TODO smarter spreading
-            x, y = @rng\random(-scatter_x, scatter_x), @rng\random(-scatter_y,scatter_y)
-            -- Can translate entire combined region; translates all subregions as well:
-            combined_region = @_combined_region[region_node]
-            combined_region\translate(x, y)
-            combined_region
-
 
     _prepare_map_topology: (node, parent=nil) =>
         map_regions = {}
@@ -226,21 +230,35 @@ MapCompiler = newtype {
         switch getmetatable(node)
             when Spread
                 {:name, :regions, :connection_scheme, :spread_scheme} = node
-                child_regions = @_prepare_children_topology(node, regions, children_set)
-                @_spread_regions(spread_scheme, child_regions)
-                @_connect_regions(connection_scheme, child_regions)
+                @_prepare_children_topology(node, regions, children_set)
+                child_regions = [@_combined_region[child] for child in *node.regions]
+                -- Handle node spreading
+                if type(spread_scheme) == "function"
+                    val = node.spread_scheme(@, node)
+                    return false if val == false
+                else
+                    val = @_spread_regions(spread_scheme, child_regions)
+                    return false if val == false
+                -- Handle node connection
+                if type(connection_scheme) == "function"
+                    val = node.connection_scheme(@, node)
+                    return false if val == false
+                else
+                    val = @_connect_regions(connection_scheme, child_regions)
+                    return false if val == false
                 combined_region = combine_map_regions(child_regions)
                 DebugUtils.visualize_map_regions {regions: child_regions, title: "After connection / spread"}
             when Shape
-                {:name, :shape, :size} = node
+                {:name, :shape, :size, :spread_scheme} = node
                 {w, h} = size
                 shape = @_generate_shape(shape,-w/2,-h/2,w,h)
                 region = MapRegion.create(shape)
                 append map_regions, region
                 if node.regions
                     scatter_x, scatter_y = math.min(20, w / 10), math.min(20, h / 10)
-                    child_regions = @_prepare_children_topology(node, node.regions, children_set, scatter_x, scatter_y)
-
+                    @_prepare_children_topology(node, node.regions, children_set)
+                    child_regions = [@_combined_region[child] for child in *node.regions]
+                    @scatter_regions(child_regions, scatter_x, scatter_y)
                     B2GenerateUtils.spread_map_regions {
                         rng: @rng
                         regions: child_regions
@@ -262,10 +280,10 @@ MapCompiler = newtype {
         @_children[node] = children_set
         @_combined_region[node] = assert combined_region, "Need combined_region ~= nil!"
 
-    get_node_owned_regions: (node) => @_regions[node]
-    get_node_children: (node) => @_children[node]
-    get_node_total_region: (node) => @_combined_region[node]
-    get_node_bbox: (node, padding=0) =>
+    as_owned_regions: (node) => @_regions[node]
+    as_children: (node) => @_children[node]
+    as_region: (node) => @_combined_region[node]
+    as_bbox: (node, padding=0) =>
         if not @_bboxes[node]
             @_bboxes[node] = map_region_bbox(@_combined_region[node])
         if padding ~= 0
@@ -278,7 +296,7 @@ MapCompiler = newtype {
                 math.max(0, math.min(y2 + padding, h))
             }
         return @_bboxes[node]
-    get_node_group_set: (node) => @_group_sets[node]
+    as_group_set: (node) => @_group_sets[node]
 
     fill_unconnected: () =>
         {w,h} = @map.size
@@ -370,8 +388,8 @@ MapCompiler = newtype {
 
     node_match: (node, args, shuffle=true) =>
         args.map = @map
-        args.area = @get_node_bbox(node, args.padding)
-        args.selector.matches_group = @get_node_group_set node
+        args.area = @as_bbox(node, args.padding)
+        args.selector.matches_group = @as_group_set node
         squares = SourceMap.rectangle_match(args)
         if shuffle then @_shuffle squares
         return squares
@@ -413,7 +431,7 @@ MapCompiler = newtype {
                     assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
                     assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
 
-            --{x1, y1, x2, y2} = @get_node_bbox(node)
+            --{x1, y1, x2, y2} = @as_bbox(node)
             --assert x1 >= padding - 0.1 and x2 < w + padding + 0.1
             --assert y1 >= padding - 0.1 and y2 < h + padding + 0.1
 

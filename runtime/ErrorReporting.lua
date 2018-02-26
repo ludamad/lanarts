@@ -230,6 +230,7 @@ function M.traceback(--[[Optional]] str)
     while i <= #stacktrace do
         i = i + 1 - resolve_deletions(stacktrace, i)
     end
+    do return traceback end
     stacktrace = combine_cpp_traceback_with_lua(stacktrace)
     for i=1,#stacktrace do
         stacktrace[i] = colfmt('{red:%d} %s', i, stacktrace[i]:trim())
@@ -246,6 +247,6 @@ function M.traceback(--[[Optional]] str)
 end
 
 AnsiColors = require "terminal.AnsiColors" -- Lazy import
--- debug.traceback = M.traceback
+debug.traceback = M.traceback
 
 return M

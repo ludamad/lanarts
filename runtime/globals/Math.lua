@@ -152,9 +152,10 @@ function vector_divide(v1, v2)
     return ret
 end
 
-function random_round(num)
+function random_round(num, rng)
     local f = floor(num)
-    if randomf(0,1) < (num-f) then
+    local rnd_num = rng and rng:randomf(0,1) or randomf(0,1)
+    if rnd_num < (num-f) then
         return f + 1
     else
         return f

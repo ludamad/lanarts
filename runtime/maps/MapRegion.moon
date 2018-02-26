@@ -46,7 +46,37 @@ MapRegion = newtype {
                 point[1] += x
                 point[2] += y
         return nil
+
+    rotate: (angle, center=nil) =>
+        center or= @center()
+        {cx, cy} = center
+        cos, sin = math.cos(angle), math.sin(angle)
+        @translate(-cx, -cy)
+        for polygon in *@polygons
+            for point in *polygon
+                {x, y} = point
+                point[1] = x*cos-y*sin
+                point[2] = x*sin+y*cos
+        for {:polygon} in *@tunnels
+            for point in *polygon
+                {x, y} = point
+                point[1] = x*cos-y*sin
+                point[2] = x*sin+y*cos
+        @translate(cx, cy)
+
+    center: () =>
+        accum_x, accum_y = 0,0
+        n_points = 0
+        {:polygons, :tunnels} = @
+        for polygon in *polygons
+            for {x, y} in *polygon
+                accum_x, accum_y = accum_x + x, accum_y + y
+                n_points += 1
+        if n_points <= 0
+            return {0,0}
+        return {accum_x / n_points, accum_y / n_points}
 }
+
 
 combine_map_regions = (regions) ->
     c_polygons = {}

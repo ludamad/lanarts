@@ -22,17 +22,27 @@ import get_door_candidates from require "maps.DoorGeneration"
 import Spread, Shape
     from require "maps.MapElements"
 
-create_scenario = () ->
+create_scenario = (rng) ->
+    size_scale = 1
+    enemy_n_scale = 1
+
+    adjusted_size = (size) ->
+        {w, h} = size
+        w *= (rng\randomf(-0.1,0.1) + rng\randomf(0.9, 1.1)) * size_scale
+        h *= (rng\randomf(-0.1,0.1) + rng\randomf(0.9, 1.1)) * size_scale
+        return {random_round(w, rng), random_round(h, rng)}
 
     -- NODES
     initial_room = Shape {
-        shape: "deformed_ellipse", size: {10, 20},
+        --shape: random_choice({"deformed_ellipse", "rectangle"})
+        shape: 'deformed_ellipse'
+        size: adjusted_size({10, 20})
         properties: {wall_tile: TileSets.hive.wall}
         paint: (node) =>
             @tile_paint(node, TileSets.hive.floor)
         place_objects: (node) =>
-            area = @get_node_bbox(node)
-            group_set = @get_node_group_set(node)
+            area = @as_bbox(node)
+            group_set = @as_group_set(node)
             for xy in *get_door_candidates(@, node)
                 -- Generate a runed door
                 MapUtils.spawn_door(@map, xy, nil, Vaults._rune_door_closed, "dummykey")
@@ -45,7 +55,7 @@ create_scenario = () ->
             }
             if #enemy_candidate_squares < 10
                 return false
-            for i=1,100
+            for i=1,10
                 sqr = enemy_candidate_squares[i]
                 if not sqr
                     break
@@ -53,7 +63,9 @@ create_scenario = () ->
     }
 
     enemy_enclosure  = Shape {
-        shape: "deformed_ellipse", size: {10, 20},
+        --shape: random_choice({"deformed_ellipse", "rectangle"})
+        shape: 'deformed_ellipse'
+        size: adjusted_size({10, 20})
         properties: {wall_tile: TileSets.hive.wall}
         paint: (node) =>
             @tile_paint(node, TileSets.hive.floor_alt)
@@ -64,8 +76,8 @@ create_scenario = () ->
             -- Loop over all enemies in this room
             for enemy, amount in pairs enemies do for i=1,amount
                -- Generate a single enemy of type 'enemy'
-               sqr = MapUtils.random_square(@map, @get_node_bbox(node), {
-                   matches_group: @get_node_group_set(node)
+               sqr = MapUtils.random_square(@map, @as_bbox(node), {
+                   matches_group: @as_group_set(node)
                    matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}
                })
                if not sqr
@@ -79,43 +91,51 @@ create_scenario = () ->
         properties = {
             tunnel_tile: TileSets.lair.floor
         }
-        --connection_scheme = () =>
-        --    @connect_map_regions()
-            
+        junction = Shape {
+            shape: "deformed_ellipse", size: {10, 20},
+            properties: {wall_tile: TileSets.hive.wall}
+        }
+        spread_scheme = () =>
+            -- Keep the junction at 0,0
+            region1 = @as_region initial_room
+            region1\rotate(@rng\randomf(-math.pi, math.pi))
+            angle1 = @rng\randomf(-math.pi, math.pi)
+            region1\translate(20*math.cos(angle1), 20*math.sin(angle1))
+
+            region2 = @as_region enemy_enclosure
+            region2\rotate(@rng\randomf(-math.pi, math.pi))
+            angle2 = angle1 + @rng\randomf(math.pi/2, math.pi)
+            region2\translate(20*math.cos(angle2), 20*math.sin(angle2))
+
+        connection_scheme = () =>
+            @_connect_regions 'direct_light', {@as_region(initial_room), @as_region(junction)}
+            @_connect_regions 'direct_light', {@as_region(junction), @as_region(enemy_enclosure)}
+
         Spread {
-            regions: {initial_room, enemy_enclosure}
-            spread_scheme: {type: 'rvo_spread', iters: 100}
+            regions: {initial_room, enemy_enclosure, junction}
+            :spread_scheme
             :properties
             :connection_scheme
         }
 
     root_node = first_quarters
-
-    --root_node = Spread {
-    --    regions: caverns
-    --    spread_scheme: {type: 'rvo_spread', iters: 100}
-    --    connection_scheme: 'direct_light'
-    --}
-
+    
     -- EVENTS/METHODS
-    generate = (args) =>
-        nil -- Reconsider if args are passed here or in creation of the map compiler type
-
     random_player_square = () =>
-        return MapUtils.random_square(@map, @get_node_bbox(initial_room), {
-            matches_group: @get_node_group_set(initial_room)
+        return MapUtils.random_square(@map, @as_bbox(initial_room), {
+            matches_group: @as_group_set(initial_room)
             matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID, SourceMap.FLAG_TUNNEL}
         })
 
     return newtype {
         parent: MapCompiler, :root_node
-        tileset: TileSets.lair, :generate
+        tileset: TileSets.lair, generate: do_nothing
         :random_player_square
     }
 
 return {
     Scenario: {
         name: "Firelord's Kingdom"
-        place: create_scenario()
+        place_func: create_scenario
     }
 }

@@ -6,7 +6,8 @@ Engine.first_map_create = () ->
     import Scenario from require "scenarios.Scenario1"
     {:MapCompilerContext} = require "maps.MapCompilerContext"
     cc = MapCompilerContext.create()
-    cc\register(Scenario.name, Scenario.place)
+    rng = require("mtwist").create(random(0, 2^30))
+    cc\register(Scenario.name, Scenario.place_func(rng))
     return cc\get {label: Scenario.name, spawn_players: true}
 
 return require("engine.StartLanarts")
