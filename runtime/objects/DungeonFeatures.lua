@@ -106,7 +106,8 @@ function Door:on_step()
     else 
         local collisions = Map.rectangle_collision_check(self.map, self.area, self)
         for _, object in ipairs(collisions) do
-            if not needs_key and not needs_lanarts and (object.is_enemy ~= nil) then
+            local enemy_openable = (not needs_key and not needs_lanarts) or self.last_open_frame > GameState.frame - 1000
+            if enemy_openable and (object.is_enemy ~= nil) then
                 is_open = true
                 break
             elseif (object.is_enemy == false) and can_player_open then
@@ -125,6 +126,7 @@ function Door:on_step()
     end
 
     if is_open then
+        self.last_open_frame = GameState.frame
         self.open_timeout = DOOR_OPEN_TIMEOUT
     end
 
@@ -175,6 +177,7 @@ function Door:init(args)
     self.closed_sprite = args.closed_sprite or M._door_closed
     self.depth = args.depth or M.FEATURE_DEPTH
     self.padding = 6
+    self.last_open_frame = -10000
     self.required_key = args.required_key or false
     self.lanarts_needed = args.lanarts_needed or 0
 end
