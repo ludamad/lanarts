@@ -25,6 +25,10 @@ import get_door_candidates from require "maps.DoorGeneration"
 import Spread, Shape
     from require "maps.MapElements"
 
+place_doors = (node) =>
+    for xy in *get_door_candidates(@, node)
+        MapUtils.spawn_door(@map, xy)
+
 place_encounter_behind_door = (node, enemies) =>
     for xy in *get_door_candidates(@, node)
         -- Generate a runed door
@@ -80,18 +84,7 @@ junction = (nodes) ->
                 @_connect_regions 'direct_light', {@as_region(node), @as_region(connector_node)}
     }
 
-
-
 create_scenario = (rng) ->
-    size_scale = 1
-    enemy_n_scale = 1
-
-    adjusted_size = (size) ->
-        {w, h} = size
-        w *= (rng\randomf(-0.1,0.1) + rng\randomf(0.9, 1.1)) * size_scale
-        h *= (rng\randomf(-0.1,0.1) + rng\randomf(0.9, 1.1)) * size_scale
-        return {random_round(w, rng), random_round(h, rng)}
-
     -- NODES
     initial_room = Shape {
         shape: 'deformed_ellipse'
@@ -111,28 +104,29 @@ create_scenario = (rng) ->
         shape: 'deformed_ellipse'
         size: {10, 20}
         properties: {wall_tile: TileSets.hive.wall, floor_tile: TileSets.hive.floor_alt}
+        place_objects: place_doors
     }
 
     root_node = junction {initial_room, junction({enemy_enclosure1, enemy_enclosure2})}
-    scale_node = (node) ->
-        if node.size
-            node.size = adjusted_size(node.size)
-        if node.regions
-            for subnode in *node.regions
-                scale_node subnode
-
-    scale_node(root_node)
 
     root_node.place_objects = (node) =>
         item_placer = (map, xy) ->
             item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, xy)
-        for i=1,4
+        for i=1,2
             vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: @rng, :item_placer, tileset: TileSets.lair})
             if not place_feature(@, node, vault)
                 break
+            vault = SourceMap.area_template_create(Vaults.stone_henge {rng: @rng, :item_placer, tileset: TileSets.lair})
+            if not place_feature(@, node, vault)
+                break
         val = place_encounter_behind_door @, initial_room, for i=1,10
-            'Ciribot'
+            if @rng\random(0,4) ~= 0
+                'Centaur Hunter'
+            elseif @rng\random(0,4) == 0
+                'Centaur Marksman'
+            else
+                'Giant Spider'
         return false if val == false
 
     {:place_feature} = require "maps.TemplateGeneration"
@@ -150,8 +144,5 @@ create_scenario = (rng) ->
     }
 
 return {
-    Scenario: {
-        name: "Firelord's Kingdom"
-        place_func: create_scenario
-    }
+    :create_scenario
 }

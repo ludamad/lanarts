@@ -203,8 +203,8 @@ void GameTiles::post_draw(GameState* gs) {
 						Pos(x * TILE_SIZE - view.x, y * TILE_SIZE - view.y),
 						res::tile(tile.tile).size());
 				using namespace ldraw;
-				ldungeon_gen::Map& src_map = *gs->get_level()->source_map();
-				gs->font().drawf(DrawOptions(Colour(0,255,0)), tilebox.center(), "%d", src_map[Pos(x, y)].group);
+				// ldungeon_gen::Map& src_map = *gs->get_level()->source_map();
+				// gs->font().drawf(DrawOptions(Colour(0,255,0)), tilebox.center(), "%d", src_map[Pos(x, y)].group);
 				if (!is_other_match) {
 					if (!was_seen(Pos(x, y))) {
 						ldraw::draw_rectangle(Colour(0, 0, 0), tilebox);

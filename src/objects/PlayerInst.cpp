@@ -144,6 +144,7 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 void PlayerInst::step(GameState* gs) {
     PERF_TIMER();
     explore_state.step();
+    printf("%d\n", team);
     paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
     //if (cooldowns().action_cooldown > 0)
     //printf("MELEE COOLDOWN %d\n", cooldowns().action_cooldown);
