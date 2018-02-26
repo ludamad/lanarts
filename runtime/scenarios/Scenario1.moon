@@ -1,5 +1,7 @@
 import MapRegion, combine_map_regions, map_regions_bbox from require "maps.MapRegion"
 
+{:place_feature} = require "maps.TemplateGeneration"
+
 World = require "core.World"
 {:MapCompiler} = require "maps.MapCompiler"
 Vaults = require "maps.Vaults"
@@ -35,7 +37,7 @@ place_encounter_behind_door = (node, enemies) =>
         }
     }
     if #enemy_candidate_squares < #enemies
-        return true --false
+        return false
     for i=1,#enemies
         MapUtils.spawn_enemy(@map, enemies[i], enemy_candidate_squares[i])
 
@@ -49,22 +51,24 @@ junction = (nodes) ->
         regions: table.tconcat {connector_node}, nodes
         spread_scheme: () =>
             {jw, jh} = @as_size connector_node
+            regions = [@as_region node for node in *nodes]
+            append regions, @as_region(connector_node)
             -- Keep the junction at 0,0
             for node in *nodes
                 region = @as_region node
                 region\rotate(@rng\randomf(-math.pi, math.pi))
                 angle = @property node, "angle", @rng\randomf(-math.pi, math.pi)
-                drift = @property node, "drift", @rng\randomf(1.2, 1.5)
+                drift = @property node, "drift", @rng\randomf(1.4, 1.7)
                 {w, h} = @as_size node
                 for i=1,N_JUNCTION_TRIES
-                    dx, dy = (w*drift+jw)*math.cos(angle), (h*drift+jh)*math.sin(angle)
+                    dx, dy = (w*drift+jw)/1.5*math.cos(angle), (h*drift+jh)/1.5*math.sin(angle)
                     region\translate(dx, dy)
-                    if false and has_overlaps {regions: [@as_region node for node in *nodes]}
+                    if has_overlaps {:regions}
                         if i == N_JUNCTION_TRIES
                             return false
                         region\translate(-dx, -dy)
                         angle = @rng\randomf(-math.pi, math.pi)
-                        drift = @rng\randomf(1.2, 1.7)
+                        drift = @rng\randomf(1.4, 1.7)
                     else
                         break
             return true
@@ -75,6 +79,8 @@ junction = (nodes) ->
             for node in *nodes
                 @_connect_regions 'direct_light', {@as_region(node), @as_region(connector_node)}
     }
+
+
 
 create_scenario = (rng) ->
     size_scale = 1
@@ -93,20 +99,43 @@ create_scenario = (rng) ->
         properties: {wall_tile: TileSets.hive.wall}
         paint: (node) =>
             @tile_paint(node, TileSets.hive.floor)
-        place_objects: (node) =>
-            val = place_encounter_behind_door @, node, for i=1,10
-                'Ciribot'
-            return false if val == false
     }
 
-    enemy_enclosure  = Shape {
+    enemy_enclosure1  = Shape {
         shape: 'deformed_ellipse'
         size: {10, 20}
         properties: {wall_tile: TileSets.hive.wall, floor_tile: TileSets.hive.floor_alt}
     }
 
-    root_node = junction {initial_room, enemy_enclosure}
+    enemy_enclosure2 = Shape {
+        shape: 'deformed_ellipse'
+        size: {10, 20}
+        properties: {wall_tile: TileSets.hive.wall, floor_tile: TileSets.hive.floor_alt}
+    }
 
+    root_node = junction {initial_room, junction({enemy_enclosure1, enemy_enclosure2})}
+    scale_node = (node) ->
+        if node.size
+            node.size = adjusted_size(node.size)
+        if node.regions
+            for subnode in *node.regions
+                scale_node subnode
+
+    scale_node(root_node)
+
+    root_node.place_objects = (node) =>
+        item_placer = (map, xy) ->
+            item = ItemUtils.item_generate ItemGroups.basic_items
+            MapUtils.spawn_item(map, item.type, item.amount, xy)
+        for i=1,4
+            vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: @rng, :item_placer, tileset: TileSets.lair})
+            if not place_feature(@, node, vault)
+                break
+        val = place_encounter_behind_door @, initial_room, for i=1,10
+            'Ciribot'
+        return false if val == false
+
+    {:place_feature} = require "maps.TemplateGeneration"
     -- EVENTS/METHODS
     random_player_square = () =>
         return MapUtils.random_square(@map, @as_bbox(initial_room), {

@@ -59,7 +59,7 @@ namespace ldungeon_gen {
 		uint16_t must_be_on_bits;
 		uint16_t must_be_off_bits;
 		uint16_t must_be_content;
-        Range16 must_be_group;
+        Range16 must_be_group, cant_be_group;
 		bool use_must_be_content;
 
 		Selector(uint16_t must_be_on_bits, uint16_t must_be_off_bits,
@@ -81,7 +81,8 @@ namespace ldungeon_gen {
 			return must_be_on_bits == o.must_be_on_bits
 					&& must_be_off_bits == o.must_be_off_bits
 					&& must_be_content == o.must_be_content
-					&& must_be_group == o.must_be_group
+				    && must_be_group == o.must_be_group
+				    && cant_be_group == o.cant_be_group
 					&& use_must_be_content == o.use_must_be_content;
 		}
 	};
@@ -150,14 +151,14 @@ namespace ldungeon_gen {
 						group(group) {
 		}
 		inline bool matches(Selector selector) const {
-			return ((flags & selector.must_be_on_bits)
-					== selector.must_be_on_bits)
-					&& ((flags & ~selector.must_be_off_bits)
-							== flags)
+			return ((flags & selector.must_be_on_bits) == selector.must_be_on_bits)
+					&& ((flags & ~selector.must_be_off_bits) == flags)
 					&& (!selector.use_must_be_content
 							|| content == selector.must_be_content)
-					&& (selector.must_be_group.empty()
-							|| selector.must_be_group.within(group));
+				    && (selector.must_be_group.empty()
+						    || selector.must_be_group.within(group))
+					&& (selector.cant_be_group.empty()
+						    || !selector.cant_be_group.within(group));
 		}
 		inline void apply(Operator oper) {
 			/* By turning off first, we can wipe all flags and set new ones */
