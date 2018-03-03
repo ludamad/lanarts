@@ -24,19 +24,24 @@ struct PlayerDataEntry {
 	MultiframeActionQueue action_queue;
 	GameInstRef player_inst;
 	std::string classtype;
+	// Represents a high-level keyboard+mouse, controller, bot, or
+	// network input source.
 	LuaValue input_source;
+	//
+	LuaValue input_adapter;
 	bool is_local_player;
 	int net_id;
     int index; // Index in list, for convenience
+	int team;
 
 	PlayerInst* player() const;
 
 	PlayerDataEntry(const std::string& player_name, GameInst* player_inst,
 					const std::string& classtype, LuaValue input_source,
-					bool is_local_player, int net_id, int index) :
+					bool is_local_player, int net_id, int index, int team) :
 			player_name(player_name), player_inst(player_inst), classtype(
 					classtype), input_source(input_source),
-			is_local_player(is_local_player), net_id(net_id), index(index) {
+			is_local_player(is_local_player), net_id(net_id), index(index), team(team) {
 	}
 };
 
@@ -48,7 +53,7 @@ public:
 	void clear();
 	void register_player(const std::string& name, PlayerInst* player,
 			const std::string& classtype, const LuaValue& input_source,
-						 bool is_local_player, int net_id = 0);
+						 bool is_local_player, int net_id = 0, int team = 0);
 
 	std::vector<PlayerDataEntry>& all_players() {
 		return _players;

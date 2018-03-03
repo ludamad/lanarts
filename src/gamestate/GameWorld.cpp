@@ -182,7 +182,7 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 
 //		if (pde.player_inst.empty()) {
         pde.player_inst = new PlayerInst(c.starting_stats,
-                c.sprites[spriteidx], position, PLAYER_TEAM, pde.is_local_player);
+                c.sprites[spriteidx], position, pde.team, pde.is_local_player);
         if (!pde.input_source.empty()) {
             pde.input_source.push();
             LuaValue input_source = luawrap::call<LuaValue>(gs->luastate(), pde.player_inst.get());

@@ -870,6 +870,12 @@ void PlayerInst::_use_move(GameState *gs, const GameAction &action) {
    		}
    	}
    }
+   
+    if (cooldowns().is_hurting()) { 
+        //&& effects.get_active("Berserk") == nullptr) {
+            reduce_vx = true;
+            reduce_vy = true;
+    }
         if (reduce_vx) {
             vx *= 0.5;
         }

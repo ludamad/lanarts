@@ -57,7 +57,7 @@
 
 #include "GameMapState.h"
 #include "GameState.h"
-
+#include <iostream>
 static int generate_seed() {
 	//the most significant bits of systime are likely to be very similar, mix with clock()
 	int clk = int(clock()) << 22;
@@ -548,6 +548,7 @@ static void lua_drawables_draw_rest(LuaDrawableQueue::Iterator iter) {
 void GameState::draw(bool drawhud) {
 	perf_timer_begin(FUNCNAME);
 
+    Timer t;
 	ldraw::display_draw_start();
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -597,6 +598,7 @@ void GameState::draw(bool drawhud) {
 
 	ldraw::display_draw_finish();
 
+    // std::cout << "STEP MS " << float(t.get_microseconds()) / 1000.0f << std::endl;
 //	glFinish(); // XXX: Apparently glFinish is not recommended
 	perf_timer_end(FUNCNAME);
 }

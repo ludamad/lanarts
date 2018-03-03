@@ -48,7 +48,7 @@ place_encounter_behind_door = (node, enemies) =>
 N_JUNCTION_TRIES = 4
 junction = (nodes) ->
     connector_node = Shape {
-        shape: "deformed_ellipse", size: {10, 20},
+        shape: "deformed_ellipse", size: {14, 30},
         properties: {wall_tile: TileSets.hive.wall}
     }
     return Spread {
@@ -88,7 +88,7 @@ create_scenario = (rng) ->
     -- NODES
     initial_room = Shape {
         shape: 'deformed_ellipse'
-        size: {10, 20}
+        size: {14, 24}
         properties: {wall_tile: TileSets.hive.wall}
         paint: (node) =>
             @tile_paint(node, TileSets.hive.floor)
@@ -96,13 +96,13 @@ create_scenario = (rng) ->
 
     enemy_enclosure1  = Shape {
         shape: 'deformed_ellipse'
-        size: {10, 20}
+        size: {14, 24}
         properties: {wall_tile: TileSets.hive.wall, floor_tile: TileSets.hive.floor_alt}
     }
 
     enemy_enclosure2 = Shape {
         shape: 'deformed_ellipse'
-        size: {10, 20}
+        size: {14, 24}
         properties: {wall_tile: TileSets.hive.wall, floor_tile: TileSets.hive.floor_alt}
         place_objects: place_doors
     }
@@ -112,7 +112,7 @@ create_scenario = (rng) ->
     root_node.place_objects = (node) =>
         item_placer = (map, xy) ->
             item = ItemUtils.item_generate ItemGroups.basic_items
-            MapUtils.spawn_item(map, item.type, item.amount, xy)
+            -- MapUtils.spawn_item(map, item.type, item.amount, xy)
         for i=1,2
             vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: @rng, :item_placer, tileset: TileSets.lair})
             if not place_feature(@, node, vault)
@@ -120,7 +120,7 @@ create_scenario = (rng) ->
             vault = SourceMap.area_template_create(Vaults.stone_henge {rng: @rng, :item_placer, tileset: TileSets.lair})
             if not place_feature(@, node, vault)
                 break
-        val = place_encounter_behind_door @, initial_room, for i=1,10
+        val = place_encounter_behind_door @, initial_room, for i=1,0
             if @rng\random(0,4) ~= 0
                 'Centaur Hunter'
             elseif @rng\random(0,4) == 0
@@ -131,18 +131,19 @@ create_scenario = (rng) ->
 
     {:place_feature} = require "maps.TemplateGeneration"
     -- EVENTS/METHODS
-    random_player_square = () =>
+
+Scenario1 = newtype {
+    parent: MapCompiler
+    root_node: () =>
+        return nil
+    generate: do_nothing
+    random_player_square: () =>
         return MapUtils.random_square(@map, @as_bbox(initial_room), {
             matches_group: @as_group_set(initial_room)
             matches_none: {SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID, SourceMap.FLAG_TUNNEL}
         })
-
-    return newtype {
-        parent: MapCompiler, :root_node
-        tileset: TileSets.lair, generate: do_nothing
-        :random_player_square
-    }
+}
 
 return {
-    :create_scenario
+    :Scenario1
 }

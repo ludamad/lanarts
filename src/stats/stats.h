@@ -29,6 +29,8 @@ struct GameState;
 struct CoreStats {
 	int hp = 0, max_hp = 0;
 	int mp = 0, max_mp = 0;
+	float hp_bleed = 0; // Amount of 'locked out' HP that can't be regenerated.
+	float mp_bleed = 0; // Amount of 'locked out' MP that can't be regenerated.
 	int strength = 0, defence = 0, magic = 0, willpower = 0;
 	float hpregen = 0, mpregen = 0;
 	// Values < 0

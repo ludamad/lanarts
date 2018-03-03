@@ -17,7 +17,11 @@ M = nilprotect {
 try_stun = (caster, mon) ->
     white_power = EffectUtils.get_power(caster, "White")
     resist = math.min(1.25, EffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
+    if not mon.is_enemy
+        resist = 0.5
     if chance(resist)
+        if not mon.is_enemy
+            white_power = -5
         mon\add_effect("Stunned", (100 + white_power * 10) * resist)
         mon\add_effect("Stunned", (100 + white_power * 10) * resist)
         play_sound "sound/ringfire-hit.ogg"
@@ -169,7 +173,7 @@ DataW.spell_create {
         }
     projectile: SpellUtils.passing_projectile {
         speed: 4
-        damage_multiplier: 1
+        damage_multiplier: 0.9
         n_steps: 30
         can_wall_bounce: false
         on_map_init: () =>
