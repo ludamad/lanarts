@@ -8,7 +8,6 @@ Map = require "core.Map"
 MapUtils = require "maps.MapUtils"
 World = require "core.World"
 Vaults = require "maps.Vaults"
-TileSets = require "tiles.Tilesets"
 
 import MapRegion, combine_map_regions, map_region_bbox, map_regions_bbox
     from require("maps.MapRegion")
@@ -42,7 +41,6 @@ MapCompiler = newtype {
         @_bboxes = {}
         @_spawn_players = args.spawn_players
         @_next_group_id = 1
-    tileset: TileSets.lair
     add: (selector, operator) =>
         append @operators, {:selector, :operator}
 
@@ -159,7 +157,7 @@ MapCompiler = newtype {
     property: (node, property, default=nil) =>
         if node.properties[property] == nil
             return default
-        return node.properties[property]
+        return ode.properties[property]
     connect_map_regions: (regions, n_connections=2) =>
         B2GenerateUtils.connect_map_regions {
             rng: @rng
@@ -185,13 +183,13 @@ MapCompiler = newtype {
                         r1 = @rng\random(scheme_args.acceptable_dist or 12)
                         r2 = @rng\random(scheme_args.acceptable_dist or 12)
                         return r1 + r2
-                    map.arc_chance = scheme_args.arc_chance or 0.2
+                    map.arc_chance = 0.2
                     NewMaps = require "maps.NewMaps"
                     NewMaps.connect_edges map, @rng, {
-                        floor1: scheme_args.floor_tile or @tileset.floor,
-                        floor2: scheme_args.floor_tile_alt or @tileset.floor_alt
+                        floor1: @tileset.floor,
+                        floor2: @tileset.floor_alt
                         connect_line_width: () ->
-                            if @rng\randomf() < (scheme_args.connect_chance or 0.2)
+                            if @rng\randomf() < 0.2
                                 return 2
                             return 1
                     }, {1,1, map.size[1] - 1, map.size[2] - 1}, edges
@@ -431,14 +429,12 @@ MapCompiler = newtype {
         @for_all_nodes (node) =>
             for polygon in *@_combined_region[node].polygons
                 for {x, y} in *polygon
-                    nil
-                    -- assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
-                    --assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
+                    assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
+                    assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
             for {:polygon} in *@_combined_region[node].tunnels
                 for {x, y} in *polygon
-                    nil
-                    --assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
-                    --assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
+                    assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
+                    assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
 
             --{x1, y1, x2, y2} = @as_bbox(node)
             --assert x1 >= padding - 0.1 and x2 < w + padding + 0.1
@@ -485,9 +481,6 @@ MapCompiler = newtype {
 
     -- Creates @map, ready to be filled
     prepare: (args={}) =>
-        meta = getmetatable(@)
-        if type(meta.root_node) == "function"
-            @root_node = meta.root_node(@, args)
         MAX_TRIES = 1000
         for i=1,MAX_TRIES
             table.clear @_children
