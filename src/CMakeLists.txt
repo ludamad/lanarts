@@ -41,6 +41,7 @@ include_directories(
     ${FREETYPE_INCLUDE_DIRS}
     "${LIBS}/common-lib/include"
     "${LIBS}/draw-lib/include"
+    "${DEPS}/freetype/include"
     "${LIBS}/dungeon-generation-lib/include"
     ${LIBS} # for net
     "${LIBS}/luawrap-lib/include"
@@ -108,8 +109,23 @@ else()
     set( BACKTRADE_DEP "" ) 
 endif()
 
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    set(ARCH_LIBS 
+        mingw32
+		
+	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2.a
+	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2_image.a
+	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2main.a
+	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2_mixer.a
+	mingw32  m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid
+        ws2_32 
+    )
+else()
+    set(ARCH_LIBS 
+	${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
+    )
+endif()
 set (libraries 
-#        mingw32
 	ldraw
 	lcommon
 	lanarts_dungeon_gen
@@ -125,19 +141,16 @@ set (libraries
         enet
         lua_enet
         lua_box2d
-#        ws2_32
-#        mingw32
-#        winmm
 	RVO
         #physfs-static
         libxmi
 	${OPENGL_gl_LIBRARY}
-	${FREETYPE_LIBRARIES}
+	freetype
+	#	${FREETYPE_LIBRARIES}
         UnitTest++
         backward_object
         ${BACKTRADE_DEP}
-        ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
-        # SDL2-mixer
+	${ARCH_LIBS}
 )
 
 target_link_libraries( lanarts 

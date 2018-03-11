@@ -1,0 +1,14 @@
+prefix=/usr/local/i686-w64-mingw32
+exec_prefix=/usr/local/i686-w64-mingw32
+libdir=/usr/local/i686-w64-mingw32/lib
+includedir=/usr/local/i686-w64-mingw32/include
+
+Name: FreeType 2
+URL: http://freetype.org
+Description: A free, high-quality, and portable font engine.
+Version: 20.0.14
+Requires:
+Requires.private: 
+Libs: -L${libdir} -lfreetype
+Libs.private: -lpng16 -lm -lz -lm
+Cflags: -I${includedir}/freetype2

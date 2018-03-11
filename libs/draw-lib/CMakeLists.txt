@@ -30,10 +30,12 @@ include_directories(
 	"${SRC}/luawrap-lib/include"
 	${DEPS}/UnitTest++
 	${DEPS}/lua
+	${DEPS}/freetype/include
 	"${DEPS}/sdl2/include"
 	"${DEPS}/sdl2-image"
 	${OpenGL_INCLUDE_DIRS} 		
-	${FREETYPE_INCLUDE_DIRS} 
+	# ${FREETYPE_INCLUDE_DIRS} 
+	freetype
 )
 
 file(GLOB ldraw_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
@@ -62,7 +64,8 @@ set(LINKEDDEPS
 	lua
 		${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES}
 	${OPENGL_gl_LIBRARY}
-	${FREETYPE_LIBRARIES}
+	# ${FREETYPE_LIBRARIES}
+	freetype
 )
 
 add_executable( ldraw_ex ${ldraw_examples} )

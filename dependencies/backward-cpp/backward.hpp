@@ -46,7 +46,8 @@
 #define BACKWARD_SYSTEM_UNKNOWN 
 #endif
 
-#define BACKWARD_HAS_BFD 1
+#undef BACKWARD_HAS_BFD // temporary ADAM 
+// #define BACKWARD_HAS_BFD 1
 // You can define one of the following (or leave it to the auto-detection):
 //
 //	- specialization for linux

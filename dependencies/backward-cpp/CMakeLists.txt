@@ -39,11 +39,7 @@ endif()
 ###############################################################################
 
 
-if ($ENV{BUILD_LUAJIT})
-    add_definitions(-DBACKWARD_SYSTEM_UNKNOWN=1)
-else()
-    add_definitions(-DBACKWARD_SYSTEM_LINUX=1)
-endif()
+add_definitions(-DBACKWARD_SYSTEM_UNKNOWN=1)
 add_definitions(-std=c++11)
 #CHECK_INCLUDE_FILES (bfd.h HAVE_BFD_H)
 #if (NOT HAVE_BFD_H) 
