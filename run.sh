@@ -74,6 +74,9 @@ fi
 # These are used to communicate with CMake
 # Each flag has an optional shortform, use whichever is preferred.
 
+if handle_flag "--mingw" ; then
+    export BUILD_MINGW=1
+fi
 if handle_flag "--luajit" || handle_flag "-lj" ; then
     export BUILD_LUAJIT=1
 fi
@@ -123,6 +126,9 @@ function build_lanarts(){
     if [ $BUILD_PROF_USE ] ; then
         BUILD_DIR="${BUILD_DIR}_profuse"
     fi
+    if [ $BUILD_MINGW ] ; then
+        BUILD_DIR="${BUILD_DIR}_mingw"
+    fi
     rm_if_link build
     if [ -d build ] ; then
         echo "You have a non-symlink build directory. Lanarts has moved to symlinking 'build' to 'build_release' or 'build_debug'. Please rename the build directory to the appropriate one of those." >&2
@@ -131,7 +137,11 @@ function build_lanarts(){
     mkdir -p $BUILD_DIR
     ln -s $BUILD_DIR build 
     cd $BUILD_DIR
-    cmake -Wno-dev .. | colorify '1;33'
+    if [ $BUILD_MINGW ] ; then
+	cmake -DCMAKE_TOOLCHAIN_FILE=mingw-toolchain.cmake  -Wno-dev .. | colorify '1;33'
+    else
+	cmake -Wno-dev .. | colorify '1;33'
+    fi
     if handle_flag "--clean" ; then
         make clean
     fi
