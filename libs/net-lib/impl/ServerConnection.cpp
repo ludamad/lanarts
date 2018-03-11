@@ -107,14 +107,14 @@ int ServerConnection::server_poll_thread(void* context) {
 				int idx = connections.add(event.peer);
 
 				/* Store client ID. */
-				event.peer->data = (void*) (long) (idx + 1);
+				event.peer->data = (void*) (long long) (idx + 1);
 				break;
 			}
 
 			case ENET_EVENT_TYPE_RECEIVE: {
 				receiver_t receiver, _unused_sender;
 				ENetPacket* epacket = event.packet;
-				int sender_id = (int) (long) event.peer->data;
+				int sender_id = (int) (long long) event.peer->data;
 				set_epacket_sender(epacket, sender_id);
 				copy_packet_to_buffer(epacket, packet_buffer, receiver,
 						_unused_sender);

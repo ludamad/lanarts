@@ -11,13 +11,43 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
   set(FREETYPE_INCLUDE_DIRS "/Users/adomurad/sources/freetype2/build/include"  "/Users/adomurad/sources/freetype2/include/freetype")
   set(FREETYPE_LIBRARIES "/Users/adomurad/sources/freetype2/build/libfreetype.a")
 else ()
+endif ()
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    if ($ENV{BUILD_FEDORA_CROSS})
+        INCLUDE(FindPkgConfig)
+        # PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+        PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
+        PKG_SEARCH_MODULE(SDL2MIXER REQUIRED SDL2_mixer>=2.0.0)
+        set(ARCH_LIBS 
+            ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
+            ${SDL2_LIBRARIES}
+            mingw32
+                    
+            mingw32  m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid
+            ws2_32 kernel32
+        )
+    else()
+        set(ARCH_LIBS 
+            mingw32
+                    
+            ${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2.a
+            ${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2_image.a
+            ${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2main.a
+            ${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2_mixer.a
+            mingw32  m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid
+            ws2_32 kernel32
+        )
+    endif()
+else()
     INCLUDE(FindPkgConfig)
     PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
     PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
     PKG_SEARCH_MODULE(SDL2MIXER REQUIRED SDL2_mixer>=2.0.0)
     include(FindFreetype)
-endif ()
-
+    set(ARCH_LIBS 
+	${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
+    )
+endif()
 set( LIBS ../libs)
 set( DEPS ../dependencies)
 set( BUILTDEPS ${CMAKE_BINARY_DIR}/dependencies )
@@ -107,23 +137,6 @@ if ( HAS_BFD)
     set( BACKTRADE_DEP bfd ) 
 else()
     set( BACKTRADE_DEP "" ) 
-endif()
-
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-    set(ARCH_LIBS 
-        mingw32
-		
-	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2.a
-	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2_image.a
-	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2main.a
-	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2_mixer.a
-	mingw32  m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid
-        ws2_32 
-    )
-else()
-    set(ARCH_LIBS 
-	${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
-    )
 endif()
 set (libraries 
 	ldraw

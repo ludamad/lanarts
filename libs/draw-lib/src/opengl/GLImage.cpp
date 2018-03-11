@@ -106,8 +106,8 @@ void GLImage::initialize(const std::string& filename) {
                 texh = texcoord[3];
         // If images cannot be loaded by OpenGL, error, except if in headless mode:
 	} else if (getenv("LANARTS_HEADLESS") == NULL) {
-		printf("Texture from image '%s' (%dx%d) could not be loaded\n",
-				filename.c_str(), width, height);
+		printf("Texture from image '%s' (%dx%d) could not be loaded (%s)\n",
+				filename.c_str(), width, height, SDL_GetError());
 		fatal_error(); // Don't fatal error for now! TODO conditional on environment variable?
         }
 

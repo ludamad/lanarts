@@ -13,12 +13,28 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
   set(SDL2_LIBRARIES "-s USE_SDL=2")
   set(SDL2_IMAGE_LIBRARIES "-s USE_SDL_IMAGE=2")
 else ()
-	INCLUDE(FindPkgConfig)
-    include(FindFreetype)
-	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-	PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 endif ()
 
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    set(ARCH_LIBS 
+        mingw32
+		
+	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2.a
+	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2_image.a
+	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2main.a
+	${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2_mixer.a
+	mingw32  m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid
+        ws2_32 
+    )
+else()
+    set(ARCH_LIBS 
+	${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
+    )
+    INCLUDE(FindPkgConfig)
+    include(FindFreetype)
+    PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+    PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
+endif()
 
 set( SRC ../)
 set( DEPS ../../dependencies)

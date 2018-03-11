@@ -29,8 +29,8 @@
 #include <lcommon/math_util.h>
 
 static int lapi_values_aux(lua_State* L) {
-	long idx = (long) lua_touserdata(L, lua_upvalueindex(2));
-	long len = (long) lua_touserdata(L, lua_upvalueindex(3));
+	long long idx = (long long) lua_touserdata(L, lua_upvalueindex(2));
+	long long len = (long long) lua_touserdata(L, lua_upvalueindex(3));
 
 	if (idx > len) {
 		return 0;

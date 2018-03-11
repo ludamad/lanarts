@@ -138,7 +138,12 @@ function build_lanarts(){
     ln -s $BUILD_DIR build 
     cd $BUILD_DIR
     if [ $BUILD_MINGW ] ; then
-	cmake -DCMAKE_TOOLCHAIN_FILE=mingw-toolchain.cmake  -Wno-dev .. | colorify '1;33'
+        if python -mplatform | grep fedora ; then
+            export BUILD_FEDORA_CROSS=1
+            mingw64-cmake  -Wno-dev .. | colorify '1;33'
+        else 
+            cmake -DCMAKE_TOOLCHAIN_FILE=mingw-toolchain.cmake  -Wno-dev .. | colorify '1;33'
+        fi
     else
 	cmake -Wno-dev .. | colorify '1;33'
     fi

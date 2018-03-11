@@ -40,7 +40,6 @@ set(YAML_CPP_VERSION "${YAML_CPP_VERSION_MAJOR}.${YAML_CPP_VERSION_MINOR}.${YAML
 # --> General
 # see http://www.cmake.org/cmake/help/cmake2.6docs.html#variable:BUILD_SHARED_LIBS
 #     http://www.cmake.org/cmake/help/cmake2.6docs.html#command:add_library
-option(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
 
 # --> Apple
 # option(APPLE_UNIVERSAL_BIN "Apple: Build universal binary" OFF)
@@ -99,9 +98,6 @@ if(IPHONE)
 endif()
 
 if(WIN32)
-	if(BUILD_SHARED_LIBS)
-		add_definitions(-D${PROJECT_NAME}_DLL)	# use or build Windows DLL
-	endif()
 	if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 		set(CMAKE_INSTALL_PREFIX "C:/")
 	endif()
@@ -186,10 +182,8 @@ if(MSVC)
 	set(CMAKE_STATIC_LIBRARY_PREFIX "lib")	# to distinguish static libraries from DLL import libs
 
 	# c) Correct suffixes for static libraries
-	if(NOT BUILD_SHARED_LIBS)
-		### General stuff
-		set(LIB_TARGET_SUFFIX "${LIB_SUFFIX}${LIB_RT_SUFFIX}")
-	endif()
+            ### General stuff
+            set(LIB_TARGET_SUFFIX "${LIB_SUFFIX}${LIB_RT_SUFFIX}")
 
 	### Project stuff
 	# /W3 = set warning level; see http://msdn.microsoft.com/en-us/library/thxezb7y.aspx
@@ -223,7 +217,7 @@ set(_INSTALL_DESTINATIONS
 ###
 ### Library
 ###
-add_library(yaml-cpp
+add_library(yaml-cpp STATIC
 	${sources}
 	${public_headers}
 	${private_headers}
@@ -245,15 +239,13 @@ if(IPHONE)
 endif()
 
 if(MSVC)
-	if(NOT BUILD_SHARED_LIBS)
-		# correct library names
-		set_target_properties(yaml-cpp PROPERTIES
-			DEBUG_POSTFIX "${LIB_TARGET_SUFFIX}d"
-			RELEASE_POSTFIX "${LIB_TARGET_SUFFIX}"
-			MINSIZEREL_POSTFIX "${LIB_TARGET_SUFFIX}"
-			RELWITHDEBINFO_POSTFIX "${LIB_TARGET_SUFFIX}"
-		)
-	endif()
+            # correct library names
+            set_target_properties(yaml-cpp PROPERTIES
+                    DEBUG_POSTFIX "${LIB_TARGET_SUFFIX}d"
+                    RELEASE_POSTFIX "${LIB_TARGET_SUFFIX}"
+                    MINSIZEREL_POSTFIX "${LIB_TARGET_SUFFIX}"
+                    RELWITHDEBINFO_POSTFIX "${LIB_TARGET_SUFFIX}"
+            )
 endif()
 
 install(TARGETS yaml-cpp ${_INSTALL_DESTINATIONS})
