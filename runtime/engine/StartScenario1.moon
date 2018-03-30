@@ -24,14 +24,14 @@ create_dungeon = (rng) ->
     LAIR = {
         {"Firelord's Kingdom", }
     }
-    return 
+    return
 
 Engine.first_map_create = () ->
-    import Scenario from require "scenarios.Scenario1"
+    import create_scenario from require "scenarios.Scenario1"
     {:MapCompilerContext} = require "maps.MapCompilerContext"
     cc = MapCompilerContext.create()
     rng = require("mtwist").create(random(0, 2^30))
-    cc\register(Scenario.name, Scenario.place_func(rng))
-    return cc\get {label: Scenario.name, spawn_players: true}
+    cc\register("Firelord's Kingdom", create_scenario(rng))
+    return cc\get {label: "Firelord's Kingdom", spawn_players: true}
 
 return require("engine.StartLanarts")
