@@ -116,7 +116,7 @@ static void run_lua_value(void* arg) {
 }
 
 
-static void run_engine_Main(int argc, const char **argv) {
+static void run_engine_Main(int argc, const char **argv) { 
     lua_State* L = init_luastate();
 
     // Lua code uses lua_core_EngineInternal.cpp to do low-level setup
@@ -131,6 +131,7 @@ static void run_engine_Main(int argc, const char **argv) {
     if (step_func.isnil()) {
         return;
     }
+
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop_arg(run_lua_value, (void*)new LuaValue(step_func), 0, 0);
 #else
@@ -159,7 +160,6 @@ int main(int argc, char** argv) {
 	try {
 #endif
 #ifdef __EMSCRIPTEN__
-    printf("WHATSUP\n");
     vector<const char*> args = {"./lanarts", "engine.StartLanarts"};
     run_engine_Main(args.size(), &args[0]); // Remove 'bare' argument
 #else

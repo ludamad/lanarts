@@ -52,14 +52,18 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 
     if (MAIN_WINDOW == NULL){
 
-        SDL_CreateWindowAndRenderer(
-                w, h,
-                SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0),
-                &MAIN_WINDOW,
-                &MAIN_RENDERER
-        );
-        SDL_SetWindowTitle(MAIN_WINDOW, window_name);
-
+       // SDL_CreateWindowAndRenderer(
+       //         w, h,
+       //         SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0),
+       //         &MAIN_WINDOW,
+       //         &MAIN_RENDERER
+       // );
+      MAIN_WINDOW = SDL_CreateWindow(
+        window_name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, 
+        SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0)
+      );
+      // Create an OpenGL context associated with the window.
+      SDL_GL_CreateContext(MAIN_WINDOW);
     }   
     if (MAIN_WINDOW == NULL) {
         fprintf(stderr, "Couldn't set GL mode: %s\n", SDL_GetError());

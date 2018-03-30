@@ -15,12 +15,17 @@ endif ()
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     if ($ENV{BUILD_FEDORA_CROSS})
         INCLUDE(FindPkgConfig)
-        # PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+        PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
         PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
         PKG_SEARCH_MODULE(SDL2MIXER REQUIRED SDL2_mixer>=2.0.0)
         set(ARCH_LIBS 
             ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
             ${SDL2_LIBRARIES}
+            #SDL2-image
+            #SDL2-mixer
+            #SDL2-static
+
+            #${SDL2_LIBRARIES}
             mingw32
                     
             mingw32  m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid

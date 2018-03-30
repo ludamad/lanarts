@@ -11,8 +11,7 @@ MAGE_START_STATS = {
     equipment: {
         gold: 0
         inventory: {
-            {item: "Mana Potion"},
-            {item: "Stripe Boots", equipped: true}
+            {item: "Mana Potion"}
         }
     }
 }

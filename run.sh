@@ -140,7 +140,7 @@ function build_lanarts(){
     if [ $BUILD_MINGW ] ; then
         if python -mplatform | grep fedora ; then
             export BUILD_FEDORA_CROSS=1
-            mingw64-cmake  -Wno-dev .. | colorify '1;33'
+            mingw32-cmake  -Wno-dev .. | colorify '1;33'
         else 
             cmake -DCMAKE_TOOLCHAIN_FILE=mingw-toolchain.cmake  -Wno-dev .. | colorify '1;33'
         fi
