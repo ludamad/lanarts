@@ -8,6 +8,7 @@ local GameState = require "core.GameState"
 
 local Network = require "core.Network"
 local GameSettingsMenu = require "menus.GameSettingsMenu"
+local GameScenarioMenu = require "menus.GameScenarioMenu"
 local LobbyMenu = require "menus.LobbyMenu"
 local PregameMenu = require "menus.PregameMenu"
 local ScoresMenu = require "menus.ScoresMenu"
@@ -92,6 +93,7 @@ local setup_settings_menu -- forward declare
 local setup_pregame_menu -- forward declare
 local setup_scores_menu -- forward declare
 local setup_lobby_menu -- forward declare
+local setup_game_scenario_menu -- forward declare
 
 function exit_menu(exit_game)
     -- Signals event loop that menu is finished
@@ -154,12 +156,28 @@ function setup_settings_menu()
     menu_state.back = setup_start_menu
     menu_state.continue = function ()
         if settings.class_type ~= "" then
-            exit_menu()
+            setup_game_scenario_menu()
         end
     end
 
     menu_state.menu:add_instance(
         GameSettingsMenu.create( --[[Back Button]] menu_state.back, --[[Start Game Button]] menu_state.continue),
+        Display.CENTER
+    )
+end
+
+function setup_game_scenario_menu()
+    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
+
+    menu_state.back = setup_settings_menu
+    menu_state.continue = function ()
+        if setup_game_scenario_menu then
+            exit_menu()
+        end
+    end
+
+    menu_state.menu:add_instance(
+        GameScenarioMenu.create( --[[Back Button]] menu_state.back, --[[Start Game Button]] menu_state.continue),
         Display.CENTER
     )
 end

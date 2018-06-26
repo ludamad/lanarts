@@ -70,31 +70,24 @@ get_power = (obj, type) ->
 -- Returns a modifier, 0 signifying complete resistance, 1 signifying no resistance, and amounts > 1 signifying weakness
 get_resistance = (obj, type) ->
     raw_resist = get_effect_stat(obj, TYPE_RESIST_EFFECT[type])
-    -- Values over 100 or -100 signify extremes (extreme weakness and complete resistance)
+    -- Values over 100 or -100 signify extremes (extreme weakness and resistance)
     if raw_resist <= -100
-        return 10
+        return 1.5
     if raw_resist >= 100
-        return 0
+        return 0.5
     -- Otherwise, resistances are capped between -5 and +5 (inclusive)
     resist = math.max(math.min(math.floor(raw_resist), 5), -5)
-    return math.pow(2, -(2*resist) / 5) -- from 0.25 to 4x
+    -- from 0.75 to 1.25x
+    print type, resist
+    print 1 - resist / 10
+    return 1 - resist / 10
 
 -- Default implementation of projectile hit function, in Lua
 hit_func = (type, attacker, target, atkstats) ->
     {:power, :damage, :magic_percentage} = atkstats
     power += get_power(attacker, type)
-    damage *= get_resistance(target, type)
+    type_multiplier = get_resistance(target, type)
     -- TODO take 'attacker' argument
-    return target\damage(damage, power, magic_percentage, attacker)
+    return target\damage(damage, power, magic_percentage, attacker, type_multiplier)
 
---        when 3 then 0.4
---        when 2 then 0.6
---        when 1 then 0.8
---        when 0 then 1.0
---        when -1 then 1.33
---        when -2 then 1.66
---        when -3 then 2
---        else
---            error("Out of range resist value #{resist}")
---
 return {:get_effect_stat, :get_resistance, :get_power, :TYPES, :get_monster_resistances}

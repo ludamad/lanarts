@@ -260,12 +260,12 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attac
         });
     }
 
-    if (attack.type_multiplier < 0.05) {
+    if (attack.type_multiplier < 0.60) {
         gs->add_instance(
-                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Immune!",
+                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Highly ineffective!",
                                  attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
     }
-    else if (attack.type_multiplier < 0.3) {
+    else if (attack.type_multiplier < 0.85) {
         gs->add_instance(
                 new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Very ineffective!",
                                  attack.type_multiplier < 1 ? COL_RED : COL_GREEN));
@@ -274,15 +274,15 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attac
         gs->add_instance(
                 new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Ineffective!",
                                  attack.type_multiplier < 1 ? COL_PALE_RED : COL_GREEN));
-    } else if (attack.type_multiplier < 1.2) {
-//        gs->add_instance(
-//                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Effective!",
-//                                 COL_PALE_GREEN));
-    } else if (attack.type_multiplier < 1.5) {
+    } else if (attack.type_multiplier <= 1.05) {
+        gs->add_instance(
+                new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Effective!",
+                                 COL_PALE_GREEN));
+    } else if (attack.type_multiplier <= 1.15) {
         gs->add_instance(
                 new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Quite Effective!",
                                  COL_PALE_GREEN));
-    } else if (attack.type_multiplier < 1.9) {
+    } else if (attack.type_multiplier <= 1.25) {
         gs->add_instance(
                 new AnimatedInst(ipos() + Pos {10, 0}, -1, 25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH, "Very Effective!",
                                  attack.type_multiplier < 1 ? COL_RED : COL_GREEN));

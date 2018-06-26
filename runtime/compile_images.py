@@ -16,6 +16,7 @@ SPR_FOLDERS = [
     "spr_doors",
     "spr_keys",
     "spr_rings",
+    "spr_menu",
     "spr_weapons",
     "spr_gamepad",
     "spr_armour",

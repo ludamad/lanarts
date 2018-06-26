@@ -471,6 +471,7 @@ end
 
 -- submodule
 return {
-    create = game_settings_menu_create
+    create = game_settings_menu_create,
+    label_button_create = label_button_create
 }
 
