@@ -58,6 +58,7 @@ set( DEPS ../dependencies)
 set( BUILTDEPS ${CMAKE_BINARY_DIR}/dependencies )
 
 add_definitions( -std=c++14 -Wno-deprecated-declarations -Wno-c++11-narrowing)
+#add_definitions( -DSTABLE_EXE)
 
 if (${USE_LUAJIT})
     set( lua_includes ${DEPS}/luajit/src )
@@ -136,7 +137,7 @@ file(GLOB lanarts_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
        tests/*
 )
 
-add_executable( lanarts ${lanarts_src} ${lanarts_tests})
+add_executable( lanarts ${lanarts_src} ${lanarts_tests} util/currdir.hpp gamestate/map_operations.h)
 CHECK_INCLUDE_FILE( bfd.h HAS_BFD ) 
 if ( HAS_BFD) 
     set( BACKTRADE_DEP bfd ) 

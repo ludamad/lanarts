@@ -14,6 +14,7 @@
 #include <luawrap/LuaValue.h>
 
 #include <ldungeon_gen/Map.h>
+#include <lcommon/lambda_utils.h>
 
 #include "objects/TeamRelations.h"
 
@@ -57,6 +58,11 @@ public:
 
 	void push_level_object(level_id id);
 	void pop_level_object(level_id id);
+
+	template <typename Func>
+	bool for_each(const Func& func) {
+		return ::for_each(level_states, func);
+	}
 
 	int number_of_levels() {
 		return level_states.size();

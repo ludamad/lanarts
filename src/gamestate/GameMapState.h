@@ -124,6 +124,11 @@ public:
         return _vision_radius;
     }
 
+    template <typename T, typename Func>
+    bool for_each(const Func& func) {
+        return _inst_set.for_each<T>(func);
+	}
+
 public:
 	std::vector<GameRoomPortal> exits, entrances;
 private:

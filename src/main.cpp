@@ -32,6 +32,7 @@
 
 #include "gamestate/GameState.h"
 
+#include "util/currdir.hpp"
 #include "lua_api/lua_api.h"
 #include "lua_api/lua_yaml.h"
 #include "lua_api/lua_api.h"
@@ -156,6 +157,10 @@ static void handleSIGINT(int signal) {
 /* Must take (int, char**) to play nice with SDL */
 int main(int argc, char** argv) {
   std::signal(SIGINT, handleSIGINT);
+  // change working directory to executable location:
+#ifdef STABLE_EXE
+  chdir(get_basename(argv[0]));
+#endif
 #if NDEBUG
 	try {
 #endif

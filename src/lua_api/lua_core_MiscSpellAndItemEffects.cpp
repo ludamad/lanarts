@@ -5,6 +5,7 @@
 #include <luawrap/luawrap.h>
 
 #include <ldungeon_gen/map_misc_ops.h>
+#include <gamestate/map_operations.h>
 
 #include "objects/PlayerInst.h"
 #include "objects/StoreInst.h"
@@ -52,15 +53,16 @@ static void magic_map_effect(LuaStackValue linst) {
     }
 }
 
+
+static bool magic_map_completion(LuaStackValue lplayer, const char* map_name) {
+    return map_completion(lua_api::gamestate(lplayer), lplayer.as<PlayerInst*>(), map_name);
+}
+
 namespace lua_api {
 	void register_lua_core_MiscSpellAndItemEffects(lua_State* L) {
 		// Mouse API
 		LuaValue module = lua_api::register_lua_submodule(L, "core.MiscSpellAndItemEffects");
 		module["magic_map_effect"].bind_function(magic_map_effect);
-//		mouse.getters["mouse_xy"].bind_function(mouse_xy);
-//		mouse.getters["mouse_left_held"].bind_function(mouse_left_held);
-//		mouse.getters["mouse_left_pressed"].bind_function(mouse_left_pressed);
-//		mouse.getters["mouse_right_held"].bind_function(mouse_right_held);
-//		mouse.getters["mouse_right_pressed"].bind_function(mouse_right_pressed);
+        module["map_completion"].bind_function(magic_map_completion);
 	}
 }

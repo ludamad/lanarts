@@ -63,6 +63,17 @@ public:
 
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
+
+	template <typename T, typename Func>
+	bool for_each(const Func& func) {
+        for (auto& unit : unit_set) {
+            T* inst = dynamic_cast<T*>(unit.inst);
+            if (inst && !func(inst)) {
+                return false;
+            }
+        }
+        return true;
+	}
 private:
 
 	//Internal Structures:

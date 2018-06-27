@@ -68,13 +68,13 @@ bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker
 
     if (core_stats().hurt(dmg)) {
         die(gs);
-        if (attacker != NULL && team != PLAYER_TEAM && !dynamic_cast<PlayerInst*>(this)) {
+        EnemyInst* e_this = dynamic_cast<EnemyInst*>(this);
+        if (attacker != NULL && team != PLAYER_TEAM && e_this) {
             attacker->signal_killed_enemy();
             PlayerData& pc = gs->player_data();
             double xpworth = this->xpworth();
-            LANARTS_ASSERT(dynamic_cast<EnemyInst*>(this));
-            double n_killed = (pc.n_enemy_killed(((EnemyInst*) this)->enemy_type()) - 1) / pc.all_players().size();
-            int kills_before_stale = ((EnemyInst*) this)->etype().kills_before_stale;
+            double n_killed = double(pc.n_enemy_killed(e_this->enemy_type()) - 1) / pc.all_players().size();
+            int kills_before_stale = e_this->etype().kills_before_stale;
             xpworth *= pow(0.9, n_killed * 25 / kills_before_stale); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
             if (n_killed > kills_before_stale) {
                 xpworth = 0;
@@ -91,17 +91,17 @@ bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker
             } else {
                 snprintf(buffstr, 32, "%d XP", amnt);
             }
-            gs->add_instance(
-                    new AnimatedInst(ipos(), -1, 25, PosF(), PosF(),
-                                     AnimatedInst::DEPTH, buffstr, COL_GOLD));
+            gs->add_instance<AnimatedInst>(
+                    ipos(), -1, 25, PosF(), PosF(),
+                    AnimatedInst::DEPTH, buffstr, COL_GOLD);
             gs->set_level(prev_level);
             return true;
         }
     }
 
-    gs->add_instance(
-            new AnimatedInst(ipos(), -1, 25, PosF(-1,-1), PosF(), AnimatedInst::DEPTH,
-                             format("%d", dmg), Colour(255, 148, 120)));
+    gs->add_instance<AnimatedInst>(
+            ipos(), -1, 25, PosF(-1,-1), PosF(), AnimatedInst::DEPTH,
+            format("%d", dmg), Colour(255, 148, 120));
 
     if (dynamic_cast<PlayerInst*>(attacker)) {
         // Damage from player causes hurt cooldown

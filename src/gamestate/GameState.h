@@ -111,6 +111,10 @@ public:
 	GameInst* get_instance(level_id level, obj_id id);
 	obj_id add_instance(GameInst* inst);
 	obj_id add_instance(level_id level, GameInst* inst);
+	template <typename T, typename ...Args>
+	obj_id add_instance(Args... args) {
+		return add_instance(new T(args...));
+	};
 	void remove_instance(GameInst* inst, bool add_to_removed = true);
 	//Skip an instance id as if we were making an instance
 	//used for synchronization purposes in network play
@@ -313,8 +317,8 @@ private:
 	lua_State* L;
 	int frame_n;
 	bool _is_loading_save = false;
-        // Used for restarting purposes, the initial value held by core.GlobalData, decided by runtime/InitialGlobalData.lua:
-        LuaValue initial_global_data;
+	// Used for restarting purposes, the initial value held by core.GlobalData, decided by runtime/InitialGlobalData.lua:
+	LuaValue initial_global_data;
 	GameStateInitData init_data;
 
 	GameNetConnection connection;
