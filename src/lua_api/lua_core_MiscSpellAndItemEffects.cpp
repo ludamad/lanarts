@@ -16,10 +16,7 @@
 #include "lua_api.h"
 
 // Reveal a map completely:
-static void magic_map_effect(LuaStackValue linst) {
-    PlayerInst* inst = linst.as<PlayerInst*>();
-    auto* gs = lua_api::gamestate(linst);
-    auto* level = gs->get_level(inst->current_floor);
+void reveal_map(GameState* gs, GameMapState* level) {
     auto& tiles = level->tiles();
     auto seen_map = tiles.previously_seen_map();
     auto source_map = level->source_map();
@@ -53,8 +50,13 @@ static void magic_map_effect(LuaStackValue linst) {
     }
 }
 
+static void magic_map_effect(LuaStackValue linst) {
+    PlayerInst* inst = linst.as<PlayerInst*>();
+    GameState* gs = lua_api::gamestate(linst);
+    reveal_map(gs, inst->get_map(gs));
+}
 
-static bool magic_map_completion(LuaStackValue lplayer, const char* map_name) {
+static bool lmap_completion(LuaStackValue lplayer, const char* map_name) {
     return map_completion(lua_api::gamestate(lplayer), lplayer.as<PlayerInst*>(), map_name);
 }
 
@@ -63,6 +65,6 @@ namespace lua_api {
 		// Mouse API
 		LuaValue module = lua_api::register_lua_submodule(L, "core.MiscSpellAndItemEffects");
 		module["magic_map_effect"].bind_function(magic_map_effect);
-        module["map_completion"].bind_function(magic_map_completion);
+        module["map_completion"].bind_function(lmap_completion);
 	}
 }
