@@ -156,7 +156,8 @@ function setup_settings_menu()
     menu_state.back = setup_start_menu
     menu_state.continue = function ()
         if settings.class_type ~= "" then
-            setup_game_scenario_menu()
+            --setup_game_scenario_menu()
+            exit_menu()
         end
     end
 

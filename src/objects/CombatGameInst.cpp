@@ -388,8 +388,11 @@ void CombatGameInst::post_draw(GameState *gs) {
         draw_statbar(on_screen(gs, statbox), float(ecore.hp) / ecore.max_hp);
     }
     if (dynamic_cast<PlayerInst*>(this) && dynamic_cast<PlayerInst *>(this)->is_focus_player(gs)) {
-        res::sprite("spr_enemies.good_neutral").draw(on_screen(gs, PosF {x-16, y-16}));
-        res::sprite("spr_enemies.good_neutral").draw(on_screen(gs, PosF {x-16, y-16}));
+        res::sprite("spr_effects.good_neutral").draw(on_screen(gs, PosF {x-23, y-23}));
+        //res::sprite("spr_effects.good_neutral").draw(on_screen(gs, PosF {x-23, y-23}));
+    } else if (dynamic_cast<PlayerInst*>(this)) {
+        res::sprite("spr_effects.friendly").draw(on_screen(gs, PosF {x-23, y-23}));
+        //res::sprite("spr_effects.good_neutral-2").draw(on_screen(gs, PosF {x-23, y-23}));
     }
 }
 

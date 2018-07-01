@@ -26,6 +26,10 @@ static PosF get_direction_towards(GameState* gs, PosF pos, int obj_radius, BBox 
         }
         // Get the accumulation vector:
         normalize(heading.x, heading.y, STRIDE);
+        // BUG FIX -- make sure |heading| != 0
+        if (heading.x == 0 && heading.y == 0) {
+            heading.x = STRIDE;
+        }
         PosF accum = pos;
         // Accumulate until we have reached our target, or hit a wall:
         bool reached = true;
