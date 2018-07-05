@@ -51,7 +51,7 @@ generate = (rng) ->
         i += 1
     {w,h} = compiler.map.size
     SourceMap.area_fill_unconnected {
-        map: compiler.map 
+        map: compiler.map
         seed: {w/2, h/2}
         unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
         mark_operator: {add: {SourceMap.FLAG_RESERVED2}}

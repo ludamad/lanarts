@@ -38,7 +38,7 @@ local function is_valid_ip_string(text)
     if #parts ~= 4 then return false end
 
     -- Assert all components are numbers <= 255
-    for _, part in ipairs(parts) do 
+    for _, part in ipairs(parts) do
         local number = tonumber(part)
         if number == nil then return false end
         if number < 0 or number > 255 then return false end
@@ -51,7 +51,7 @@ local function host_IP_field_create()
     local params = settings_text_field_params {
         label_text = "Host IP:",
         default_text = settings.ip,
-        input_callbacks = { -- Field validating & updating 
+        input_callbacks = { -- Field validating & updating
             update = function(field) -- Update host IP based on contents
                 settings.ip = field.text
             end,
@@ -65,7 +65,7 @@ local function connection_port_field_create()
     local params = settings_text_field_params {
         label_text = "Connection Port:",
         default_text = settings.port,
-        input_callbacks = { -- Field validating & updating 
+        input_callbacks = { -- Field validating & updating
             update = function(field) -- Update connection port based on contents
                 settings.port = tonumber(field.text)
             end,
@@ -81,7 +81,7 @@ local function connection_toggle_create()
     local server_option_image = image_cached_load("interface/sprites/config/server_icon.png")
     local single_player_option_image = image_cached_load("interface/sprites/config/single_player_icon.png")
 
-    local toggle = { 
+    local toggle = {
         size = SETTINGS_BOX_SIZE,
         font = SETTINGS_FONT
     }
@@ -92,7 +92,7 @@ local function connection_toggle_create()
             settings.connection_type = (settings.connection_type + 1) % 3
         end
     end
-    
+
     function toggle:draw(xy)
         -- Draw the connection type
 
@@ -126,7 +126,7 @@ local function connection_toggle_create()
 end
 
 local function respawn_toggle_create()
-    local toggle = { 
+    local toggle = {
         size = SETTINGS_BOX_SIZE,
         font = SETTINGS_FONT,
     }
@@ -152,13 +152,13 @@ local function respawn_toggle_create()
         local sprite_color = settings.regen_on_death and TEXT_COLOR or COL_LIGHT_RED
         local box_color = sprite_color
 
-        if mouse_over(xy, self.size) then 
-            box_color = COL_GOLD 
+        if mouse_over(xy, self.size) then
+            box_color = COL_GOLD
         end
 
         sprite:draw( {origin = Display.LEFT_CENTER, color = sprite_color}, { x, y + h / 2 } )
         self.font:draw( {color = TEXT_COLOR, origin = Display.LEFT_CENTER, color = text_color}, { x + 8 + sprite.size[2], y + h / 2 }, text )
-    
+
         Display.draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
     end
 
@@ -166,7 +166,7 @@ local function respawn_toggle_create()
 end
 
 local function frame_action_repeat_toggle_create()
-    local toggle = { 
+    local toggle = {
         size = SETTINGS_BOX_SIZE,
         large_font = BIG_SETTINGS_FONT,
         font = SETTINGS_FONT,
@@ -187,19 +187,19 @@ local function frame_action_repeat_toggle_create()
         local x,y = unpack(xy)
         local w, h = unpack(self.size)
 
-        self.font:draw( {color=COL_GREEN, origin = Display.LEFT_CENTER}, { x + 8, y + h / 2 }, 
+        self.font:draw( {color=COL_GREEN, origin = Display.LEFT_CENTER}, { x + 8, y + h / 2 },
             (settings.frame_action_repeat+1) .. 'x'
         )
-        self.font:draw( {color = COL_PALE_GREEN, origin = Display.LEFT_CENTER}, { x + 40, y + h / 2 }, 
+        self.font:draw( {color = COL_PALE_GREEN, origin = Display.LEFT_CENTER}, { x + 40, y + h / 2 },
             "Network Skip Rate"
         )
-    
+
         local box_color = mouse_over(xy, self.size) and COL_GOLD or COL_PALE_GREEN
         Display.draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
     end
 
     return toggle
-    
+
 end
 
 local function speed_description(time_per_step)
@@ -220,7 +220,7 @@ local function speed_description(time_per_step)
 end
 
 local function speed_toggle_create()
-    local toggle = { 
+    local toggle = {
         size = SETTINGS_BOX_SIZE,
         font = SETTINGS_FONT,
         sprite = image_cached_load("interface/sprites/config/speed_setting.png")
@@ -242,7 +242,7 @@ local function speed_toggle_create()
 
     function toggle:draw(xy)
         local text = "Speed: " .. speed_description(settings.time_per_step)
-   
+
         local alpha = 255 - (settings.time_per_step - 10) * 20
 
         local x,y = unpack(xy)
@@ -250,7 +250,7 @@ local function speed_toggle_create()
 
         self.sprite:draw( { color = {255, 255, 255, alpha}, origin = Display.LEFT_CENTER }, { x, y + h / 2 } )
         self.font:draw( {color = TEXT_COLOR, origin = Display.LEFT_CENTER}, { x + 8 + self.sprite.size[2], y + h / 2 }, text )
-    
+
         local box_color = mouse_over(xy, self.size) and COL_GOLD or COL_WHITE
         Display.draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
     end
@@ -268,11 +268,11 @@ local function label_button_create(params, color_formula, on_click)
 
     label_button:add_instance( sprite, Display.CENTER_TOP )
     label_button:add_instance( label, Display.CENTER_BOTTOM )
-    
+
     function label_button:step(xy) -- Makeshift inheritance
         InstanceBox.step(self, xy)
 
-        if self:mouse_over(xy) and Mouse.mouse_left_pressed then 
+        if self:mouse_over(xy) and Mouse.mouse_left_pressed then
             on_click(self, xy)
         end
 
@@ -289,7 +289,7 @@ local function class_choice_buttons_create()
     local x_padding, y_padding = 32, 16
     local font = MID_SETTINGS_FONT
 
-    local buttons = { 
+    local buttons = {
         { "White Mage", sprite_base .. "whitemage.png", COL_WHITE},
         { "Red Mage", sprite_base .. "redmage.png", COL_PALE_RED},
 --        { "Blue Mage", sprite_base .. "bluemage.png", COL_PALE_BLUE},
@@ -301,7 +301,7 @@ local function class_choice_buttons_create()
     }
     local prev, next = {}, {}
     for i, button in ipairs(buttons) do
-        local name = button[1] 
+        local name = button[1]
         local prev_i = i <= 1 and #buttons or i - 1
         local next_i = i >= #buttons and 1 or i + 1
 
@@ -326,24 +326,24 @@ local function class_choice_buttons_create()
     for i = 1, #buttons do
         local button = buttons[i]
 
-        button_row:add_instance( 
+        button_row:add_instance(
             label_button_create(
                 { size = button_size,
                   font = font,
                   text = button[1],
-                  sprite = image_cached_load(button[2]) 
+                  sprite = image_cached_load(button[2])
                 },
                 function(self, xy) -- color_formula
                     if settings.class_type == button[1] then
                         return COL_GOLD
-                    else 
+                    else
                         return self:mouse_over(xy) and COL_PALE_YELLOW or COL_WHITE--button[3]
                     end
                 end,
                 function(self, xy) -- on_click
                     settings.class_type = button[1]
                 end
-             ) 
+             )
          )
 
     end
@@ -353,7 +353,7 @@ end
 
 local function center_setting_fields_create()
     local fields = InstanceLine.create( {force_size = {500, 162}, dx = 320, dy = 64, per_row = 2} )
-    local current_setting 
+    local current_setting
 
     -- Adds different options depending on the connection type
     local function add_fields()
@@ -387,7 +387,7 @@ local function center_setting_fields_create()
         end
 
     end
-    
+
     add_fields() -- Do initial creation
 
     function fields:step(xy) -- Makeshift inheritance
@@ -424,7 +424,7 @@ local function back_and_continue_options_create(on_back_click, on_start_click)
     -- associate each label with a handler
     -- we make use of the ability to have objects as keys
     local components = {
-        [ TextLabel.create(BIG_SETTINGS_FONT, "Back") ] = on_back_click or do_nothing ,  
+        [ TextLabel.create(BIG_SETTINGS_FONT, "Back") ] = on_back_click or do_nothing ,
         [ TextLabel.create(BIG_SETTINGS_FONT, "Start") ] = on_start_click or do_nothing
     }
 
@@ -450,20 +450,20 @@ end
 local function game_settings_menu_create(on_back_click, on_start_click)
     local fields = InstanceBox.create( {size = { 640, 480 } } )
 
-    fields:add_instance( 
-        class_choice_buttons_create(), 
+    fields:add_instance(
+        class_choice_buttons_create(),
         Display.CENTER_TOP, --[[Down 50 pixels]] { 0, 50 } )
 
-    fields:add_instance( 
-        center_setting_fields_create(), 
+    fields:add_instance(
+        center_setting_fields_create(),
         {0.50, 0.70} )
 
-    fields:add_instance( 
-        back_and_continue_options_create(on_back_click, on_start_click), 
+    fields:add_instance(
+        back_and_continue_options_create(on_back_click, on_start_click),
         Display.CENTER_BOTTOM, --[[Up 20 pixels]] { 0, -20 } )
 
-    fields:add_instance( 
-        choose_class_message_create(), 
+    fields:add_instance(
+        choose_class_message_create(),
         Display.CENTER_BOTTOM, --[[Up 50 pixels]] { 0, -50 }  )
 
     return fields
@@ -474,4 +474,3 @@ return {
     create = game_settings_menu_create,
     label_button_create = label_button_create
 }
-

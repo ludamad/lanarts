@@ -2,12 +2,12 @@
 -- Generates the game maps, starting with high-level details (places that will be in the game)
 -- and then generating actual tiles.
 ----
-import map_place_object, ellipse_points, 
-    LEVEL_PADDING, Region, RVORegionPlacer, 
-    random_rect_in_rect, random_ellipse_in_ellipse, 
+import map_place_object, ellipse_points,
+    LEVEL_PADDING, Region, RVORegionPlacer,
+    random_rect_in_rect, random_ellipse_in_ellipse,
     ring_region_delta_func, default_region_delta_func, spread_region_delta_func,
-    center_region_delta_func, 
-    towards_region_delta_func, 
+    center_region_delta_func,
+    towards_region_delta_func,
     random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
     Tile, tile_operator from require "maps.GenerateUtils"
 
@@ -30,7 +30,7 @@ OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
 
 -- Generation constants and data
-{   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE, 
+{   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE,
     :FLAG_OVERWORLD, :FLAG_ROOM, :FLAG_NO_ENEMY_SPAWN, :FLAG_NO_ITEM_SPAWN
 } = Vaults
 
@@ -82,7 +82,7 @@ snake_pit_floor_plans = (rng) ->
         table.merge(base, raw)
 
 M.N_FLOORS = 2
-M.TEMPLATE  = (rng, floor, connector) -> 
+M.TEMPLATE  = (rng, floor, connector) ->
     n_stairs_up = connector.n_portals("up")
     plan = snake_pit_floor_plans(rng)[floor]
     subtemplates = for i=1,plan.n_subareas
@@ -119,7 +119,7 @@ M.TEMPLATE  = (rng, floor, connector) ->
                 if floor == M.N_FLOORS and n_items_placed == 0
                     item = {type: "Azurite Key", amount: 1}
                 else
-                    item = ItemUtils.randart_generate(1) -- Power level 1 
+                    item = ItemUtils.randart_generate(1) -- Power level 1
                 MapUtils.spawn_item(map, item.type, item.amount, xy)
                 n_items_placed += 1
             return config

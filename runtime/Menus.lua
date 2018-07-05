@@ -230,7 +230,7 @@ local function menu_step()
         -- but a bypass is allowed for cases where it must be done
         rawset("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
     end
-    
+
     -- (3) Call the menu step function
     if menu_state.menu then
         menu_state.menu:step( {0, 0} )

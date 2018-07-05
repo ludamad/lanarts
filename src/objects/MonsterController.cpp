@@ -265,7 +265,7 @@ void MonsterController::post_draw(GameState* gs) {
         return;
     }
 
-    ldraw::draw_circle_outline(COL_GREEN.alpha(140),
+    ldraw::draw_circle_outline(COL_PALE_RED.alpha(140),
             on_screen(gs, target->ipos()), target->target_radius + 5, 2);
 }
 
