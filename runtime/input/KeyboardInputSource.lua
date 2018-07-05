@@ -143,5 +143,8 @@ end
 function KeyboardInputSource:draw_action_bar_spell_hint(...) -- TODO
 end
 
+for k, v in pairs(require "input.KeyboardDraw") do
+    KeyboardInputSource[k] = v
+end
 
 return KeyboardInputSource
