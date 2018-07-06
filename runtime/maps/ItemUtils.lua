@@ -2,7 +2,6 @@
 
 local map_utils = require "maps.MapUtils"
 local Randarts = require "items.Randarts"
-local GlobalData = require "core.GlobalData"
 
 local M = {} -- Submodule
 

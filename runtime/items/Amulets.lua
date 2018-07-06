@@ -210,7 +210,15 @@ Data.equipment_create {
     -- TODO implement
     -- TODO use
     spr_item = "spr_runes.rune_snake",
-    sellable = false
+    sellable = false,
+    pickup_func = function(self, user)
+        local GlobalData = require "core.GlobalData"
+        if not GlobalData.lanarts_picked_up[self.name] then
+            play_sound "sound/win sound 2-1.ogg"
+        end
+        GlobalData.lanarts_picked_up[self.name] = true 
+    end
+
 }
 
 Data.equipment_create {
@@ -222,7 +230,14 @@ Data.equipment_create {
     -- TODO use
     spr_item = "spr_runes.rune_tomb",
     sellable = false,
-    effects_granted = {"SummonMummyOnKill"}
+    effects_granted = {"SummonMummyOnKill"},
+    pickup_func = function(self, user)
+        local GlobalData = require "core.GlobalData"
+        if not GlobalData.lanarts_picked_up[self.name] then
+            play_sound "sound/win sound 2-1.ogg"
+        end
+        GlobalData.lanarts_picked_up[self.name] = true 
+    end
 }
 
 
@@ -235,7 +250,14 @@ Data.equipment_create {
     -- TODO use
     spr_item = "spr_runes.rune_abyss",
     sellable = false,
-    effects_granted = {"SummonMummyOnKill"}
+    effects_granted = {"SummonMummyOnKill"},
+    pickup_func = function(self, user)
+        local GlobalData = require "core.GlobalData"
+        if not GlobalData.lanarts_picked_up[self.name] then
+            play_sound "sound/win sound 2-1.ogg"
+        end
+        GlobalData.lanarts_picked_up[self.name] = true 
+    end
 }
 
 Data.equipment_create {
@@ -247,7 +269,15 @@ Data.equipment_create {
     -- TODO use
     spr_item = "spr_runes.rune_swamp",
     sellable = false,
-    effects_granted = {{"GreenPower", {power = 5}}}
+    effects_granted = {{"GreenPower", {power = 5}}},
+    pickup_func = function(self, user)
+        local GlobalData = require "core.GlobalData"
+        if not GlobalData.lanarts_picked_up[self.name] then
+            play_sound "sound/win sound 2-1.ogg"
+        end
+        GlobalData.lanarts_picked_up[self.name] = true 
+    end
+
 }
 
 Data.equipment_create {
@@ -259,7 +289,14 @@ Data.equipment_create {
     -- TODO use
     spr_item = "spr_runes.rune_demonic_4",
     sellable = false,
-    effects_granted = {{"RedResist", {resist = 5}}}
+    effects_granted = {{"RedResist", {resist = 5}}},
+    pickup_func = function(self, user)
+        local GlobalData = require "core.GlobalData"
+        if not GlobalData.lanarts_picked_up[self.name] then
+            play_sound "sound/win sound 2-1.ogg"
+        end
+        GlobalData.lanarts_picked_up[self.name] = true 
+    end
 }
 
 Data.equipment_create {
@@ -272,7 +309,14 @@ Data.equipment_create {
     spr_item = "spr_runes.rune_tartarus",
     sellable = false,
     melee_cooldown_multiplier = 1/1.08,
-    stat_bonuses = {willpower=1}
+    stat_bonuses = {willpower=1},
+    pickup_func = function(self, user)
+        local GlobalData = require "core.GlobalData"
+        if not GlobalData.lanarts_picked_up[self.name] then
+            play_sound "sound/win sound 2-1.ogg"
+        end
+        GlobalData.lanarts_picked_up[self.name] = true 
+    end
 }
 
 Data.equipment_create {

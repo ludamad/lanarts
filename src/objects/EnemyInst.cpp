@@ -243,8 +243,8 @@ void EnemyInst::draw(GameState* gs) {
 		luawrap::call<void>(L, (GameInst*) this);
 	}
 	if (team == PLAYER_TEAM) {
-        res::sprite("spr_enemies.good_neutral").draw(on_screen(gs, PosF {x-16, y-16}));
-        res::sprite("spr_amulets.i-faith").draw(on_screen(gs, PosF {x-16, y-16}));
+            res::sprite("spr_effects.friendly").draw(on_screen(gs, PosF {x-16, y-16}));
+            res::sprite("spr_amulets.i-faith").draw(on_screen(gs, PosF {x-16, y-16}));
 	}
 }
 

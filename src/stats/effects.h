@@ -12,6 +12,7 @@
 
 #include "AllowedActions.h"
 #include "effect_data.h"
+#include "../../libs/luawrap-lib/include/luawrap/LuaValue.h"
 
 const int EFFECTS_MAX = 25;
 
@@ -52,6 +53,7 @@ struct Effect {
         }
         return state["time_left"].as<int>();
     }
+    LuaField method(const char* name);
 };
 struct EffectStats {
     bool has_active_effect() const;

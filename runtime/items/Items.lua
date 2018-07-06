@@ -1,9 +1,7 @@
-local GlobalData = require "core.GlobalData"
 local EffectUtils = require "spells.EffectUtils"
 local MiscSpellAndItemEffects = require "core.MiscSpellAndItemEffects"
 local EventLog = require "ui.EventLog"
 
-assert(GlobalData.keys_picked_up)
 
 Data.item_create {
     name = "Gold", -- An entry named gold must exist, it is handled specially
@@ -17,6 +15,7 @@ Data.item_create {
     use_message = "Now that you have picked up this key, you can open Azurite doors.",
     spr_item = "key1",
     pickup_func = function(self, user)
+        local GlobalData = require "core.GlobalData"
         if not GlobalData.keys_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
@@ -36,6 +35,7 @@ Data.item_create {
     use_message = "Now that you have picked up this key, you can open Dandelite doors.",
     spr_item = "key2",
     pickup_func = function(self, user)
+        local GlobalData = require "core.GlobalData"
         if not GlobalData.keys_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
@@ -54,6 +54,7 @@ Data.item_create {
     type = "key",
     spr_item = "spr_keys.magentite_key",
     pickup_func = function(self, user)
+        local GlobalData = require "core.GlobalData"
         if not GlobalData.keys_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
@@ -73,6 +74,7 @@ Data.item_create {
     use_message = "Now that you have picked up this key, you can open Burgundite doors.",
     spr_item = "key3",
     pickup_func = function(self, user)
+        local GlobalData = require "core.GlobalData"
         if not GlobalData.keys_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
@@ -145,7 +147,7 @@ Data.item_create {
 
 Data.item_create {
     name = "Scroll of Experience",
-    description = "Bestows the user with a vision, leading to increased experience.",
+    description = "Grants 100XP for the user's party.",
     use_message = "Experience is bestowed upon you!",
 
     shop_cost = {55,105},
@@ -153,7 +155,18 @@ Data.item_create {
     spr_item = "scroll_exp",
 
     action_func = function(self, user)
-        user:gain_xp(100)
+        -- Collect ally players.
+        local ally_players = {}
+        for _, ally in ipairs(Map.allies_list(caster)) do
+            if not ally.is_enemy then
+                append(ally_players, ally)
+            end
+        end
+        -- Grant all of them an XP share.
+        local xp_granted = 100 / #ally_players
+        for _, ally in ipairs(ally_players) do
+            ally:gain_xp(xp_granted)
+        end
     end
 }
 

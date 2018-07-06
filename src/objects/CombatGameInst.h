@@ -117,6 +117,7 @@ public:
 	void use_projectile_spell(GameState* gs, SpellEntry& spl_entry,
 							  const Projectile& projectile, const Pos& target);
 	void use_spell(GameState* gs, SpellEntry& spl_entry, const Pos& target, GameInst* target_object = nullptr);
+	void use_mp(GameState* gs, int mp);
 //members
 public:
 // <PURE DATA REGION see (de)serialize>

@@ -339,3 +339,7 @@ void EffectStats::clear() {
 bool EffectStats::has(const char* effect_name) {
     return get_active(effect_name) != NULL;
 }
+
+LuaField Effect::method(const char* name) {
+    return entry().raw_lua_object["on_attack_func"];
+}

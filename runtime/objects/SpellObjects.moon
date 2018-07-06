@@ -4,7 +4,6 @@ Display = require "core.Display"
 
 ObjectUtils = require "objects.ObjectUtils"
 LuaGameObject = require "objects.LuaGameObject"
-GlobalData = require "core.GlobalData"
 
 M = nilprotect {} -- Submodule
 M._spell_wall = Display.image_load "spr_spells/spell-wall.png"

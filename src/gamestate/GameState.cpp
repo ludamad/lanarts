@@ -277,9 +277,9 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	luawrap::globals(L)["Engine"]["pre_deserialize"].push();
 	luawrap::call<void>(L);
 
-    LuaValue global_data;
-    conf.decode(serializer, global_data);
-    luawrap::globals(L)["package"]["loaded"]["core.GlobalData"] = global_data;
+        LuaValue global_data;
+        conf.decode(serializer, global_data);
+        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"] = global_data;
 
 	settings.deserialize_gameplay_settings(serializer);
 	serializer.read(base_rng_state); // Load RNG state

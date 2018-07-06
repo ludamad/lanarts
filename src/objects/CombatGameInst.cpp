@@ -735,7 +735,7 @@ void CombatGameInst::use_projectile_spell(GameState* gs, SpellEntry& spl_entry,
 void CombatGameInst::use_spell(GameState* gs, SpellEntry& spl_entry, const Pos& target, GameInst* target_object) {
     lua_State* L = gs->luastate();
 
-    core_stats().mp -= spl_entry.mp_cost;
+    use_mp(gs, spl_entry.mp_cost);
     float spell_cooldown_mult =
             effective_stats().cooldown_modifiers.spell_cooldown_multiplier;
     cooldowns().reset_action_cooldown(
@@ -804,4 +804,15 @@ void CombatGameInst::gain_xp_from(GameState* gs, CombatGameInst* inst, float dx,
             new AnimatedInst(Pos(inst->x + dx, inst->y + dy), -1, 25,
                     PosF(), PosF(), AnimatedInst::DEPTH, buffstr,
                     Colour(255, 215, 11)));
+}
+
+void CombatGameInst::use_mp(GameState* gs, int mp) {
+    if (mp == 0) {
+        // No need to call effect methods
+        return;
+    }
+    core_stats().mp -= mp;
+    effects.for_each([&](Effect& eff) {
+        lcall(eff.method("on_use_mp"), /*args:*/ eff.state, this, mp);
+    });
 }
