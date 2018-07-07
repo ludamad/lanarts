@@ -112,8 +112,10 @@ public:
 	obj_id add_instance(GameInst* inst);
 	obj_id add_instance(level_id level, GameInst* inst);
 	template <typename T, typename ...Args>
-	obj_id add_instance(Args... args) {
-		return add_instance(new T(args...));
+	T* add_instance(Args... args) {
+		T* obj = new T(args...);
+		add_instance(obj);
+		return obj;
 	};
 	void remove_instance(GameInst* inst, bool add_to_removed = true);
 	//Skip an instance id as if we were making an instance

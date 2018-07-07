@@ -194,7 +194,6 @@ DataW.enemy_create {
     xpaward: 100
     appear_message: "A queen bee appears!"
     defeat_message: "The queen bee has buzzed its last buzz."
-    kills_before_stale: 50
     types: {"Green"}
     stats: {
         attacks: {{weapon: "Fast Melee"}}
@@ -219,7 +218,6 @@ DataW.enemy_create {
     xpaward: 25
     appear_message: "A giant killer bee appears!"
     defeat_message: "The giant bee has buzzed its last buzz."
-    kills_before_stale: 100
     types: {"Green"}
     stats: {
         attacks: {{weapon: "Fast Melee"}}
@@ -279,7 +277,6 @@ DataW.enemy_create {
     xpaward: 15
     appear_message: "You hear a mouther start screeching!"
     defeat_message: "The mouther has been shut."
-    kills_before_stale: 100
     types: {"Green", "Black"}
     stats: {
         attacks: {
@@ -1015,7 +1012,6 @@ DataW.enemy_create {
     death_sprite: "blood"
     radius: 9
     xpaward: 10
-    kills_before_stale: 100
     appear_message: "An adder slithers onto the scene! "
     defeat_message: "The adder is dead. "
     types: {"Green"}

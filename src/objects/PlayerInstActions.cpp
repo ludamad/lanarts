@@ -944,7 +944,7 @@ void PlayerInst::_use_dngn_portal(GameState *gs, const GameAction &action) {
 void PlayerInst::gain_xp(GameState* gs, int xp) {
    int levels_gained = stats().gain_xp(xp, this);
    if (levels_gained > 0) {
-   	char level_gain_str[128];
+   	    char level_gain_str[128];
         gs->for_screens([&]() {
             snprintf(level_gain_str, 128, "%s reached level %d!",
                      is_focus_player(gs) ? "You have" : "Your ally has",

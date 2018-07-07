@@ -7,6 +7,7 @@
 #include <ldraw/DrawOptions.h>
 
 #include <typeinfo>
+#include <draw/fonts.h>
 
 #include "draw/draw_sprite.h"
 #include "draw/SpriteEntry.h"
@@ -59,7 +60,9 @@ void AnimatedInst::draw(GameState* gs) {
 					textcol.b + fade * wd.b / 100, 255 - fade);
 		}
 
-		gs->font().draw(alphacol, on_screen(gs, ipos()), text);
+		ldraw::Font _font = font ? *font : res::font_primary();
+		auto draw_options = ldraw::DrawOptions(should_center_font ? ldraw::CENTER : ldraw::LEFT_TOP, alphacol);
+		_font.draw(draw_options, on_screen(gs, ipos()), text);
 	}
 }
 
