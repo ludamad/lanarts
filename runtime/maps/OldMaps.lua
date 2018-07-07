@@ -57,7 +57,7 @@ M.medium_enemies = table.merge(M.medium_animals, {
   {enemy = "Chicken",           chance = 50                                             },
 --  {enemy = "Unseen Horror",     chance = 5                                             },
 --  {enemy = "Centaur Hunter",      chance = 10                                             }
-     {enemy = "Centaur Marksman",      chance = 30, guaranteed_spawns = 5                                              },
+     {enemy = "Centaur Hunter",      chance = 10 },
 })
  
 M.mediumhard_enemies = table.merge(M.medium_animals, {
@@ -66,7 +66,7 @@ M.mediumhard_enemies = table.merge(M.medium_animals, {
   --{enemy = "Chicken",           chance = 50                                             },
   {enemy = "Super Chicken",     chance = 50                                             },
 --  {enemy = "Unseen Horror",     chance = 5                                             },
-  {enemy = "Centaur Hunter",      chance = 0, guaranteed_spawns = 2},
+  {enemy = "Centaur Hunter",      chance = 1, guaranteed_spawns = 2},
 })
   
 M.hard_enemies = {
@@ -76,7 +76,7 @@ M.hard_enemies = {
  {enemy = "Skeleton",            chance = 75                                              },
  {enemy = "Ciribot",           chance = 75                                              },
  {enemy = "Golem",             guaranteed_spawns = 1                                    },
- {enemy = "Centaur Hunter",      chance = 0, guaranteed_spawns = 4},
+ {enemy = "Centaur Hunter",      chance = 1, guaranteed_spawns = 4},
 -- {enemy = "Unseen Horror",     chance = 10,   group_chance = 33, group_size = 2           }
 }
 
@@ -84,7 +84,7 @@ M.harder_enemies = {
   {enemy = "Hell Storm",        chance = 20,  group_chance = 33, group_size = 3           },
   {enemy = "Golem",             guaranteed_spawns = 1, group_chance = 100, group_size = 2 },
   {enemy = "Jester",            chance = 20                                             },
-  {enemy = "Centaur Marksman",      chance = 0, guaranteed_spawns = 4},
+  {enemy = "Centaur Marksman",      chance = 1, guaranteed_spawns = 4},
   {enemy = "Executioner",           chance = 30,                                           },
   {enemy = "Mana Sapper",            chance =5                                             },
   {enemy = "Giant Chicken",             guaranteed_spawns = 1, group_chance = 100, group_size = 3 },
@@ -143,6 +143,25 @@ local varied_layout5 = {
         },
         tunnels =  { width = {1,2}, per_room = 2        }
 }
+
+local small_layout1 = {
+        size = {{60,80}, {60,80}},
+        rooms = {
+          combine=true,
+          {padding = 1, amount = {3,4}, size = {4,5}},
+          {padding = 1, amount = {1,2}, size = {5,7}}
+        },
+        tunnels =  { width = {2,6}, per_room = {2, 3}      }
+}         
+local small_layout2 = {
+        size = {{60,80}, {60,80}},
+        rooms = {
+          combine=true,
+          {padding = 1, amount = {3,4}, size = {4,5}},
+          {padding = 1, amount = {1,2}, size = {5,7}}
+        },
+        tunnels =  { width = {1,5}, per_room = {2, 20}      }
+}
 local medium_layout1 = {
         size = {{60,80}, {60,80}},
         rooms = {
@@ -160,7 +179,7 @@ local medium_layout2 = {
         tunnels =  { width = {1,5}, per_room = {2, 20}      }
 }
 local large_layout1 = {
-        size = {{70,90}, {70,90}},
+        size = {{80,60}, {60,80}},
         rooms = { padding = 3, amount = 15, size = {8,12} },
         tunnels = {
           width = {1, 3},
@@ -168,7 +187,7 @@ local large_layout1 = {
        }
 }
 local large_layout2 = {
-        size = {{70,90}, {70,90}}, 
+        size = {{60,80}, {60,80}}, 
         rooms = { padding = 3, amount = 15, size = {8,12} }, 
         tunnels = { width = {1, 3}, per_room = 9 }
 }
@@ -264,7 +283,7 @@ M.Dungeon2 = {
 }
 
 M.Dungeon3 = {
-  { layout = medium_layouts,
+  { layout = {small_layout1, small_layout2},
     dont_scale_enemies = true,
     content = {
       items = { amount = 5,  group = ItemGroups.basic_items   },
@@ -279,7 +298,7 @@ M.Dungeon3 = {
     content = {
       items = { amount = 8,  group = ItemGroups.basic_items   },
       enemies = {
-        amount = {7,10},
+        amount = {10,12},
         generated = M.mediumhard_enemies
       }
     }
@@ -321,7 +340,7 @@ M.Dungeon4 = {
   { layout = large_layouts,
     dont_scale_enemies = true,
     content = {
-      items = { amount = 10, group = ItemGroups.enchanted_items   },
+      items = { amount = 20,  group = ItemGroups.enchanted_items, randart_chance = 25, randart_power_level = 2   },
       enemies = {
         amount = 30,
         generated = M.harder_enemies
@@ -329,24 +348,23 @@ M.Dungeon4 = {
     }
   
   },
-  -- Level 9
-  { layout = large_layouts,
-    dont_scale_enemies = true,
-    content = {
-      items = { amount = 12,  group = ItemGroups.enchanted_items   },
-      enemies = {
-        amount = 30,
-        generated = M.harder_enemies
-      }
-    }
-  },
+ -- -- Level 9
+ -- { layout = large_layouts,
+ --   dont_scale_enemies = true,
+ --   content = {
+ --     items = { amount = 12,  group = ItemGroups.enchanted_items   },
+ --     enemies = {
+ --       amount = 30,
+ --       generated = M.harder_enemies
+ --     }
+ --   }
+ -- },
   -- Level 10
-  { layout = large_layouts,
-    dont_scale_enemies = true,
+  { templates = {"maps/dungeon1room1a.txt", "maps/dungeon1room1b.txt", "maps/dungeon1room1c.txt"},
     content = {
-      items = { amount = 12,  group = ItemGroups.enchanted_items   },
+      items = { amount = 20,  group = ItemGroups.enchanted_items, randart_chance = 10, randart_power_level = 3   },
       enemies = {
-        amount = 30,
+        amount = {13, 15},
         generated = table.tconcat(M.harder_enemies, {{enemy = "Pixulloch", guaranteed_spawns = 1}, {enemy = "Hell Forged", guaranteed_spawns = 1}})
       }
     }
@@ -361,7 +379,7 @@ end
 local function generate_items(map, items)
     local n_items = random_round(range_resolve(items.amount))
     for i=1,n_items do
-        ItemUtils.item_object_generate(map, items.group)
+        ItemUtils.item_object_generate(map, items.group, --[[Optional]] items.randart_power_level, --[[Optional]] items.randart_chance)
     end
 end
 
@@ -578,7 +596,13 @@ end
 
 local function generate_layout(map, layout, tileset)
     event_log("(RNG #%d) generating layout\n", map.rng:amount_generated())
-    generate_rooms(map, layout.rooms, tileset)
+    if layout.rooms.combine then
+        for _, sublayout in ipairs(layout.rooms) do
+            generate_rooms(map, sublayout, tileset)
+        end
+    else
+        generate_rooms(map, layout.rooms, tileset)
+    end
     generate_tunnels(map, layout.tunnels, tileset)
     event_log("(RNG #%d) after generating layout\n", map.rng:amount_generated())
 end

@@ -83,8 +83,8 @@ function M.item_generate(group, --[[Optional]] randart_power_level, --[[Optional
     return M.raw_item_generate(group)
 end
 
-function M.item_object_generate(map, group, --[[Optional]] randart_power_level)
-    local item = M.item_generate(group, randart_power_level)
+function M.item_object_generate(map, group, --[[Optional]] randart_power_level, --[[Optional]] randart_chance)
+    local item = M.item_generate(group, randart_power_level, randart_chance)
     map_utils.random_item(map, item.type, item.amount)
 end
 
