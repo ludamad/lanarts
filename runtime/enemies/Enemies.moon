@@ -610,11 +610,11 @@ DataW.enemy_create {
     sprite: "spr_enemies.humanoid.centaur"
     death_sprite: "blood"
     radius: 12
-    xpaward: 50
+    xpaward: 40
     appear_message: "A centaur hunter readies his bow."
     defeat_message: "The centaur hunter has been defeated."
     stats: {
-        hp: 80
+        hp: 60
         hpregen: 0.01
         movespeed: 4
         strength: 20
@@ -643,7 +643,7 @@ DataW.enemy_create {
     appear_message: "A centaur marksman readies his bow."
     defeat_message: "The centaur marksman has been defeated."
     stats: {
-        hp: 120
+        hp: 100
         hpregen: 0.02
         movespeed: 4
         strength: 30
