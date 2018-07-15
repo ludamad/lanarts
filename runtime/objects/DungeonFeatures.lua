@@ -6,7 +6,6 @@ local EventLog = require "ui.EventLog"
 
 local ObjectUtils = require "objects.ObjectUtils"
 local LuaGameObject = require "objects.LuaGameObject"
-local GlobalData = require "core.GlobalData"
 
 local M = nilprotect {} -- Submodule
 
@@ -17,6 +16,8 @@ M.FEATURE_DEPTH = 100
 local DEACTIVATION_DISTANCE = 768
 
 local function n_lanarts_picked_up()
+    local GlobalData = require "core.GlobalData"
+    pretty(GlobalData)
     local n = 0
     for _, _ in pairs(GlobalData.lanarts_picked_up) do
         n = n + 1
@@ -74,6 +75,7 @@ function Door:on_step()
 --    if Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
 --        return -- Need to be able to scale to many deactivated instances
 --    end 
+    local GlobalData = require "core.GlobalData"
 
     if self.open_timeout > 0 then
         self.open_timeout = self.open_timeout - 1

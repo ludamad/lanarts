@@ -107,7 +107,7 @@ Data.equipment_create {
     description = "The magic robes of a beginner white mage.",
     type = "armour",
 
-    shop_cost = {10,20},
+    shop_cost = {40,100},
 
     spr_item = "spr_armour.white_robe",
 
@@ -115,10 +115,10 @@ Data.equipment_create {
         willpower = 1,
     },
     effects_granted = {
-        {"BlackResist", {resist = -1}},
-        {"BlackPower", {power= -1}},
-        {"WhiteResist", {resist = 1}},
-        {"WhitePower", {power = 1}},
+        {"BlackResist", {resist = -4}},
+        {"BlackPower", {power= -4}},
+        {"WhiteResist", {resist = 4}},
+        {"WhitePower", {power = 4}},
     }
 }
 
@@ -127,7 +127,7 @@ Data.equipment_create {
     description = "The magic robes of a beginner red mage.",
     type = "armour",
 
-    shop_cost = {10,20},
+    shop_cost = {40,100},
 
     spr_item = "spr_armour.robe_ego1",
 
@@ -135,10 +135,10 @@ Data.equipment_create {
         willpower = 1,
     },
     effects_granted = {
-        {"BlueResist", {resist = -1}},
-        {"BluePower", {power = -1}},
-        {"RedResist", {resist = 1}},
-        {"RedPower", {power = 1}},
+        {"BlueResist", {resist = -4}},
+        {"BluePower", {power = -4}},
+        {"RedResist", {resist = 4}},
+        {"RedPower", {power = 4}},
     }
 }
 

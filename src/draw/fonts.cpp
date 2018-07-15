@@ -7,12 +7,15 @@
 
 using namespace ldraw;
 
-static Font __primary, __menu;
+static Font __primary, __bigprimary, __menu;
 
 namespace res {
 
 Font& font_primary() {
 	return __primary;
+}
+Font& font_bigprimary() {
+	return __bigprimary;
 }
 Font& font_menu() {
 	return __menu;
@@ -20,6 +23,7 @@ Font& font_menu() {
 
 
 void font_free() {
+	__bigprimary.clear();
 	__primary.clear();
 	__menu.clear();
 }

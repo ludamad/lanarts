@@ -30,6 +30,7 @@
 
 #include <lcommon/math_util.h>
 #include <ldraw/colour_constants.h>
+#include <draw/fonts.h>
 
 #include "PlayerInst.h"
 
@@ -48,7 +49,7 @@ static int random_round(MTwist& rng, float f) {
 }
 
 const int HURT_COOLDOWN = 30;
-bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker) {
+bool CombatGameInst::damage(GameState* gs, float fdmg, CombatGameInst* attacker) {
     if (current_floor == -1) {
         return false; // Don't die twice.
     }
@@ -57,8 +58,7 @@ bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker
         return false;
     }
     lua_State* L = gs->luastate();
-    auto* prev_level = gs->get_level();
-    gs->set_level(gs->get_level(current_floor));
+    auto* map = get_map(gs);
     event_log("CombatGameInst::damage: id %d took %.2f dmg\n", id, fdmg);
 
     int dmg = random_round(gs->rng(), fdmg);
@@ -69,39 +69,42 @@ bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker
     if (core_stats().hurt(dmg)) {
         die(gs);
         EnemyInst* e_this = dynamic_cast<EnemyInst*>(this);
+
         if (attacker != NULL && team != PLAYER_TEAM && e_this) {
+            int attacker_xp = attacker->gain_xp_from(gs, this);
             attacker->signal_killed_enemy();
-            PlayerData& pc = gs->player_data();
-            double xpworth = this->xpworth();
-            double n_killed = double(pc.n_enemy_killed(e_this->enemy_type()) - 1) / pc.all_players().size();
-            int kills_before_stale = e_this->etype().kills_before_stale;
-            xpworth *= pow(0.9, n_killed * 25 / kills_before_stale); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
-            if (n_killed > kills_before_stale) {
-                xpworth = 0;
-            }
-            float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
+//            PlayerData& pc = gs->player_data();
+//            double xpworth = this->xpworth();
+//            double n_killed = double(pc.n_enemy_killed(e_this->enemy_type()) - 1) / pc.all_players().size();
+//            int kills_before_stale = e_this->etype().kills_before_stale;
+//            xpworth *= pow(0.9, n_killed * 25 / kills_before_stale); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
+//            if (n_killed > kills_before_stale) {
+//                xpworth = 0;
+//            }
+//            float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
+//
+//            int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
+//
+//            attacker->stats().gain_xp(amnt, attacker);
 
-            int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
-
-            attacker->stats().gain_xp(amnt, attacker);
-            //players_gain_xp(gs, amnt);
             char buffstr[32];
-            if (xpworth == 0) {
-                snprintf(buffstr, 32, "STALE", amnt);
-            } else {
-                snprintf(buffstr, 32, "%d XP", amnt);
+            if (attacker_xp != 0) {
+                snprintf(buffstr, 32, "%d XP", attacker_xp);
             }
-            gs->add_instance<AnimatedInst>(
-                    ipos(), -1, 25, PosF(), PosF(),
+            auto* inst = map->add_instance<AnimatedInst>(
+                    gs, ipos(), -1, 25, PosF(), PosF(),
                     AnimatedInst::DEPTH, buffstr, COL_GOLD);
-            gs->set_level(prev_level);
+            inst->font = &res::font_bigprimary();
+            inst->should_center_font = true;
             return true;
         }
     }
 
-    gs->add_instance<AnimatedInst>(
-            ipos(), -1, 25, PosF(-1,-1), PosF(), AnimatedInst::DEPTH,
-            format("%d", dmg), Colour(255, 148, 120));
+    auto* inst = map->add_instance<AnimatedInst>(
+            gs, ipos(), -1, 25, PosF(-1,-1), PosF(), AnimatedInst::DEPTH,
+            format("%d", dmg), Colour(255, 148/2, 120/2));
+    inst->font = &res::font_bigprimary();
+    inst->should_center_font = true;
 
     if (dynamic_cast<PlayerInst*>(attacker)) {
         // Damage from player causes hurt cooldown
@@ -111,7 +114,6 @@ bool CombatGameInst:: damage(GameState* gs, float fdmg, CombatGameInst* attacker
             core_stats().hp_bleed += fdmg;
         }
     }
-    gs->set_level(prev_level);
     return false;
 }
 
@@ -735,7 +737,7 @@ void CombatGameInst::use_projectile_spell(GameState* gs, SpellEntry& spl_entry,
 void CombatGameInst::use_spell(GameState* gs, SpellEntry& spl_entry, const Pos& target, GameInst* target_object) {
     lua_State* L = gs->luastate();
 
-    core_stats().mp -= spl_entry.mp_cost;
+    use_mp(gs, spl_entry.mp_cost);
     float spell_cooldown_mult =
             effective_stats().cooldown_modifiers.spell_cooldown_multiplier;
     cooldowns().reset_action_cooldown(
@@ -769,39 +771,62 @@ simul_id& CombatGameInst::collision_simulation_id() {
     return simulation_id;
 }
 
-void CombatGameInst::gain_xp_from(GameState* gs, CombatGameInst* inst, float dx,
-        float dy) {
-    if (team == MONSTER_TEAM) {
-        return;
+static int players_gain_xp(GameState* gs, team_id team, float xp, bool use_bonus) {
+    PlayerData& pd = gs->player_data();
+    std::vector<PlayerDataEntry>& players = pd.all_players();
+
+    int n_players = 0;
+    for (auto& player : players) {
+        if (player.player()->team == team) {
+            n_players++;
+        }
     }
+    if (n_players == 0) {
+        return 0;
+    }
+    float multiplayer_bonus = 1.0f / ((1 + n_players/2.0f) / n_players);
+    if (!use_bonus) {
+        multiplayer_bonus = 1;
+    }
+    xp *= multiplayer_bonus;
+    auto xp_portion = (int)ceil(xp * multiplayer_bonus / n_players);
+
+    for (auto& player : players) {
+        auto* inst = player.player();
+        if (inst->team == team) {
+            inst->gain_xp(gs, xp_portion);
+        }
+    }
+    return xp;
+}
+
+int CombatGameInst::team_gain_xp(GameState* gs, float xp, bool use_bonus) {
+    return players_gain_xp(gs, team, xp, use_bonus);
+}
+
+int CombatGameInst::gain_xp_from(GameState* gs, CombatGameInst* inst) {
     PlayerData& pc = gs->player_data();
     signal_killed_enemy();
     // Nothing for killing players yet:
     if (!dynamic_cast<EnemyInst*>(inst)) {
+        return 0;
+    }
+
+    double xpworth = ((EnemyInst*)inst)->xpworth();
+    // TODO track kills per team
+    double n_killed = (pc.n_enemy_killed(((EnemyInst*) inst)->enemy_type()) - 1) / pc.all_players().size();
+    // Level out at 25% of the original XP, after ~27 kills per player
+    xpworth *= std::max(0.25, pow(0.9, n_killed));
+    return team_gain_xp(gs, xpworth, /*use bonus*/ true);
+}
+
+void CombatGameInst::use_mp(GameState* gs, int mp) {
+    if (mp == 0) {
+        // No need to call effect methods
         return;
     }
-
-    char buffstr[32];
-    double xpworth = ((EnemyInst*)inst)->xpworth();
-    double n_killed = (pc.n_enemy_killed(((EnemyInst*) inst)->enemy_type()) - 1) / pc.all_players().size();
-    int kills_before_stale = ((EnemyInst*) inst)->etype().kills_before_stale;
-    xpworth *= pow(0.9, n_killed * 25 / kills_before_stale); // sum(0.9**i for i in range(25)) => ~9.28x the monsters xp value over time
-    if (n_killed > kills_before_stale) {
-        xpworth = 0;
-    }
-    float multiplayer_bonus = 1.0f / ((1 + pc.all_players().size()/2.0f) / pc.all_players().size());
-
-    int amnt = round(xpworth * multiplayer_bonus / pc.all_players().size());
-
-    stats().gain_xp(amnt * 15, this);
-    //players_gain_xp(gs, amnt);
-    if (xpworth == 0) {
-        snprintf(buffstr, 32, "STALE", amnt);
-    } else {
-        snprintf(buffstr, 32, "%d XP", amnt);
-    }
-    gs->add_instance(
-            new AnimatedInst(Pos(inst->x + dx, inst->y + dy), -1, 25,
-                    PosF(), PosF(), AnimatedInst::DEPTH, buffstr,
-                    Colour(255, 215, 11)));
+    core_stats().mp -= mp;
+    effects.for_each([&](Effect& eff) {
+        lcall(eff.method("on_use_mp"), /*args:*/ eff.state, this, mp);
+    });
 }

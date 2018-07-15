@@ -59,6 +59,9 @@ public:
 	int height() const;
 
 	void clear();
+	bool empty() const {
+		return _font.empty();
+	}
 
 private:
 	mutable std::string _print_buffer;

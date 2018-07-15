@@ -11,6 +11,7 @@
 namespace res {
 
 ldraw::Font& font_primary();
+ldraw::Font& font_bigprimary();
 ldraw::Font& font_menu();
 
 // Free all fonts

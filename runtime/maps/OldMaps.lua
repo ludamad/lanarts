@@ -5,7 +5,6 @@ local Dungeons = require "maps.Dungeons"
 local MapUtils = require "maps.MapUtils"
 local SourceMap = require "core.SourceMap"
 local World = require "core.World"
-local GlobalData = require "core.GlobalData"
 local M = nilprotect {} -- Submodule
 
 M.weak_undead = {
@@ -114,34 +113,53 @@ local tiny_layout3 = {
         tunnels =  { padding = 1, width = {1,4},  per_room = {2,3} }
 }
 
-local small_layout1 = {
+local varied_layout1 = {
         size = {40, 40},
         rooms =    { padding = 0, amount = 40, size = {4,4} },
         tunnels =  { padding = 1, width = {1,2},   per_room = 5 }
 }
 
-local small_layout2 = {
+local varied_layout2 = {
         size = {50, 50},
         rooms =    { padding = 1, amount = 20, size = {10,10}},
         tunnels =  { padding = 1, width = {1,2},  per_room = 2   }
 }
-local small_layout3 = {
+local varied_layout3 = {
         size = {64, 64},
         rooms =    { padding = 1, amount = 23, size = {5,7} },
         tunnels =  { width = {1,2}, per_room = {2, 5}      }
 }
-local small_layout4 = {
-        size = {76, 76},
+local varied_layout4 = {
+        size = {64, 64},
         rooms =    { padding = 1, amount = 20, size = {8,10}},
         tunnels =  { width = {1,2}, per_room = {2, 5}      }
 } 
-local small_layout5 = {
-        size = {90, 60},
+local varied_layout5 = {
+        size = {64, 64},
         rooms = {
           {padding = 1, amount = {3,4}, size = {15,15}},
           {padding = 1, amount = {8,10}, size = {8,10} }
         },
         tunnels =  { width = {1,2}, per_room = 2        }
+}
+
+local small_layout1 = {
+        size = {{60,80}, {60,80}},
+        rooms = {
+          combine=true,
+          {padding = 1, amount = {3,4}, size = {4,5}},
+          {padding = 1, amount = {1,2}, size = {5,7}}
+        },
+        tunnels =  { width = {2,6}, per_room = {2, 3}      }
+}         
+local small_layout2 = {
+        size = {{60,80}, {60,80}},
+        rooms = {
+          combine=true,
+          {padding = 1, amount = {3,4}, size = {4,5}},
+          {padding = 1, amount = {1,2}, size = {5,7}}
+        },
+        tunnels =  { width = {1,5}, per_room = {2, 20}      }
 }
 local medium_layout1 = {
         size = {{60,80}, {60,80}},
@@ -160,7 +178,7 @@ local medium_layout2 = {
         tunnels =  { width = {1,5}, per_room = {2, 20}      }
 }
 local large_layout1 = {
-        size = {{70,90}, {70,90}},
+        size = {{80,60}, {60,80}},
         rooms = { padding = 3, amount = 15, size = {8,12} },
         tunnels = {
           width = {1, 3},
@@ -168,7 +186,7 @@ local large_layout1 = {
        }
 }
 local large_layout2 = {
-        size = {{70,90}, {70,90}}, 
+        size = {{60,80}, {60,80}}, 
         rooms = { padding = 3, amount = 15, size = {8,12} }, 
         tunnels = { width = {1, 3}, per_room = 9 }
 }
@@ -181,10 +199,11 @@ local large_layout3 = {
 
 local tiny_layouts = {tiny_layout1, tiny_layout2, tiny_layout3}   
 M.tiny_layouts = tiny_layouts
-local small_layouts = {
-  small_layout1, small_layout2, small_layout3, small_layout4, small_layout5
+local varied_layouts = {
+  --varied_layout1, varied_layout2, 
+  varied_layout3, varied_layout4, varied_layout5
 }
-M.small_layouts = small_layouts
+M.varied_layouts = varied_layouts
 
 local medium_layouts = {
   medium_layout1, medium_layout2
@@ -209,7 +228,7 @@ M.Dungeon1 = {
     }
   },
   -- Level 2
-  { layout = {small_layout1},
+  { layout = {varied_layout1},
     content = {
       items = { amount = 6,  group = ItemGroups.enchanted_items   },
       enemies = {
@@ -250,7 +269,7 @@ M.Dungeon2 = {
     }
   },
 
-  { layout = {small_layout1},
+  { layout = {varied_layout1},
     content = {
       items = { amount = 6,  group = ItemGroups.basic_items },
       enemies = {
@@ -263,21 +282,22 @@ M.Dungeon2 = {
 }
 
 M.Dungeon3 = {
-  { layout = medium_layouts,
+  { layout = {small_layout1, small_layout2},
     dont_scale_enemies = true,
     content = {
       items = { amount = 5,  group = ItemGroups.basic_items   },
       enemies = {
-        amount = {12,14},
+        -- amount = {12,14},
+        amount = {8, 10}, 
         generated = M.mediumhard_enemies
       }
     }
   },
-  { layout = small_layouts,
+  { layout = varied_layouts,
     content = {
       items = { amount = 8,  group = ItemGroups.basic_items   },
       enemies = {
-        amount = {13,15},
+        amount = {10,12},
         generated = M.mediumhard_enemies
       }
     }
@@ -294,7 +314,7 @@ M.Dungeon3 = {
 }
 M.Dungeon4 = {
 --  -- Level 6
---  { layout = {small_layout1},
+--  { layout = {varied_layout1},
 --    dont_scale_enemies = true,
 --    content = {
 --      items = { amount = 8, group = table.tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
@@ -319,7 +339,7 @@ M.Dungeon4 = {
   { layout = large_layouts,
     dont_scale_enemies = true,
     content = {
-      items = { amount = 10, group = ItemGroups.enchanted_items   },
+      items = { amount = 20,  group = ItemGroups.enchanted_items, randart_chance = 25, randart_power_level = 2   },
       enemies = {
         amount = 30,
         generated = M.harder_enemies
@@ -327,24 +347,23 @@ M.Dungeon4 = {
     }
   
   },
-  -- Level 9
-  { layout = large_layouts,
-    dont_scale_enemies = true,
-    content = {
-      items = { amount = 12,  group = ItemGroups.enchanted_items   },
-      enemies = {
-        amount = 30,
-        generated = M.harder_enemies
-      }
-    }
-  },
+ -- -- Level 9
+ -- { layout = large_layouts,
+ --   dont_scale_enemies = true,
+ --   content = {
+ --     items = { amount = 12,  group = ItemGroups.enchanted_items   },
+ --     enemies = {
+ --       amount = 30,
+ --       generated = M.harder_enemies
+ --     }
+ --   }
+ -- },
   -- Level 10
-  { layout = large_layouts,
-    dont_scale_enemies = true,
+  { templates = {"maps/dungeon1room1a.txt", "maps/dungeon1room1b.txt", "maps/dungeon1room1c.txt"},
     content = {
-      items = { amount = 12,  group = ItemGroups.enchanted_items   },
+      items = { amount = 20,  group = ItemGroups.enchanted_items, randart_chance = 10, randart_power_level = 3   },
       enemies = {
-        amount = 30,
+        amount = {13, 15},
         generated = table.tconcat(M.harder_enemies, {{enemy = "Pixulloch", guaranteed_spawns = 1}, {enemy = "Hell Forged", guaranteed_spawns = 1}})
       }
     }
@@ -359,7 +378,7 @@ end
 local function generate_items(map, items)
     local n_items = random_round(range_resolve(items.amount))
     for i=1,n_items do
-        ItemUtils.item_object_generate(map, items.group)
+        ItemUtils.item_object_generate(map, items.group, --[[Optional]] items.randart_power_level, --[[Optional]] items.randart_chance)
     end
 end
 
@@ -379,6 +398,7 @@ function M.enemy_generate(chances)
         rand = rand - (entry.chance or 0)
         if rand <= 0 then
             if entry.enemy == "Ciribot" then
+                local GlobalData = require "core.GlobalData"
                 return GlobalData.midrange_bastard_enemy 
             else
                 return entry.enemy
@@ -575,7 +595,13 @@ end
 
 local function generate_layout(map, layout, tileset)
     event_log("(RNG #%d) generating layout\n", map.rng:amount_generated())
-    generate_rooms(map, layout.rooms, tileset)
+    if layout.rooms.combine then
+        for _, sublayout in ipairs(layout.rooms) do
+            generate_rooms(map, sublayout, tileset)
+        end
+    else
+        generate_rooms(map, layout.rooms, tileset)
+    end
     generate_tunnels(map, layout.tunnels, tileset)
     event_log("(RNG #%d) after generating layout\n", map.rng:amount_generated())
 end

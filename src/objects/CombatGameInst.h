@@ -18,11 +18,6 @@
 
 struct AttackStats;
 
-struct CollisionAvoidanceParameters {
-	simul_id collision_simulation_id;
-	int avoidance_radius;
-};
-
 class CombatGameInst: public GameInst {
 public:
 	CombatGameInst(const CombatStats& base_stats, sprite_id sprite, Pos xy, team_id team, float radius, bool solid =
@@ -90,14 +85,14 @@ public:
 	Inventory& inventory();
 	EquipmentStats& equipment();
 
-	void gain_xp_from(GameState* gs, CombatGameInst* inst, float dx = -5, float dy = -5);
+	int gain_xp_from(GameState* gs, CombatGameInst* inst);
 	sprite_id get_sprite() const {
 		return sprite;
 	}
 
-        bool& is_ghost() {
-            return _is_ghost;
-        }
+    bool& is_ghost() {
+        return _is_ghost;
+    }
 	simul_id& collision_simulation_id();
 
 	obj_id& target() {
@@ -117,6 +112,9 @@ public:
 	void use_projectile_spell(GameState* gs, SpellEntry& spl_entry,
 							  const Projectile& projectile, const Pos& target);
 	void use_spell(GameState* gs, SpellEntry& spl_entry, const Pos& target, GameInst* target_object = nullptr);
+	void use_mp(GameState* gs, int mp);
+    int team_gain_xp(GameState* gs, float xp, bool use_bonus=false);
+
 //members
 public:
 // <PURE DATA REGION see (de)serialize>

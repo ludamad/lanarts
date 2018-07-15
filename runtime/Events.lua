@@ -1,5 +1,4 @@
 local GameState = require "core.GameState"
-local GlobalData = require "core.GlobalData"
 local DeathScreen = require "menus.DeathScreen"
 local Network = require "core.Network"
 local World = require "core.World"
@@ -13,6 +12,7 @@ function events.PlayerInit(player)
 end
 
 function events.PlayerDeath(player)
+    local GlobalData = require "core.GlobalData"
     if settings.regen_on_death then
         -- On soft-core, turn players into ghosts when they die:
         player.is_ghost = true

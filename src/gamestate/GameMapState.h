@@ -83,6 +83,12 @@ public:
 	}
 
 	obj_id add_instance(GameState* gs, GameInst* inst);
+	template <typename T, typename ...Args>
+	T* add_instance(GameState* gs, Args... args) {
+		T* inst = new T(args...);
+		add_instance(gs, inst);
+		return inst;
+	};
 
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);

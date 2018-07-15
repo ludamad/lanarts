@@ -7,6 +7,7 @@
 #define ANIMATEDINST_H_
 #include <string>
 #include <cmath>
+#include <ldraw/Font.h>
 
 #include "draw/draw_sprite.h"
 
@@ -43,12 +44,16 @@ public:
 
 	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
+
 private:
 	Colour textcol;
 	float rx, ry, vx, vy, orientx, orienty;
 	int sprite, timeleft, animatetime;
 	float animateframe;
 	std::string text;
+public:
+    ldraw::Font* font = nullptr;
+    bool should_center_font = false;
 };
 
 inline AnimatedInst* animated_inst(const Pos& pos, const std::string& text,

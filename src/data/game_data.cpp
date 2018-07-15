@@ -185,6 +185,7 @@ int init_resource_data(lua_State *L) {
 	GameState* gs = lua_api::gamestate(L);
 	// Initialize fonts specified in settings
 	res::font_primary().initialize(gs->game_settings().font, 10);
+    res::font_bigprimary().initialize(gs->game_settings().font, 12);
 	res::font_menu().initialize(gs->game_settings().menu_font, 20);
     game_class_data.init(L);
     game_effect_data.init(L);
