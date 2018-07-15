@@ -21,7 +21,7 @@ M.weak_hell = {
 }
 M.strong_hell = {
   {enemy = "Hell Storm",        chance = 20,  group_chance = 33, group_size = 3           },
-     {enemy = "Centaur Marksman",      chance = 30, guaranteed_spawns = 5                                              },
+     {enemy = "Centaur Marksman",      chance = 30, guaranteed_spawns = 2                                              },
     {enemy = "Hell Forged", chance = 20},
   {enemy = "Executioner",          guaranteed_spawns = 8                                           },
   {enemy = "Mana Sapper",            chance = 20, group_size = 1                                             },
@@ -57,7 +57,6 @@ M.medium_enemies = table.merge(M.medium_animals, {
   {enemy = "Chicken",           chance = 50                                             },
 --  {enemy = "Unseen Horror",     chance = 5                                             },
 --  {enemy = "Centaur Hunter",      chance = 10                                             }
-     {enemy = "Centaur Hunter",      chance = 10 },
 })
  
 M.mediumhard_enemies = table.merge(M.medium_animals, {
@@ -66,7 +65,7 @@ M.mediumhard_enemies = table.merge(M.medium_animals, {
   --{enemy = "Chicken",           chance = 50                                             },
   {enemy = "Super Chicken",     chance = 50                                             },
 --  {enemy = "Unseen Horror",     chance = 5                                             },
-  {enemy = "Centaur Hunter",      chance = 1, guaranteed_spawns = 2},
+--  {enemy = "Centaur Hunter",      chance = 10                                             },
 })
   
 M.hard_enemies = {
@@ -76,7 +75,7 @@ M.hard_enemies = {
  {enemy = "Skeleton",            chance = 75                                              },
  {enemy = "Ciribot",           chance = 75                                              },
  {enemy = "Golem",             guaranteed_spawns = 1                                    },
- {enemy = "Centaur Hunter",      chance = 1, guaranteed_spawns = 4},
+-- {enemy = "Centaur Hunter",      chance = 30                                              },
 -- {enemy = "Unseen Horror",     chance = 10,   group_chance = 33, group_size = 2           }
 }
 
@@ -84,7 +83,7 @@ M.harder_enemies = {
   {enemy = "Hell Storm",        chance = 20,  group_chance = 33, group_size = 3           },
   {enemy = "Golem",             guaranteed_spawns = 1, group_chance = 100, group_size = 2 },
   {enemy = "Jester",            chance = 20                                             },
-  {enemy = "Centaur Marksman",      chance = 1, guaranteed_spawns = 4},
+  {enemy = "Centaur Hunter",      chance = 10,                                              },
   {enemy = "Executioner",           chance = 30,                                           },
   {enemy = "Mana Sapper",            chance =5                                             },
   {enemy = "Giant Chicken",             guaranteed_spawns = 1, group_chance = 100, group_size = 3 },
