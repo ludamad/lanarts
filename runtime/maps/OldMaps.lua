@@ -179,7 +179,7 @@ local medium_layout2 = {
         tunnels =  { width = {1,5}, per_room = {2, 20}      }
 }
 local large_layout1 = {
-        size = {{80,60}, {60,80}},
+        size = {{60,80}, {60,80}},
         rooms = { padding = 3, amount = 15, size = {8,12} },
         tunnels = {
           width = {1, 3},

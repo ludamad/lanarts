@@ -21,8 +21,9 @@ game_init = (load_file=nil) ->
     GameState.clear_players()
     n_players = (if os.getenv("LANARTS_CONTROLLER") then 0 else 1) + #require("core.Gamepad").ids()
     GameState.register_player(settings.username, settings.class_type, Engine.player_input, true, 0, 0)
+    classes = {"", "Red Mage", "Fighter", "Red Mage"}
     for i=2,n_players
-        GameState.register_player("Player " .. i, 'Red Mage', Engine.player_input, true, i - 1, 0)
+        GameState.register_player("Player " .. i, classes[i], Engine.player_input, true, i - 1, 0)
 
     log "Initializing GameState object..."
     EngineInternal.init_gamestate()

@@ -1,7 +1,7 @@
 local EffectUtils = require "spells.EffectUtils"
 local MiscSpellAndItemEffects = require "core.MiscSpellAndItemEffects"
 local EventLog = require "ui.EventLog"
-
+local Map = require "core.Map"
 
 Data.item_create {
     name = "Gold", -- An entry named gold must exist, it is handled specially
@@ -157,7 +157,7 @@ Data.item_create {
     action_func = function(self, user)
         -- Collect ally players.
         local ally_players = {}
-        for _, ally in ipairs(Map.allies_list(caster)) do
+        for _, ally in ipairs(Map.allies_list(user)) do
             if not ally.is_enemy then
                 append(ally_players, ally)
             end

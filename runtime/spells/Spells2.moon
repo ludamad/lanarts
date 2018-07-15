@@ -304,7 +304,7 @@ DataW.spell_create {
     description: "Dash in a straight line, hitting all enemies in your path. Bounces if you hit a wall, doing increasing damage." -- Can still perform abilities while dashing.",
     --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
     mp_cost: 4
-    cooldown: 30
+    cooldown: 20
     can_cast_with_held_key: false
     fallback_to_melee: true
     spell_cooldown: 15
