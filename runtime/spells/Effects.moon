@@ -879,7 +879,7 @@ share_damage = (target, damage, min_health) ->
     target.stats.hp -= damage
 
 LAST_WARNING = GameVar.create("LAST_WARNING", -math.huge)
-for name in *{"Ranger", "Fighter", "Rogue", "Green Mage", "Black Mage", "Necromancer", "Stormcaller", "Red Mage", "Blue Mage"}
+for name in *{"Ranger", "Fighter", "Rogue", "Green Mage", "Black Mage", "Necromancer", "Stormcaller", "Pyrocaster", "Blue Mage"}
     DataW.effect_create {
         :name
         stat_func: (obj, old, new) =>
