@@ -294,7 +294,7 @@ local function class_choice_buttons_create()
     local font = MID_SETTINGS_FONT
 
     local buttons = {
-        { "White Mage", sprite_base .. "whitemage.png", COL_WHITE},
+        { "Stormcaller", sprite_base .. "whitemage.png", COL_WHITE},
         { "Red Mage", sprite_base .. "redmage.png", COL_PALE_RED},
 --        { "Blue Mage", sprite_base .. "bluemage.png", COL_PALE_BLUE},
         { "Fighter", sprite_base .. "fighter.png", {0, 204, 0}},
@@ -345,13 +345,24 @@ local function class_choice_buttons_create()
             end
         )
         function label:draw(xy)
+            local bbox = {}
             if settings.class_type == button[1] then
                 self.sprite.options.color = COL_GOLD
-                self.label.options.color = button[3]
+                self.label.options.color = COL_GOLD -- button[3]
             else
                 --self.sprite.options.color = with_alpha(self:mouse_over(xy) and COL_PALE_YELLOW or button[3], 100)
-                self.sprite.options.color = COL_WHITE -- with_alpha(button[3], self:mouse_over(xy) and 155 or 55)
-                self.label.options.color = with_alpha(button[3], self:mouse_over(xy) and 155 or 55)
+                self.sprite.options.color = button[3] -- with_alpha(button[3], self:mouse_over(xy) and 155 or 55)
+                self.label.options.color = with_alpha(button[3], self:mouse_over(xy) and 255 or 55)
+            end
+            function self.label:draw(xy)
+                TextLabel.draw(self, xy)
+                local sx, sy = unpack(self.size)
+                local x, y = unpack(xy)
+                local padding = 4
+                local rect = {x - padding, y - padding, x + sx + padding, y + sy + padding}
+                if settings.class_type == button[1] then
+                    Display.draw_rectangle_outline(self.options.color, rect)
+                end
             end
             InstanceBox.draw(self, xy)
         end

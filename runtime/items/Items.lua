@@ -248,14 +248,14 @@ Data.item_create  {
 Data.item_create {
     name = "Luminos Spellbook",
     use_message = "You learn Luminos!",
-    description = "Teaches the spell 'Luminos'. The user must be a White Mage.",
+    description = "Teaches the spell 'Luminos'. The user must be a Stormcaller.",
 
     shop_cost = {55,205},
 
     spr_item = "spr_books.yellow",
 
     prereq_func = function(self, user)
-        return user:has_effect "White Mage"
+        return user:has_effect "Stormcaller"
     end,
     action_func = function(self, user)
         user:learn_spell "Luminos"

@@ -56,7 +56,7 @@ export LANARTS_TESTCASE=tests.OverworldExplore
 export LANARTS_SMALL=1 
 #export LANARTS_OVERWORLD_TEST=1
 export LANARTS_SEED=123456732
-#export LANARTS_2P="White Mage"
+#export LANARTS_2P="Stormcaller"
 #export ARENA_ENEMIES="return {Ciribot=1}"
 gdb -silent -ex="break lua_error" -ex="break exit" -ex="break _exit" -ex="break abort" -ex="catch throw" -ex=r --args "$RUNTIME_FOLDER/../build/src/lanarts" $args
 #"$RUNTIME_FOLDER/../build/src/lanarts" $args

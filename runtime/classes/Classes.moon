@@ -51,7 +51,7 @@ Data.class_create {
 }
 
 Data.class_create {
-    name: "White Mage",
+    name: "Stormcaller",
     sprites: (for i=1,2 do "spr_classes.white_mage#{i}")
     available_spells: {
         {spell: "Minor Missile", level_needed: 1},
