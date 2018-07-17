@@ -229,19 +229,20 @@ void EnemyInst::draw(GameState* gs) {
 	if (!gs->object_visible_test(this))
 		return;
 
-	if (etype().draw_event.empty()) {
-		float frame = gs->frame();
-		if (etype().name == "Hydra") {
-			frame = floor(core_stats().hp / float(core_stats().max_hp) * 4);
-			if (frame >= 4)
-				frame = 4;
-		}
-		CombatGameInst::draw(gs, frame);
-	} else {
+	float frame = gs->frame();
+	if (etype().name == "Hydra") {
+		frame = floor(core_stats().hp / float(core_stats().max_hp) * 4);
+		if (frame >= 4)
+			frame = 4;
+	}
+	CombatGameInst::draw(gs, frame);
+
+	if (!etype().draw_event.empty()) {
 		lua_State* L = gs->luastate();
 		etype().draw_event.get(L).push();
 		luawrap::call<void>(L, (GameInst*) this);
 	}
+
 	if (team == PLAYER_TEAM) {
             res::sprite("spr_effects.friendly").draw(on_screen(gs, PosF {x-16, y-16}));
             res::sprite("spr_amulets.i-faith").draw(on_screen(gs, PosF {x-23, y-23}));

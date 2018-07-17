@@ -388,6 +388,8 @@ void CombatGameInst::post_draw(GameState *gs) {
         const BBox statbox(x - 10, y - healthbar_offsety, x + 10,
                 y - healthbar_offsety + 5);
         draw_statbar(on_screen(gs, statbox), float(ecore.hp) / ecore.max_hp);
+        // Draw HP on top of HP bar
+        res::font_primary().drawf(ldraw::DrawOptions(ldraw::CENTER, COL_WHITE), on_screen(gs, statbox.center()), "%d", ecore.hp, ecore.max_hp);
     }
     if (dynamic_cast<PlayerInst*>(this) && dynamic_cast<PlayerInst *>(this)->is_focus_player(gs)) {
         res::sprite("spr_effects.good_neutral").draw(on_screen(gs, PosF {x-23, y-23}));

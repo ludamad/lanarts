@@ -265,6 +265,8 @@ local function label_button_create(params, color_formula, on_click)
     local size = params.size
 
     local label_button = InstanceBox.create( params )
+    label_button.sprite = sprite
+    label_button.label = label
 
     label_button:add_instance( sprite, Display.CENTER_TOP )
     label_button:add_instance( label, Display.CENTER_BOTTOM )
@@ -275,10 +277,12 @@ local function label_button_create(params, color_formula, on_click)
         if self:mouse_over(xy) and Mouse.mouse_left_pressed then
             on_click(self, xy)
         end
-
+    end
+    function label_button:draw(xy) 
         local color = color_formula(self, xy)
         sprite.options.color = color
-        label.options.color = color == COL_WHITE and TEXT_COLOR or color
+        label.options.color = (color == COL_WHITE and TEXT_COLOR or color)
+        InstanceBox.draw(self, xy)
     end
 
     return label_button
@@ -293,7 +297,7 @@ local function class_choice_buttons_create()
         { "White Mage", sprite_base .. "whitemage.png", COL_WHITE},
         { "Red Mage", sprite_base .. "redmage.png", COL_PALE_RED},
 --        { "Blue Mage", sprite_base .. "bluemage.png", COL_PALE_BLUE},
-        { "Fighter", sprite_base .. "fighter.png", {244, 140, 66}},
+        { "Fighter", sprite_base .. "fighter.png", {0, 204, 0}},
 --        { "Rogue", sprite_base .. "rogue.png", {244, 140, 66}},
 --        { "Ranger", sprite_base .. "archer.png"},
         { "Necromancer", sprite_base .. "necromancer.png", COL_GRAY},
@@ -326,26 +330,33 @@ local function class_choice_buttons_create()
     for i = 1, #buttons do
         local button = buttons[i]
 
-        button_row:add_instance(
-            label_button_create(
-                { size = button_size,
-                  font = font,
-                  text = button[1],
-                  sprite = image_cached_load(button[2])
-                },
-                function(self, xy) -- color_formula
-                    if settings.class_type == button[1] then
-                        return COL_GOLD
-                    else
-                        return self:mouse_over(xy) and COL_PALE_YELLOW or COL_WHITE--button[3]
-                    end
-                end,
-                function(self, xy) -- on_click
-                    settings.class_type = button[1]
-                end
-             )
-         )
+        local label = label_button_create(
+            { size = button_size,
+              font = font,
+              text = button[1],
+              text_colour = COL_WHITE,
+              sprite = image_cached_load(button[2])
+            },
+            function(self, xy) -- color_formula
+                return COL_WHITE
+            end,
+            function(self, xy) -- on_click
+                settings.class_type = button[1]
+            end
+        )
+        function label:draw(xy)
+            if settings.class_type == button[1] then
+                self.sprite.options.color = COL_GOLD
+                self.label.options.color = button[3]
+            else
+                --self.sprite.options.color = with_alpha(self:mouse_over(xy) and COL_PALE_YELLOW or button[3], 100)
+                self.sprite.options.color = COL_WHITE -- with_alpha(button[3], self:mouse_over(xy) and 155 or 55)
+                self.label.options.color = with_alpha(button[3], self:mouse_over(xy) and 155 or 55)
+            end
+            InstanceBox.draw(self, xy)
+        end
 
+        button_row:add_instance(label)
     end
 
     return button_row
