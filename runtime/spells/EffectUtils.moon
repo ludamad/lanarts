@@ -27,34 +27,39 @@ get_monster_resistances = (types) ->
     }
     for type in *types
         if type == "Red"
-            resists.Red += 5
+            --resists.Red += 5
             --resists.Green += 2
             --resists.Blue -= 1
             --resists.Black -= 1
-            --resists.Piercing += 2
+            resists.Piercing += 5
         elseif type == "Black"
-            resists.Black += 5
+            --resists.Black += 5
             --resists.Green += 2
             --resists.White -= 1
             --resists.Slashing += 4
             --resists.Piercing += 4
+            --resists.Bludgeon += 4
+            resists.Slashing += 5
         elseif type == "White"
-            resists.White += 5
+            --resists.White += 5
             --resists.Blue += 2
             --resists.Black -= 1
             --resists.Red -= 1
+            resists.Bludgeon += 5
         elseif type == "Green"
             --resists.Bludgeon += 2
-            resists.Green += 5
+            --resists.Green += 5
             --resists.Blue += 2
             --resists.Red -= 1
             --resists.Black -= 1
+            resists.Slashing += 5
         elseif type == "Blue"
             --resists.Slashing += 2
-            resists.Blue += 5
+            --resists.Blue += 5
             --resists.Red += 4
             --resists.Green -= 1
             --resists.White -= 1
+            resists.Piercing += 5
     return resists
 
 get_effect_stat = (obj, type, default = 0) ->
