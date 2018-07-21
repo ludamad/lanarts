@@ -48,7 +48,7 @@ MapCompiler = newtype {
         append @post_poned, f
     -- Override to handle explicitly set spawn points
 
-    random_player_square: (player) -> MapUtils.random_square(@map, nil)
+    random_player_square: (player) => MapUtils.random_square(@map, nil)
 
     get_player_spawn_points: () =>
         log_verbose "get_player_spawn_points #{@label} #{#World.players}"

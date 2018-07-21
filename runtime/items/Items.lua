@@ -11,6 +11,7 @@ Data.item_create {
 Data.item_create {
     name = "Azurite Key",
     type = "key",
+    entry_type = "Key",
     description = "Now that you have picked up this key, you can open Azurite doors.",
     use_message = "Now that you have picked up this key, you can open Azurite doors.",
     spr_item = "key1",
@@ -32,6 +33,7 @@ Data.item_create {
     name = "Dandelite Key",
     description = "Now that you have picked up this key, you can open Dandelite doors.",
     type = "key",
+    entry_type = "Key",
     use_message = "Now that you have picked up this key, you can open Dandelite doors.",
     spr_item = "key2",
     pickup_func = function(self, user)
@@ -52,6 +54,7 @@ Data.item_create {
     name = "Magentite Key",
     description = "Now that you have picked up this key, you can open Magentite doors.",
     type = "key",
+    entry_type = "Key",
     spr_item = "spr_keys.magentite_key",
     pickup_func = function(self, user)
         local GlobalData = require "core.GlobalData"
@@ -71,6 +74,7 @@ Data.item_create {
     name = "Burgundite Key",
     description = "Now that you have picked up this key, you can open Burgundite doors.",
     type = "key",
+    entry_type = "Key",
     use_message = "Now that you have picked up this key, you can open Burgundite doors.",
     spr_item = "key3",
     pickup_func = function(self, user)

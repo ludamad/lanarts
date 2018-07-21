@@ -34,7 +34,9 @@ void EquipmentStats::equip(itemslot_t slot) {
 
 bool EquipmentStats::use_ammo(int amnt) {
 	LANARTS_ASSERT(has_projectile());
-	return projectile_slot().remove_copies(amnt);
+	bool usage = projectile_slot().remove_copies(amnt);
+	inventory.sort();
+	return usage;
 }
 
 void EquipmentStats::serialize(GameState* gs, SerializeBuffer& serializer) {

@@ -526,9 +526,10 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
    bool already_item_here = gs->object_radius_test(dropx, dropy,
    		ItemInst::RADIUS, item_colfilter);
    if (!already_item_here) {
-   	gs->add_instance(new ItemInst(dropped_item, Pos(dropx, dropy), id));
-   	itemslot.deequip();
-   	itemslot.remove_copies(dropped_item.amount);
+   	  gs->add_instance<ItemInst>(dropped_item, Pos(dropx, dropy), id);
+   	  itemslot.deequip();
+   	  itemslot.remove_copies(dropped_item.amount);
+   	  inventory().sort();
    }
     gs->for_screens([&]() {
         if (this->local) {
@@ -737,6 +738,7 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
             int gold_gained = type.sell_cost() * sell_amount;
             auto message = format("Transaction: %s x %d for %d GP.", type.name.c_str(), sell_amount, gold_gained);
             item.remove_copies(sell_amount);
+            inventory().sort();
             gs->for_screens([&](){
                 gs->game_chat().add_message(message, COL_PALE_YELLOW);
             });

@@ -92,6 +92,7 @@ void ItemEntry::parse_lua_table(const LuaValue& table) {
             exit(1);
         }
 	}
+	item_entry_type = set_if_nil(table, "entry_type", (const char*)"One-time Use");
 
 	stackable = set_if_nil(table, "stackable", true);
 

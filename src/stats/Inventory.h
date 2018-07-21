@@ -109,7 +109,7 @@ public:
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
 
-	void equip(itemslot_t i);
+	void equip(itemslot_t i, bool force_equip = true);
 	void deequip(itemslot_t i);
 	void deequip_type(int type);
 
@@ -126,6 +126,7 @@ public:
         return items;
     }
 	itemslot_t get_equipped(int type, itemslot_t last_slot = -1) const;
+	void sort();
 private:
 	void __dequip_projectile_if_invalid();
 	void __dequip_overfilled_slots();

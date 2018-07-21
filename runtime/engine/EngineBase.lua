@@ -2,13 +2,14 @@
 -- make up Lanarts.
 --
 -- For tests:
-local interceptable_require = require
-if require("tests.main").testcase then
+
+local function interceptable_require(...)
     local test_module = require("tests.main").testcase
-    interceptable_require = function(...)
+    if test_module then
         print("intercepting ", ...)
         return test_module:intercept(...)
     end
+    return require(...)
 end
 
 function Engine.menu_start(...)

@@ -4,6 +4,7 @@
  */
 
 #include <lcommon/SerializeBuffer.h>
+#include <algorithm>
 
 #include "items/ItemEntry.h"
 #include "items/EquipmentEntry.h"
@@ -11,6 +12,64 @@
 #include "items/WeaponEntry.h"
 
 #include "Inventory.h"
+
+template <typename Func>
+static Range find_slice_forgive1(Inventory& inv, int start_index, const Func& f_matches) {
+	// Use a greedy algorithm to find a string of indices where 'f_matches' is *mostly* true.
+	// Precisely: We increment an index as long as one of our next 2 members has 'f_matches' true,
+	// and return a range up until that index.
+	auto& slots = inv.raw_slots();
+	for (int i = start_index; i < inv.max_size(); i++) {
+		bool matches = f_matches(slots[i]);
+		// If we
+		if (!matches && i + 1 < inv.max_size()) {
+			matches = f_matches(slots[i+1]);
+		}
+		if (!matches) {
+			return {start_index, i};
+		}
+	}
+	return {start_index, inv.max_size()};
+}
+
+static const std::string ONE_TIME = "One-time Use";
+static const std::string EVOCABLE = "Evocable";
+static const std::string KEY = "Key";
+
+void Inventory::sort() {
+	auto calc_rank = [](const ItemSlot& slot) -> int {
+		if (slot.empty()) {
+			// Make sure empty slots are lost
+			return 100;
+		}
+		int rank = 0;
+		if (slot.item_entry().entry_type() == ONE_TIME) {
+			return rank;
+		}
+		rank++;
+		if (slot.item.is_weapon()) {
+			return rank;
+		}
+		rank++;
+		if (slot.item_entry().entry_type() == EVOCABLE) {
+			return rank;
+		}
+		rank++;
+		if (slot.item.is_equipment()) {
+			return rank;
+		}
+		rank++;
+		if (slot.item_entry().entry_type() == KEY) {
+			return rank;
+		}
+		rank++;
+		return rank;
+	};
+
+	std::stable_sort(raw_slots().begin(), raw_slots().end(), [&](const ItemSlot& a, const ItemSlot& b) {
+		return calc_rank(a) < calc_rank(b);
+	});
+}
 
 itemslot_t Inventory::add(const Item& item, bool equip_as_well) {
 	itemslot_t slot = -1;
@@ -37,10 +96,15 @@ itemslot_t Inventory::add(const Item& item, bool equip_as_well) {
 		}
 	}
 
-	if (equip_as_well && slot != -1) {
-		equip(slot);
+	if (slot == -1) {
+	    return -1;
 	}
 
+	if (equip_as_well || item.is_equipment()) {
+		equip(slot, /*force equip?*/ equip_as_well);
+	}
+
+	sort();
 	return slot;
 }
 
@@ -155,7 +219,7 @@ void Inventory::__dequip_projectile_if_invalid() {
 	}
 }
 
-void Inventory::equip(itemslot_t i) {
+void Inventory::equip(itemslot_t i, bool force_equip) {
 	ItemSlot& slot = get(i);
 	EquipmentEntry& eentry = slot.item.equipment_entry();
 	int max_slots = number_of_equip_slots(*this, eentry.type);
@@ -172,11 +236,15 @@ void Inventory::equip(itemslot_t i) {
 		}
 	}
 	if (nslots >= max_slots) {
-		get(last_slot).equipped = false;
+	    if (!force_equip) {
+            return;
+        }
+        get(last_slot).equipped = false;
 	}
 	slot.equipped = true;
 	__dequip_overfilled_slots();
 	__dequip_projectile_if_invalid();
+    sort();
 }
 // Returns NULL if nothing equipped
 // pass previous result for slots that can have multiple items equipped
@@ -194,6 +262,7 @@ void Inventory::deequip(itemslot_t i) {
 	slot.deequip();
 	__dequip_overfilled_slots();
 	__dequip_projectile_if_invalid();
+    sort();
 }
 
 itemslot_t Inventory::get_equipped(int type, itemslot_t last_slot) const {

@@ -26,12 +26,8 @@ class Drawable;
 
 class ItemEntry: public ResourceEntryBase {
 public:
-	ItemEntry() :
-			item_sprite(-1), stackable(true) {
-	}
-
 	virtual const char* entry_type() {
-		return "One-time Use";
+		return item_entry_type.c_str();
 	}
 	virtual ~ItemEntry() {
 	}
@@ -72,9 +68,10 @@ public:
 	Range shop_cost;
 	LuaAction use_action;
 	LuaValue pickup_call;
-	sprite_id item_sprite;
-        bool sellable = true;
-	bool stackable;
+	std::string item_entry_type;
+	sprite_id item_sprite = 1;
+	bool sellable = true;
+	bool stackable = true;
 };
 
 extern ResourceDataSet<ItemEntry*> game_item_data;

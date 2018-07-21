@@ -307,10 +307,9 @@ void EnemyInst::die(GameState *gs) {
 		});
 		if (etype().death_sprite > -1) {
 			const int DEATH_SPRITE_TIMEOUT = 1600;
-			gs->add_instance(
-					new AnimatedInst(ipos(), etype().death_sprite,
-							DEATH_SPRITE_TIMEOUT, PosF(), PosF(),
-							ItemInst::DEPTH));
+			gs->add_instance<AnimatedInst>(
+				ipos(), etype().death_sprite,
+				DEATH_SPRITE_TIMEOUT, PosF(), PosF(), ItemInst::DEPTH);
 		}
 	}
 }
