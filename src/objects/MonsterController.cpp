@@ -101,7 +101,7 @@ CombatGameInst* MonsterController::find_actor_to_target(GameState* gs, EnemyInst
 
             int dx = e->x - actor->x, dy = e->y - actor->y;
             int distsqr = dx * dx + dy * dy;
-            event_log("Enemy id=%d name=%s considering target id=%d, dx=%d, dy=%d\n", e->id, e->etype().name.c_str(), actor->id, dx, dy);
+            event_log("Enemy id=%d name=%s considering target id=%d, dx=%d, dy=%d\n", std::max(0,e->id), e->etype().name.c_str(), std::max(0,actor->id), dx, dy);
             if (distsqr > 0 /*overflow check*/&& distsqr < mindistsqr) {
                 mindistsqr = distsqr;
                 closest_actor = actor;
@@ -156,7 +156,7 @@ void MonsterController::pre_step(GameState* gs) {
 
 
         if (actor != NULL && eb.current_action == EnemyBehaviour::CHASING_PLAYER) {
-                event_log("Enemy id=%d has enemy of interest %d\n", e->id, actor->id);
+                event_log("Enemy id=%d has enemy of interest %d\n", std::max(0,e->id), std::max(0,actor->id));
                 eois.push_back(
                     EnemyOfInterest(e, actor->id, inst_distance(e, actor))
                 );

@@ -59,7 +59,7 @@ bool CombatGameInst::damage(GameState* gs, float fdmg, CombatGameInst* attacker)
     }
     lua_State* L = gs->luastate();
     auto* map = get_map(gs);
-    event_log("CombatGameInst::damage: id %d took %.2f dmg\n", id, fdmg);
+    event_log("CombatGameInst::damage: id %d took %.2f dmg\n", std::max(0, id), fdmg);
 
     int dmg = random_round(gs->rng(), fdmg);
     if (dmg == 0) {
@@ -247,7 +247,7 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attac
 
     event_log("CombatGameInst::damage: id %d getting hit by {cooldown = %.2f, "
                       "damage=%.2f, power=%.2f, magic_percentage=%f, physical_percentage=%f}\n",
-              id, attack.cooldown, attack.damage, attack.power,
+              std::max(0, id), attack.cooldown, attack.damage, attack.power,
               attack.magic_percentage,
               attack.physical_percentage());
 
@@ -409,7 +409,7 @@ EffectiveAttackStats lua_attack_stats_callback(lua_State* L, LuaValue& callback,
 
 bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
         const Item& weapon, bool ignore_cooldowns, float damage_multiplier) {
-    event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d\n", id, inst->id,     weapon.id);
+    event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d\n", std::max(0, id), inst->id,     weapon.id);
 
     bool isdead = false;
     if (!ignore_cooldowns && !cooldowns().can_doaction())
@@ -476,7 +476,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
     if (!cooldowns().can_doaction())
         return false;
 
-    event_log("CombatGameInst::projectile_attack: id %d hitting id %d, weapon = id %d\n", id, inst ? inst->id : 0, weapon.id);
+    event_log("CombatGameInst::projectile_attack: id %d hitting id %d, weapon = id %d\n", std::max(0, id), inst ? std::max(inst->id, 0) : 0, weapon.id);
     MTwist& mt = gs->rng();
 
     WeaponEntry& wentry = weapon.weapon_entry();
@@ -503,7 +503,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 
     event_log(
             "CombatGameInst::projectile_attack id=%d created projectile at %d, %d\n",
-            id, p.x, p.y);
+            std::max(0, id), p.x, p.y);
 
     int range = pentry.range();
 
@@ -571,7 +571,7 @@ const float ROUNDING_MULTIPLE = 256.0f;
 PosF CombatGameInst::attempt_move_to_position(GameState* gs,
         const PosF& newxy) {
 
-    event_log("CombatGameInst::attempt_move_to_position id=%d, %f, %f\n", id,
+    event_log("CombatGameInst::attempt_move_to_position id=%d, %f, %f\n", std::max(0, id),
             newxy.x, newxy.y);
     float dx = newxy.x - rx, dy = newxy.y - ry;
     float dist = sqrt(dx * dx + dy * dy);
@@ -616,14 +616,14 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
 void CombatGameInst::update_position() {
     x = iround(rx); //update based on rounding of true float
     y = iround(ry);
-    event_log("Instance id %d integer positions set to (%f,%f) from (%f,%f)\n", id, x, y, rx, ry);
+    event_log("Instance id %d integer positions set to (%f,%f) from (%f,%f)\n", std::max(0, id), x, y, rx, ry);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
     rx = round(newx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
     ry = round(newy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
     rx = newx, ry = newy;
-    event_log("Instance id %d float positions set to (%f,%f)\n", id, rx, ry);
+    event_log("Instance id %d float positions set to (%f,%f)\n", std::max(0, id), rx, ry);
     update_position();
 }
 

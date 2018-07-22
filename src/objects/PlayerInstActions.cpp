@@ -906,7 +906,7 @@ void PlayerInst::_use_move(GameState *gs, const GameAction &action) {
         if (reduce_vy) {
             vy *= 0.5;
         }
-   event_log("Player id: %d using move for turn %d, vx=%f, vy=%f\n", id, gs->frame(), vx, vy);
+   event_log("Player id: %d using move for turn %d, vx=%f, vy=%f\n", std::max(0, id), gs->frame(), vx, vy);
    perf_timer_end(FUNCNAME);
 }
 

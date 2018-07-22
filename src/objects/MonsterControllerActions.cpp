@@ -83,7 +83,7 @@ bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
 		}
 		if (!randomized && gs->rng().rand(32) == 0
 				&& choose_random_direction(gs, e, er.vx, er.vy)) {
-			event_log("Enemy id=%d going (x=%.2f, y=%.2f) => (vx=%.2f, vy=%.2f)\n", e->id, e->x, e->y, er.vx, er.vy);
+			event_log("Enemy id=%d going (x=%.2f, y=%.2f) => (vx=%.2f, vy=%.2f)\n", std::max(0, e->id), e->x, e->y, er.vx, er.vy);
 			er.random_walk_timer = gs->rng().rand(TILE_SIZE, TILE_SIZE * 4) / e->effective_stats().movespeed;
 			randomized = true;
 		}
@@ -178,7 +178,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 		EnemyInst* e = eois[i].e;
 		float movespeed = e->effective_stats().movespeed;
 		int actor_id = eois[i].actor_id;
-                event_log("Enemy id=%d has move speed %f chasing actor id=%d\n", e->id, movespeed, actor_id);
+                event_log("Enemy id=%d has move speed %f chasing actor id=%d\n", std::max(0, e->id), movespeed, actor_id);
 		CombatGameInst* p = gs->get_instance<CombatGameInst>(actor_id);
                 if (p == NULL) {
                     continue;
@@ -213,7 +213,7 @@ void MonsterController::set_monster_headings(GameState* gs,
                                 }
                             }
                         }
-                        event_log("set_monster_headings id=%d randomizing movement, vx=%d vy=%d\n", e->id, e->vx, e->vy);
+                        event_log("set_monster_headings id=%d randomizing movement, vx=%d vy=%d\n", std::max(0, e->id), e->vx, e->vy);
                     } else {
                         PosF heading = get_direction_towards(gs, e, p, movespeed);
                         e->vx = heading.x;
@@ -273,7 +273,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 		eb.movement_decided = true;
 		e->vx = round(e->vx * 4096.0f) / 4096.0f;
 		e->vy = round(e->vy * 4096.0f) / 4096.0f;
-                event_log("set_monster_headings id=%d vx=%f vy=%f\n", e->id, e->vx, e->vy);
+                event_log("set_monster_headings id=%d vx=%f vy=%f\n", std::max(0, e->id), e->vx, e->vy);
 	}
 
 	perf_timer_end(FUNCNAME);
@@ -388,6 +388,6 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	eb.path_start = Pos(e->x, e->y);
 
 	event_log("Path for instance id: %d, (%d path steps), x: %f y: %f target_radius: %f depth %d\n",
-			e->id, (int)eb.path.size(), e->x, e->y, e->target_radius, e->depth);
+			std::max(0, e->id), (int)eb.path.size(), e->x, e->y, e->target_radius, e->depth);
 	perf_timer_end(FUNCNAME);
 }
