@@ -234,13 +234,13 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
                 if (!(*gs->tiles().previously_seen_map())[xy]) {
                     return true;
                 }
-                if (depth > 0) {
-                    float rx = (xy.x+.5) *TILE_SIZE, ry = (xy.y+.5)* TILE_SIZE;
-                    bool feature_here = (gs->object_radius_test(this, NULL, 0, &is_explorable_solid_object, rx, ry, 1) > 0);
-                    if (feature_here && recurse(recurse, xy.x, xy.y, depth - 1)) {
-                        return true;
-                    }
-                }
+//                if (depth > 0) {
+//                    float rx = (xy.x+.5) *TILE_SIZE, ry = (xy.y+.5)* TILE_SIZE;
+//                    bool feature_here = (gs->object_radius_test(this, NULL, 0, &is_explorable_solid_object, rx, ry, 1) > 0);
+//                    if (feature_here && recurse(recurse, xy.x, xy.y, depth - 1)) {
+//                        return true;
+//                    }
+//                }
             }
         }
         return false;

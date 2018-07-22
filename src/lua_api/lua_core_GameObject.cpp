@@ -514,7 +514,8 @@ namespace GameInstWrap {
 	}
 
 	void push_ref(lua_State* L, GameInst* inst) {
-		LANARTS_ASSERT(!inst->destroyed);
+	    // TODO proper lua lifecycle management with weak refs
+//		LANARTS_ASSERT(!inst->destroyed);
 		GameInst** lua_inst = (GameInst**) lua_newuserdata(L, sizeof(GameInst*));
 		*lua_inst = inst;
 		luameta_push(L, &ref_metatable);
