@@ -1,4 +1,4 @@
-add_definitions("-std=c++14")
+add_definitions("-std=c++14 -Wno-c++11-narrowing")
 add_subdirectory( luawrap-lib )
 add_subdirectory( common-lib )
 add_subdirectory( dungeon-generation-lib )
