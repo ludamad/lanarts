@@ -98,6 +98,7 @@ static Inventory parse_inventory(const LuaField& value) {
 	for (int i = 1; i <= len; i++) {
 		ret.add(parse_as_item(value[i]));
 	}
+	ret.sort();
 	return ret;
 }
 
@@ -116,5 +117,6 @@ EquipmentStats parse_equipment(const LuaField& value) {
 		Item item = parse_as_item(value["projectile"]);
 		ret.inventory.add(item, true);
 	}
+	ret.inventory.sort();
 	return ret;
 }

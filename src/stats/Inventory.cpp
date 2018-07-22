@@ -104,7 +104,6 @@ itemslot_t Inventory::add(const Item& item, bool equip_as_well) {
 		equip(slot, /*force equip?*/ equip_as_well);
 	}
 
-	sort();
 	return slot;
 }
 
@@ -244,7 +243,6 @@ void Inventory::equip(itemslot_t i, bool force_equip) {
 	slot.equipped = true;
 	__dequip_overfilled_slots();
 	__dequip_projectile_if_invalid();
-    sort();
 }
 // Returns NULL if nothing equipped
 // pass previous result for slots that can have multiple items equipped
@@ -262,7 +260,6 @@ void Inventory::deequip(itemslot_t i) {
 	slot.deequip();
 	__dequip_overfilled_slots();
 	__dequip_projectile_if_invalid();
-    sort();
 }
 
 itemslot_t Inventory::get_equipped(int type, itemslot_t last_slot) const {

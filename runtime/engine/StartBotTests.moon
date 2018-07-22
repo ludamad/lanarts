@@ -8,7 +8,7 @@ EventLog = require "ui.EventLog"
 -- ProgrammableInputSource = require "input.ProgrammableInputSource"
 -- BotInputSource = require "ai.BotInputSource"
 
-game_init = (load_file=nil) ->
+game_init = () ->
     GameState = require("core.GameState")
     -- Player config
     GameState.clear_players()
@@ -19,6 +19,7 @@ game_init = (load_file=nil) ->
 
     log "Initializing GameState object..."
     EngineInternal.init_gamestate()
+    random_seed(12345678)
     EngineInternal.start_game()
 
 run_bot_tests = (raw_args) ->
@@ -28,10 +29,10 @@ run_bot_tests = (raw_args) ->
 
     local game_start, game_step
 
-    game_start = (load_file=nil) ->
+    game_start = () ->
         return ResourceLoading.ensure_resources_before () ->
             -- (1) Init game
-            game_init(load_file)
+            game_init()
 
             -- (2) Set up input for first game step
             GameState = require("core.GameState")
@@ -63,7 +64,7 @@ run_bot_tests = (raw_args) ->
             -- Font settings
             font: 'fonts/Gudea-Regular.ttf'
             menu_font: 'fonts/alagard_by_pix3m-d6awiwp.ttf'
-            time_per_step: 1
+            time_per_step: 0
             invincible: true
         },
         entry_point: game_start,

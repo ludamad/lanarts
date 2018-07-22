@@ -117,6 +117,7 @@ static bool handle_create_item(GameState* gs, const std::string& command) {
 		} else {
 			printed.message = std::string(rest) + " put in your inventory !";
 			p->stats().equipment.inventory.add(Item(item, amnt));
+			p->stats().equipment.inventory.sort();
 			printed.message_colour = Colour(50, 255, 50);
 		}
         gs->game_chat().add_message(printed);

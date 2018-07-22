@@ -342,7 +342,8 @@ enemy_create = (args) ->
                 when "White" then tosprite('spr_effects.white-enemy')
                 when "Green" then tosprite('spr_effects.green-enemy')
             {x, y} = Display.to_screen_xy(inst.xy)
-            sprite\draw({color: {255,255,255, 50}, origin: Display.CENTER}, {x + inst.radius, y + inst.radius})
+            if sprite
+                sprite\draw({color: {255,255,255, 50}, origin: Display.CENTER}, {x + inst.radius, y + inst.radius})
             -- Fonts.small\draw({color: {200,255,200,255}, origin: Display.CENTER_TOP}, {x, y - inst.radius - 16}, inst.stats.hp)
 
     -- Are there methods we want to make available on the enemy object?

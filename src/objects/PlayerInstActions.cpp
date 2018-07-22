@@ -510,6 +510,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
    	cooldowns().reset_pickup_cooldown(PICKUP_RATE);
    	gs->remove_instance(iteminst);
    }
+   inventory().sort();
 }
 
 void PlayerInst::perform_queued_actions(GameState* gs) {
@@ -548,13 +549,13 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
    	  gs->add_instance<ItemInst>(dropped_item, Pos(dropx, dropy), id);
    	  itemslot.deequip();
    	  itemslot.remove_copies(dropped_item.amount);
-   	  inventory().sort();
    }
     gs->for_screens([&]() {
         if (this->local) {
             gs->game_hud().reset_slot_selected();
         }
     });
+    inventory().sort();
 }
 
 void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
@@ -580,6 +581,7 @@ void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
    	slot.item.clear();
                 play("sound/inventory_sound_effects/sellbuy.ogg");
    }
+   inventory().sort();
 }
 
 void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
@@ -587,12 +589,13 @@ void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
    ItemSlot& itemslot2 = inventory().get(action.use_id2);
 
    std::swap(itemslot1, itemslot2);
-        if (action.use_id != action.use_id2) {
-            play("sound/inventory_sound_effects/leather_inventory.ogg");
-        }
+    if (action.use_id != action.use_id2) {
+        play("sound/inventory_sound_effects/leather_inventory.ogg");
+    }
     gs->for_screens([&]() {
         gs->game_hud().reset_slot_selected();
     });
+    inventory().sort();
 }
 
 void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
@@ -669,70 +672,71 @@ void PlayerInst::_use_item(GameState *gs, const GameAction &action) {
    if (!effective_stats().allowed_actions.can_use_items) {
    	return;
    }
-        // Dead players can't use items:
-        if (is_ghost()) {
-            return;
-        }
-   itemslot_t slot = action.use_id;
-   ItemSlot& itemslot = inventory().get(slot);
-   Item& item = itemslot.item;
-   if (item.amount <= 0) {
-            return;
-        }
-   ItemEntry& type = itemslot.item_entry();
+    // Dead players can't use items:
+    if (is_ghost()) {
+        return;
+    }
+    itemslot_t slot = action.use_id;
+    ItemSlot& itemslot = inventory().get(slot);
+    Item& item = itemslot.item;
+    if (item.amount <= 0) {
+        return;
+    }
+    ItemEntry& type = itemslot.item_entry();
 
-   lua_State* L = gs->luastate();
+    lua_State* L = gs->luastate();
 
-            if (item.is_equipment()) {
-                    if (itemslot.is_equipped()) {
-                            inventory().deequip(slot);
-                    } else {
-                            if (item.is_projectile()) {
-                                    // Best-effort to equip, may not be possible:
-                                    projectile_smart_equip(inventory(), slot);
-                            } else if (item.is_weapon()) {
-                                    const Projectile& p = equipment().projectile();
-                                    if (!p.empty()) {
-                                            if (!p.projectile_entry().is_standalone()) {
-                                                    inventory().deequip_type(
-                                                                    EquipmentEntry::AMMO);
-                                            }
-                                    }
-                                    equipment().equip(slot);
-                                    // Try and equip a projectile
-                                    WeaponEntry& wentry = item.weapon_entry();
-                                    if (wentry.uses_projectile) {
-                                            const Projectile& p = equipment().projectile();
-                                            if (p.empty()) {
-                                                    projectile_smart_equip(inventory(),
-                                                                    wentry.weapon_class);
-                                            }
-                                    }
-                            } else {
-                                    equipment().equip(slot);
-                            }
-
-                            if (item.is_weapon() || item.is_projectile()) {
-                                    last_chosen_weaponclass =
-                                                    weapon().weapon_entry().weapon_class;
-                            }
+    if (item.is_equipment()) {
+        if (itemslot.is_equipped()) {
+            inventory().deequip(slot);
+        } else {
+            if (item.is_projectile()) {
+                // Best-effort to equip, may not be possible:
+                projectile_smart_equip(inventory(), slot);
+            } else if (item.is_weapon()) {
+                const Projectile& p = equipment().projectile();
+                if (!p.empty()) {
+                    if (!p.projectile_entry().is_standalone()) {
+                        inventory().deequip_type(
+                                EquipmentEntry::AMMO);
                     }
-            } else if (equipment().valid_to_use(item)
-                            && item_check_lua_prereq(L, type, this)) {
-                    item_do_lua_action(L, type, this,
-                                    Pos(action.action_x, action.action_y), item.amount);
-        gs->for_screens([&](){
+                }
+                equipment().equip(slot);
+                // Try and equip a projectile
+                WeaponEntry& wentry = item.weapon_entry();
+                if (wentry.uses_projectile) {
+                    const Projectile& p = equipment().projectile();
+                    if (p.empty()) {
+                        projectile_smart_equip(inventory(),
+                                               wentry.weapon_class);
+                    }
+                }
+            } else {
+                equipment().equip(slot);
+            }
+
+            if (item.is_weapon() || item.is_projectile()) {
+                last_chosen_weaponclass =
+                        weapon().weapon_entry().weapon_class;
+            }
+        }
+    } else if (equipment().valid_to_use(item)
+               && item_check_lua_prereq(L, type, this)) {
+        item_do_lua_action(L, type, this,
+                           Pos(action.action_x, action.action_y), item.amount);
+        gs->for_screens([&]() {
             if (is_focus_player(gs) && !type.inventory_use_message().empty()) {
                 gs->game_chat().add_message(type.inventory_use_message(),
-                        Colour(100, 100, 255));
+                                            Colour(100, 100, 255));
             }
         });
-                    if (item.is_projectile())
-                            itemslot.clear();
-                    else
-                            item.remove_copies(1);
-                    reset_rest_cooldown();
-            }
+        if (item.is_projectile())
+            itemslot.clear();
+        else
+            item.remove_copies(1);
+        reset_rest_cooldown();
+    }
+    inventory().sort();
 }
 
 void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
@@ -757,7 +761,6 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
             int gold_gained = type.sell_cost() * sell_amount;
             auto message = format("Transaction: %s x %d for %d GP.", type.name.c_str(), sell_amount, gold_gained);
             item.remove_copies(sell_amount);
-            inventory().sort();
             gs->for_screens([&](){
                 gs->game_chat().add_message(message, COL_PALE_YELLOW);
             });
@@ -773,6 +776,7 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
             gs->game_chat().add_message("Cannot sell currently equipped items!", COL_RED);
         });
     }
+    inventory().sort();
 }
 
 void PlayerInst::_use_rest(GameState *gs, const GameAction &action) {
