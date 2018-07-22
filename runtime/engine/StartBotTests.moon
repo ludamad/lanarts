@@ -8,7 +8,7 @@ EventLog = require "ui.EventLog"
 -- ProgrammableInputSource = require "input.ProgrammableInputSource"
 -- BotInputSource = require "ai.BotInputSource"
 
-game_init = () ->
+game_init = (seed) ->
     GameState = require("core.GameState")
     -- Player config
     GameState.clear_players()
@@ -19,7 +19,7 @@ game_init = () ->
 
     log "Initializing GameState object..."
     EngineInternal.init_gamestate()
-    random_seed(12345678)
+    random_seed(seed)
     EngineInternal.start_game()
 
 fps_updater = () ->
@@ -42,8 +42,9 @@ fps_updater = () ->
 run_bot_tests = (raw_args) ->
     parser = argparse("lanarts", "Run lanarts bot tests.")
     parser\option "--test_save_and_load", "Should we have headless execution?", false
-    parser\option("-s --steps", "Maximum number of steps to take.", nil)
+    parser\option("--steps", "Maximum number of steps to take.", nil)
     parser\option("--event_log", "Event log to write to.", nil)
+    parser\option("--seed", "Starting seed.", "12345678")
     parser\option("--comparison_event_log", "Event log to compare to.", nil)
     args = parser\parse(raw_args)
 
@@ -52,7 +53,7 @@ run_bot_tests = (raw_args) ->
     game_start = () ->
         return ResourceLoading.ensure_resources_before () ->
             -- (1) Init game
-            game_init()
+            game_init(tonumber(args.seed))
 
             -- (2) Set up input for first game step
             GameState = require("core.GameState")
