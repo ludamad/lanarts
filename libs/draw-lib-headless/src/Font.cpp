@@ -55,96 +55,96 @@ struct font_data {
 };
 
 void char_data::init(char ch, FT_Face face) {
-	// Load The Glyph For Our Character.
-	if (FT_Load_Glyph(face, FT_Get_Char_Index(face, ch), FT_LOAD_DEFAULT))
-		throw std::runtime_error("FT_Load_Glyph failed");
+	//// Load The Glyph For Our Character.
+	//if (FT_Load_Glyph(face, FT_Get_Char_Index(face, ch), FT_LOAD_DEFAULT))
+	//	throw std::runtime_error("FT_Load_Glyph failed");
 
-	// Move The Face's Glyph Into A Glyph Object.
-	FT_Glyph glyph;
-	if (FT_Get_Glyph(face->glyph, &glyph))
-		throw std::runtime_error("FT_Get_Glyph failed");
+	//// Move The Face's Glyph Into A Glyph Object.
+	//FT_Glyph glyph;
+	//if (FT_Get_Glyph(face->glyph, &glyph))
+	//	throw std::runtime_error("FT_Get_Glyph failed");
 
 
-	// Convert The Glyph To A Bitmap.
-	FT_Glyph_To_Bitmap(&glyph, ft_render_mode_normal, 0, 1);
-	FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
+	//// Convert The Glyph To A Bitmap.
+	//FT_Glyph_To_Bitmap(&glyph, ft_render_mode_normal, 0, 1);
+	//FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
 
-	FT_Bitmap& bitmap = bitmap_glyph->bitmap;
+	//FT_Bitmap& bitmap = bitmap_glyph->bitmap;
 
-	advance = face->glyph->advance.x >> 6;
-	left = bitmap_glyph->left;
-	w = bitmap.width;
-	h = bitmap.rows;
-	move_up = bitmap_glyph->top; //-bitmap.rows;
+	//advance = face->glyph->advance.x >> 6;
+	//left = bitmap_glyph->left;
+	//w = bitmap.width;
+	//h = bitmap.rows;
+	//move_up = bitmap_glyph->top; //-bitmap.rows;
 //
-	data = new unsigned char[4 * w * h];
-	for (int y = 0; y < h; y++) {
-		for (int x = 0; x < w; x++) {
-			const int my = y; //h-1-y;
-			data[4 * (x + w * my)] = 255;
-			data[4 * (x + w * my) + 1] = 255;
-			data[4 * (x + w * my) + 2] = 255;
-			data[4 * (x + w * my) + 3] = bitmap.buffer[x + w * y];
-		}
-	}
-	FT_Done_Glyph(glyph);
+	//data = new unsigned char[4 * w * h];
+	//for (int y = 0; y < h; y++) {
+	//	for (int x = 0; x < w; x++) {
+	//		const int my = y; //h-1-y;
+	//		data[4 * (x + w * my)] = 255;
+	//		data[4 * (x + w * my) + 1] = 255;
+	//		data[4 * (x + w * my) + 2] = 255;
+	//		data[4 * (x + w * my) + 3] = bitmap.buffer[x + w * y];
+	//	}
+	//}
+	//FT_Done_Glyph(glyph);
 }
 
 char_data::~char_data() {
-	delete[] data;
+	//delete[] data;
 }
 
 /*Initialize a font of size 'h' from a font file.*/
 void init_font(font_data* fd, const char* fname, unsigned int h) {
-	FT_Library library;
-	fd->h = h;
+	//FT_Library library;
+	//fd->h = h;
 
-	if (FT_Init_FreeType(&library)) {
-		throw std::runtime_error( format("Font initialization for '%s' failed!", fname) );
-	}
+	//if (FT_Init_FreeType(&library)) {
+	//	throw std::runtime_error( format("Font initialization for '%s' failed!", fname) );
+	//}
 
-	FT_Face face;
+	//FT_Face face;
 
-	//This is where we load in the font information from the file.
-	//Of all the places where the code might die, this is the most likely,
-	//as FT_New_Face will die if the font file does not exist or is somehow broken.
-	if (FT_New_Face(library, fname, 0, &face)) {
-		throw std::runtime_error(
-				 format("Font '%s' does not exist, or is an invalid font file!", fname));
-	}
+	////This is where we load in the font information from the file.
+	////Of all the places where the code might die, this is the most likely,
+	////as FT_New_Face will die if the font file does not exist or is somehow broken.
+	//if (FT_New_Face(library, fname, 0, &face)) {
+	//	throw std::runtime_error(
+	//			 format("Font '%s' does not exist, or is an invalid font file!", fname));
+	//}
 
-	//For some twisted reason, Freetype measures font size
-	//in terms of 1/64ths of pixels.  Thus, to make a font
-	//h pixels high, we need to request a size of h*64.
-	FT_Set_Char_Size(face, h * 64, h * 64, 96, 96);
+	////For some twisted reason, Freetype measures font size
+	////in terms of 1/64ths of pixels.  Thus, to make a font
+	////h pixels high, we need to request a size of h*64.
+	//FT_Set_Char_Size(face, h * 64, h * 64, 96, 96);
 
-	int maxw = 0;
-	int maxh = 0;
-	for (int i = 0; i < 128; i++) {
-		char_data& data = fd->data[i];
-		data.init(i, face);
-		data.imgoffset = maxw;
-		maxw += data.w;
-		maxh = std::max(maxh, data.h);
-	}
+	//int maxw = 0;
+	//int maxh = 0;
+	//for (int i = 0; i < 128; i++) {
+	//	char_data& data = fd->data[i];
+	//	data.init(i, face);
+	//	data.imgoffset = maxw;
+	//	maxw += data.w;
+	//	maxh = std::max(maxh, data.h);
+	//}
 
 
-	float ptw = power_of_two_round(maxw), pth = power_of_two_round(maxh);
-	fd->font_img.initialize(Size(ptw, pth));
-	for (int i = 0; i < 128; i++) {
-		char_data& data = fd->data[i];
-		int offset = data.imgoffset;
-		data.tx1 = offset / ptw;
-		data.tx2 = (offset + data.w) / ptw;
-		data.ty1 = 0 / pth;
-		data.ty2 = (data.h) / pth;
-	}
+	//float ptw = power_of_two_round(maxw), pth = power_of_two_round(maxh);
+	//fd->font_img.initialize(Size(ptw, pth));
+	//for (int i = 0; i < 128; i++) {
+	//	char_data& data = fd->data[i];
+	//	int offset = data.imgoffset;
+	//	data.tx1 = offset / ptw;
+	//	data.tx2 = (offset + data.w) / ptw;
+	//	data.ty1 = 0 / pth;
+	//	data.ty2 = (data.h) / pth;
+	//}
 
 	//We don't need the face information now that the display
 	//lists have been created, so we free the assosiated resources.
-	FT_Done_Face(face);
+	//FT_Done_Face(face);
 
-	FT_Done_FreeType(library);
+	//FT_Done_FreeType(library);
 }
 
 /******************************************************************
@@ -190,47 +190,48 @@ static int process_string(const font_data& font, const char* text,
 /* General gl_print function for others to delegate to */
 static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
 		PosF p, int maxwidth, bool actually_print, const char* text) {
-	perf_timer_begin(FUNCNAME);
+	//perf_timer_begin(FUNCNAME);
 
-	LDRAW_ASSERT(options.draw_region == BBoxF());
-	LDRAW_ASSERT(options.draw_angle == 0.0f);
-	LDRAW_ASSERT(options.draw_frame == 0.0f);
-	LDRAW_ASSERT(options.draw_scale == SizeF(1.0f, 1.0f));
+	//LDRAW_ASSERT(options.draw_region == BBoxF());
+	//LDRAW_ASSERT(options.draw_angle == 0.0f);
+	//LDRAW_ASSERT(options.draw_frame == 0.0f);
+	//LDRAW_ASSERT(options.draw_scale == SizeF(1.0f, 1.0f));
 
-	std::vector<int> line_splits;
-	int measured_width = process_string(font, text, maxwidth, line_splits);
-	int height = font.h * line_splits.size();
+	//std::vector<int> line_splits;
+	//int measured_width = process_string(font, text, maxwidth, line_splits);
+	//int height = font.h * line_splits.size();
 
-	p = adjusted_for_origin(p, SizeF(measured_width, height),
-			options.draw_origin);
+	//p = adjusted_for_origin(p, SizeF(measured_width, height),
+	//		options.draw_origin);
 
-	const Colour& c = options.draw_colour;
+	//const Colour& c = options.draw_colour;
 
-	Size size(0, 0);
-	for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {
-		int len = 0;
-		int eol = line_splits[linenum];
+	//Size size(0, 0);
+	//for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {
+	//	int len = 0;
+	//	int eol = line_splits[linenum];
 
-		size.h += font.h;
+	//	size.h += font.h;
 
-		for (; i < eol && text[i]; i++) {
-			unsigned char chr = text[i];
-			if (chr == '\n') {
-				continue; //skip newline char
-			}
-			const char_data& cdata = font.data[chr];
-			len += cdata.advance;
-			if (actually_print) {
-				Pos drawpos(p.x + len - (cdata.advance - cdata.left),
-						p.y + size.h - cdata.move_up);
-				gl_draw_glyph(font, chr, drawpos, options.draw_scale);
-			}
-		}
-		size.w = std::max(len, size.w);
-		size.h += 1;
-	}
-	perf_timer_end(FUNCNAME);
-	return size;
+	//	for (; i < eol && text[i]; i++) {
+	//		unsigned char chr = text[i];
+	//		if (chr == '\n') {
+	//			continue; //skip newline char
+	//		}
+	//		const char_data& cdata = font.data[chr];
+	//		len += cdata.advance;
+	//		if (actually_print) {
+	//			Pos drawpos(p.x + len - (cdata.advance - cdata.left),
+	//					p.y + size.h - cdata.move_up);
+	//			gl_draw_glyph(font, chr, drawpos, options.draw_scale);
+	//		}
+	//	}
+	//	size.w = std::max(len, size.w);
+	//	size.h += 1;
+	//}
+	//perf_timer_end(FUNCNAME);
+	//return size;
+        return SizeF {0.0f, 0.0f};
 }
 
 /******************************************************************

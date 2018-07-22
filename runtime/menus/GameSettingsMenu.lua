@@ -300,7 +300,7 @@ local function class_choice_buttons_create()
         { "Fighter", sprite_base .. "fighter.png", {0, 204, 0}},
 --        { "Rogue", sprite_base .. "rogue.png", {244, 140, 66}},
 --        { "Ranger", sprite_base .. "archer.png"},
-        { "Necromancer", sprite_base .. "necromancer.png", COL_GRAY},
+        { "Necromancer", sprite_base .. "necromancer.png", COL_LIGHT_GRAY},
 --        { "Lifelinker", sprite_base .. "lifelinker.png"}
     }
     local prev, next = {}, {}
@@ -346,25 +346,26 @@ local function class_choice_buttons_create()
         )
         function label:draw(xy)
             local bbox = {}
+            self.label.has_mouse = self:mouse_over(xy)
             if settings.class_type == button[1] then
                 self.sprite.options.color = COL_GOLD
                 self.label.options.color = COL_GOLD -- button[3]
             else
                 --self.sprite.options.color = with_alpha(self:mouse_over(xy) and COL_PALE_YELLOW or button[3], 100)
                 self.sprite.options.color = button[3] -- with_alpha(button[3], self:mouse_over(xy) and 155 or 55)
-                self.label.options.color = with_alpha(button[3], self:mouse_over(xy) and 255 or 55)
-            end
-            function self.label:draw(xy)
-                TextLabel.draw(self, xy)
-                local sx, sy = unpack(self.size)
-                local x, y = unpack(xy)
-                local padding = 4
-                local rect = {x - padding, y - padding, x + sx + padding, y + sy + padding}
-                if settings.class_type == button[1] then
-                    Display.draw_rectangle_outline(self.options.color, rect)
-                end
+                self.label.options.color = button[3] -- with_alpha(button[3], self:mouse_over(xy) and 1 or 0.4)
             end
             InstanceBox.draw(self, xy)
+        end
+        function label.label:draw(xy)
+            TextLabel.draw(self, xy)
+            local sx, sy = unpack(self.size)
+            local x, y = unpack(xy)
+            local padding = 4
+            local rect = {x - padding, y - padding, x + sx + padding, y + sy + padding}
+            if settings.class_type == button[1] or self.has_mouse then
+                Display.draw_rectangle_outline(self.options.color, rect)
+            end
         end
 
         button_row:add_instance(label)

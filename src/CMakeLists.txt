@@ -32,6 +32,7 @@ elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
                     
             mingw32  m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid
             ws2_32 kernel32
+	    freetype
         )
     else()
         set(ARCH_LIBS 
@@ -43,6 +44,7 @@ elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
             ${CMAKE_SOURCE_DIR}/dependencies/binary/libSDL2_mixer.a
             mingw32  m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid
             ws2_32 kernel32
+	    freetype
         )
     endif()
 else()
@@ -53,6 +55,7 @@ else()
     include(FindFreetype)
     set(ARCH_LIBS 
 	${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
+        freetype
     )
 endif()
 set( LIBS ../libs)
@@ -166,7 +169,6 @@ set (libraries
         #physfs-static
         libxmi
 	${OPENGL_gl_LIBRARY}
-	freetype
 	#	${FREETYPE_LIBRARIES}
         UnitTest++
         backward_object
