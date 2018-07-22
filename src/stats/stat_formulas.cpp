@@ -40,7 +40,7 @@ static float damage_multiplier(float power, float resistance) {
 static float basic_damage_formula(const EffectiveAttackStats& attacker, float resistance) {
 	float mult = damage_multiplier(attacker.power, resistance) * attacker.type_multiplier;
 	float result = attacker.damage * mult;
-	event_log("basic_damage_formula: mult=%f, damage=%f defence=%f result=%f\n",
+	event_log("basic_damage_formula: mult=%.2f, damage=%.2f defence=%.2f result=%.2f\n",
 			mult, attacker.damage, resistance, result);
 	return std::max(0.0f, result);
 }
@@ -60,7 +60,7 @@ float damage_formula(const EffectiveAttackStats& attacker,
 	float mdmg = magic_damage_formula(attacker, defender);
 	float pdmg = physical_damage_formula(attacker, defender);
 
-	event_log("damage_formula attacker damage=%.2f power=%.2f cooldown=%d magic_percentage=%.2f\n",
+	event_log("damage_formula attacker damage=%.2f power=%.2f cooldown=%.2f magic_percentage=%.2f\n",
 			attacker.damage, attacker.power, attacker.cooldown,
 			attacker.magic_percentage);
 	event_log("damage_formula defender physical.resistance=%.2f magic.resistance=%.2f\n",

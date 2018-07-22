@@ -274,7 +274,7 @@ void GameInstSet::step(GameState* gs) {
 		if (valid_inst(inst)) {
 			perf_timer_begin(typeid(*inst).name());
 			inst->destroyed = false;
-			event_log("Step-event for id %d\n", inst->id);
+			event_log("Step-event for id %d\n", std::max(inst->id,0));
 			inst->step(gs);
 			update_instance_for_step(&unit_set[i], inst);
 			perf_timer_end(typeid(*inst).name());

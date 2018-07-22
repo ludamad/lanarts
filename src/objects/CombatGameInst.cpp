@@ -245,8 +245,8 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attac
     }
     EffectiveAttackStats attack = lua_pop_effectiveattackstats(gs->luastate());
 
-    event_log("CombatGameInst::damage: id %d getting hit by {cooldown = %d, "
-                      "damage=%.2f, power=%.2f, magic_percentage=%f, physical_percentage=%f}",
+    event_log("CombatGameInst::damage: id %d getting hit by {cooldown = %.2f, "
+                      "damage=%.2f, power=%.2f, magic_percentage=%f, physical_percentage=%f}\n",
               id, attack.cooldown, attack.damage, attack.power,
               attack.magic_percentage,
               attack.physical_percentage());
