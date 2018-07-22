@@ -4,6 +4,7 @@ GameObject = require "core.GameObject"
 PathFinding = require "core.PathFinding"
 Map = require "core.Map"
 Keyboard = require "core.Keyboard"
+ObjectUtils = require "objects.ObjectUtils"
 
 HARDCODED_AI_SEED = 12345657
 ASTAR_BUFFER = PathFinding.astar_buffer_create()
@@ -84,7 +85,16 @@ path_planner = (player) -> nilprotect {
         {:map, :tile_xy} = player
         @target = obj
         @target_map = map
+        -- objs = Map.objects_list(map)
+        -- restores = {}
+        -- for obj in *objs
+        --     tile_xy = ObjectUtils.tile_xy(obj, true)
+        --     if Map.tile_is_solid(map, tile_xy)
+        --         Map.tile_set_solid(map, tile_xy, false)
+        --         append restores, tile_xy
         @stored_path = ASTAR_BUFFER\calculate_path map, tile_xy, obj.tile_xy
+        -- for tile_xy in *restores
+        --     Map.tile_set_solid(map, tile_xy, true)
         @coord = 2
     next_direction_towards: () =>
         if player.map ~= @target_map
@@ -92,7 +102,7 @@ path_planner = (player) -> nilprotect {
             @target = false
         if not @target
             return nil
-        if @n_till_refresh <= 0 
+        if @n_till_refresh <= 0
             @set_path_towards(@target)
             @n_till_refresh = 32
         coord = @get_next_coord()
@@ -123,7 +133,7 @@ ai_state = (player) -> {
             return item
         return nil
     queued_movements: {}
-    get_next_direction: () => 
+    get_next_direction: () =>
         if #@queued_movements > 0
             dir = @queued_movements[#@queued_movements]
             @queued_movements[#@queued_movements] = nil
@@ -133,31 +143,31 @@ ai_state = (player) -> {
         if dir
             return dir
         append @queued_movements, @get_next_wander_direction()
-        return {0,0}
-        --next_obj = nil
-        --for obj in *_objects(player, "item")
-        --    if obj.type == @next_key_item()
-        --        next_obj = obj
-        --        break
-        --if not next_obj
-        --    if @next_key_item() == "Azurite Key"
-        --        for i=2,1,-1
-        --            if next_obj 
-        --                break
-        --            next_obj = @portal_planner\closest_portal("Snake Pit ".. i)
-        --        for i=3,1,-1
-        --            if next_obj 
-        --                break
-        --            next_obj = @portal_planner\closest_portal("Temple ".. i)
-        --    elseif @key_items[2] == ""
-        --        for i=3,1,-1
-        --            if next_obj 
-        --                break
-        --            next_obj = @portal_planner\closest_portal("Outpost ".. i)
-        --if next_obj
-        --    @path_planner\set_path_towards(next_obj)
-        --    return @path_planner\next_direction_towards()
-        --return nil
+        -- return {0,0}
+        next_obj = nil
+        for obj in *_objects(player, "item")
+           if obj.type == @next_key_item()
+               next_obj = obj
+               break
+        if not next_obj
+           if @next_key_item() == "Azurite Key"
+               for i=2,1,-1
+                   if next_obj
+                       break
+                   next_obj = @portal_planner\closest_portal("Snake Pit ".. i)
+               for i=3,1,-1
+                   if next_obj
+                       break
+                   next_obj = @portal_planner\closest_portal("Temple ".. i)
+           elseif @key_items[2] == ""
+               for i=3,1,-1
+                   if next_obj
+                       break
+                   next_obj = @portal_planner\closest_portal("Outpost ".. i)
+        if next_obj
+           @path_planner\set_path_towards(next_obj)
+           return @path_planner\next_direction_towards()
+        return nil
     _closest: (objs) =>
         o = nil
         min_dist_sqr = math.huge
@@ -168,7 +178,7 @@ ai_state = (player) -> {
                 min_dist_sqr = dist_sqr
                 o = obj
         return assert o
-    get_next_wander_direction: () => 
+    get_next_wander_direction: () =>
         portals = _objects player, "actor"
         objs = table.filter portals, (p) -> p.team ~= player.team
         --assert #_objects(player, "feature") > 0

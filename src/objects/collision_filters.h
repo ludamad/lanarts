@@ -8,6 +8,7 @@
 
 class GameInst;
 
+bool any_colfilter(GameInst* self, GameInst* other);
 bool item_colfilter(GameInst* self, GameInst* other);
 bool autopickup_colfilter(GameInst* self, GameInst* other);
 bool enemy_colfilter(GameInst* self, GameInst* other);

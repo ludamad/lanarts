@@ -12,6 +12,10 @@
 
 #include "stats/items/ItemEntry.h"
 
+bool any_colfilter(GameInst* self, GameInst* other) {
+    return true;
+}
+
 bool item_colfilter(GameInst* self, GameInst* other) {
 	return dynamic_cast<ItemInst*>(other) != NULL;
 }

@@ -141,7 +141,7 @@ public:
     //   Used for decisions about pathing to the object.
     //   For player team members this is updated every step and perfect pathing towards the object is used.
     //   For minor team members (every other NPC) this is not used.
-    FloodFillPaths* _paths_to_object = NULL;
+	FloodFillPaths* _paths_to_object = NULL;
 private:
 	CombatStats base_stats;
 	EffectiveStats estats;

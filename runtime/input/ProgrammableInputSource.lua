@@ -3,9 +3,8 @@ local ProgrammableInputSource = newtype()
 local GameActions = require "core.GameActions"
 local GameState = require "core.GameState"
 
-function ProgrammableInputSource:init(player, poll_input)
+function ProgrammableInputSource:init(player)
     self.player = player
-    self._poll_input = poll_input
     self:reset()
 end
 
@@ -70,9 +69,14 @@ end
 
 function ProgrammableInputSource:handle_store(try_buy_slot)
 end
+
+function ProgrammableInputSource:step()
+    -- TO BE EXTENDED BY CHILD CLASS
+end
+
 function ProgrammableInputSource:poll_input()
     self:reset()
-    self:_poll_input()
+    self:step()
 end
 
 function ProgrammableInputSource:slot_highlighted()

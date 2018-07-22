@@ -194,7 +194,16 @@ static bool has_visible_monster(GameState* gs, PlayerInst* p = NULL) {
     //return false;
 }
 
+
+static bool is_explorable_solid_object(GameInst* player, GameInst* obj) {
+    auto* L = player->lua_variables.luastate();
+    luawrap::globals(L)["Engine"]["is_explorable_solid_object"].push();
+    return luawrap::call<bool>(L, obj);
+}
+
 Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
+    // TODO do exploration that uses flood fill pathfidning with is_explorable_solid_object taken into account
+    // TODO add third kind of map property? solid only for monster?
    if (finished != NULL) {
    	*finished = false;
    }
@@ -209,35 +218,44 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
     int dx = 0, dy = 0;
 
     auto bbox = paths_to_object().location();
-    // Make sure not touching borders:
-    bbox.x1 = std::max(bbox.x1, 1);
-    bbox.x2 = std::min(bbox.x2, gs->tiles().tile_width() - 1);
-    bbox.y1 = std::max(bbox.y1, 1);
-    bbox.y2 = std::min(bbox.y2, gs->tiles().tile_height() - 1);
+    BBox bounds({0,0}, gs->tiles().size());
+//    // Make sure not touching borders:
+//    bbox.x1 = std::max(bbox.x1, 1);
+//    bbox.x2 = std::min(bbox.x2, gs->tiles().tile_width() - 1);
+//    bbox.y1 = std::max(bbox.y1, 1);
+//    bbox.y2 = std::min(bbox.y2, gs->tiles().tile_height() - 1);
+    auto is_near_unseen = [&](const auto& recurse, int x, int y, int depth = 1) {
+        for (int dy = -1; dy <= +1; dy++) {
+            for (int dx = -1; dx <= +1; dx++) {
+                Pos xy = {x + dx, y + dy};
+//                if (!bounds.contains(xy) || (dx == 0 && dy == 0)) {
+//                    continue;
+//                }
+                if (!(*gs->tiles().previously_seen_map())[xy]) {
+                    return true;
+                }
+                if (depth > 0) {
+                    float rx = (xy.x+.5) *TILE_SIZE, ry = (xy.y+.5)* TILE_SIZE;
+                    bool feature_here = (gs->object_radius_test(this, NULL, 0, &is_explorable_solid_object, rx, ry, 1) > 0);
+                    if (feature_here && recurse(recurse, xy.x, xy.y, depth - 1)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    };
     FOR_EACH_BBOX(bbox, x, y) {
         auto* node = paths_to_object().node_at({x, y});
         if (node->solid) {
             continue;
         }
         float dist = node->distance;
-        if (dist == 0 && (node->dx != 0 || node->dy != 0)) {
+        if (dist == 0 || (node->dx != 0 && node->dy != 0)) {
             continue;
         }
-        bool near_unseen = false;
-        for (int dy = -1; dy <= +1; dy++) {
-            for (int dx = -1; dx <= +1; dx++) {
-                if (!(*gs->tiles().previously_seen_map())[{x+dx,y+dy}]) {
-                    near_unseen = true;
-                    break;
-                }
-            }
-            if (near_unseen) {
-                break;
-            }
-        }
+        bool near_unseen = is_near_unseen(/*for recursion:*/ is_near_unseen, x, y);
         float rx = (x+.5) *TILE_SIZE, ry = (y+.5)* TILE_SIZE;
-        // float dx = rx - this->rx, dy = ry - this->ry; 
-        // float sqr_dist = rx*rx+ry*ry;
         // " Ludamad: Automatic item picking up was interesting but way too good.
         //   Dashing into a dungeon and quickly picking up items around should be a conscious effort by the player."
         // Ludamad: OK, let's try with just stackable items.
@@ -253,7 +271,7 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
             //    adjusted_dist = (sqrt(sqr_dist) / 32);
             //}
 
-            if (dist != 0 && (min_dist >= adjusted_dist || is_item > found_item) && (is_item >= found_item)) {
+            if ((min_dist >= adjusted_dist || is_item > found_item) && (is_item >= found_item)) {
                 closest = {x,y};
                 min_dist = adjusted_dist;
                 found_item = is_item;
@@ -294,6 +312,7 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
    }
     explore_state.set_move({dx,dy}, TILE_SIZE / std::max(4.0f, effective_stats().movespeed));
     gs->set_level(old_current_level);
+    printf("%d %d\n", dx, dy);
     return {dx, dy};
 }
 

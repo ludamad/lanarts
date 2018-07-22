@@ -50,6 +50,9 @@ public:
 		return _size.h;
 	}
 
+	Size size() const {
+		return _size;
+	}
 	GameTiles& tiles() {
 		return _tiles;
 	}

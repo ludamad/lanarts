@@ -23,6 +23,16 @@ function Engine.loading_screen_draw(...)
     return LoadingScreen.draw(...)
 end
 
+function Engine.is_explorable_solid_object(obj)
+    -- Hook from C++
+    local func = getmetatable(obj).is_explorable
+    if func then
+        return func(obj)
+    else
+        return false
+    end
+end
+
 function Engine.resources_load(...)
     log "function Engine.resources_load(...)"
 

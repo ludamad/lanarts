@@ -57,9 +57,9 @@ void PlayerInst::init(GameState* gs) {
 
 	_score_stats.deepest_floor = std::max(_score_stats.deepest_floor, current_floor);
 
-        if (!_paths_to_object) {
-            _paths_to_object = new FloodFillPaths();
-        }
+	if (!_paths_to_object) {
+		_paths_to_object = new FloodFillPaths();
+	}
 	paths_to_object().initialize(gs->tiles().solidity_map());
 	paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
 	collision_simulation_id() = gs->collision_avoidance().add_player_object(

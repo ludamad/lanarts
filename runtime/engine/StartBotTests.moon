@@ -5,13 +5,15 @@ StartEngine = require "engine.StartEngine"
 EngineHooks = require "engine.EngineBase"
 Settings = require "engine.Settings"
 EventLog = require "ui.EventLog"
+-- ProgrammableInputSource = require "input.ProgrammableInputSource"
+-- BotInputSource = require "ai.BotInputSource"
 
 game_init = (load_file=nil) ->
     GameState = require("core.GameState")
     -- Player config
     GameState.clear_players()
     GameState.register_player 'Playabot', 'Fighter', -- Name and class
-        (require "input.ProgrammableInputSource").create, -- input source
+        (require("ai.BotInputSource").create), -- input source
         true, 0, --netid
         0 -- team
 
@@ -61,6 +63,8 @@ run_bot_tests = (raw_args) ->
             -- Font settings
             font: 'fonts/Gudea-Regular.ttf'
             menu_font: 'fonts/alagard_by_pix3m-d6awiwp.ttf'
+            time_per_step: 1
+            invincible: true
         },
         entry_point: game_start,
         debug: args.debug,

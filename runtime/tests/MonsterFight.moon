@@ -18,7 +18,7 @@ MonsterFightRoom = () -> newtype {
             size: {20, 20}
         }
     tileset: require("tiles.Tilesets").lair
-    -- Called before compile() is called 
+    -- Called before compile() is called
     generate: (args) =>
         MapUtils = require "maps.MapUtils"
         for enemy, amount in pairs args.enemies
@@ -77,7 +77,7 @@ M.create_player = () -> nilprotect {
     simulate: (k) => sim k
     _n_inputs: 0
     -- Forwarding to handle events from a variety of modules, acts as a pseudo-require:
-    intercept: (str) => 
+    intercept: (str) =>
         itable = nilprotect {}
         for k,v in pairs @
             itable[k] = (...) -> v(@, ...)
@@ -98,11 +98,11 @@ M.create_player = () -> nilprotect {
     overworld_create: () => M.progger()
     -- END EVENTS --
     -- Default is to always want to simulate:
-    should_simulate_input: () => true 
+    should_simulate_input: () => true
     simulate_menu_input: () =>
         Keyboard = require "core.Keyboard"
         switch @_n_inputs
-            when 0 
+            when 0
                 sim 'n'
             when 1 -- Mage
                 sim 'TAB'
@@ -121,7 +121,7 @@ M.create_player = () -> nilprotect {
             if @should_simulate_input()
                 GameState._input_clear()
             --    return true
-            --else 
+            --else
                 x = user_input_capture()
                 @simulate_menu_input()
                 return x
@@ -151,7 +151,7 @@ M.create_player = () -> nilprotect {
                 return true
             should_continue = user_gamestate_step(...)
             RATE = 125
-            if GameState.frame % RATE == 2 
+            if GameState.frame % RATE == 2
                 --state = {}
                 --for k,v in pairs(@)
                 --    state[k] = v

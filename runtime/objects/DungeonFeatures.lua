@@ -32,10 +32,10 @@ function Base:init(args)
     self.traits = self.traits or {}
     self.sprites = {}
     table.insert(self.traits, M.FEATURE_TRAIT)
-end 
+end
 function Base:on_draw()
     if Display.object_within_view(self) then
-        local sprite = self.sprite or self.sprites[GameState.screen_get()] 
+        local sprite = self.sprite or self.sprites[GameState.screen_get()]
         if sprite ~= nil then
             ObjectUtils.screen_draw(sprite, self.xy, self.alpha, self.frame)
         end
@@ -48,7 +48,7 @@ local Decoration = M.Decoration
 function Decoration:on_step()
 --    if self.sprite or Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
 --        return -- Need to be able to scale to many deactivated instances
---    end 
+--    end
     for screen_idx in screens() do
         if self.sprites[screen_idx] ~= self.real_sprite and Map.object_visible(self) then
             self.sprites[screen_idx] = self.real_sprite
@@ -66,21 +66,12 @@ local test_mode = os.getenv("LANARTS_TESTCASE")
 M.Door = LuaGameObject.type_create({base = Base})
 local Door = M.Door
 local DOOR_OPEN_TIMEOUT = 128
-local function is_solid(obj) 
+local function is_solid(obj)
     return obj.solid
 end
 
-function Door:on_step()
---    if Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
---        return -- Need to be able to scale to many deactivated instances
---    end 
+function Door:is_explorable()
     local GlobalData = require "core.GlobalData"
-
-    if self.open_timeout > 0 then
-        self.open_timeout = self.open_timeout - 1
-        return
-    end
-
     local needs_key = (self.required_key ~= false)
     local needs_lanarts = false
     local can_player_open = true
@@ -99,15 +90,30 @@ function Door:on_step()
     if settings.invincible then
         can_player_open = true
     end
+    return can_player_open
+end
+
+function Door:on_step()
+--    if Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
+--        return -- Need to be able to scale to many deactivated instances
+--    end
+    local GlobalData = require "core.GlobalData"
+
+    if self.open_timeout > 0 then
+        self.open_timeout = self.open_timeout - 1
+        return
+    end
+    local needs_key = (self.required_key ~= false)
+    local can_player_open = self:is_explorable()
     local is_open = false
     local collisions = Map.rectangle_collision_check(self.map, self.unpadded_area, self)
-    collisions = table.filter(collisions, is_solid) 
-    if #collisions > 0 and can_player_open then
+    collisions = table.filter(collisions, is_solid)
+    if #collisions > 0 and can_player_open or settings.invincible then
         is_open = true
-    else 
+    else
         local collisions = Map.rectangle_collision_check(self.map, self.area, self)
         for _, object in ipairs(collisions) do
-            local enemy_openable = (not needs_key and not needs_lanarts) or self.last_open_frame > GameState.frame - 1000
+            local enemy_openable = (not needs_key and self.lanarts_needed == 0) or self.last_open_frame > GameState.frame - 1000
             if enemy_openable and (object.is_enemy ~= nil) then
                 is_open = true
                 break
@@ -188,7 +194,7 @@ local Chest = M.Chest
 local DOOR_OPEN_TIMEOUT = 128
 function Chest:on_map_init()
     local whalf = self.real_sprite.width / 2
-    local hhalf = self.real_sprite.height / 2 
+    local hhalf = self.real_sprite.height / 2
     self.area = {
         self.x - whalf, self.y - hhalf,
         self.x + whalf, self.y + hhalf
