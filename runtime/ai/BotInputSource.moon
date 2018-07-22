@@ -103,8 +103,9 @@ return newtype {
         USE_KNOCK = @_rng\randomf() < 0.1
         USE_ITEM = @_rng\randomf() < 0.1
         SELL_ITEM = @_rng\randomf() < 0.1
+        RANDOM_MOVE = @_rng\randomf() < 0.01
         dir = nil
-        if not @_use_portal
+        if not RANDOM_MOVE and not @_use_portal
             if USE_DASH
                 @set("use_spell_slot", 2)
             elseif USE_KNOCK
@@ -118,6 +119,13 @@ return newtype {
         if #@_queued > 0
             dir = @_queued[1]
             table.remove(@_queued, 1)
+        if not dir and RANDOM_MOVE
+            dir = {0,0}
+            while dir[1] == 0 and dir[2] == 0
+                dx = @_rng\random_choice {-1, 0, 1}
+                dy = @_rng\random_choice {-1, 0, 1}
+                dir = {dx, dy}
+            if dir then for i=1,4 do append @_queued, dir
         if not dir
             dir = @_try_explore()
         if not dir

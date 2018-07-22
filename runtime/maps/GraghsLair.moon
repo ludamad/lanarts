@@ -63,7 +63,7 @@ floor_plans = (rng) ->
                 {enemy: "Sheep", guaranteed_spawns: 5, chance: 100}
                 {enemy: "Mouther", guaranteed_spawns: 4}
                 {enemy: "Black Mamba", guaranteed_spawns: 4}
-                {enemy: "Centaur Hunter", guaranteed_spawns: 3}
+                {enemy: "Hydra", guaranteed_spawns: 1}
                 {enemy: "Gragh", guaranteed_spawns: 1}
                 {enemy: "Elephant", guaranteed_spawns: 5}
             }
