@@ -95,7 +95,7 @@ bool load_settings_data(GameSettings& settings, const char* filename) {
 					settings.autouse_health_potions);
 			optional_set(root, "autouse_mana_potions",
 					settings.autouse_mana_potions);
-			optional_set(root, "keep_event_log", settings.keep_event_log);
+			optional_set(root, "event_log", settings.event_log);
 			optional_set(root, "comparison_event_log",
 					settings.comparison_event_log);
 

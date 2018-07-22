@@ -38,7 +38,7 @@ struct GameSettings {
 	/*Debug options*/
 	bool draw_diagnostics, verbose_output;
 	bool invincible;
-	bool keep_event_log;
+	std::string event_log;
 	std::string comparison_event_log;
 
 	/*Replay settings, can be set in menu*/
@@ -82,7 +82,7 @@ struct GameSettings {
 		autouse_health_potions = true;
 		autouse_mana_potions = true;
 
-		keep_event_log = false;
+		event_log = "";
 	}
 
 	void parse(LuaValue& lsettings);

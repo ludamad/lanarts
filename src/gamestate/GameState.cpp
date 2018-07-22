@@ -150,10 +150,13 @@ static void _event_log_initialize(GameState* gs, GameSettings& settings) {
 		input_log = settings.comparison_event_log.c_str();
 	}
 
-	if (settings.keep_event_log) {
+	if (!settings.event_log.empty()) {
 		/* We will fail to write logs unless we have a log directory */
 		ensure_directory("logs");
-		format(input_log_name_buffer, "logs/game_event_log%d", gs->game_timestamp());
+		if (settings.event_log == "true" || settings.event_log == "yes") {
+		    settings.event_log = "logs/game_event_log%d";
+		}
+		format(input_log_name_buffer, settings.event_log.c_str(), gs->game_timestamp());
 		output_log = input_log_name_buffer.c_str();
 	}
 

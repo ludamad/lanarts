@@ -5,6 +5,7 @@
  */
 
 #include <lcommon/strformat.h>
+#include <iostream>
 
 #include "GameState.h"
 #include "GameMapState.h"
@@ -27,9 +28,9 @@ void GameLogger::initialize_logs(GameState* gs, const char* input_log,
             printf("Failed to open log file %s\n", input_log);
         }
     }
-        if (output_log_file) {
-            output_log_file.close();
-        }
+    if (output_log_file) {
+        output_log_file.close();
+    }
     if (output_log) {
         printf("Logging to file %s\n", output_log);
         output_log_file.open(output_log, std::ios_base::out);
@@ -63,12 +64,20 @@ void GameLogger::event_log(const char *fmt, va_list ap) {
     va_end(ap);
 
     logline += text;
-    output_log_file.write(logline.c_str(), logline.size());
+    if (output_log_file) {
+        output_log_file.write(logline.c_str(), logline.size());
+    }
     if (input_log_file) {
         std::getline(input_log_file, line);
         if (!line.empty()) {
             line += '\n';
-            LANARTS_ASSERT(line == logline);
+            if (line != logline) {
+                std::cout << "UNABLE TO MATCH: " << std::endl;
+                std::cout << logline << std::endl;
+                std::cout << "WITH COMPARISON LINE: " << std::endl;
+                std::cout << line << std::endl;
+                abort();
+            }
         }
         if (input_log_file.eof()) {
             input_log_file.close();
@@ -83,7 +92,7 @@ void GameLogger::event_log(const char *fmt, ...) {
 }
 
 bool GameLogger::is_active() {
-    if (!gs || !output_log_file) {
+    if (!gs || (!output_log_file && !input_log_file)) {
         return false;
     }
     return true;

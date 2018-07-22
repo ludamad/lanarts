@@ -184,7 +184,7 @@ function run_lanarts(){
     export vblank_mode=0
     if handle_flag "--gdb" || handle_flag "-g" ; then
         echo "Wrapping in GDB:" | colorify '1;35'
-        gdb -silent -ex="break lua_error" -ex="break abort" -ex="catch throw" -ex=r --args ../build/src/lanarts $args
+        gdb -silent -x ../debug.gdb --args ../build/src/lanarts $args
     else
         exec ../build/src/lanarts $args
     fi

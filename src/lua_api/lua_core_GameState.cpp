@@ -216,7 +216,7 @@ LuaValue luaapi_settings_proxy(lua_State* L) {
 	BIND(verbose_output);
 	BIND(autouse_health_potions);
 	BIND(autouse_mana_potions);
-	BIND(keep_event_log);
+	BIND(event_log);
 	BIND(comparison_event_log);
 #undef BIND
 

@@ -75,7 +75,7 @@ void GameSettings::parse(LuaValue& lsettings) {
                  autouse_health_potions);
     optional_fill(lsettings, "autouse_mana_potions",
                  autouse_mana_potions);
-    optional_fill(lsettings, "keep_event_log", keep_event_log);
+    optional_fill(lsettings, "event_log", event_log);
     optional_fill(lsettings, "comparison_event_log",
                  comparison_event_log);
 

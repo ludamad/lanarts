@@ -22,9 +22,29 @@ game_init = () ->
     random_seed(12345678)
     EngineInternal.start_game()
 
+fps_updater = () ->
+    GameState = require("core.GameState")
+    fps_timer = timer_create()
+    fps_count, fps_lastframe, fps = 1, 0, nil
+    fps = 0
+    return () ->
+        frame_increase = math.max(0, GameState.frame - fps_lastframe)
+        fps_lastframe = GameState.frame
+        fps_count = fps_count + frame_increase
+
+        ms = fps_timer\get_milliseconds()
+        if ms > 1000 then
+            fps = fps_count / ms * 1000
+            fps_timer\start()
+            fps_count = 0
+        return fps
+
 run_bot_tests = (raw_args) ->
     parser = argparse("lanarts", "Run lanarts bot tests.")
     parser\option "--test_save_and_load", "Should we have headless execution?", false
+    parser\option("-s --steps", "Maximum number of steps to take.", nil)
+    parser\option("--event_log", "Event log to write to.", nil)
+    parser\option("--comparison_event_log", "Event log to compare to.", nil)
     args = parser\parse(raw_args)
 
     local game_start, game_step
@@ -43,19 +63,34 @@ run_bot_tests = (raw_args) ->
             -- (3) Transfer to game loop
             return game_step()
 
-    game_step = () ->
-        -- (1) Load dependencies
-        GameState = require("core.GameState")
-        GameLoop = require("GameLoop")
+    game_step = () -> 
+        fps_update = fps_updater()
+        step = () ->
+            -- (1) Load dependencies
+            GameState = require("core.GameState")
+            GameLoop = require("GameLoop")
+            
+            -- (2) Update with frame stats
+            step_only = (GameState.frame % 100 ~= 0)
+            fps = fps_update()
+            if not step_only
+                print "Frame", GameState.frame, "FPS", fps
 
-        -- (2) Run game loop & and see if game
-        -- should be saved + exited
-        step_only = (GameState.frame % 100 ~= 0)
-        if not GameLoop.game_step(step_only)
-            -- Exit
-            return nil
-        -- (3) Loop again
-        return game_step
+            -- (3) Check if we are at final frame:
+            if args.steps and GameState.frame >= tonumber(args.steps)
+                print "Final frame achieved."
+                -- Exit
+                return nil
+
+            -- (4) Run game loop & and see if game
+            -- should be saved + exited
+            if not GameLoop.game_step(step_only)
+                -- Exit
+                return nil
+
+            -- (5) Loop again
+            return step
+        return step()
 
     return StartEngine.start_engine {
         settings: { -- Settings object
@@ -68,6 +103,8 @@ run_bot_tests = (raw_args) ->
             menu_font: 'fonts/alagard_by_pix3m-d6awiwp.ttf'
             time_per_step: 0
             invincible: true
+            event_log: args.event_log
+            comparison_event_log: args.comparison_event_log
         },
         entry_point: game_start,
         debug: args.debug,
