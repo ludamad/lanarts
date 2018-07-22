@@ -38,6 +38,7 @@
 #include "lua_api/lua_api.h"
 
 #include "lua_api.h"
+#include <lcommon/sdl_headless_support.h>
 
 
 static int engine_initialize_subsystems(lua_State *L) {

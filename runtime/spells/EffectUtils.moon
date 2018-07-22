@@ -83,8 +83,6 @@ get_resistance = (obj, type) ->
     -- Otherwise, resistances are capped between -5 and +5 (inclusive)
     resist = math.max(math.min(math.floor(raw_resist), 5), -5)
     -- from 0.75 to 1.25x
-    print type, resist
-    print 1 - resist / 10
     return 1 - resist / 10
 
 -- Default implementation of projectile hit function, in Lua

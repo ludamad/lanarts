@@ -20,6 +20,10 @@ else ()
     message("Using Lua 5.1, use -lj to use luajit if raw Lua performance is inadequate.")
 endif ()
 
+if ($ENV{BUILD_HEADLESS})
+    add_definitions(-DBUILD_HEADLESS)
+endif()
+
 if ($ENV{BUILD_FLAGS})
     add_definitions ($ENV{BUILD_FLAGS})
 endif()

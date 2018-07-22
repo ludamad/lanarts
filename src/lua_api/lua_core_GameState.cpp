@@ -20,6 +20,7 @@
 #include "gamestate/ScoreBoard.h"
 
 #include "lua_api.h"
+#include <lcommon/sdl_headless_support.h>
 
 static void game_save(LuaStackValue filename) {
 	FILE* file = fopen(filename.as<const char*>(), "wb");

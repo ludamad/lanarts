@@ -8,6 +8,7 @@
 #include <SDL_mixer.h>
 
 #include "lsound.h"
+#include <lcommon/sdl_headless_support.h>
 
 namespace lsound {
 	int init(int nchannels) {

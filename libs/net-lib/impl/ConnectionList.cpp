@@ -4,6 +4,7 @@
  */
 
 #include "ConnectionList.h"
+#include <lcommon/sdl_headless_support.h>
 
 ConnectionList::ConnectionList() {
 	_list_lock = SDL_CreateMutex();

@@ -7,6 +7,7 @@
 #include <ldraw/display.h>
 
 #include "IOController.h"
+#include <lcommon/sdl_headless_support.h>
 
 IOState::IOState() {
 	clear();

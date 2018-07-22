@@ -11,6 +11,7 @@
 
 #include "lsound.h"
 #include "lua_lsound.h"
+#include <lcommon/sdl_headless_support.h>
 
 using namespace lsound;
 

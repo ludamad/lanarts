@@ -20,7 +20,7 @@ file(GLOB lcommon_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 add_library( lcommon
              STATIC
-             ${lcommon_src} include/lcommon/lambda_utils.h)
+             ${lcommon_src} include/lcommon/lambda_utils.h include/lcommon/sdl_headless_support.h)
 
 AUX_SOURCE_DIRECTORY(tests lcommon_tests) 
 

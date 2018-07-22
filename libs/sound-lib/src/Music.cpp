@@ -7,6 +7,7 @@
 
 #include "Music.h"
 #include "Sound.h"
+#include <lcommon/sdl_headless_support.h>
 
 /* Controls the smart pointer deletion */
 static void __freemusic_callback(void* mm) {
@@ -35,7 +36,7 @@ namespace lsound {
 		if (mm) {
 			_music = smartptr<Mix_Music>(mm, __freemusic_callback);
 		} else {
-                    printf("Music Error %s\n",Mix_GetError());
+                    //printf("Music Error %s\n",Mix_GetError());
                 }
 	}
 
@@ -43,7 +44,7 @@ namespace lsound {
 		if (_music) {
 			Mix_PlayMusic(_music.get(), 0);
 		} else {
-                    printf("Music Error %s\n",Mix_GetError());
+                    //printf("Music Error %s\n",Mix_GetError());
                 }
 	}
 	void Music::clear() {
@@ -58,7 +59,7 @@ namespace lsound {
 		if (_music) {
 			Mix_PlayMusic(_music.get(), -1);
 		} else {
-                        printf("Music Error %s\n",Mix_GetError());
+                        //printf("Music Error %s\n",Mix_GetError());
                 }
 	}
 

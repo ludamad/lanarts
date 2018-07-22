@@ -4,6 +4,7 @@
  */
 
 #include "PacketQueue.h"
+#include <lcommon/sdl_headless_support.h>
 
 PacketQueue::PacketQueue() {
 	_queue_lock = SDL_CreateMutex();

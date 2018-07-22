@@ -7,6 +7,7 @@
 
 #include "SoundEffect.h"
 #include "Sound.h"
+#include <lcommon/sdl_headless_support.h>
 
 /* Controls the smart pointer deletion */
 static void __freesound_callback(void* mm) {
@@ -37,7 +38,7 @@ namespace lsound {
 		if (_soundeffect) {
 			Mix_PlayChannel(-1, _soundeffect.get(), 0);
 		} else {
-                        printf("Music Error %s\n",Mix_GetError());
+                        //printf("Music Error %s\n",Mix_GetError());
                 }
 	}
 	void SoundEffect::clear() {
@@ -52,7 +53,7 @@ namespace lsound {
 		if (_soundeffect) {
 			Mix_PlayChannel(-1, _soundeffect.get(), -1);
 		} else {
-                        printf("Music Error %s\n",Mix_GetError());
+                        //printf("Music Error %s\n",Mix_GetError());
                 }
 	}
 

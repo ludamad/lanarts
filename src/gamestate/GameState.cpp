@@ -18,6 +18,7 @@
 #include <lcommon/SerializeBuffer.h>
 #include <lcommon/directory.h>
 #include <lcommon/strformat.h>
+#include <lcommon/sdl_headless_support.h>
 
 #include <ldraw/display.h>
 #include <luawrap/luawrap.h>

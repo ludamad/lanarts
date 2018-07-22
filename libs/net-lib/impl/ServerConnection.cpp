@@ -17,6 +17,7 @@
 #include "enet_util.h"
 #include "PacketQueue.h"
 #include "ServerConnection.h"
+#include <lcommon/sdl_headless_support.h>
 
 const int SERVER_POLL_TIME = 200; /* 200 milliseconds */
 
