@@ -24,6 +24,7 @@ local text_button_params = {
     click_box_padding = 5
 }
 
+-- The initial loading screen:
 local function start_menu_create(on_start_click, on_join_click, on_load_click, on_score_click)
     local menu = InstanceBox.create( { size = Display.display_size } )
     local transparent_sprite =  Sprite.image_create("LANARTS-transparent.png")
