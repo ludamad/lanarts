@@ -26,10 +26,10 @@ static Range find_slice_forgive1(Inventory& inv, int start_index, const Func& f_
 			matches = f_matches(slots[i+1]);
 		}
 		if (!matches) {
-			return {start_index, i};
+			return Range {start_index, i};
 		}
 	}
-	return {start_index, inv.max_size()};
+	return Range {start_index, inv.max_size()};
 }
 
 static const std::string ONE_TIME = "One-time Use";
