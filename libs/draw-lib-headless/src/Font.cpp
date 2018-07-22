@@ -2,11 +2,11 @@
 #include <stdexcept>
 #include <vector>
 
-#include <ft2build.h>
-#include <freetype/freetype.h>
-#include <freetype/ftglyph.h>
-#include <freetype/ftoutln.h>
-#include <freetype/fttrigon.h>
+//#include <ft2build.h>
+//#include <freetype/freetype.h>
+//#include <freetype/ftglyph.h>
+//#include <freetype/ftoutln.h>
+//#include <freetype/fttrigon.h>
 
 #include <lcommon/math_util.h>
 #include <lcommon/geometry.h>
@@ -26,73 +26,8 @@ namespace ldraw {
 /******************************************************************
  *  Initialization routines                                       *
  ******************************************************************/
-
-/*Stores everything needed to render a character glyph in opengl */
-struct char_data {
-	int imgoffset;
-	int w, h;
-	int advance;
-	int left;
-	int move_up;
-	unsigned char* data;
-	float tx1, tx2, ty1, ty2;
-
-	char_data() {
-		memset(this, 0, sizeof(char_data));
-	}
-	void init(char ch, FT_Face face);
-	~char_data();
-};
-
-/*Holds all of the information related to any freetype font that we want to create.*/
 struct font_data {
-	GLImage font_img;
-	char_data data[128];
-	float h; //Height of the font
-	font_data() {
-		h = 0;
-	}
 };
-
-void char_data::init(char ch, FT_Face face) {
-	//// Load The Glyph For Our Character.
-	//if (FT_Load_Glyph(face, FT_Get_Char_Index(face, ch), FT_LOAD_DEFAULT))
-	//	throw std::runtime_error("FT_Load_Glyph failed");
-
-	//// Move The Face's Glyph Into A Glyph Object.
-	//FT_Glyph glyph;
-	//if (FT_Get_Glyph(face->glyph, &glyph))
-	//	throw std::runtime_error("FT_Get_Glyph failed");
-
-
-	//// Convert The Glyph To A Bitmap.
-	//FT_Glyph_To_Bitmap(&glyph, ft_render_mode_normal, 0, 1);
-	//FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
-
-	//FT_Bitmap& bitmap = bitmap_glyph->bitmap;
-
-	//advance = face->glyph->advance.x >> 6;
-	//left = bitmap_glyph->left;
-	//w = bitmap.width;
-	//h = bitmap.rows;
-	//move_up = bitmap_glyph->top; //-bitmap.rows;
-//
-	//data = new unsigned char[4 * w * h];
-	//for (int y = 0; y < h; y++) {
-	//	for (int x = 0; x < w; x++) {
-	//		const int my = y; //h-1-y;
-	//		data[4 * (x + w * my)] = 255;
-	//		data[4 * (x + w * my) + 1] = 255;
-	//		data[4 * (x + w * my) + 2] = 255;
-	//		data[4 * (x + w * my) + 3] = bitmap.buffer[x + w * y];
-	//	}
-	//}
-	//FT_Done_Glyph(glyph);
-}
-
-char_data::~char_data() {
-	//delete[] data;
-}
 
 /*Initialize a font of size 'h' from a font file.*/
 void init_font(font_data* fd, const char* fname, unsigned int h) {
@@ -157,33 +92,34 @@ static void gl_draw_glyph(const font_data& font, char glyph, const PosF& pos,
 /*Splits up strings, respecting space boundaries & returns maximum width */
 static int process_string(const font_data& font, const char* text,
 		int max_width, std::vector<int>& line_splits) {
-	int last_space = 0, ind = 0;
-	int largest_width = 0;
-	int width = 0, width_since_space = 0;
-	unsigned char c;
-
-	while ((c = text[ind]) != '\0') {
-		const char_data& cdata = font.data[c];
-		width += cdata.advance;
-		width_since_space += cdata.advance;
-
-		if (isspace(c)) {
-			last_space = ind;
-			width_since_space = 0;
-		}
-		bool overmax = max_width != -1 && width > max_width;
-		if (c == '\n' || (overmax && !isspace(c))) {
-			line_splits.push_back(last_space + 1);
-			largest_width = std::max(width, largest_width);
-			width = width_since_space;
-		}
-		ind++;
-	}
-	line_splits.push_back(ind);
-
-	largest_width = std::max(width, largest_width);
-
-	return largest_width;
+//	int last_space = 0, ind = 0;
+//	int largest_width = 0;
+//	int width = 0, width_since_space = 0;
+//	unsigned char c;
+//
+//	while ((c = text[ind]) != '\0') {
+//		const char_data& cdata = font.data[c];
+//		width += cdata.advance;
+//		width_since_space += cdata.advance;
+//
+//		if (isspace(c)) {
+//			last_space = ind;
+//			width_since_space = 0;
+//		}
+//		bool overmax = max_width != -1 && width > max_width;
+//		if (c == '\n' || (overmax && !isspace(c))) {
+//			line_splits.push_back(last_space + 1);
+//			largest_width = std::max(width, largest_width);
+//			width = width_since_space;
+//		}
+//		ind++;
+//	}
+//	line_splits.push_back(ind);
+//
+//	largest_width = std::max(width, largest_width);
+//
+//	return largest_width;
+    return 0;
 }
 
 //
@@ -275,7 +211,7 @@ SizeF Font::get_draw_size(const std::string& str, int maxwidth) const {
 	return get_draw_size(str.c_str(), maxwidth);
 }
 int Font::height() const {
-	return _font->h;
+	return 0;//_font->h;
 }
 
 void Font::clear() {
