@@ -45,11 +45,13 @@ run_bot_tests = (raw_args) ->
 
     game_step = () ->
         -- (1) Load dependencies
+        GameState = require("core.GameState")
         GameLoop = require("GameLoop")
 
         -- (2) Run game loop & and see if game
         -- should be saved + exited
-        if not GameLoop.game_step()
+        step_only = (GameState.frame % 100 ~= 0)
+        if not GameLoop.game_step(step_only)
             -- Exit
             return nil
         -- (3) Loop again

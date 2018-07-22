@@ -26,6 +26,8 @@
 #include "GameWorld.h"
 #include "ScoreBoard.h"
 
+constexpr auto LIFE_CHECK_FRAMES = 100;
+
 GameWorld::GameWorld(GameState* gs) :
 		gs(gs),
 		next_room_id(-1) {
@@ -268,14 +270,17 @@ bool GameWorld::step() {
         gs->screens.screen().last_player_pos = gs->focus_object()->ipos();
 	});
 	// TODO performance
-	std::vector<GameInstRef> new_keep_alives;
-	for (GameInstRef ref : _alive_removed_objects) {
-		if (ref.get()->reference_count > 1) {
-			ref->id = -int(new_keep_alives.size());
-			new_keep_alives.push_back(ref);
+	if (gs->frame() % LIFE_CHECK_FRAMES == 0) {
+		std::vector<GameInstRef> new_keep_alives;
+		for (GameInstRef& ref : _alive_removed_objects) {
+			if (ref.get()->reference_count > 1) {
+				ref->id = -int(new_keep_alives.size());
+				new_keep_alives.push_back(ref);
+			}
 		}
+		_alive_removed_objects.swap(new_keep_alives);
+		printf("%d ALIVE\n", new_keep_alives.size());
 	}
-	_alive_removed_objects.swap(new_keep_alives);
 
 	gs->frame()++;
 	return true;

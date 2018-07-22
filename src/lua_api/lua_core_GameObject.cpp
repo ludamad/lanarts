@@ -89,7 +89,8 @@ static int lapi_gameinst_setter_fallback(lua_State* L) {
 }
 
 static int lapi_gameinst_freeref(lua_State* L) {
-	GameInst::free_reference(luawrap::get<GameInst*>(L, 1));
+	auto user_data = (GameInst**) lua_touserdata(L, 1);
+	GameInst::free_reference(*user_data);
 	return 0;
 }
 
@@ -160,8 +161,6 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	lua_pushcfunction(L, &lapi_gameinst_setter_fallback);
 	luameta_defaultsetter(meta, LuaStackValue(L, -1));
 	lua_pop(L, 1);
-
-	luameta_gc(meta, lapi_gameinst_freeref);
 
 	return meta;
 }
@@ -510,10 +509,12 @@ namespace GameInstWrap {
 		LuaValue meta = luameta_new(L, "GameInstRef");
 		meta["__save"].bind_function(__save);
 		meta["__load"].bind_function(__load);
+		luameta_gc(meta, lapi_gameinst_freeref);
 		return meta;
 	}
 
 	void push_ref(lua_State* L, GameInst* inst) {
+		LANARTS_ASSERT(!inst->destroyed);
 		GameInst** lua_inst = (GameInst**) lua_newuserdata(L, sizeof(GameInst*));
 		*lua_inst = inst;
 		luameta_push(L, &ref_metatable);

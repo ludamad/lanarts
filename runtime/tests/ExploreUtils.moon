@@ -80,8 +80,8 @@ portal_planner = (player) -> nilprotect {
                 obj_dist = vector_distance(portal.xy, player.xy)
                 if obj_dist < closest_distance
                     closest = portal
-                    closest_distance = obj_dist 
-        return closest 
+                    closest_distance = obj_dist
+        return closest
     unused_portals: () =>
         portals = _objects player, "feature"
         return table.filter portals, (p) -> not p.has_been_used
@@ -215,10 +215,13 @@ ai_state = (player) -> {
         --assert #_objects(player, "feature") > 0
         if #objs == 0
             objs = @portal_planner\unused_portals()
+        local next_obj
         if #objs == 0
-            return nil
-        --next_obj = @rng\random_choice(objs)
-        next_obj = @_closest objs
+            objs = _objects player, "feature"
+            -- return nil
+            next_obj = @rng\random_choice(objs)
+        else
+            next_obj = @_closest objs
         @path_planner\set_path_towards(next_obj)
         dir = @path_planner\next_direction_towards()
         return dir

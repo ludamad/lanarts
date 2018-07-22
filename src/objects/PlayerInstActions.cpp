@@ -312,7 +312,6 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
    }
     explore_state.set_move({dx,dy}, TILE_SIZE / std::max(4.0f, effective_stats().movespeed));
     gs->set_level(old_current_level);
-    printf("%d %d\n", dx, dy);
     return {dx, dy};
 }
 

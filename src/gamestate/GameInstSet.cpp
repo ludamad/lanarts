@@ -47,6 +47,7 @@ GameInstSet::~GameInstSet() {
 	}
 
 	for (int i = 0; i < deallocation_list.size(); i++) {
+		deallocation_list[i]->lua_variables.clear();
 		GameInst::free_reference(deallocation_list[i]);
 	}
 }
@@ -264,6 +265,7 @@ void GameInstSet::step(GameState* gs) {
 
 	perf_timer_begin(FUNCNAME);
 	for (int i = 0; i < deallocation_list.size(); i++) {
+		deallocation_list[i]->lua_variables.clear();
 		GameInst::free_reference(deallocation_list[i]);
 	}
 	deallocation_list.clear();
