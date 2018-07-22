@@ -1,7 +1,7 @@
 cd `dirname $0`
 
 # Good practice -- exit completely on any bad exit code:
-set -e 
+set -e
 
 ###############################################################################
 # Helper functions for conditionally coloring text.
@@ -23,12 +23,12 @@ function colorify() {
         local words;
         words=$(cat)
         echo -e "\e[$1m$words\e[0m"
-    fi 
+    fi
 }
 
 ###############################################################################
 # Bash function to check for a flag in 'args' and remove it.
-# Treats 'args' as one long string. 
+# Treats 'args' as one long string.
 # Returns true if flag was removed.
 ###############################################################################
 
@@ -77,6 +77,9 @@ fi
 if handle_flag "--mingw" ; then
     export BUILD_MINGW=1
 fi
+if handle_flag "--headless" ; then
+    export BUILD_HEADLESS=1
+fi
 if handle_flag "--luajit" || handle_flag "-lj" ; then
     export BUILD_LUAJIT=1
 fi
@@ -106,14 +109,17 @@ if [[ -e /proc/cpuinfo ]] ; then
 else
     cores=4 # Guess -- may want to manually edit if above fails.
 fi
-# Helper for managing build directories: 
+# Helper for managing build directories:
 function rm_if_link(){ [ ! -L "$1" ] || rm -f "$1"; }
 function build_lanarts(){
     BUILD_DIR="build_debug"
     if [ $BUILD_OPTIMIZE ] ; then
         BUILD_DIR="build_release"
     fi
-    # Specialize build dirs 
+    # Specialize build dirs
+    if [ $BUILD_HEADLESS ] ; then
+        BUILD_DIR="${BUILD_DIR}_headless"
+    fi
     if [ $BUILD_LUAJIT ] ; then
         BUILD_DIR="${BUILD_DIR}_luajit"
     fi
@@ -135,13 +141,13 @@ function build_lanarts(){
         exit 1
     fi
     mkdir -p $BUILD_DIR
-    ln -s $BUILD_DIR build 
+    ln -s $BUILD_DIR build
     cd $BUILD_DIR
     if [ $BUILD_MINGW ] ; then
         if python -mplatform | grep fedora ; then
             export BUILD_FEDORA_CROSS=1
             mingw32-cmake  -Wno-dev .. | colorify '1;33'
-        else 
+        else
             cmake -DCMAKE_TOOLCHAIN_FILE=mingw-toolchain.cmake  -Wno-dev .. | colorify '1;33'
         fi
     else
@@ -170,7 +176,7 @@ if handle_flag "-b" || handle_flag "--build" ; then
 fi
 
 ###############################################################################
-# Running the game. 
+# Running the game.
 ###############################################################################
 
 function run_lanarts(){

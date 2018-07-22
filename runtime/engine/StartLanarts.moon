@@ -65,11 +65,17 @@ run_lanarts = (raw_args) ->
 
     game_step = () ->
         -- (1) Load dependencies
-        Keys = require("core.Keyboard")
-        GameLoop = require("GameLoop")
-        GameState = require("core.GameState")
+        Keys = require "core.Keyboard"
+        GameLoop = require "GameLoop"
+        GameState = require "core.GameState"
+        Network = require "core.Network"
 
-        -- (2) Run game loop & and see if game
+        -- (2) Consume network events (TODO this should link to player input sources)
+        perf.timing_begin("**Sync Message**")
+        Network.sync_message_consume()
+        perf.timing_end("**Sync Message**")
+
+        -- (3) Run game loop & and see if game
         -- should be saved + exited
         if not GameLoop.game_step()
             -- Save and exit
@@ -79,14 +85,20 @@ run_lanarts = (raw_args) ->
             EngineInternal.init_gamestate_api(settings)
             -- Go back to menu
             return menu_start()
-        -- (3) If F4 is pressed, pause the game
+        -- (4) If F4 is pressed, pause the game
         if Keys.key_pressed(Keys.F4)
             GameLoop.loop_control.game_is_paused = not GameLoop.loop_control.game_is_paused
-        -- (4) If Escape is pressed, tell user about shift+escape
+        -- (5) If Escape is pressed, tell user about shift+escape
         if Keys.key_pressed(Keys.ESCAPE)
             for _ in screens()
                 EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
-        -- (5) Loop again
+        -- (6) Backup save every ~5 minutes
+        if GameState.frame > 0 and GameState.frame % (100 * 60 * 5) == 0
+            for _ in screens()
+                EventLog.add("BACKING UP SAVE!", COL_WHITE)
+            GameState.save("saves/backup-frame-" .. GameState.frame .. ".save")
+
+        -- (7) Loop again
         return game_step
 
     return StartEngine.start_engine {

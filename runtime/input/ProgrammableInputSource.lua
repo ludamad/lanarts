@@ -3,8 +3,9 @@ local ProgrammableInputSource = newtype()
 local GameActions = require "core.GameActions"
 local GameState = require "core.GameState"
 
-function ProgrammableInputSource:init(player)
+function ProgrammableInputSource:init(player, poll_input)
     self.player = player
+    self._poll_input = poll_input
     self:reset()
 end
 
@@ -51,7 +52,7 @@ function ProgrammableInputSource:reset()
         should_explore = false,
         use_item_slot = -1,
         sell_item_slot = -1,
-        should_shift_autotarget = false, 
+        should_shift_autotarget = false,
         target_position = {0,0},
         should_use_weapon = false,
         use_spell_slot = -1,
@@ -70,6 +71,8 @@ end
 function ProgrammableInputSource:handle_store(try_buy_slot)
 end
 function ProgrammableInputSource:poll_input()
+    self:reset()
+    self:_poll_input()
 end
 
 function ProgrammableInputSource:slot_highlighted()
@@ -95,7 +98,7 @@ function ProgrammableInputSource:handle_spells()
 end
 
 
-function ProgrammableInputSource:sell_mode(...) 
+function ProgrammableInputSource:sell_mode(...)
     return false
 end
 function ProgrammableInputSource:handle_store(...)

@@ -3,30 +3,23 @@
 --
 -- For tests:
 
-local function interceptable_require(...)
-    local test_module = require("tests.main").testcase
-    if test_module then
-        print("intercepting ", ...)
-        return test_module:intercept(...)
-    end
-    return require(...)
-end
+Engine.require = require
 
 function Engine.menu_start(...)
     log "function Engine.menu_start(...)"
-    local menus = require "Menus"
+    local menus = Engine.require "Menus"
     return menus.start_menu_show(...)
 end
 
 function Engine.pregame_menu_start(...)
     log "function Engine.pregame_menu_show(...)"
-    local menus = require "Menus"
+    local menus = Engine.require "Menus"
     return menus.pregame_menu_show(...)
 end
 
 function Engine.loading_screen_draw(...)
     log "function Engine.loading_screen_draw(...)"
-    local LoadingScreen = require "menus.LoadingScreen"
+    local LoadingScreen = Engine.require "menus.LoadingScreen"
     return LoadingScreen.draw(...)
 end
 
@@ -34,9 +27,9 @@ function Engine.resources_load(...)
     log "function Engine.resources_load(...)"
 
     local function _req(module)
-        local GameState = require("core.GameState")
+        local GameState = Engine.require("core.GameState")
         log_verbose("Loading resources from '" .. module .. "'")
-        local ret = yield_point(require, module)
+        local ret = yield_point(Engine.require, module)
         return ret
     end
 
@@ -66,48 +59,48 @@ end
 
 function Engine.game_start(...)
     -- Dont intercept the actual game loop, that's being tested:
-    local game_loop = require "GameLoop"
+    local game_loop = Engine.require "GameLoop"
     -- require("maps.01_Overworld").test_determinism()
 
     return game_loop.run_loop(...)
 end
 
 function Engine.post_draw(...)
-    local game_loop = require "GameLoop"
+    local game_loop = Engine.require "GameLoop"
 
     return game_loop.post_draw(...)
 end
 
 function Engine.overlay_draw(...)
-    local game_loop = require "GameLoop"
+    local game_loop = Engine.require "GameLoop"
 
     return game_loop.overlay_draw(...)
 end
 
 function Engine.game_won(...)
-    local events = interceptable_require "Events"
+    local events = Engine.require "Events"
 
     return events.player_has_won(...)
 end
 
 function Engine.event_occurred(...)
-    local events = interceptable_require "Events"
+    local events = Engine.require "Events"
 
     return events.trigger_event(...)
 end
 
 function Engine.first_map_create(...)
     if os.getenv("LINEAR_MODE") then
-        local linear_mode = interceptable_require "maps.LinearMode"
+        local linear_mode = Engine.require "maps.LinearMode"
         return linear_mode.first_map_create()
     end
-    local region1 = interceptable_require "maps.01_Overworld"
+    local region1 = Engine.require "maps.01_Overworld"
     local map = region1.overworld_create(...)
     return map
 end
 
 function Engine.pre_serialize()
-    local SerializationUtils = require "SerializationUtils"
+    local SerializationUtils = Engine.require "SerializationUtils"
     local timer = timer_create()
     SerializationUtils.name_global_data()
     SerializationUtils.install_require_fallback()

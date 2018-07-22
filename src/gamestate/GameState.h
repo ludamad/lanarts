@@ -339,7 +339,7 @@ private:
 
 	LuaSerializeConfig config;
 	GameStatePostSerializeData _post_deserialize_data;
-        int initial_seed = 0;
+	int initial_seed = 0;
     friend class GameWorld;
 };
 

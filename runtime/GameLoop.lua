@@ -33,10 +33,6 @@ function M.game_step(steponly)
     end
     perf.timing_begin("**Game Frame**")
 
-    perf.timing_begin("**Sync Message**")
-    Network.sync_message_consume()
-    perf.timing_end("**Sync Message**")
-
     local timer = timer_create()
 
     if not steponly then
@@ -51,14 +47,6 @@ function M.game_step(steponly)
     end
     perf.timing_end("**Step**")
 
-    -- Backup save every ~20 minutes
-    if GameState.frame > 0 and GameState.frame % (100 * 60 * 20) == 0 then
-        for _ in screens() do
-            EventLog.add("BACKING UP SAVE!", COL_WHITE)
-        end
-        local GameState = require "core.GameState"
-        GameState.save("saves/backup-frame-" .. GameState.frame .. ".save")
-    end
     -- ROBUSTNESS
     -- Will be called after a game restarts during step event, but for a newly generated game world.
     -- See robustness note below which assures that each run has the same ordering of input_handle's.

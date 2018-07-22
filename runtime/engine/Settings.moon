@@ -28,6 +28,4 @@ settings_load = (settings_file) ->
             settings[k] = v
     return settings
 
-
-
 return {:settings_save, :settings_load}

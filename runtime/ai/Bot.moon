@@ -27,6 +27,20 @@ random_enemies = () ->
         ret[enemy.name] = 1
     return ret
 
+-- function ProgrammableInputSource:reset()
+--     -- "Do nothing" state
+--     self.input = {
+--         move_direction = {0,0},
+--         should_explore = false,
+--         use_item_slot = -1,
+--         sell_item_slot = -1,
+--         should_shift_autotarget = false,
+--         target_position = {0,0},
+--         should_use_weapon = false,
+--         use_spell_slot = -1,
+--     }
+-- end
+
 random_items = () ->
     itemlist = (for k,v in pairs items do v)
     ret = {}

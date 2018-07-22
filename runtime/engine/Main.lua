@@ -1,11 +1,11 @@
 -- engine.Main
--- 
+--
 -- This module exposes a 'main' function that acts as a flexible runner for
 -- the full Lanarts game as well as test components / alternate entry points.
 
 -- (1) Setup paths
-package.path = package.path .. ';dependencies/?.lua' 
-package.path = package.path .. ';dependencies/socket/?.lua' 
+package.path = package.path .. ';dependencies/?.lua'
+package.path = package.path .. ';dependencies/socket/?.lua'
 
 -- (2) Surpress noisy input
 require("Logging").set_log_level(os.getenv("LANARTS_LOG") or "WARN")

@@ -55,10 +55,10 @@ IOState = newtype {
         @held.button_left_dpad = Gamepad.button_left_dpad(@id)
         @held.button_right_stick = Gamepad.button_right_stick(@id)
         @held.button_left_stick = Gamepad.button_left_stick(@id)
-        
+
         @held.axis_left_trigger = Gamepad.axis_left_trigger(@id) > 0.7
         @held.axis_right_trigger = Gamepad.axis_right_trigger(@id) > 0.7
-        
+
         @held.button_left_shoulder = Gamepad.button_left_shoulder(@id)
         @held.button_right_shoulder = Gamepad.button_right_shoulder(@id)
         @held.button_back = Gamepad.button_back(@id)
@@ -84,7 +84,7 @@ IOState = newtype {
         @held.right_axis_right = (Gamepad.axis_right_x(@id) > 0.2)
         @pressed.right_axis_left = not @held.right_axis_left and (Gamepad.axis_right_x(@id) < -0.2)
         @held.right_axis_left = (Gamepad.axis_right_x(@id) < -0.2)
-        
+
     is_held: (s) => return @held[s] or false
     is_pressed: (s) => return @pressed[s] or false
 }
@@ -155,19 +155,19 @@ _extend {
     handle_inventory: (drop_item, reposition_item) =>
         @_handle_grid_menu()
         if @_should_macro
-            for button in *BINDABLE_BUTTONS 
+            for button in *BINDABLE_BUTTONS
                 if @iostate\is_held(button)
                     @_bind(@item_slot_bindings, button, @slot_highlighted())
         if @_should_select_item
             if @slot_selected() ~= -1
-                if @slot_highlighted() == @slot_selected() 
+                if @slot_highlighted() == @slot_selected()
                     drop_item(@slot_selected(), @_should_halve)
                 else
                     reposition_item(@slot_selected(), @slot_highlighted())
                 @item_selected_xy = {-1, 0}
             else
                 @item_selected_xy = {@iostate.highlighted_xy[1], @iostate.highlighted_xy[2]}
-    handle_store: (try_buy_item) => 
+    handle_store: (try_buy_item) =>
         @_handle_grid_menu()
         if @_should_menu_confirm
             if @slot_highlighted() ~= -1
@@ -182,13 +182,13 @@ _extend {
     handle_spells: () =>
         @_handle_grid_menu()
         if @_should_macro
-            for button in *BINDABLE_BUTTONS 
+            for button in *BINDABLE_BUTTONS
                 if @iostate\is_held(button)
                     @_bind(@spell_slot_bindings, button, @slot_highlighted())
     handle_enemy_info: () =>
         @_handle_grid_menu()
     slot_highlighted: () => @iostate.highlighted_xy[1] + @iostate.highlighted_xy[2] * 5
-    slot_selected: () => 
+    slot_selected: () =>
         @item_selected_xy[1] + @item_selected_xy[2] * 5
     _draw_button: (button, xy) =>
         sprite = tosprite("spr_gamepad.xbox_#{button}")
@@ -230,14 +230,14 @@ _extend {
         @_should_sell = not @_should_macro and @iostate\is_held("button_back")
     sell_mode: () => @_should_sell
     move_direction: () => @iostate.left_axis_dir
-    target_position: () => 
+    target_position: () =>
         if @iostate.right_axis_dir[1] == 0 and @iostate.right_axis_dir[2] == 0
             return {0,0}
         return vector_add @player.xy, vector_scale(@iostate.right_axis_dir, 32)
     should_explore: () => @iostate\is_held "button_left_stick"
 
     use_spell_slot: () =>
-        if @_should_use_item_bindings 
+        if @_should_use_item_bindings
             return -1
         for binding in *@spell_slot_bindings
             {button, slot} = binding

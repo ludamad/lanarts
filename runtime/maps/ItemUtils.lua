@@ -34,13 +34,13 @@ local function nested_chance(group, attribute)
     for i=1,#group do
         if group[i] ~= nil then
             if not group[i].chance then
-                pretty(group[i])
+                --pretty(group[i])
             end
             total_chance = total_chance + group[i].chance
         end
     end
     if total_chance == 0 then
-        pretty(group)
+        --pretty(group)
     end
     assert(total_chance ~= 0)
     local rand_x = random(0, total_chance)
@@ -52,7 +52,7 @@ local function nested_chance(group, attribute)
             end
         end
     end
-    pretty(group)
+    --pretty(group)
     return nil
 end
 
