@@ -39,7 +39,7 @@ MapCompiler = newtype {
         @_group_sets = {}
         @_combined_region = {}
         @_bboxes = {}
-        @_spawn_players = args.spawn_players
+        @_spawn_players = args.spawn_players or false
         @_next_group_id = 1
     add: (selector, operator) =>
         append @operators, {:selector, :operator}

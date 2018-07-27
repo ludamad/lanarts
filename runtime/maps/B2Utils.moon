@@ -80,6 +80,8 @@ set_velocities_to_fixed_set = (bodies, fixed_bodies, clump_once_near = false) ->
     for o in *bodies
         pos = o.body\GetPosition()
         p1, p2, dist = body_distance(o, fixed_bodies)
+        if not p1 or not p2
+            continue
         if clump_once_near and #bodies > 1
             if dist < 100
                 p1, p2, dist = body_distance(o, bodies)
