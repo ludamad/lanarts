@@ -252,31 +252,93 @@ DataW.spell_create {
 }
 ----------------- </INNER FIRE IMPL> ---------------------
 
+FLAME_RATE = 30
+MAX_INTENSITY = 300
+INTENSITY_SPREAD_INTERVAL = 60
+
+get_burn_intensity = (inst) ->
+    if inst\has_effect("Burn")
+        return inst\get_effect("Burn").intensity
+    else
+        return 0
+
+apply_raw_burn = (inst, attacker, intensity) ->
+    inst\add_effect("Burn", {:intensity, :attacker, time_left: math.huge})
+
+apply_burn_intensity = (inst, attacker, intensity) ->
+    -- Over 10 seconds, we will lose that much life.
+    -- Intensity determined by how much % of our life has been taken * MAX_INTENSITY
+    flammability = inst.def.flammability or 1
+    intensity *= flammability
+    apply_raw_burn(inst, attacker, intensity)
+
+apply_burn_damage = (inst, attacker, damage) ->
+    -- Calculate burn intensity from damage done
+    percent_damage = damage / inst.stats.max_hp
+    intensity = percent_damage * 100
+    intensity = 100
+    apply_burn_intensity(inst, attacker, intensity)
+    
 DataW.effect_create {
-    -- Burn has 4 distinct states:
-    -- - 
+    -- Burn is controlled by 2 variables:
+    -- - Intensity, from 0 to 300.
+    -- -    - Shown as one flame, 2 flame, 3 flame etc based on rounding down after dividing by 100.
+    -- - Flammability, 0 to 1+
+    -- -    - Scaling factor. Per enemy. Generally 0.5 for red/blue creatures, 1.5 for green.
+    -- -    - Used above in apply_burn.
     name: "Burn"
     can_use_rest: false
-    fade_out: 5
     effected_colour: {255,160,160}
     effected_sprite: "spr_effects.inner_flame"
-    apply_func: (caster, time_left) =>
-        @kill_tracker = caster.kills
-        @max_time = math.max(@max_time or 0, time_left)
-        @extensions = 0
-    step_func: (caster) =>
-        time_passed = @max_time - @time_left
-        if time_passed % 20 == 0
-            play_sound "sound/ringfire-loop.ogg"
-        diff = math.max(caster.kills - @kill_tracker, 0)
-        for i=1,diff
-            @time_left = math.min(@max_time * 1.5, @time_left + 60 + TypeEffectUtils.get_power(caster, 'Red') * 5)
-            for _ in screens()
-                if caster\is_local_player()
-                    EventLog.add("Your inner fire grows ...", {200,200,255})
-                    play_sound "sound/berserk.ogg"
-            @extensions += 1
-        @kill_tracker = caster.kills
+    fade_out: 5
+    init_func: (inst) =>
+        @intensity = 0
+        @flammability = inst.def.flammability
+        @n_steps = 0
+    apply_func: (inst, args) =>
+        @attacker = assert args.attacker
+        @intensity = math.min(@intensity + args.intensity, MAX_INTENSITY)
+    step_func: (inst) =>
+        -- Intensity goes down by 1 a turn, to a maximum of 0
+        @intensity -= 1
+        @intensity = math.max(@intensity, 0)
+        @n_steps += 1
+        if @n_steps % FLAME_RATE == 0
+            -- At 300 intensity, the target loses 5% of their max HP every half second.
+            -- At 100 intensity, the target loses 1.25% of their max HP every half second.
+            percentage_intensity = @intensity / MAX_INTENSITY
+            percentage_loss = percentage_intensity / 20
+            damage = percentage_loss * inst.stats.max_hp
+            @spread_fire(inst)
+            -- Make sure to destroy object only AFTER fire spreading
+            inst\direct_damage(damage, @attacker)
+    spread_fire: (inst) =>
+        -- Called every half second.
+        -- When INTENSITY_SPREAD_INTERVAL more intensity than a nearby enemy and they are less than 32px away...
+        --      - 90% chance, do nothing
+        --      - otherwise, increase nearby enemy intensity by INTENSITY_SPREAD_INTERVAL, up to our intensity - INTENSITY_SPREAD_INTERVAL
+        induced_intensity = @intensity - INTENSITY_SPREAD_INTERVAL
+        for obj in *Map.radius_collision_check(inst.map, 32 + inst.target_radius, inst.xy)
+            if (obj.team == nil) or obj.team == @attacker.team
+                continue -- Not eligible
+            obj_intensity = get_burn_intensity(obj)
+            if induced_intensity <= obj_intensity
+                continue -- Cant induce intensity, lesser induced intensity
+            if chance(0.9)
+                continue -- 90% chance to fail to do anything
+            new_intensity = math.min(induced_intensity, obj_intensity + INTENSITY_SPREAD_INTERVAL)
+            apply_burn_intensity inst, @attacker, (new_intensity - obj_intensity) -- delta
+    draw_func: (inst) =>
+        --alpha = 1.0
+        --if @in_time_slice(0.0, 0.1)
+        --    alpha = @get_progress(0.0, 0.1)
+        --elseif @in_time_slice(0.9, 1)
+        --    alpha = 1.0 - @get_progress(0.9, 1)
+        ObjectUtils.screen_draw(M._fire, inst.xy, 0.8, @n_steps)
+        font_cached_load(settings.font, 20)\draw {
+            color: COL_WHITE
+            origin: Display.CENTER
+        }, Display.to_screen_xy(inst.xy), tostring(@intensity)
 }
 
 -- FIRE STORM
@@ -324,6 +386,8 @@ DataW.spell_create {
         speed: 7
         damage_multiplier: 1.25
         spr_attack: "fire bolt"
+        on_damage: (target, damage) =>
+            apply_burn_damage(target, @caster, damage)
         on_deinit: () =>
             if @caster.destroyed
                 return

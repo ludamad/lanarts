@@ -1,4 +1,4 @@
-local EffectUtils = require "spells.EffectUtils"
+local TypeEffectUtils = require "spells.TypeEffectUtils"
 local MiscSpellAndItemEffects = require "core.MiscSpellAndItemEffects"
 local EventLog = require "ui.EventLog"
 local Map = require "core.Map"
@@ -119,7 +119,7 @@ Data.item_create {
     spr_item = "spr_scrolls.red_mana_potion",
 
     prereq_func = function (self, user)
-        if EffectUtils.get_power(user, "Red") <= 0 then
+        if TypeEffectUtils.get_power(user, "Red") <= 0 then
             for _ in screens() do
                 if caster:is_local_player() then
                     EventLog.add("You do not have any Red Power!", COL_PALE_RED)
@@ -131,7 +131,7 @@ Data.item_create {
     end,
 
     action_func = function(self, user)
-        user:heal_mp(EffectUtils.get_power(user, "Red") * 25)
+        user:heal_mp(TypeEffectUtils.get_power(user, "Red") * 25)
     end
 }
 

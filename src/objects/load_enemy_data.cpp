@@ -105,6 +105,7 @@ static EnemyEntry parse_enemy_type(const LuaStackValue& table) {
     entry.target_draw_func = table["target_draw_func"];
 
     entry.effect_modifiers.status_effects = load_statuses(table["effects_active"]);
+    entry.raw_table = table;
     return entry;
 }
 

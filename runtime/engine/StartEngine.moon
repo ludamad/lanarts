@@ -54,7 +54,7 @@ start_engine = (config) ->
         ErrorReporting = require "ErrorReporting"
         if config.nofilter
             ErrorReporting.filter_patterns = {}
-        ErrorReporting.context = tonumber(config.context)
+        ErrorReporting.context = tonumber(config.context) or ErrorReporting.context
 
         -- (3) Initialize subsystems + game state object
         engine_init(config.settings)

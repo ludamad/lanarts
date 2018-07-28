@@ -230,7 +230,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
     LUAWRAP_METHOD(methods, gain_xp_from, OBJ->gain_xp_from(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2)));
     LUAWRAP_METHOD(methods, team_gain_xp, OBJ->team_gain_xp(lua_api::gamestate(L), lua_tonumber(L, 2)));
 	LUAWRAP_GETTER(getters, can_rest, OBJ->cooldowns().can_rest());
-	LUAWRAP_METHOD(methods, direct_damage, OBJ->damage(lua_api::gamestate(L), lua_tointeger(L, 2), lua_gettop(L) < 3 ? NULL : luawrap::get<CombatGameInst*>(L, 3)));
+	LUAWRAP_METHOD(methods, direct_damage, OBJ->damage(lua_api::gamestate(L), lua_tonumber(L, 2), lua_gettop(L) < 3 ? NULL : luawrap::get<CombatGameInst*>(L, 3)));
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true,
             // Damage multiplier:
             luawrap::get_defaulted(L, 3, 1.0f))) );
@@ -300,6 +300,7 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
 
 	LUAWRAP_GETTER(getters, name, OBJ->etype().name);
     LUAWRAP_GETTER(getters, unique, OBJ->etype().unique);
+	LUAWRAP_GETTER(getters, def, OBJ->etype().raw_table);
     LUAWRAP_GETTER(getters, is_enemy, true);
 	LUAWRAP_GETTER(getters, kills, 0);
     LUAWRAP_GETTER(getters, xpworth, OBJ->xpworth());
@@ -368,6 +369,7 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
     LUAWRAP_GETTER(getters, target, lua_api::gamestate(L)->get_instance(OBJ->target()));
 	LUAWRAP_GETTER(getters, deepest_floor, OBJ->score_stats().deepest_floor);
 	LUAWRAP_GETTER(getters, deaths, OBJ->score_stats().deaths);
+	LUAWRAP_GETTER(getters, def, OBJ->class_stats().class_entry().raw_table);
         LUAWRAP_GETTER(getters, spells, OBJ->stats().spells.spell_id_list());
         LUAWRAP_GETTER(getters, last_moved_direction, OBJ->last_moved_direction());
         LUAWRAP_GETTER(getters, is_ghost, OBJ->is_ghost());

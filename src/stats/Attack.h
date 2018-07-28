@@ -41,6 +41,7 @@ public:
 	int range, cooldown;
 	sprite_id attack_sprite;
 	LuaAction attack_action;
+	LuaValue on_damage;
 };
 
 Attack parse_attack(const LuaField& field);

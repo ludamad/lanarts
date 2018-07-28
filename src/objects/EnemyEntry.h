@@ -32,6 +32,7 @@ struct EnemyEntry: public ResourceEntryBase {
 	LuaLazyValue init_event, step_event, draw_event, death_event;
 	LuaValue console_draw_func, target_draw_func;
 	StatusEffectModifiers effect_modifiers;
+	LuaValue raw_table;
 
 	void init(lua_State* L) {
 		init_event.initialize(L);

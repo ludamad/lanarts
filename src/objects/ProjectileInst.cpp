@@ -196,7 +196,8 @@ void ProjectileInst::step(GameState* gs) {
 		effstats = lua_attack_stats_callback(L,
 			  projectile.projectile_entry().attack_stat_func,
 			  effstats, origin, victim);
-		effstats = lua_hit_callback(projectile.projectile_entry().action_func().get(L), effstats, this, victim);
+		auto& entry = projectile.projectile_entry();
+		effstats = lua_hit_callback(entry.action_func().get(L), effstats, this, victim);
 
 		if (gs->game_settings().verbose_output) {
 			char buff[100];
@@ -205,7 +206,7 @@ void ProjectileInst::step(GameState* gs) {
 			gs->for_screens([&]() {gs->game_chat().add_message(buff);});
 		}
 
-		if (effstats.damage > 0 && !projectile.projectile_entry().deals_special_damage) {
+		if (effstats.damage > 0 && !entry.deals_special_damage) {
 			if (dynamic_cast<PlayerInst *>(victim)) {
 				play(hurt_sound, "sound/player_hurt.ogg");
 			}
@@ -215,7 +216,9 @@ void ProjectileInst::step(GameState* gs) {
 					play(minor_missile_sound, "sound/minor_missile.ogg");
 				}
 			});
-			victim->damage(gs, effstats, origin);
+			float final_damage = 0;
+			victim->damage(gs, effstats, origin, &final_damage);
+			lcall(entry.attack.on_damage, this, victim, final_damage);
 		}
 	}
 

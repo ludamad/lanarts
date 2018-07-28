@@ -72,6 +72,7 @@ void ClassEntry::parse_lua_table(const LuaValue& table) {
 	for (int i = 1; i <= sprite_len; i++) {
 		this->sprites.push_back(res::sprite_id(sprites[i].to_str()));
 	}
+	raw_table = table;
 }
 namespace res {
 	::class_id class_id(const char* name) {

@@ -4,7 +4,7 @@ local GameState = require "core.GameState"
 local Map = require "core.Map"
 local DataW = require "DataWrapped"
 local Bresenham = require "core.Bresenham"
-local EffectUtils = require "spells.EffectUtils"
+local TypeEffectUtils = require "spells.TypeEffectUtils"
 local SpellObjects = require "objects.SpellObjects"
 
 -- Effects:
@@ -218,8 +218,8 @@ function Pain.action_func(caster, x, y, target)
     aura.range = eff_range
     play_pained_sound()
     local damage, power = random(3, 9), random(3,5) + stats.magic
-    power = power + EffectUtils.get_power(caster, "Black")
-    damage = damage * EffectUtils.get_resistance(target, "Black")
+    power = power + TypeEffectUtils.get_power(caster, "Black")
+    damage = damage * TypeEffectUtils.get_resistance(target, "Black")
     if target:damage(damage, power, 1, caster) then
         play_sound "sound/painkill.ogg"
         if caster:has_effect("AmuletGreatPain") then
@@ -365,7 +365,7 @@ function GreaterPain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
     caster:direct_damage(60)
     caster:add_effect("Pained", 50)
-    local power = EffectUtils.get_power(caster, "Black")
+    local power = TypeEffectUtils.get_power(caster, "Black")
     caster:add_effect("Pain Aura", {time_left = 100 + power * 25, damage = 5, range = GreaterPain.range + (caster.stats.level + power)* 5})
     for _ in screens() do
         if caster:is_local_player() then
@@ -424,7 +424,7 @@ function FearStrike.action_func(caster, x, y)
         return
     end
     caster:melee(closest_mon)
-    if chance(math.min(1.0, EffectUtils.get_resistance(closest_mon, 'Black'))) then
+    if chance(math.min(1.0, TypeEffectUtils.get_resistance(closest_mon, 'Black'))) then
         closest_mon:add_effect("Fear", 100)
     end
     for _ in screens() do

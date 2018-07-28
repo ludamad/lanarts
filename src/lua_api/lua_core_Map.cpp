@@ -374,7 +374,7 @@ static int gmap_set_vision_radius(LuaStackValue map_obj, int vision_radius) {
     return 0;
 }
 
-const int MAX_RET = 16;
+const int MAX_RET = 64;
 
 static int gmap_object_collision_check(lua_State* L) {
     GameState* gs = lua_api::gamestate(L);

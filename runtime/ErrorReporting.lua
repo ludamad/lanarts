@@ -4,6 +4,7 @@
 
 local AnsiColors -- Lazy imported
 local MoonscriptErrors = require("moonscript.errors")
+local M -- Forward declare for inner functions
 
 -- **Hack:
 local function real_path_to_virtual(s) return s end
@@ -53,19 +54,18 @@ end
 local FILE_LINE_MATCHER = modulestart("%s*[^%.]+%.lua:%d+:%s*")
 
 -- Configuration
-local M -- Forward declare for inner functions
 M = {
     filter_patterns = {
 --        -- Lines to delete starting with this line and going up
         ["moon:"] = 1, -- Filter moonscript's addition to the traceback
         ["stack traceback:"] = 1,
         [".*ErrorReporting%.lua"] = 1,
---        [modulestart "GlobalVariableLoader%.lua:.*'__index'"] = 1,
---        [modulestart "Globals%.lua:.*'errorf'"] = 2,
---        [modulestart "globals/LuaJITReplacements%.lua:.*'__index'"] = 2,
---        [modulestart "Main.lua"] = 1,
---        [modulestart "TestRunner.lua:[^']+'main'"] = 1,
---        ["%s*%[C%]: in function 'error'"] = 4
+        [modulestart "GlobalVariableLoader%.lua:.*'__index'"] = 1,
+        [modulestart "Globals%.lua:.*'errorf'"] = 2,
+        [modulestart "globals/LuaJITReplacements%.lua:.*'__index'"] = 2,
+        [modulestart "Main.lua"] = 1,
+        [modulestart "TestRunner.lua:[^']+'main'"] = 1,
+        ["%s*%[C%]: in function 'error'"] = 4
     },
 --    
     stacktrace_replacements = {
@@ -230,7 +230,6 @@ function M.traceback(--[[Optional]] str)
     while i <= #stacktrace do
         i = i + 1 - resolve_deletions(stacktrace, i)
     end
-    do return traceback end
     stacktrace = combine_cpp_traceback_with_lua(stacktrace)
     for i=1,#stacktrace do
         stacktrace[i] = colfmt('{red:%d} %s', i, stacktrace[i]:trim())
@@ -247,7 +246,7 @@ function M.traceback(--[[Optional]] str)
 end
 
 AnsiColors = require "terminal.AnsiColors" -- Lazy import
---debug.traceback = M.traceback
-debug.traceback = require('ltraceback').stacktrace
+debug.traceback = M.traceback
+--debug.traceback = require('ltraceback').stacktrace
 
 return M

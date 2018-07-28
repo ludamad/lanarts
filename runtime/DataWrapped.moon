@@ -1,4 +1,4 @@
-EffectUtils = require "spells.EffectUtils"
+TypeEffectUtils = require "spells.TypeEffectUtils"
 GameObject = require "core.GameObject"
 
 draw_console_effect = (sprite, text, xy, color = COL_PALE_YELLOW) ->
@@ -32,6 +32,9 @@ effect_create = (args) ->
     args.remove_derived_func or= (obj, args) =>
         @n_derived = 0
         @active = (@time_left > 0)
+    -- Corresponds to an application from obj\add "effect"
+    -- Represents a dynamic addition of an effect, not one 
+    -- statically determined from a character's equipment.
     args.apply_buff_func or= (obj, args) =>
         @active = true
         if wrapped_apply
@@ -164,14 +167,14 @@ add_cooldown_multiplier = (args, f1) ->
 
 add_types = (args, types) ->
     for type in *types
-        assert table.contains(EffectUtils.TYPES, type), "Invalid type!"
+        assert table.contains(TypeEffectUtils.TYPES, type), "Invalid type!"
         add_on_hit_func args, (obj, target, atkstats) ->
-            atkstats.power += EffectUtils.get_power(obj, type)
-            atkstats.type_multiplier *= EffectUtils.get_resistance(target, type)
+            atkstats.power += TypeEffectUtils.get_power(obj, type)
+            atkstats.type_multiplier *= TypeEffectUtils.get_resistance(target, type)
 
 power_effects = (powers, effects = {}) ->
     for type, power in pairs powers
-        assert table.contains(EffectUtils.TYPES, type), "Invalid type!"
+        assert table.contains(TypeEffectUtils.TYPES, type), "Invalid type!"
         if power == 0 -- Special case for simplifying code-generated content
             continue
         append effects, {"#{type}Power", {:power}}
@@ -179,7 +182,7 @@ power_effects = (powers, effects = {}) ->
 
 resistance_effects = (resists, effects = {}) ->
     for type, resist in pairs resists
-        assert table.contains(EffectUtils.TYPES, type), "Invalid type!"
+        assert table.contains(TypeEffectUtils.TYPES, type), "Invalid type!"
         if resist == 0 -- Special case for simplifying code-generated content
             continue
         append effects, {"#{type}Resist", {:resist}}
@@ -240,7 +243,7 @@ spell_create = (args) ->
     if args.types
         for type in *args.types
             add_cooldown_multiplier args, () =>
-                return 1 - EffectUtils.get_power(@, type) * 0.03
+                return 1 - TypeEffectUtils.get_power(@, type) * 0.03
     for type in *(args.types or {})
         add_console_draw_func args, (caster, get_next) ->
             E = require "spells.Effects"
@@ -309,7 +312,7 @@ enemy_create = (args) ->
 
     -- If no resistances provided, derive based on provided types
     if args.resistances == nil and args.types ~= nil
-        args.resistances = EffectUtils.get_monster_resistances(args.types)
+        args.resistances = TypeEffectUtils.get_monster_resistances(args.types)
 
     -- Compile resistances into effects
     if args.resistances ~= nil
@@ -318,6 +321,22 @@ enemy_create = (args) ->
 
     -- Update enemy information drawing based on provided types
     for type in *(args.types or {})
+        switch type
+            when "Red"
+                args.flammability = 0.5
+                args.poisonability = 1
+            when "Blue"
+                args.flammability = 0.5
+                args.poisonability = 1
+            when "Black"
+                args.flammability = 1
+                args.poisonability = 1
+            when "White"
+                args.flammability = 1
+                args.poisonability = 1
+            when "Green"
+                args.flammability = 1.5
+                args.poisonability = 0.5
         add_console_draw_func args, (edata, get_next) ->
             E = require "spells.Effects"
             switch type

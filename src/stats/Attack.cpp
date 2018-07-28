@@ -17,6 +17,7 @@ Attack parse_attack(const LuaField& field) {
 	if (!field["on_hit_func"].isnil()) {
 		atk.attack_action.action_func = LuaLazyValue(LuaValue(field["on_hit_func"]));
 	}
+	atk.on_damage = field["on_damage"];
 	return atk;
 }
 

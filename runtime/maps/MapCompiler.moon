@@ -284,6 +284,11 @@ MapCompiler = newtype {
         @_regions[node] = map_regions
         @_children[node] = children_set
         @_combined_region[node] = assert combined_region, "Need combined_region ~= nil!"
+        for {:polygons} in *children_set
+            for polygon in *polygons
+                for {x,y} in *polygon
+                    assert math.abs(x) ~= math.huge and math.abs(y) ~= math.huge
+        return true
 
     as_owned_regions: (node) => @_regions[node]
     as_children: (node) => @_children[node]
@@ -328,7 +333,7 @@ MapCompiler = newtype {
     -- Depth-first traversal of node tree
     for_all_nodes: (func) =>
         recurse = (node) ->
-            for child in * @_children[node]
+            for child in *@_children[node]
                 recurse(child)
             func(@, node)
         recurse(@root_node)
@@ -492,8 +497,7 @@ MapCompiler = newtype {
             table.clear @_bboxes
             padding = args.padding or 10
             content = args.content or (if rawget(self, 'tileset') then @tileset.wall else 0)
-            val = @_prepare_map_topology(@root_node)
-            if val == false
+            if not @_prepare_map_topology(@root_node)
                 continue
             success = @_prepare_source_map(@label, padding, content)
             if success
@@ -517,35 +521,52 @@ MapCompiler = newtype {
         return gmap
 }
 
-main = (raw_args) ->
-    -- AreaTemplate -> MapAreaSet -> Map
-    area = Spread {
-        regions: for i=1,3
-            Shape {
-                shape: 'deformed_ellipse'
-                size: {(i+5) * 10, (i+5) * 10}
-            }
-        connection_scheme: 'direct'
-        spread_scheme: 'box2d'
-    }
-    rng = require('mtwist').create(os.time())
-    compiler = MapCompiler.create {
-        label: "Demo"
-        :rng,
-        root: area
-    }
-
-    i = 1
-    compiler\for_all_nodes (node) =>
-        @apply node, {
-            operator: {
-                remove: SourceMap.FLAG_SOLID
-                add: SourceMap.FLAG_SEETHROUGH
-                content: i
-            }
-        }
-        i += 1
+display = (compiler) ->
+    compiler\prepare()
     DebugUtils.enable_visualization(800, 600)
     DebugUtils.debug_show_source_map(compiler.map)
+
+main = (raw_args) ->
+    {:DragonLair} = require 'maps.Places'
+    rng = require('mtwist').create(os.time())
+    for i=1,10
+        compiler = DragonLair.create {
+            label: "Demo"
+            :rng
+        }
+        display(compiler)
+
+    --TileSets = require "tiles.Tilesets"
+    ---- AreaTemplate -> MapAreaSet -> Map
+    --area = Spread {
+    --    regions: for i=1,3
+    --        Shape {
+    --            shape: 'deformed_ellipse'
+    --            size: {(i+5) * 10, (i+5) * 10}
+    --        }
+    --    connection_scheme: 'direct'
+    --    spread_scheme: 'box2d'
+    --}
+    --compiler = MapCompiler.create {
+    --    label: "Demo"
+    --    :rng,
+    --    root: area
+    --    generate: (args) =>
+    --}
+    --compiler.tileset = TileSets.lair
+
+    --i = 1
+    --compiler\prepare()
+    ----compiler\for_all_nodes (node) =>
+    ----    @apply node, {
+    ----        operator: {
+    ----            remove: SourceMap.FLAG_SOLID
+    ----            add: SourceMap.FLAG_SEETHROUGH
+    ----            content: i
+    ----        }
+    ----    }
+    ----    i += 1
+    --DebugUtils.enable_visualization(800, 600)
+    --DebugUtils.debug_show_source_map(compiler.map)
 
 return {:MapCompiler, :main}

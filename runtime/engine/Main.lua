@@ -26,11 +26,26 @@ local function main(raw_args)
     -- Delegate to the passed module
     -- COMPATIBLITY with lua utilities:
     rawset(_G, 'arg', raw_args)
-    local main = require(module_name)
-    if type(main) ~= "function" then
-        return nil
+    if not run_target:find("engine%.") then
+        local StartEngine = require "engine.StartEngine"
+        return StartEngine.start_engine {
+            settings = { -- Settings object
+                -- Window settings
+                fullscreen = false,
+                view_width = 640,
+                view_height = 480,
+                -- Font settings
+                font = 'fonts/Gudea-Regular.ttf',
+                menu_font = 'fonts/alagard_by_pix3m-d6awiwp.ttf'
+            },
+            entry_point = function() 
+                require(module_name).main(raw_args)
+            end
+        }
+    else 
+        local main = require(module_name)
+        return main(raw_args)
     end
-    return main(raw_args)
 end
 
 return main

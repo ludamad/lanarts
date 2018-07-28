@@ -446,6 +446,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 
     float final_dmg = 0;
     isdead = inst->damage(gs, atkstats, this, &final_dmg);
+    lcall(weapon.weapon_entry().attack.on_damage, this, inst, final_dmg);
 
     effects.for_each([&](Effect& eff) {
         lcall(/*func:*/ eff.entry().on_melee_func, /*args:*/ eff.state, this, inst, final_dmg);
