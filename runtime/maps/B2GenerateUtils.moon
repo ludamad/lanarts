@@ -124,6 +124,9 @@ B2ShapeConnector = newtype {
 
         -- Find closest points:
         p1, p2, dist = B2Utils.body_distance(body_a, body_b)
+        if not p1 or not p2
+            return false
+
         x1, y1 = p1.x, p1.y
         x2, y2 = p2.x, p2.y
         local dx, dy

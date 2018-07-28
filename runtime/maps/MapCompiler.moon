@@ -422,6 +422,8 @@ MapCompiler = newtype {
         bbox = map_region_bbox @_combined_region[@root_node]
         -- Assert that our polygons fit within our created source map bounds:
         w, h = bbox[3] - bbox[1], bbox[4] - bbox[2]
+        if math.abs(w) == math.huge or math.abs(h) == math.huge
+            return false
         -- TODO DEBUG-ONLY CHECK Really make sure we are drawing in correct bounds
 
         @_combined_region[@root_node]\translate(-bbox[1] + padding, -bbox[2] + padding)

@@ -6,7 +6,7 @@ Display = require "core.Display"
 DataW = require "DataWrapped"
 ObjectUtils = require "objects.ObjectUtils"
 SpellUtils = require "spells.SpellUtils"
-EffectUtils = require "spells.EffectUtils"
+TypeEffectUtils = require "spells.TypeEffectUtils"
 
 M = nilprotect {
     _fire: tosprite "spr_effects.fire-anim"
@@ -66,7 +66,7 @@ SpawnedFire = RingFireBase {
         @damage_cooldowns = {} -- takes [dx][dy][obj]
         @base_init(args)
     _on_kill: (obj) => 
-        r_pow = EffectUtils.get_power(@caster, 'Red')
+        r_pow = TypeEffectUtils.get_power(@caster, 'Red')
         -- Augment chain fire chance with Red power
         if chance(.1 + 0.4 * bounds_percentage(r_pow, 0, 4))
             mon_name = SpellUtils.mon_title(obj)
@@ -120,7 +120,7 @@ RingOfFire = RingFireBase {
             xy: obj.xy -- Create around the damaged enemy
             duration: 40
         }
-        r_pow = EffectUtils.get_power(@caster, 'Red')
+        r_pow = TypeEffectUtils.get_power(@caster, 'Red')
         -- Very rare: Ring of fire creates mana potion.
         if chance(0.01 * bounds_percentage(r_pow, 2, 4))
             SpellUtils.message(@caster, "Your awesome fire magic creates a red mana potion!", COL_PALE_BLUE)
@@ -181,12 +181,12 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        duration = 350 + 100 * bounds_percentage(EffectUtils.get_power(caster, 'Red'), 0, 4)
+        duration = 350 + 100 * bounds_percentage(TypeEffectUtils.get_power(caster, 'Red'), 0, 4)
         GameObject.add_to_level RingOfFire.create({:caster, :duration})
         caster\add_effect "Ring of Flames Stat Boost", duration
     console_draw_func: (get_next) =>
         damage = math.floor(RingOfFire._damage * 60 / 5)
-        power = @effective_stats().magic + EffectUtils.get_power(@, "Red")
+        power = @effective_stats().magic + TypeEffectUtils.get_power(@, "Red")
         draw_console_effect get_next(), tosprite("spr_spells.spell_icon_ring_of_flames"), {
             {COL_PALE_GREEN, damage}
             {COL_PALE_YELLOW, " damage per second"}
@@ -214,19 +214,13 @@ DataW.effect_create {
         @kill_tracker = caster.kills
         @max_time = math.max(@max_time or 0, time_left)
         @extensions = 0
-    --remove_func: (caster) =>
-    --    caster\add_effect("Exhausted", @exhausted_duration)
-    --    for _ in screens()
-    --        if caster\is_local_player()
-    --            play_sound "sound/exhausted.ogg"
-    --            EventLog.add("You are now exhausted...", {255,200,200})
     step_func: (caster) =>
         time_passed = @max_time - @time_left
         if time_passed % 20 == 0
             play_sound "sound/ringfire-loop.ogg"
         diff = math.max(caster.kills - @kill_tracker, 0)
         for i=1,diff
-            @time_left = math.min(@max_time * 1.5, @time_left + 60 + EffectUtils.get_power(caster, 'Red') * 5)
+            @time_left = math.min(@max_time * 1.5, @time_left + 60 + TypeEffectUtils.get_power(caster, 'Red') * 5)
             for _ in screens()
                 if caster\is_local_player()
                     EventLog.add("Your inner fire grows ...", {200,200,255})
@@ -244,7 +238,7 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        caster\add_effect "Inner Fire", 300 + 200 * bounds_percentage(caster.stats.level + EffectUtils.get_power(caster, 'Red'), 0, 10)
+        caster\add_effect "Inner Fire", 300 + 200 * bounds_percentage(caster.stats.level + TypeEffectUtils.get_power(caster, 'Red'), 0, 10)
     console_draw_func: (get_next) =>
         draw_console_effect get_next(), tosprite("fire bolt"), {
             {COL_PALE_GREEN, "4x Fire Bolts"}
@@ -257,6 +251,68 @@ DataW.spell_create {
     cooldown: 0
 }
 ----------------- </INNER FIRE IMPL> ---------------------
+
+DataW.effect_create {
+    -- Burn has 4 distinct states:
+    -- - 
+    name: "Burn"
+    can_use_rest: false
+    fade_out: 5
+    effected_colour: {255,160,160}
+    effected_sprite: "spr_effects.inner_flame"
+    apply_func: (caster, time_left) =>
+        @kill_tracker = caster.kills
+        @max_time = math.max(@max_time or 0, time_left)
+        @extensions = 0
+    step_func: (caster) =>
+        time_passed = @max_time - @time_left
+        if time_passed % 20 == 0
+            play_sound "sound/ringfire-loop.ogg"
+        diff = math.max(caster.kills - @kill_tracker, 0)
+        for i=1,diff
+            @time_left = math.min(@max_time * 1.5, @time_left + 60 + TypeEffectUtils.get_power(caster, 'Red') * 5)
+            for _ in screens()
+                if caster\is_local_player()
+                    EventLog.add("Your inner fire grows ...", {200,200,255})
+                    play_sound "sound/berserk.ogg"
+            @extensions += 1
+        @kill_tracker = caster.kills
+}
+
+-- FIRE STORM
+DataW.spell_create {
+    name: "Fire Storm",
+    spr_spell: "fire bolt",
+    description: "A fast bolt of fire. Burns target over time. Burning targets spread fire when hit",
+    types: {"Red"}
+    projectile: {
+        speed: 7
+        damage_multiplier: 1.25
+        spr_attack: "fire bolt"
+        on_deinit: () =>
+            if @caster.destroyed
+                return
+            r_pow = TypeEffectUtils.get_power(@caster, 'Red')
+            if @caster\has_effect "Inner Fire"
+                SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
+                GameObject.add_to_level SpawnedFire.create {
+                    caster: @caster
+                    xy: @xy
+                    duration: 20 + r_pow * 3
+                }
+            -- Very rare, high power red mages: Spawned fire is created.
+            elseif chance(0.05 * bounds_percentage(r_pow, 4, 10))
+                SpellUtils.message(@caster, "Fire springs forth from the fire bolt due to your great Red Power!", COL_PALE_BLUE)
+                GameObject.add_to_level SpawnedFire.create {
+                    caster: @caster
+                    xy: @xy
+                    duration: 20 + r_pow * 3
+                }
+
+    }
+    mp_cost: 10,
+    cooldown: 35
+}
 
 -- FIRE BOLT
 DataW.spell_create {
@@ -271,7 +327,7 @@ DataW.spell_create {
         on_deinit: () =>
             if @caster.destroyed
                 return
-            r_pow = EffectUtils.get_power(@caster, 'Red')
+            r_pow = TypeEffectUtils.get_power(@caster, 'Red')
             if @caster\has_effect "Inner Fire"
                 SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
                 GameObject.add_to_level SpawnedFire.create {

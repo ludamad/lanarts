@@ -3,7 +3,7 @@
 -- and then is created based on selection from score range.
 
 DataWrapped = require "DataWrapped"
-TYPES = require("spells.EffectUtils").TYPES
+TYPES = require("spells.TypeEffectUtils").TYPES
 
 _STAT_BONUSES = {
     enchantment: (level) =>

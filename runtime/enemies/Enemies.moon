@@ -3,7 +3,7 @@ ObjectUtils = require "objects.ObjectUtils"
 DataW = require "DataWrapped"
 GameObject = require "core.GameObject"
 World = require "core.World"
-EffectUtils = require "spells.EffectUtils"
+TypeEffectUtils = require "spells.TypeEffectUtils"
 
 random_xy_near = (obj) -> {obj.x + random(-32,32), obj.y + random(-32, 32)}
 -- ELEMENTAL ENEMIES --
@@ -658,7 +658,7 @@ DataW.enemy_create {
         spr_attack: 'nessos arrows'
         power: {base: {10, 10}}
         on_hit_func: (target, atkstats) =>
-            if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
+            if chance(.25 * TypeEffectUtils.get_resistance(target, 'Green'))
                 target\add_effect "Poison", {
                     time_left: 100
                     poison_rate: 25
@@ -697,7 +697,7 @@ DataW.enemy_create {
         spr_attack: 'nessos arrows'
         types: {"Piercing"}
         on_hit_func: (target, atkstats) =>
-            if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
+            if chance(.25 * TypeEffectUtils.get_resistance(target, 'Green'))
                 target\add_effect "Poison", {
                     time_left: 100
                     poison_rate: 25
@@ -1152,7 +1152,7 @@ DataW.enemy_create {
         spr_attack: 'stone_arrow_projectile'
         power: {base: {10, 10}}
         on_hit_func: (target, atkstats) =>
-            if chance(.25 * EffectUtils.get_resistance(target, 'Green'))
+            if chance(.25 * TypeEffectUtils.get_resistance(target, 'Green'))
                 target\add_effect "Exhausted", 5
     }
 }

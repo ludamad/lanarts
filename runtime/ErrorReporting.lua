@@ -248,5 +248,6 @@ end
 
 AnsiColors = require "terminal.AnsiColors" -- Lazy import
 --debug.traceback = M.traceback
+debug.traceback = require('ltraceback').stacktrace
 
 return M

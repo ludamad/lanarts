@@ -7,7 +7,7 @@ Bresenham = require "core.Bresenham"
 Display = require "core.Display"
 SpellObjects = require "objects.SpellObjects"
 DataW = require "DataWrapped"
-EffectUtils = require "spells.EffectUtils"
+TypeEffectUtils = require "spells.TypeEffectUtils"
 
 DataW.effect_create {
     name: "Poison"
@@ -32,7 +32,7 @@ DataW.effect_create {
             @steps += 1
         else
             @steps = 0
-            obj\damage(@damage / 2, @power, @magic_percentage, @attacker, (EffectUtils.get_resistance obj, "Green"))
+            obj\damage(@damage / 2, @power, @magic_percentage, @attacker, (TypeEffectUtils.get_resistance obj, "Green"))
 }
 
 DataW.effect_create {
@@ -362,8 +362,8 @@ DataW.additive_effect_create {
     on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Poison")
             return
-        power = EffectUtils.get_power(attacker, "Green")
-        resist = EffectUtils.get_resistance(defender, "Green")
+        power = TypeEffectUtils.get_power(attacker, "Green")
+        resist = TypeEffectUtils.get_resistance(defender, "Green")
         poison_chance = @_get_value()
         if chance(poison_chance * resist)
             eff = defender\add_effect "Poison", {
@@ -804,8 +804,8 @@ DataW.effect_create {
                 caster\add_effect("Pained", 50)
                 stats = caster\effective_stats()
                 damage, power = @damage, random(2,5) + stats.magic
-                power = power + EffectUtils.get_power(caster, "Black")
-                type_multiplier = EffectUtils.get_resistance(mon, "Black")
+                power = power + TypeEffectUtils.get_power(caster, "Black")
+                type_multiplier = TypeEffectUtils.get_resistance(mon, "Black")
                 if mon\damage(damage, power, 1, caster, type_multiplier) then
                     {:stats} = caster
                     {:max_hp} = mon\effective_stats()

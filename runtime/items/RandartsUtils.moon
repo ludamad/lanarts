@@ -1,5 +1,5 @@
 RandartsBonuses = require "items.RandartsBonuses"
-EffectUtils = require "spells.EffectUtils"
+TypeEffectUtils = require "spells.TypeEffectUtils"
 
 get_resource_names = (type) ->
     randart_images = require("compiled.Resources").resource_id_list
@@ -161,7 +161,7 @@ apply_random_effect = () =>
             "PoisonedWeapon"
             "KnockbackWeapon"
         } 
-        for type in *EffectUtils.TYPES
+        for type in *TypeEffectUtils.TYPES
             if _is_armour(@) and type ~= "Slashing" and type ~= "Bludgeon" -- Only have piercing resist ATM
                 append effects, "#{type}Resist"
             if not _is_armour(@) and type ~= "Slashing" and type ~= "Bludgeon" and type ~= "Piercing"

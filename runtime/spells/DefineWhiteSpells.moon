@@ -6,7 +6,7 @@ Display = require "core.Display"
 DataW = require "DataWrapped"
 ObjectUtils = require "objects.ObjectUtils"
 SpellUtils = require "spells.SpellUtils"
-EffectUtils = require "spells.EffectUtils"
+TypeEffectUtils = require "spells.TypeEffectUtils"
 
 M = nilprotect {
     _flash: tosprite "spr_effects.tornado"
@@ -15,8 +15,8 @@ M = nilprotect {
 
 -- A standardized stun for white mage:
 try_stun = (caster, mon) ->
-    white_power = EffectUtils.get_power(caster, "White")
-    resist = math.min(1.25, EffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
+    white_power = TypeEffectUtils.get_power(caster, "White")
+    resist = math.min(1.25, TypeEffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
     if not mon.is_enemy
         resist = 0.5
     if chance(resist)
@@ -99,7 +99,7 @@ DataW.spell_create {
         on_hit_func: (target, atkstats) =>
             if @caster
                 return
-            white_power = EffectUtils.get_power(@caster, "White")
+            white_power = TypeEffectUtils.get_power(@caster, "White")
             prob = interpolate(white_power, 0, 5, 0.0, 0.2)
             if chance(prob)
                 try_stun(@caster, target)
@@ -128,7 +128,7 @@ DataW.spell_create {
         on_hit_func: (target, atkstats) =>
             if @caster
                 return
-            white_power = EffectUtils.get_power(@caster, "White")
+            white_power = TypeEffectUtils.get_power(@caster, "White")
             prob = interpolate(white_power, 0, 5, 0.0, 0.2)
             if chance(prob)
                 try_stun(@caster, target)
@@ -226,12 +226,12 @@ DataW.effect_create {
 --    fallback_to_melee: false
 --    action_func: (caster, x, y) ->
 --        GameObject.add_to_level Flash.create({:caster, duration: 100, damage: 10})
---        --white_power = EffectUtils.get_power(caster, "White")
+--        --white_power = TypeEffectUtils.get_power(caster, "White")
 --        --for_all_visible_mons caster, (mon) ->
---        --    resist = math.min(1.25, EffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
+--        --    resist = math.min(1.25, TypeEffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
 --        --    mon\add_effect("Stunned", (100 + white_power * 10) * resist)
 --        --SpellUtils.message(caster, "You try to daze all enemies in sight!", {200,200,255})
---        ----caster\add_effect("Blinding Light", 500 + EffectUtils.get_power(caster,"White")*100)
+--        ----caster\add_effect("Blinding Light", 500 + TypeEffectUtils.get_power(caster,"White")*100)
 --        play_sound "sound/ludaze.ogg"
 --    autotarget_func: (caster) -> caster.x, caster.y
 --    prereq_func: (caster) -> 

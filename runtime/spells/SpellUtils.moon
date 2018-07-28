@@ -6,14 +6,14 @@ Display = require "core.Display"
 DataW = require "DataWrapped"
 LuaGameObject = require "objects.LuaGameObject"
 ObjectUtils = require "objects.ObjectUtils"
-EffectUtils = require "spells.EffectUtils"
+TypeEffectUtils = require "spells.TypeEffectUtils"
 
 do_damage = (caster, types, target, damage, power = 0, magic_percentage = 1) ->
     stats = caster\effective_stats()
     power += magic_percentage * stats.magic + (1 - magic_percentage) * stats.strength
     for type in *types
-        power += EffectUtils.get_power(caster, type)
-        damage *= EffectUtils.get_resistance(target, type)
+        power += TypeEffectUtils.get_power(caster, type)
+        damage *= TypeEffectUtils.get_resistance(target, type)
     return target\damage(damage, power, magic_percentage, caster)
 
 spell_object_type = (T) ->
@@ -37,7 +37,7 @@ spell_object_type = (T) ->
     T.caster_type_power = () =>
         power = 0
         for type in *@types
-            power += EffectUtils.get_power(@caster, type)
+            power += TypeEffectUtils.get_power(@caster, type)
         return power
     T.do_damage = (target, damage, power = 0, magic_percentage = 1) =>
         return do_damage(@caster, @types, target, damage, power, magic_percentage)

@@ -58,7 +58,11 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 	GameTiles& tiles = gs->tiles();
 	GameView& view = gs->view();
 
+#ifdef DEBUG
 	bool minimap_reveal = gs->key_down_state(SDLK_z);
+#else
+	bool minimap_reveal = false;
+#endif
 
 	std::vector<PlayerInst*> players = gs->player_data().players_in_level(gs->get_level()->id());
 	for (int y = 0; y < shown.height(); y++) {
