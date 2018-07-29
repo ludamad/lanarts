@@ -340,6 +340,7 @@ DataW.effect_create {
         --elseif @in_time_slice(0.9, 1)
         --    alpha = 1.0 - @get_progress(0.9, 1)
         if @intensity > INTENSITY_SPREAD_INTERVAL
+            nil
             --ObjectUtils.screen_draw(M._fire, inst.xy, 0.8, @n_steps)
             --font_cached_load(settings.font, 20)\draw {
             --    color: COL_WHITE
