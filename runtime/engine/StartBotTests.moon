@@ -8,11 +8,11 @@ EventLog = require "ui.EventLog"
 -- ProgrammableInputSource = require "input.ProgrammableInputSource"
 -- BotInputSource = require "ai.BotInputSource"
 
-game_init = (seed) ->
+game_init = (seed, class_name) ->
     GameState = require("core.GameState")
     -- Player config
     GameState.clear_players()
-    GameState.register_player 'Playabot', 'Fighter', -- Name and class
+    GameState.register_player 'Playabot', class_name, -- Name and class
         (require("ai.BotInputSource").create), -- input source
         true, 0, --netid
         0 -- team
@@ -45,6 +45,7 @@ run_bot_tests = (raw_args) ->
     parser\option("--steps", "Maximum number of steps to take.", nil)
     parser\option("--event_log", "Event log to write to.", nil)
     parser\option("--seed", "Starting seed.", "12345678")
+    parser\option("--class", "Bot class.", "Fighter")
     parser\option("--comparison_event_log", "Event log to compare to.", nil)
     args = parser\parse(raw_args)
 
@@ -53,7 +54,7 @@ run_bot_tests = (raw_args) ->
     game_start = () ->
         return ResourceLoading.ensure_resources_before () ->
             -- (1) Init game
-            game_init(tonumber(args.seed))
+            game_init(tonumber(args.seed), args.class)
 
             -- (2) Set up input for first game step
             GameState = require("core.GameState")
