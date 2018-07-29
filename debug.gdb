@@ -5,7 +5,7 @@ break abort
 catch throw
 set $_exitcode = -1
 run
-#if $_exitcode != 0
-#    info stack
-#end
-#quit $_exitcode
+if $_exitcode != 0
+    info stack
+end
+quit $_exitcode
