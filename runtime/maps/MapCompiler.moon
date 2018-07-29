@@ -431,7 +431,6 @@ MapCompiler = newtype {
 
     _prepare_source_map: (label, padding, content) =>
         -- Correct map topology:
-        pretty @_combined_region[@root_node]
         bbox = map_region_bbox @_combined_region[@root_node]
         -- Assert that our polygons fit within our created source map bounds:
         w, h = bbox[3] - bbox[1], bbox[4] - bbox[2]

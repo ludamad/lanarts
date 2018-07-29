@@ -91,6 +91,11 @@ run_bot_tests = (raw_args) ->
 
             -- (5) Loop again
             return step
+        EngineHooks.game_won = () ->
+            -- Exit on next step
+            print "GAME WAS WON"
+            step = () ->
+                return nil
         return step()
 
     return StartEngine.start_engine {

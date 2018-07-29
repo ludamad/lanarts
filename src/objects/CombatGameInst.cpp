@@ -463,8 +463,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 
     WeaponEntry& wentry = weapon.weapon_entry();
     if (wentry.name != "none") {
-        gs->add_instance(
-                new AnimatedInst(inst->ipos(), wentry.attack_sprite(), 25));
+        gs->add_instance<AnimatedInst>(inst->ipos(), wentry.attack_sprite(), 25);
     }
 
     signal_attacked_successfully();

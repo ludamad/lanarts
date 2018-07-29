@@ -253,8 +253,8 @@ DataW.spell_create {
 ----------------- </INNER FIRE IMPL> ---------------------
 
 FLAME_RATE = 30
-MAX_INTENSITY = 300
-INTENSITY_SPREAD_INTERVAL = 60
+MAX_INTENSITY = 60 * 20 -- 20 seconds
+INTENSITY_SPREAD_INTERVAL = MAX_INTENSITY / 3
 
 get_burn_intensity = (inst) ->
     if inst\has_effect("Burn")
@@ -276,7 +276,7 @@ apply_burn_damage = (inst, attacker, damage) ->
     -- Calculate burn intensity from damage done
     percent_damage = damage / inst.stats.max_hp
     intensity = percent_damage * 100
-    intensity = 100
+    intensity = INTENSITY_SPREAD_INTERVAL
     apply_burn_intensity(inst, attacker, intensity)
     
 DataW.effect_create {
@@ -310,6 +310,11 @@ DataW.effect_create {
             percentage_loss = percentage_intensity / 20
             damage = percentage_loss * inst.stats.max_hp
             @spread_fire(inst)
+            GameObject.animation_create {
+                xy: inst.xy
+                sprite: "spr_effects.fire-anim"
+                duration: 25
+            }
             -- Make sure to destroy object only AFTER fire spreading
             inst\direct_damage(damage, @attacker)
     spread_fire: (inst) =>
@@ -324,21 +329,22 @@ DataW.effect_create {
             obj_intensity = get_burn_intensity(obj)
             if induced_intensity <= obj_intensity
                 continue -- Cant induce intensity, lesser induced intensity
-            if chance(0.9)
-                continue -- 90% chance to fail to do anything
+            --if chance(0.9)
+            --    continue -- 90% chance to fail to do anything
             new_intensity = math.min(induced_intensity, obj_intensity + INTENSITY_SPREAD_INTERVAL)
-            apply_burn_intensity inst, @attacker, (new_intensity - obj_intensity) -- delta
+            apply_burn_intensity obj, @attacker, (new_intensity - obj_intensity) -- delta
     draw_func: (inst) =>
         --alpha = 1.0
         --if @in_time_slice(0.0, 0.1)
         --    alpha = @get_progress(0.0, 0.1)
         --elseif @in_time_slice(0.9, 1)
         --    alpha = 1.0 - @get_progress(0.9, 1)
-        ObjectUtils.screen_draw(M._fire, inst.xy, 0.8, @n_steps)
-        font_cached_load(settings.font, 20)\draw {
-            color: COL_WHITE
-            origin: Display.CENTER
-        }, Display.to_screen_xy(inst.xy), tostring(@intensity)
+        if @intensity > INTENSITY_SPREAD_INTERVAL
+            --ObjectUtils.screen_draw(M._fire, inst.xy, 0.8, @n_steps)
+            --font_cached_load(settings.font, 20)\draw {
+            --    color: COL_WHITE
+            --    origin: Display.CENTER
+            --}, Display.to_screen_xy(inst.xy), tostring(@intensity)
 }
 
 -- FIRE STORM
