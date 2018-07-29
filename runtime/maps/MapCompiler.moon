@@ -235,8 +235,10 @@ MapCompiler = newtype {
         switch getmetatable(node)
             when Spread
                 {:name, :regions, :connection_scheme, :spread_scheme} = node
+                assert #regions > 0
                 @_prepare_children_topology(node, regions, children_set)
-                child_regions = [@_combined_region[child] for child in *node.regions]
+                child_regions = [@_combined_region[child] for child in *regions]
+                assert #child_regions > 0
                 -- Handle node spreading
                 if type(spread_scheme) == "function"
                     val = node.spread_scheme(@, node)
@@ -251,13 +253,16 @@ MapCompiler = newtype {
                 else
                     val = @_connect_regions(connection_scheme, child_regions)
                     return false if val == false
+                assert #child_regions > 0
                 combined_region = combine_map_regions(child_regions)
+                assert #combined_region.polygons > 0
                 DebugUtils.visualize_map_regions {regions: child_regions, title: "After connection / spread"}
             when Shape
                 {:name, :shape, :size, :spread_scheme} = node
                 {w, h} = size
                 shape = @_generate_shape(shape,-w/2,-h/2,w,h)
                 region = MapRegion.create(shape)
+                assert #region.polygons > 0
                 append map_regions, region
                 if node.regions
                     scatter_x, scatter_y = math.min(20, w / 10), math.min(20, h / 10)
@@ -274,8 +279,10 @@ MapCompiler = newtype {
                     }
                     combined_region = combine_map_regions(child_regions)
                     combined_region = combine_map_regions({region, combined_region})
+                    assert #combined_region.polygons > 0
                 else
                     combined_region = region
+                    assert #combined_region.polygons > 0
                 DebugUtils.visualize_map_regions {regions: map_regions, title: "Shape"}
             else
                 error("Unknown node")
@@ -284,10 +291,10 @@ MapCompiler = newtype {
         @_regions[node] = map_regions
         @_children[node] = children_set
         @_combined_region[node] = assert combined_region, "Need combined_region ~= nil!"
-        for {:polygons} in *children_set
-            for polygon in *polygons
-                for {x,y} in *polygon
-                    assert math.abs(x) ~= math.huge and math.abs(y) ~= math.huge
+        assert #@_combined_region[node].polygons > 0
+        for polygon in *@_combined_region[node].polygons
+            for {x,y} in *polygon
+                assert math.abs(x) ~= math.huge and math.abs(y) ~= math.huge
         return true
 
     as_owned_regions: (node) => @_regions[node]
@@ -424,6 +431,7 @@ MapCompiler = newtype {
 
     _prepare_source_map: (label, padding, content) =>
         -- Correct map topology:
+        pretty @_combined_region[@root_node]
         bbox = map_region_bbox @_combined_region[@root_node]
         -- Assert that our polygons fit within our created source map bounds:
         w, h = bbox[3] - bbox[1], bbox[4] - bbox[2]
@@ -443,11 +451,6 @@ MapCompiler = newtype {
                     assert x >= padding - 0.1 and x <= w+padding +0.1, "pad=#{padding}, #{x}, #{w}"
                     assert y >= padding - 0.1 and y <= h+padding +0.1 , "pad=#{padding}, #{y}, #{h}"
 
-            --{x1, y1, x2, y2} = @as_bbox(node)
-            --assert x1 >= padding - 0.1 and x2 < w + padding + 0.1
-            --assert y1 >= padding - 0.1 and y2 < h + padding + 0.1
-
-        --print("WIDTH", w, "HEIGHT", h)
         @map = SourceMap.map_create {
             rng: @rng
             :label

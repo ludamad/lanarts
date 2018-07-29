@@ -44,6 +44,17 @@ typecheck = (type) -> (name) -> (obj, args) ->
         error("Invalid argument type #{name} = #{val}")
     obj[name] = args[name]
 
+_flatten = (t, accum={}) ->
+    if getmetatable(t)
+        append accum, t
+    else
+        for elem in *t
+            _flatten(elem, accum)
+    return accum
+
+flat_table = (name) -> (obj, args) ->
+    obj[name] = _flatten(args[name])
+
 any = (name) -> (obj, args) ->
     obj[name] = args[name]
     nil -- do nothing
@@ -79,7 +90,7 @@ _FILL_SCHEMES = {
 
 M.Spread = _node {
     name: optional "string"
-    regions: typecheck "table"
+    regions: flat_table
     connection_scheme: from_set(_CONNECTION_SCHEMES, true)
     spread_scheme: from_set(_SPREAD_SCHEMES, true)
     paint: optional "function"
