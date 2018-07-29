@@ -146,6 +146,8 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	lua_pop(L, 1);
 
 	LuaValue setters = luameta_setters(meta);
+	luawrap::bind_setter(setters["radius"], &GameInst::radius);
+	luawrap::bind_setter(setters["target_radius"], &GameInst::target_radius);
 	LUAWRAP_SETTER(setters, x, double, OBJ->update_position(VAL, OBJ->y));
 	LUAWRAP_SETTER(setters, y, double, OBJ->update_position(OBJ->x, VAL));
 	LUAWRAP_SETTER(setters, xy, PosF, OBJ->update_position(VAL.x, VAL.y));
@@ -209,10 +211,12 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
         luawrap::bind_getter(getters["vy"], &CombatGameInst::vy);
 	luawrap::bind_getter(getters["is_resting"], &CombatGameInst::is_resting);
     LUAWRAP_GETTER(getters, sprite, game_sprite_data.get(OBJ->get_sprite()).sprite);
+	LUAWRAP_GETTER(getters, sprite_name, game_sprite_data.get(OBJ->get_sprite()).name);
     luawrap::bind_getter(getters["team"], &CombatGameInst::team);
     luawrap::bind_getter(getters["vision_radius"], &CombatGameInst::vision_radius);
     luawrap::bind_setter(setters["vision_radius"], &CombatGameInst::vision_radius);
 	getters["stats"].bind_function(lapi_gameinst_stats);
+	LUAWRAP_SETTER(setters, sprite_name, std::string, OBJ->get_sprite() = res::sprite_id(VAL));
 
 	LuaValue methods = luameta_constants(meta);
     methods["is_combat_object"] = true;

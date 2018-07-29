@@ -30,10 +30,9 @@ Data.class_create {
     name: "Pyrocaster",
     sprites: (for i=1,2 do "spr_classes.red_mage#{i}")
     available_spells: {
-        {spell: "Minor Missile", level_needed: 1},
         {spell: "Fire Bolt", level_needed: 1},
         {spell: "Ring of Flames", level_needed: 2},
-        {spell: "Inner Fire", level_needed: 3},
+        {spell: "Dragonform", level_needed: 3},
     },
     start_stats: MAGE_START_STATS
     gain_per_level: MAGE_GAIN_STATS

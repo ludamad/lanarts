@@ -7,5 +7,6 @@ set $_exitcode = -1
 run
 if $_exitcode != 0
     info stack
+    printf "%s", ltraceback(L)
 end
 quit $_exitcode

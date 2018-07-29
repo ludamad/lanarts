@@ -10,6 +10,7 @@ TypeEffectUtils = require "spells.TypeEffectUtils"
 
 M = nilprotect {
     _fire: tosprite "spr_effects.fire-anim"
+    _burning: tosprite "spr_effects.burning"
 }
 
 ----------------- <RING OF FIRE IMPL> ---------------------
@@ -22,6 +23,7 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
         -- Damage cooldowns by individual flame
         @cooldown = args.cooldown or 5
     _on_kill: (obj) => nil -- Default do nothing
+    _on_damage: (obj) => nil
     base_on_step: () =>
         if @caster.is_ghost
             GameObject.destroy(@)
@@ -34,8 +36,10 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
             for obj in *Map.radius_collision_check(@map, 15, {x, y})
                 if damage_cooldown[obj] or (obj.team == nil) or obj.team == @caster.team
                     continue
-                if not obj.destroyed and @do_damage(obj, @_damage)
-                    @_on_kill(obj)
+                if not obj.destroyed 
+                    if @do_damage(obj, @_damage)
+                        @_on_kill(obj)
+                    @_on_damage(obj, @_damage)
                 --    @message "You gain mana from killing #{mon_name}!", COL_PALE_BLUE
                 --    @caster\heal_mp(5)
                 play_sound "sound/ringfire-hit.ogg"
@@ -64,25 +68,41 @@ SpawnedFire = RingFireBase {
     _damage: 2 / 4
     init: (args) =>
         @damage_cooldowns = {} -- takes [dx][dy][obj]
+        @initial_duration = args.duration
+        @fire_radius = args.fire_radius or 1
         @base_init(args)
-    _on_kill: (obj) => 
-        r_pow = TypeEffectUtils.get_power(@caster, 'Red')
-        -- Augment chain fire chance with Red power
-        if chance(.1 + 0.4 * bounds_percentage(r_pow, 0, 4))
+    _on_kill: (obj) =>
+        --r_pow = TypeEffectUtils.get_power(@caster, 'Red')
+        ---- Augment chain fire chance with Red power
+        --if chance(.1 + 0.4 * bounds_percentage(r_pow, 0, 4))
+        --    mon_name = SpellUtils.mon_title(obj)
+        --    SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
+        --    GameObject.add_to_level SpawnedFire.create {
+        --        caster: @caster
+        --        xy: obj.xy -- Create around the damaged enemy
+        --        duration: 40
+        --    }
+        ---- Very rare: Spawned fire creates mana potion.
+        --if chance(0.01 * bounds_percentage(r_pow, 2, 4))
+        --    SpellUtils.message(@caster, "Your awesome fire magic creates a red mana potion!", COL_PALE_BLUE)
+        --    ObjectUtils.spawn_item_near(@caster, "Red Mana Potion", 1, obj.x, obj.y)
+        nil -- Experiment: Don't chain on deaths
+
+    _on_damage: (obj) =>
+        divider = if @fire_radius == 0 then 1 else 3
+        if chance(.15 / divider)
             mon_name = SpellUtils.mon_title(obj)
-            SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
+            SpellUtils.message(@caster, "Suddenly, #{mon_name} catches on fire!", COL_PALE_RED)
             GameObject.add_to_level SpawnedFire.create {
                 caster: @caster
+                fire_radius: 0 -- @fire_radius
                 xy: obj.xy -- Create around the damaged enemy
-                duration: 40
+                cooldown: @cooldown
+                duration: @initial_duration
             }
-        -- Very rare: Spawned fire creates mana potion.
-        if chance(0.01 * bounds_percentage(r_pow, 2, 4))
-            SpellUtils.message(@caster, "Your awesome fire magic creates a red mana potion!", COL_PALE_BLUE)
-            ObjectUtils.spawn_item_near(@caster, "Red Mana Potion", 1, obj.x, obj.y)
 
     for_all_rings: (f) =>
-        rad = 1
+        rad = @fire_radius
         for dy=-rad,rad
             for dx=-rad,rad
                 if math.abs(dx) + math.abs(dy) == 2
@@ -196,7 +216,7 @@ DataW.spell_create {
             {COL_PALE_YELLOW, "Power: "}
             {COL_PALE_GREEN, power}
         }
-    mp_cost: 50
+    mp_cost: 20
     spell_cooldown: 800
     cooldown: 100
 }
@@ -205,7 +225,7 @@ DataW.spell_create {
 
 ----------------- <INNER FIRE IMPL> ---------------------
 DataW.effect_create {
-    name: "Inner Fire"
+    name: "Dragonform"
     can_use_rest: false
     fade_out: 5
     effected_colour: {255,160,160}
@@ -214,31 +234,46 @@ DataW.effect_create {
         @kill_tracker = caster.kills
         @max_time = math.max(@max_time or 0, time_left)
         @extensions = 0
+        -- TODO go farther, have claw as weapon during.
+        @intial_state or= {
+            sprite_name: caster.sprite_name
+            target_radius: caster.target_radius
+        }
+        @fire_sprite_name = caster.sprite_name
+        caster.sprite_name = 'spr_enemies.dragons.fire_dragon'
+    stat_func: (obj, old, new) =>
+        new.defence += 6
+        new.strength += 6
+        new.willpower += 6
+        new.speed *= 0.8
+    remove_func: (caster) =>
+        --if @initial_state
+        caster.sprite_name = @fire_sprite_name --@initial_state.sprite_name
+        --    caster.target_radius = @initial_state.target_radius
     step_func: (caster) =>
         time_passed = @max_time - @time_left
         if time_passed % 20 == 0
             play_sound "sound/ringfire-loop.ogg"
         diff = math.max(caster.kills - @kill_tracker, 0)
         for i=1,diff
-            @time_left = math.min(@max_time * 1.5, @time_left + 60 + TypeEffectUtils.get_power(caster, 'Red') * 5)
+            @time_left = math.min(@max_time * 1.5, @time_left + 10)
             for _ in screens()
                 if caster\is_local_player()
                     EventLog.add("Your inner fire grows ...", {200,200,255})
-                    play_sound "sound/berserk.ogg"
+                    --play_sound "sound/berserk.ogg"
             @extensions += 1
         @kill_tracker = caster.kills
 }
 
-
 DataW.spell_create {
-    name: "Inner Fire"
-    description: "A form of great fire. For a limited time, you rapidly shoot exploding fire bolts."
+    name: "Dragonform"
+    description: "A form of great fire. For a limited time, you become a slow but immensely powerful dragon."
     types: {"Red"}
-    spr_spell: "spr_spells.spell_icon_inner_fire"
+    spr_spell: 'spr_enemies.dragons.fire_dragon'
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        caster\add_effect "Inner Fire", 300 + 200 * bounds_percentage(caster.stats.level + TypeEffectUtils.get_power(caster, 'Red'), 0, 10)
+        caster\add_effect "Dragonform", 300 + 200 * bounds_percentage(caster.stats.level, 0, 10)
     console_draw_func: (get_next) =>
         draw_console_effect get_next(), tosprite("fire bolt"), {
             {COL_PALE_GREEN, "4x Fire Bolts"}
@@ -250,6 +285,7 @@ DataW.spell_create {
     spell_cooldown: 1600
     cooldown: 0
 }
+
 ----------------- </INNER FIRE IMPL> ---------------------
 
 FLAME_RATE = 30
@@ -275,8 +311,8 @@ apply_burn_intensity = (inst, attacker, intensity) ->
 apply_burn_damage = (inst, attacker, damage) ->
     -- Calculate burn intensity from damage done
     percent_damage = damage / inst.stats.max_hp
-    intensity = percent_damage * 100
-    intensity = INTENSITY_SPREAD_INTERVAL
+    intensity = percent_damage * MAX_INTENSITY * 4
+    --intensity = INTENSITY_SPREAD_INTERVAL
     apply_burn_intensity(inst, attacker, intensity)
     
 DataW.effect_create {
@@ -303,18 +339,19 @@ DataW.effect_create {
         @intensity -= 1
         @intensity = math.max(@intensity, 0)
         @n_steps += 1
-        if @n_steps % FLAME_RATE == 0
+        if @intensity > INTENSITY_SPREAD_INTERVAL and @n_steps % FLAME_RATE == 0
             -- At 300 intensity, the target loses 5% of their max HP every half second.
             -- At 100 intensity, the target loses 1.25% of their max HP every half second.
             percentage_intensity = @intensity / MAX_INTENSITY
             percentage_loss = percentage_intensity / 20
             damage = percentage_loss * inst.stats.max_hp
             @spread_fire(inst)
-            GameObject.animation_create {
-                xy: inst.xy
-                sprite: "spr_effects.fire-anim"
-                duration: 25
-            }
+            --animation = GameObject.animation_create {
+            --    xy: inst.xy
+            --    sprite: "spr_effects.fire-anim"
+            --    duration: 25
+            --}
+            --animation.on_step = () => @xy = inst.xy
             -- Make sure to destroy object only AFTER fire spreading
             inst\direct_damage(damage, @attacker)
     spread_fire: (inst) =>
@@ -339,48 +376,18 @@ DataW.effect_create {
         --    alpha = @get_progress(0.0, 0.1)
         --elseif @in_time_slice(0.9, 1)
         --    alpha = 1.0 - @get_progress(0.9, 1)
-        if @intensity > INTENSITY_SPREAD_INTERVAL
-            nil
+        for i=1,3
+            if @intensity > INTENSITY_SPREAD_INTERVAL * i
+                {x, y} = inst.xy
+                -- place in top left
+                x += inst.radius / 2 + 4
+                y += inst.radius / 2 + 4
+                ObjectUtils.screen_draw(M._burning, {x+ i*8, y}, 1, @n_steps)
             --ObjectUtils.screen_draw(M._fire, inst.xy, 0.8, @n_steps)
             --font_cached_load(settings.font, 20)\draw {
             --    color: COL_WHITE
             --    origin: Display.CENTER
             --}, Display.to_screen_xy(inst.xy), tostring(@intensity)
-}
-
--- FIRE STORM
-DataW.spell_create {
-    name: "Fire Storm",
-    spr_spell: "fire bolt",
-    description: "A fast bolt of fire. Burns target over time. Burning targets spread fire when hit",
-    types: {"Red"}
-    projectile: {
-        speed: 7
-        damage_multiplier: 1.25
-        spr_attack: "fire bolt"
-        on_deinit: () =>
-            if @caster.destroyed
-                return
-            r_pow = TypeEffectUtils.get_power(@caster, 'Red')
-            if @caster\has_effect "Inner Fire"
-                SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
-                GameObject.add_to_level SpawnedFire.create {
-                    caster: @caster
-                    xy: @xy
-                    duration: 20 + r_pow * 3
-                }
-            -- Very rare, high power red mages: Spawned fire is created.
-            elseif chance(0.05 * bounds_percentage(r_pow, 4, 10))
-                SpellUtils.message(@caster, "Fire springs forth from the fire bolt due to your great Red Power!", COL_PALE_BLUE)
-                GameObject.add_to_level SpawnedFire.create {
-                    caster: @caster
-                    xy: @xy
-                    duration: 20 + r_pow * 3
-                }
-
-    }
-    mp_cost: 10,
-    cooldown: 35
 }
 
 -- FIRE BOLT
@@ -391,28 +398,24 @@ DataW.spell_create {
     types: {"Red"}
     projectile: {
         speed: 7
-        damage_multiplier: 1.25
+        damage_multiplier: 1.2
         spr_attack: "fire bolt"
         on_damage: (target, damage) =>
-            apply_burn_damage(target, @caster, damage)
+            --apply_burn_damage(target, @caster, damage)
+            nil
         on_deinit: () =>
             if @caster.destroyed
                 return
             r_pow = TypeEffectUtils.get_power(@caster, 'Red')
-            if @caster\has_effect "Inner Fire"
+            if @caster\has_effect("Dragonform") or chance(0.05 + 0.05 * @caster.stats.level)
                 SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
+                -- TODO idea, fire_radius: 2 greater fire wand
                 GameObject.add_to_level SpawnedFire.create {
+                    fire_radius: if @caster\has_effect("Dragonform") then 1 else 0
                     caster: @caster
                     xy: @xy
-                    duration: 20 + r_pow * 3
-                }
-            -- Very rare, high power red mages: Spawned fire is created.
-            elseif chance(0.05 * bounds_percentage(r_pow, 4, 10))
-                SpellUtils.message(@caster, "Fire springs forth from the fire bolt due to your great Red Power!", COL_PALE_BLUE)
-                GameObject.add_to_level SpawnedFire.create {
-                    caster: @caster
-                    xy: @xy
-                    duration: 20 + r_pow * 3
+                    cooldown: (if @caster\has_effect("Dragonform") then 20 else 20)
+                    duration: (if @caster\has_effect("Dragonform") then 80 else 200)
                 }
 
     }

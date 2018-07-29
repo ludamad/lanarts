@@ -708,7 +708,7 @@ void CombatGameInst::use_projectile_spell(GameState* gs, SpellEntry& spl_entry,
     int nbounces = pentry.number_of_target_bounces;
     float speed = pentry.speed * effective_stats().core.spell_velocity_multiplier;
 
-    bool has_greater_fire = effects.has("AmuletGreaterFire") || effects.has("Inner Fire");
+    bool has_greater_fire = effects.has("AmuletGreaterFire") || effects.has("Dragonform");
     bool is_spread_spell = pentry.name == "Mephitize" || pentry.name == "Purple Dragon Projectile";
     if (is_spread_spell || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt") || (pentry.name == "Tornado Storm")) {
         float vx = 0, vy = 0;

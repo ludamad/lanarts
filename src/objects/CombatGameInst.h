@@ -86,7 +86,7 @@ public:
 	EquipmentStats& equipment();
 
 	int gain_xp_from(GameState* gs, CombatGameInst* inst);
-	sprite_id get_sprite() const {
+	sprite_id& get_sprite() {
 		return sprite;
 	}
 
