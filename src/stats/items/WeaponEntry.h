@@ -61,7 +61,7 @@ public:
 	std::string weapon_class;
 	bool uses_projectile;
 	Attack attack;
-        LuaValue attack_stat_func;
+	LuaValue attack_stat_func;
 };
 
 weapon_id get_weapon_by_name(const char* name);

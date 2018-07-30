@@ -103,6 +103,7 @@ function Door:on_step()
         self.open_timeout = self.open_timeout - 1
         return
     end
+    local needs_lanarts = (n_lanarts_picked_up() < self.lanarts_needed)
     local needs_key = (self.required_key ~= false)
     local can_player_open = self:is_explorable()
     local is_open = false

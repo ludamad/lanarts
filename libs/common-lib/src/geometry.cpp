@@ -289,6 +289,10 @@ PosF PosF::scaled(float scale) const {
 	return PosF(x * scale, y * scale);
 }
 
+Pos PosF::to_pos() const {
+	return {x, y};
+}
+
 bool PosF::operator !=(const PosF& o) const {
 	return !(*this == o);
 }

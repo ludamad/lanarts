@@ -111,6 +111,7 @@ public:
 
 	void use_projectile_spell(GameState* gs, SpellEntry& spl_entry,
 							  const Projectile& projectile, const Pos& target);
+	void try_use_spell(GameState* gs, SpellEntry& spl_entry, const Pos& target, GameInst* target_object);
 	void use_spell(GameState* gs, SpellEntry& spl_entry, const Pos& target, GameInst* target_object = nullptr);
 	void use_mp(GameState* gs, int mp);
     int team_gain_xp(GameState* gs, float xp, bool use_bonus=false);

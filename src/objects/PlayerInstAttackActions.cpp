@@ -160,10 +160,10 @@ bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
     }
 }
 
-static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
+static int get_targets(GameState* gs, PlayerInst* p, PosF xy, int rad,
         GameInst** enemies, int max_targets) {
     int numhit = gs->object_radius_test(p, enemies, max_targets,
-            enemy_filter, ax, ay, rad);
+            enemy_filter, xy.x, xy.y, rad);
     if (numhit < max_targets) {
         GameInst* inst = get_nearest_visible_enemy(gs, p);
         if (inst) {
@@ -293,7 +293,8 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
                     /*caster*/ this, target.x, target.y);
             if (can_use) {
                 queued_actions.push_back(
-                        game_action(gs, this, GameAction::USE_SPELL,
+                    game_action(gs, this,
+                                GameAction::USE_SPELL,
                                 spell_to_cast, target.x, target.y));
                 return true;
             } else if (!auto_target) {
@@ -440,7 +441,6 @@ void PlayerInst::_use_weapon(GameState *gs, const GameAction &action) {
     if (!effective_stats().allowed_actions.can_use_weapons) {
         return;
     }
-    lua_State* L = gs->luastate();
 
     WeaponEntry& wentry = weapon().weapon_entry();
     MTwist& mt = gs->rng();
@@ -450,8 +450,8 @@ void PlayerInst::_use_weapon(GameState *gs, const GameAction &action) {
         return;
     }
 
-    Pos start(x, y);
-    Pos actpos(action.action_x, action.action_y);
+    PosF start = pos();
+    PosF actpos {action.action_x, action.action_y};
 
     if (wentry.uses_projectile && !equipment().has_projectile()) {
         return;
@@ -462,7 +462,6 @@ void PlayerInst::_use_weapon(GameState *gs, const GameAction &action) {
     if (equipment().has_projectile()) {
         Projectile projectile = equipment().projectile();
         ProjectileEntry& pentry = projectile.projectile_entry();
-        item_id item = get_item_by_name(pentry.name.c_str());
 
         int weaprange = pentry.range();
         float movespeed = pentry.speed;
@@ -474,25 +473,35 @@ void PlayerInst::_use_weapon(GameState *gs, const GameAction &action) {
             weaprange = wentry.range();
             cooldown = wentry.cooldown();
             weaponattack = {weapon(), projectile};
-        } else {
         }
 
-        bool wallbounce = pentry.can_wall_bounce;
-        int nbounces = 0;
-
-        GameInst* bullet = new ProjectileInst(projectile,
-                effective_atk_stats(mt, weaponattack), id, start, actpos,
-                movespeed, weaprange, NONE, wallbounce, nbounces);
-        gs->add_instance(bullet);
+        gs->add_instance<ProjectileInst>(
+            projectile, effective_atk_stats(mt, weaponattack),
+            id, start.to_pos(), actpos.to_pos(),
+            movespeed, weaprange, NONE, pentry.can_wall_bounce, pentry.can_wall_bounce ? 3 : 0);
         if (!equipment().use_ammo()) {
             exhaust_projectile_autoequip(this, this->last_chosen_weaponclass);
         }
+        cooldowns().reset_action_cooldown(
+            cooldown * estats.cooldown_modifiers.ranged_cooldown_multiplier);
+    } else if (!wentry.attack.alt_action.isnil()) {
+        auto* target_object = gs->get_instance(target());
+        lcall(wentry.attack.alt_action, this, actpos, target_object);
+        // TODO not necessarily:
+        cooldowns().reset_action_cooldown(
+            cooldown * estats.cooldown_modifiers.spell_cooldown_multiplier);
     } else {
-        int weaprange = wentry.range() + this->radius + TILE_SIZE / 2;
-        float mag = distance_between(actpos, Pos(x, y));
-        if (mag > weaprange) {
-            float dx = actpos.x - x, dy = actpos.y - y;
-            actpos = Pos(x + dx / mag * weaprange, y + dy / mag * weaprange);
+        float weap_range = wentry.range() + this->radius + TILE_SIZE / 2;
+        float distance = distance_between(actpos, pos());
+        if (distance > weap_range) {
+            LANARTS_ASSERT(distance > 0);
+            // Find the unit direction vector towards the target
+            PosF dir = {
+                (actpos.x - x) / distance,
+                (actpos.y - y) / distance
+            };
+            // Find the attack point in the direction of attack
+            actpos = pos() + dir.scaled(weap_range);
         }
 
         GameInst* enemies[MAX_MELEE_HITS];
@@ -500,27 +509,22 @@ void PlayerInst::_use_weapon(GameState *gs, const GameAction &action) {
         const int max_targets = 1;
         const int dmgradius = 4;
 
-        int numhit = get_targets(gs, this, actpos.x, actpos.y, dmgradius,
-                enemies, max_targets);
+        int numhit = get_targets(
+            gs, this,
+            actpos, dmgradius, enemies, max_targets
+        );
 
-        if (numhit == 0) {
-            return;
-        }
-
+        // TODO weapon attack hook
         for (int i = 0; i < numhit; i++) {
-            EnemyInst* e = (EnemyInst*)enemies[i];
-            attack(gs, e, AttackStats(equipment().weapon()) );
+            auto* e = (EnemyInst*)enemies[i];
+            attack(gs, e, AttackStats(equipment().weapon()));
         }
-        cooldown = wentry.cooldown();
+        if (numhit > 0) {
+            cooldown = wentry.cooldown();
+        }
+        cooldowns().reset_action_cooldown(
+            cooldown * estats.cooldown_modifiers.melee_cooldown_multiplier);
     }
-
-    float cooldown_mult;
-    if (equipment().has_projectile()) {
-        cooldown_mult = estats.cooldown_modifiers.ranged_cooldown_multiplier;
-    } else {
-        cooldown_mult = estats.cooldown_modifiers.melee_cooldown_multiplier;
-    }
-    cooldowns().reset_action_cooldown(cooldown * cooldown_mult);
 
     reset_rest_cooldown();
 }
@@ -541,24 +545,11 @@ void PlayerInst::_use_spell(GameState *gs, const GameAction &action) {
     if (is_ghost()) {
         return;
     }
-    if (!effective_stats().allowed_actions.can_use_spells) {
-        return;
-    }
-
     spell_id spell = spells_known().get(action.use_id);
     SpellEntry& spl_entry = res::spell(spell);
-
-    if (cooldowns().spell_cooldowns[spell] > 0) {
-        return;
-    }
-    if (spl_entry.mp_cost > core_stats().mp
-            || (!spl_entry.can_cast_with_cooldown && !cooldowns().can_doaction())) {
-        return;
-    }
-
-    Pos target_xy = Pos(action.action_x, action.action_y);
-    use_spell(gs, spl_entry, target_xy, gs->get_instance(target()));
-
-    cooldowns().action_cooldown *= effective_stats().cooldown_mult;
-    cooldowns().reset_rest_cooldown(REST_COOLDOWN);
+    try_use_spell(
+        gs, spl_entry,
+        {action.action_x, action.action_y},
+        gs->get_instance(target())
+    );
 }

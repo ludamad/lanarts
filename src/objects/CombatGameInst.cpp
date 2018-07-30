@@ -510,33 +510,36 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
     bool has_greater_fire = (effects.get_active("AmuletGreaterFire") != NULL);
     bool is_spread_spell = pentry.name == "Mephitize" || pentry.name == "Purple Dragon Projectile";
     if (is_spread_spell || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt")) {
-          float vx = 0, vy = 0;
-          ::direction_towards(Pos {x, y}, p, vx, vy, 10000);
-          int directions = (is_spread_spell ? 16 : 4);
+        float vx = 0, vy = 0;
+        ::direction_towards(Pos{x, y}, p, vx, vy, 10000);
+        int directions = (is_spread_spell ? 16 : 4);
 
-          for (int i = 0; i < directions; i++) {
-              const float PI =3.141592;
-              float angle = PI / directions * 2 * i;
-              Pos new_target {x + cos(angle) * vx - sin(angle) * vy, y + cos(angle) * vy + sin(angle) * vx};
-              GameInst* pinst = new ProjectileInst(projectile, atkstats, id, ipos(), new_target, pentry.speed, pentry.range(), 
-                NONE, pentry.can_wall_bounce, pentry.number_of_target_bounces, pentry.can_pass_through);
-              gs->add_instance(pinst);
-          }
-      } else {
-          GameInst* bullet = new ProjectileInst(projectile, atkstats, id, Pos(x, y),
-            p, pentry.speed, range,
-            NONE, pentry.can_wall_bounce, pentry.number_of_target_bounces, pentry.can_pass_through);
-          gs->add_instance(bullet);
+        for (int i = 0; i < directions; i++) {
+            const float PI = 3.141592;
+            float angle = PI / directions * 2 * i;
+            Pos new_target{x + cos(angle) * vx - sin(angle) * vy, y + cos(angle) * vy + sin(angle) * vx};
+            gs->add_instance<ProjectileInst>(projectile, atkstats, id, ipos(), new_target, pentry.speed,
+                                             pentry.range(),
+                                             NONE, pentry.can_wall_bounce, pentry.number_of_target_bounces,
+                                             pentry.can_pass_through);
+        }
+    } else {
+        gs->add_instance<ProjectileInst>(projectile, atkstats, id, Pos(x, y),
+                                         p, pentry.speed, range,
+                                         NONE, pentry.can_wall_bounce, pentry.number_of_target_bounces,
+                                         pentry.can_pass_through);
     }
     cooldowns().reset_action_cooldown(
-            pentry.cooldown()
-                    * estats.cooldown_modifiers.ranged_cooldown_multiplier);
+        pentry.cooldown() * estats.cooldown_modifiers.ranged_cooldown_multiplier
+    );
     cooldowns().action_cooldown += gs->rng().rand(-4, 5);
     return false;
 }
 
 bool CombatGameInst::attack(GameState* gs, CombatGameInst* inst,
         const AttackStats& attack) {
+
+    WeaponEntry& weapon = attack.weapon.weapon_entry();
 
     if (attack.is_ranged()) {
         return projectile_attack(gs, inst, attack.weapon, attack.projectile);
@@ -728,11 +731,10 @@ void CombatGameInst::use_projectile_spell(GameState* gs, SpellEntry& spl_entry,
         }
 
     } else {
-        GameInst* pinst = new ProjectileInst(projectile,
-                effective_atk_stats(mt, projectile_attack), id,
-                Pos(x, y), target, speed, pentry.range(), NONE,
-                wallbounce, nbounces, passthrough);
-        gs->add_instance(pinst);
+        gs->add_instance<ProjectileInst>(projectile,
+                                         effective_atk_stats(mt, projectile_attack), id,
+                                         Pos(x, y), target, speed, pentry.range(), NONE,
+                                         wallbounce, nbounces, passthrough);
     }
 }
 
@@ -755,6 +757,25 @@ void CombatGameInst::use_spell(GameState* gs, SpellEntry& spl_entry, const Pos& 
         // Use action_func callback
         lcall(spl_entry.action_func, /*caster*/ this, target.x, target.y, /*target object*/ target_object);
     }
+}
+
+void CombatGameInst::try_use_spell(GameState* gs, SpellEntry& spl_entry, const Pos& target, GameInst* target_object) {
+    if (!effective_stats().allowed_actions.can_use_spells) {
+        return;
+    }
+
+    if (cooldowns().spell_cooldowns[spl_entry.id] > 0) {
+        return;
+    }
+    if (spl_entry.mp_cost > core_stats().mp
+        || (!spl_entry.can_cast_with_cooldown && !cooldowns().can_doaction())) {
+        return;
+    }
+
+    use_spell(gs, spl_entry, target, target_object);
+
+    cooldowns().action_cooldown *= effective_stats().cooldown_mult;
+    cooldowns().reset_rest_cooldown(REST_COOLDOWN);
 }
 
 CoreStats& CombatGameInst::core_stats() {

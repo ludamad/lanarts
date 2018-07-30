@@ -10,6 +10,7 @@ MAGE_START_STATS = {
     magic: 7,
     equipment: {
         gold: 0
+        weapon: "Apprentice Staff"
         inventory: {
             {item: "Mana Potion"}
         }
@@ -42,7 +43,6 @@ Data.class_create {
     name: "Blue Mage",
     sprites: (for i=1,2 do "spr_classes.blue_mage#{i}")
     available_spells: {
-        {spell: "Minor Missile", level_needed: 1},
         {spell: "Water Bolt", level_needed: 1},
     },
     start_stats: MAGE_START_STATS
@@ -53,7 +53,6 @@ Data.class_create {
     name: "Stormcaller",
     sprites: (for i=1,2 do "spr_classes.white_mage#{i}")
     available_spells: {
-        {spell: "Minor Missile", level_needed: 1},
         {spell: "Energy Spear", level_needed: 1},
         {spell: "Chain Lightning", level_needed: 2},
         {spell: "Tornado Storm", level_needed: 3},
@@ -83,7 +82,7 @@ Data.class_create {
 --        equipment: {
 --          weapon: "Mace",
 --          gold: 0,
---          inventory: {{item: "Health Potion"}},
+--          Nnventory: {{item: "Health Potion"}},
 --        }
 --    },
 --    gain_per_level: {

@@ -8,8 +8,6 @@
 #include <cmath>
 #include "math_util.h"
 
-#include "geometry.h"
-
 int squish(int a, int b, int c) {
 	return std::min(std::max(a, b), c - 1);
 }
@@ -24,7 +22,7 @@ int power_of_two_round(int input) {
 }
 
 float compute_direction(const PosF & p1, const PosF & p2) {
-	return atan2(p2.y - p1.y, p2.x - p1.x);
+	return atan2f(p2.y - p1.y, p2.x - p1.x);
 }
 
 int round_to_multiple(int num, int mult, bool centered) {
@@ -36,19 +34,24 @@ int centered_multiple(int num, int mult) {
 }
 
 Pos centered_multiple(const Pos& pos, int mult) {
-	return Pos(centered_multiple(pos.x, mult), centered_multiple(pos.y, mult));
+	return {
+		centered_multiple(pos.x, mult),
+		centered_multiple(pos.y, mult)
+	};
 }
 
 Pos round_to_multiple(const Pos& pos, int mult, bool centered) {
-	return Pos(round_to_multiple(pos.x, mult, centered),
-			round_to_multiple(pos.y, mult, centered));
+	return {
+		round_to_multiple(pos.x, mult, centered),
+		round_to_multiple(pos.y, mult, centered)
+	};
 }
 
 void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry,
 		float speed) {
 	rx = b.x - a.x;
 	ry = b.y - a.y;
-	float mag = sqrt(rx * rx + ry * ry);
+	float mag = sqrtf(rx * rx + ry * ry);
 	if (mag > 0) {
 		rx /= mag / speed;
 		ry /= mag / speed;
@@ -58,7 +61,13 @@ void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry,
 float distance_between(const Pos & a, const Pos & b) {
 	float dx = a.x - b.x;
 	float dy = a.y - b.y;
-	return sqrt(dx * dx + dy * dy);
+	return sqrtf(dx * dx + dy * dy);
+}
+
+float distance_between(const PosF & a, const PosF & b) {
+	float dx = a.x - b.x;
+	float dy = a.y - b.y;
+	return sqrtf(dx * dx + dy * dy);
 }
 
 float squared_distance(const PosF & a, const PosF & b) {
@@ -68,7 +77,7 @@ float squared_distance(const PosF & a, const PosF & b) {
 }
 
 float magnitude(float x, float y) {
-	return sqrt(x * x + y * y);
+	return sqrtf(x * x + y * y);
 }
 
 float square_magnitude(const PosF& xy) {

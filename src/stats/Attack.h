@@ -13,10 +13,6 @@ class LuaField;
 
 class Attack {
 public:
-	Attack() :
-			range(0), cooldown(0), attack_sprite(-1) {
-	}
-
 	CoreStatMultiplier& damage_stats() {
 		return damage_modifiers.damage_stats;
 	}
@@ -38,8 +34,9 @@ public:
 
 	DamageStats damage_modifiers;
 
-	int range, cooldown;
-	sprite_id attack_sprite;
+	LuaValue alt_action;
+	int range = 0, cooldown = 0;
+	sprite_id attack_sprite = -1;
 	LuaAction attack_action;
 	LuaValue on_damage;
 };

@@ -63,6 +63,24 @@ DataW.weapon_create {
 }
 
 DataW.weapon_create {
+    name = "Apprentice Staff",
+    description = "A staff of endless minor bolts.",
+    type = "staves",
+
+    types = {
+    },
+    shop_cost = {75, 105},
+
+    spr_item = "spr_weapons.staff-of-minor",
+    alt_action = function(caster, xy, target)
+        caster:use_spell("Minor Missile", xy, target)
+    end,
+
+    cooldown = 240,
+    range = 400
+}
+
+DataW.weapon_create {
     name = "Dagger",
     description = "A short, swift, pointy blade.",
     type = "short blades",
@@ -87,7 +105,7 @@ DataW.weapon_create {
 
     spr_item = "spr_weapons.short_sword1",
 
-    --stat_bonuses = {
+--stat_bonuses = {
     --    strength = 1
     --},
     cooldown = 40,

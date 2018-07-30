@@ -25,8 +25,8 @@ DataW.spell_create {
         damage_multiplier: 0.75
         can_wall_bounce: true
     }
-    mp_cost: 4,
-    cooldown: 35
+    mp_cost: 0,
+    cooldown: 60
 }
 
 -- MAGIC ARROW

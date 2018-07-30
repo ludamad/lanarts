@@ -102,9 +102,9 @@ LuaValue lua_rvoworldmetatable(lua_State* L) {
     methods["remove_instance"].bind_function(remove_instance);
     methods["update_instance"].bind_function(update_instance);
     methods["get_velocity"].bind_function(get_velocity);
-        methods["get_position"].bind_function(get_position);
-        methods["set_position"].bind_function(set_position);
-        methods["get_radius"].bind_function(get_radius);
+    methods["get_position"].bind_function(get_position);
+    methods["set_position"].bind_function(set_position);
+    methods["get_radius"].bind_function(get_radius);
     methods["get_preferred_velocity"].bind_function(get_preferred_velocity);
     methods["set_preferred_velocity"].bind_function(set_preferred_velocity);
     methods["change_instance_id"].bind_function(change_instance_id);
