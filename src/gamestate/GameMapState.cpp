@@ -94,7 +94,7 @@ obj_id GameMapState::add_instance(GameState* gs, GameInst* inst) {
 	gs->game_world().set_current_level(this);
 	obj_id id = game_inst_set().add_instance(inst);
 	inst->init(gs);
-	event_log("Adding instance id: %d x: %f y: %f target_radius: %f depth %d\n",
+	event_log("Adding instance id: %d x: %f y: %f target_radius: %f depth %d",
 			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
 	gs->game_world().set_current_level(current_level);
 

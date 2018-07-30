@@ -40,7 +40,7 @@ static float damage_multiplier(float power, float resistance) {
 static float basic_damage_formula(const EffectiveAttackStats& attacker, float resistance) {
 	float mult = damage_multiplier(attacker.power, resistance) * attacker.type_multiplier;
 	float result = attacker.damage * mult;
-	event_log("basic_damage_formula: mult=%.2f, damage=%.2f defence=%.2f result=%.2f\n",
+	event_log("basic_damage_formula: mult=%.2f, damage=%.2f defence=%.2f result=%.2f",
 			mult, attacker.damage, resistance, result);
 	return std::max(0.0f, result);
 }
@@ -60,14 +60,14 @@ float damage_formula(const EffectiveAttackStats& attacker,
 	float mdmg = magic_damage_formula(attacker, defender);
 	float pdmg = physical_damage_formula(attacker, defender);
 
-	event_log("damage_formula attacker damage=%.2f power=%.2f cooldown=%.2f magic_percentage=%.2f\n",
+	event_log("damage_formula attacker damage=%.2f power=%.2f cooldown=%.2f magic_percentage=%.2f",
 			attacker.damage, attacker.power, attacker.cooldown,
 			attacker.magic_percentage);
-	event_log("damage_formula defender physical.resistance=%.2f magic.resistance=%.2f\n",
+	event_log("damage_formula defender physical.resistance=%.2f magic.resistance=%.2f",
 			defender.core.defence,
 			defender.core.willpower);
-	event_log("damage_formula: mdmg=%f, pdmg=%f\n", mdmg, pdmg);
-	event_log("damage_formula: type modifier=%f\n", attacker.type_multiplier);
+	event_log("damage_formula: mdmg=%f, pdmg=%f", mdmg, pdmg);
+	event_log("damage_formula: type modifier=%f", attacker.type_multiplier);
 
 	return mdmg * attacker.magic_percentage
 			+ pdmg * attacker.physical_percentage();
@@ -130,7 +130,7 @@ EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
     }
 	factor_in_equipment_stats(gs->rng(), ret, stats.equipment);
 	ret.cooldown_modifiers.apply(ret.cooldown_mult);
-	event_log("effective_stats: hp=%d, mp=%d, hpregen=%f, mpregen=%f\n",
+	event_log("effective_stats: hp=%d, mp=%d, hpregen=%f, mpregen=%f",
 			ret.core.hp, ret.core.mp, ret.core.hpregen, ret.core.mpregen);
 	if (stats.class_stats.has_class()) {
 	    if (stats.class_stats.class_entry().name == "Necromancer") {

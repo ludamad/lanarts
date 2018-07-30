@@ -598,7 +598,7 @@ void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
-   event_log("Player id=%d performing act=%d, xy=(%.2f,%.2f), frame=%d, origin=%d, room=%d, use_id=%d, use_id2=%d\n",
+   event_log("Player id=%d performing act=%d, xy=(%.2f,%.2f), frame=%d, origin=%d, room=%d, use_id=%d, use_id2=%d",
    		this->player_entry(gs).net_id,
    		action.act, action.action_x,
    		action.action_y, action.frame, action.origin, action.room,
@@ -906,7 +906,7 @@ void PlayerInst::_use_move(GameState *gs, const GameAction &action) {
         if (reduce_vy) {
             vy *= 0.5;
         }
-   event_log("Player id: %d using move for turn %d, vx=%f, vy=%f\n", std::max(0, id), gs->frame(), vx, vy);
+   event_log("Player id: %d using move for turn %d, vx=%f, vy=%f", std::max(0, id), gs->frame(), vx, vy);
    perf_timer_end(FUNCNAME);
 }
 

@@ -616,7 +616,7 @@ void GameState::remove_instance(GameInst* inst, bool add_to_removed) {
 		return;
 	}
 	event_log(
-			"Removing instance id: %d x: %f y: %f target_radius: %f depth %d\n",
+			"Removing instance id: %d x: %f y: %f target_radius: %f depth %d",
 			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
 	GameMapState* level = world.get_level(inst->current_floor);
 	level->game_inst_set().remove_instance(inst);

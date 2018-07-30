@@ -187,7 +187,7 @@ void ProjectileInst::step(GameState* gs) {
 	if (colobj) {
 		CombatGameInst* victim = (CombatGameInst*) colobj;
 		event_log(
-				"ProjectileInst::step id=%d from player id=%d hit enemy id=%d\n",
+				"ProjectileInst::step id=%d from player id=%d hit enemy id=%d",
 				std::max(id, 0), std::max(origin->id, 0), std::max(colobj->id,0));
 		origin->signal_attacked_successfully();
 
@@ -256,7 +256,7 @@ void ProjectileInst::step(GameState* gs) {
 		}
 	}
 
-	event_log("ProjectileInst id=%d has rx=%f, ry=%f, vx=%f,vy=%f\n", std::max(id, 0), rx,
+	event_log("ProjectileInst id=%d has rx=%f, ry=%f, vx=%f,vy=%f", std::max(id, 0), rx,
 			  ry, vx, vy);
 }
 

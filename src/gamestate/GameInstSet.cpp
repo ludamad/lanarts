@@ -240,7 +240,7 @@ obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 	InstanceState* state = &unit_set[0];
 
 	if (id == 0 && inst->id != 0) {
-		fprintf(stderr, "Adding instance with id of %d; not 0!\n", inst->id);
+		fprintf(stderr, "Adding instance with id of %d; not 0!", inst->id);
 		LANARTS_ASSERT(false);
 	}
 
@@ -274,7 +274,7 @@ void GameInstSet::step(GameState* gs) {
 		if (valid_inst(inst)) {
 			perf_timer_begin(typeid(*inst).name());
 			inst->destroyed = false;
-			event_log("Step-event for id %d\n", std::max(inst->id,0));
+			event_log("Step-event for id %d", std::max(inst->id,0));
 			inst->step(gs);
 			update_instance_for_step(&unit_set[i], inst);
 			perf_timer_end(typeid(*inst).name());
