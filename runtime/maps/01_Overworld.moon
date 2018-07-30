@@ -227,14 +227,14 @@ overworld_spawns = (map) ->
             OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
 
 place_feature = (map, template, region_filter) ->
-   event_log("(RNG #%d) placing feature\n", map.rng\amount_generated())
+   event_log("(RNG #%d) placing feature", map.rng\amount_generated())
    -- Function to try a single placement, returns success:
    attempt_placement = (template) ->
        orient = map.rng\random_choice {
            SourceMap.ORIENT_DEFAULT, SourceMap.ORIENT_FLIP_X, SourceMap.ORIENT_FLIP_Y,
            SourceMap.ORIENT_TURN_90, SourceMap.ORIENT_TURN_180, SourceMap.ORIENT_TURN_270
        }
-       event_log("(RNG #%d) orient=%d\n", map.rng\amount_generated(), orient)
+       event_log("(RNG #%d) orient=%d", map.rng\amount_generated(), orient)
        for r in *map.regions
            if not region_filter(r)
                continue
@@ -256,7 +256,7 @@ place_feature = (map, template, region_filter) ->
    -- Function to try placement n times, returns success:
    attempt_placement_n_times = (template, n) ->
        for i=1,n
-           event_log("(RNG #%d) placement=%d\n", map.rng\amount_generated(), i)
+           event_log("(RNG #%d) placement=%d", map.rng\amount_generated(), i)
            if attempt_placement(template)
                return true
        return false
@@ -960,7 +960,7 @@ overworld_create = () ->
     MapSeq = MapSequence.create {preallocate: 1}
     local conf, schema
     NewMaps.map_create (rng) ->
-        event_log("(RNG #%d) Attempting overworld generation\n", rng\amount_generated())
+        event_log("(RNG #%d) Attempting overworld generation", rng\amount_generated())
         conf or= OVERWORLD_CONF(rng)
         schema or= rng\random(3)
         dungeon_tileset = ({Tilesets.snake, Tilesets.lair, Tilesets.pebble})[schema + 1]

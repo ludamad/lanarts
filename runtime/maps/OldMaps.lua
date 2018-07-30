@@ -562,39 +562,39 @@ local function generate_tunnels(map, tunnels, tileset)
 end
 
 local function map_gen_apply(map, placements, wall, floor, __unused_alternate, size, padding)
-   event_log("(RNG #%d) before apply room carve oper\n", map.rng:amount_generated())
+   event_log("(RNG #%d) before apply room carve oper", map.rng:amount_generated())
     SourceMap.random_placement_apply { rng = map.rng, map = map, area = get_inner_area(map),
         child_operator = Dungeons.room_carve_operator(wall, floor, padding or 1),
         size_range = size, amount_of_placements_range = placements,
         create_subgroup = false
    }
-   event_log("(RNG #%d) after apply room carve oper\n", map.rng:amount_generated())
+   event_log("(RNG #%d) after apply room carve oper", map.rng:amount_generated())
 end
 
 local function generate_rooms(map, rooms, tileset)
     if not rooms.amount then
         rooms = random_choice(rooms)
     end
-    event_log("Room layout = " .. pretty_tostring(rooms) .. " \n")
+    event_log("Room layout = " .. pretty_tostring(rooms))
     -- Ensure it is a range
     local amounts = range_resolve(rooms.amount)
-    event_log("(RNG #%d) generating %d rooms\n", map.rng:amount_generated(), amounts)
+    event_log("(RNG #%d) generating %d rooms", map.rng:amount_generated(), amounts)
     local alt_amount = random(math.floor(amounts*0.10), math.ceil(amounts*0.50))
     amounts = amounts - alt_amount
     -- Compensate for extra players
     local size_mult = size_multiplier()
     local size = map_call(math.ceil, {rooms.size[1] * size_mult, rooms.size[2] * size_mult})
     -- Compensate for padding
-    event_log("(RNG #%d) size={%d,%d} padding=%d amount = %d, alt_amount = %d\n", 
+    event_log("(RNG #%d) size={%d,%d} padding=%d amount = %d, alt_amount = %d", 
         map.rng:amount_generated(), size[1], size[2], rooms.padding, amounts, alt_amount)
     size = {size[1] + rooms.padding*2, size[2] + rooms.padding*2}
     map_gen_apply(map, {alt_amount, alt_amount}, tileset.wall, tileset.floor_alt, tileset.floor, size, rooms.padding)
     map_gen_apply(map, {amounts, amounts}, tileset.wall, tileset.floor, tileset.floor_alt, size, rooms.padding)
-    event_log("(RNG #%d) after generating %d rooms\n", map.rng:amount_generated(), amounts)
+    event_log("(RNG #%d) after generating %d rooms", map.rng:amount_generated(), amounts)
 end
 
 local function generate_layout(map, layout, tileset)
-    event_log("(RNG #%d) generating layout\n", map.rng:amount_generated())
+    event_log("(RNG #%d) generating layout", map.rng:amount_generated())
     if layout.rooms.combine then
         for _, sublayout in ipairs(layout.rooms) do
             generate_rooms(map, sublayout, tileset)
@@ -603,7 +603,7 @@ local function generate_layout(map, layout, tileset)
         generate_rooms(map, layout.rooms, tileset)
     end
     generate_tunnels(map, layout.tunnels, tileset)
-    event_log("(RNG #%d) after generating layout\n", map.rng:amount_generated())
+    event_log("(RNG #%d) after generating layout", map.rng:amount_generated())
 end
 
 local function generate_from_template(label, template, tileset)
@@ -621,12 +621,12 @@ function M.create_map(dungeon, floor)
     local map
     if entry.layout then
         local layout = random_choice(entry.layout)
-        event_log("Picking layout " .. pretty_tostring(layout) .. "\n")
+        event_log("Picking layout " .. pretty_tostring(layout))
         local size = map_call(range_resolve, layout.size)
         local size_mult = (size_multiplier() + 1) / 2
         size = {math.ceil(size[1] * size_mult), math.ceil(size[2] * size_mult)}
         map = MapUtils.map_create(label, size, tileset.wall)
-        event_log("(RNG #%d) after creating map\n", map.rng:amount_generated())
+        event_log("(RNG #%d) after creating map", map.rng:amount_generated())
         generate_layout(map, layout, tileset)
     else 
         local template = random_choice(entry.templates)
@@ -638,11 +638,11 @@ function M.create_map(dungeon, floor)
     -- TODO consolidate what is actually expected of maps.
     -- For now, just fake one region for 01_Overworld.moon
     map.regions = { {conf = {}, bbox = function(self) return {0,0, map.size[1], map.size[2]} end}}
-    event_log("(RNG #%d) calling dungeon.on_generate\n", map.rng:amount_generated())
+    event_log("(RNG #%d) calling dungeon.on_generate", map.rng:amount_generated())
     if dungeon.on_generate and not dungeon.on_generate(map, floor) then
         return nil
     end
-    event_log("(RNG #%d) generating content\n", map.rng:amount_generated())
+    event_log("(RNG #%d) generating content", map.rng:amount_generated())
     generate_content(map, entry.content, tileset)
     return map
 end

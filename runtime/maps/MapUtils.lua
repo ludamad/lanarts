@@ -25,16 +25,16 @@ function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] oper
     if not sqr then
         return nil
     elseif area then
-        event_log("(RNG #%d) Finding random square in x:%d-%d, y:%d-%d => {%d, %d}\n", 
+        event_log("(RNG #%d) Finding random square in x:%d-%d, y:%d-%d => {%d, %d}", 
             map.rng:amount_generated(), area[1], area[3], area[2], area[4], sqr[1], sqr[2])
     else
-        event_log("Finding random square in whole level => {%d, %d}\n", sqr[1], sqr[2])
+        event_log("Finding random square in whole level => {%d, %d}", sqr[1], sqr[2])
     end
     return sqr
 end
 
 function M.spawn_enemy(map, type, tile_xy, --[[Optional]] team)
-    event_log("Spawning enemy %s at {%d, %d}\n", 
+    event_log("Spawning enemy %s at {%d, %d}", 
         type, tile_xy[1], tile_xy[2])
     local object = GameObject.enemy_create {
         do_init = false,
@@ -47,7 +47,7 @@ function M.spawn_enemy(map, type, tile_xy, --[[Optional]] team)
 end
 
 function M.spawn_epic_store(map, items, tile_xy)
-    event_log("Spawning EPIC store with %d items at {%d, %d}\n", 
+    event_log("Spawning EPIC store with %d items at {%d, %d}", 
         #items, tile_xy[1], tile_xy[2])
     local object = GameObject.store_create {
         xy = M.from_tile_xy(tile_xy),
@@ -59,7 +59,7 @@ function M.spawn_epic_store(map, items, tile_xy)
 end
 
 function M.spawn_store(map, items, tile_xy)
-    event_log("Spawning store with %d items at {%d, %d}\n", 
+    event_log("Spawning store with %d items at {%d, %d}", 
         #items, tile_xy[1], tile_xy[2])
     local object = GameObject.store_create {
         xy = M.from_tile_xy(tile_xy),
@@ -74,7 +74,7 @@ end
 function M.spawn_item(map, type, amount, tile_xy)
     -- Default to 1:
     amount = amount or 1
-    event_log("Spawning item %s (amount=%s) at {%d, %d}\n", 
+    event_log("Spawning item %s (amount=%s) at {%d, %d}", 
         type, amount, tile_xy[1], tile_xy[2])
     local object = GameObject.item_create {
         do_init = false,
@@ -150,7 +150,7 @@ function M.spawn_chest(map, sqr, contents)
 end
 
 function M.spawn_portal(map, sqr, sprite, --[[Optional]] callback, --[[Optional]] frame)
-    event_log("Spawning portal at {%d, %d}\n", sqr[1], sqr[2])
+    event_log("Spawning portal at {%d, %d}", sqr[1], sqr[2])
     local object = GameObject.feature_create {
         do_init = false,
         xy = M.from_tile_xy(sqr),
