@@ -49,6 +49,13 @@ GameLogger::~GameLogger() {
     }
 }
 
+static void replace_newlines(std::string& str) {
+    std::string::size_type pos = 0; // Must initialize
+    while ((pos = str.find("\r\n", pos)) != std::string::npos) {
+        str[pos] = ' ';
+    }
+}
+
 void GameLogger::event_log(const char *fmt, va_list ap) {
     static std::string logline;
 
@@ -62,15 +69,16 @@ void GameLogger::event_log(const char *fmt, va_list ap) {
     char text[512];
     vsnprintf(text, sizeof(text), fmt, ap);
     va_end(ap);
-
     logline += text;
+    replace_newlines(logline);
+
     if (output_log_file) {
         output_log_file.write(logline.c_str(), logline.size());
+        output_log_file << '\n';
     }
     if (input_log_file) {
         std::getline(input_log_file, line);
         if (!line.empty()) {
-            line += '\n';
             if (line != logline) {
                 std::cout << "UNABLE TO MATCH: " << std::endl;
                 std::cout << logline << std::endl;
