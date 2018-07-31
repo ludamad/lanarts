@@ -1547,7 +1547,7 @@ DataW.enemy_create {
         strength: 20
         magic: 25
         defence: 10
-        willpower: 12
+        willpower: 15
     }
     projectile: {
         weapon_class: "magic"

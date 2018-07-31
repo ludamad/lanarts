@@ -76,7 +76,7 @@ DataW.weapon_create {
         caster:use_spell("Minor Missile", xy, target)
     end,
 
-    cooldown = 240,
+    cooldown = 200,
     range = 400
 }
 

@@ -133,18 +133,21 @@ RingOfFire = RingFireBase {
             {math.sin(angle) * radius, math.cos(angle) * radius}
     -- Extra functionality over RingFireBase: creating SpawnedFire
     _on_kill: (obj) =>
-        mon_name = SpellUtils.mon_title(obj)
-        SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
-        GameObject.add_to_level SpawnedFire.create {
-            caster: @caster
-            xy: obj.xy -- Create around the damaged enemy
-            duration: 40
-        }
-        r_pow = TypeEffectUtils.get_power(@caster, 'Red')
-        -- Very rare: Ring of fire creates mana potion.
-        if chance(0.01 * bounds_percentage(r_pow, 2, 4))
-            SpellUtils.message(@caster, "Your awesome fire magic creates a red mana potion!", COL_PALE_BLUE)
-            ObjectUtils.spawn_item_near(@caster, "Red Mana Potion", 1, obj.x, obj.y)
+        --mon_name = SpellUtils.mon_title(obj)
+        --SpellUtils.message(@caster, "Fire springs forth from the defeated #{mon_name}!", COL_PALE_BLUE)
+        --GameObject.add_to_level SpawnedFire.create {
+        --    caster: @caster
+        --    xy: obj.xy -- Create around the damaged enemy
+        --    duration: 40
+        --}
+        --r_pow = TypeEffectUtils.get_power(@caster, 'Red')
+        ---- Very rare: Ring of fire creates mana potion.
+        --if chance(0.01 * bounds_percentage(r_pow, 2, 4))
+        --    SpellUtils.message(@caster, "Your awesome fire magic creates a red mana potion!", COL_PALE_BLUE)
+        --    ObjectUtils.spawn_item_near(@caster, "Red Mana Potion", 1, obj.x, obj.y)
+        nil
+    _on_damage: (obj) =>
+        nil
     -- GameObject methods
     -- Extra functionality over RingFireBase: Manage caster's vision radius
     on_map_deinit: () =>
@@ -216,7 +219,7 @@ DataW.spell_create {
             {COL_PALE_YELLOW, "Power: "}
             {COL_PALE_GREEN, power}
         }
-    mp_cost: 20
+    mp_cost: 40
     spell_cooldown: 800
     cooldown: 100
 }

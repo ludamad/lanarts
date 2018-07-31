@@ -18,12 +18,12 @@ mon_title = (mon) -> if mon.unique then mon.name else "the #{mon.name}"
 -- Basic typeless mage spell
 DataW.spell_create {
     name: "Minor Missile"
-    spr_spell: "minor missile"
+    spr_spell: "spr_effects.energy"
     description: "A low cost neutral bolt of energy. Hits a single target. The bolt can bounce off walls safely."
     projectile: {
-        speed: 7.25
-        damage_multiplier: 0.75
-        can_wall_bounce: true
+        speed: 6
+        damage_multiplier: 0.5
+        can_wall_bounce: false
     }
     mp_cost: 0,
     cooldown: 60
