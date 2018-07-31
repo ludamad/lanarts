@@ -50,9 +50,10 @@ GameLogger::~GameLogger() {
 }
 
 static void replace_newlines(std::string& str) {
-    std::string::size_type pos = 0; // Must initialize
-    while ((pos = str.find("\r\n", pos)) != std::string::npos) {
-        str[pos] = ' ';
+    for (char& c : str) {
+        if (c == '\n' || c == '\r') {
+            c = ' ';
+        }
     }
 }
 
