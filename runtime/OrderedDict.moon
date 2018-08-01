@@ -1,4 +1,4 @@
-_keys = (t) -> for k,v in pairs(t)
+_keys = (t) -> return for k,v in pairs(t)
     assert type(k) == "string" or type(k) == "number"
     k
 
@@ -15,6 +15,7 @@ _meta = {
         return
     __pairs: () =>
         i = 1
+        assert @keys, @vals
         return () ->
             key = @keys[i]
             i += 1
@@ -26,7 +27,9 @@ _meta = {
 
 _init = (dict) =>
     if dict ~= nil
+        assert not getmetatable(dict)
         @keys = _keys(dict)
+        table.sort(@keys)
         @vals = dict
     else
         @keys = {} -- Key order list
