@@ -434,6 +434,7 @@ DataW.effect_create {
             else
                 caster.summoned[mon] += 1
                 @n_summons += 1
+        caster.summoned\__compact()
 }
 
 -- TODO flip effect of fortification -- TODO whut?

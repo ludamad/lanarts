@@ -296,7 +296,7 @@ end
 -- TODO after the dust settles, see which 'pairs' primitives are important.
 local original_pairs = pairs
 local getmetatable = getmetatable
-OrderedDict = require "OrderedDict"
+OrderedDict = require("OrderedDict").OrderedDict
 function pairs(t)
     local meta = getmetatable(t)
     if meta == nil or meta.__pairs == nil then

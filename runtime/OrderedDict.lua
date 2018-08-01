@@ -12,27 +12,41 @@ _keys = function(t)
     return _accum_0
   end)()
 end
+local TOMBSTONE = { }
+local compact
+compact = function(self)
+  table.remove_occurrences(self.__keys, TOMBSTONE)
+end
 local _meta = {
   __index = function(self, k)
-    return self.vals[k]
+    if k == '__compact' then
+      return compact
+    end
+    return self.__vals[k]
   end,
   __newindex = function(self, k, v)
     assert(k ~= nil)
     if v == nil then
-      table.remove_occurrences(self.keys, k)
-    elseif self.vals[k] == nil then
-      append(self.keys, v)
+      for i, key in ipairs(self.__keys) do
+        if key == k then
+          self.__keys[i] = TOMBSTONE
+        end
+      end
+    elseif self.__vals[k] == nil then
+      append(self.__keys, k)
     end
-    self.vals[k] = v
+    self.__vals[k] = v
   end,
   __pairs = function(self)
     local i = 1
-    assert(self.keys, self.vals)
     return function()
-      local key = self.keys[i]
-      i = i + 1
+      local key = TOMBSTONE
+      while key == TOMBSTONE do
+        key = self.__keys[i]
+        i = i + 1
+      end
       if key ~= nil then
-        return key, self.vals[key]
+        return key, self.__vals[key]
       else
         return 
       end
@@ -43,15 +57,18 @@ local _init
 _init = function(self, dict)
   if dict ~= nil then
     assert(not getmetatable(dict))
-    self.keys = _keys(dict)
-    table.sort(self.keys)
-    self.vals = dict
+    self.__keys = _keys(dict)
+    table.sort(self.__keys)
+    self.__vals = dict
   else
-    self.keys = { }
-    self.vals = { }
+    self.__keys = { }
+    self.__vals = { }
   end
   return setmetatable(self, _meta)
 end
-return function(dict)
-  return _init({ }, dict)
-end
+return {
+  OrderedDict = function(dict)
+    return _init({ }, dict)
+  end,
+  TOMBSTONE = TOMBSTONE
+}
