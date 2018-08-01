@@ -21,12 +21,12 @@ MonsterFightRoom = () -> newtype {
     -- Called before compile() is called
     generate: (args) =>
         MapUtils = require "maps.MapUtils"
-        for enemy, amount in pairs args.enemies
+        for enemy, amount in spairs args.enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)
                 -- Team 1
                 MapUtils.spawn_enemy(@map, enemy, sqr, 1)
-        for enemy, amount in pairs args.enemies
+        for enemy, amount in spairs args.enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)
                 -- Team 2
@@ -39,7 +39,7 @@ PROGRESSION = () ->
     init = () ->
         random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
         template = MonsterFightRoom()
-        for enemy, iattributes in pairs enemies
+        for enemy, iattributes in spairs enemies
             --if not enemy\match "Dragon"
             --    continue
             append fs, () ->

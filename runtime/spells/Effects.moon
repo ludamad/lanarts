@@ -419,11 +419,12 @@ DataW.effect_create {
     init_func: (caster) =>
         @n_summons = 0
     step_func: (caster) =>
-        caster.summoned or= @summoned or {}
+        caster.summoned or= @summoned or OrderedDict()
         @summoned or= caster.summoned
         @n_summons = 0
-        for mon, time in pairs caster.summoned
+        for mon, time in strictpairs caster.summoned
             if not mon.destroyed
+                event_log("Desummoning monster (%s, id=%d) at (%.2f, %.2f)", mon.name, math.max(0, mon.id), mon.x, mon.y)
                 time_out = (if mon.name == "Spectral Beast" then (time > 600) else (time > 1200)) -- All others are permanents
                 diff_floor = (caster.map ~= mon.map)
                 if time_out or diff_floor
@@ -441,10 +442,10 @@ DataW.effect_create {
     console_draw_func: (player, get_next) => 
         draw_console_effect(tosprite("spr_spells.statue_form"), "Gain defence when hit", get_next())
     init_func: (caster) =>
-        @active_bonuses = {}
+        @active_bonuses = OrderedDict()
         @duration = 320
     stat_func: (obj, old, new) =>
-        for k, v in pairs @active_bonuses -- Abuse that stat_func is called every frame
+        for k, v in strictpairs @active_bonuses -- Abuse that stat_func is called every frame
             if v == 0 
                 for _ in screens()
                     EventLog.add("Your defence falls back down...", COL_PALE_BLUE)

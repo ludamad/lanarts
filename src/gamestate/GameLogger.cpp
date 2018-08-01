@@ -68,11 +68,11 @@ void GameLogger::event_log(const char *fmt, va_list ap) {
     format(logline, "Frame %d Level %d RNG #%d: ",
             (int)gs->frame(), level ? (int)level->id() : -1, gs->rng().amount_generated());
     char text[512];
+
     vsnprintf(text, sizeof(text), fmt, ap);
     va_end(ap);
     logline += text;
     replace_newlines(logline);
-
     if (output_log_file) {
         output_log_file.write(logline.c_str(), logline.size());
         output_log_file << '\n';

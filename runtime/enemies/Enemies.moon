@@ -137,14 +137,15 @@ summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) ->
     init_func: () =>
         @n_steps = 0
         @summon_rate = rate
-        @summoned = {}
+        @summoned = OrderedDict {}
         @n_summons = 0
     step_func: () =>
         @n_summons = 0
-        for mon, time in pairs @summoned
+        for mon, time in strictpairs @summoned
             if time > kill_time
                 mon\direct_damage(mon.stats.hp + 1)
             if mon.destroyed
+                event_log("Desummoning monster (%s, id=%d) at (%.2f, %.2f)", mon.name, math.max(0, mon.id), mon.x, mon.y)
                 @summoned[mon] = nil
             else
                 @summoned[mon] += 1

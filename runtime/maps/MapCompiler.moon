@@ -227,7 +227,7 @@ MapCompiler = newtype {
         node.parent = parent
         node.properties or= {}
         if parent ~= nil
-            for k,v in pairs(parent.properties)
+            for k,v in spairs(parent.properties)
                 if node.properties[k] ~= nil
                     continue
                 -- Only inherit properties if we have not set them explicitly

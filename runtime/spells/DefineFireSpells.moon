@@ -44,7 +44,7 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
                 --    @caster\heal_mp(5)
                 play_sound "sound/ringfire-hit.ogg"
                 damage_cooldown[obj] = @cooldown
-            for k,v in pairs damage_cooldown
+            for k,v in strictpairs damage_cooldown
                 v -= 1
                 damage_cooldown[k] = (if v > 0 then v else nil)
     on_step: () => @base_on_step()
@@ -67,7 +67,7 @@ SpawnedFire = RingFireBase {
     -- RingFireBase config
     _damage: 2 / 4
     init: (args) =>
-        @damage_cooldowns = {} -- takes [dx][dy][obj]
+        @damage_cooldowns = OrderedDict() -- takes [dx][dy][obj]
         @initial_duration = args.duration
         @fire_radius = args.fire_radius or 1
         @base_init(args)
@@ -111,8 +111,8 @@ SpawnedFire = RingFireBase {
                 x, y = cx + dx * Map.TILE_SIZE, cy + dy * Map.TILE_SIZE
                 if not @caster\within_field_of_view({x, y})
                     continue
-                @damage_cooldowns[dy] or= {}
-                @damage_cooldowns[dy][dx] or= {}
+                @damage_cooldowns[dy] or= OrderedDict()
+                @damage_cooldowns[dy][dx] or= OrderedDict()
                 f(x, y, @damage_cooldowns[dy][dx])
 }
 
@@ -120,7 +120,7 @@ RingOfFire = RingFireBase {
     -- RingFireBase config
     _damage: 2 / 5
     init: (args) =>
-        @damage_cooldowns = {} -- takes [index][obj]
+        @damage_cooldowns = OrderedDict() -- takes [index][obj]
         @fireballs = {}
         @base_init(args)
     _create_rings: (radius_bonus = 0) =>
@@ -168,7 +168,7 @@ RingOfFire = RingFireBase {
         rings = @_create_rings(50 - 50 * radius_percentage)
         for idx=1,#rings
             {x, y} = rings[idx]
-            @damage_cooldowns[idx] or= {}
+            @damage_cooldowns[idx] or= OrderedDict()
             f(x + @caster.x, y + @caster.y, @damage_cooldowns[idx])
 }
 

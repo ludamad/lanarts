@@ -20,7 +20,7 @@ user_player_input = false
 ASTAR_BUFFER = PathFinding.astar_buffer_create()
 
 random_enemies = () ->
-    enemylist = (for k,v in pairs enemies do v)
+    enemylist = (for k,v in spairs enemies do v)
     ret = {}
     for i=1,10
         enemy = random_choice(enemylist)
@@ -28,7 +28,7 @@ random_enemies = () ->
     return ret
 
 random_items = () ->
-    itemlist = (for k,v in pairs items do v)
+    itemlist = (for k,v in spairs items do v)
     ret = {}
     for i=1,10
         for j=1,100
@@ -46,7 +46,7 @@ PROGRESSION = () ->
     init = () ->
         random_seed(1000) -- TEST_SEED + math.random() * 1000000 * 2)
 
-        for enemy, iattributes in pairs enemies
+        for enemy, iattributes in spairs enemies
             --if not enemy\match "Dragon"
             --    continue
             append fs, () ->
@@ -59,7 +59,7 @@ PROGRESSION = () ->
                     spawn_players: true
                 }
 
-        for item, attributes in pairs items
+        for item, attributes in spairs items
             if not attributes.types or #attributes.types < 2
                 continue
             if attributes.is_randart

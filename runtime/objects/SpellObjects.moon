@@ -148,8 +148,8 @@ M.SpellSpikes.on_draw = () =>
         alpha = math.max(0, math.min(alpha, 1))
         ObjectUtils.screen_draw(@sprite, @xy, alpha)
 
-with M.SummonAbility = LuaGameObject.type_create()
-    .init = (args) =>
+M.SummonAbility = LuaGameObject.type_create {
+    init: (args) =>
         {:monster, :on_summon, :caster, :xy, :duration} = args
         M.SummonAbility.parent_init(@, xy, 16, true, SPELL_WALL_DEPTH)
         @duration = duration
@@ -157,7 +157,7 @@ with M.SummonAbility = LuaGameObject.type_create()
         @n_steps = 0
         @on_summon = on_summon or do_nothing
         @monster = monster
-    .on_map_init = () =>
+    on_map_init: () =>
         -- Move to somewhere randomly nearby, but in sight:
         for i=1,100
             {x,y} = @xy
@@ -173,10 +173,10 @@ with M.SummonAbility = LuaGameObject.type_create()
                 continue
             @xy = {x, y}
             break
-    .on_step = () =>
+    on_step: () =>
         @n_steps += 1
         if @n_steps >= @duration
-            mon = GameObject.enemy_create {type: @monster, xy: @xy, team: (if @caster.is_enemy then 1 else 0)}
+            mon = GameObject.enemy_create {type: @monster, xy: @xy, team: @caster.team}
             if type(@.on_summon) == "function"
                 @.on_summon(mon)
             else
@@ -184,10 +184,11 @@ with M.SummonAbility = LuaGameObject.type_create()
                 pretty @.on_summon
             @caster.summoned[mon] = 1
             GameObject.destroy(@)
-    .on_draw = () =>
+    on_draw: () =>
         if Map.object_visible(@)
             alpha = @n_steps / @duration
             sprite = monster_sprite @monster
             ObjectUtils.screen_draw(sprite, @xy, alpha, nil, nil, COL_GRAY)
+}
 
 return M

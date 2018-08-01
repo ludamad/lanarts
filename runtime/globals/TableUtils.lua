@@ -293,3 +293,27 @@ function values(table)
     end
 end
 
+-- TODO after the dust settles, see which 'pairs' primitives are important.
+local original_pairs = pairs
+local getmetatable = getmetatable
+OrderedDict = require "OrderedDict"
+function pairs(t)
+    local meta = getmetatable(t)
+    if meta == nil or meta.__pairs == nil then
+        return original_pairs(t)
+    end
+    return meta.__pairs(t)
+end
+
+-- sorted pairs
+function spairs(t) 
+    return pairs(OrderedDict(t))
+end
+
+-- pairs which fails if its not deterministic
+function strictpairs(t)
+    local meta = getmetatable(t)
+    assert(meta, "Object cannot be raw table! Unsafe!")
+    assert(meta.__pairs, "Object NEEDS a stable __pairs implementation! Raw 'pairs' is not deterministic!")
+    return meta.__pairs(t)
+end

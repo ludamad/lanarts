@@ -32,7 +32,7 @@ Flash = SpellUtils.spell_object_type {
         @_damage = args.damage
         -- Damage cooldowns by individual aspects
         @cooldown = args.cooldown or 50
-        @damage_cooldowns = {}
+        @damage_cooldowns = OrderedDict()
     _on_kill: (obj) => nil -- Default do nothing
     on_step: () =>
         if @caster.is_ghost
@@ -48,7 +48,7 @@ Flash = SpellUtils.spell_object_type {
                     @_on_kill(mon)
                 try_stun(@caster, mon)
                 damage_cooldown[mon] = @cooldown
-            for k,v in pairs damage_cooldown
+            for k,v in strictpairs damage_cooldown
                 v -= 1
                 damage_cooldown[k] = (if v > 0 then v else nil)
     for_all_rings: (f) =>
@@ -61,8 +61,8 @@ Flash = SpellUtils.spell_object_type {
                 x, y = cx + dx * Map.TILE_SIZE, cy + dy * Map.TILE_SIZE
                 if not @caster\within_field_of_view({x, y})
                     continue
-                @damage_cooldowns[dy] or= {}
-                @damage_cooldowns[dy][dx] or= {}
+                @damage_cooldowns[dy] or= OrderedDict()
+                @damage_cooldowns[dy][dx] or= OrderedDict()
                 f(x, y, @damage_cooldowns[dy][dx])
     on_draw: () =>
         if @caster.destroyed or @caster.map ~= @map

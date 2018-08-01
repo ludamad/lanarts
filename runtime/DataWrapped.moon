@@ -173,7 +173,7 @@ add_types = (args, types) ->
             atkstats.type_multiplier *= TypeEffectUtils.get_resistance(target, type)
 
 power_effects = (powers, effects = {}) ->
-    for type, power in pairs powers
+    for type, power in spairs powers
         assert table.contains(TypeEffectUtils.TYPES, type), "Invalid type!"
         if power == 0 -- Special case for simplifying code-generated content
             continue
@@ -181,7 +181,7 @@ power_effects = (powers, effects = {}) ->
     return effects
 
 resistance_effects = (resists, effects = {}) ->
-    for type, resist in pairs resists
+    for type, resist in spairs resists
         assert table.contains(TypeEffectUtils.TYPES, type), "Invalid type!"
         if resist == 0 -- Special case for simplifying code-generated content
             continue

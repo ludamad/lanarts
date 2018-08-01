@@ -79,7 +79,7 @@ passing_projectile = (args) ->
             return
         @attacked_map or= {}
         @n_hits or= 0
-        for k,v in pairs @attacked_map
+        for k,v in strictpairs @attacked_map
             if v == 0 
                 @attacked_map[k] = nil
             else

@@ -66,7 +66,7 @@ DragonLairFoyer = newtype {
     }
     -- Called before compile() is called
     generate: (args) =>
-        for enemy, amount in pairs @enemies
+        for enemy, amount in spairs @enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)
                 MapUtils.spawn_enemy(@map, enemy, sqr)
@@ -95,7 +95,7 @@ DragonLair = newtype {
     }
     -- Called before compile() is called
     generate: (args) =>
-        for enemy, amount in pairs @enemies
+        for enemy, amount in spairs @enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)
                 MapUtils.spawn_enemy(@map, enemy, sqr)
@@ -132,12 +132,12 @@ Arena = newtype {
     -- Called before compile() is called
     generate: (args) =>
         enemies = args.enemies or loadstring(os.getenv "ARENA_ENEMIES")() or {}
-        for enemy, amount in pairs enemies
+        for enemy, amount in spairs enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)
                 MapUtils.spawn_enemy(@map, enemy, sqr)
         items = args.items or loadstring(os.getenv "ARENA_ITEMS")() or {}
-        for type, amount in pairs items
+        for type, amount in spairs items
             sqr = MapUtils.random_square(@map, nil)
             MapUtils.spawn_item(@map, type, amount, sqr)
 }
@@ -153,12 +153,12 @@ SimpleRoom = newtype {
     -- Called before compile() is called
     generate: (args) =>
         enemies = args.enemies or {}
-        for enemy, amount in pairs enemies
+        for enemy, amount in spairs enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)
                 MapUtils.spawn_enemy(@map, enemy, sqr)
         items = args.items or {}
-        for type, amount in pairs items
+        for type, amount in spairs items
             if type == "Gold" or _G.items[type].drop_chance ~= nil
                 sqr = MapUtils.random_square(@map, nil)
                 MapUtils.spawn_item(@map, type, amount, sqr) if sqr
@@ -181,12 +181,12 @@ ChickenCoop = newtype {
         --enemies["Poulter"] = 1
         --enemies["Waffles"] = 1
         enemies["Chicken"] = 100
-        for enemy, amount in pairs enemies
+        for enemy, amount in spairs enemies
             for i=1,amount
                 sqr = MapUtils.random_square(@map, nil)
                 MapUtils.spawn_enemy(@map, enemy, sqr)
         items = args.items or {}
-        for type, amount in pairs items
+        for type, amount in spairs items
             if type == "Gold" or _G.items[type].drop_chance ~= nil
                 sqr = MapUtils.random_square(@map, nil)
                 MapUtils.spawn_item(@map, type, amount, sqr)
