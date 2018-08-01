@@ -47,7 +47,6 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
             for k,v in strictpairs damage_cooldown
                 v -= 1
                 damage_cooldown[k] = (if v > 0 then v else nil)
-            damage_cooldown\__compact()
     on_step: () => @base_on_step()
     on_draw: () =>
         if @caster.destroyed or @caster.map ~= @map

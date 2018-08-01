@@ -150,7 +150,6 @@ summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) ->
             else
                 @summoned[mon] += 1
                 @n_summons += 1
-        @summoned\__compact()
         if Map.object_visible(@) and not (@has_effect "Summoning") and @n_summons < amount
             if #Map.allies_list(@) == 0
                 return

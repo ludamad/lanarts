@@ -1,3 +1,4 @@
+local type = type
 local _keys
 _keys = function(t)
   return (function()
@@ -12,28 +13,39 @@ _keys = function(t)
     return _accum_0
   end)()
 end
-local TOMBSTONE = { }
-local compact
-compact = function(self)
-  table.remove_occurrences(self.__keys, TOMBSTONE)
+local _cmp_mixed_type
+_cmp_mixed_type = function(a, b)
+  local ta, tb = type(a), type(b)
+  if ta == tb then
+    return a < b
+  else
+    return ta < tb
+  end
 end
+local TOMBSTONE = { }
 local _meta = {
   __index = function(self, k)
-    if k == '__compact' then
-      return compact
-    end
     return self.__vals[k]
   end,
   __newindex = function(self, k, v)
     assert(k ~= nil)
+    local tmbs = self.__tombstone_idxs
     if v == nil then
       for i, key in ipairs(self.__keys) do
         if key == k then
           self.__keys[i] = TOMBSTONE
+          append(tmbs, TOMBSTONE)
+          break
         end
       end
     elseif self.__vals[k] == nil then
-      append(self.__keys, k)
+      local last_tmb = tmbs[#tmbs]
+      if tmbs[#tmbs] ~= nil then
+        self.__keys[last_tmb] = k
+        tmbs[#tmbs] = nil
+      else
+        append(self.__keys, k)
+      end
     end
     self.__vals[k] = v
   end,
@@ -58,12 +70,13 @@ _init = function(self, dict)
   if dict ~= nil then
     assert(not getmetatable(dict))
     self.__keys = _keys(dict)
-    table.sort(self.__keys)
+    table.sort(self.__keys, _cmp_mixed_type)
     self.__vals = dict
   else
     self.__keys = { }
     self.__vals = { }
   end
+  self.__tombstone_idxs = { }
   return setmetatable(self, _meta)
 end
 return {
