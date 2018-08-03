@@ -143,16 +143,13 @@ summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) ->
         @n_summons = 0
         for mon, time in strictpairs @summoned
             if time > kill_time
-                print "Attacking mon for desummon"
                 mon\direct_damage(mon.stats.hp + 1)
             if mon.destroyed
                 event_log("Desummoning monster (%s, id=%d) at (%.2f, %.2f)", mon.name, math.max(0, mon.id), mon.x, mon.y)
-                print("Desummoning monster (%s, id=%d) at (%.2f, %.2f)", mon.name, math.max(0, mon.id), mon.x, mon.y)
                 @summoned[mon] = nil
             else
                 @summoned[mon] += 1
                 @n_summons += 1
-        print #Map.allies_list(@)
         if Map.object_visible(@) and not (@has_effect "Summoning") and @n_summons < amount
             if #Map.allies_list(@) == 0
                 return
