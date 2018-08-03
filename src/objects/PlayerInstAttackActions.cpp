@@ -545,6 +545,10 @@ void PlayerInst::_use_spell(GameState *gs, const GameAction &action) {
     if (is_ghost()) {
         return;
     }
+    if (spells_known().amount() <= action.use_id) {
+        // This spell is no longer valid since being queued!
+        return;
+    }
     spell_id spell = spells_known().get(action.use_id);
     SpellEntry& spl_entry = res::spell(spell);
     try_use_spell(
