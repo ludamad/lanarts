@@ -574,7 +574,7 @@ void LuaSerializeConfig::decode(SerializeBuffer& serializer, LuaValue& value) {
 		lua_gettable(L, -2);
 		if (lua_isstring(L, -1)) {
 			str = lua_tostring(L, -1);
-			printf("DECODING AS INDEX '%s'\n", str);
+			//printf("DECODING AS INDEX '%s'\n", str);
 		}
 		lua_pop(L, 1);
 	}

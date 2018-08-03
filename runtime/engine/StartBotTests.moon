@@ -6,7 +6,7 @@ EngineHooks = require "engine.EngineBase"
 Settings = require "engine.Settings"
 EventLog = require "ui.EventLog"
 
-game_init = (seed, class_name) ->
+game_init = (seed, class_name, load_file=nil) ->
     GameState = require("core.GameState")
     -- Player config
     GameState.clear_players()
@@ -18,7 +18,10 @@ game_init = (seed, class_name) ->
     log "Initializing GameState object..."
     EngineInternal.init_gamestate()
     random_seed(seed)
-    EngineInternal.start_game()
+    if load_file
+        GameState.load(load_file)
+    else
+        EngineInternal.start_game()
 
 fps_updater = () ->
     GameState = require("core.GameState")
@@ -44,6 +47,8 @@ run_bot_tests = (raw_args) ->
     parser\option("--event_log", "Event log to write to.", nil)
     parser\option("--seed", "Starting seed.", "12345678")
     parser\option("--class", "Bot class.", "Fighter")
+    parser\option("--save", "Save file to save to.", nil)
+    parser\option("--load", "Save file to load from.", nil)
     parser\option("--comparison_event_log", "Event log to compare to.", nil)
     args = parser\parse(raw_args)
 
@@ -52,7 +57,7 @@ run_bot_tests = (raw_args) ->
     game_start = () ->
         return ResourceLoading.ensure_resources_before () ->
             -- (1) Init game
-            game_init(tonumber(args.seed), args.class)
+            game_init(tonumber(args.seed), args.class, args.load)
 
             -- (2) Set up input for first game step
             GameState = require("core.GameState")
@@ -60,10 +65,18 @@ run_bot_tests = (raw_args) ->
             if not GameState.input_handle()
                 error("Game exited")
 
+            -- (2) Check if game
             -- (3) Transfer to game loop
             return game_step()
 
-    game_step = () -> 
+    game_exit = (msg) ->
+        print msg
+        if args.save
+            GameState = require("core.GameState")
+            GameState.save(args.save)
+        return nil
+
+    game_step = () ->
         fps_update = fps_updater()
         step = () ->
             -- (1) Load dependencies
@@ -78,23 +91,19 @@ run_bot_tests = (raw_args) ->
 
             -- (3) Check if we are at final frame:
             if args.steps and GameState.frame >= tonumber(args.steps)
-                print "Final frame achieved."
-                -- Exit
-                return nil
+                return game_exit "Final frame achieved."
 
             -- (4) Run game loop & and see if game
             -- should be saved + exited
             if not GameLoop.game_step(step_only)
-                -- Exit
-                return nil
+                return game_exit "Game loop exited."
 
             -- (5) Loop again
             return step
         EngineHooks.game_won = () ->
             -- Exit on next step
-            print "GAME WAS WON"
             step = () ->
-                return nil
+                return game_exit "GAME WAS WON"
         return step()
 
     return StartEngine.start_engine {
