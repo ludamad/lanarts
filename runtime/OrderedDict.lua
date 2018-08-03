@@ -34,7 +34,7 @@ local _meta = {
       for i, key in ipairs(self.__keys) do
         if key == k then
           self.__keys[i] = TOMBSTONE
-          append(tmbs, TOMBSTONE)
+          append(tmbs, i)
           break
         end
       end

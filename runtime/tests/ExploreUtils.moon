@@ -170,16 +170,16 @@ ai_state = (player) -> {
             @queued_movements[#@queued_movements] = nil
             return dir
         dir = @path_planner\next_direction_towards()
-        --pretty(dir)
+
         if dir
             return dir
-        append @queued_movements, @get_next_wander_direction()
-        -- return {0,0}
+
         next_obj = nil
         for obj in *_objects(player, "item")
            if obj.type == @next_key_item()
                next_obj = obj
                break
+
         if not next_obj
            if @next_key_item() == "Azurite Key"
                for i=2,1,-1
@@ -195,10 +195,13 @@ ai_state = (player) -> {
                    if next_obj
                        break
                    next_obj = @portal_planner\closest_portal("Outpost ".. i)
+
+        -- Get the next position towards the object we are aiming towards
         if next_obj
            @path_planner\set_path_towards(next_obj)
            return @path_planner\next_direction_towards()
         return nil
+
     _closest: (objs) =>
         o = nil
         min_dist_sqr = math.huge
@@ -209,6 +212,7 @@ ai_state = (player) -> {
                 min_dist_sqr = dist_sqr
                 o = obj
         return assert o
+
     get_next_wander_direction: () =>
         portals = _objects player, "actor"
         objs = table.filter portals, (p) -> p.team ~= player.team

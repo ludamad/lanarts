@@ -80,6 +80,7 @@ return newtype {
         append @_queued, {1,1}
         @_use_portal = true
         --portal\on_player_interact(player)
+
     _should_end: () =>
         if not @input_source
             return false
@@ -138,6 +139,7 @@ return newtype {
             @set("move_direction", dir)
         @_use_portal = false
         return true
+
     _attack_action: () =>
         -- Necromancer:
         player = @player

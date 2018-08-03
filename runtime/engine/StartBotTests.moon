@@ -5,8 +5,6 @@ StartEngine = require "engine.StartEngine"
 EngineHooks = require "engine.EngineBase"
 Settings = require "engine.Settings"
 EventLog = require "ui.EventLog"
--- ProgrammableInputSource = require "input.ProgrammableInputSource"
--- BotInputSource = require "ai.BotInputSource"
 
 game_init = (seed, class_name) ->
     GameState = require("core.GameState")

@@ -23,7 +23,7 @@ _meta = {
             for i, key in ipairs(@__keys)
                 if key == k
                     @__keys[i] = TOMBSTONE
-                    append tmbs, TOMBSTONE
+                    append tmbs, i
                     break
         elseif @__vals[k] == nil -- member creation, O(1)
             last_tmb = tmbs[#tmbs]

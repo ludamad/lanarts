@@ -419,8 +419,7 @@ DataW.effect_create {
     init_func: (caster) =>
         @n_summons = 0
     step_func: (caster) =>
-        caster.summoned or= @summoned or OrderedDict()
-        @summoned or= caster.summoned
+        caster.summoned or= OrderedDict()
         @n_summons = 0
         for mon, time in strictpairs caster.summoned
             if not mon.destroyed
@@ -616,7 +615,7 @@ DataW.effect_create {
         @on_summon = do_nothing
         @summon_xy = false
         @start_map = caster.map
-        caster.summoned or= {}
+        caster.summoned or= OrderedDict()
     step_func: (caster) =>
         @n_steps += 1
         if @n_steps == @delay

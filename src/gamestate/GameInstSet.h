@@ -66,7 +66,7 @@ public:
 
 	template <typename T, typename Func>
 	bool for_each(const Func& func) {
-        for (auto& unit : unit_set) {
+            for (auto& unit : unit_set) {
             T* inst = dynamic_cast<T*>(unit.inst);
             if (inst && !func(inst)) {
                 return false;
