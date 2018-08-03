@@ -269,6 +269,7 @@ void GameInstSet::step(GameState* gs) {
 		GameInst::free_reference(deallocation_list[i]);
 	}
 	deallocation_list.clear();
+	float world_width = gs->width(), world_height = gs->height();
 	for (int i = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
 		if (valid_inst(inst)) {
@@ -276,6 +277,9 @@ void GameInstSet::step(GameState* gs) {
 			inst->destroyed = false;
 			event_log("Step-event for id %d", std::max(inst->id,0));
 			inst->step(gs);
+			// Move the object within bounds:
+			inst->x = std::min(std::max(0.0f, inst->x), world_width - 1);
+			inst->y = std::min(std::max(0.0f, inst->y), world_height - 1);
 			update_instance_for_step(&unit_set[i], inst);
 			perf_timer_end(typeid(*inst).name());
 		}
