@@ -65,7 +65,7 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
 local SpawnedFire
 SpawnedFire = RingFireBase {
     -- RingFireBase config
-    _damage: 2 / 4
+    _damage: 0.2
     init: (args) =>
         @damage_cooldowns = OrderedDict() -- takes [dx][dy][obj]
         @initial_duration = args.duration
@@ -90,7 +90,7 @@ SpawnedFire = RingFireBase {
 
     _on_damage: (obj) =>
         divider = if @fire_radius == 0 then 1 else 3
-        if chance(.15 / divider)
+        if chance(.05 / divider)
             mon_name = SpellUtils.mon_title(obj)
             SpellUtils.message(@caster, "Suddenly, #{mon_name} catches on fire!", COL_PALE_RED)
             GameObject.add_to_level SpawnedFire.create {
@@ -118,7 +118,7 @@ SpawnedFire = RingFireBase {
 
 RingOfFire = RingFireBase {
     -- RingFireBase config
-    _damage: 2 / 5
+    _damage: 0.2
     init: (args) =>
         @damage_cooldowns = OrderedDict() -- takes [index][obj]
         @fireballs = {}
@@ -405,20 +405,27 @@ DataW.spell_create {
         spr_attack: "fire bolt"
         on_damage: (target, damage) =>
             --apply_burn_damage(target, @caster, damage)
-            nil
+            if @caster\has_effect("Dragonform")
+                SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
+                GameObject.add_to_level SpawnedFire.create {
+                    fire_radius: 1
+                    caster: @caster
+                    xy: @xy
+                    cooldown: 20
+                    duration: 80
+                }
         on_deinit: () =>
             if @caster.destroyed
                 return
             r_pow = TypeEffectUtils.get_power(@caster, 'Red')
-            if @caster\has_effect("Dragonform") or chance(0.05 + 0.05 * @caster.stats.level)
+            if chance(0.05 + 0.01 * r_pow)
                 SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
-                -- TODO idea, fire_radius: 2 greater fire wand
                 GameObject.add_to_level SpawnedFire.create {
-                    fire_radius: if @caster\has_effect("Dragonform") then 1 else 0
+                    fire_radius: 0
                     caster: @caster
                     xy: @xy
-                    cooldown: (if @caster\has_effect("Dragonform") then 20 else 20)
-                    duration: (if @caster\has_effect("Dragonform") then 80 else 200)
+                    cooldown: 20
+                    duration: 200
                 }
 
     }

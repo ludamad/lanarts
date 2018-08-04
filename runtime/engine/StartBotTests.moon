@@ -42,7 +42,6 @@ fps_updater = () ->
 
 run_bot_tests = (raw_args) ->
     parser = argparse("lanarts", "Run lanarts bot tests.")
-    parser\option "--test_save_and_load", "Should we have headless execution?", false
     parser\option("--steps", "Maximum number of steps to take.", nil)
     parser\option("--event_log", "Event log to write to.", nil)
     parser\option("--seed", "Starting seed.", "12345678")
@@ -65,7 +64,6 @@ run_bot_tests = (raw_args) ->
             if not GameState.input_handle()
                 error("Game exited")
 
-            -- (2) Check if game
             -- (3) Transfer to game loop
             return game_step()
 

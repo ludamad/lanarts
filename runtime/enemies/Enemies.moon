@@ -506,7 +506,7 @@ DataW.enemy_create summoner_base("Imp", 1, 100, 100) {
     death_func: () =>
         item = random_choice {"Will Scroll", "Strength Scroll", "Defence Scroll", "Magic Scroll"}
         ObjectUtils.spawn_item_near(@, item, 1)
-        ObjectUtils.spawn_item_near(@, "Abyssal Lanart", 1)
+        ObjectUtils.spawn_item_near(@, "War Lanart", 1)
         ItemUtils = require "maps.ItemUtils"
         -- Spawn a level 1 randart:
         {:type, :amount} = ItemUtils.randart_generate(1)
@@ -1487,7 +1487,7 @@ DataW.enemy_create {
         strength: 8
         magic: 25
         defence: 5
-        willpower: 15
+        willpower: 10
     }
     types: {"Red"}
     projectile: {

@@ -49,6 +49,7 @@ return newtype {
     parent: ProgrammableInputSource
     init: (player) =>
         ProgrammableInputSource.init(@, player)
+        print "CREATING BOTINPUTSOURCE"
         initialize(@)
     -- step: () =>
     --     @_simulate_game_input()

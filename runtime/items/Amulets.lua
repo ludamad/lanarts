@@ -223,14 +223,14 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Tomb Lanart",
-    description = "Helps open Pixullochia. When equipped, summons a zombie on every kill.",
+    description = "Helps open Pixullochia. When equipped, grants +3 Black Power.",
     type = "lanart",
 
     -- TODO implement
     -- TODO use
     spr_item = "spr_runes.rune_tomb",
     sellable = false,
-    effects_granted = {"SummonMummyOnKill"},
+    effects_granted = {{"GreenPower", {power = 5}}},
     pickup_func = function(self, user)
         local GlobalData = require "core.GlobalData"
         if not GlobalData.lanarts_picked_up[self.name] then
@@ -242,15 +242,15 @@ Data.equipment_create {
 
 
 Data.equipment_create {
-    name = "Abyssal Lanart",
-    description = "Helps open Pixullochia. When equipped, summons a zombie on every kill.",
+    name = "War Lanart",
+    description = "Helps open Pixullochia. When equipped, grants +2 strength.",
     type = "lanart",
 
     -- TODO implement
     -- TODO use
     spr_item = "spr_runes.rune_abyss",
     sellable = false,
-    effects_granted = {"SummonMummyOnKill"},
+    stat_bonuses = {strength = 2},
     pickup_func = function(self, user)
         local GlobalData = require "core.GlobalData"
         if not GlobalData.lanarts_picked_up[self.name] then

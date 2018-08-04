@@ -138,9 +138,9 @@ armour = (chance, args) -> _filter {
     -- Body Armour
     args.ignore_weak or { item: "Leather Armour",     chance: 8                      }
     args.ignore_weak or { item: "Robe",               chance: 6                      }
-    args.ignore_weak or { item: "Green Robe",               chance: 1         }
-    args.ignore_weak or { item: "White Robe",               chance: 1         }
-    args.ignore_weak or { item: "Red Robe",               chance: 1         }
+    --args.ignore_weak or { item: "Green Robe",               chance: 1         }
+    --args.ignore_weak or { item: "White Robe",               chance: 1         }
+    --args.ignore_weak or { item: "Red Robe",               chance: 1         }
 
     args.ignore_medium or{ item: "Chainmail",          chance: 4                      }
     args.ignore_medium or { item: "Magician's Robe",    chance: 2                      }

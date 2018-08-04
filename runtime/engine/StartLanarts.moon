@@ -52,6 +52,9 @@ run_lanarts = (raw_args) ->
     game_start = (load_file=nil) ->
         return ResourceLoading.ensure_resources_before () ->
             -- (1) Init game
+            -- TODO refactor:
+            if load_file
+                load_file = args.load
             game_init(load_file)
 
             -- (2) Set up input for first game step
@@ -80,7 +83,7 @@ run_lanarts = (raw_args) ->
         if not GameLoop.game_step()
             -- Save and exit
             GameState.score_board_store()
-            GameState.save(argv_configuration.save_file or "saves/savefile.save")
+            GameState.save(args.save or "saves/savefile.save")
             -- Allocate a fresh GameState
             EngineInternal.init_gamestate_api(settings)
             -- Go back to menu
@@ -105,8 +108,6 @@ run_lanarts = (raw_args) ->
         :settings,
         entry_point: menu_start,
         debug: args.debug,
-        save: args.save,
-        load: args.load
         nofilter: args.nofilter
         on_exit: Settings.settings_save
     }
