@@ -105,7 +105,7 @@ void EquipmentEntry::parse_lua_table(const LuaValue& table) {
 		type = name2type(table["type"].to_str());
 	}
 	stackable = false;
-	use_action = LuaAction(LuaValue());
+	use_action = LuaAction();
 	stat_modifiers = parse_stat_modifiers(table);
 	cooldown_modifiers = parse_cooldown_modifiers(table);
 	spells_granted = parse_spells_known(table["spells_granted"]);

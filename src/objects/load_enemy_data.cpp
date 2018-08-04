@@ -14,46 +14,6 @@
 
 using namespace std;
 
-EnemyEntry parse_enemy_type(lua_State* L, const YAML::Node& n) {
-	EnemyEntry entry;
-
-	entry.name = parse_str(n["name"]);
-	entry.description = parse_defaulted(n, "description", std::string());
-
-	entry.appear_msg = parse_defaulted(n, "appear_message", std::string());
-	entry.defeat_msg = parse_defaulted(n, "defeat_message", std::string());
-
-	entry.radius = parse_int(n["radius"]);
-	entry.xpaward = parse_int(n["xpaward"]);
-
-	entry.enemy_sprite = parse_sprite_number(n, "sprite");
-	entry.death_sprite = parse_sprite_number(n, "death_sprite");
-	entry.basestats = parse_combat_stats(n["stats"]);
-    entry.unique = parse_defaulted(n, "unique", false);
-    entry.vision_radius = parse_defaulted(n, "vision_radius", 7);
-
-	entry.init_event = parse_luaexpr(L, n, "init_func");
-	entry.step_event = parse_luaexpr(L, n, "step_func");
-	entry.draw_event = parse_luaexpr(L, n, "draw_func");
-	entry.death_event = parse_luaexpr(L, n, "death_func");
-
-        auto effects_granted = parse_defaulted(n, "effects_active", vector<string>());
-        entry.effect_modifiers.status_effects.clear();
-        for (string& str : effects_granted) {
-             entry.effect_modifiers.status_effects.push_back({get_effect_by_name(str.c_str()), LuaValue(L)});
-        }
-
-	return entry;
-}
-
-void load_enemy_callbackf(const YAML::Node& node, lua_State* L,
-		LuaValue* value) {
-	EnemyEntry entry = parse_enemy_type(L, node);
-	game_enemy_data.new_entry(entry.name, entry);
-
-	(*value)[entry.name] = node;
-}
-
 
 std::vector<StatusEffect> load_statuses(const LuaValue& effects) {
     if (effects.isnil()) {
@@ -97,10 +57,10 @@ static EnemyEntry parse_enemy_type(const LuaStackValue& table) {
     entry.unique = defaulted(table, "unique", false);
     entry.vision_radius = defaulted(table, "vision_radius", 7);
 
-    entry.init_event.initialize(table["init_func"]);
-    entry.step_event.initialize(table["step_func"]);
-    entry.draw_event.initialize(table["draw_func"]);
-    entry.death_event.initialize(table["death_func"]);
+    entry.init_event = table["init_func"];
+    entry.step_event = table["step_func"];
+    entry.draw_event = table["draw_func"];
+    entry.death_event = table["death_func"];
     entry.console_draw_func = table["console_draw_func"];
     entry.target_draw_func = table["target_draw_func"];
 

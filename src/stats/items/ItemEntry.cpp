@@ -78,10 +78,10 @@ void ItemEntry::parse_lua_table(const LuaValue& table) {
         pickup_call = table["pickup_func"];
 
 	if (!table["action_func"].isnil()) {
-		use_action.action_func = LuaLazyValue(table["action_func"]);
+		use_action.action_func = table["action_func"];
 	}
 	if (!table["prereq_func"].isnil()) {
-		use_action.prereq_func = LuaLazyValue(table["prereq_func"]);
+		use_action.prereq_func = table["prereq_func"];
 	}
 	item_sprite = -1;
 	if (!table["spr_item"].isnil()) {
