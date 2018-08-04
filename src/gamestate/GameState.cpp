@@ -698,7 +698,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 	}
 
 	perf_timer_end(FUNCNAME);
-	return (!has_player);
+	return false; //(!has_player);
 }
 bool GameState::object_visible_test(GameInst* obj, PlayerInst* player,
 		bool canreveal) {
