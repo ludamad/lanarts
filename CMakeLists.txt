@@ -35,7 +35,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_definitions("-O1")
+    #add_definitions("-O1")
     if ($ENV{BUILD_SANITIZE})
         SET (CMAKE_EXE_LINKER_FLAGS
             "-fsanitize=address -fsanitize=undefined"

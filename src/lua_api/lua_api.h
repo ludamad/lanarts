@@ -99,9 +99,6 @@ class CombatStats;
 class EffectiveStats;
 class EffectiveAttackStats;
 
-// Defined in lua_core_GameObject
-void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst);
-
 void lua_push_effectivestats(lua_State* L, GameInst* inst);
 void lua_push_effectivestats(lua_State* L, const EffectiveStats& stats);
 void lua_push_effectiveattackstats(lua_State* L, const EffectiveAttackStats& stats);

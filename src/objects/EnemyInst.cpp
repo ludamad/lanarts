@@ -138,10 +138,10 @@ void EnemyInst::init(GameState* gs) {
 	lua_State* L = gs->luastate();
 
 	float diffmult = monster_difficulty_multiplier(gs, etype());
-	core_stats().hp = ceil(core_stats().hp  * diffmult);
-	core_stats().max_hp = ceil(core_stats().max_hp  * diffmult);
+	core_stats().hp = static_cast<int>(ceil(core_stats().hp * diffmult));
+	core_stats().max_hp = static_cast<int>(ceil(core_stats().max_hp * diffmult));
 
-	lua_gameinst_callback(L, etype().init_event, this);
+	lcall(etype().init_event, this);
 	lua_api::event_monster_init(L, this);
 }
 static bool starts_with_vowel(const std::string& name) {
@@ -263,12 +263,7 @@ void EnemyInst::die(GameState* gs) {
     auto* curr_level = gs->get_level();
     gs->set_level(get_map(gs));
     if (!destroyed) {
-        // Figure out if the respawns_on_death flag was set
-        lua_lookup(gs->luastate(), "respawns_on_death");
-        bool should_respawn = lua_toboolean(gs->luastate(), -1);
-        lua_pop(gs->luastate(), 1);
-
-        lua_gameinst_callback(gs->luastate(), etype().death_event, this);
+		lcall(etype().death_event, this);
         lua_api::event_monster_death(gs->luastate(), this);
         gs->player_data().n_enemy_killed(enemytype)++;
         AnimatedInst* anim = new AnimatedInst(ipos(), etype().enemy_sprite, 20);
@@ -282,26 +277,6 @@ void EnemyInst::die(GameState* gs) {
         }
 
         MTwist& mt = gs->rng();
-        //if (should_respawn) {
-        //        printf("SHOULD\n");
-        //    auto* level = gs->get_level();
-        //    for (int i = 0; i < 100; i++) {
-        //        double direction = mt.rand(360) * deg2rad;
-        //        double magnitude = mt.rand(3100) + 100;
-        //        double vx = cos(direction) * magnitude, vy = sin(direction) * magnitude;
-        //        int nx = round(rx + vx), ny = round(ry + vy);
-        //        bool solid = gs->tile_radius_test(nx, ny, TILE_SIZE) || gs->object_radius_test(nx, ny, TILE_SIZE);
-        //        if (solid || gs->radius_visible_test(nx, ny, TILE_SIZE * 2)) {
-        //            continue;
-        //        }
-        //        if (nx < 0 || ny < 0 || nx > level->width() || ny > level->height()) {
-        //            continue;
-        //        }
-        //        printf("SPAWNING %i \n", i);
-        //        gs->add_instance(new EnemyInst(enemytype, nx, ny));
-        //        break;
-        //    }
-        //}
         CollisionAvoidance& coll_avoid = gs->collision_avoidance();
         coll_avoid.remove_object(collision_simulation_id());
 

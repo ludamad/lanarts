@@ -557,15 +557,6 @@ namespace GameInstWrap {
 	}
 }
 
-/* TODO: Deprecated */
-void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst) {
-	if (value.empty())
-		return;
-	value.push();
-	luawrap::push(L, inst);
-	lua_call(L, 1, 0);
-}
-
 typedef LuaValue (*exclusionf)(lua_State* L);
 
 static void push_exclusion_set(lua_State* L, exclusionf func) {
