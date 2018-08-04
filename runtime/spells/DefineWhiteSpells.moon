@@ -24,7 +24,8 @@ try_stun = (caster, mon) ->
             white_power = -5
         mon\add_effect("Stunned", (100 + white_power * 10) * resist)
         mon\add_effect("Stunned", (100 + white_power * 10) * resist)
-        play_sound "sound/ringfire-hit.ogg"
+        if Map.object_visible(mon)
+            play_sound "sound/ringfire-hit.ogg"
 
 Flash = SpellUtils.spell_object_type {
     types: {"White"}

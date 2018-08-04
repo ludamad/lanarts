@@ -140,7 +140,7 @@ function Door:on_step()
 
     if is_open ~= self.was_open then
         local tile_xy = ObjectUtils.tile_xy(self, true)
-        if is_open then
+        if is_open and Map.object_visible(self) then
             play_sound "sound/door.ogg"
         else
             --play_sound "sound/doorClose_3.ogg"

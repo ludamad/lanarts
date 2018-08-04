@@ -21,7 +21,7 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
     base_init: (args) =>
         assert @_damage
         -- Damage cooldowns by individual flame
-        @cooldown = args.cooldown or 5
+        @cooldown = args.cooldown or 20
     _on_kill: (obj) => nil -- Default do nothing
     _on_damage: (obj) => nil
     base_on_step: () =>

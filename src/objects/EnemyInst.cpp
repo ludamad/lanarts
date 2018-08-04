@@ -237,11 +237,7 @@ void EnemyInst::draw(GameState* gs) {
 	}
 	CombatGameInst::draw(gs, frame);
 
-	if (!etype().draw_event.empty()) {
-		lua_State* L = gs->luastate();
-		etype().draw_event.push();
-		luawrap::call<void>(L, (GameInst*) this);
-	}
+	lcall(etype().draw_event, this);
 
 	if (team == PLAYER_TEAM) {
             res::sprite("spr_effects.friendly").draw(on_screen(gs, PosF {x-16, y-16}));

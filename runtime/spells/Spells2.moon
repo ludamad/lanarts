@@ -157,7 +157,8 @@ DataW.spell_create {
     fallback_to_melee: false
     action_func: (caster, x, y) ->
         caster\add_effect("Ludaze", 30)
-        play_sound "sound/ludaze.ogg"
+        if Map.object_visible(caster)
+            play_sound "sound/ludaze.ogg"
         for mon in *(Map.enemies_list caster)
             if not Map.object_visible(mon, mon.xy, caster)
                 continue
@@ -276,7 +277,8 @@ DataW.spell_create {
             return false
         return not caster\has_effect("Exhausted") and not (caster\has_effect "Summoning")
     action_func: (caster, x_unused, y_unused) ->
-        play_sound "sound/summon.ogg"
+        if Map.object_visible(caster)
+            play_sound "sound/summon.ogg"
         monster = "Spectral Beast"
         if not (caster\has_effect "Summoning")
             caster\direct_damage(35)

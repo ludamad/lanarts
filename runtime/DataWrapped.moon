@@ -350,20 +350,20 @@ enemy_create = (args) ->
                     draw_console_effect E._black_power, "Black Type", get_next()
                 when "Green"
                     draw_console_effect E._poison_power, "Green Type", get_next()
-        add_draw_func args, (inst) ->
-            --switch type
-            --    when "Red"
-            Display = require "core.Display"
-            sprite = switch type
-                when "Red" then tosprite('spr_effects.fire-enemy')
-                when "Blue" then tosprite('spr_effects.blue-enemy')
-                when "Black" then tosprite('spr_effects.black-enemy')
-                when "White" then tosprite('spr_effects.white-enemy')
-                when "Green" then tosprite('spr_effects.green-enemy')
-            {x, y} = Display.to_screen_xy(inst.xy)
-            if sprite
-                sprite\draw({color: {255,255,255, 50}, origin: Display.CENTER}, {x + inst.radius, y + inst.radius})
-            -- Fonts.small\draw({color: {200,255,200,255}, origin: Display.CENTER_TOP}, {x, y - inst.radius - 16}, inst.stats.hp)
+        --add_draw_func args, (inst) ->
+        --    --switch type
+        --    --    when "Red"
+        --    Display = require "core.Display"
+        --    sprite = switch type
+        --        when "Red" then tosprite('spr_effects.fire-enemy')
+        --        when "Blue" then tosprite('spr_effects.blue-enemy')
+        --        when "Black" then tosprite('spr_effects.black-enemy')
+        --        when "White" then tosprite('spr_effects.white-enemy')
+        --        when "Green" then tosprite('spr_effects.green-enemy')
+        --    {x, y} = Display.to_screen_xy(inst.xy)
+        --    if sprite
+        --        sprite\draw({color: {255,255,255, 50}, origin: Display.CENTER}, {x + inst.radius, y + inst.radius})
+        --    -- Fonts.small\draw({color: {200,255,200,255}, origin: Display.CENTER_TOP}, {x, y - inst.radius - 16}, inst.stats.hp)
 
     -- Are there methods we want to make available on the enemy object?
     if args.methods
