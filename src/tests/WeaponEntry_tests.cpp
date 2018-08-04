@@ -50,7 +50,7 @@ extern ResourceDataSet<SpriteEntry> game_sprite_data;
 //		CHECK(7 == item.attack.damage_modifiers.damage_stats.strength);
 //		CHECK(8 == item.attack.damage_modifiers.damage_stats.magic);
 //		CHECK(Range(9,9) == item.attack.damage_modifiers.damage_stats.base);
-//		CHECK(10 == item.action_func().get(L).to_int());
+//		CHECK(10 == item.action_func().to_int());
 //		CHECK(11 == item.attack.cooldown);
 //		CHECK(12 == item.attack.range);
 //

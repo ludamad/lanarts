@@ -23,10 +23,6 @@ public:
 	virtual ~WeaponEntry() {
 	}
 
-	virtual void initialize(lua_State* L) {
-		EquipmentEntry::initialize(L);
-		attack.init(L);
-	}
 	CoreStatMultiplier& damage_stats() {
 		return attack.damage_stats();
 	}
@@ -52,7 +48,7 @@ public:
 	sprite_id attack_sprite() {
 		return attack.attack_sprite;
 	}
-	LuaLazyValue& action_func() {
+	LuaValue& action_func() {
 		return attack.attack_action.action_func;
 	}
 

@@ -199,7 +199,7 @@ void MonsterController::pre_step(GameState* gs) {
                     continue;
                 }
         lua_State* L = gs->luastate();
-        lua_gameinst_callback(L, e->etype().step_event.get(L), e);
+        lua_gameinst_callback(L, e->etype().step_event, e);
         update_velocity(gs, e);
         simul_id simid = e->collision_simulation_id();
         coll_avoid.set_position(simid, e->rx, e->ry);

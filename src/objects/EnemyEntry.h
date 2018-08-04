@@ -29,17 +29,11 @@ struct EnemyEntry: public ResourceEntryBase {
 	std::vector<StatusEffect> active_effects;
 	int vision_radius = 7; // TODO, use
 
-	LuaLazyValue init_event, step_event, draw_event, death_event;
+	LuaValue init_event, step_event, draw_event, death_event;
 	LuaValue console_draw_func, target_draw_func;
 	StatusEffectModifiers effect_modifiers;
 	LuaValue raw_table;
 
-	void init(lua_State* L) {
-		init_event.initialize(L);
-		step_event.initialize(L);
-        draw_event.initialize(L);
-        death_event.initialize(L);
-	}
 	virtual const char* entry_type() {
 		return "Enemy";
 	}

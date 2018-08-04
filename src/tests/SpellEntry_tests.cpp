@@ -54,7 +54,7 @@ extern ResourceDataSet<ItemEntry*> game_item_data;
 //		CHECK("description" == spell.description);
 //		CHECK(1 == spell.mp_cost);
 //		CHECK(2 == spell.cooldown);
-//		CHECK(3 == spell.autotarget_func.get(L).to_num());
+//		CHECK(3 == spell.autotarget_func.to_num());
 //		CHECK(true == spell.can_cast_with_held_key);
 //		CHECK(true == spell.can_cast_with_cooldown);
 //		CHECK(true == spell.fallback_to_melee);

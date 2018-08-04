@@ -640,7 +640,7 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 
 static bool item_check_lua_prereq(lua_State* L, ItemEntry& type,
    	GameInst* user) {
-   LuaValue& prereq = type.inventory_use_prereq_func().get(L);
+   LuaValue& prereq = type.inventory_use_prereq_func();
    if (prereq.empty())
    	return true;
 
@@ -656,7 +656,7 @@ static bool item_check_lua_prereq(lua_State* L, ItemEntry& type,
 }
 static void item_do_lua_action(lua_State* L, ItemEntry& type, GameInst* user,
    	const Pos& p, int amnt) {
-   LuaValue& usefunc = type.inventory_use_func().get(L);
+   LuaValue& usefunc = type.inventory_use_func();
    usefunc.push();
    luayaml_push_item(L, type.name.c_str());
    luawrap::push(L, user);

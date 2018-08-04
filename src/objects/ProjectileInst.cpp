@@ -197,7 +197,7 @@ void ProjectileInst::step(GameState* gs) {
 			  projectile.projectile_entry().attack_stat_func,
 			  effstats, origin, victim);
 		auto& entry = projectile.projectile_entry();
-		effstats = lua_hit_callback(entry.action_func().get(L), effstats, this, victim);
+		effstats = lua_hit_callback(entry.action_func(), effstats, this, victim);
 
 		if (gs->game_settings().verbose_output) {
 			char buff[100];

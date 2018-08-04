@@ -31,9 +31,6 @@ public:
 	}
 	virtual ~ItemEntry() {
 	}
-	virtual void initialize(lua_State* L) {
-		use_action.init(L);
-	}
 
 	virtual sprite_id get_sprite() {
 		return item_sprite;
@@ -48,10 +45,10 @@ public:
 	SpriteEntry& item_sprite_entry();
 	ldraw::Drawable& item_image();
 
-	LuaLazyValue& inventory_use_func() {
+	LuaValue& inventory_use_func() {
 		return use_action.action_func;
 	}
-	LuaLazyValue& inventory_use_prereq_func() {
+	LuaValue& inventory_use_prereq_func() {
 		return use_action.prereq_func;
 	}
 

@@ -28,10 +28,6 @@ public:
 		return damage_modifiers.physical_percentage;
 	}
 
-	void init(lua_State* L) {
-		attack_action.init(L);
-	}
-
 	DamageStats damage_modifiers;
 
 	LuaValue alt_action;

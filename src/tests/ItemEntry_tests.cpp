@@ -45,8 +45,8 @@ extern ResourceDataSet<SpriteEntry> game_sprite_data;
 //		CHECK("description" == item.description);
 //		CHECK("use_message" == item.use_action.success_message );
 //		CHECK("cant_use_message" == item.use_action.failure_message );
-//		CHECK(1 == item.use_action.action_func.get(L).to_int());
-//		CHECK(2 == item.use_action.prereq_func.get(L).to_int());
+//		CHECK(1 == item.use_action.action_func.to_int());
+//		CHECK(2 == item.use_action.prereq_func.to_int());
 //
 //		L.finish_check();
 //	}

@@ -404,27 +404,26 @@ DataW.spell_create {
         damage_multiplier: 1.2
         spr_attack: "fire bolt"
         on_damage: (target, damage) =>
+            if @caster.destroyed
+                return
             --apply_burn_damage(target, @caster, damage)
+            r_pow = TypeEffectUtils.get_power(@caster, 'Red')
             if @caster\has_effect("Dragonform")
                 SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
                 GameObject.add_to_level SpawnedFire.create {
                     fire_radius: 1
                     caster: @caster
                     xy: @xy
-                    cooldown: 20
+                    :damage
                     duration: 80
                 }
-        on_deinit: () =>
-            if @caster.destroyed
-                return
-            r_pow = TypeEffectUtils.get_power(@caster, 'Red')
-            if chance(0.05 + 0.01 * r_pow)
+            elseif chance(0.05 + 0.01 * r_pow)
                 SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
                 GameObject.add_to_level SpawnedFire.create {
                     fire_radius: 0
                     caster: @caster
                     xy: @xy
-                    cooldown: 20
+                    :damage
                     duration: 200
                 }
 

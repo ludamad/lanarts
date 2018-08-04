@@ -141,7 +141,7 @@ void EnemyInst::init(GameState* gs) {
 	core_stats().hp = ceil(core_stats().hp  * diffmult);
 	core_stats().max_hp = ceil(core_stats().max_hp  * diffmult);
 
-	lua_gameinst_callback(L, etype().init_event.get(L), this);
+	lua_gameinst_callback(L, etype().init_event, this);
 	lua_api::event_monster_init(L, this);
 }
 static bool starts_with_vowel(const std::string& name) {
@@ -239,7 +239,7 @@ void EnemyInst::draw(GameState* gs) {
 
 	if (!etype().draw_event.empty()) {
 		lua_State* L = gs->luastate();
-		etype().draw_event.get(L).push();
+		etype().draw_event.push();
 		luawrap::call<void>(L, (GameInst*) this);
 	}
 

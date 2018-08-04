@@ -424,8 +424,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 
     // Modify the attack stat function:
     atkstats = lua_attack_stats_callback(gs->luastate(), weapon.weapon_entry().attack_stat_func, atkstats, this, inst);
-    atkstats = lua_hit_callback(weapon.weapon_entry().action_func().get(gs->luastate()),
-                                atkstats, this, inst);
+    atkstats = lua_hit_callback(weapon.weapon_entry().action_func(), atkstats, this, inst);
     if (gs->game_settings().verbose_output) {
         char buff[100];
         snprintf(buff, 100, "Attack: [dmg %.2f pow %.2f mag %d%%]",
