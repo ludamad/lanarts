@@ -10,6 +10,7 @@
 #include <luawrap/luameta.h>
 #include <luawrap/functions.h>
 #include <luawrap/types.h>
+#include <SerializeBuffer.h>
 
 #include "mtwist.h"
 
@@ -95,7 +96,20 @@ LuaValue lua_mtwistmetatable(lua_State* L) {
 	methods["random_round"].bind_function(random_round);
 	methods["guassian"].bind_function(guassian);
 	methods["amount_generated"].bind_function(amount_generated);
-
+    meta["__save"] = [](MTwist& mtwist) {
+        char data[sizeof(MTwist)];
+        memcpy(data, &mtwist, sizeof(MTwist));
+        return std::string {data, data + sizeof(MTwist)};
+    };
+    meta["__load"] = [](LuaStackValue _meta, LuaStackValue datastring) {
+        auto* L = datastring.luastate();
+        datastring.push();
+        size_t len;
+        auto* data = luaL_checklstring(L, -1, &len);
+        MTwist mtwist;
+        memcpy(&mtwist, data, len);
+        return mtwist;
+    };
 	luameta_gc<MTwist>(meta);
 
 	return meta;
@@ -109,6 +123,9 @@ int luaopen_mtwist(lua_State *L) {
 	luawrap::install_userdata_type<MTwist, &lua_mtwistmetatable>();
 	LuaValue module = LuaValue::newtable(L);
 	module["create"].bind_function(newmtwist);
+	// For serialization reachability:
+    luameta_push(L, &lua_mtwistmetatable);
+    module["metatable"].pop();
 	module.push();
 	return 1;
 }

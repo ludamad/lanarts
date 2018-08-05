@@ -84,8 +84,6 @@ public:
 	GameInstRef& get_removed_object(int id);
 private:
 	void place_player(GameMapState* map, GameInst* p);
-	void spawn_players(GeneratedRoom& genlevel, void** player_instances,
-			size_t nplayers);
 	bool midstep;
 	int next_room_id;
 

@@ -27,8 +27,6 @@ struct PlayerDataEntry {
 	// Represents a high-level keyboard+mouse, controller, bot, or
 	// network input source.
 	LuaValue input_source;
-	//
-	LuaValue input_adapter;
 	bool is_local_player;
 	int net_id;
     int index; // Index in list, for convenience

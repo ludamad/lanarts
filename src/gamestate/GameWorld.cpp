@@ -182,19 +182,21 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 		ClassEntry& c = game_class_data.get(pde.classtype);
 		int spriteidx = gs->rng().rand(c.sprites.size());
 
-//		if (pde.player_inst.empty()) {
-        pde.player_inst = new PlayerInst(c.starting_stats,
-                c.sprites[spriteidx], position, pde.team, pde.is_local_player);
-        if (!pde.input_source.empty()) {
-            pde.input_source.push();
-            LuaValue input_source = luawrap::call<LuaValue>(gs->luastate(), pde.player_inst.get());
-            dynamic_cast<PlayerInst&>(*pde.player_inst.get()).input_source().value = input_source;
-        }
-//		}
 		printf("Spawning for player %d: %s\n", i,
 			   pde.is_local_player ? "local player" : "network player");
-		map->add_instance(gs, pde.player_inst.get());
+
+		auto* player_inst = map->add_instance<PlayerInst>(
+			gs,
+			c.starting_stats,
+			c.sprites[spriteidx],
+			position,
+			pde.team,
+			pde.is_local_player
+		);
+		pde.player_inst = player_inst;
+		player_inst->input_source().value = lcall<LuaValue>(pde.input_source, player_inst);
 	}
+
     gs->for_screens([&]() {
         GameMapState *level = gs->local_player()->get_map(gs);
         if (level != get_current_level()) {
@@ -381,10 +383,6 @@ void GameWorld::push_level_object(level_id id) {
 
 void GameWorld::pop_level_object(level_id id) {
 	this->lua_level_states[id].pop();
-}
-
-void GameWorld::spawn_players(GeneratedRoom& genlevel, void** player_instances,
-		size_t nplayers) {
 }
 
 GameMapState *GameWorld::get_current_level() {

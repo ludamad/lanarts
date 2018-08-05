@@ -71,6 +71,9 @@ run_bot_tests = (raw_args) ->
         print msg
         if args.save
             GameState = require("core.GameState")
+            World = require("core.World")
+            --for {:instance} in *World.players
+            --    instance.input_source\save_to_global()
             GameState.save(args.save)
         return nil
 

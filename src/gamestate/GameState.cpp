@@ -307,6 +307,10 @@ void GameState::deserialize(SerializeBuffer& serializer) {
             first = false; // HACK to get first player's class
         }
     });
+    for (auto& player : player_data().all_players()) {
+        auto* inst = player.player();
+        inst->input_source().value = lcall<LuaValue>(player.input_source, inst);
+    }
     luawrap::globals(L)["Engine"]["post_deserialize"].push();
     luawrap::call<void>(L);
     is_loading_save() = true;

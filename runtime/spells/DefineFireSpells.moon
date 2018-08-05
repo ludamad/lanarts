@@ -118,7 +118,7 @@ SpawnedFire = RingFireBase {
 
 RingOfFire = RingFireBase {
     -- RingFireBase config
-    _damage: 0.2
+    _damage: 0.5
     init: (args) =>
         @damage_cooldowns = OrderedDict() -- takes [index][obj]
         @fireballs = {}
@@ -165,7 +165,7 @@ RingOfFire = RingFireBase {
             if @percent_passed() <= i / 10
                 radius_percentage = @get_progress((i-1)/10,i/10)
                 break
-        rings = @_create_rings(50 - 50 * radius_percentage)
+        rings = @_create_rings(30 - 30 * radius_percentage)
         for idx=1,#rings
             {x, y} = rings[idx]
             @damage_cooldowns[idx] or= OrderedDict()

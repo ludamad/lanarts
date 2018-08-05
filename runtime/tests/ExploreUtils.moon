@@ -232,4 +232,5 @@ ai_state = (player) -> {
 
 }
 
-return {:portal_planner, :path_planner, :ai_state}
+-- Note: ASTAR_BUFFER passed for reachability in serialization
+return {:portal_planner, :path_planner, :ai_state, :ASTAR_BUFFER}

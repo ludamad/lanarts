@@ -27,6 +27,7 @@ game_init = (load_file=nil) ->
 
     log "Initializing GameState object..."
     EngineInternal.init_gamestate()
+    print "load_location_is_valid(load_file)", load_location_is_valid(load_file)
     if load_location_is_valid(load_file)
         GameState.load(load_file)
     else
@@ -53,7 +54,7 @@ run_lanarts = (raw_args) ->
         return ResourceLoading.ensure_resources_before () ->
             -- (1) Init game
             -- TODO refactor:
-            if load_file
+            if load_file and args.load
                 load_file = args.load
             game_init(load_file)
 

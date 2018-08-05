@@ -1,6 +1,5 @@
 ProgrammableInputSource = require "input.ProgrammableInputSource"
 GameState = require "core.GameState"
-GlobalData = require "core.GlobalData"
 World = require "core.World"
 GameObject = require "core.GameObject"
 PathFinding = require "core.PathFinding"
@@ -10,6 +9,8 @@ World = require "core.World"
 ObjectUtils = require "objects.ObjectUtils"
 
 HARDCODED_AI_SEED = 12345678
+
+local load_from_global
 
 -- BotInputSource method
 initialize = () =>
@@ -33,30 +34,23 @@ initialize = () =>
     -- BotInputSource method
 load_from_global = () =>
     GlobalData = require "core.GlobalData"
-    for kev, value in pairs(GlobalData.ai_state or {})
+    for key, value in pairs(GlobalData.ai_state or {})
         @[key] = value
 
 -- BotInputSource method
 save_to_global = () =>
     GlobalData = require "core.GlobalData"
     ai_state = {}
-    for kev, value in pairs @
+    for key, value in pairs @
         ai_state[key] = value
     GlobalData.ai_state = ai_state
 
--- Return BotInputSource, using the above pseudo-methods
+-- Return BotInputSource, an extended ProgrammableInputSource that implements a basic AI strategy
 return newtype {
     parent: ProgrammableInputSource
     init: (player) =>
         ProgrammableInputSource.init(@, player)
-        print "CREATING BOTINPUTSOURCE"
         initialize(@)
-    -- step: () =>
-    --     @_simulate_game_input()
-    --     @set_inputs {
-    --         move_direction: {1, 0}
-    --     }
-
     -- BotInputSource method
     step: () =>
         @_ai_state\step()
@@ -70,6 +64,8 @@ return newtype {
         else
             @_n_same_square = 0
         @_lpx, @_lpy = player.x, player.y
+
+    :save_to_global
 
     _goto_random_portal: () =>
         portals = {}
