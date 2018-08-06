@@ -337,7 +337,7 @@ for {resist_sprite, power_sprite, type, color} in *{
     -- Simply a stat variable:
     DataW.additive_effect_create {
         name: "#{type}Resist"
-        key: "resist" -- Additive effect, accessed with @_get_value().
+        key: "resist" -- Additive effect, accessed with @value().
         console_draw_func: (player, get_next) =>
             text = "#{type} Resist"
             res = if @resist < 0 then @resist else "+"..@resist
@@ -348,7 +348,7 @@ for {resist_sprite, power_sprite, type, color} in *{
     -- TODO separate sprite
     DataW.additive_effect_create {
         name: "#{type}Power"
-        key: "power" -- Additive effect, accessed with @_get_value().
+        key: "power" -- Additive effect, accessed with @value().
         console_draw_func: (player, get_next) =>
             text = "#{type} Power"
             res = if @power < 0 then @power else "+"..@power
@@ -356,7 +356,7 @@ for {resist_sprite, power_sprite, type, color} in *{
     }
 DataW.additive_effect_create {
     name: "PoisonedWeapon"
-    key: "poison_percentage" -- Additive effect, accessed with @_get_value().
+    key: "poison_percentage" -- Additive effect, accessed with @value().
     console_draw_func: (player, get_next) =>
         draw_weapon_console_effect(player, M._poison, "+#{math.floor(@poison_percentage * 100)}% chance poison", get_next())
     on_melee_func: (attacker, defender, damage) =>
@@ -364,7 +364,7 @@ DataW.additive_effect_create {
             return
         power = TypeEffectUtils.get_power(attacker, "Green")
         resist = TypeEffectUtils.get_resistance(defender, "Green")
-        poison_chance = @_get_value()
+        poison_chance = @value()
         if chance(poison_chance * resist)
             eff = defender\add_effect "Poison", {
                 time_left: 100
@@ -379,11 +379,11 @@ DataW.additive_effect_create {
 
 DataW.additive_effect_create {
     name: "Spiky"
-    key: "recoil_percentage" -- Additive effect, accessed with @_get_value().
+    key: "recoil_percentage" -- Additive effect, accessed with @value().
     console_draw_func: (player, get_next) =>
         draw_console_effect(tosprite("spr_spells.spectral_weapon"), "+#{math.floor(@recoil_percentage * 100)}% melee recoil damage", get_next())
     on_receive_melee_func: (attacker, defender, damage) =>
-        percentage_recoil = @_get_value()
+        percentage_recoil = @value()
         attacker\direct_damage(damage * percentage_recoil, defender)
         for _ in screens()
             if defender.is_local_player and defender\is_local_player()

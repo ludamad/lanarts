@@ -65,7 +65,7 @@ get_monster_resistances = (types) ->
 get_effect_stat = (obj, type, default = 0) ->
     assert(obj and type and default)
     if obj\has_effect(type)
-        return obj\get_effect(type)\_get_value()
+        return obj\get_effect(type)\value()
     return default
 
 -- Get power of a certain type

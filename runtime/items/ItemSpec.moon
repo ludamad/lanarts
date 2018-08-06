@@ -9,9 +9,9 @@
 --     if bonus.stat_func
 --         DataW.additive_effect_create {
 --             name: "#{bonus.name}Effect"
---             key: "amount" -- Additive effect, accessed with @_get_value().
+--             key: "amount" -- Additive effect, accessed with @value().
 --             stat_func: (obj, old, new) =>
---                 bonus\stat_func(@_get_value(), obj, old, new)
+--                 bonus\stat_func(@value(), obj, old, new)
 --         }
 --         bonus.effects_granted = {{"#{bonus.name}Effect", {amount: 1}}}
 --
@@ -20,7 +20,7 @@
 --     define_bonus {
 --         :name
 --         sprite: tosprite("spr_bonuses.#{name\lower()}")
---         console_draw_func: (inst, get_next) =>
+--         console_draw_func: (obj, get_next) =>
 --             draw_console_effect get_next(), @sprite, {
 --                 {COL_LIGHT_GRAY, "#{@name}: "}
 --                 {COL_WHITE, "#{@name} classes get +1 Strength, +1 Magic."}
@@ -50,7 +50,7 @@
 --     name: "Luxury"
 --     appears_in_stores: false -- TODO use
 --     sprite: tosprite("spr_bonuses.luxury")
---     console_draw_func: (inst, get_next) =>
+--     console_draw_func: (obj, get_next) =>
 --         draw_console_effect get_next(), @sprite, {
 --             {COL_GOLD, "Luxury: "}
 --             -- TODO is this just like finding money?
@@ -96,10 +96,10 @@
 --     entry.name =  "#{adjective} #{entry.name}"
 --
 --     -- Draw console description
---     entry.console_draw_func = (inst, get_next) =>
+--     entry.console_draw_func = (obj, get_next) =>
 --         for bonus in *bonus_objs
 --             if bonus.console_draw_func
---                 bonus\console_draw_func(inst, get_next)
+--                 bonus\console_draw_func(obj, get_next)
 --
 --     -- Calculate auto_equip status
 --     if entry.auto_equip == nil

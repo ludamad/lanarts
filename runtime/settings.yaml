@@ -20,3 +20,4 @@ invincible: yes #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
 keep_event_log: no
+volume: 0

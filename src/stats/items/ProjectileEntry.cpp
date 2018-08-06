@@ -51,4 +51,5 @@ void ProjectileEntry::parse_lua_table(const LuaValue& table) {
     attack_stat_func = table["attack_stat_func"];
     raw_table = table;
     radius = defaulted(table, "radius", 5);
+    auto_equip = false;
 }

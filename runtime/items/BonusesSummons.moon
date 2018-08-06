@@ -3,7 +3,7 @@
 {:draw_console_text, :draw_console_effect} = require 'ui.ConsoleUtils'
 {:define_bonus} = require "items.Bonuses"
 
-summon_console_draw_func = (bonus, inst, get_next) ->
+summon_console_draw_func = (bonus, obj, get_next) ->
     draw_console_effect get_next(), bonus.sprite, {
         {COL_GOLD, "#{bonus.name}: "}
         {COL_WHITE, "Can summon after kill."}
@@ -41,7 +41,7 @@ define_bonus {
     name: "Mummycall"
     sprite: tosprite "spr_enemies.undead.mummy"
     effects_granted: {"SummonMummyOnKill"}
-    console_draw_func: (inst, get_next) =>
+    console_draw_func: (obj, get_next) =>
         draw_console_effect get_next(), @sprite, {
             {COL_GOLD, "#{bonus.name}: "}
             {COL_WHITE, "Summons after each kill."}

@@ -2,6 +2,9 @@
 
 {:draw_console_text, :draw_console_effect} = require 'ui.ConsoleUtils'
 {:define_bonus} = require "items.Bonuses"
+Display = require "core.Display"
+EventLog = require "ui.EventLog"
+GameObject = require "core.GameObject"
 
 -- Knockback: Stun bonus (description from effect)
 define_bonus {
@@ -23,32 +26,72 @@ define_bonus {
         @sprite\draw options, {x, y}
 }
 
+-- Poison: Stun bonus (description from effect)
 define_bonus {
-    name: "Spiky"
-    sprite: tosprite "spr_spells.spectral_weapon"
-    effects_granted: {{"Fortification", {recoil_percentage: 0.10}}}
+    name: "Poison"
+    sprite: tosprite "spr_weapons.i-venom"
+    effects_granted: {{"PoisonedWeapon", {poison_percentage: 0.1}}}
     item_draw_func: (options, x, y) =>
-        @sprite\draw options, {x, y}
+        options = table.merge options, {scale: {1,1}}
+        @sprite\draw options, {x - 16, y - 16}
 }
 
--- -- Append the effect to add, as well as the perceived 'tier' of this effect
--- -- Higher tier effects effect the final scoring of the randart quadratically.
--- Fortification: (level) => append @effects, {"Fortification", 1} -- Fixed value
--- Spiky: (level) =>
---     recoil_percentage = 0
---     for i =1,level
---         recoil_percentage += @rng\randomf(-0.05, 0.10)  -- Value proportional to recoil_percentage
---     recoil_percentage = math.max(0.05, recoil_percentage)
---     append @effects, {{"Spiky", {:recoil_percentage}}, recoil_percentage / 0.05}
--- PossiblySummonCentaurOnKill: (level) => append @effects, {"PossiblySummonCentaurOnKill", 2.5} -- Fixed value
--- PossiblySummonGolemOnKill: (level) => append @effects, {"PossiblySummonGolemOnKill", 2.5} -- Fixed value
--- PossiblySummonStormElementalOnKill: (level) => append @effects, {"PossiblySummonStormElementalOnKill", 2} -- Fixed value
--- VampiricWeapon: (level) => append @effects, {"VampiricWeapon", 1} -- Fixed value
--- ConfusingWeapon: (level) => append @effects, {"ConfusingWeapon", 1} -- Fixed value
--- KnockbackWeapon: (level) => append @effects, {"KnockbackWeapon", 1} -- Fixed value
--- PoisonedWeapon: (level) =>
---     poison_percentage = 0
---     for i =1,level
---         poison_percentage += @rng\randomf(-0.05, 0.10)  -- Value proportional to recoil_percentage
---     poison_percentage = math.max(0.05, poison_percentage)
---     append @effects, {{"PoisonedWeapon", {:poison_percentage}}, poison_percentage / 0.05}
+define_bonus {
+    name: "Confusion"
+    sprite: tosprite "spr_weapons.i-confusion"
+    effects_granted: {"ConfusingWeapon"}
+    item_draw_func: (options, x, y) =>
+        options = table.merge options, {scale: {1,1}}
+        @sprite\draw options, {x - 16, y - 16}
+}
+
+VAMPIRISM_VELOCITIES = {
+    {-4, -4}
+    {0, -4}
+    {4, -4}
+    {4, 0}
+    {4, 4}
+    {0, 4}
+    {-4, 4}
+    {-4, 0}
+}
+
+-- TODO:
+-- - Vampirism, gain health on weapon damage, Black/Green.
+-- - Enliven - gain health on weapon kill, White/Green.
+define_bonus {
+    name: "Vampiric"
+    sprite: tosprite "spr_weapons.i-vampirism"
+    item_draw_func: (options, x, y) =>
+        options = table.merge options, {scale: {1,1}}
+        @sprite\draw options, {x - 16, y - 16}
+
+    console_draw_func: (obj, get_next) =>
+        xy = get_next()
+        obj.weapon_sprite\draw {
+            origin: Display.LEFT_CENTER
+        }, {xy[1], xy[2] + 4}
+        draw_console_effect xy, @sprite, {
+            {COL_LIGHT_GRAY, "#{@name}: "}
+            {COL_WHITE, "Heal +20% of melee damage dealt."}
+        }
+        get_next()
+
+    effect: {
+        init_func: (obj) =>
+            @attacks = 0
+        on_melee_func: (obj, defender, damage) =>
+            for _ in screens()
+                if obj\is_local_player()
+                    EventLog.add("You steal the enemy's life!", {200,200,255})
+            GameObject.animation_create {
+                xy: obj.xy
+                sprite: "spr_bonuses.fangs"
+                duration: 25
+                velocity: VAMPIRISM_VELOCITIES[(@attacks % #VAMPIRISM_VELOCITIES) + 1]
+            }
+            obj\heal_hp(damage / 5 * @n_derived)
+            @attacks += 1
+            return damage
+    }
+}

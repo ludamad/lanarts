@@ -40,7 +40,7 @@ LuaValue lua_soundmetatable(lua_State* L) {
 }
 
 static void set_volume(LuaStackValue table, LuaStackValue key, double volume) {
-	Mix_Volume(-1, volume / double(MIX_MAX_VOLUME));
+	Mix_Volume(-1, volume * double(MIX_MAX_VOLUME));
 }
 
 static double get_volume(LuaStackValue table, LuaStackValue key) {

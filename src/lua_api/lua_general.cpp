@@ -361,6 +361,15 @@ namespace lua_api {
 		return submodule;
 	}
 
+	int lapi_string_hash(const char *str) {
+		int hash = 5381;
+		int c;
+		while ((c = *str++)) {
+			hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+		}
+		return hash;
+	}
+
 	int l_itervalues(lua_State* L) {
 		lua_pushvalue(L, 1);
 		lua_pushlightuserdata(L, (void*) (1)); // Lua array iteration starts at 1
@@ -415,7 +424,7 @@ namespace lua_api {
         globals["tosprite"].bind_function(lapi_tosprite);
         globals["monster_sprite"].bind_function(lapi_monster_sprite);
 		globals["cpp_traceback"].bind_function(lapi_cpp_traceback);
-
+		globals["__string_hash"].bind_function(lapi_string_hash);
 
 		LuaValue lengine = luawrap::ensure_table(globals["LEngine"]);
 		lengine["import_internal_raw"].bind_function(lengine_import_internal_raw);

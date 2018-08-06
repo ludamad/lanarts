@@ -107,7 +107,15 @@ void EquipmentEntry::parse_lua_table(const LuaValue& table) {
 	stackable = false;
 	use_action = LuaAction();
 	stat_modifiers = parse_stat_modifiers(table);
-	cooldown_modifiers = parse_cooldown_modifiers(table);
+	CooldownModifiers cdown;
+	if (!table["stat_bonuses"].isnil()) {
+        cdown = parse_cooldown_modifiers(table["stat_bonuses"]);
+	}
+	if (cdown.is_default()) {
+		// Fallback behaviour, only if cooldown modifiers not shown in stat_bonuses:
+        cdown = parse_cooldown_modifiers(table);
+	}
+	cooldown_modifiers = cdown;
 	spells_granted = parse_spells_known(table["spells_granted"]);
     effect_modifiers.status_effects = load_statuses(table["effects_granted"]);
 	auto_equip = luawrap::defaulted(table, "auto_equip", true);

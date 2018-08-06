@@ -12,6 +12,10 @@ function string:split(delim)
     return ret
 end
 
+function string:hash()
+    return __string_hash(self)
+end
+
 function string:trimsplit(s)
     local parts = self:split(s)
     for i,p in ipairs(parts) do parts[i] = p:trim() end

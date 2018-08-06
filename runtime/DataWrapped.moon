@@ -33,7 +33,7 @@ effect_create = (args) ->
         @n_derived = 0
         @active = (@time_left > 0)
     -- Corresponds to an application from obj\add "effect"
-    -- Represents a dynamic addition of an effect, not one 
+    -- Represents a dynamic addition of an effect, not one
     -- statically determined from a character's equipment.
     args.apply_buff_func or= (obj, args) =>
         @active = true
@@ -81,7 +81,7 @@ _subeffect_effect_create = (args, starting_value, accum) ->
         @active = false
         table.clear @subeffects
         @current = starting_value
-    args._get_value = (obj) =>
+    args.value = (obj) =>
         x = @current
         for eff in *@subeffects
             x = accum(x, eff)

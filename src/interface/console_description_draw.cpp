@@ -321,16 +321,16 @@ static void draw_effect_modifiers_overlay(GameState* gs,
 static void draw_equipment_description_overlay(GameState* gs,
                                                DescriptionBoxHelper& dbh, const Item& item) {
     EquipmentEntry& entry = item.equipment_entry();
-    if (dbh.get_draw_index() % 2 == 1) {
-        dbh.get_next_draw_position();
-    }
-    call_console_draw_func(entry.console_draw_func, entry.raw, gs->local_player(), dbh);
     draw_stat_bonuses_overlay(gs, dbh, entry.core_stat_modifier());
     draw_defence_bonuses_overlay(gs, dbh, entry.armour_modifier());
     draw_damage_bonuses_overlay(gs, dbh, entry.damage_modifier());
     draw_cooldown_modifiers_overlay(gs, dbh, entry.cooldown_modifiers);
     draw_spells_granted_overlay(gs, dbh, entry.spells_granted);
     draw_effect_modifiers_overlay(gs, dbh, entry.effect_modifiers);
+    if (dbh.get_draw_index() % 2 == 1) {
+        dbh.get_next_draw_position();
+    }
+    call_console_draw_func(entry.console_draw_func, entry.raw, gs->local_player(), dbh);
 }
 
 static void draw_attack_description_overlay(GameState* gs,

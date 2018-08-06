@@ -80,13 +80,15 @@ struct EffectiveAttackStats {
 };
 
 struct CooldownModifiers {
-	float rest_cooldown_multiplier;
-	float spell_cooldown_multiplier;
-	float melee_cooldown_multiplier;
-	float ranged_cooldown_multiplier;
-	CooldownModifiers() :
-			rest_cooldown_multiplier(1.0f), spell_cooldown_multiplier(1.0f), melee_cooldown_multiplier(
-					1.0f), ranged_cooldown_multiplier(1.0f) {
+	float rest_cooldown_multiplier = 1.0f;
+	float spell_cooldown_multiplier = 1.0f;
+	float melee_cooldown_multiplier = 1.0f;
+	float ranged_cooldown_multiplier = 1.0f;
+	bool is_default() const {
+		return (
+			rest_cooldown_multiplier == 1.0f && spell_cooldown_multiplier == 1.0f &&
+			melee_cooldown_multiplier == 1.0f && ranged_cooldown_multiplier == 1.0f
+		);
 	}
 	void apply(float mult) {
 
