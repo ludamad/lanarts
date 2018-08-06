@@ -61,6 +61,7 @@ public:
 	// Status effects from wearing this armour
 	StatusEffectModifiers effect_modifiers;
 	SpellsKnown spells_granted;
+	bool auto_equip = true;
 };
 
 equipment_id get_equipment_by_name(const char* name);

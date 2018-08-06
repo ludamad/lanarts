@@ -94,12 +94,6 @@ static int game_main_call(lua_State* L) {
 	return 1;
 }
 
-static int game_resources_load(lua_State* L) {
-	GameState* gs = lua_api::gamestate(L);
-	init_resource_data(gs->luastate());
-	return 0;
-}
-
 static int game_step(lua_State* L) {
 	bool status = lua_api::gamestate(L)->step();
 	lua_pushboolean(L, status); // should quit on false
@@ -348,8 +342,6 @@ namespace lua_api {
 
 		LuaValue globals = luawrap::globals(L);
 		LuaValue game = register_lua_submodule(L, "core.GameState");
-
-		game["resources_load"].bind_function(game_resources_load);
 
 		game["save"].bind_function(game_save);
 		game["load"].bind_function(game_load);

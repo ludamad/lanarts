@@ -225,7 +225,7 @@ void PlayerInst::step(GameState* gs) {
 }
 
 void PlayerInst::draw(GameState* gs) {
-	CombatGameInst::draw(gs, 0.0f, is_ghost() ? 0.4 : 1.0);
+	CombatGameInst::draw(gs, gs->frame(), is_ghost() ? 0.4 : 1.0);
 }
 
 void PlayerInst::copy_to(GameInst *inst) const {

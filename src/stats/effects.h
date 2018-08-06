@@ -41,7 +41,7 @@ struct Effect {
     //    - 'apply_buff', apply an effect that comes from e.g. a spell or other game event. Usually interacts with 'time_left'.
     //    For other applicable methods, see EffectEntry.
 	LuaValue state;
-    EffectEntry& entry() {
+    EffectEntry& entry() const {
         return game_effect_data.get(id);
     }
     bool is_active() const {

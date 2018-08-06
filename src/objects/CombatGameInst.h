@@ -69,10 +69,10 @@ public:
 	CoreStats& core_stats();
 	ClassStats& class_stats();
 
-        Pos direction_towards(GameState* gs, GameInst* inst);
-        Pos direction_towards_enemy(GameState* gs);
-        Pos direction_towards_object(GameState* gs, col_filterf filter);
-        Pos direction_towards_ally_player(GameState* gs);
+	Pos direction_towards(GameState* gs, GameInst* inst);
+	Pos direction_towards_enemy(GameState* gs);
+	Pos direction_towards_object(GameState* gs, col_filterf filter);
+	Pos direction_towards_ally_player(GameState* gs);
 
 	/* With attack data */
 	EffectiveAttackStats effective_atk_stats(MTwist& mt,

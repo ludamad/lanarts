@@ -110,4 +110,5 @@ void EquipmentEntry::parse_lua_table(const LuaValue& table) {
 	cooldown_modifiers = parse_cooldown_modifiers(table);
 	spells_granted = parse_spells_known(table["spells_granted"]);
     effect_modifiers.status_effects = load_statuses(table["effects_granted"]);
+	auto_equip = luawrap::defaulted(table, "auto_equip", true);
 }

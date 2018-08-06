@@ -11,6 +11,7 @@ print "local M = nilprotect {}"
 
 SPR_FOLDERS = [
     "spr_books",
+    "spr_bonuses",
     "spr_classes",
     "spr_classes/icons",
     "spr_doors",

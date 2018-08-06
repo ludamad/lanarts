@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <string>
 
+#include <lcommon/geometry.h>
+
 #include "lanarts_defines.h"
 #include "data/ResourceEntryBase.h"
 #include "data/ResourceDataSet.h"
@@ -22,6 +24,7 @@ struct GLimage;
 struct SpriteEntry;
 namespace ldraw {
 class Drawable;
+class DrawOptions;
 }
 
 class ItemEntry: public ResourceEntryBase {
@@ -52,19 +55,20 @@ public:
 		return use_action.prereq_func;
 	}
 
-        const std::string& inventory_use_message() {
+	const std::string& inventory_use_message() {
 		return use_action.success_message;
 	}
 	const std::string& inventory_use_fail_message() {
 		return use_action.failure_message;
 	}
+	virtual void draw(const ldraw::DrawOptions& options, Pos xy);
 
 	virtual void parse_lua_table(const LuaValue& table);
 
 	// Cost when appearing in shops, if (0,0) will not appear in shops.
 	Range shop_cost;
 	LuaAction use_action;
-	LuaValue pickup_call;
+	LuaValue pickup_call, console_draw_func, item_draw_func;
 	std::string item_entry_type;
 	sprite_id item_sprite = 1;
 	bool sellable = true;

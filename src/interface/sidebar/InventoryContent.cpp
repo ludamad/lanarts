@@ -37,7 +37,7 @@ static void draw_player_inventory_slot(GameState* gs, LuaValue handler, ItemSlot
         if (gs->io_controller().ctrl_held()) {
             options.draw_colour.a *= 0.5; // 50% opacity
         }
-		ientry.item_image().draw(options, Pos(x,y));
+        ientry.draw(options, {x, y});
 
         if (ientry.stackable) {
 			gs->font().drawf(COL_WHITE, Pos(x+1, y+1), "%d", itemslot.amount());

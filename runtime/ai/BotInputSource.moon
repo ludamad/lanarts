@@ -150,7 +150,7 @@ return newtype {
                         @set("use_spell_slot", 1)
                     else
                         @set("use_spell_slot", 0)
-                elseif player.class_name == 'Fighter'
+                elseif player.class_name == 'Fighter' or player.class_name == 'Templar'
                     @set("should_use_weapon", true)
                 else
                     @set("use_spell_slot", @_rng\random(0, 4))

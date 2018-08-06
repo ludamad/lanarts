@@ -100,8 +100,13 @@ itemslot_t Inventory::add(const Item& item, bool equip_as_well) {
 	    return -1;
 	}
 
-	if (equip_as_well || item.is_equipment()) {
-		equip(slot, /*force equip?*/ equip_as_well);
+	if (equip_as_well) {
+		equip(slot, /*explicit equip?*/ true);
+	} else {
+		bool should_autoequip = item.is_equipment() && item.equipment_entry().auto_equip;
+		if (should_autoequip) {
+			equip(slot, /*explicit equip?*/ false);
+		}
 	}
 
 	return slot;

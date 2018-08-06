@@ -23,8 +23,6 @@ return {
         above_xy = {xy[1], xy[2] - 32}
         @_draw_button('h', above_xy)
     draw_action_bar_spell_hint: (xy, slot) =>
-        pretty xy
-        pretty slot
         for s, b in ipairs spell_keys
             if slot == s - 1
                 above_xy = {xy[1], xy[2] - 32}

@@ -7,6 +7,7 @@
 #include <luawrap/luawraperror.h>
 
 #include <lcommon/strformat.h>
+#include <draw/draw_sprite.h>
 
 #include "ResourceEntryBase.h"
 
@@ -30,7 +31,7 @@ void ResourceEntryBase::init(int id, const LuaValue& table) {
 		this->description = luawrap::set_if_nil(table, "description",
 				std::string());
 
-		this->lua_representation = table;
+		this->raw = table;
 
 		parse_lua_table(table);
 	} catch (const luawrap::Error& error) {
@@ -63,4 +64,9 @@ void ResourceEntryBase::init(int id, const LuaValue& table) {
 }
 
 void ResourceEntryBase::parse_lua_table(const LuaValue& table) {
+	raw = table;
+}
+
+void ResourceEntryBase::draw(const ldraw::DrawOptions& options, Pos xy) {
+	draw_sprite(get_sprite(), xy.x, xy.y);
 }

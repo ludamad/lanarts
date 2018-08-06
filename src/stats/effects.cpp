@@ -87,15 +87,7 @@ void EffectStats::draw_effect_sprites(GameState* gs, GameInst* inst, const Pos& 
                 draw_sprite(view, eentry.effected_sprite, p.x, p.y,
                         drawcolour);
             }
-            lua_State* L = gs->luastate();
-            if (!eentry.draw_func.empty() && !eentry.draw_func.isnil()) {
-                eentry.draw_func.push();
-                eff.state.push();
-                luawrap::push(L, inst);
-                luawrap::push(L, p.x);
-                luawrap::push(L, p.y);
-                lua_call(L, 4, 0);
-            }
+            lcall(eentry.draw_func, eff.state, inst, p.x, p.y);
         }
     }
 }
@@ -139,17 +131,8 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
     for (int i = 0; i < effects.size(); i++) {
         const Effect& eff = effects[i];
         if (eff.is_active()) {
-            auto& stat_func = game_effect_data.get(eff.id).stat_func;
-            if (stat_func.isnil()) {
-                continue;
-            }
-            stat_func.push();
-            eff.state.push();
-            luawrap::push(L, inst);
-
-            lua_pushvalue(L, baseind);
-            lua_pushvalue(L, affind);
-            lua_call(L, 4, 0);
+            auto& stat_func = eff.entry().stat_func;
+            lcall(stat_func, eff.state, inst, LuaStackValue(L, baseind), LuaStackValue(L, affind));
         }
     }
 //    basestats = lua_get_combatstats(L, baseind);

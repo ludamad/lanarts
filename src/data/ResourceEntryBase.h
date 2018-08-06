@@ -10,6 +10,7 @@
 #include <stdexcept>
 
 #include <luawrap/LuaValue.h>
+#include <lcommon/geometry.h>
 
 #include "lanarts_defines.h"
 
@@ -21,6 +22,10 @@ public:
 	}
 };
 
+namespace ldraw {
+	class DrawOptions;
+}
+
 class ResourceEntryBase {
 public:
 	// Both id & name can identifiy the resource uniquely
@@ -28,10 +33,11 @@ public:
 	std::string name;
 	std::string description;
 
-	LuaValue lua_representation;
+	LuaValue raw;
 
 	ResourceEntryBase();
 	virtual ~ResourceEntryBase();
+	virtual void draw(const ldraw::DrawOptions& options, Pos xy);
 
 	virtual sprite_id get_sprite() = 0;
 	virtual const char* entry_type() = 0;

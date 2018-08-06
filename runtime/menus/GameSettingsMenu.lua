@@ -295,6 +295,7 @@ local function class_choice_buttons_create()
 
     local buttons = {
         { "Stormcaller", sprite_base .. "whitemage.png", COL_WHITE},
+        -- { "Templar", sprite_base .. "fighter.png", COL_WHITE},
         { "Pyrocaster", sprite_base .. "redmage.png", COL_PALE_RED},
         -- { "Bard", sprite_base .. "bluemage.png", COL_PALE_BLUE},
         { "Fighter", sprite_base .. "fighter.png", {0, 204, 0}},

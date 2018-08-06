@@ -7,6 +7,7 @@ DataW = require "DataWrapped"
 ObjectUtils = require "objects.ObjectUtils"
 SpellUtils = require "spells.SpellUtils"
 TypeEffectUtils = require "spells.TypeEffectUtils"
+{:draw_console_text, :draw_console_effect} = require 'ui.ConsoleUtils'
 
 M = nilprotect {
     _fire: tosprite "spr_effects.fire-anim"
@@ -171,23 +172,6 @@ RingOfFire = RingFireBase {
             @damage_cooldowns[idx] or= OrderedDict()
             f(x + @caster.x, y + @caster.y, @damage_cooldowns[idx])
 }
-
-draw_console_text = (xy, texts) ->
-    {x, y} = xy
-    for {color, text} in *texts
-        x += font_cached_load(settings.font, 10)\draw {
-            :color
-            origin: Display.LEFT_CENTER
-        }, {x, y}, text 
-    return nil
-
-
-draw_console_effect = (xy, sprite, texts) ->
-    {x, y} = xy
-    sprite\draw {
-        origin: Display.LEFT_CENTER
-    }, {x, y + 4}
-    draw_console_text {x + Map.TILE_SIZE + 4, y}, texts
 
 DataW.effect_create {
     name: "Ring of Flames Stat Boost"

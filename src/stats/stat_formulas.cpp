@@ -98,7 +98,8 @@ static void factor_in_equipment_derived_stats(MTwist& mt,
 			effective.spells.add_spell(spell);
 		}
 	}
-	// Factor in effects granted from equipment:
+	// Factor in dynamic bonuses gained from equipment:
+
 }
 
 static void factor_in_equipment_stats(MTwist& mt, EffectiveStats& effective,

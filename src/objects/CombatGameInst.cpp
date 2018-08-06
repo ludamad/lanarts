@@ -31,6 +31,7 @@
 #include <lcommon/math_util.h>
 #include <ldraw/colour_constants.h>
 #include <draw/fonts.h>
+#include <iostream>
 
 #include "PlayerInst.h"
 
