@@ -100,7 +100,7 @@ static BBox action_bar_area(const BBox& view_box) {
 	return BBox(view_box.x1, view_box.y2 - TILE_SIZE, view_box.x2, view_box.y2);
 }
 static BBox text_console_area(const BBox& view_box) {
-	const int TEXT_CONSOLE_HEIGHT = 100;
+	const int TEXT_CONSOLE_HEIGHT = 110;
 	return BBox(view_box.x1, view_box.y1, view_box.x2,
 			view_box.y1 + TEXT_CONSOLE_HEIGHT);
 }

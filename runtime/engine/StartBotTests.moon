@@ -83,7 +83,7 @@ run_bot_tests = (raw_args) ->
             -- (1) Load dependencies
             GameState = require("core.GameState")
             GameLoop = require("GameLoop")
-            
+
             -- (2) Update with frame stats
             step_only = (GameState.frame % 100 ~= 0)
             fps = fps_update()

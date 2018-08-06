@@ -104,7 +104,7 @@ public:
 
     Pos get_next_draw_position() {
         int xinterval = bbox.width() / cols_per_row;
-        int yinterval = TILE_SIZE / 2;
+        int yinterval = TILE_SIZE;
 
         int col = draw_index % cols_per_row;
         int row = draw_index / cols_per_row;
@@ -318,12 +318,12 @@ static void draw_effect_modifiers_overlay(GameState* gs,
 static void draw_equipment_description_overlay(GameState* gs,
                                                DescriptionBoxHelper& dbh, const Item& item) {
     EquipmentEntry& entry = item.equipment_entry();
+    call_console_draw_func(entry.console_draw_func, entry.raw, gs->local_player(), dbh);
     draw_stat_bonuses_overlay(gs, dbh, entry.core_stat_modifier());
     draw_defence_bonuses_overlay(gs, dbh, entry.armour_modifier());
     draw_damage_bonuses_overlay(gs, dbh, entry.damage_modifier());
     draw_cooldown_modifiers_overlay(gs, dbh, entry.cooldown_modifiers);
     draw_spells_granted_overlay(gs, dbh, entry.spells_granted);
-    call_console_draw_func(entry.console_draw_func, entry.raw, gs->local_player(), dbh);
     draw_effect_modifiers_overlay(gs, dbh, entry.effect_modifiers);
 }
 
@@ -354,22 +354,19 @@ static void draw_weapon_description_overlay(GameState* gs,
     PlayerInst* p = gs->local_player();
     CoreStats& core = p->effective_stats().core;
 
-    lcall(game_item_data.get_raw_data()[entry.name]["console_draw_func"], gs->local_player(), [&dbh]() -> Pos {
-        return dbh.get_next_draw_position();
-    });
-    draw_attack_description_overlay(gs, dbh, core, entry.attack);
     draw_equipment_description_overlay(gs, dbh, weapon);
+    draw_attack_description_overlay(gs, dbh, core, entry.attack);
 }
 
 static void draw_projectile_description_overlay(GameState* gs,
                                                 DescriptionBoxHelper& dbh, const Projectile& projectile) {
     ProjectileEntry& entry = projectile.projectile_entry();
+    draw_equipment_description_overlay(gs, dbh, projectile);
     if (entry.is_standalone()) {
         PlayerInst* p = gs->local_player();
         CoreStats& core = p->effective_stats().core;
         draw_attack_description_overlay(gs, dbh, core, entry.attack);
     }
-    draw_equipment_description_overlay(gs, dbh, projectile);
 }
 
 void draw_console_spell_description(GameState* gs, SpellEntry& entry) {

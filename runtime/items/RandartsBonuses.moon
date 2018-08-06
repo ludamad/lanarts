@@ -1,5 +1,5 @@
 -- Make an random piece of equipment
--- Equipment is created using various generation schemes, 
+-- Equipment is created using various generation schemes,
 -- and then is created based on selection from score range.
 
 DataWrapped = require "DataWrapped"
@@ -10,24 +10,24 @@ _STAT_BONUSES = {
         for i=1,level
             @enchantment += @rng\random(-1, 3)
         @enchantment = math.max(@enchantment, 1)
-    mp: (level) => 
+    mp: (level) =>
         for i=1,level
             @stat_bonuses.mp += @rng\random(-25, 25)
-    hp: (level) => 
+    hp: (level) =>
         for i=1,level
             @stat_bonuses.hp += @rng\random(-25, 25)
-    mpregen: (level) => 
+    mpregen: (level) =>
         for i=1,level
             @stat_bonuses.mpregen += @rng\random(-300, 300) / 100 / 60
-    hpregen: (level) => 
+    hpregen: (level) =>
         for i=1,level
             @stat_bonuses.hpregen += @rng\random(-300, 300) / 100 / 60
-    spell_velocity_multiplier: (level) => 
+    spell_velocity_multiplier: (level) =>
         for i=1,level
             @stat_bonuses.spell_velocity_multiplier += @rng\randomf(-0.15, 0.15)
 }
 for stat in *{"strength", "magic", "defence", "willpower"}
-    _STAT_BONUSES[stat] = (level) => 
+    _STAT_BONUSES[stat] = (level) =>
         for i=1,level
             @stat_bonuses[stat] += @rng\random(-3, 4)
 
@@ -172,7 +172,7 @@ Bonuses = newtype {
         n_powers = 0
         for k, v in pairs @powers
             if v ~= 0 then n_powers += 1
-            append dims, v 
+            append dims, v
         for {effect, v} in *@effects
             append dims, v
         for {spell, v} in *@spells
@@ -209,11 +209,11 @@ Bonuses = newtype {
         base.description = description
         -- Handle @stat_bonuses
         base.stat_bonuses or= {}
-        for k, v in pairs @stat_bonuses 
+        for k, v in pairs @stat_bonuses
             base.stat_bonuses[k] or= 0
             base.stat_bonuses[k] += v
         -- Handle @stat_multipliers
-        for k, v in pairs @stat_multipliers 
+        for k, v in pairs @stat_multipliers
             base[k] or= 1
             base[k] *= v
         -- TODO add base types to weapon?

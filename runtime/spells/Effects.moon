@@ -16,7 +16,7 @@ DataW.effect_create {
     effected_colour: {100, 255, 100}
     fade_out: 4
     can_use_rest: false
-    stat_func: (obj, old, new) => 
+    stat_func: (obj, old, new) =>
         new.defence = math.max(0, new.defence - 5)
         new.willpower = math.max(0, new.willpower - 3)
         if not obj.is_enemy
@@ -44,7 +44,7 @@ DataW.effect_create {
     fade_out: 5
     effected_colour: {255,160,160}
     effected_sprite: "berserk_effected"
-    stat_func: (obj, old, new) => 
+    stat_func: (obj, old, new) =>
         new.strength += obj.stats.level
         new.defence = math.max(0, new.defence + 3)
         new.willpower = math.max(0, new.willpower + 3)
@@ -72,7 +72,7 @@ DataW.effect_create {
                 if obj\is_local_player()
                     EventLog.add("Your rage grows ...", {200,200,255})
                     play_sound "sound/berserk.ogg"
-                if settings.verbose_output 
+                if settings.verbose_output
                     EventLog.add("Killed Enemy, berserk time_left = " .. @time_left)
             if obj\has_effect("AmuletBerserker") and chance(0.05) then
                 play_sound "sound/summon.ogg"
@@ -103,15 +103,15 @@ DataW.effect_create {
 }
 DataW.effect_create {
     name: "Expedited"
-    stat_func: () => 
-        if new.speed < 6 
+    stat_func: () =>
+        if new.speed < 6
             new.speed = math.max(new.speed * 1.5, 6)
         new.ranged_cooldown_multiplier /= 1.5
     can_use_rest: false
-    finish_func: (obj) => 
+    finish_func: (obj) =>
         for _ in screens()
             if obj\is_local_player()
-                EventLog.add("You are no longer expedited.", {255,200,200}) 
+                EventLog.add("You are no longer expedited.", {255,200,200})
     effected_colour: {220,220,255}
     effected_sprite: "haste effected"
 }
@@ -330,7 +330,7 @@ for {resist_sprite, power_sprite, type, color} in *{
     -- Swords
     {M._generic_resist, M._generic_power, "Slashing", {66, 222, 188}}
     {M._generic_resist, M._generic_power, "Bludgeon", {66, 244, 194}}
-    -- 
+    --
     {M._generic_resist, M._generic_power, "Piercing", {66, 244, 214}}
 } do
     color = COL_WHITE -- OVERRIDE HACK FOR NOW
@@ -338,18 +338,18 @@ for {resist_sprite, power_sprite, type, color} in *{
     DataW.additive_effect_create {
         name: "#{type}Resist"
         key: "resist" -- Additive effect, accessed with @_get_value().
-        console_draw_func: (player, get_next) => 
+        console_draw_func: (player, get_next) =>
             text = "#{type} Resist"
             res = if @resist < 0 then @resist else "+"..@resist
             draw_console_effect(resist_sprite, "#{res} #{text}", get_next(), if @resist >= 1 then color else COL_PALE_RED)
     }
     -- Adds power specifically to attacks of this type
-    -- Subform of 
+    -- Subform of
     -- TODO separate sprite
     DataW.additive_effect_create {
         name: "#{type}Power"
         key: "power" -- Additive effect, accessed with @_get_value().
-        console_draw_func: (player, get_next) => 
+        console_draw_func: (player, get_next) =>
             text = "#{type} Power"
             res = if @power < 0 then @power else "+"..@power
             draw_console_effect(power_sprite, "#{res} #{text}", get_next(), if @power >= 0 then color else COL_PALE_RED)
@@ -357,7 +357,7 @@ for {resist_sprite, power_sprite, type, color} in *{
 DataW.additive_effect_create {
     name: "PoisonedWeapon"
     key: "poison_percentage" -- Additive effect, accessed with @_get_value().
-    console_draw_func: (player, get_next) => 
+    console_draw_func: (player, get_next) =>
         draw_weapon_console_effect(player, M._poison, "+#{math.floor(@poison_percentage * 100)}% chance poison", get_next())
     on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Poison")
@@ -380,7 +380,7 @@ DataW.additive_effect_create {
 DataW.additive_effect_create {
     name: "Spiky"
     key: "recoil_percentage" -- Additive effect, accessed with @_get_value().
-    console_draw_func: (player, get_next) => 
+    console_draw_func: (player, get_next) =>
         draw_console_effect(tosprite("spr_spells.spectral_weapon"), "+#{math.floor(@recoil_percentage * 100)}% melee recoil damage", get_next())
     on_receive_melee_func: (attacker, defender, damage) =>
         percentage_recoil = @_get_value()
@@ -407,7 +407,7 @@ DataW.effect_create {
     name: "DiesOutsideOfSummonerRange"
     init_func: (summon) =>
         @summoner = false -- TODO think about allowing initial state to be passed to effects!
-        -- TODO but OTOH I like the current system. 
+        -- TODO but OTOH I like the current system.
     step_func: (summon) =>
         assert @summoner, "No summoner set on DiesOutsideOfSummonerRange!"
         if not Map.object_visible summon, summon.xy, @summoner
@@ -438,18 +438,18 @@ DataW.effect_create {
 -- TODO flip effect of fortification -- TODO whut?
 DataW.effect_create {
     name: "Fortification"
-    console_draw_func: (player, get_next) => 
+    console_draw_func: (player, get_next) =>
         draw_console_effect(tosprite("spr_spells.statue_form"), "Gain defence when hit", get_next())
     init_func: (caster) =>
         @active_bonuses = OrderedDict()
         @duration = 320
     stat_func: (obj, old, new) =>
         for k, v in strictpairs @active_bonuses -- Abuse that stat_func is called every frame
-            if v == 0 
+            if v == 0
                 for _ in screens()
                     EventLog.add("Your defence falls back down...", COL_PALE_BLUE)
                 @active_bonuses[k] = nil
-            else 
+            else
                 new.defence += 2
                 @active_bonuses[k] -= 1
     on_receive_damage_func: (attacker, defender, damage) =>
@@ -518,8 +518,8 @@ for equip_slot in *{"", "Armour", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
 
 DataW.effect_create {
     name: "PossiblySummonCentaurOnKill"
-    console_draw_func: (player, get_next) => 
-        draw_console_effect(tosprite("spr_enemies.humanoid.centaur"), "Can summon after kill", get_next())
+    -- console_draw_func: (player, get_next) =>
+    --     draw_console_effect(tosprite("spr_enemies.humanoid.centaur"), "Can summon after kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -532,15 +532,15 @@ DataW.effect_create {
                     EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
                 play_sound "sound/summon.ogg"
                 eff = caster\add_effect("Summoning", 5)
-                eff.monster = "Centaur Hunter" 
+                eff.monster = "Centaur Hunter"
                 eff.duration = 5
             @kill_tracker += 1
 }
 
 DataW.effect_create {
     name: "SummonMummyOnKill"
-    console_draw_func: (player, get_next) => 
-        draw_console_effect(tosprite("spr_enemies.undead.mummy"), "Summons help every kill", get_next())
+    -- console_draw_func: (player, get_next) =>
+    --     draw_console_effect(tosprite("spr_enemies.undead.mummy"), "Summons help every kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -552,15 +552,15 @@ DataW.effect_create {
                 EventLog.add("A mummy is summoned due to your graceful killing!!", COL_PALE_BLUE)
             play_sound "sound/summon.ogg"
             eff = caster\add_effect("Summoning", 5)
-            eff.monster = "Mummy" 
+            eff.monster = "Mummy"
             eff.duration = 5
             @kill_tracker += 1
 }
 
 DataW.effect_create {
     name: "PossiblySummonStormElementalOnKill"
-    console_draw_func: (player, get_next) => 
-        draw_console_effect(tosprite("storm elemental"), "Can appear after a kill", get_next())
+    -- console_draw_func: (player, get_next) =>
+    --     draw_console_effect(tosprite("storm elemental"), "Can appear after a kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -581,8 +581,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "PossiblySummonGolemOnKill"
-    console_draw_func: (player, get_next) => 
-        draw_console_effect(tosprite("golem"), "Can appear after a kill", get_next())
+    -- console_draw_func: (player, get_next) =>
+    --     draw_console_effect(tosprite("golem"), "Can appear after a kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -745,7 +745,7 @@ DataW.effect_create {
                 mon\add_effect("Sapped", 35)
                 mon.stats.mp = math.max(0, mon.stats.mp - 10)
                 for _ in screens()
-                    if mon\is_local_player() 
+                    if mon\is_local_player()
                         EventLog.add("Your MP is drained!", {200,200,255})
                     elseif not mon.is_enemy
                         EventLog.add(mon.name .. "'s MP is drained!", {200,200,255})
@@ -770,7 +770,7 @@ DataW.effect_create {
             return
     draw_func: (caster, top_left_x, top_left_y) =>
         @max_alpha = 0.35
-        if @animation_only 
+        if @animation_only
             @max_alpha /= 4
         elseif not caster.is_enemy and not caster\has_effect "Pained"
             @max_alpha /= 2
@@ -817,13 +817,13 @@ DataW.effect_create {
                         caster\heal_hp(max_hp / 16)
                     --stats.mp = math.min(stats.max_mp, stats.mp + @mp_gain)
                     ---- Summon zombies by probability!?
-                    --if caster\is_local_player() 
+                    --if caster\is_local_player()
                     --    EventLog.add("You drain the enemy's life force as MP!", {200,200,255})
                     --elseif not caster.is_enemy
                     --    EventLog.add(caster.name .. " drains the enemy's life force as MP!", {200,200,255})
     draw_func: (caster, top_left_x, top_left_y) =>
         @max_alpha = 0.35
-        if @animation_only 
+        if @animation_only
             @max_alpha /= 4
         elseif not caster.is_enemy and not caster\has_effect "Pained"
             @max_alpha /= 2
@@ -834,11 +834,11 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "VampiricWeapon"
-    console_draw_func: (player, get_next) => 
+    console_draw_func: (player, get_next) =>
         draw_weapon_console_effect(player, M._vampirism, "Heal +25% dealt", get_next())
     on_melee_func: (attacker, defender, damage) =>
         for _ in screens()
-            if attacker\is_local_player() 
+            if attacker\is_local_player()
                 EventLog.add("You steal the enemy's life!", {200,200,255})
         attacker\heal_hp(damage / 4 * @n_derived)
         return damage
@@ -860,7 +860,7 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "KnockbackWeapon"
-    console_draw_func: (player, get_next) => 
+    console_draw_func: (player, get_next) =>
         draw_weapon_console_effect(player, M._fleeing, "+10% chance of knockback", get_next())
     on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Thrown")
@@ -872,7 +872,7 @@ DataW.effect_create {
 }
 
 share_damage = (target, damage, min_health) ->
-    -- TODO 
+    -- TODO
     min_health = 0
     if target.stats.hp - damage < min_health
         damage = math.max(0, target.stats.hp - min_health)
@@ -945,7 +945,7 @@ DataW.effect_create {
         @dir_vector = {math.cos(args.angle) * 16, math.sin(args.angle) * 16}
     step_func: (caster) =>
         @steps += 1
-        -- Move forward: 
+        -- Move forward:
         @dir_vector = GameObject.simulate_bounce(caster, @dir_vector)
         xy = {caster.x + @dir_vector[1], caster.y + @dir_vector[2]}
         if Map.object_tile_check(caster, xy)
@@ -1039,7 +1039,7 @@ DataW.effect_create {
             thrown = defender\add_effect("Thrown", 10)
             thrown.angle = vector_direction({mon.x, mon.y}, {defender.x, defender.y})
             for _ in screens()
-                if not mon.is_enemy and mon\is_local_player() 
+                if not mon.is_enemy and mon\is_local_player()
                     EventLog.add("The " .. defender.name .." is thrown back!", {200,200,255})
                 elseif not defender.is_enemy and defender\is_local_player()
                     EventLog.add("You are thrown back!", {200,200,255})
