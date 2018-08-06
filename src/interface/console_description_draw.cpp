@@ -112,6 +112,9 @@ public:
 
         return Pos(bbox.x1 + SX + xinterval * col, bbox.y1 + SY + yinterval * row);
     }
+    int get_draw_index() {
+        return draw_index;
+    }
 
 private:
     int cols_per_row;
@@ -318,6 +321,9 @@ static void draw_effect_modifiers_overlay(GameState* gs,
 static void draw_equipment_description_overlay(GameState* gs,
                                                DescriptionBoxHelper& dbh, const Item& item) {
     EquipmentEntry& entry = item.equipment_entry();
+    if (dbh.get_draw_index() % 2 == 1) {
+        dbh.get_next_draw_position();
+    }
     call_console_draw_func(entry.console_draw_func, entry.raw, gs->local_player(), dbh);
     draw_stat_bonuses_overlay(gs, dbh, entry.core_stat_modifier());
     draw_defence_bonuses_overlay(gs, dbh, entry.armour_modifier());
@@ -354,19 +360,19 @@ static void draw_weapon_description_overlay(GameState* gs,
     PlayerInst* p = gs->local_player();
     CoreStats& core = p->effective_stats().core;
 
-    draw_equipment_description_overlay(gs, dbh, weapon);
     draw_attack_description_overlay(gs, dbh, core, entry.attack);
+    draw_equipment_description_overlay(gs, dbh, weapon);
 }
 
 static void draw_projectile_description_overlay(GameState* gs,
                                                 DescriptionBoxHelper& dbh, const Projectile& projectile) {
     ProjectileEntry& entry = projectile.projectile_entry();
-    draw_equipment_description_overlay(gs, dbh, projectile);
     if (entry.is_standalone()) {
         PlayerInst* p = gs->local_player();
         CoreStats& core = p->effective_stats().core;
         draw_attack_description_overlay(gs, dbh, core, entry.attack);
     }
+    draw_equipment_description_overlay(gs, dbh, projectile);
 }
 
 void draw_console_spell_description(GameState* gs, SpellEntry& entry) {
