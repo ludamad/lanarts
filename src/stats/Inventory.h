@@ -127,10 +127,17 @@ public:
     }
 	itemslot_t get_equipped(int type, itemslot_t last_slot = -1) const;
 	void sort();
+    weapon_id& get_natural_weapon() {
+        return natural_weapon;
+    }
+    const weapon_id& get_natural_weapon() const {
+        return natural_weapon;
+    }
 private:
 	void __dequip_projectile_if_invalid();
 	void __dequip_overfilled_slots();
 	std::vector<ItemSlot> items;
+	weapon_id natural_weapon = NONE;
 };
 
 bool projectile_valid_to_equip(const Inventory& inventory, const Projectile& proj);

@@ -204,7 +204,7 @@ weapon_create = (args, for_enemy = false) ->
     args.power or= {base: {power, power}, strength: 1}
     args.range or= 7
     for type in *(args.types or {})
-        add_console_draw_func args, (inst, get_next) ->
+        add_console_draw_func args, (entry, inst, get_next) ->
             E = require "spells.Effects"
             switch type
                 when "Red"

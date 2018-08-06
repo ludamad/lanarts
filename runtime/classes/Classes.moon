@@ -206,8 +206,6 @@ Data.class_create {
     name: "Necromancer",
     sprites: {"spr_enemies.humanoid.necromancer"},
     available_spells: {
-      { spell: "Pain",
-        level_needed: 1 },
       { spell: "Baleful Regeneration",
         level_needed: 1 },
       { spell: "Summon Dark Aspect",
@@ -232,7 +230,6 @@ Data.class_create {
         willpower: 7,
         magic: 7,
         equipment: {
-          weapon: "Dagger",
           gold: 0,
           inventory: {{item: "Mana Potion", amount: 1}}
         }

@@ -63,6 +63,22 @@ DataW.weapon_create {
 }
 
 DataW.weapon_create {
+    name = "Pain",
+    description = "Instantly damage a nearby enemy, but hurt yourself in the process. If you kill the enemy, you gain back one third its life.",
+    type = "unarmed",
+    types = {"Black"},
+    spr_item = "spr_spells.pain",
+    cooldown = 30,
+
+    alt_action = function(caster, xy, target)
+        caster:use_spell("Pain", xy, target)
+    end,
+
+    range = 50
+}
+
+
+DataW.weapon_create {
     name = "Apprentice Staff",
     description = "A staff of endless minor bolts.",
     type = "staves",

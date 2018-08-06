@@ -73,6 +73,9 @@ void PlayerInst::init(GameState* gs) {
         int xp = atoi(getenv("LANARTS_XP"));
         stats().gain_xp(xp, this);
     }
+    if (class_stats().class_entry().name == "Necromancer") {
+		inventory().get_natural_weapon() = get_weapon_by_name("Pain");
+	}
 }
 
 PlayerInst::~PlayerInst() {

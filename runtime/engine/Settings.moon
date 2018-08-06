@@ -2,7 +2,7 @@ yaml = require "yaml"
 
 settings_save = (settings) ->
     -- Injected into settings in further engine runs:
-    {:time_per_step, :username, :class_type, :frame_action_repeat, :regen_on_death, :volume} = settings
+    {:time_per_step, :username, :class_type, :frame_action_repeat, :regen_on_death} = settings
     yaml_str = yaml.dump({:time_per_step, :username, :class_type, :frame_action_repeat, :regen_on_death})
     -- ensure_directory("saves")
     file_dump_string("saves/saved_settings.yaml", yaml_str)

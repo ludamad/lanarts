@@ -15,12 +15,12 @@ define_color_bonus = (name, classes) ->
         console_draw_func: (obj, get_next) =>
             if of_class obj, classes
                 draw_console_effect get_next(), @sprite, {
-                    {COL_GREEN, "#{@name}: "}
+                    {COL_PALE_GRAY, "#{@name}: "}
                     {COL_WHITE, "#{@name} classes get +1 Strength, +1 Magic."}
                 }
             else
                 draw_console_effect get_next(), @sprite, {
-                    {COL_PALE_RED, "#{@name}: "}
+                    {COL_GRAY, "#{@name}: "}
                     {COL_GRAY, "#{@name} classes get +1 Strength, +1 Magic."}
                 }
             get_next()

@@ -104,6 +104,10 @@ itemslot_t Inventory::add(const Item& item, bool equip_as_well) {
 		equip(slot, /*explicit equip?*/ true);
 	} else {
 		bool should_autoequip = item.is_equipment() && item.equipment_entry().auto_equip;
+		if (natural_weapon && item.is_weapon()) {
+			// Don't autoequip if we have a natural weapon
+			should_autoequip = false;
+		}
 		if (should_autoequip) {
 			equip(slot, /*explicit equip?*/ false);
 		}
@@ -137,6 +141,7 @@ void Inventory::serialize(GameState* gs, SerializeBuffer& serializer) {
 		items[i].item.serialize(gs, serializer);
 		serializer.write_byte(items[i].equipped);
 	}
+	serializer.write(natural_weapon);
 }
 
 void Inventory::deserialize(GameState* gs, SerializeBuffer& serializer) {
@@ -147,6 +152,7 @@ void Inventory::deserialize(GameState* gs, SerializeBuffer& serializer) {
 		items[i].item.deserialize(gs, serializer);
 		items[i].equipped = serializer.read_byte();
 	}
+	serializer.read(natural_weapon);
 }
 
 static EquipmentEntry::equip_type SPECIAL_SLOTS[] = {EquipmentEntry::RING, EquipmentEntry::AMULET, EquipmentEntry::BODY_ARMOUR};
@@ -300,7 +306,7 @@ Weapon equipped_weapon(const Inventory & inventory) {
 	if (slot != -1) {
 		return inventory.get(slot).item;
 	} else {
-		return Weapon();
+		return Weapon(inventory.get_natural_weapon());
 	}
 }
 

@@ -14,11 +14,9 @@ load_location_is_valid = (load_file) ->
     else
         error("'#{load_file}' does not exist!")
 
-game_init = (settings, load_file=nil) ->
+game_init = (load_file=nil) ->
     Settings.settings_save(settings)
     GameState = require("core.GameState")
-    Sound = require("core.Sound")
-    Sound.sound_volume = settings.volume
     -- Player config
     GameState.clear_players()
     n_players = (if os.getenv("LANARTS_CONTROLLER") then 0 else 1) + #require("core.Gamepad").ids()
@@ -58,7 +56,7 @@ run_lanarts = (raw_args) ->
             -- TODO refactor:
             if load_file and args.load
                 load_file = args.load
-            game_init(settings, load_file)
+            game_init(load_file)
 
             -- (2) Set up input for first game step
             GameState = require("core.GameState")
