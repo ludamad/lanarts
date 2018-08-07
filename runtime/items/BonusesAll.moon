@@ -1,6 +1,7 @@
 -- Simple helper module to import all bonuses
 {:compile_bonuses, :BONUSES} = require "items.Bonuses"
 
+require "items.BonusesArmour"
 require "items.BonusesColor"
 require "items.BonusesRing"
 require "items.BonusesWeapon"

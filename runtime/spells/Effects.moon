@@ -912,20 +912,21 @@ for name in *{"Ranger", "Fighter", "Templar", "Rogue", "Green Mage", "Black Mage
                                 EventLog.add("You gain mana from the carnage!", COL_PALE_BLUE)
                         instance\heal_mp(2)
                 @kill_tracker += 1
-        on_receive_damage_func: (attacker, caster, damage) =>
-            if name == "Necromancer"
-                attacker\direct_damage(damage * 0.33, caster)
-                for _ in screens()
-                    if caster\is_local_player()
-                        EventLog.add("Your corrosive flesh hurts #{attacker.name} as you are hit!", COL_PALE_BLUE)
-            if GameState.frame > LAST_WARNING\get() + 100 and not caster.is_ghost
-                low_num = 50
-                if name == "Necromancer"
-                    low_num = 30
-                if caster.stats.hp - damage <= low_num or caster.stats.hp - damage <= caster\effective_stats().max_hp * 0.1
-                    LAST_WARNING\set GameState.frame
-                    play_sound "sound/allyislow1c.ogg"
-            return damage
+        -- TODO reconsider whether Necro needs corrosive skin
+        --on_receive_melee_func: (attacker, caster, damage) =>
+        --    if name == "Necromancer"
+        --        attacker\direct_damage(damage * 0.33, caster)
+        --        for _ in screens()
+        --            if caster\is_local_player()
+        --                EventLog.add("Your corrosive flesh hurts #{attacker.name} as you are hit!", COL_PALE_BLUE)
+        --    if GameState.frame > LAST_WARNING\get() + 100 and not caster.is_ghost
+        --        low_num = 50
+        --        if name == "Necromancer"
+        --            low_num = 30
+        --        if caster.stats.hp - damage <= low_num or caster.stats.hp - damage <= caster\effective_stats().max_hp * 0.1
+        --            LAST_WARNING\set GameState.frame
+        --            play_sound "sound/allyislow1c.ogg"
+        --    return damage
     }
 
 -- Move in a direction, attacking everyone along the way

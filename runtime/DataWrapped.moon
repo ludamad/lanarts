@@ -81,7 +81,7 @@ _subeffect_effect_create = (args, starting_value, accum) ->
         @active = false
         table.clear @subeffects
         @current = starting_value
-    args.value = (obj) =>
+    args.value = () =>
         x = @current
         for eff in *@subeffects
             x = accum(x, eff)

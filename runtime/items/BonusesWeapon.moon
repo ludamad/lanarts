@@ -5,6 +5,7 @@
 Display = require "core.Display"
 EventLog = require "ui.EventLog"
 GameObject = require "core.GameObject"
+BonusesUtils = require "items.BonusesUtils"
 
 -- Knockback: Stun bonus (description from effect)
 define_bonus {
@@ -45,17 +46,6 @@ define_bonus {
         @sprite\draw options, {x - 16, y - 16}
 }
 
-VAMPIRISM_VELOCITIES = {
-    {-4, -4}
-    {0, -4}
-    {4, -4}
-    {4, 0}
-    {4, 4}
-    {0, 4}
-    {-4, 4}
-    {-4, 0}
-}
-
 -- TODO:
 -- - Vampirism, gain health on weapon damage, Black/Green.
 -- - Enliven - gain health on weapon kill, White/Green.
@@ -79,19 +69,13 @@ define_bonus {
 
     effect: {
         init_func: (obj) =>
-            @attacks = 0
+            @n_animations = 0
         on_melee_func: (obj, defender, damage) =>
             for _ in screens()
                 if obj\is_local_player()
                     EventLog.add("You steal the enemy's life!", {200,200,255})
-            GameObject.animation_create {
-                xy: obj.xy
-                sprite: "spr_bonuses.fangs"
-                duration: 25
-                velocity: VAMPIRISM_VELOCITIES[(@attacks % #VAMPIRISM_VELOCITIES) + 1]
-            }
+            BonusesUtils.create_animation @, obj, "spr_bonuses.fangs"
             obj\heal_hp(damage / 5 * @n_derived)
-            @attacks += 1
             return damage
     }
 }
