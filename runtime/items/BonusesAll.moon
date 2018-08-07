@@ -10,7 +10,6 @@ require "items.BonusesStats"
 
 KEY_SPRITES = {
     "spr_rings.agate"
-    "spr_rings.big-skull-ring"
     "spr_rings.brass"
     "spr_rings.bronze"
     "spr_rings.clay"

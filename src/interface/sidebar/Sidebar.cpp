@@ -62,6 +62,7 @@ static void draw_player_statbars(GameState* gs, PlayerInst* player, int x,
 /* Helper method for drawing basic stat information*/
 static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 		int x, int y, int width) {
+	auto* L = gs->luastate();
 	ClassStats& class_stats = player_inst->class_stats();
 	CoreStats& core = player_inst->effective_stats().core;
 
@@ -106,7 +107,9 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	gs->font().drawf(COL_PALE_BLUE, p2, "Will %d", core.willpower);
 
 	p1.y += y_interval;
-	p2.y += y_interval; ;
+	p2.y += y_interval;
+
+	lcall(luawrap::globals(L)["Engine"]["draw_sidebar_color"], player_inst, p1);
 
 	p1.y += y_interval;
 	p2.y += y_interval;

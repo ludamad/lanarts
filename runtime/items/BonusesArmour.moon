@@ -15,14 +15,14 @@ define_bonus {
             sprite = tosprite "spr_bonuses.spiky"
             draw_console_effect get_next(), sprite, {
                 {COL_LIGHT_GRAY, "Spiky: "}
-                {COL_WHITE, "You deal +10% damage back on melee."}
+                {COL_WHITE, "You deal +25% damage back on melee."}
             }
             get_next()
         init_func: (obj) =>
             @n_animations = 0
         on_receive_melee_func: (attacker, obj, damage) =>
-            percentage_recoil = @n_derived * 0.1
-            attacker\direct_damage(damage * percentage_recoil, obj)
+            percentage_recoil = @n_derived * 0.25
+            attacker\direct_damage(random_round(damage * percentage_recoil), obj)
             for _ in screens()
                 if obj.is_local_player and obj\is_local_player()
                     EventLog.add("You strike back with spikes!", COL_PALE_BLUE)

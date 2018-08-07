@@ -302,6 +302,9 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& raw_attac
         fdmg = lcall_def(fdmg, /*func:*/ eff.entry().raw_lua_object["on_deal_damage_func"], /*args:*/ eff.state, attacker, this, fdmg);
     });
 
+    if (final_dmg) {
+        *final_dmg = fdmg;
+    }
     return damage(gs, fdmg, attacker);
 }
 

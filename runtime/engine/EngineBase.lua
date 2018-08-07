@@ -161,4 +161,41 @@ function Engine.post_deserialize()
 
 end
 
+function Engine.draw_sidebar_color(obj, xy)
+    local Display = require "core.Display"
+    local BonusesUtils = require "items.BonusesUtils"
+    local x, y = unpack(xy)
+    if BonusesUtils.of_color(obj, "Green") then
+        tosprite("spr_bonuses.green"):draw({origin=Display.CENTER, scale={0.75, 0.75}}, {x + 16, y + 16})
+        font_cached_load(settings.font, 14):draw({
+            color = COL_PALE_GREEN,
+            origin = Display.LEFT_CENTER
+        }, {x + 32, y + 16}, obj.class_name)
+    elseif  BonusesUtils.of_color(obj, "White") then
+        tosprite("spr_bonuses.white"):draw({origin=Display.CENTER, scale={0.75, 0.75}}, {x + 16, y + 16})
+        font_cached_load(settings.font, 14):draw({
+            color = COL_WHITE,
+            origin = Display.LEFT_CENTER
+        }, {x + 32, y + 16}, obj.class_name)
+    elseif  BonusesUtils.of_color(obj, "Blue") then
+        tosprite("spr_bonuses.blue"):draw({origin=Display.CENTER, scale={0.75, 0.75}}, {x + 16, y + 16})
+        font_cached_load(settings.font, 14):draw({
+            color = COL_PALE_BLUE,
+            origin = Display.LEFT_CENTER
+        }, {x + 32, y + 16}, obj.class_name)
+    elseif  BonusesUtils.of_color(obj, "Red") then
+        tosprite("spr_bonuses.red"):draw({origin=Display.CENTER, scale={0.75, 0.75}}, {x + 16, y + 16})
+        font_cached_load(settings.font, 14):draw({
+            color = COL_PALE_RED,
+            origin = Display.LEFT_CENTER
+        }, {x + 32, y + 16}, obj.class_name)
+    elseif  BonusesUtils.of_color(obj, "Black") then
+        tosprite("spr_bonuses.black"):draw({origin=Display.CENTER, scale={0.75, 0.75}}, {x + 16, y + 16})
+        font_cached_load(settings.font, 14):draw({
+            color = COL_LIGHT_GRAY,
+            origin = Display.LEFT_CENTER
+        }, {x + 32, y + 16}, obj.class_name)
+    end
+end
+
 return Engine

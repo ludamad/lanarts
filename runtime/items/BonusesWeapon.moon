@@ -2,6 +2,8 @@
 
 {:draw_console_text, :draw_console_effect} = require 'ui.ConsoleUtils'
 {:define_bonus} = require "items.Bonuses"
+{:of_colors, :draw_color_bound_weapon_effect} = require "items.BonusesUtils"
+
 Display = require "core.Display"
 EventLog = require "ui.EventLog"
 GameObject = require "core.GameObject"
@@ -46,9 +48,8 @@ define_bonus {
         @sprite\draw options, {x - 16, y - 16}
 }
 
--- TODO:
 -- - Vampirism, gain health on weapon damage, Black/Green.
--- - Enliven - gain health on weapon kill, White/Green.
+--  TODO - Enliven - gain health on weapon kill, White/Blue.
 define_bonus {
     name: "Vampiric"
     sprite: tosprite "spr_weapons.i-vampirism"
@@ -57,25 +58,19 @@ define_bonus {
         @sprite\draw options, {x - 16, y - 16}
 
     console_draw_func: (obj, get_next) =>
-        xy = get_next()
-        obj.weapon_sprite\draw {
-            origin: Display.LEFT_CENTER
-        }, {xy[1], xy[2] + 4}
-        draw_console_effect xy, @sprite, {
-            {COL_LIGHT_GRAY, "#{@name}: "}
-            {COL_WHITE, "Heal +20% of melee damage dealt."}
-        }
-        get_next()
+        draw_color_bound_weapon_effect @, obj, get_next, {"Black", "Green"},
+            "Heal +20% of melee damage dealt."
 
     effect: {
         init_func: (obj) =>
             @n_animations = 0
         on_melee_func: (obj, defender, damage) =>
-            for _ in screens()
-                if obj\is_local_player()
-                    EventLog.add("You steal the enemy's life!", {200,200,255})
-            BonusesUtils.create_animation @, obj, "spr_bonuses.fangs"
-            obj\heal_hp(damage / 5 * @n_derived)
+            if of_colors obj, {"Black", "Green"}
+                for _ in screens()
+                    if obj\is_local_player()
+                        EventLog.add("You steal the enemy's life!", {200,200,255})
+                BonusesUtils.create_animation @, obj, "spr_bonuses.fangs"
+                obj\heal_hp(damage / 5 * @n_derived)
             return damage
     }
 }

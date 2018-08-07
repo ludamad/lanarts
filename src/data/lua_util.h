@@ -53,6 +53,24 @@ inline T lcall(const LuaValue& field, const Args... args) {
 }
 
 template<typename ...Args>
+inline void lcall(const LuaField& field, const Args... args) {
+    if (field.isnil()) {
+        return;
+    }
+    field.push();
+    luawrap::call<void>(field.luastate(), args...);
+}
+
+template<typename T, typename ...Args>
+inline T lcall(const LuaField& field, const Args... args) {
+    if (field.isnil()) {
+        return T();
+    }
+    field.push();
+    return luawrap::call<T>(field.luastate(), args...);
+}
+
+template<typename ...Args>
 inline void lmeth(const LuaValue& field, const char* key, const Args... args) {
     if (field[key].isnil()) {
         return;
