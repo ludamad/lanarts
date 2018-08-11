@@ -340,6 +340,9 @@ private:
 	LuaSerializeConfig config;
 	GameStatePostSerializeData _post_deserialize_data;
 	int initial_seed = 0;
+	// TODO integrate this more cleanly
+	// Represents a list of
+	std::vector<std::string> dynamic_item_names;
     friend class GameWorld;
 };
 
