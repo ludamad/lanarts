@@ -2,12 +2,10 @@
 
 {:draw_console_text, :draw_console_effect} = require 'ui.ConsoleUtils'
 {:define_bonus} = require "items.Bonuses"
+{:draw_simple_effect} = require "items.BonusesUtils"
 
 summon_console_draw_func = (bonus, obj, get_next) ->
-    draw_console_effect get_next(), bonus.sprite, {
-        {COL_GOLD, "#{bonus.name}: "}
-        {COL_WHITE, "Can summon after kill."}
-    }
+    draw_simple_effect bonus, get_next(), bonus.name, "Can summon after kill"
     get_next()
 
 -- TODO redo Centaur
@@ -25,11 +23,7 @@ define_bonus {
     sprite: tosprite "spr_enemies.humanoid.centaur"
     effects_granted: {"PossiblySummonCentaurOnKill"}
     console_draw_func: (obj, get_next) =>
-        draw_console_effect get_next(), @sprite, {
-            {COL_LIGHT_GRAY, "#{@name}: "}
-            {COL_WHITE, "Summon a Centaur. "}
-        }
-        get_next()
+        summon_console_draw_func @, obj, get_next
     -- effect: {
     --     init_func: (obj) =>
     --         @n_animations = 0
@@ -67,12 +61,7 @@ define_bonus {
     name: "Mummycall"
     sprite: tosprite "spr_enemies.undead.mummy"
     effects_granted: {"SummonMummyOnKill"}
-    console_draw_func: (obj, get_next) =>
-        draw_console_effect get_next(), @sprite, {
-            {COL_GOLD, "#{bonus.name}: "}
-            {COL_WHITE, "Summons after each kill."}
-        }
-        get_next()
+    console_draw_func: summon_console_draw_func
     item_draw_func: (options, x, y) =>
         @sprite\draw options, {x, y}
 }

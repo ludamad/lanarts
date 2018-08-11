@@ -39,16 +39,23 @@ run_lanarts = (raw_args) ->
     parser = argparse("lanarts", "Run lanarts.")
     parser\option "--debug", "Attach debugger."
     parser\option "--nofilter", "Do not filter Lua error reporting of noise."
+    parser\option "--class", "Class to immediately start with.", false
+    parser\option "--macro", "Script to run from debug_scripts/"
     parser\option "-C --context", "Amount of lines of Lua error context.", "4"
     parser\option "--settings", "Settings YAML file to use.", "settings.yaml"
     parser\option "--save", "Save file to save to.", false
     parser\option "--load", "Save file to load from.", false
     args = parser\parse(raw_args)
-    settings = Settings.settings_load(args.settings)
+    -- TODO dont use global 'settings' object
+    initial_settings = Settings.settings_load(args.settings)
 
-    local menu_start, game_start, game_step
-    menu_start = () ->
-        return Engine.menu_start(game_start)
+    local entry_point, game_start, game_step
+    entry_point = () ->
+        if args.class
+            settings.class_type = args.class
+            return game_start()
+        else
+            return Engine.menu_start(game_start)
 
     game_start = (load_file=nil) ->
         return ResourceLoading.ensure_resources_before () ->
@@ -58,13 +65,17 @@ run_lanarts = (raw_args) ->
                 load_file = args.load
             game_init(load_file)
 
-            -- (2) Set up input for first game step
+            -- (2) Run macro script
+            if args.macro
+                require("debug_scripts." .. args.macro)
+
+            -- (3) Set up input for first game step
             GameState = require("core.GameState")
             GameState.input_capture()
             if not GameState.input_handle()
                 error("Game exited")
 
-            -- (3) Transfer to game loop
+            -- (4) Transfer to game loop
             return game_step()
 
     game_step = () ->
@@ -86,9 +97,9 @@ run_lanarts = (raw_args) ->
             GameState.score_board_store()
             GameState.save(args.save or "saves/savefile.save")
             -- Allocate a fresh GameState
-            EngineInternal.init_gamestate_api(settings)
+            EngineInternal.init_gamestate_api(initial_settings)
             -- Go back to menu
-            return menu_start()
+            return entry_point()
         -- (4) If F4 is pressed, pause the game
         if Keys.key_pressed(Keys.F4)
             GameLoop.loop_control.game_is_paused = not GameLoop.loop_control.game_is_paused
@@ -106,8 +117,8 @@ run_lanarts = (raw_args) ->
         return game_step
 
     return StartEngine.start_engine {
-        :settings,
-        entry_point: menu_start,
+        settings: initial_settings,
+        :entry_point,
         debug: args.debug,
         nofilter: args.nofilter
         on_exit: Settings.settings_save

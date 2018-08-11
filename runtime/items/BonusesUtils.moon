@@ -45,27 +45,26 @@ of_colors = (obj, colors) ->
     return false
 
 _draw_color_bound_effect = (obj, xy, colors, description) =>
+    {x, y} = xy
     if of_colors obj, colors
-        draw_console_text {xy[1] + 36, xy[2] + 16}, {
-            {COL_PALE_YELLOW, "(Only #{table.concat colors, " or "} classes)"}
+        draw_console_effect {x, y - 8}, @sprite, {
+            {COL_GREEN, "#{table.concat colors, " or "} class bonus"}
         }
-        draw_console_effect xy, @sprite, {
-            {COL_LIGHT_GRAY, "#{@name}: "}
+        draw_console_text {x + 36, y + 8}, {
             {COL_WHITE, description}
         }
     else
-        draw_console_text {xy[1] + 36, xy[2] + 16}, {
-            {COL_RED, "(Only #{table.concat colors, " or "} classes)"}
+        draw_console_effect {x, y - 8}, @sprite, {
+            {COL_RED, "#{table.concat colors, " or "} class bonus"}
         }
-        draw_console_effect xy, @sprite, {
-            {COL_GRAY, "#{@name}: "}
+        draw_console_text {x + 36, y + 8}, {
             {COL_GRAY, description}
         }
 
 draw_color_bound_effect = (obj, get_next, colors, description) =>
     xy = get_next()
     _draw_color_bound_effect @, obj, xy, colors, description
-    get_next()
+    -- get_next()
 
 draw_color_bound_weapon_effect = (obj, get_next, colors, description) =>
     xy = get_next()
@@ -73,6 +72,18 @@ draw_color_bound_weapon_effect = (obj, get_next, colors, description) =>
         origin: Display.LEFT_CENTER
     }, {xy[1], xy[2] + 4}
     _draw_color_bound_effect @, obj, xy, colors, description
-    get_next()
+    --get_next()
 
-return {:create_animation, :of_color, :of_colors, :draw_color_bound_effect, :draw_color_bound_weapon_effect}
+draw_simple_effect  = (xy, name, description) =>
+    {x, y} = xy
+    draw_console_effect {x, y - 8}, @sprite, {
+        {COL_GOLD, name}
+    }
+    draw_console_text {x + 36, y + 8}, {
+        {COL_WHITE, description}
+    }
+
+return {
+    :create_animation, :of_color, :of_colors, :draw_color_bound_effect
+    :draw_color_bound_weapon_effect, :draw_simple_effect
+}

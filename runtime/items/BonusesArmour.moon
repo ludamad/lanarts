@@ -13,10 +13,8 @@ define_bonus {
     effect: {
         console_draw_func: (obj, get_next) =>
             sprite = tosprite "spr_bonuses.spiky"
-            draw_console_effect get_next(), sprite, {
-                {COL_LIGHT_GRAY, "Spiky: "}
-                {COL_WHITE, "You deal +25% damage back on melee."}
-            }
+            BonusesUtils.draw_simple_effect {sprite: tosprite "spr_bonuses.spiky"}, get_next(), "Spiky",
+                "You deal +25% damage back on melee."
             get_next()
         init_func: (obj) =>
             @n_animations = 0

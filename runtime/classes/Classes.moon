@@ -153,7 +153,7 @@ Data.class_create {
         equipment: {
           weapon: "Mace",
           gold: 0,
-          inventory: {{item: "Health Potion"}, {item: "Black Luxury Ring"}},
+          inventory: {{item: "Health Potion"}},
         }
     },
     gain_per_level: {

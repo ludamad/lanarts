@@ -1,17 +1,13 @@
 {:draw_console_text, :draw_console_effect} = require 'ui.ConsoleUtils'
 {:define_bonus} = require "items.Bonuses"
+{:draw_simple_effect} = require "items.BonusesUtils"
 
--- +1/+1 COLOR BONUSES
 define_stat_bonus = (name, description, stat_bonuses) ->
     define_bonus {
         :name
         sprite: tosprite("spr_bonuses.#{name\lower()}")
         console_draw_func: (obj, get_next) =>
-            draw_console_effect get_next(), @sprite, {
-                {COL_LIGHT_GRAY, "#{@name}: "}
-                {COL_WHITE, description}
-            }
-            get_next()
+            draw_simple_effect @, get_next(), name, description
         :stat_bonuses
         item_draw_func: (options, x, y) =>
             @sprite\draw options, {x, y}
