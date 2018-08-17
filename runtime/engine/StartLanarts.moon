@@ -27,7 +27,6 @@ game_init = (load_file=nil) ->
 
     log "Initializing GameState object..."
     EngineInternal.init_gamestate()
-    print "load_location_is_valid(load_file)", load_location_is_valid(load_file)
     if load_location_is_valid(load_file)
         GameState.load(load_file)
     else

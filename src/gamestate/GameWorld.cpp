@@ -281,7 +281,7 @@ bool GameWorld::step() {
 			}
 		}
 		_alive_removed_objects.swap(new_keep_alives);
-		printf("%d ALIVE\n", new_keep_alives.size());
+		// printf("%d ALIVE\n", new_keep_alives.size());
 	}
 
 	gs->frame()++;

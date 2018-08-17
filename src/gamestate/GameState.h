@@ -309,6 +309,9 @@ public:
 
 	// Game screens to draw:
 	GameScreenSet screens;
+
+	void loop(lsound::Sound& sound, const char* path);
+	void loop(const char* sound_path);
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
 
@@ -339,6 +342,7 @@ private:
 
 	LuaSerializeConfig config;
 	GameStatePostSerializeData _post_deserialize_data;
+	std::string current_music_path;
 	int initial_seed = 0;
     friend class GameWorld;
 };
@@ -346,6 +350,5 @@ private:
 GameState* gs(SerializeBuffer& buff);
 
 void play(const char* sound_path);
-void loop(const char* sound_path);
 
 #endif /* GAMESTATE_H_ */

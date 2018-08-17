@@ -23,7 +23,6 @@ void SpellEntry::parse_lua_table(const LuaValue& table) {
     cooldown = table["cooldown"].to_num();
     spell_cooldown = defaulted(table, "spell_cooldown", 0);
 	mp_cost = table["mp_cost"].to_num();
-	cha = table["mp_cost"].to_num();
 
 	if (!table["projectile"].isnil()) {
 		projectile = Projectile(
@@ -39,6 +38,8 @@ void SpellEntry::parse_lua_table(const LuaValue& table) {
     action_func = table["action_func"];
     prereq_func = table["prereq_func"];
     console_draw_func = table["console_draw_func"];
+    on_channel_func = table["on_channel_func"];
+    is_channeled_func = table["is_channeled_func"];
 
 	can_cast_with_cooldown = set_if_nil(table, "can_cast_with_cooldown", false);
 	can_cast_with_held_key = set_if_nil(table, "can_cast_with_held_key", true);

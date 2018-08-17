@@ -265,9 +265,9 @@ void GameState::serialize(SerializeBuffer& serializer) {
 	player_data().serialize(this, serializer);
 
     screens.serialize(this, serializer);
+    serializer.write(current_music_path);
 	luawrap::globals(L)["Engine"]["post_serialize"].push();
 	luawrap::call<void>(L);
-
 	serializer.flush();
 }
 
@@ -310,6 +310,11 @@ void GameState::deserialize(SerializeBuffer& serializer) {
     for (auto& player : player_data().all_players()) {
         auto* inst = player.player();
         inst->input_source().value = lcall<LuaValue>(player.input_source, inst);
+    }
+    serializer.read(current_music_path);
+    if (!current_music_path.empty()) {
+        std::cout << "CURRENT MUSIC PATH " << current_music_path << std::endl;
+        loop(current_music_path.c_str());
     }
     luawrap::globals(L)["Engine"]["post_deserialize"].push();
     luawrap::call<void>(L);
@@ -784,7 +789,7 @@ LuaValue& GameState::lua_input() {
 	return local_player()->input_source().value;
 }
 
-static std::map<const char*, lsound::Sound> SOUND_MAP;
+static std::map<std::string, lsound::Sound> SOUND_MAP;
 
 void play(lsound::Sound& sound, const char* path) {
         if (sound.empty()) {
@@ -797,15 +802,16 @@ void play(const char* sound_path) {
     play(SOUND_MAP[sound_path], sound_path);
 }
 
-void loop(lsound::Sound& sound, const char* path) {
+void GameState::loop(lsound::Sound& sound, const char* path) {
         if (sound.empty()) {
             sound = lsound::load_music(path);
         }
         lsound::stop_music();
         sound.loop();
+        current_music_path = path;
 }
 
-void loop(const char* sound_path) {
+void GameState::loop(const char* sound_path) {
     loop(SOUND_MAP[sound_path], sound_path);
 }
 

@@ -960,9 +960,9 @@ void PlayerInst::_use_dngn_portal(GameState *gs, const GameAction &action) {
                 label_has_digit ? "" : "the ", map_label.c_str()),
             is_focus_player(gs) ? COL_WHITE : COL_YELLOW);
         if (map_label == "Plain Valley") {
-            loop("sound/overworld.ogg");
+            gs->loop("sound/overworld.ogg");
         } else {
-            loop("sound/dungeon.ogg");
+            gs->loop("sound/dungeon.ogg");
         }
     });
 }

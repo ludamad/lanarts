@@ -29,6 +29,8 @@
 
 #include "lanarts_defines.h"
 
+#include "data/lua_util.h"
+
 #include "objects/EnemyInst.h"
 
 #include "objects/ProjectileInst.h"
@@ -580,14 +582,14 @@ void PlayerInst::_channel_spell(GameState *gs, const GameAction &action) {
     SpellEntry& spl_entry = res::spell(spell);
 
     bool is_channeled = lcall_def(/*default*/ false, spl_entry.is_channeled_func,
-        /*caster*/ this, action.action_x, action.action_.y);
+        /*caster*/ this, action.action_x, action.action_y);
     if (!is_channeled) {
         // This spell is no longer valid since being queued!
         return;
     }
 
     lcall(spl_entry.on_channel_func, this,
-        {action.action_x, action.action_y},
+        PosF {action.action_x, action.action_y},
         gs->get_instance(target())
     );
 }
