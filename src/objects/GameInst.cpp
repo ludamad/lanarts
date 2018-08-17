@@ -173,7 +173,7 @@ void GameInst::free_reference(GameInst* inst) {
 //}
 
 GameMapState* GameInst::get_map(GameState* gs) {
-	return gs->get_level(current_floor);
+	return current_floor >= 0 ? gs->get_level(current_floor) : nullptr;
 }
 
 std::vector<StatusEffect> GameInst::base_status_effects(GameState* gs) {
