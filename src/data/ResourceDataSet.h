@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <luawrap/luawrap.h>
 #include "data/hashmap.h"
+#include "lua_util.h"
 
 /*
  * ResourceDataSet:
@@ -75,6 +76,11 @@ public:
     }
     R& get(const char* name) {
         id_t id = _get_id(name);
+        if (id == id_t::NONE && !on_miss.empty()) {
+            lcall(on_miss, name);
+            // Retry after giving on_miss a chance to generate an entry for 'name':
+            id = _get_id(name);
+        }
         if (id == id_t::NONE) {
             throw std::runtime_error(("Entry '" + std::string(name) + "' does not exist!").c_str());
         }
@@ -116,6 +122,9 @@ public:
         raw_data[name] = value;
     }
 
+    void set_on_miss_fallback(LuaValue value) {
+        on_miss = value;
+    }
 private:
     char* strclone(const char* name) {
         int len = strlen(name);
@@ -146,6 +155,7 @@ private:
     map_t map_to_id = nullptr;
     std::vector<char*> allocated_keys;
     LuaValue raw_data;
+    LuaValue on_miss;
 };
 
 #endif
