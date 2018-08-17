@@ -137,7 +137,7 @@ private:
 	void __dequip_projectile_if_invalid();
 	void __dequip_overfilled_slots();
 	std::vector<ItemSlot> items;
-	weapon_id natural_weapon = NONE;
+	weapon_id natural_weapon = NO_ITEM;
 };
 
 bool projectile_valid_to_equip(const Inventory& inventory, const Projectile& proj);

@@ -68,7 +68,7 @@ passing_projectile = (args) ->
     combined = table.merge base, args
     combined.on_map_init = () =>
         @n_steps = args.n_steps
-        @attacked_map = {}
+        @attacked_map = OrderedDict()
         @n_hits = 0
         if args.on_map_init
             args.on_map_init(@)
@@ -77,10 +77,10 @@ passing_projectile = (args) ->
         if @n_steps <= 0
             GameObject.destroy(@)
             return
-        @attacked_map or= {}
+        @attacked_map or= OrderedDict()
         @n_hits or= 0
         for k,v in strictpairs @attacked_map
-            if v == 0 
+            if v == 0
                 @attacked_map[k] = nil
             else
                 @attacked_map[k] = v - 1
