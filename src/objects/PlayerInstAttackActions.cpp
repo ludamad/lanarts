@@ -289,12 +289,20 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
         }
 
         if (can_trigger && can_target) {
+            bool is_channeled = lcall_def(/*default*/ false, spl_entry.is_channeled_func,
+                /*caster*/ this, target.x, target.y);
             bool can_use = lcall_def(/*default*/ true, spl_entry.prereq_func,
                     /*caster*/ this, target.x, target.y);
             if (can_use) {
                 queued_actions.push_back(
                     game_action(gs, this,
                                 GameAction::USE_SPELL,
+                                spell_to_cast, target.x, target.y));
+                return true;
+            } else if (is_channeled) {
+                queued_actions.push_back(
+                    game_action(gs, this,
+                                GameAction::CHANNEL_SPELL,
                                 spell_to_cast, target.x, target.y));
                 return true;
             } else if (!auto_target) {
@@ -553,6 +561,32 @@ void PlayerInst::_use_spell(GameState *gs, const GameAction &action) {
     SpellEntry& spl_entry = res::spell(spell);
     try_use_spell(
         gs, spl_entry,
+        {action.action_x, action.action_y},
+        gs->get_instance(target())
+    );
+}
+
+void PlayerInst::_channel_spell(GameState *gs, const GameAction &action) {
+    // Dead players can't channel spells:
+    if (is_ghost()) {
+        return;
+    }
+    if (spells_known().amount() <= action.use_id) {
+        // This spell is no longer valid since being queued!
+        return;
+    }
+
+    spell_id spell = spells_known().get(action.use_id);
+    SpellEntry& spl_entry = res::spell(spell);
+
+    bool is_channeled = lcall_def(/*default*/ false, spl_entry.is_channeled_func,
+        /*caster*/ this, action.action_x, action.action_.y);
+    if (!is_channeled) {
+        // This spell is no longer valid since being queued!
+        return;
+    }
+
+    lcall(spl_entry.on_channel_func, this,
         {action.action_x, action.action_y},
         gs->get_instance(target())
     );

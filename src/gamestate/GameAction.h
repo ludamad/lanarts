@@ -28,7 +28,8 @@ struct GameAction {
 		DEEQUIP_ITEM,
 		REPOSITION_ITEM,
 		CHOSE_SPELL,
-		PURCHASE_FROM_STORE
+		PURCHASE_FROM_STORE,
+		CHANNEL_SPELL
 	};
 	GameAction();
 	GameAction(obj_id origin, action_t act, int frame, int level,

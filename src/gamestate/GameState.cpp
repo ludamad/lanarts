@@ -821,16 +821,25 @@ void GameStatePostSerializeData::postpone_instance_deserialization(GameInst** ho
 
 void GameStatePostSerializeData::process(GameState* gs) {
     accepting_data = false;
+
+    auto lookup_inst = [=](GameInstPostSerializeData& e) {
+        return e.id > 0 ?
+               gs->get_level(e.current_floor)->game_inst_set().get_instance(e.id)
+                        : gs->game_world().get_removed_object(-e.id).get();
+    };
+
     for (GameInstPostSerializeData& e : postponed_insts) {
-        GameInst* inst = e.id > 0 ?
-						 gs->get_level(e.current_floor)->game_inst_set().get_instance(e.id)
-								  : gs->game_world().get_removed_object(-e.id).get();
+        GameInst* inst = lookup_inst(e);
         if (inst == NULL) {
             throw std::runtime_error(format("Attempt to load GameInst that cannot be found at level %d, id %d!", e.current_floor, e.id));
         } else {
             GameInst::retain_reference(inst);
             *e.holder = inst;
         }
+    }
+
+    for (GameInstPostSerializeData& e : postponed_insts) {
+        GameInst* inst = lookup_inst(e);
         lua_State* L = gs->luastate();
         if (!inst->lua_variables.empty() && !inst->lua_variables.isnil()) {
             inst->lua_variables["__objectref"].push();

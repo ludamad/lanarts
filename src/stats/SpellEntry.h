@@ -21,10 +21,12 @@
 struct SpellEntry: public ResourceEntryBase {
 	sprite_id sprite = NONE;
 	int mp_cost = 0, cooldown = 0, spell_cooldown = 0;
-	LuaValue action_func; // Immediate action
+	LuaValue action_func; // Immediate action. Initializes channels
+    LuaValue on_channel_func; // Called on channel. Typically sets an effect with time limit=1.
     LuaValue console_draw_func; // Drawing in the help bar
     LuaValue autotarget_func; // Auto-target func
     LuaValue prereq_func; // Pre-req to casting
+	LuaValue is_channeled_func; // Function to detect if being channeled. Typically checks for an effect.
 
     Projectile projectile;
 	bool can_cast_with_cooldown = false, can_cast_with_held_key = false, fallback_to_melee = false;

@@ -610,6 +610,8 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
    	return _use_weapon(gs, action);
    case GameAction::USE_SPELL:
    	return _use_spell(gs, action);
+   case GameAction::CHANNEL_SPELL:
+   	return _channel_spell(gs, action);
    case GameAction::USE_REST:
    	return _use_rest(gs, action);
    case GameAction::USE_PORTAL:

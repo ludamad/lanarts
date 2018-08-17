@@ -170,6 +170,7 @@ private:
     void _use_weapon(GameState *gs, const GameAction &action);
     void _use_dngn_portal(GameState *gs, const GameAction &action);
     void _use_spell(GameState *gs, const GameAction &action);
+    void _channel_spell(GameState *gs, const GameAction &action);
     void _use_rest(GameState *gs, const GameAction &action);
     void _use_item(GameState *gs, const GameAction &action);
     void sell_item(GameState* gs, const GameAction& action);
