@@ -93,5 +93,6 @@ static ProjectileEntry* parse_projectile(const LuaStackValue& table) {
 
 void lapi_data_create_projectile(const LuaStackValue& table) {
     ProjectileEntry* entry = parse_projectile(table);
+    table["__method"] = "projectile_create"; 
     game_item_data.new_entry(entry->name, entry, table);
 }

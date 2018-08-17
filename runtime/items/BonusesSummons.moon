@@ -20,6 +20,7 @@ summon_console_draw_func = (bonus, obj, get_next) ->
 --      - Use cooldown system, show cooldown on item itself(!)
 define_bonus {
     name: "Centaur"
+    shop_cost: {100, 200}
     sprite: tosprite "spr_enemies.humanoid.centaur"
     effects_granted: {"PossiblySummonCentaurOnKill"}
     console_draw_func: (obj, get_next) =>
@@ -41,6 +42,7 @@ define_bonus {
 
 define_bonus {
     name: "Golem"
+    shop_cost: {100, 200}
     sprite: tosprite "golem"
     effects_granted: {"PossiblySummonGolemOnKill"}
     console_draw_func: summon_console_draw_func
@@ -50,6 +52,7 @@ define_bonus {
 
 define_bonus {
     name: "Stormcall"
+    shop_cost: {50, 100}
     sprite: tosprite "storm elemental"
     effects_granted: {"PossiblySummonStormElementalOnKill"}
     console_draw_func: summon_console_draw_func
@@ -59,6 +62,7 @@ define_bonus {
 
 define_bonus {
     name: "Mummycall"
+    shop_cost: {200, 400}
     sprite: tosprite "spr_enemies.undead.mummy"
     effects_granted: {"SummonMummyOnKill"}
     console_draw_func: summon_console_draw_func

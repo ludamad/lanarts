@@ -8,6 +8,7 @@ EventLog = require "ui.EventLog"
 define_bonus {
     name: "Spiky"
     sprite: tosprite "spr_bonuses.spiky"
+    shop_cost: {100, 200}
     item_draw_func: (options, x, y) =>
         @sprite\draw options, {x, y}
     effect: {

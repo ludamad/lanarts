@@ -339,7 +339,12 @@ static int gmap_object_visible(lua_State* L) {
     Pos xy = stack_defaulted(L, 2, inst->ipos());
     PlayerInst* player = stack_defaulted(L, 3, (PlayerInst*)NULL);
 
-    GameMapState* prev_map = gs->get_level();
+    auto* prev_map = gs->get_level();
+    auto* new_map = inst->get_map(gs);
+    if (!new_map) {
+        lua_pushboolean(L, false);
+        return 1;
+    }
     gs->set_level(gs->game_world().get_level(inst->current_floor));
 
     lua_pushboolean(L, gs->radius_visible_test(xy.x, xy.y, inst->radius, player));

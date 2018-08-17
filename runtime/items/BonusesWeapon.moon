@@ -12,6 +12,7 @@ BonusesUtils = require "items.BonusesUtils"
 -- Knockback: Stun bonus (description from effect)
 define_bonus {
     name: "Knockback"
+    shop_cost: {50, 100}
     sprite: tosprite "spr_effects.fleeing"
     effects_granted: {"KnockbackWeapon"}
     item_draw_func: (options, x, y) =>
@@ -19,10 +20,11 @@ define_bonus {
         @sprite\draw options, {x - 20, y}
 }
 
--- Fortified: Grants fortifaction (description from effect)
+-- Fortified: Grants fortification (description from effect)
 
 define_bonus {
     name: "Fortified"
+    shop_cost: {100, 200}
     sprite: tosprite "spr_spells.statue_form"
     effects_granted: {"Fortification"}
     item_draw_func: (options, x, y) =>
@@ -32,6 +34,7 @@ define_bonus {
 -- Poison: Stun bonus (description from effect)
 define_bonus {
     name: "Poison"
+    shop_cost: {100, 200}
     sprite: tosprite "spr_weapons.i-venom"
     effects_granted: {{"PoisonedWeapon", {poison_percentage: 0.1}}}
     item_draw_func: (options, x, y) =>
@@ -41,6 +44,7 @@ define_bonus {
 
 define_bonus {
     name: "Confusion"
+    shop_cost: {100, 200}
     sprite: tosprite "spr_weapons.i-confusion"
     effects_granted: {"ConfusingWeapon"}
     item_draw_func: (options, x, y) =>
@@ -52,6 +56,7 @@ define_bonus {
 --  TODO - Enliven - gain health on weapon kill, White/Blue.
 define_bonus {
     name: "Vampiric"
+    shop_cost: {100, 200}
     sprite: tosprite "spr_weapons.i-vampirism"
     item_draw_func: (options, x, y) =>
         options = table.merge options, {scale: {1,1}}

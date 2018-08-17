@@ -14,4 +14,7 @@ define_bonus {
         draw_simple_effect @, get_next(), "Luxury", "Sells for 3x."
     item_draw_func: (options, x, y) =>
         @sprite\draw options, {x, y}
+    apply: (entry)  =>
+        {min, max} = entry.shop_cost
+        entry.shop_cost = {min * 3, max * 3}
 }

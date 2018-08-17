@@ -22,6 +22,7 @@ using namespace std;
 void lapi_data_create_item(const LuaStackValue& table) {
 	ItemEntry* entry = new ItemEntry;
 	entry->init(game_item_data.size(), table);
+        table["__method"] = "item_create"; 
 
 	game_item_data.new_entry(entry->name, entry, table);
 }

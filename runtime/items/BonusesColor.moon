@@ -6,6 +6,7 @@
 define_color_bonus = (name) ->
     define_bonus {
         :name
+        shop_cost: {50, 100}
         sprite: tosprite("spr_bonuses.#{name\lower()}")
         console_draw_func: (obj, get_next) =>
             draw_color_bound_effect @, obj, get_next, {name},

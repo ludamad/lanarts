@@ -76,11 +76,6 @@ public:
     }
     R& get(const char* name) {
         id_t id = _get_id(name);
-        if (id == id_t::NONE && !on_miss.empty()) {
-            lcall(on_miss, name);
-            // Retry after giving on_miss a chance to generate an entry for 'name':
-            id = _get_id(name);
-        }
         if (id == id_t::NONE) {
             throw std::runtime_error(("Entry '" + std::string(name) + "' does not exist!").c_str());
         }
@@ -125,6 +120,16 @@ public:
     void set_on_miss_fallback(LuaValue value) {
         on_miss = value;
     }
+    void ensure_exists(const char* name) {
+        any_t result = nullptr;
+        auto lookup_status = hashmap_get(map_to_id, (char*)name, &result);
+        if (lookup_status == MAP_MISSING && !on_miss.empty()) {
+            lcall(on_miss, name);
+            // Retry after giving on_miss a chance to generate an entry for 'name':
+            lookup_status = hashmap_get(map_to_id, (char*)name, &result);
+            LANARTS_ASSERT(lookup_status != MAP_MISSING);
+        }
+    }
 private:
     char* strclone(const char* name) {
         int len = strlen(name);
@@ -143,7 +148,9 @@ private:
     }
     id_t _get_id(const char* name) {
         any_t result = nullptr;
-        if (hashmap_get(map_to_id, (char*)name, &result) == MAP_MISSING) {
+
+        auto lookup_status = hashmap_get(map_to_id, (char*)name, &result);
+        if (lookup_status == MAP_MISSING) {
             return id_t::NONE;
         }
         return static_cast<id_t>((long long)result);

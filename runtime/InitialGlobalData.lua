@@ -6,6 +6,7 @@ return function()
         keys_picked_up = {dummykey = true},
         lanarts_picked_up = {},
         n_lives = #World.players * 100,
-        midrange_bastard_enemy = "Ciribot"--({"Ciribot", "Clown Mage"})[var]
+        midrange_bastard_enemy = "Ciribot",--({"Ciribot", "Clown Mage"})[var]
+        __dynamic_item_generations = {}
     }
 end

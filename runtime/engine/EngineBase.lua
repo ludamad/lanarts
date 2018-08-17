@@ -38,7 +38,8 @@ function Engine.resources_load(...)
 
     local function _req(module)
         local GameState = Engine.require("core.GameState")
-        log_verbose("Loading resources from '" .. module .. "'")
+        --log_verbose
+        print("Loading resources from '" .. module .. "'")
         local ret = yield_point(Engine.require, module)
         return ret
     end
@@ -119,7 +120,6 @@ function Engine.pre_serialize()
 end
 
 function Engine.post_serialize()
-
 end
 
 function Engine.io()
@@ -158,7 +158,10 @@ end
 Engine.pre_deserialize = Engine.pre_serialize
 
 function Engine.post_deserialize()
-
+    local GlobalData = require "core.GlobalData"
+    for _, name in ipairs(GlobalData["__dynamic_item_generations"]) do
+        ensure_item(name)
+    end
 end
 
 function Engine.draw_sidebar_color(obj, xy)
@@ -196,6 +199,17 @@ function Engine.draw_sidebar_color(obj, xy)
             origin = Display.LEFT_CENTER
         }, {x + 32, y + 16}, obj.class_name)
     end
+end
+
+Engine.resources_loaded = false
+
+function Engine.on_item_get_miss(name)
+    -- When looking up an item by name fails, generate it
+    local GlobalData = require "core.GlobalData"
+    append(GlobalData["__dynamic_item_generations"], name)
+    local BonusesAll = require "items.BonusesAll"
+    BonusesAll.generate(name)
+    --.generate_by_name(name)
 end
 
 return Engine

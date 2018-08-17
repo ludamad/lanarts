@@ -80,6 +80,11 @@ static void engine_init_gamestate_api(LuaValue lsettings) {
         GameState *gs = old_gs ? new(old_gs) GameState(settings, L) : new GameState(settings, L);
         lua_api::register_api(gs, L);
     }
+
+    // Item lookup fallbacks:
+    game_item_data.set_on_miss_fallback(
+        luawrap::globals(L)["Engine"]["on_item_get_miss"]
+    );
 }
 
 static int engine_init_gamestate(lua_State* L) {

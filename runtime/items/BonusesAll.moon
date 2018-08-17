@@ -41,29 +41,31 @@ KEY_SPRITES = {
     "spr_rings.wooden"
 }
 
--- TODO properly calculate shop cost
--- TODO -- piggy back into randarts system - use new tech to enhance RandartsBonuses
-USED = {}
-for bonus1 in *BONUSES.__keys
-    define = (bonus2) ->
-        bonuses = {bonus1, bonus2}
-        table.sort(bonuses)
-        created = compile_bonuses {
-            name: "Ring"
-            description: ""
-            type: "ring"
-            shop_cost: {30, 90}
-            spr_item: "spr_rings.ivory"
-        }, bonuses
-        if USED[created.name]
-            return
-        created.spr_item = KEY_SPRITES[created.name\hash() % #KEY_SPRITES + 1]
-        Data.equipment_create(created)
-        USED[created.name] = true
+generate = (name) ->
+    parts = name\split(" ")
+    i = 1
+    bonuses = {}
+    while i <= #parts
+        potential_bonus = parts[i]
+        if not BONUSES[potential_bonus]
+            break
+        append bonuses, potential_bonus
+        i += 1
+    base_name = table.concat [parts[j] for j=i,#parts], ' '
+    base_obj = items[base_name]
+    if not base_obj
+        return
+    
+    -- "Do not have an item definition for '#{base_name}'!"
+    definer_method = Data[base_obj.__method]
 
-        created = compile_bonuses items.Mace, {bonus1, bonus2}
-        Data.weapon_create(created)
+    created = compile_bonuses(base_obj, bonuses)
+    name_hash = created.name\hash()
 
-    for bonus2 in *BONUSES.__keys
-        define bonus2
-    define nil
+    if created.type == "ring"
+        created.spr_item = KEY_SPRITES[name_hash % #KEY_SPRITES + 1]
+
+    definer_method(created)
+    
+
+return {:generate}

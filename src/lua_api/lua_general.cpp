@@ -27,6 +27,7 @@
 #include "lua_api.h"
 
 #include <lcommon/math_util.h>
+#include <stats/items/ItemEntry.h>
 
 static int lapi_values_aux(lua_State* L) {
 	long long idx = (long long) lua_touserdata(L, lua_upvalueindex(2));
@@ -322,6 +323,11 @@ static LuaValue lengine_import_internal_raw(LuaStackValue importstring) {
 	return ret_table;
 }
 
+static const char* lapi_ensure_item(const char* str) {
+	game_item_data.ensure_exists(str);
+	return str;
+}
+
 namespace lua_api {
 	void event_projectile_hit(lua_State* L, ProjectileInst* projectile,
 			GameInst* target) {
@@ -424,6 +430,7 @@ namespace lua_api {
         globals["tosprite"].bind_function(lapi_tosprite);
         globals["monster_sprite"].bind_function(lapi_monster_sprite);
 		globals["cpp_traceback"].bind_function(lapi_cpp_traceback);
+		globals["ensure_item"].bind_function(lapi_ensure_item);
 		globals["__string_hash"].bind_function(lapi_string_hash);
 
 		LuaValue lengine = luawrap::ensure_table(globals["LEngine"]);

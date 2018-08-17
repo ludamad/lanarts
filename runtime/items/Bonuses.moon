@@ -58,6 +58,11 @@ compile_bonuses = (base, bonuses) ->
         if bonus.apply
             bonus\apply(entry)
 
+    for {:shop_cost} in *bonus_objs
+        if shop_cost
+            entry.shop_cost = vector_add(entry.shop_cost, shop_cost)
+    entry.shop_cost = vector_scale(entry.shop_cost, math.max(1, #bonuses))
+
     -- Compute name
     entry.name =  "#{adjective} #{entry.name}"
 

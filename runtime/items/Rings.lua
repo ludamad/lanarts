@@ -149,4 +149,3 @@ Data.equipment_create {
     stat_bonuses = { magic = 2, willpower = -1, mp = 10}
 }
 
-require "items.ItemSpec"

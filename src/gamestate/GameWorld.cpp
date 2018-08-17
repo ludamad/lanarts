@@ -206,7 +206,7 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 }
 
 GameMapState* GameWorld::get_level(level_id id) {
-	return level_states.at(id);
+	return id >= 0 ? level_states.at(id) : nullptr;
 }
 
 void GameWorld::set_current_level(GameMapState* level) {
