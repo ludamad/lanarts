@@ -841,8 +841,8 @@ int CombatGameInst::gain_xp_from(GameState* gs, CombatGameInst* inst) {
     double xpworth = ((EnemyInst*)inst)->xpworth();
     // TODO track kills per team
     double n_killed = (pc.n_enemy_killed(((EnemyInst*) inst)->enemy_type()) - 1) / pc.all_players().size();
-    // Level out at 25% of the original XP, after ~27 kills per player
-    xpworth *= std::max(0.25, pow(0.9, n_killed));
+    // Level out at 5% of the original XP, after ~27 kills per player
+    xpworth *= std::max(0.05, pow(0.9, n_killed));
     return team_gain_xp(gs, xpworth, /*use bonus*/ true);
 }
 
