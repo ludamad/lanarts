@@ -20,17 +20,6 @@ define_bonus {
         @sprite\draw options, {x - 20, y}
 }
 
--- Fortified: Grants fortification (description from effect)
-
-define_bonus {
-    name: "Fortified"
-    shop_cost: {100, 200}
-    sprite: tosprite "spr_spells.statue_form"
-    effects_granted: {"Fortification"}
-    item_draw_func: (options, x, y) =>
-        @sprite\draw options, {x, y}
-}
-
 -- Poison: Stun bonus (description from effect)
 define_bonus {
     name: "Poison"

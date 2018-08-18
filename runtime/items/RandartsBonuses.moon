@@ -4,7 +4,7 @@
 
 DataWrapped = require "DataWrapped"
 BonusesAll = require "items.BonusesAll"
-{:compile_bonuses} = require "items.Bonuses"
+{:compile_bonuses, :BONUSES} = require "items.Bonuses"
 
 TYPES = require("spells.TypeEffectUtils").TYPES
 
@@ -44,7 +44,6 @@ _EFFECT_BONUSES = {
     -- Append the effect to add, as well as the perceived 'tier' of this effect
     -- Higher tier effects effect the final scoring of the randart quadratically.
     Fortification: (level) => append @effects, {"Fortification", 1} -- Fixed value
-    Spiky: (level) => append @newstyle_bonuses, "Spiky"
     PossiblySummonCentaurOnKill: (level) => append @effects, {"PossiblySummonCentaurOnKill", 2.5} -- Fixed value
     PossiblySummonGolemOnKill: (level) => append @effects, {"PossiblySummonGolemOnKill", 2.5} -- Fixed value
     PossiblySummonStormElementalOnKill: (level) => append @effects, {"PossiblySummonStormElementalOnKill", 2} -- Fixed value
@@ -84,6 +83,9 @@ _EFFECT_BONUSES = {
         @_added_bonuses[spell] = true
         append @spells, {spell, 1}
 }
+
+for bonus in *BONUSES.__keys
+    _EFFECT_BONUSES[bonus] = (level) => append @newstyle_bonuses, bonus
 
 for type in *TYPES
     _EFFECT_BONUSES["#{type}Resist"] = (level) =>
@@ -141,7 +143,7 @@ Bonuses = newtype {
         @_added_bonuses = {}
     -- Take a bonus context object from add_bonus
     add_bonus: (bonus, level = @level) =>
-        if @_added_bonuses[bonus]
+        if not BONUSES[bonus] and @_added_bonuses[bonus]
             return false
         _BONUSES[bonus](@, level)
         @_added_bonuses[bonus] = true
@@ -174,6 +176,8 @@ Bonuses = newtype {
             append dims, v
         for {effect, v} in *@effects
             append dims, v
+        for bonus in *@newstyle_bonuses
+            append dims, (@rng\randomf() + 0.5) * BONUSES[bonus].shop_cost[1] / 50
         for {spell, v} in *@spells
             append dims, v
         effective_bonuses = 0
@@ -190,15 +194,16 @@ Bonuses = newtype {
                 penalties += 1
             score += sign * dim * dim * 100
 
-        if n_resists + n_powers > 2 -- reject
-            return false
-        -- TODO turn off penalties for now via this rejection criteria:
-        if penalties > 0 -- TODO 1 -- reject
-            return false
+        print score, min_score, max_score
+        --if n_resists + n_powers > 2 -- reject
+        --    return false
+        ---- TODO turn off penalties for now via this rejection criteria:
+        --if penalties > 0 -- TODO 1 -- reject
+        --    return false
         if score < min_score or score > max_score
             return false
-        if effective_bonuses < 2 -- reject
-            return false
+        --if effective_bonuses < 2 -- reject
+        --    return false
         -- reject if not within the right score:
         return true, score
 

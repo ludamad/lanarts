@@ -102,22 +102,47 @@ INSTANCES = 20
 
 -- Enchantments:
 apply_core_stat_buff = () =>
-    if @rng\randomf() < 0.4
+    --if @rng\randomf() < 0.5
+    --    if @rng\randomf() < 0.4
+    --        return @add_bonus @rng\random_choice {
+    --            "magic_cooldown_multiplier"
+    --            "melee_cooldown_multiplier"
+    --            "ranged_cooldown_multiplier"
+    --            "spell_velocity_multiplier"
+    --        }
+    --    return @add_bonus @rng\random_choice {
+    --        "mp"
+    --        "hp"
+    --        "hpregen"
+    --        "mpregen"
+    --        "strength"
+    --        "defence"
+    --        "willpower"
+    --        "magic"
+    --    }
+    --else
+    if @rng\randomf() < 0.05
         return @add_bonus @rng\random_choice {
-            "magic_cooldown_multiplier"
-            "melee_cooldown_multiplier"
-            "ranged_cooldown_multiplier"
-            "spell_velocity_multiplier"
+            --"magic_cooldown_multiplier"
+            --"melee_cooldown_multiplier"
+            --"ranged_cooldown_multiplier"
+            "Speedbolt"
         }
     return @add_bonus @rng\random_choice {
-        "mp"
-        "hp"
-        "hpregen"
-        "mpregen"
-        "strength"
-        "defence"
-        "willpower"
-        "magic"
+        "Polymath"
+        "Combat"
+        "Heart"
+        "Mana"
+        "Power"
+        "Quickshot"
+        "Quickcast"
+        "Flurry"
+        "Savage"
+        "Focus"
+        "Black"
+        "White"
+        "Green"
+        "Red"
     }
 
 _is_melee_weapon = () =>
@@ -142,51 +167,40 @@ _is_armour = () =>
     return @base.type == 'belt' or @base.type == 'armour' or @base.type == 'gloves' or @base.type == 'legwear'
 
 apply_random_effect = () =>
+    if @rng\randomf() < 0.02 or @base.__method == "weapon_create"
+        return @add_bonus @rng\random_choice {
+            "Vampiric"
+            "Confusion"
+            "Poison"
+            "Knockback"
+        }
     if _is_jewellery(@) and @rng\randomf() < 0.01
         return @add_bonus "RandomSpell"
     elseif _is_armour(@) and @rng\randomf() < 0.01
-        return @add_bonus "Fortification"
+        return @add_bonus "Fortified"
     elseif _is_armour(@) and @rng\randomf() < 0.05
         return @add_bonus "Spiky"
-    elseif _is_jewellery(@) and @rng\randomf() < 0.05
-        return @add_bonus "PossiblySummonCentaurOnKill"
-    elseif _is_jewellery(@) and @rng\randomf() < 0.05
-        return @add_bonus "PossiblySummonGolemOnKill"
-    elseif _is_jewellery(@) and @rng\randomf() < 0.1
-        return @add_bonus "PossiblySummonStormElementalOnKill"
-    else
-        effects = { --if _is_melee_weapon(@) then {
-            "VampiricWeapon"
-            "ConfusingWeapon"
-            "PoisonedWeapon"
-            "KnockbackWeapon"
-        } 
-        for type in *TypeEffectUtils.TYPES
-            if _is_armour(@) and type ~= "Slashing" and type ~= "Bludgeon" -- Only have piercing resist ATM
-                append effects, "#{type}Resist"
-            if not _is_armour(@) and type ~= "Slashing" and type ~= "Bludgeon" and type ~= "Piercing"
-                append effects, "#{type}Power"
-        effect = @rng\random_choice(effects)
-        return @add_bonus effect
+    elseif _is_jewellery(@) and @rng\randomf() < 0.01
+        return @add_bonus "Centaur"
+    elseif _is_jewellery(@) and @rng\randomf() < 0.01
+        return @add_bonus "Golem"
+    elseif _is_jewellery(@) and @rng\randomf() < 0.01
+        return @add_bonus "Stormcall"
+    elseif _is_jewellery(@) and @rng\randomf() < 0.001
+        return @add_bonus "Mummycall"
+    return apply_core_stat_buff(@)
 
 apply_misc_stat_buff = () =>
-    if @rng\randomf() < 0.1 
-        return @add_bonus "spell_velocity_multiplier"
     return apply_random_effect(@)
 
 apply_buffs = () =>
-    while not apply_core_stat_buff(@)
-        nil
-    while not apply_misc_stat_buff(@)
-        nil
-    while not apply_misc_stat_buff(@)
-        nil
+    if @base.__method == "weapon_create"
+        for i=1,math.min(@level, 2)
+            while not apply_random_effect(@)
+                nil
+        return
     for i=1,@level
-        if @rng\randomf() > 0.25
-            break
-        while not apply_core_stat_buff(@)
-            nil
-        while not apply_misc_stat_buff(@)
+        while not apply_random_effect(@)
             nil
 
 randart_pickup = (item, user) ->
@@ -203,6 +217,7 @@ make_bonus_object = (rng, level, base_score, base_entry) ->
             bonuses\add_bonus("enchantment")
         apply_buffs(bonuses)
         success, score = bonuses\validate(min_score - base_score, max_score - base_score)
+        print base_entry.name, success, score
         if success
             return bonuses, score + base_score
     error("UNEXPECTED")
@@ -214,7 +229,7 @@ _get_randarts = (rng, definer, level, base_entry, base_score, weight, randart_sp
         name, description = get_name_and_description(rng, base_entry.name, level)
         obj = bonuses\create_definer_object(name, description)
         obj.type = base_entry.type
-        obj.shop_cost = {score/4, score/2}
+        obj.shop_cost = {score/2, score}
         obj.is_randart = true
         obj.spr_item = rng\random_choice(randart_sprites)
         obj.pickup_func = randart_pickup

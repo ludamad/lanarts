@@ -10,7 +10,8 @@ define_color_bonus = (name) ->
         sprite: tosprite("spr_bonuses.#{name\lower()}")
         console_draw_func: (obj, get_next) =>
             draw_color_bound_effect @, obj, get_next, {name},
-                "+1 Strength, +1 Magic."
+                "+1 Strength, +1 Magic, Improved Spells."
+            get_next()
         effect: {
             stat_func: (obj, old, new) =>
                 if of_color obj, name

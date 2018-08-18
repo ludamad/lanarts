@@ -68,9 +68,17 @@ get_effect_stat = (obj, type, default = 0) ->
         return obj\get_effect(type)\value()
     return default
 
+COLORS = {'White','Black','Green','Red','Blue'}
+
+get_bonus = (obj, bonus) ->
+    if not table.contains COLORS, bonus
+        return 0
+    eff = obj\get_effect(bonus)
+    return if eff then eff.n_derived else 0
+
 -- Get power of a certain type
 get_power = (obj, type) ->
-    return get_effect_stat(obj, TYPE_POWER_EFFECT[type])
+    return get_effect_stat(obj, TYPE_POWER_EFFECT[type]) + get_bonus(obj, "#{type}Bonus")
 
 -- Returns a modifier, 0 signifying complete resistance, 1 signifying no resistance, and amounts > 1 signifying weakness
 get_resistance = (obj, type) ->

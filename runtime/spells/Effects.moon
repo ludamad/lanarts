@@ -540,8 +540,8 @@ for equip_slot in *{"", "Armour", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
 
 DataW.effect_create {
     name: "PossiblySummonCentaurOnKill"
-    console_draw_func: (player, get_next) =>
-        draw_console_effect(tosprite("spr_enemies.humanoid.centaur"), "Can summon after kill", get_next())
+    --console_draw_func: (player, get_next) =>
+    --    draw_console_effect(tosprite("spr_enemies.humanoid.centaur"), "Can summon after kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -561,8 +561,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "SummonMummyOnKill"
-    console_draw_func: (player, get_next) =>
-        draw_console_effect(tosprite("spr_enemies.undead.mummy"), "Summons help every kill", get_next())
+    --console_draw_func: (player, get_next) =>
+    --    draw_console_effect(tosprite("spr_enemies.undead.mummy"), "Summons help every kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -581,8 +581,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "PossiblySummonStormElementalOnKill"
-    console_draw_func: (player, get_next) =>
-        draw_console_effect(tosprite("storm elemental"), "Can appear after a kill", get_next())
+    --console_draw_func: (player, get_next) =>
+    --    draw_console_effect(tosprite("storm elemental"), "Can appear after a kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -603,8 +603,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "PossiblySummonGolemOnKill"
-    console_draw_func: (player, get_next) =>
-        draw_console_effect(tosprite("golem"), "Can appear after a kill", get_next())
+    --console_draw_func: (player, get_next) =>
+    --    draw_console_effect(tosprite("golem"), "Can appear after a kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills

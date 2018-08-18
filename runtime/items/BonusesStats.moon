@@ -49,6 +49,10 @@ define_stat_bonus "Flurry",
     "Increase melee rate.",
     {melee_cooldown_multiplier: 1/(1.05)}
 
+define_stat_bonus "Speedbolt",
+    "Increase spell velocity.",
+    {spell_velocity_multiplier: 1.3}
+
 define_stat_bonus "Savage",
     "Gain Strength, but lose Defence.",
     {strength: 3, defence: -2}
