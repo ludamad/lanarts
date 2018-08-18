@@ -93,10 +93,11 @@ local function viable_item_square(obj, tx, ty, avoid_obj)
     return true
 end
 
+local MAX_ITERS = 100
 local function spiral_iterate(f)
     local x, y = 0, 0
     local dx, dy = 0, -1
-    while true do
+    for i=1,MAX_ITERS do
         if f(x, y) then
             return
         end
@@ -119,6 +120,32 @@ function M.spawn_item_near(obj, item, amount, --[[Optional]] avoid_obj, --[[Opti
     local x, y = math.floor((objX or obj.x) / 32), math.floor((objY or obj.y) / 32)
     spiral_iterate(function(dx, dy)
         return try_spawn_item(obj, item, amount, x + dx, y + dy, avoid_obj)
+    end)
+end
+
+local function try_spawn_item(obj, item, amount, tx, ty, avoid_obj)
+    if not viable_item_square(obj, tx, ty, avoid_obj) then
+        return false
+    end
+    GameObject.item_create {type = item, amount = amount, xy = {tx*32+16, ty*32+16}, do_init = true}
+    return true
+end
+
+function M.spawn_item_near(obj, item, amount, --[[Optional]] avoid_obj, --[[Optional]] objX, --[[Optional]] objY)
+    local x, y = math.floor((objX or obj.x) / 32), math.floor((objY or obj.y) / 32)
+    spiral_iterate(function(dx, dy)
+        return try_spawn_item(obj, item, amount, x + dx, y + dy, avoid_obj)
+    end)
+end
+
+function M.nearby_square_iterate(obj, func) 
+    local x, y = math.floor(obj.x / 32), math.floor(obj.y / 32)
+    spiral_iterate(function(dx, dy) 
+        if Map.tile_is_solid(obj.map, {x + dx, y + dy}) then
+            return false
+        end
+        local rx, ry = (x + dx + .5) * 32, (y + dy + .5) * 32
+        return func({rx, ry})
     end)
 end
 

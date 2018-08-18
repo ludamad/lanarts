@@ -21,7 +21,7 @@ return {
         return nil
     draw_action_bar_weapon_hint: (xy) =>
         above_xy = {xy[1], xy[2] - 32}
-        @_draw_button('h', above_xy)
+        @_draw_button('g', above_xy)
     draw_action_bar_spell_hint: (xy, slot) =>
         for s, b in ipairs spell_keys
             if slot == s - 1

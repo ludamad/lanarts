@@ -17,7 +17,6 @@ require("spells.Projectiles")
 -- New spells coded in more convenient syntax:
 -- TODO figure out long term plan
 require("spells.Spells2")
-require("spells.DefineBlackSpells")
 
 -- REGENERATION
 
@@ -231,7 +230,7 @@ function Pain.action_func(caster, x, y, target)
         end
         SummonUtils.summon_one_hit_monster(caster, target.xy, "Flying Skull") 
     else
-        caster:direct_damage(15)
+        caster:direct_damage(20)
     end
     caster:add_effect("Pained", 50)
     for _ in screens() do 

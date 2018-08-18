@@ -210,7 +210,7 @@ Data.class_create {
         level_needed: 1 },
       { spell: "Summon Dark Aspect",
         level_needed: 2 },
-      { spell: "Greater Pain",
+      { spell: "Skeleton Army",
         level_needed: 3 },
       -- { spell: "",
       --   level_needed: 2 },

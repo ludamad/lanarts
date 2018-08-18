@@ -88,7 +88,7 @@ function KeyboardInputSource:target_position()
     return {0,0}
 end
 function KeyboardInputSource:should_use_weapon()
-    return held "h"
+    return held "g"
 end
 function KeyboardInputSource:should_exit_game()
     error("TODO")

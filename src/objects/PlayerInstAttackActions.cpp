@@ -275,6 +275,15 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
             can_target = true;
         }
 
+        bool is_channeled = lcall_def(/*default*/ false, spl_entry.is_channeled_func,
+            /*caster*/ this, target.x, target.y);
+        if (is_channeled) {
+            queued_actions.push_back(
+                game_action(gs, this,
+                            GameAction::CHANNEL_SPELL,
+                            spell_to_cast, target.x, target.y));
+            return true;
+        }
         bool not_enough_mana = (spl_entry.mp_cost > core_stats().mp);
         bool cooldown_active = (cooldowns().spell_cooldowns[spl_entry.id] > 0);
         if (not_enough_mana || cooldown_active) {
@@ -291,20 +300,12 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
         }
 
         if (can_trigger && can_target) {
-            bool is_channeled = lcall_def(/*default*/ false, spl_entry.is_channeled_func,
-                /*caster*/ this, target.x, target.y);
             bool can_use = lcall_def(/*default*/ true, spl_entry.prereq_func,
                     /*caster*/ this, target.x, target.y);
             if (can_use) {
                 queued_actions.push_back(
                     game_action(gs, this,
                                 GameAction::USE_SPELL,
-                                spell_to_cast, target.x, target.y));
-                return true;
-            } else if (is_channeled) {
-                queued_actions.push_back(
-                    game_action(gs, this,
-                                GameAction::CHANNEL_SPELL,
                                 spell_to_cast, target.x, target.y));
                 return true;
             } else if (!auto_target) {

@@ -9,6 +9,7 @@ SpellObjects = require "objects.SpellObjects"
 DataW = require "DataWrapped"
 require "spells.DefineFireSpells"
 require "spells.DefineWhiteSpells"
+require "spells.DefineBlackSpells"
 
 INFINITE_DURATION = 2^30 -- For all intents and purposes
 mon_title = (mon) -> if mon.unique then mon.name else "the #{mon.name}"

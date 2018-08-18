@@ -14,14 +14,19 @@ load_location_is_valid = (load_file) ->
     else
         error("'#{load_file}' does not exist!")
 
-game_init = (load_file=nil) ->
+game_init = (args, load_file=nil) ->
     Settings.settings_save(settings)
     GameState = require("core.GameState")
     -- Player config
     GameState.clear_players()
     n_players = (if os.getenv("LANARTS_CONTROLLER") then 0 else 1) + #require("core.Gamepad").ids()
     GameState.register_player(settings.username, settings.class_type, Engine.player_input, true, 0, 0)
-    classes = {"", "Pyrocaster", "Fighter", "Pyrocaster"}
+    classes = {
+        args.class,
+        args.class2 or "Pyrocaster",
+        args.class3 or "Fighter",
+        args.class4 or "Pyrocaster"
+    }
     for i=2,n_players
         GameState.register_player("Player " .. i, classes[i], Engine.player_input, true, i - 1, 0)
 
@@ -39,6 +44,9 @@ run_lanarts = (raw_args) ->
     parser\option "--debug", "Attach debugger."
     parser\option "--nofilter", "Do not filter Lua error reporting of noise."
     parser\option "--class", "Class to immediately start with.", false
+    parser\option "--class2", "Player 2's class.", false
+    parser\option "--class3", "Player 3's class.", false
+    parser\option "--class4", "Player 4's class.", false
     parser\option "--macro", "Script to run from debug_scripts/"
     parser\option "-C --context", "Amount of lines of Lua error context.", "4"
     parser\option "--settings", "Settings YAML file to use.", "settings.yaml"
@@ -53,6 +61,8 @@ run_lanarts = (raw_args) ->
         if args.class
             settings.class_type = args.class
             return game_start()
+        elseif args.load
+            return game_start(args.load)
         else
             return Engine.menu_start(game_start)
 
@@ -62,7 +72,7 @@ run_lanarts = (raw_args) ->
             -- TODO refactor:
             if load_file and args.load
                 load_file = args.load
-            game_init(load_file)
+            game_init(args, load_file)
 
             -- (2) Run macro script
             if args.macro
