@@ -1,4 +1,17 @@
 Data.equipment_create {
+    -- Used as base of enchanted rings:
+    name = "Ring",
+    description = "A magical ring.",
+    type = "ring",
+
+    shop_cost = { 35, 55 },
+
+    spr_item = "spr_rings.ethereal",
+
+    stat_bonuses = {}
+}
+
+Data.equipment_create {
     name = "Ring of Spells",
     description = "A ring bound with magical energies, giving the user increased mana reserves and making spell projectiles move faster.",
     type = "ring",

@@ -313,7 +313,6 @@ void GameState::deserialize(SerializeBuffer& serializer) {
     }
     serializer.read(current_music_path);
     if (!current_music_path.empty()) {
-        std::cout << "CURRENT MUSIC PATH " << current_music_path << std::endl;
         loop(current_music_path.c_str());
     }
     luawrap::globals(L)["Engine"]["post_deserialize"].push();

@@ -127,7 +127,7 @@ public:
             lcall(on_miss, name);
             // Retry after giving on_miss a chance to generate an entry for 'name':
             lookup_status = hashmap_get(map_to_id, (char*)name, &result);
-            LANARTS_ASSERT(lookup_status != MAP_MISSING);
+//            LANARTS_ASSERT(lookup_status != MAP_MISSING);
         }
     }
 private:

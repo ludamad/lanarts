@@ -110,6 +110,7 @@ static bool handle_create_item(GameState* gs, const std::string& command) {
 			amnt = 1;
 		rest = skip_whitespace(rest);
 
+                game_item_data.ensure_exists(rest);
 		item_id item = get_item_by_name(rest, false);
 		if (item == -1) {
 			printed.message = "No such item, '" + std::string(rest) + "'!";

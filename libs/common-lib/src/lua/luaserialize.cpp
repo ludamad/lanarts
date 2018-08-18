@@ -62,11 +62,14 @@ static std::vector<std::string> get_keys(const LuaValue& value) {
 }
 
 static void encode_keys(SerializeBuffer& serializer, const LuaValue& value) {
+#ifndef NDEBUG
     // TODO if ndebug
     serializer.write_container(get_keys(value));
+#endif
 }
 
 static void decode_keys(SerializeBuffer& serializer, const LuaValue& value) {
+#ifndef NDEBUG
     std::vector<std::string> keys;
     serializer.read_container(keys);
     std::vector<std::string> new_keys = get_keys(value);
@@ -77,6 +80,7 @@ static void decode_keys(SerializeBuffer& serializer, const LuaValue& value) {
     if (keys != new_keys) {
         throw std::runtime_error("Corrupted load!");
     }
+#endif
 }
 
 /***************************************************************************************
@@ -88,6 +92,7 @@ void LuaSerializeContext::encode_table(int idx) {
     lua_pushvalue(L, idx);
 	lua_pushnil(L);
 	while (lua_next(L, -2) != 0) {
+#ifndef NDEBUG
         const char* name = NULL;
         const char* type_name = NULL;
 		if (lua_type(L, -2) == LUA_TSTRING) {
@@ -95,11 +100,15 @@ void LuaSerializeContext::encode_table(int idx) {
             type_name = lua_typename(L, lua_type(L, -1));
 			//printf("ENCODING '%s' as '%s'\n", lua_tostring(L, -2), lua_typename(L, lua_type(L, -1)));
 		}
+#endif
         LuaValue k{L, -2};
         LuaValue v{L, -1};
 		encode(-2);
+#ifndef NDEBUG
         try {
+#endif
         encode(-1);
+#ifndef NDEBUG
         } catch (...) {
             //
             printf("Error occurred -- dumping Lua object at %d\n", idx);
@@ -113,12 +122,15 @@ void LuaSerializeContext::encode_table(int idx) {
             //
             throw;
         };
+#endif
 		lua_pop(L, 1);
 	}
 	buffer->write_byte(LS_TABLE_END_SENTINEL);
 	lua_pop(L, 1);
+#ifndef NDEBUG
     {LuaValue VALUE{L, idx};
         encode_keys(*buffer, VALUE);}
+#endif
 }
 
 // On success, writes [LS_REF_ID, <ref id>] or [LS_REF_NAME, <ref name>]
@@ -371,8 +383,10 @@ void LuaSerializeContext::decode_table(int idx) {
 		lua_rawset(L, -3);
 	}
 	lua_pop(L, 1);
+#ifndef NDEBUG
     {LuaValue VALUE{L, idx};
         decode_keys(*buffer, VALUE);}
+#endif
 }
 
 // Simple string holder to pass to our lua_Reader.

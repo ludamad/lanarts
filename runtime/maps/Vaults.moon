@@ -98,6 +98,10 @@ M.ridge_dungeon = (args) -> {
                     append map.player_candidate_squares, {x*32+16, y*32+16}
         }
 
+        'F': {
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN, M.FLAG_HAS_VAULT}
+            content: args.tileset.floor
+        }
         'D': {
             add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT, M.FLAG_HAS_OBJECT}
             matches_none: {FLAGS_HAS_CONTENT}
@@ -183,18 +187,30 @@ M.sealed_dungeon = (args) -> table.merge M.ridge_dungeon(args), {
     data: random_choice {
 [=[
 .....wwwwwww....
-...111fffffdfff+
-.111fffffffdfff+
+...111fffffdFFF+
+.111fffffffdFFF+
 .11fffffff11....
 .11***11111.....
 .1f*D*111.......
 .1111111........]=]
 [[
+...wwwwwwwwwww...
+..wwffffffffww...
+..wffff*fffffw...
+..wffff*fffffdFF+
+..wff*ff**fffdFF+
+wwwffff*ffffww...
+wffffff*ffffw....
+1fDffffffffww....
+11ffwwwwwwww.....
+.111w............
+]]
+[[
 ...wwwwww...
 ..wwfffww...
 ..wfffffw...
-..wfffffdff+
-..wfffffdff+
+..wfffffdFF+
+..wfffffdFF+
 wwwffffww...
 wffffffw....
 1fDfffww....
@@ -203,7 +219,7 @@ wffffffw....
 ]]
 [=[
 ......w++w..
-......wffw..
+......wFFw..
 .....wwddww.
 ...wwwffffww
 .wwwffffffww
@@ -213,8 +229,8 @@ wffffffw....
 .wwwwwww....]=]
 [[
 ...wwwww....
-..wwfffdff+.
-.wwffffdff+.
+..wwfffdFF+.
+.wwffffdFF+.
 .wfDfffwww..
 .wwffwww....
 ..wwww......
@@ -224,9 +240,33 @@ wffffffw....
 .....wwwfffffw
 ...wwwffffffww
 ...wwfffffffww
-+ffdf***f1111.
-+ffdf*D*ff1...
++FFdf***f1111.
++FFdf*D*ff1...
 ...www11111...]=]
+[=[
+.......wwwwwww...
+.....wwwfffffwww.
+...wwwfffffffffww
+...wwffffffffffww
++FFdf***ffff1111.
++FFdf***ffff1111.
++FFdf*D*fffff111.
+...wwffffffffffww
+...wwwfffffffffww
+.....wwwfffffwww.
+.......wwwwwww...]=]
+[=[
+.......wwwwwww
+.....wwwfffffw
+...wwwffffffww
+...wwfffffffww
++FFdf***f1111.
++FFdf***f1111.
++FFdf*D*ff111.
+...wwfffffffww
+...wwwffffffww
+.....wwwfffffw
+.......wwwwwww]=]
 }
 }
 

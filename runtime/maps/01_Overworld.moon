@@ -669,7 +669,7 @@ overworld_features = (map) ->
             return nil
         door_placer = (map, xy) ->
             -- nil is passed for the default open sprite
-            MapUtils.spawn_door(map, xy, nil, Vaults._closed_door_crypt)
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, 'Azurite Key')
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq2, dungeon)
         vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.temple, :door_placer, :gold_placer, player_spawn_area: true})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
@@ -696,7 +696,7 @@ overworld_features = (map) ->
                     return if floor == SnakePit.N_FLOORS then 0 else 3
             }
         door_placer = (map, xy) ->
-            MapUtils.spawn_door(map, xy)
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, 'Azurite Key')
         next_dungeon = {1}
         place_dungeon = (map, xy) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")

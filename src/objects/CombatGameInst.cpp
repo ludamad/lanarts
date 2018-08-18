@@ -557,9 +557,10 @@ void CombatGameInst::init(GameState* gs) {
     // Make sure current_floor is set before adding to team:
     gs->team_data().add(this);
 
-    if ((dynamic_cast<PlayerInst*>(this)) && !_paths_to_object) {
+    //if ((dynamic_cast<PlayerInst*>(this)) && !_paths_to_object) {
+    if (team == PLAYER_TEAM && !_paths_to_object) {
         _paths_to_object = new FloodFillPaths();
-	paths_to_object().initialize(gs->tiles().solidity_map());
+	    paths_to_object().initialize(gs->tiles().solidity_map());
     }
     if ((dynamic_cast<PlayerInst*>(this)) && !field_of_view) {
         field_of_view = new fov();
@@ -687,7 +688,7 @@ void CombatGameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
     estats.deserialize(serializer);
     if (team == PLAYER_TEAM && id > 0) {
         _paths_to_object = new FloodFillPaths();
-	paths_to_object().initialize(gs->tiles().solidity_map());
+	    paths_to_object().initialize(gs->tiles().solidity_map());
         field_of_view = new fov();
         int sx = x / TILE_SIZE;
         int sy = y / TILE_SIZE;

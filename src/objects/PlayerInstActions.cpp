@@ -913,10 +913,11 @@ void PlayerInst::_use_move(GameState *gs, const GameAction &action) {
 }
 
 void PlayerInst::_use_dngn_portal(GameState *gs, const GameAction &action) {
-    // Dead players can't leave the level:
-    if (is_ghost()) {
-        return;
-    }
+   // TODO: Letting dead players leave level to prevent death loops.
+   // // Dead players can't leave the level:
+   // if (is_ghost()) {
+   //     return;
+   // }
    if (!effective_stats().allowed_actions.can_use_stairs) {
         gs->for_screens([&](){
             if (is_focus_player(gs)) {

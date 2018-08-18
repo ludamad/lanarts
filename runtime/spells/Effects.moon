@@ -628,7 +628,7 @@ DataW.effect_create {
     name: "Reviving"
     remove_func: (player) =>
         player.is_ghost = false
-        player.stats.hp = player\effective_stats().max_hp / 2
+        player.stats.hp = player\effective_stats().max_hp -- / 2 TODO should ghosts have half HP?
     draw_func: (player, top_left_x, top_left_y) =>
         xy = Display.to_screen_xy player.xy
         Fonts.small\draw({origin: Display.CENTER}, xy, "#{math.ceil @time_left / 60}")
