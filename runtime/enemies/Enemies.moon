@@ -1320,12 +1320,12 @@ DataW.enemy_create {
     appear_message: "A re-animated skeleton appears!"
     defeat_message: "The skeleton is broken unto a pile of bones."
     types: {"Black"}
-    weapon: {cooldown: 40, damage: 3}
+    weapon: {cooldown: 40}
     stats: {
         hp: 50
         hpregen: 0
         movespeed: 2
-        strength: 2
+        strength: 7
         magic: 2
         defence: 0
         willpower: 2

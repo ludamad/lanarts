@@ -64,21 +64,23 @@ TypeEffectUtils = require "spells.TypeEffectUtils"
 DataW.spell_create {
     name: "Skeleton Army"
     types: {"Black"}
-    description: "Briefly summon an army of skeletons.",
+    description: "Briefly summon an army of skeletons. Grow stronger based on caster's willpower.",
     can_cast_with_held_key: true
     spr_spell: "spr_spells.animate_skeleton"
     can_cast_with_cooldown: false
     mp_cost: 10
     cooldown: 25
-    spell_cooldown: 800
+    spell_cooldown: 400
     fallback_to_melee: false
     prereq_func: (obj) ->
         return true
     action_func: (obj) ->
         n_summoned = 0
+        bpower = TypeEffectUtils.get_power(obj, "Black")
         ObjectUtils.nearby_square_iterate obj, (xy) ->
-            SummonUtils.summon_one_hit_monster(obj, xy, "SummonSkeleton")
+            mon = SummonUtils.summon_one_hit_monster(obj, xy, "SummonedSkeleton", 100 + bpower * 10)
+            mon.stats.strength = obj.stats.willpower / 3
             n_summoned += 1
-            return n_summoned >= 10 + obj.stats.level * 3 + TypeEffectUtils.get_power(obj, "Black") * 2
+            return n_summoned >= 10 + obj.stats.level * 3 + bpower * 2
 }
 
