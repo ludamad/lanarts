@@ -3,50 +3,48 @@
 -- and then is created based on selection from score range.
 
 DataWrapped = require "DataWrapped"
+BonusesAll = require "items.BonusesAll"
+{:compile_bonuses} = require "items.Bonuses"
+
 TYPES = require("spells.TypeEffectUtils").TYPES
 
 _STAT_BONUSES = {
     enchantment: (level) =>
         for i=1,level
-            @enchantment += @rng\random(-1, 3)
+            @enchantment += @rng\random(0, 2)
         @enchantment = math.max(@enchantment, 1)
     mp: (level) =>
         for i=1,level
-            @stat_bonuses.mp += @rng\random(-25, 25)
+            @stat_bonuses.mp += @rng\random(0, 25)
     hp: (level) =>
         for i=1,level
-            @stat_bonuses.hp += @rng\random(-25, 25)
+            @stat_bonuses.hp += @rng\random(0, 25)
     mpregen: (level) =>
         for i=1,level
-            @stat_bonuses.mpregen += @rng\random(-300, 300) / 100 / 60
+            @stat_bonuses.mpregen += @rng\random(0, 300) / 100 / 60
     hpregen: (level) =>
         for i=1,level
-            @stat_bonuses.hpregen += @rng\random(-300, 300) / 100 / 60
+            @stat_bonuses.hpregen += @rng\random(0, 300) / 100 / 60
     spell_velocity_multiplier: (level) =>
         for i=1,level
-            @stat_bonuses.spell_velocity_multiplier += @rng\randomf(-0.15, 0.15)
+            @stat_bonuses.spell_velocity_multiplier += @rng\randomf(0, 0.15)
 }
 for stat in *{"strength", "magic", "defence", "willpower"}
     _STAT_BONUSES[stat] = (level) =>
         for i=1,level
-            @stat_bonuses[stat] += @rng\random(-3, 4)
+            @stat_bonuses[stat] += @rng\random(0, 4)
 
 _STAT_MULTIPLIER_BONUSES = {}
 for stat in *{"magic_cooldown_multiplier" , "melee_cooldown_multiplier", "ranged_cooldown_multiplier"}
     _STAT_MULTIPLIER_BONUSES[stat] = (level) =>
         for i=1,level
-            @stat_multipliers[stat] += @rng\randomf(-0.15, 0.15)
+            @stat_multipliers[stat] += @rng\randomf(0, 0.15)
 
 _EFFECT_BONUSES = {
     -- Append the effect to add, as well as the perceived 'tier' of this effect
     -- Higher tier effects effect the final scoring of the randart quadratically.
     Fortification: (level) => append @effects, {"Fortification", 1} -- Fixed value
-    Spiky: (level) =>
-        recoil_percentage = 0
-        for i =1,level
-            recoil_percentage += @rng\randomf(-0.05, 0.10)  -- Value proportional to recoil_percentage
-        recoil_percentage = math.max(0.05, recoil_percentage)
-        append @effects, {{"Spiky", {:recoil_percentage}}, recoil_percentage / 0.05}
+    Spiky: (level) => append @newstyle_bonuses, "Spiky"
     PossiblySummonCentaurOnKill: (level) => append @effects, {"PossiblySummonCentaurOnKill", 2.5} -- Fixed value
     PossiblySummonGolemOnKill: (level) => append @effects, {"PossiblySummonGolemOnKill", 2.5} -- Fixed value
     PossiblySummonStormElementalOnKill: (level) => append @effects, {"PossiblySummonStormElementalOnKill", 2} -- Fixed value
@@ -131,6 +129,7 @@ Bonuses = newtype {
             ranged_cooldown_multiplier: 1.0
         }
         @effects = {}
+        @newstyle_bonuses = {}
         @enchantment = 0 -- For weapons only for now
         @powers = {}
         @resistances = {}
@@ -193,7 +192,8 @@ Bonuses = newtype {
 
         if n_resists + n_powers > 2 -- reject
             return false
-        if penalties > 1 -- reject
+        -- TODO turn off penalties for now via this rejection criteria:
+        if penalties > 0 -- TODO 1 -- reject
             return false
         if score < min_score or score > max_score
             return false
@@ -232,7 +232,10 @@ Bonuses = newtype {
             for i=1,2
                 base.damage.base[i] = math.ceil(base.damage.base[i] * (1 + @enchantment * 0.2))
             base.name = "+#{@enchantment} #{base.name}"
-        return base
+        base.shop_cost or= {0,0}
+        created = compile_bonuses(base, @newstyle_bonuses)
+        created.name = base.name -- TODO dont mutate name yet
+        return created
 }
 
 return {:Bonuses}
