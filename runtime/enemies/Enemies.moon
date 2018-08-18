@@ -1314,15 +1314,15 @@ DataW.enemy_create {
 
 DataW.enemy_create {
     name: "SummonedSkeleton"
-    sprite: "skeleton"
+    sprite: "spr_enemies.undead.skeleton_ugly_thing"
     radius: 11
     xpaward: 10
-    appear_message: "A re-animated skeleton appears!"
-    defeat_message: "The skeleton is broken unto a pile of bones."
+    appear_message: "A re-animated skeleton abomination appears!"
+    defeat_message: "The skeleton abomination is broken unto a pile of bones."
     types: {"Black"}
     weapon: {cooldown: 40}
     stats: {
-        hp: 50
+        hp: 5
         hpregen: 0
         movespeed: 2
         strength: 7

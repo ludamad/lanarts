@@ -66,7 +66,7 @@ DataW.spell_create {
     types: {"Black"}
     description: "Briefly summon an army of skeletons. Grow stronger based on caster's willpower.",
     can_cast_with_held_key: true
-    spr_spell: "spr_spells.animate_skeleton"
+    spr_spell: "spr_enemies.undead.skeleton_ugly_thing"
     can_cast_with_cooldown: false
     mp_cost: 10
     cooldown: 25
