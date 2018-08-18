@@ -3,14 +3,14 @@ Display = require "core.Display"
 {:draw_console_text, :draw_console_effect} = require 'ui.ConsoleUtils'
 
 ANIMATE_VELOCITIES = {
-    {-4, -4}
-    {0, -4}
-    {4, -4}
-    {4, 0}
-    {4, 4}
-    {0, 4}
-    {-4, 4}
-    {-4, 0}
+    {-1, -1}
+    {0, -1}
+    {1, -1}
+    {1, 0}
+    {1, 1}
+    {0, 1}
+    {-1, 1}
+    {-1, 0}
 }
 
 COLOR_CLASSES = {
@@ -22,12 +22,12 @@ COLOR_CLASSES = {
 }
 
 
-create_animation = (obj, sprite) =>
+create_animation = (obj, sprite, speed=4) =>
     GameObject.animation_create {
         xy: obj.xy
         sprite: sprite
         duration: 25
-        velocity: ANIMATE_VELOCITIES[(@n_animations % #ANIMATE_VELOCITIES) + 1]
+        velocity: vector_scale(ANIMATE_VELOCITIES[(@n_animations % #ANIMATE_VELOCITIES) + 1], speed)
     }
     -- To make sure animations dont sync, add random jitter:
     @n_animations += if chance 0.1 then 2 else 1

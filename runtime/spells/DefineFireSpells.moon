@@ -61,6 +61,7 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
         @for_all_rings (x, y) ->
             ObjectUtils.screen_draw(M._fire, {x, y}, alpha / 2, frame)
 }, extension
+M.RingOfFire = RingOfFire
 
 -- When something dies from RingOfFire, this is spawned
 local SpawnedFire
@@ -116,6 +117,7 @@ SpawnedFire = RingFireBase {
                 @damage_cooldowns[dy][dx] or= OrderedDict()
                 f(x, y, @damage_cooldowns[dy][dx])
 }
+M.SpawnedFire = SpawnedFire
 
 RingOfFire = RingFireBase {
     -- RingFireBase config
@@ -172,6 +174,7 @@ RingOfFire = RingFireBase {
             @damage_cooldowns[idx] or= OrderedDict()
             f(x + @caster.x, y + @caster.y, @damage_cooldowns[idx])
 }
+M.RingOfFire = RingOfFire
 
 DataW.effect_create {
     name: "Ring of Flames Stat Boost"

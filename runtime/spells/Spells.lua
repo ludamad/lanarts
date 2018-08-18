@@ -6,6 +6,7 @@ local DataW = require "DataWrapped"
 local Bresenham = require "core.Bresenham"
 local TypeEffectUtils = require "spells.TypeEffectUtils"
 local SpellObjects = require "objects.SpellObjects"
+local SummonUtils = require "spells.SummonUtils"
 
 -- Effects:
 require("spells.Effects")
@@ -227,8 +228,9 @@ function Pain.action_func(caster, x, y, target)
         else
             caster:heal_hp(target:effective_stats().max_hp / 3)
         end
+        SummonUtils.summon_one_hit_monster(caster, target.xy, "Flying Skull") 
     else
-        caster:direct_damage(20)
+        caster:direct_damage(15)
     end
     caster:add_effect("Pained", 50)
     for _ in screens() do 

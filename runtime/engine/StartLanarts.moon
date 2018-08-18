@@ -107,7 +107,7 @@ run_lanarts = (raw_args) ->
             for _ in screens()
                 EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
         -- (6) Backup save every ~5 minutes
-        if GameState.frame > 0 and GameState.frame % (60 * 60 * 2) == 0  -- Every 2 minutes at 60FPS
+        if GameState.frame > 0 and GameState.frame % (60 * 60 * 5) == 0  -- Every 5 minutes at 60FPS
             for _ in screens()
                 EventLog.add("BACKING UP SAVE!", COL_WHITE)
             GameState.save((args.save or "saves/savefile.save") .. ".backup." .. GameState.frame)

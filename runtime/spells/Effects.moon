@@ -8,6 +8,7 @@ Display = require "core.Display"
 SpellObjects = require "objects.SpellObjects"
 DataW = require "DataWrapped"
 TypeEffectUtils = require "spells.TypeEffectUtils"
+BonusesUtils = require "items.BonusesUtils"
 
 DataW.effect_create {
     name: "Poison"
@@ -280,9 +281,10 @@ DataW.effect_create {
         draw_weapon_console_effect(player, M._fear, "+10% chance fear", get_next())
     on_melee_func: (attacker, defender, dmg) =>
         if defender\has_effect("Fear")
-            return
+            return damage
         if chance(.1)
             eff = defender\add_effect("Fear", 150)
+        return damage
 }
 
 DataW.effect_create {
@@ -291,9 +293,10 @@ DataW.effect_create {
         draw_weapon_console_effect(player, M._confusion, "+10% chance daze", get_next())
     on_melee_func: (attacker, defender, dmg) =>
         if defender\has_effect("Dazed")
-            return
+            return damage
         if chance(.1 * @n_derived)
             eff = defender\add_effect("Dazed", 70)
+        return damage
 }
 
 
@@ -361,7 +364,7 @@ DataW.additive_effect_create {
         draw_weapon_console_effect(player, M._poison, "+#{math.floor(@poison_percentage * 100)}% chance poison", get_next())
     on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Poison")
-            return
+            return damage
         power = TypeEffectUtils.get_power(attacker, "Green")
         resist = TypeEffectUtils.get_resistance(defender, "Green")
         poison_chance = @value()
@@ -375,6 +378,7 @@ DataW.additive_effect_create {
                 type_resistance: resist
                 magic_percentage: 1.0
             }
+        return damage
 }
 
 DataW.additive_effect_create {
@@ -413,6 +417,25 @@ DataW.effect_create {
         if not Map.object_visible summon, summon.xy, @summoner
             summon\direct_damage(10)
 }
+
+DataW.effect_create {
+    -- Dies at the end of this effect, or on the first attack.
+    name: "DiesOnEndOrFirstAttack"
+    init_func: () =>
+        @n_animations = rand_range(0, 16)
+    die: (obj) =>
+        BonusesUtils.create_animation @, obj, "spr_bonuses.ghost", 0.5
+        obj\die()
+    remove_func: (obj) =>
+        @die obj
+    on_melee_func: (obj, defender, damage) =>
+        @die obj
+        return damage
+    on_projectile_func: (obj, defender, xy) =>
+        @die obj
+        return damage
+}
+
 
 DataW.effect_create {
     name: "Summoner"
@@ -518,8 +541,8 @@ for equip_slot in *{"", "Armour", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
 
 DataW.effect_create {
     name: "PossiblySummonCentaurOnKill"
-    -- console_draw_func: (player, get_next) =>
-    --     draw_console_effect(tosprite("spr_enemies.humanoid.centaur"), "Can summon after kill", get_next())
+    console_draw_func: (player, get_next) =>
+        draw_console_effect(tosprite("spr_enemies.humanoid.centaur"), "Can summon after kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -539,8 +562,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "SummonMummyOnKill"
-    -- console_draw_func: (player, get_next) =>
-    --     draw_console_effect(tosprite("spr_enemies.undead.mummy"), "Summons help every kill", get_next())
+    console_draw_func: (player, get_next) =>
+        draw_console_effect(tosprite("spr_enemies.undead.mummy"), "Summons help every kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -559,8 +582,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "PossiblySummonStormElementalOnKill"
-    -- console_draw_func: (player, get_next) =>
-    --     draw_console_effect(tosprite("storm elemental"), "Can appear after a kill", get_next())
+    console_draw_func: (player, get_next) =>
+        draw_console_effect(tosprite("storm elemental"), "Can appear after a kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -581,8 +604,8 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "PossiblySummonGolemOnKill"
-    -- console_draw_func: (player, get_next) =>
-    --     draw_console_effect(tosprite("golem"), "Can appear after a kill", get_next())
+    console_draw_func: (player, get_next) =>
+        draw_console_effect(tosprite("golem"), "Can appear after a kill", get_next())
     category: "EquipEffect"
     init_func: (caster) =>
         @kill_tracker = caster.kills
@@ -891,6 +914,7 @@ for name in *{"Ranger", "Fighter", "Templar", "Rogue", "Green Mage", "Black Mage
         init_func: (caster) =>
             @kill_tracker = caster.kills
             @links = {}
+            @n_animations = 0
             LAST_WARNING\set -math.huge -- HACK
         step_func: (caster) =>
             -- Keep state for doing summons in a stateful effect:
@@ -900,17 +924,18 @@ for name in *{"Ranger", "Fighter", "Templar", "Rogue", "Green Mage", "Black Mage
                 eff = caster\add_effect "Summoner", 2
                 eff.duration = 30
             while caster.kills > @kill_tracker
-                if name == "Necromancer"
-                    for _ in screens()
-                        if caster\is_local_player()
-                            EventLog.add("You gain mana for killing!", COL_PALE_BLUE)
-                    caster\heal_mp(5)
+                --if name == "Necromancer"
+                --    for _ in screens()
+                --        if caster\is_local_player()
+                --            EventLog.add("You gain mana for killing!", COL_PALE_BLUE)
+                --    caster\heal_mp(5)
                 for {:instance, :class_name} in *World.players
-                    if instance ~= caster and class_name == "Necromancer"
+                    if class_name == "Necromancer"
                         for _ in screens()
                             if instance\is_local_player()
-                                EventLog.add("You gain mana from the carnage!", COL_PALE_BLUE)
-                        instance\heal_mp(2)
+                                EventLog.add("You steal the dying monster's life!", COL_PALE_BLUE)
+                        instance\heal_mp(10)
+                        BonusesUtils.create_animation @, instance, "spr_bonuses.mana", 0.5
                 @kill_tracker += 1
         -- TODO reconsider whether Necro needs corrosive skin
         --on_receive_melee_func: (attacker, caster, damage) =>
@@ -1045,6 +1070,7 @@ DataW.effect_create {
                 elseif not defender.is_enemy and defender\is_local_player()
                     EventLog.add("You are thrown back!", {200,200,255})
             -- mon\remove_effect("Charging")
+        return damage
 }
 
 return M

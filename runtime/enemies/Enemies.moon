@@ -108,6 +108,30 @@ DataW.enemy_create {
 }
 
 DataW.enemy_create {
+    name: "Flying Skull"
+    sprite: "spr_enemies.undead.flying_skull"
+    radius: 11
+    xpaward: 10
+    appear_message: "A flying skull appears!"
+    defeat_message: "The flying skull fades."
+    types: {"Black"}
+    stats: {
+        attacks: {
+            {weapon: "Basic Melee"}
+        }
+        hp: 40
+        hpregen: 0
+        movespeed: 4
+        -- base stats:
+        strength: 5
+        defence: 8
+        magic: 10
+        willpower: 8
+    }
+}
+
+
+DataW.enemy_create {
     name: "Mummy"
     sprite: "spr_enemies.undead.mummy"
     radius: 11

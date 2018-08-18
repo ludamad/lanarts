@@ -23,8 +23,8 @@ define_bonus {
     shop_cost: {100, 200}
     sprite: tosprite "spr_enemies.humanoid.centaur"
     effects_granted: {"PossiblySummonCentaurOnKill"}
-    console_draw_func: (obj, get_next) =>
-        summon_console_draw_func @, obj, get_next
+    --console_draw_func: (obj, get_next) =>
+    --    summon_console_draw_func @, obj, get_next
     -- effect: {
     --     init_func: (obj) =>
     --         @n_animations = 0
@@ -45,7 +45,7 @@ define_bonus {
     shop_cost: {100, 200}
     sprite: tosprite "golem"
     effects_granted: {"PossiblySummonGolemOnKill"}
-    console_draw_func: summon_console_draw_func
+    --console_draw_func: summon_console_draw_func
     item_draw_func: (options, x, y) =>
         @sprite\draw options, {x, y}
 }
@@ -55,7 +55,7 @@ define_bonus {
     shop_cost: {50, 100}
     sprite: tosprite "storm elemental"
     effects_granted: {"PossiblySummonStormElementalOnKill"}
-    console_draw_func: summon_console_draw_func
+    --console_draw_func: summon_console_draw_func
     item_draw_func: (options, x, y) =>
         @sprite\draw options, {x, y}
 }
@@ -65,7 +65,7 @@ define_bonus {
     shop_cost: {200, 400}
     sprite: tosprite "spr_enemies.undead.mummy"
     effects_granted: {"SummonMummyOnKill"}
-    console_draw_func: summon_console_draw_func
+    --console_draw_func: summon_console_draw_func
     item_draw_func: (options, x, y) =>
         @sprite\draw options, {x, y}
 }
