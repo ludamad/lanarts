@@ -14,7 +14,7 @@ M = nilprotect {
 }
 
 -- A standardized stun for white mage:
-try_stun = (caster, mon) ->
+try_stun = (caster, mon, cooldown=nil) ->
     white_power = TypeEffectUtils.get_power(caster, "White")
     resist = math.min(1.25, TypeEffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
     if not mon.is_enemy
@@ -22,8 +22,8 @@ try_stun = (caster, mon) ->
     if chance(resist)
         if not mon.is_enemy
             white_power = -5
-        mon\add_effect("Stunned", (100 + white_power * 10) * resist)
-        mon\add_effect("Stunned", (100 + white_power * 10) * resist)
+        mon\add_effect("Stunned", cooldown or (100 + white_power * 10) * resist)
+        mon\add_effect("Stunned", cooldown or (100 + white_power * 10) * resist)
         if Map.object_visible(mon)
             play_sound "sound/ringfire-hit.ogg"
 
@@ -80,6 +80,7 @@ Flash = SpellUtils.spell_object_type {
             --ObjectUtils.screen_draw(M._flash, {x, y}, alpha / 2, frame)
             ObjectUtils.screen_draw(M._bolt, {x, y}, alpha / 2, frame)
 }
+M.Flash = Flash
 
 interpolate = (val, min, max, omin, omax) ->
     val = math.max(min, math.min(max, val))
@@ -98,12 +99,10 @@ DataW.spell_create {
         speed: 4
         number_of_target_bounces: 3
         on_hit_func: (target, atkstats) =>
-            if @caster
-                return
             white_power = TypeEffectUtils.get_power(@caster, "White")
-            prob = interpolate(white_power, 0, 5, 0.0, 0.2)
+            prob = interpolate(white_power, 0, 5, 0.05, 0.2)
             if chance(prob)
-                try_stun(@caster, target)
+                try_stun(@caster, target, 30)
             
     }
     mp_cost: 20,
@@ -127,12 +126,14 @@ DataW.spell_create {
         on_map_init: () =>
             @bonus = 0.9
         on_hit_func: (target, atkstats) =>
-            if @caster
-                return
+            if not target.destroyed and chance(.25)
+                target\go_towards_if_free {@vx * @speed / 4, @vy * @speed / 4}
+            if @attacked_map[target] ~= nil
+                return nil
             white_power = TypeEffectUtils.get_power(@caster, "White")
-            prob = interpolate(white_power, 0, 5, 0.0, 0.2)
+            prob = interpolate(white_power, 0, 5, 0.05, 0.2)
             if chance(prob)
-                try_stun(@caster, target)
+                try_stun(@caster, target, 30)
             @bonus += 0.1
             atkstats.damage *= @bonus
     }
@@ -200,7 +201,7 @@ DataW.spell_create {
 
 DataW.effect_create {
     name: "Stunned"
-    effected_sprite: "spr_amulets.light"
+    effected_sprite: "spr_bonuses.stun"
     effected_colour: {200,200,200}
     can_use_rest: false
     can_use_spells: false

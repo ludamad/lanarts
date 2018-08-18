@@ -200,6 +200,20 @@ static int lapi_do_nothing(lua_State *L) {
     return 0;
 }
 
+static bool go_towards_if_free(GameState* gs, CombatGameInst* inst, float vx, float vy) {
+    float tx = vx, ty = vy;
+    float nx = inst->rx + tx, ny = inst->ry + ty;
+    if (!gs->solid_test(inst, iround(nx), iround(ny), inst->radius)) {
+        inst->update_position(nx, ny);
+        return true;
+    }
+    return false;
+}
+
+static bool lapi_go_towards_if_free(LuaStackValue obj, PosF dir) {
+    return go_towards_if_free(lua_api::gamestate(obj), obj.as<CombatGameInst*>(), dir.x, dir.y);
+}
+
 static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(CombatGameInst*);
 
@@ -229,6 +243,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	};
 	methods["effective_stats"].bind_function(lapi_gameinst_effectivestats);
     LUAWRAP_GETTER(getters, weapon_range, OBJ->equipment().weapon().weapon_entry().range());
+    methods["go_towards_if_free"].bind_function(lapi_go_towards_if_free);
 
     LUAWRAP_METHOD(methods, heal_fully, OBJ->stats().core.heal_fully());
     LUAWRAP_METHOD(methods, gain_xp_from, OBJ->gain_xp_from(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2)));
@@ -286,13 +301,24 @@ static LuaValue lua_feature_metatable(lua_State* L) {
 
 
 static LuaValue lua_iteminst_metatable(lua_State* L) {
-	LUAWRAP_SET_TYPE(ItemInst*);
+    LUAWRAP_SET_TYPE(ItemInst*);
 
-	LuaValue meta = lua_gameinst_base_metatable(L);
-        LuaValue getters = luameta_getters(meta);
-	LUAWRAP_GETTER(getters, type, OBJ->item_type().item_entry().name);
-	LUAWRAP_GETTER(getters, amount, OBJ->item_quantity());
-	return meta;
+    LuaValue meta = lua_gameinst_base_metatable(L);
+    LuaValue getters = luameta_getters(meta);
+    LUAWRAP_GETTER(getters, type, OBJ->item_type().item_entry().name);
+    LUAWRAP_GETTER(getters, amount, OBJ->item_quantity());
+    return meta;
+}
+
+static LuaValue lua_projectileinst_metatable(lua_State* L) {
+    LUAWRAP_SET_TYPE(ProjectileInst*);
+
+    LuaValue meta = lua_gameinst_base_metatable(L);
+    LuaValue getters = luameta_getters(meta);
+    LUAWRAP_GETTER(getters, vx, OBJ->vx);
+	LUAWRAP_GETTER(getters, vy, OBJ->vy);
+	LUAWRAP_GETTER(getters, speed, OBJ->speed);
+    return meta;
 }
 
 static int lua_enemyinst_metatable_clone(lua_State* L);
@@ -404,8 +430,10 @@ static void lua_gameinst_push_metatable(lua_State* L, GameInst* inst) {
 		luameta_push(L, &lua_enemyinst_metatable);
 	} else if (dynamic_cast<CombatGameInst*>(inst)) {
 		luameta_push(L, &lua_combatgameinst_metatable);
-	} else if (dynamic_cast<ItemInst*>(inst)) {
-		luameta_push(L, &lua_iteminst_metatable);
+    } else if (dynamic_cast<ItemInst*>(inst)) {
+        luameta_push(L, &lua_iteminst_metatable);
+    } else if (dynamic_cast<ProjectileInst*>(inst)) {
+        luameta_push(L, &lua_projectileinst_metatable);
 	} else if (dynamic_cast<FeatureInst*>(inst)) {
 		luameta_push(L, &lua_feature_metatable);
 	} else {
@@ -796,8 +824,10 @@ namespace lua_api {
 		submodule["CombatType"].pop();
 		luameta_push(L, &lua_feature_metatable);
 		submodule["FeatureType"].pop();
-		luameta_push(L, &lua_iteminst_metatable);
-		submodule["ItemType"].pop();
+        luameta_push(L, &lua_iteminst_metatable);
+        submodule["ItemType"].pop();
+        luameta_push(L, &lua_projectileinst_metatable);
+        submodule["ProjectileType"].pop();
 		luameta_push(L, &lua_gameinst_base_metatable);
 		submodule["Base"].pop();
 		luameta_push(L, &GameInstWrap::ref_metatable);

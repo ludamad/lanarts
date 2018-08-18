@@ -153,7 +153,7 @@ static bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 	}
 	return false;
 }
-static bool go_towards_if_free_in_direction(GameState* gs, CombatGameInst* inst,
+bool go_towards_if_free_in_direction(GameState* gs, CombatGameInst* inst,
 		float vx, float vy) {
 	float tx = vx, ty = vy;
 	normalize(tx, ty, TILE_SIZE);

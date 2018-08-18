@@ -87,14 +87,14 @@ passing_projectile = (args) ->
         if args.on_step
             args.on_step(@)
     combined.on_hit_func = (target, atkstats) =>
+        if args.on_hit_func
+            args.on_hit_func(@, target, atkstats)
         if @destroyed or @attacked_map[target] ~= nil
             atkstats.damage = 0 -- No damage this step
             return
         @attacked_map[target] = args.redamage_cooldown
         @n_hits += 1
         atkstats.type_multiplier *= (1.0 + (math.sqrt(@n_hits - 1) - 1.0) / 20)
-        if args.on_hit_func
-            args.on_hit_func(@, target, atkstats)
     return combined
 
 for_all_visible_mons = (caster, f) ->

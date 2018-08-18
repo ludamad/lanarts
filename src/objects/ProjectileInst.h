@@ -41,10 +41,9 @@ public:
             y = (int) ry;
         }
 	sprite_id sprite() const;
+	float rx, ry, vx, vy, speed;
 private:
 	static bool bullet_target_hit2(GameInst* self, GameInst* other);
-
-	float rx, ry, vx, vy, speed;
 	/* Stats at time of projectile creation */
 	EffectiveAttackStats atkstats;
 	/* Origin object, and optional exclusive target*/
