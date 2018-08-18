@@ -17,6 +17,7 @@ require("spells.Projectiles")
 -- New spells coded in more convenient syntax:
 -- TODO figure out long term plan
 require("spells.Spells2")
+require("spells.DefineBlackSpells")
 
 -- REGENERATION
 

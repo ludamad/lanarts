@@ -279,7 +279,7 @@ DataW.effect_create {
     name: "FearWeapon"
     console_draw_func: (player, get_next) =>
         draw_weapon_console_effect(player, M._fear, "+10% chance fear", get_next())
-    on_melee_func: (attacker, defender, dmg) =>
+    on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Fear")
             return damage
         if chance(.1)
@@ -291,7 +291,7 @@ DataW.effect_create {
     name: "ConfusingWeapon"
     console_draw_func: (player, get_next) =>
         draw_weapon_console_effect(player, M._confusion, "+10% chance daze", get_next())
-    on_melee_func: (attacker, defender, dmg) =>
+    on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Dazed")
             return damage
         if chance(.1 * @n_derived)
@@ -433,7 +433,6 @@ DataW.effect_create {
         return damage
     on_projectile_func: (obj, defender, xy) =>
         @die obj
-        return damage
 }
 
 
@@ -887,7 +886,7 @@ DataW.effect_create {
         draw_weapon_console_effect(player, M._fleeing, "+10% chance of knockback", get_next())
     on_melee_func: (attacker, defender, damage) =>
         if defender\has_effect("Thrown")
-            return
+            return damage
         if chance(.1 * @n_derived)
             thrown = defender\add_effect("Thrown", 20)
             thrown.angle = vector_direction({attacker.x, attacker.y}, {defender.x, defender.y})
@@ -933,9 +932,11 @@ for name in *{"Ranger", "Fighter", "Templar", "Rogue", "Green Mage", "Black Mage
                     if class_name == "Necromancer"
                         for _ in screens()
                             if instance\is_local_player()
-                                EventLog.add("You steal the dying monster's life!", COL_PALE_BLUE)
+                                EventLog.add("You feed on the dying monster's energy!", COL_PALE_BLUE)
+                        istats = instance.stats
+                        if istats.mp < istats.max_mp
+                            BonusesUtils.create_animation @, instance, "spr_bonuses.mana", 0.5
                         instance\heal_mp(10)
-                        BonusesUtils.create_animation @, instance, "spr_bonuses.mana", 0.5
                 @kill_tracker += 1
         -- TODO reconsider whether Necro needs corrosive skin
         --on_receive_melee_func: (attacker, caster, damage) =>

@@ -58,6 +58,7 @@ bool CombatGameInst::damage(GameState* gs, float fdmg, CombatGameInst* attacker)
     if (dynamic_cast<PlayerInst*>(this) && gs->game_settings().invincible) {
         return false;
     }
+
     lua_State* L = gs->luastate();
     auto* map = get_map(gs);
     event_log("CombatGameInst::damage: id %d took %.2f dmg", std::max(0, id), fdmg);

@@ -225,10 +225,6 @@ DataW.effect_create {
         @max_time = math.max(@max_time or 0, time_left)
         @extensions = 0
         -- TODO go farther, have claw as weapon during.
-        @intial_state or= {
-            sprite_name: caster.sprite_name
-            target_radius: caster.target_radius
-        }
         @fire_sprite_name = caster.sprite_name
         caster.sprite_name = 'spr_enemies.dragons.fire_dragon'
     stat_func: (obj, old, new) =>
