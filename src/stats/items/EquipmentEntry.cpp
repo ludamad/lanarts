@@ -119,4 +119,28 @@ void EquipmentEntry::parse_lua_table(const LuaValue& table) {
 	spells_granted = parse_spells_known(table["spells_granted"]);
     effect_modifiers.status_effects = load_statuses(table["effects_granted"]);
 	auto_equip = luawrap::defaulted(table, "auto_equip", true);
+	if (table["auto_equip"].isnil()) {
+		// Set autoequip to false if there are negative attributes:
+		bool has_bad = (cooldown_modifiers.ranged_cooldown_multiplier > 1) ||
+			(cooldown_modifiers.melee_cooldown_multiplier > 1) ||
+			(cooldown_modifiers.spell_cooldown_multiplier > 1) ||
+			(cooldown_modifiers.rest_cooldown_multiplier > 1) ||
+			(stat_modifiers.armour_mod.magic_resistance.base.min < 0) ||
+			(stat_modifiers.armour_mod.resistance.base.min < 0) ||
+			(stat_modifiers.damage_mod.damage_stats.base.min < 0) ||
+			(stat_modifiers.damage_mod.power_stats.base.min < 0) ||
+			(stat_modifiers.core_mod.max_hp < 0) ||
+			(stat_modifiers.core_mod.hp < 0) ||
+			(stat_modifiers.core_mod.max_mp < 0) ||
+			(stat_modifiers.core_mod.mp < 0) ||
+			(stat_modifiers.core_mod.hpregen < 0) ||
+			(stat_modifiers.core_mod.magic < 0) ||
+			(stat_modifiers.core_mod.mpregen < 0) ||
+			(stat_modifiers.core_mod.spell_velocity_multiplier < 1) ||
+			(stat_modifiers.core_mod.strength < 0) ||
+			(stat_modifiers.core_mod.willpower < 0) ||
+			(stat_modifiers.core_mod.defence < 0);
+		// auto equip if there are no downsides
+		auto_equip = !has_bad;
+	}
 }
