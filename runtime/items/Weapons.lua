@@ -71,7 +71,7 @@ DataW.weapon_create {
     cooldown = 30,
 
     alt_action = function(caster, xy, target)
-        caster:use_spell("Pain", xy, target)
+        caster:try_use_spell("Pain", xy, target)
     end,
 
     range = 50
@@ -89,7 +89,7 @@ DataW.weapon_create {
 
     spr_item = "spr_weapons.staff-of-minor",
     alt_action = function(caster, xy, target)
-        caster:use_spell("Minor Missile", xy, target)
+        caster:try_use_spell("Minor Missile", xy, target)
     end,
 
     cooldown = 200,

@@ -782,6 +782,12 @@ void CombatGameInst::try_use_spell(GameState* gs, SpellEntry& spl_entry, const P
         return;
     }
 
+    bool can_use = lcall_def(/*default*/ true, spl_entry.prereq_func,
+            /*caster*/ this, target.x, target.y);
+    if (!can_use) {
+        return;
+    }
+
     use_spell(gs, spl_entry, target, target_object);
 
     cooldowns().action_cooldown *= effective_stats().cooldown_mult;

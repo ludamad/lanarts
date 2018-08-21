@@ -257,7 +257,8 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->equipment().weapon().weapon_entry().uses_projectile);
 	LUAWRAP_GETTER(methods, has_ranged_weapon, OBJ->equipment().weapon().weapon_entry().uses_projectile);
     LUAWRAP_METHOD(methods, projectile_attack, OBJ->projectile_attack(lua_api::gamestate(L), NULL, Weapon(), Item(get_projectile_by_name(lua_tostring(L, 2)))));
-    LUAWRAP_METHOD(methods, use_spell, OBJ->use_spell(lua_api::gamestate(L), game_spell_data.get(lua_tostring(L, 2)), luawrap::get<Pos>(L, 3), luawrap::get_defaulted<GameInst*>(L, 4, nullptr)));
+	LUAWRAP_METHOD(methods, use_spell, OBJ->use_spell(lua_api::gamestate(L), game_spell_data.get(lua_tostring(L, 2)), luawrap::get<Pos>(L, 3), luawrap::get_defaulted<GameInst*>(L, 4, nullptr)));
+	LUAWRAP_METHOD(methods, try_use_spell, OBJ->try_use_spell(lua_api::gamestate(L), game_spell_data.get(lua_tostring(L, 2)), luawrap::get<Pos>(L, 3), luawrap::get_defaulted<GameInst*>(L, 4, nullptr)));
 	LUAWRAP_METHOD(methods, use_mp, OBJ->use_mp(lua_api::gamestate(L), lua_tonumber(L, 2)));
 
     methods["damage"].bind_function(lapi_combatgameinst_damage);

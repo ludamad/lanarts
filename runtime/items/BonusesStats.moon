@@ -8,7 +8,8 @@ define_stat_bonus = (name, description, stat_bonuses) ->
         shop_cost: {100, 200}
         sprite: tosprite("spr_bonuses.#{name\lower()}")
         console_draw_func: (obj, get_next) =>
-            draw_simple_effect @, get_next(), name, description
+            -- draw_simple_effect @, get_next(), name, description
+            nil
         :stat_bonuses
         item_draw_func: (options, x, y) =>
             @sprite\draw options, {x, y}
