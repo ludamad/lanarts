@@ -132,10 +132,11 @@ Data.equipment_create {
 
     shop_cost = { 115, 145 },
 
-    spell_cooldown_multiplier = 0.9,
     spr_item = "gallanthors ring",
 
-    stat_bonuses = {magic = 1, willpower = -1, mp = 10 }
+    stat_bonuses = {
+        spell_cooldown_multiplier = 0.9,
+        magic = 1, willpower = -1, mp = 10 }
 }
 
 Data.equipment_create {

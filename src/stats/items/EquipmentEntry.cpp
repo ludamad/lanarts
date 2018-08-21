@@ -109,7 +109,7 @@ void EquipmentEntry::parse_lua_table(const LuaValue& table) {
 	stat_modifiers = parse_stat_modifiers(table);
 	CooldownModifiers cdown;
 	if (!table["stat_bonuses"].isnil()) {
-        cdown = parse_cooldown_modifiers(table["stat_bonuses"]);
+            cdown = parse_cooldown_modifiers(table["stat_bonuses"]);
 	}
 	if (cdown.is_default()) {
 		// Fallback behaviour, only if cooldown modifiers not shown in stat_bonuses:

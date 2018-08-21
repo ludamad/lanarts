@@ -191,10 +191,9 @@ DataW.weapon_create {
 
     spr_item = "epic staff",
     
-    spell_cooldown_multiplier = 0.9,
 
     cooldown = 40,
-    stat_bonus = {magic = 2},
+    stat_bonus = {magic = 2, spell_cooldown_multiplier = 0.9},
 
     range = 7
 }
@@ -211,10 +210,9 @@ DataW.weapon_create {
 
     spr_item = "epic staff",
     
-    spell_cooldown_multiplier = 0.85,
 
     cooldown = 40,
-    stat_bonus = {magic = 3},
+    stat_bonus = {magic = 3, spell_cooldown_multiplier = 0.85},
 
     range = 7,
     effects_granted = {

@@ -25,12 +25,10 @@ Data.equipment_create {
 
     spr_item = "spr_armour.chain_mail1",
 
-    spell_cooldown_multiplier = 1.15,
-
-    ranged_cooldown_multiplier = 1.15,
-
     stat_bonuses = { 
         defence = 3,
+        spell_cooldown_multiplier = 1.15,
+        ranged_cooldown_multiplier = 1.15,
     },
 }
 
@@ -59,12 +57,10 @@ Data.equipment_create {
 
     spr_item = "platemail",
 
-    spell_cooldown_multiplier = 1.35,
-
-    ranged_cooldown_multiplier = 1.35,
-
     stat_bonuses = { 
         defence = 3,
+        spell_cooldown_multiplier = 1.35,
+        ranged_cooldown_multiplier = 1.35,
     },
 }
 
@@ -213,15 +209,13 @@ Data.equipment_create {
     shop_cost = {395,605},
 
     spr_item = "spr_armour.red_dragon_scale_mail",
-
-    spell_cooldown_multiplier = 1.05,
-    ranged_cooldown_multiplier = 1.05,
-
     stat_bonuses = {
         hp = 10,
         mp = 10,
         defence = 3,
         willpower = 3 
+        spell_cooldown_multiplier = 1.05,
+        ranged_cooldown_multiplier = 1.05,
     },
     effects_granted = {"ArmourManaGainOnKill"}
 }
