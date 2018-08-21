@@ -101,7 +101,7 @@ void LuaValue::newtable() const {
 }
 
 void LuaValue::clear() {
-	if (impl) {
+	if (!empty()) {
 		if (impl->is_uniquely_referenced()) {
 			impl->clear();
 		} else {

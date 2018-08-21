@@ -185,21 +185,22 @@ void PlayerInst::step(GameState* gs) {
 
 
 	//Stats/effect step
-	if (cooldowns().is_hurting())
-		reset_rest_cooldown();
+	if (cooldowns().is_hurting()) {
+        reset_rest_cooldown();
+    }
 
 	if (stats().has_died() && !is_ghost()) {
 		bool game_should_end = lua_api::event_player_death(gs->luastate(), this);
 		_score_stats.deaths++;
-                if (game_should_end) {
-                    // End the game:
-                    queued_actions.clear();
-                    actions_set_for_turn = false;
-                    // Queue a restart:
-                    gs->game_world().reset();
-                    // Exit, game's over, nothing more to see here folks:
-                    return;
-                }
+        if (game_should_end) {
+            // End the game:
+            queued_actions.clear();
+            actions_set_for_turn = false;
+            // Queue a restart:
+            gs->game_world().reset();
+            // Exit, game's over, nothing more to see here folks:
+            return;
+        }
 	}
 
 	is_resting = false;
@@ -208,17 +209,17 @@ void PlayerInst::step(GameState* gs) {
 	vy = round(vy * 256.0f) / 256.0f;
 
 	update_position(rx + vx, ry + vy);
-        if (is_ghost()) {
-            stats().core.hp = 0;
-            effective_stats().core.hp = 0;
-            // Only non-Necromancer classes have their MP stripped away
-            // It's really annoying to have hard-earned mana that goes away
-            if (class_stats().class_entry().name != "Necromancer") {
-                stats().core.mp = 0;
-                effective_stats().core.mp = 0;
-            }
-            reset_rest_cooldown();
+    if (is_ghost()) {
+        stats().core.hp = 0;
+        effective_stats().core.hp = 0;
+        // Only non-Necromancer classes have their MP stripped away
+        // It's really annoying to have hard-earned mana that goes away
+        if (class_stats().class_entry().name != "Necromancer") {
+            stats().core.mp = 0;
+            effective_stats().core.mp = 0;
         }
+        reset_rest_cooldown();
+    }
     gs->for_screens([&]() {
         if (this == gs->local_player()) {
             GameView& view = gs->view();
