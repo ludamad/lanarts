@@ -220,8 +220,6 @@ void PlayerInst::step(GameState* gs) {
             }
             reset_rest_cooldown();
         }
-        reset_rest_cooldown();
-    }
     gs->for_screens([&]() {
         if (this == gs->local_player()) {
             GameView& view = gs->view();
