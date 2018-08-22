@@ -182,7 +182,7 @@ fi
 function run_lanarts(){
     cd runtime
     export vblank_mode=0
-    if true || handle_flag "--gdb" || handle_flag "-g" ; then
+    if handle_flag "--gdb" || handle_flag "-g" ; then
         echo "Wrapping in GDB:" | colorify '1;35'
         gdb -silent -x ../debug.gdb --args ../build/src/lanarts $args
     else

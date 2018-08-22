@@ -39,7 +39,9 @@ public:
 	virtual ~ResourceEntryBase();
 	virtual void draw(const ldraw::DrawOptions& options, Pos xy);
 
-	virtual sprite_id get_sprite() = 0;
+	virtual sprite_id get_sprite() {
+		return NONE;
+	}
 	virtual const char* entry_type() = 0;
 
 	/* initialize a resource, with a table representation of the resource */

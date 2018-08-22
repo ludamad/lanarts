@@ -263,17 +263,6 @@ DataW.spell_create {
     spell_cooldown: 200
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) ->
-<<<<<<< Updated upstream
-        --if caster.stats.hp < 55
-        --    if caster\is_local_player() 
-        --        EventLog.add("You do not have enough health!", {200,200,255})
-        --    return false
-=======
-        if caster.stats.hp < 55
-            if caster\is_local_player()
-                EventLog.add("You do not have enough health!", {200,200,255})
-            return false
->>>>>>> Stashed changes
         if not caster\has_effect "Necromancer"
             if caster\is_local_player()
                 EventLog.add("You must be a necromancer to cast this spell!", {200,200,255})
