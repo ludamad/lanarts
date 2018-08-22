@@ -6,3 +6,14 @@
     - Can you enchant staves?
     - YES
 - vampirism to staff 
+
+- Make map scheme in C++
+    - Goals:
+        - Stable interface for high level map operations in C++
+        - Overall map path finding - path finding between two maps
+        - Forced generation of levels
+        - Forced clearing of levels
+        - Teleport to level
+        - Regenerate level
+            - Make levels more like the item table
+            - Stable names
