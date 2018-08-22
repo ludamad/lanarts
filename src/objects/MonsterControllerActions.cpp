@@ -39,8 +39,8 @@ static bool choose_random_direction(GameState* gs, EnemyInst* e, float& vx,
 	for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++) {
 		float direction = mt.rand(360) * deg2rad;
 		vx = cos(direction), vy = sin(direction);
-		int nx = round(e->rx + vx * TILE_SIZE), ny = round(
-				e->ry + vy * TILE_SIZE);
+		int nx = round(e->x + vx * TILE_SIZE), ny = round(
+				e->y + vy * TILE_SIZE);
 		bool solid = gs->tile_radius_test(nx, ny, TILE_SIZE);
 		if (!solid) {
 			vx *= movespeed, vy *= movespeed;
@@ -88,7 +88,7 @@ bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
 			randomized = true;
 		}
 		if (randomized) {
-			int nx = round(e->rx + er.vx), ny = round(e->ry + er.vy);
+			int nx = round(e->x + er.vx), ny = round(e->y + er.vy);
 			bool solid = gs->tile_radius_test(nx, ny, TILE_SIZE);
 			if (!solid) {
 				e->vx = er.vx, e->vy = er.vy;
@@ -158,7 +158,7 @@ bool go_towards_if_free_in_direction(GameState* gs, CombatGameInst* inst,
 	float tx = vx, ty = vy;
 	normalize(tx, ty, TILE_SIZE);
 	normalize(vx, vy, inst->effective_stats().movespeed);
-	float nx = inst->rx + tx, ny = inst->ry + ty;
+	float nx = inst->x + tx, ny = inst->y + ty;
 	if (!gs->solid_test(inst, round(nx), round(ny), inst->radius)) {
 		inst->vx = vx, inst->vy = vy;
 		return true;
@@ -262,7 +262,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 			if (gs->object_radius_test(e, NULL, 0,
 					same_target_and_moved_colfilter, e->x, e->y,
 					e->target_radius - e->effective_stats().movespeed - 2)) {
-				float dx = p->rx - e->rx, dy = p->ry - e->ry;
+				float dx = p->x - e->x, dy = p->y - e->y;
 				if (!go_towards_if_free_in_direction(gs, e, -dy, dx)
 						&& !go_towards_if_free_in_direction(gs, e, dy, -dx)) {
 					e->vx = 0, e->vy = 0;

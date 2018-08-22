@@ -22,7 +22,7 @@ class CombatGameInst: public GameInst {
 public:
 	CombatGameInst(const CombatStats& base_stats, sprite_id sprite, Pos xy, team_id team, float radius, bool solid =
 					true, int depth = 0) :
-			GameInst(xy.x, xy.y, radius, solid, depth), rx(xy.x), ry(xy.y), vx(0), vy(0), is_resting(
+			GameInst(xy.x, xy.y, radius, solid, depth), vx(0), vy(0), is_resting(
 					false), sprite(sprite), simulation_id(
 					-1), current_target(NONE), base_stats(base_stats), team(team) {
 	}
@@ -121,7 +121,6 @@ public:
 // <PURE DATA REGION see (de)serialize>
 	team_id team = NONE;
 	float vx = -1, vy = -1;
-	float rx = -1, ry = -1;
 	bool is_resting = false;
 	int xpgain = 0;
     int vision_radius = 0;

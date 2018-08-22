@@ -207,7 +207,7 @@ void PlayerInst::step(GameState* gs) {
 	vx = round(vx * 256.0f) / 256.0f;
 	vy = round(vy * 256.0f) / 256.0f;
 
-	update_position(rx + vx, ry + vy);
+	update_position(x + vx, y + vy);
         if (is_ghost()) {
             stats().core.hp = 0;
             effective_stats().core.hp = 0;
@@ -275,7 +275,7 @@ void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(_score_stats);
 	serializer.read(actions_set_for_turn);
 	serializer.read(last_chosen_weaponclass);
-    serializer.read(_last_moved_direction);
+        serializer.read(_last_moved_direction);
 	serializer.read(explore_state);
 //	serializer.read_container(queued_actions);
 	queued_actions.clear();

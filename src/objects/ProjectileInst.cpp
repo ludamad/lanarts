@@ -86,8 +86,6 @@ ProjectileInst::ProjectileInst(const Item& projectile,
 							   obj_id sole_target, bool bounce, int hits, bool pass_through) :
 		GameInst(start.x, start.y, projectile.projectile_entry().radius,
 				 false, DEPTH),
-		rx(start.x),
-		ry(start.y),
 		speed(speed),
 		origin_id(origin_id),
 		sole_target(sole_target),
@@ -143,8 +141,8 @@ void ProjectileInst::step(GameState* gs) {
 	Pos tile_hit;
 
 	frame++;
-	int newx = (int) round(rx + vx); //update based on rounding of true float
-	int newy = (int) round(ry + vy);
+	int newx = (int) round(x + vx); //update based on rounding of true float
+	int newy = (int) round(y + vy);
 	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
 										 &tile_hit);
 	if (bounce) {
@@ -167,8 +165,8 @@ void ProjectileInst::step(GameState* gs) {
 		gs->remove_instance(this);
 	}
 
-	x = (int) round(rx += vx); //update based on rounding of true float
-	y = (int) round(ry += vy);
+	x += vx;
+	y += vy;
 
 	range_left -= speed;
 
@@ -256,8 +254,8 @@ void ProjectileInst::step(GameState* gs) {
 		}
 	}
 
-	event_log("ProjectileInst id=%d has rx=%f, ry=%f, vx=%f,vy=%f", std::max(id, 0), rx,
-			  ry, vx, vy);
+	event_log("ProjectileInst id=%d has x=%f, y=%f, vx=%f,vy=%f", std::max(id, 0), x,
+			  y, vx, vy);
 }
 
 sprite_id ProjectileInst::sprite() const {
@@ -267,14 +265,14 @@ sprite_id ProjectileInst::sprite() const {
 
 void ProjectileInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	GameInst::serialize(gs, serializer);
-	SERIALIZE_POD_REGION(serializer, this, rx, sole_target);
+	SERIALIZE_POD_REGION(serializer, this, vx, sole_target);
 	projectile.serialize(gs, serializer);
 	SERIALIZE_POD_REGION(serializer, this, atkstats, damage_mult);
 }
 
 void ProjectileInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	GameInst::deserialize(gs, serializer);
-	DESERIALIZE_POD_REGION(serializer, this, rx, sole_target);
+	DESERIALIZE_POD_REGION(serializer, this, vx, sole_target);
 	projectile.deserialize(gs, serializer);
 	DESERIALIZE_POD_REGION(serializer, this, atkstats, damage_mult);
 }

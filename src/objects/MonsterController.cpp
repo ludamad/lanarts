@@ -202,7 +202,7 @@ void MonsterController::pre_step(GameState* gs) {
         lcall(e->etype().step_event, e);
         update_velocity(gs, e);
         simul_id simid = e->collision_simulation_id();
-        coll_avoid.set_position(simid, e->rx, e->ry);
+        coll_avoid.set_position(simid, e->x, e->y);
     }
 
     coll_avoid.step();

@@ -827,18 +827,18 @@ void PlayerInst::_use_move(GameState *gs, const GameAction &action) {
     };
     auto configure_dir = [&](float dx, float dy) -> Pos {
         Pos tile_xy;
-        if (!gs->tile_radius_test(rx + dx, ry + dy, radius, true, -1, &tile_xy)) {
+        if (!gs->tile_radius_test(x + dx, y + dy, radius, true, -1, &tile_xy)) {
             return {dx, dy};
         }
 
         if (fabs(dx) > 0.1 && fabs(dy) > 0.1) {
             float eff_mag = std::max(fabs(dx), fabs(dy));
             Pos dir = dx < 0 ? Pos(-eff_mag, 0) : Pos(eff_mag, 0);
-            if (!gs->tile_radius_test(rx + dir.x, ry + dir.y, radius)) {
+            if (!gs->tile_radius_test(x + dir.x, y + dir.y, radius)) {
                 return dir;
             }
             dir = dy < 0 ? Pos(0, -eff_mag) : Pos(0, eff_mag);
-            if (!gs->tile_radius_test(rx + dir.x, ry + dir.y, radius)) {
+            if (!gs->tile_radius_test(x + dir.x, y + dir.y, radius)) {
                 return dir;
             }
         }
@@ -871,10 +871,10 @@ void PlayerInst::_use_move(GameState *gs, const GameAction &action) {
     Pos direction = configure_dir(action.action_x * mag, action.action_y * mag);
    	vx = direction.x;
    	vy = direction.y;
-    if (gs->tile_radius_test(rx + vx, ry, radius)) {
+    if (gs->tile_radius_test(x + vx, y, radius)) {
         vx = 0;
     }
-    if (gs->tile_radius_test(rx, ry + vy, radius)) {
+    if (gs->tile_radius_test(x, y + vy, radius)) {
         vy = 0;
     }
 

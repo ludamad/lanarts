@@ -134,6 +134,7 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	luawrap::bind_getter(getters["destroyed"], &GameInst::destroyed);
 	luawrap::bind_getter(getters["id"], &GameInst::id);
 	luawrap::bind_getter(getters["depth"], &GameInst::depth);
+	luawrap::bind_getter(getters["current_floor"], &GameInst::current_floor);
 	luawrap::bind_getter(getters["radius"], &GameInst::radius);
     luawrap::bind_getter(getters["solid"], &GameInst::solid);
 	luawrap::bind_getter(getters["target_radius"], &GameInst::target_radius);
@@ -202,7 +203,7 @@ static int lapi_do_nothing(lua_State *L) {
 
 static bool go_towards_if_free(GameState* gs, CombatGameInst* inst, float vx, float vy) {
     float tx = vx, ty = vy;
-    float nx = inst->rx + tx, ny = inst->ry + ty;
+    float nx = inst->x + tx, ny = inst->y + ty;
     if (!gs->solid_test(inst, iround(nx), iround(ny), inst->radius)) {
         inst->update_position(nx, ny);
         return true;

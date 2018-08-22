@@ -21,8 +21,8 @@ AnimatedInst::~AnimatedInst() {
 }
 
 void AnimatedInst::step(GameState* gs) {
-	x = round(rx += vx);
-	y = round(ry += vy);
+	x += vx;
+	y += vy;
 	if (timeleft != -1 && --timeleft < 0) {
 		timeleft = 0;
 		gs->remove_instance(this);

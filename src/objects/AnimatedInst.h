@@ -24,8 +24,8 @@ public:
 			const PosF& speed = PosF(), const PosF& orientation = PosF(),
 			int depth = DEPTH, const std::string& text = std::string(),
 			Colour textcol = Colour(255, 0, 0)) :
-			GameInst(pos.x, pos.y, RADIUS, false, depth), textcol(textcol), rx(
-					pos.x), ry(pos.y), vx(speed.x), vy(speed.y), orientx(
+			GameInst(pos.x, pos.y, RADIUS, false, depth), textcol(textcol),
+                                        vx(speed.x), vy(speed.y), orientx(
 					orientation.x), orienty(orientation.y), sprite(sprite), timeleft(
 					animatetime), animatetime(animatetime), text(text) {
 		animateframe = -1;
@@ -47,7 +47,7 @@ public:
 
 private:
 	Colour textcol;
-	float rx, ry, vx, vy, orientx, orienty;
+	float vx, vy, orientx, orienty;
 	int sprite, timeleft, animatetime;
 	float animateframe;
 	std::string text;

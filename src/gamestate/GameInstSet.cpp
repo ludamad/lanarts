@@ -280,8 +280,8 @@ void GameInstSet::step(GameState* gs) {
 			inst->step(gs);
 			// Move the object within bounds (ONLY if on same floor):
             if (inst->current_floor == level->id()) {
-                inst->x = std::min(std::max(0.0f, inst->x), level_width - 1);
-                inst->y = std::min(std::max(0.0f, inst->y), level_height - 1);
+                inst->x = std::min(std::max(TILE_SIZE / 2.0f, inst->x), level_width - 1 - TILE_SIZE / 2);
+                inst->y = std::min(std::max(TILE_SIZE / 2.0f, inst->y), level_height - 1 - TILE_SIZE / 2);
             }
 			update_instance_for_step(&unit_set[i], inst);
 			perf_timer_end(typeid(*inst).name());

@@ -586,16 +586,16 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
 
     event_log("CombatGameInst::attempt_move_to_position id=%d, %f, %f", std::max(0, id),
             newxy.x, newxy.y);
-    float dx = newxy.x - rx, dy = newxy.y - ry;
-    float dist = sqrt(dx * dx + dy * dy);
-    dist = round(dist * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+    float dx = newxy.x - x, dy = newxy.y - y;
+//    float dist = sqrt(dx * dx + dy * dy);
+//    dist = round(dist * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 
     bool collided = gs->tile_radius_test(round(newxy.x), round(newxy.y), 20);
 
     if (!collided) {
-        rx = newxy.x, ry = newxy.y;
+        x = newxy.x, y = newxy.y;
     } else {
-        float nx = round(rx + vx), ny = round(ry + vy);
+        float nx = round(x + vx), ny = round(y + vy);
         bool collided = gs->tile_radius_test(nx, ny, radius);
         if (collided) {
             bool hitsx = gs->tile_radius_test(nx, y, radius);
@@ -617,27 +617,22 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
 
         vx = round(vx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
         vy = round(vy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-        rx += vx;
-        ry += vy;
+        x += vx;
+        y += vy;
     }
 
     update_position();
-
-    return Pos(rx, ry);
+    return PosF(x, y);
 }
 
 void CombatGameInst::update_position() {
-    x = iround(rx); //update based on rounding of true float
-    y = iround(ry);
-    event_log("Instance id %d integer positions set to (%f,%f) from (%f,%f)", std::max(0, id), x, y, rx, ry);
+    event_log("Instance id %d integer positions set to (%f,%f) from (%f,%f)", std::max(0, id), x, y, x, y);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
-    rx = round(newx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-    ry = round(newy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-    rx = newx, ry = newy;
-    event_log("Instance id %d float positions set to (%f,%f)", std::max(0, id), rx, ry);
-    update_position();
+    x = newx;
+    y = newy;
+    event_log("Instance id %d float positions set to (%f,%f)", std::max(0, id), x, y);
 }
 
 SpellsKnown& CombatGameInst::spells_known() {

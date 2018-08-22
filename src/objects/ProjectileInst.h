@@ -35,13 +35,11 @@ public:
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 	virtual void update_position(float newx, float newy) {
-            rx = newx;
-            ry = newy;
-            x = (int) rx;
-            y = (int) ry;
+            x = newx;
+            y = newy;
         }
 	sprite_id sprite() const;
-	float rx, ry, vx, vy, speed;
+	float vx, vy, speed;
 private:
 	static bool bullet_target_hit2(GameInst* self, GameInst* other);
 	/* Stats at time of projectile creation */

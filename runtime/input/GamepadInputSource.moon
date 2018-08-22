@@ -131,6 +131,12 @@ GamepadInputSource = newtype {
         @item_selected_xy = {-1, 0}
         @item_slot_bindings = make_bindings()
         @spell_slot_bindings = make_bindings()
+        @_should_menu_confirm = false
+        @_should_select_item = false
+        @_should_halve = false
+        @_should_use_item_bindings = false
+        @_should_macro = false
+        @_should_sell = false
 }
 _extend = (extension) ->
     for k,v in pairs extension
