@@ -34,6 +34,9 @@ struct PlayerDataEntry {
 
 	PlayerInst* player() const;
 
+	PlayerDataEntry() {
+		// For resize()
+	}
 	PlayerDataEntry(const std::string& player_name, GameInst* player_inst,
 					const std::string& classtype, LuaValue input_source,
 					bool is_local_player, int net_id, int index, int team) :

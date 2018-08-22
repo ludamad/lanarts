@@ -81,7 +81,7 @@ void PlayerData::copy_to(PlayerData& pc) const {
 	LANARTS_ASSERT(false /*This has to be fixed to work with object ids!*/);
 }
 
-static void write_inst_ref(GameInstRef& ref, GameState* gs,
+static void write_inst_ref(const GameInstRef& ref, GameState* gs,
 		SerializeBuffer& serializer) {
 	serializer.write_int(ref->id);
 	serializer.write_int(ref->current_floor);
@@ -97,10 +97,17 @@ static void read_inst_ref(GameInstRef& ref, GameState* gs,
 void PlayerData::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_int(_money);
 	serializer.write_container(_kill_amounts);
-	serializer.write_int(_players.size());
-	for (int i = 0; i < _players.size(); i++) {
-		write_inst_ref(_players[i].player_inst, gs, serializer);
-	}
+	serializer.write_container(_players, [&](const PlayerDataEntry& pde) {
+		serializer.write(pde.player_name);
+		write_inst_ref(pde.player_inst, gs, serializer);
+		serializer.write(pde.classtype);
+		LuaSerializeConfig& conf = gs->luaserialize_config();
+		conf.encode(serializer, pde.input_source);
+		serializer.write(pde.is_local_player);
+		serializer.write(pde.net_id);
+		serializer.write(pde.index);
+		serializer.write(pde.team);
+	});
 }
 
 PlayerDataEntry& PlayerData::get_entry_by_netid(int netid) {
@@ -117,15 +124,17 @@ PlayerDataEntry& PlayerData::get_entry_by_netid(int netid) {
 void PlayerData::deserialize(GameState* gs, SerializeBuffer & serializer) {
 	serializer.read_int(_money);
 	serializer.read_container(_kill_amounts);
-
-	int psize;
-	serializer.read_int(psize);
-	for (int i = 0; i < psize; i++) {
-		PlayerDataEntry& pde = _players.at(i);
+	serializer.read_container(_players, [&](PlayerDataEntry& pde) {
+		serializer.read(pde.player_name);
 		read_inst_ref(pde.player_inst, gs, serializer);
-		pde.classtype = game_class_data.get(pde.player()->class_stats().classid).name;
-		pde.action_queue.clear();
-	}
+		serializer.read(pde.classtype);
+		LuaSerializeConfig& conf = gs->luaserialize_config();
+		conf.decode(serializer, pde.input_source);
+		serializer.read(pde.is_local_player);
+		serializer.read(pde.net_id);
+		serializer.read(pde.index);
+		serializer.read(pde.team);
+	});
 }
 
 void players_gain_xp(GameState* gs, int xp) {

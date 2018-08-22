@@ -244,8 +244,10 @@ end
 
 function Pain.prereq_func(caster)
     if caster.stats.hp < 35 then
-        if caster:is_local_player() then
-            EventLog.add("You require more health!", {200,200,255})
+        for _ in screens() do 
+            if caster:is_local_player() then
+                EventLog.add("You require more health!", {200,200,255})
+            end
         end
         return false
     end
@@ -296,8 +298,10 @@ function HealAura.prereq_func(caster)
             return true
         end
     end
-    if caster:is_local_player() then
-        EventLog.add("No allies in sight!", COL_PALE_RED)
+    for _ in screens() do 
+        if caster:is_local_player() then
+            EventLog.add("No allies in sight!", COL_PALE_RED)
+        end
     end
     return false
 end
@@ -380,8 +384,10 @@ end
 
 function GreaterPain.prereq_func(caster)
     if caster.stats.hp < 80 then
-        if caster:is_local_player() then
-            EventLog.add("You have less than 80 health!", {255,200,200})
+        for _ in screens() do 
+            if caster:is_local_player() then
+                EventLog.add("You have less than 80 health!", {255,200,200})
+            end
         end
         return false
     end

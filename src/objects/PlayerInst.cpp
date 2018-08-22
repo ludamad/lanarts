@@ -185,21 +185,22 @@ void PlayerInst::step(GameState* gs) {
 
 
 	//Stats/effect step
-	if (cooldowns().is_hurting())
-		reset_rest_cooldown();
+	if (cooldowns().is_hurting()) {
+        reset_rest_cooldown();
+    }
 
 	if (stats().has_died() && !is_ghost()) {
 		bool game_should_end = lua_api::event_player_death(gs->luastate(), this);
 		_score_stats.deaths++;
-                if (game_should_end) {
-                    // End the game:
-                    queued_actions.clear();
-                    actions_set_for_turn = false;
-                    // Queue a restart:
-                    gs->game_world().reset();
-                    // Exit, game's over, nothing more to see here folks:
-                    return;
-                }
+        if (game_should_end) {
+            // End the game:
+            queued_actions.clear();
+            actions_set_for_turn = false;
+            // Queue a restart:
+            gs->game_world().reset();
+            // Exit, game's over, nothing more to see here folks:
+            return;
+        }
 	}
 
 	is_resting = false;
@@ -219,6 +220,8 @@ void PlayerInst::step(GameState* gs) {
             }
             reset_rest_cooldown();
         }
+        reset_rest_cooldown();
+    }
     gs->for_screens([&]() {
         if (this == gs->local_player()) {
             GameView& view = gs->view();
