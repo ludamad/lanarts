@@ -37,7 +37,7 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
             for obj in *Map.radius_collision_check(@map, 15, {x, y})
                 if damage_cooldown[obj] or (obj.team == nil) or obj.team == @caster.team
                     continue
-                if not obj.destroyed 
+                if not obj.destroyed
                     if @do_damage(obj, @_damage)
                         @_on_kill(obj)
                     @_on_damage(obj, @_damage)
@@ -300,7 +300,7 @@ apply_burn_damage = (inst, attacker, damage) ->
     intensity = percent_damage * MAX_INTENSITY * 4
     --intensity = INTENSITY_SPREAD_INTERVAL
     apply_burn_intensity(inst, attacker, intensity)
-    
+
 DataW.effect_create {
     -- Burn is controlled by 2 variables:
     -- - Intensity, from 0 to 300.

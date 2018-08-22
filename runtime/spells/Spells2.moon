@@ -47,8 +47,8 @@ DataW.spell_create {
     }
     cooldown: 30
     resist_modifier: 0.5
-    prereq_func: () => 
-        return @stats.weapon_type == "bows" 
+    prereq_func: () =>
+        return @stats.weapon_type == "bows"
 }
 
 -- FIRE BOLT
@@ -101,7 +101,7 @@ DataW.spell_create {
     projectile: {
         speed: 8
         on_hit_func: (target, atkstats) =>
-            target\add_effect("Fear", 100) 
+            target\add_effect("Fear", 100)
     }
     mp_cost: 0
     cooldown: 35
@@ -136,7 +136,7 @@ DataW.projectile_create {
         target\add_effect("Poison", {
             time_left: 100,
             damage: atkstats.damage,
-            attacker: @caster, 
+            attacker: @caster,
             power: atkstats.power,
             poison_rate: 25,
             magic_percentage: atkstats.magic_percentage,
@@ -150,7 +150,7 @@ DataW.spell_create {
     spr_spell: "spr_spells.ludaze"
     -- types: {"Dark"}
     damage_type: {magic: 0.5, physical: 0.5}
-    description: "Dazes and poisons all enemies in sight." 
+    description: "Dazes and poisons all enemies in sight."
     mp_cost: 25
     cooldown: 0
     spell_cooldown: 800
@@ -166,19 +166,19 @@ DataW.spell_create {
             mon\add_effect("Dazed", 100)
             target\add_effect("Poison", {
                 time_left: 100,
-                attacker: @caster, 
+                attacker: @caster,
                 damage: caster.stats.magic / 2
                 power: caster.stats.magic * 0.3
                 poison_rate: 25,
                 magic_percentage: 1,
             })
-        for _ in screens()  
+        for _ in screens()
             if caster\is_local_player()
                 EventLog.add("You daze all enemies in sight!", {200,200,255})
             elseif caster.name == "Your ally"
                 EventLog.add(caster.name .. " dazes all enemies in sight!", {200,200,255})
     autotarget_func: (caster) -> caster.x, caster.y
-    prereq_func: (caster) -> 
+    prereq_func: (caster) ->
         if not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
             for mon in *(Map.enemies_list caster)
                 if Map.object_visible(mon, mon.xy, caster)
@@ -194,7 +194,7 @@ DataW.spell_create {
     name: "Ice Form"
     types: {"Blue"}
     spr_spell: "spr_spells.iceform"
-    description: "Initiates Ice Form, a powerful ability for safe dungeoneering, preventing attacks and spells, and lowering speed drastically, but providing near immunity for 10 seconds." 
+    description: "Initiates Ice Form, a powerful ability for safe dungeoneering, preventing attacks and spells, and lowering speed drastically, but providing near immunity for 10 seconds."
     mp_cost: 40
     cooldown: 100
     damage_type: {magic: 0.5, physical: 0.5}
@@ -209,7 +209,7 @@ DataW.spell_create {
             elseif caster.name == "Your ally"
                 EventLog.add(caster.name .. " enters a glacial state!", {200,200,255})
     autotarget_func: (caster) -> caster.x, caster.y
-    prereq_func: (caster) -> 
+    prereq_func: (caster) ->
         if not caster.can_rest
             --for _ in screens()
             EventLog.add("Ice Form requires perfect concentration!", {200,200,255})
@@ -263,18 +263,25 @@ DataW.spell_create {
     spell_cooldown: 200
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) ->
+<<<<<<< Updated upstream
         --if caster.stats.hp < 55
         --    if caster\is_local_player() 
         --        EventLog.add("You do not have enough health!", {200,200,255})
         --    return false
+=======
+        if caster.stats.hp < 55
+            if caster\is_local_player()
+                EventLog.add("You do not have enough health!", {200,200,255})
+            return false
+>>>>>>> Stashed changes
         if not caster\has_effect "Necromancer"
-            if caster\is_local_player() 
+            if caster\is_local_player()
                 EventLog.add("You must be a necromancer to cast this spell!", {200,200,255})
             return false
         amount = math.max 1, math.ceil((caster\effective_stats().willpower - 4) / 2)
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons >= amount
-            if caster\is_local_player() 
+            if caster\is_local_player()
                 EventLog.add("You cannot currently control more than #{amount} aspects!", {200,200,255})
             return false
         return not caster\has_effect("Exhausted") and not (caster\has_effect "Summoning")
@@ -339,7 +346,7 @@ DataW.spell_create {
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons >= 2 -- caster.stats.level
             for _ in screens()
-                if caster\is_local_player() 
+                if caster\is_local_player()
                     EventLog.add("You cannot currently control more than #{2} aspects!", {200,200,255})
             return false
         return not caster\has_effect("Exhausted") and not (caster\has_effect "Summoning")
@@ -378,7 +385,7 @@ DataW.spell_create {
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons == 0
             for _ in screens()
-                if caster\is_local_player() 
+                if caster\is_local_player()
                     EventLog.add("You have no lifelinked monsters!", {200,200,255})
             return false
         return not caster\has_effect("Exhausted") and not (caster\has_effect "Summoning")
@@ -421,4 +428,3 @@ DataW.spell_create {
 --        }
 --        obj = SpellObjects.SpellSpikes.create { points points, point_index = i, caster = caster, duration = 500}
 --}
-
