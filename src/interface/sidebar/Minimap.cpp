@@ -58,7 +58,7 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 	GameTiles& tiles = gs->tiles();
 	GameView& view = gs->view();
 
-#ifdef DEBUG
+#ifndef NDEBUG
 	bool minimap_reveal = gs->key_down_state(SDLK_z);
 #else
 	bool minimap_reveal = false;

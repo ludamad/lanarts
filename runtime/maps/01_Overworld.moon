@@ -129,13 +129,13 @@ OVERWORLD_CONF = (rng) ->
         n_statues: 4
     }
 
-DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1) ->
+DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1, n_regions=nil) ->
     C = create_dungeon_scheme(tileset)
     -- Rectangle-heavy or polygon-heavy?
     switch schema -- rng\random(3)
         when 3
             -- Few, bigger, rooms?
-            C.number_regions = rng\random(15,20)
+            C.number_regions = n_regions or rng\random(15,20)
             C.room_radius = () ->
                 r = 8
                 for j=1,rng\random(5,10) do r += rng\randomf(0, 1)
@@ -144,7 +144,7 @@ DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1) ->
             C.rect_room_size_range = {7,15}
         when 4
             -- Few, big, rooms?
-            C.number_regions = rng\random(13,18)
+            C.number_regions = n_regions or rng\random(13,18)
             C.room_radius = () ->
                 r = 5
                 for j=1,rng\random(5,10) do r += rng\randomf(0, 1)
@@ -153,7 +153,7 @@ DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1) ->
             C.rect_room_size_range = {7,15}
         when 0
             -- Few, big, rooms?
-            C.number_regions = rng\random(15,20)
+            C.number_regions = n_regions or rng\random(15,20)
             C.room_radius = () ->
                 r = 4
                 for j=1,rng\random(5,10) do r += rng\randomf(0, 1)
@@ -162,7 +162,7 @@ DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1) ->
             C.rect_room_size_range = {7,15}
         when 1
             -- Mix?
-            C.number_regions = rng\random(15,20)
+            C.number_regions = n_regions or rng\random(15,20)
             C.room_radius = () ->
                 r = 2
                 for j=1,rng\random(0,10) do r += rng\randomf(0, 1)
@@ -171,7 +171,7 @@ DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1) ->
             C.rect_room_size_range = {7,15}
         when 2
             -- Mostly rectangular rooms?
-            C.number_regions = rng\random(2,7)
+            C.number_regions = n_regions or rng\random(2,7)
             C.room_radius = () ->
                 r = 2
                 for j=1,rng\random(0,10) do r += rng\randomf(0, 1)
@@ -389,10 +389,10 @@ M.crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
     tileset = Tilesets.crypt
     return NewMaps.map_create (rng) -> {
         map_label: "Crypt"
-        w: 150, h: 150
+        w: 110, h: 100
         seethrough: false
-        outer_conf: DUNGEON_CONF(rng, Tilesets.crypt)
-        subtemplates: {DUNGEON_CONF(rng, Tilesets.crypt, 4)}
+        outer_conf: DUNGEON_CONF(rng, Tilesets.crypt, nil, 10)
+        subtemplates: {DUNGEON_CONF(rng, Tilesets.crypt, 4, 10)}
         shell: 10
         default_wall: Tile.create(Tilesets.crypt.wall, true, true, {})
         post_poned: {}
@@ -463,7 +463,7 @@ M.crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
             return true
         _spawn_items: (map) =>
             area = {0,0,map.size[1],map.size[2]}
-            for group in *{{ItemGroups.basic_items,20}, {ItemGroups.enchanted_items, 10}, {{item: "Scroll of Experience", chance: 100}, 2}}
+            for group in *{{ItemGroups.enchanted_items, 5}, {{item: "Scroll of Experience", chance: 100}, 1}}
                 for i=1,group[2] do
                     sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
                     if not sqr
@@ -750,9 +750,9 @@ overworld_features = (map) ->
             -- Place Hive inside the lair:
             HiveSeq = MapSequence.create {preallocate: 1}
             on_generate = (map, floor) ->
-                if floor == 1
-                    if not M.place_hive(map, HiveSeq)
-                        return nil
+                --if floor == 1
+                --    if not M.place_hive(map, HiveSeq)
+                --        return nil
                 return true
             on_finish = (game_map, floor) ->
                 if floor == 1

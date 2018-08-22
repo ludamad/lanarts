@@ -40,27 +40,27 @@ M = nilprotect {} -- Module
 floor_plans = (rng) ->
     tileset = TileSets.hive
     raw_plans = {
-        [1]: {
-            size: {45, 45}
-            n_subareas: 1
-            n_enemies: 0
-            n_encounter_vaults: 0
-            enemy_entries: {
---                {enemy: "Mana Sapper", guaranteed_spawns: 5, chance: 100}
-                {enemy: "Giant Bee", guaranteed_spawns: 4, chance: 100}
-                {enemy: "Queen Bee", guaranteed_spawns: 2, chance: 100}
-            }
-            --- Chance = 100 => Guaranteed randart
-            item_groups: {{ItemGroups.enchanted_items, 6}}
-            number_regions: 8
-            room_radius: () -> random(2,10)
-            arc_chance: 0
-            rect_room_num_range: {0, 0}
-            rect_room_size_range: {1, 1}
-            n_statues: 4
-            n_healing_squares: 1
-        }
-        [2]: {
+--        {
+--            size: {45, 45}
+--            n_subareas: 1
+--            n_enemies: 0
+--            n_encounter_vaults: 0
+--            enemy_entries: {
+----                {enemy: "Mana Sapper", guaranteed_spawns: 5, chance: 100}
+--                {enemy: "Giant Bee", guaranteed_spawns: 4, chance: 100}
+--                {enemy: "Queen Bee", guaranteed_spawns: 2, chance: 100}
+--            }
+--            --- Chance = 100 => Guaranteed randart
+--            item_groups: {{ItemGroups.enchanted_items, 6}}
+--            number_regions: 8
+--            room_radius: () -> random(2,10)
+--            arc_chance: 0
+--            rect_room_num_range: {0, 0}
+--            rect_room_size_range: {1, 1}
+--            n_statues: 4
+--            n_healing_squares: 1
+--        }
+        {
             size: {45, 45}
             n_subareas: 1
             n_enemies: 0
@@ -86,7 +86,7 @@ floor_plans = (rng) ->
         base = table.merge NewDungeons.dungeon_defaults(rng), NewDungeons.create_dungeon_scheme(tileset)
         table.merge(base, raw)
 
-M.N_FLOORS = 2
+M.N_FLOORS = 1
 M.TEMPLATE  = (rng, floor, connector) -> 
     n_stairs_up = connector.n_portals("up")
     plan = floor_plans(rng)[floor]

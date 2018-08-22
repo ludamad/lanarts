@@ -8,9 +8,9 @@ Data.equipment_create {
     spr_item = "leather armour",
     randart_weight = 100,
 
-    spell_cooldown_multiplier = 1.1,
 
     stat_bonuses = { 
+        spell_cooldown_multiplier = 1.1,
         defence = 2,
     },
 }
@@ -213,7 +213,7 @@ Data.equipment_create {
         hp = 10,
         mp = 10,
         defence = 3,
-        willpower = 3 
+        willpower = 3,
         spell_cooldown_multiplier = 1.05,
         ranged_cooldown_multiplier = 1.05,
     },
