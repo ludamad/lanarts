@@ -202,11 +202,26 @@ generate_door_candidates = (map, rng, regions) ->
         -- Account for there already being a perimeter -- don't want to remove tunnels too far, get weird artifacts.
         filter_random_third(x1+1,y1+1,x2-1,y2-1)
 
-map_try_create = (template_f) ->
-    seed = random(0, 2 ^ 30)
-    rng = require("mtwist").create(seed)
-    event_log("(RNG #%d) Attempting map_try_create with seed %d", rng\amount_generated(), seed)
-    template = template_f(rng)
+source_map_create = (args) ->
+    { :rng, :size, :default_content,
+      :default_flags, :map_label, :arc_chance,
+      :wandering_enabled } = args
+    return SourceMap.map_create {
+        :rng
+        :size
+        content: default_content
+        flags: default_flags
+        :map_label
+        arc_chance: arc_chance or 0
+        wandering_enabled: if wandering_enabled == nil then true else wandering_enabled
+        door_locations: {}
+        post_maps: {}
+        rectangle_rooms: {}
+        player_candidate_squares: {}
+    }
+
+map_try_create = (rng, template) ->
+    event_log("(RNG #%d) Attempting map_try_create", rng\amount_generated())
     {PW,PH} = LEVEL_PADDING
     mw,mh = template.w, template.h
     outer = Region.create(1+PW,1+PH,mw-PW,mh-PH)
@@ -215,7 +230,7 @@ map_try_create = (template_f) ->
     rect2 = {{1+PW, mh-PH}, {mw-PW, mh-PH}, {mw-PW, 1+PH}, {1+PW, 1+PH}}
     major_regions = RVORegionPlacer.create {rect2}
     event_log("(RNG #%d) before SourceMap.map_create", rng\amount_generated())
-    map = SourceMap.map_create { 
+    map = SourceMap.map_create {
         rng: rng
         size: {mw, mh}
         content: template.default_wall.id
@@ -258,20 +273,29 @@ map_try_create = (template_f) ->
 
     generate_subareas(template, map, rng, major_regions.regions, starting_edges)
     map.regions = major_regions.regions
+    return map
+
+check_connection = (map) ->
+    return SourceMap.area_fully_connected {
+        :map,
+        unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
+        mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
+        marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
+    }
+
+_map_create_pass = (rng, template_f) ->
+    template = template_f(rng)
+    map = map_try_create(rng, template)
 
     if not template\on_create_source_map(map)
         print("ABORT: on_create_source_map")
         return nil
 
     -- Reject levels that are not fully connected:
-    if not SourceMap.area_fully_connected {
-        :map, 
-        unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
-        mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
-        marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
-    }
+    if not check_connection(map)
         print("ABORT: connection check failed")
         return nil
+
     for _, map_gen_func in ipairs(map.post_maps)
         map_gen_func()
 
@@ -279,12 +303,27 @@ map_try_create = (template_f) ->
     template\on_create_game_map(game_map)
     return game_map
 
+try_n_times = (n, f) ->
+    for i=1,n
+        ret = f()
+        if ret
+            return ret
+        print "** MAP GENERATION ATTEMPT " .. i .. " FAILED, RETRYING **"
+    error("Could not generate a viable map in " .. n .. " tries!")
+
+new_rng = () ->
+    seed = random(0, 2 ^ 30)
+    event_log("(RNG 0) Creating mtwist object with seed=%d", seed)
+    return require("mtwist").create(seed)
+
 map_create = (template) ->
+    rng = new_rng()
+    event_log("(RNG #%d) Attempting map_create", rng\amount_generated())
     for i=1,1000
-        map = map_try_create(template)
+        map = _map_create_pass(rng, template)
         if map
             return map
         print "** MAP GENERATION ATTEMPT " .. i .. " FAILED, RETRYING **"
     error("Could not generate a viable map in 1000 tries!")
 
-return {:map_create, :generate_door_candidates, :connect_edges}
+return {:map_create, :generate_door_candidates, :connect_edges, :generate_game_map, :map_try_create, :check_connection, :try_n_times, :new_rng}

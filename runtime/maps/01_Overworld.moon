@@ -957,9 +957,11 @@ overworld_features = (map) ->
             f(game_map)
 
 overworld_create = () ->
+    rng = NewMaps.new_rng()
     MapSeq = MapSequence.create {preallocate: 1}
     local conf, schema
-    NewMaps.map_create (rng) ->
+
+    template_f = () ->
         event_log("(RNG #%d) Attempting overworld generation", rng\amount_generated())
         conf or= OVERWORLD_CONF(rng)
         schema or= rng\random(3)
@@ -973,25 +975,38 @@ overworld_create = () ->
             shell: 50
             arc_chance: conf.arc_chance
             default_wall: Tile.create(Tilesets.grass.wall, true, true, {FLAG_OVERWORLD})
-            post_poned: {}
             wandering_enabled: true
-            on_create_source_map: (map) =>
-                post_creation_callback = overworld_features(map)
-                if not post_creation_callback
-                    return nil
-                append @post_poned, post_creation_callback
-                NewMaps.generate_door_candidates(map, rng, map.regions)
-                overworld_spawns(map)
-                @player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
-                if not @player_spawn_points
-                    return nil
-                return true
-            on_create_game_map: (game_map) =>
-                for f in *@post_poned
-                    f(game_map)
-                World.players_spawn(game_map, @player_spawn_points)
-                Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
         }
+
+    return NewMaps.try_n_times 1000, () ->
+        template = template_f()
+        map = NewMaps.map_try_create(rng, template)
+        if not map
+            return nil
+
+        post_creation_callback = overworld_features(map)
+        if not post_creation_callback
+            return nil
+
+        NewMaps.generate_door_candidates(map, rng, map.regions)
+        overworld_spawns(map)
+        player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
+        if not player_spawn_points
+            return nil
+
+        -- Reject levels that are not fully connected:
+        if not NewMaps.check_connection(map)
+            print("ABORT: connection check failed")
+            return nil
+
+        for _, map_gen_func in ipairs(map.post_maps)
+            map_gen_func()
+
+        game_map = NewMaps.generate_game_map(map)
+        post_creation_callback(game_map)
+        World.players_spawn(game_map, player_spawn_points)
+        Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
+        return game_map
 
 return {
     :overworld_create

@@ -37,14 +37,23 @@ public:
     virtual void parse_lua_table(const LuaValue& table);
 
     LuaValue generate_func;
-    // Contentious: We want to be able to link to this map in two ways, in and out.
-    // Should every map define its in and out? Implies directionality.
-    // Or should we have a separate class, called MapLinkEntry?
-    // This class would 
-    LuaValue place_entrance_func;
-
 };
 
-extern ResourceDataSet<MapDefEntry*> game_item_data;
+// All portals belong to a specific MapLinkEntry
+class MapLinkEntry {
+public:
+    std::string exit_map, enter_map;
+
+    // Doesn't quite work. Each map has a different scheme for giving potential locations.
+    // Schema:
+    // - Instantiate place_exit_map_portals
+    // - This creates a placement y/n function on a rectangular area
+    // - It is the job of the placement function to shift this to an appropriate position
+    LuaValue place_exit_map_portals;
+    LuaValue place_enter_map_portals;
+};
+
+extern ResourceDataSet<MapDefEntry> map_def_entries;
+extern std::vector<MapLinkEntry> map_link_entries;
 
 #endif

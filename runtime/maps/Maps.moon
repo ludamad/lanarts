@@ -1,6 +1,8 @@
-import 
-from require "maps.MapElements"
+MAPS = {}
 
-Data.map_set_create {
-    name: "Map"
-}
+define_map = (entry) ->
+
+
+
+
+link_maps "Overworld"
