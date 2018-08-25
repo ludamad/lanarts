@@ -967,21 +967,25 @@ overworld_create = () ->
         schema or= rng\random(3)
         dungeon_tileset = ({Tilesets.snake, Tilesets.lair, Tilesets.pebble})[schema + 1]
         return {
-            map_label: "Plain Valley"
+            :rng
             subtemplates: {DUNGEON_CONF(rng, dungeon_tileset, schema), conf}
-            w: OVERWORLD_DIM_LESS, h: OVERWORLD_DIM_MORE
             seethrough: true
             outer_conf: conf
             shell: 50
-            arc_chance: conf.arc_chance
             default_wall: Tile.create(Tilesets.grass.wall, true, true, {FLAG_OVERWORLD})
-            wandering_enabled: true
         }
 
     return NewMaps.try_n_times 1000, () ->
         template = template_f()
-        map = NewMaps.map_try_create(rng, template)
-        if not map
+        map = NewMaps.source_map_create {
+            :rng
+            size: {OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE}
+            default_content: template.default_wall.id
+            default_flags: {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH}
+            map_label: "Plain Valley"
+            arc_chance: conf.arc_chance
+        }
+        if not NewMaps.map_try_create(map, rng, template)
             return nil
 
         post_creation_callback = overworld_features(map)

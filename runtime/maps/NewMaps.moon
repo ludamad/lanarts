@@ -215,37 +215,33 @@ source_map_create = (args) ->
         arc_chance: arc_chance or 0
         wandering_enabled: if wandering_enabled == nil then true else wandering_enabled
         door_locations: {}
+        instances: {}
         post_maps: {}
         rectangle_rooms: {}
+        -- For the overworld, created by dungeon features we add later:
         player_candidate_squares: {}
     }
 
-map_try_create = (rng, template) ->
-    event_log("(RNG #%d) Attempting map_try_create", rng\amount_generated())
+map_from_template = (template) ->
+    return source_map_create {
+        rng: rng
+        size: {template.w, template.h}
+        default_content: template.default_wall.id
+        default_flags: {SourceMap.FLAG_SOLID, if template.seethrough then SourceMap.FLAG_SEETHROUGH else 0}
+        map_label: template.map_label
+        arc_chance: template.arc_chance
+        wandering_enabled: template.wandering_enabled
+    }
+
+map_try_create = (map, rng, template) ->
+    event_log("(RNG #%d) before map_try_create", rng\amount_generated())
     {PW,PH} = LEVEL_PADDING
-    mw,mh = template.w, template.h
+    {mw, mh} = map.size
     outer = Region.create(1+PW,1+PH,mw-PW,mh-PH)
     -- Generate regions in a large area, crop them later
     rect = {{1+PW, 1+PH}, {mw-PW, 1+PH}, {mw-PW, mh-PH}, {1+PW, mh-PH}}
     rect2 = {{1+PW, mh-PH}, {mw-PW, mh-PH}, {mw-PW, 1+PH}, {1+PW, 1+PH}}
     major_regions = RVORegionPlacer.create {rect2}
-    event_log("(RNG #%d) before SourceMap.map_create", rng\amount_generated())
-    map = SourceMap.map_create {
-        rng: rng
-        size: {mw, mh}
-        content: template.default_wall.id
-        flags: {SourceMap.FLAG_SOLID, if template.seethrough then SourceMap.FLAG_SEETHROUGH else 0}
-        map_label: template.map_label,
-        instances: {}
-        arc_chance: template.arc_chance or 0
-        door_locations: {}
-        post_maps: {}
-        rectangle_rooms: {}
-        wandering_enabled: template.wandering_enabled
-        -- For the overworld, created by dungeon features we add later:
-        player_candidate_squares: {}
-    }
-    event_log("(RNG #%d) after SourceMap.map_create", rng\amount_generated())
 
     for subconf in *assert(template.subtemplates, "Must have subtemplates!")
         {w,h} = subconf.size
@@ -273,6 +269,7 @@ map_try_create = (rng, template) ->
 
     generate_subareas(template, map, rng, major_regions.regions, starting_edges)
     map.regions = major_regions.regions
+    event_log("(RNG #%d) after map_try_create", rng\amount_generated())
     return map
 
 check_connection = (map) ->
@@ -285,7 +282,9 @@ check_connection = (map) ->
 
 _map_create_pass = (rng, template_f) ->
     template = template_f(rng)
-    map = map_try_create(rng, template)
+    map = map_from_template(template)
+    if not map_try_create(map, rng, template)
+        return nil
 
     if not template\on_create_source_map(map)
         print("ABORT: on_create_source_map")
@@ -326,4 +325,4 @@ map_create = (template) ->
         print "** MAP GENERATION ATTEMPT " .. i .. " FAILED, RETRYING **"
     error("Could not generate a viable map in 1000 tries!")
 
-return {:map_create, :generate_door_candidates, :connect_edges, :generate_game_map, :map_try_create, :check_connection, :try_n_times, :new_rng}
+return {:map_create, :generate_door_candidates, :connect_edges, :generate_game_map, :map_try_create, :check_connection, :try_n_times, :new_rng, :source_map_create}
