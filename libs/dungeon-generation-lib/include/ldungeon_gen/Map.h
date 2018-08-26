@@ -170,7 +170,7 @@ namespace ldungeon_gen {
 			}
 			if (oper.group_value != uint16_t(-1)) {
 				group = oper.group_value;
-                        }
+			}
 		}
 		inline void apply(ConditionalOperator oper) {
 			if (matches(oper.selector)) {
@@ -206,7 +206,9 @@ namespace ldungeon_gen {
 	class Map: public Grid<Square> {
 	public:
 		Map(const Size& size = Size(), const Square& fill_value = Square());
-		std::vector<Group> groups;
+		std::vector<Group> groups; // DEPRECATED
+		group_t group_counter = ROOT_GROUP_ID;
+		group_t max_group_counter = INT_MAX; // For checking purposes
 		LuaValue luafields;
 
 		group_t make_group(const BBox& area, int parent_group_id);
@@ -219,6 +221,11 @@ namespace ldungeon_gen {
 
 		void serialize(SerializeBuffer& serializer) const;
 		void deserialize(SerializeBuffer& serializer);
+		group_t new_group(size_t predicted_subgroups) {
+			group_t next_group_id = group_counter;
+			group_counter += predicted_subgroups;
+			return group_counter;
+		}
 		void clear() {
 		    resize(Size(0,0));
 		    groups.clear();

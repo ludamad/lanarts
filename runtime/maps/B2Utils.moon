@@ -31,6 +31,7 @@ _ray_cast = () ->
             if fix\RayCast(output, input, ind)
                 return true
             ind += 1
+        return false
 ray_cast = _ray_cast()
 
 shape_set_distance = (t1, fixs1, t2, fixs2) ->

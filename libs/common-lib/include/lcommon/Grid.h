@@ -6,6 +6,7 @@
 #ifndef GRID_H_
 #define GRID_H_
 
+#include <memory>
 #include <vector>
 #include "geometry.h"
 #include "lcommon_assert.h"
@@ -87,6 +88,10 @@ public:
 		return _size;
 	}
 
+	Size& size() {
+		return _size;
+	}
+
 	int width() const {
 		return _size.w;
 	}
@@ -119,6 +124,62 @@ public:
 private:
 	Size _size;
 	std::vector<V> _contents;
+};
+
+template <typename V>
+class GridSlice {
+private:
+
+	typedef typename std::vector<V>::reference Ref;
+	typedef typename std::vector<V>::const_reference ConstRef;
+
+public:
+
+	GridSlice(BBox area, const std::shared_ptr<Grid<V>>& grid) : _area(area), _grid(grid) {
+	}
+
+	/**
+	 * Get the element at 'xy'.
+	 */
+	Ref operator[](const Pos& xy) {
+		return (*_grid)[xy + _area.left_top()];
+	}
+
+	/**
+	 * Get the element at 'xy' (but unmodifiable).
+	 */
+	ConstRef operator[](const Pos& xy) const {
+		return (*_grid)[xy + _area.left_top()];
+	}
+
+	/**
+	 * Fills contents, by default fills with default constructor for V.
+	 */
+	void fill(const V& fill_value = V()) {
+		FOR_EACH_BBOX(_area, x, y) {
+			(*_grid)[{x,y}] = fill_value;
+		}
+	}
+
+	Size size() const {
+		return _area.size();
+	}
+
+	int width() const {
+		return _area.width();
+	}
+
+	int height() const {
+		return _area.height();
+	}
+
+	bool empty() const {
+		return _area.empty();
+	}
+
+private:
+	BBox _area;
+	std::shared_ptr<Grid<V>> _grid;
 };
 
 #endif /* GRID_H_ */

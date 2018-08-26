@@ -92,6 +92,8 @@ namespace ldungeon_gen {
 		serializer.write(size());
 		serializer.write_container(_internal_vector());
 		serializer.write_int(groups.size());
+		serializer.write(group_counter);
+		serializer.write(max_group_counter);
 		for (int i = 0; i < groups.size(); i++) {
 			groups[i].serialize(serializer);
 		}
@@ -101,6 +103,8 @@ namespace ldungeon_gen {
 		Size new_size;
 		serializer.read(new_size);
 		serializer.read_container(_internal_vector());
+		serializer.read(group_counter);
+		serializer.read(max_group_counter);
 		resize(new_size);
 
 		int group_size;

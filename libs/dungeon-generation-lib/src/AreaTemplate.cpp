@@ -71,11 +71,13 @@ namespace ldungeon_gen {
                 /* Area of map to apply to: */
 		BBox grid_rect(Pos(), _grid->size());
 		FOR_EACH_BBOX(grid_rect, x, y) {
-			Pos sqr = xy + reorient(Pos(x,y), Size(w,h), orientation);
+			Pos sqr_xy = xy + reorient(Pos(x,y), Size(w,h), orientation);
 			char chr = (*_grid)[Pos(x,y)];
 			Glyph glyph = _legend[chr];
+			Square& sqr = (*map)[sqr_xy];
+			sqr.apply(glyph.oper.oper);
+			sqr.group = parent_group_id;
 
-			(*map)[sqr].apply(glyph.oper.oper);
 
 			/* Apply lua function */
 			if (!glyph.value.empty() && !glyph.value.isnil()) {

@@ -284,15 +284,15 @@ DataW.enemy_create {
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ObjectUtils.spawn_item_near(@, "Swarm Lanart", 1)
-        -- Spawn 2 level 1 randarts:
+        -- Spawn 1 level 1 randarts:
         for i=1,1
             {:type, :amount} = ItemUtils.randart_generate(1)
             ObjectUtils.spawn_item_near(@, type, amount)
-        -- Spawn 1 level 2 randarts:
-        for i=1,1
-            {:type, :amount} = ItemUtils.randart_generate(2)
-            ObjectUtils.spawn_item_near(@, type, amount)
-        ObjectUtils.spawn_item_near(@, "Amulet of Great Pain", 1)
+        ---- Spawn 1 level 2 randarts:
+        --for i=1,1
+        --    {:type, :amount} = ItemUtils.randart_generate(2)
+        --    ObjectUtils.spawn_item_near(@, type, amount)
+        --ObjectUtils.spawn_item_near(@, "Amulet of Great Pain", 1)
 }
 
 DataW.enemy_create {
@@ -446,7 +446,7 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
                 GameObject.destroy(@)
     }
     resistances: {
-        Red: 5
+        Red: 2
         Blue: -1.25
         Green: 0
     }
@@ -461,8 +461,8 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ObjectUtils.spawn_item_near(@, 'Dragon Lanart', 1)
-        -- Spawn level 1 randarts scaling to #players:
-        for i=1,#World.players * 2
+        -- Spawn level 1 randarts scaling to #players: TODO evalute whether to scale to players
+        for i=1,1 -- #World.players * 2
             {:type, :amount} = ItemUtils.randart_generate(1)
             ObjectUtils.spawn_item_near(@, type, amount)
         item = random_choice {"Will Scroll", "Strength Scroll", "Defence Scroll", "Magic Scroll"}
@@ -558,13 +558,13 @@ DataW.enemy_create {
     }
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
-        -- Spawn 2 level 1 randarts:
-        for i=1,2
+        -- Spawn 1 level 1 randarts:
+        for i=1,1
             {:type, :amount} = ItemUtils.randart_generate(1)
             ObjectUtils.spawn_item_near(@, type, amount)
-        ObjectUtils.spawn_item_near(@, "Gragh's Club", 1)
+        -- ObjectUtils.spawn_item_near(@, "Gragh's Club", 1)
         ObjectUtils.spawn_item_near(@, "Rage Lanart", 1)
-        ObjectUtils.spawn_item_near(@, "Amulet of the Berserker", 1)
+        -- ObjectUtils.spawn_item_near(@, "Amulet of the Berserker", 1)
     effects_active: {"Enraging"}
 }
 
@@ -592,8 +592,8 @@ DataW.enemy_create {
         ObjectUtils.spawn_item_near(@, "Obliteration Lanart", 1)
         ObjectUtils.spawn_item_near(@, "Amulet of Greater Fire", 1)
         -- Spawn 1 level 2 randart:
-        for i=1,2
-            {:type, :amount} = ItemUtils.randart_generate(1)
+        for i=1,1
+            {:type, :amount} = ItemUtils.randart_generate(2)
             ObjectUtils.spawn_item_near(@, type, amount)
     effects_active: {{"Pain Aura", {damage: 25, range: 40}}}
 }

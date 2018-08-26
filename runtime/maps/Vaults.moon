@@ -34,13 +34,11 @@ M._anvil = Display.image_load "features/sprites/anvil.png"
 UNSOLID_ADD = {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
 make_legend = (args, legend) ->
     args.tileset or= {}
-    return table.merge {
+    definition = table.merge {
         '!': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.store_placer, matches_none: SourceMap.FLAG_SOLID}
         '.': { -- '.' means 'any tile'
-            remove: {}
         }
         '+': {  -- '+' means 'walkable tile'
-            remove: {}
             matches_none: {M.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}
         }
         '*': {
@@ -81,6 +79,13 @@ make_legend = (args, legend) ->
         }
 
     }, legend
+    -- Now, allow args to define the group of each definer:
+    if args.group
+        for k, v in pairs(definition)
+            -- If this definer adds or subtracts anything, set the group:
+            if args.add or args.remove
+                v.group = args.group
+    return definition
 
 M.ridge_dungeon = (args) -> {
     legend: make_legend args, {

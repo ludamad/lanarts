@@ -87,7 +87,7 @@ get_name_and_description = (rng, artifact, power_level) ->
     error "Unexpected!"
 
 -- Desired score ranges for levels:
-pmod = (math.sqrt(#require("core.World").players) - 1) / 8 + 1
+pmod = 1 -- (math.sqrt(#require("core.World").players) - 1) / 8 + 1
 LEVEL_RANGES = {
     {600 * pmod, 900 * pmod}
     {900 * pmod, 1600 * pmod}
