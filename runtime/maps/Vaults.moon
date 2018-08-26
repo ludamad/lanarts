@@ -37,8 +37,10 @@ make_legend = (args, legend) ->
     definition = table.merge {
         '!': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.store_placer, matches_none: SourceMap.FLAG_SOLID}
         '.': { -- '.' means 'any tile'
+            remove: {}
         }
         '+': {  -- '+' means 'walkable tile'
+            remove: {}
             matches_none: {M.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}
         }
         '*': {
@@ -83,7 +85,9 @@ make_legend = (args, legend) ->
     if args.group
         for k, v in pairs(definition)
             -- If this definer adds or subtracts anything, set the group:
-            if args.add or args.remove
+            has_add = args.add and #args.add > 0
+            has_remove = args.remove and #args.remove > 0
+            if has_add or has_remove
                 v.group = args.group
     return definition
 

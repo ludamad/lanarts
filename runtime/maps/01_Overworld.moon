@@ -678,7 +678,7 @@ overworld_features = (map) ->
     OldMapSeq3 = MapSequence.create {preallocate: 1}
     OldMapSeq4 = MapSequence.create {preallocate: 1}
 
-    append map.post_game_map, () ->
+    append map.post_game_map, (game_map) ->
         OldMapSeq3\slot_resolve(1, game_map)
         OldMapSeq4\slot_resolve(1, game_map)
 
@@ -695,7 +695,9 @@ overworld_features = (map) ->
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
             return false -- Dont reject -- true
     for i=1,4
-        if place_outdoor_ridges() then return nil
+        if place_outdoor_ridges()
+            print "RETRY: place_outdoor_ridges()"
+            return nil
     -------------------------
 
     if not place_easy(map)
@@ -723,7 +725,9 @@ overworld_features = (map) ->
             return true
         append map.post_game_map, (game_map) ->
             CryptSeq\slot_resolve(1, game_map)
-    if place_crypt() then return nil
+    if place_crypt()
+        print "RETRY: place_crypt()"
+        return nil
     -----------------------------
 
     if not map.rng\random_choice({place_medium1a, place_medium1b})(map)
@@ -804,7 +808,7 @@ overworld_features = (map) ->
             return true
         append map.post_game_map, (game_map) ->
             Seq\slot_resolve(1, game_map)
-    place_graghs_lair()
+    --if place_graghs_lair() then return nil
     -----------------------------
 
     -----------------------------
@@ -832,7 +836,9 @@ overworld_features = (map) ->
         vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.snake, :door_placer, :gold_placer, player_spawn_area: false})
         if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
             return true
-    if place_medium2() then return nil
+    if place_medium2()
+        print "RETRY: place_medium2()"
+        return nil
     -----------------------------
 
     -------------------------
@@ -850,7 +856,9 @@ overworld_features = (map) ->
         vault = SourceMap.area_template_create(Vaults.skull_surrounded_dungeon {dungeon_placer: place_dungeon, :enemy_placer, :door_placer, :tileset, player_spawn_area: false})
         if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
             return true
-    if place_hard() then return nil
+    if place_hard()
+        print "RETRY: place_hard()"
+        return nil
     -------------------------
 
     -------------------------
@@ -877,7 +885,9 @@ overworld_features = (map) ->
             vault = SourceMap.area_template_create(Vaults.small_random_vault {rng: map.rng, item_placer, :enemy_placer, :gold_placer, :store_placer, :tileset, :door_placer, :tileset})
             if not place_feature(map, vault, (r) -> true)
                 return false -- Dont reject
-    if place_small_vaults() then return nil
+    if place_small_vaults()
+        print "RETRY: place_small_vaults()"
+        return nil
     -------------------------
 
     ---------------------------------
@@ -928,7 +938,7 @@ overworld_features = (map) ->
         vault = SourceMap.area_template_create(Vaults.anvil_encounter {:enemy_placer, :boss_placer, :item_placer, :gold_placer, :door_placer})
         if not place_feature(map, vault, (r) -> true)
             return true
-    if place_centaur_challenge() then return nil
+    --if place_centaur_challenge() then return nil
     ---------------------------------
 
     ---------------------------------
@@ -962,7 +972,9 @@ overworld_features = (map) ->
                 -- Dont reject
                 continue
                 -- return true
-    if place_tunnel() then return nil
+    if place_tunnel()
+        print "RETRY: place_tunnel()"
+        return nil
     ---------------------------------
 
     return true
@@ -1015,12 +1027,12 @@ generate_map_node = (create_map_base, fill_map) -> NewMaps.try_n_times MAX_GENER
     NewMaps.generate_door_candidates(map, rng, map.regions)
 
     -- Reject levels that are not fully connected:
-    if not NewMaps.check_connection(map)
-        print("ABORT: connection check failed")
-        return nil
+    --if not NewMaps.check_connection(map)
+    --    print("ABORT: connection check failed")
+    --    return nil
 
-    for _, map_gen_func in ipairs(map.post_maps)
-        map_gen_func()
+    for f in *map.post_maps
+        f()
     return {
         :map
         static_area: MapRegion.create({})
@@ -1032,74 +1044,14 @@ generate_map_node = (create_map_base, fill_map) -> NewMaps.try_n_times MAX_GENER
 overworld_create = () ->
     {:map} = grassy_overworld()
     player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
-    if not player_spawn_points
-        return nil
-
-    -- Reject levels that are not fully connected:
-    if not NewMaps.check_connection(map)
-        print("ABORT: connection check failed")
-        return nil
-
+    assert player_spawn_points, "Could not pick player spawn squares!"
+    
     game_map = NewMaps.generate_game_map(map)
     for f in *map.post_game_map
         f(game_map)
     World.players_spawn(game_map, player_spawn_points)
     Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
     return game_map
-
---overworld_create = () ->
---    rng = NewMaps.new_rng()
---    local conf, schema
---
---    template_f = () ->
---        event_log("(RNG #%d) Attempting overworld generation", rng\amount_generated())
---        conf or= OVERWORLD_CONF(rng)
---        schema or= rng\random(3)
---        return {
---            :rng
---            subtemplates: {DUNGEON_CONF(rng, Tilesets.pebble, schema), conf}
---            seethrough: true
---            outer_conf: conf
---            shell: 50
---            default_wall: Tile.create(Tilesets.grass.wall, true, true, {FLAG_OVERWORLD})
---        }
---
---    return NewMaps.try_n_times 1000, () ->
---        template = template_f()
---        map = NewMaps.source_map_create {
---            :rng
---            size: {OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE}
---            default_content: template.default_wall.id
---            default_flags: {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH}
---            map_label: "Plain Valley"
---            arc_chance: conf.arc_chance
---        }
---        if not NewMaps.map_try_create(map, rng, template)
---            return nil
---
---        if not overworld_features(map)
---            return nil
---
---        NewMaps.generate_door_candidates(map, rng, map.regions)
---        overworld_spawns(map)
---        player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
---        if not player_spawn_points
---            return nil
---
---        -- Reject levels that are not fully connected:
---        if not NewMaps.check_connection(map)
---            print("ABORT: connection check failed")
---            return nil
---
---        for _, map_gen_func in ipairs(map.post_maps)
---            map_gen_func()
---
---        game_map = NewMaps.generate_game_map(map)
---        for f in *map.post_game_map
---            f(game_map)
---        World.players_spawn(game_map, player_spawn_points)
---        Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
---        return game_map
 
 return {
     :overworld_create

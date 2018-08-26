@@ -223,7 +223,7 @@ source_map_create = (args) ->
         player_candidate_squares: {}
     }
 
-map_from_template = (template) ->
+map_from_template = (rng, template) ->
     return source_map_create {
         rng: rng
         size: {template.w, template.h}
@@ -283,7 +283,7 @@ check_connection = (map) ->
 
 _map_create_pass = (rng, template_f) ->
     template = template_f(rng)
-    map = map_from_template(template)
+    map = map_from_template(rng, template)
     if not map_try_create(map, rng, template)
         return nil
 
