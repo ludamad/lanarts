@@ -808,7 +808,7 @@ overworld_features = (map) ->
             return true
         append map.post_game_map, (game_map) ->
             Seq\slot_resolve(1, game_map)
-    --if place_graghs_lair() then return nil
+    if place_graghs_lair() then return nil
     -----------------------------
 
     -----------------------------
@@ -909,7 +909,7 @@ overworld_features = (map) ->
             vault = SourceMap.area_template_create(template {:enemy_placer, :item_placer, :gold_placer, :door_placer})
             if not place_feature(map, vault, (r) -> true)
                 return true
-    --if place_big_vaults() then return nil
+    -- if place_big_vaults() then return nil
     ---------------------------------
 
     ---------------------------------
@@ -938,7 +938,7 @@ overworld_features = (map) ->
         vault = SourceMap.area_template_create(Vaults.anvil_encounter {:enemy_placer, :boss_placer, :item_placer, :gold_placer, :door_placer})
         if not place_feature(map, vault, (r) -> true)
             return true
-    --if place_centaur_challenge() then return nil
+    if place_centaur_challenge() then return nil
     ---------------------------------
 
     ---------------------------------
@@ -1024,12 +1024,12 @@ generate_map_node = (create_map_base, fill_map) -> NewMaps.try_n_times MAX_GENER
     if not fill_map(map)
         return nil
 
-    NewMaps.generate_door_candidates(map, rng, map.regions)
-
     -- Reject levels that are not fully connected:
-    --if not NewMaps.check_connection(map)
-    --    print("ABORT: connection check failed")
-    --    return nil
+    if not NewMaps.check_connection(map)
+        print("ABORT: connection check failed")
+        return nil
+    
+    NewMaps.generate_door_candidates(map, rng, map.regions)
 
     for f in *map.post_maps
         f()
