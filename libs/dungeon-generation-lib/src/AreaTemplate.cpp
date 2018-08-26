@@ -89,7 +89,7 @@ namespace ldungeon_gen {
 				LuaStackValue mapval(L, -1);
 				glyph.value.push();
 				mapval.push();
-				luawrap::push(L, sqr);
+				luawrap::push(L, sqr_xy);
 				lua_call(L, 2, 0);
 			}
 		}

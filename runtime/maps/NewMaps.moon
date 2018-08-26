@@ -217,6 +217,7 @@ source_map_create = (args) ->
         door_locations: {}
         instances: {}
         post_maps: {}
+        post_game_map: {}
         rectangle_rooms: {}
         -- For the overworld, created by dungeon features we add later:
         player_candidate_squares: {}
@@ -300,20 +301,23 @@ _map_create_pass = (rng, template_f) ->
 
     game_map = generate_game_map(map)
     template\on_create_game_map(game_map)
+    for f in *map.post_game_map
+        f(game_map)
     return game_map
-
-try_n_times = (n, f) ->
-    for i=1,n
-        ret = f()
-        if ret
-            return ret
-        print "** MAP GENERATION ATTEMPT " .. i .. " FAILED, RETRYING **"
-    error("Could not generate a viable map in " .. n .. " tries!")
 
 new_rng = () ->
     seed = random(0, 2 ^ 30)
     event_log("(RNG 0) Creating mtwist object with seed=%d", seed)
     return require("mtwist").create(seed)
+
+try_n_times = (n, f) ->
+    rng = new_rng()
+    for i=1,n
+        ret = f(rng)
+        if ret
+            return ret
+        print "** MAP GENERATION ATTEMPT " .. i .. " FAILED, RETRYING **"
+    error("Could not generate a viable map in " .. n .. " tries!")
 
 map_create = (template) ->
     rng = new_rng()

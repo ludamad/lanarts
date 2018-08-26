@@ -7,6 +7,14 @@ MAX_TRIES = 1000
 ----
 -- Polygon based regions
 
+rectangle_points = (x, y, w, h) ->
+    return {
+        {x, y}
+        {x + w, y}
+        {x + w, y +h}
+        {x, y + h}
+    }
+
 ellipse_points = (x, y, w, h, n_points = 16, start_angle = 0) ->
     points = {}
     angle,step = start_angle,(1/n_points* 2 * math.pi)
@@ -390,6 +398,7 @@ return {
     :subregion_minimum_spanning_tree, :region_minimum_spanning_tree, 
     :spread_region_delta_func
     :center_region_delta_func
+    :rectangle_points
     :ellipse_points
     :ellipse_points_0
     :skewed_ellipse_points
