@@ -497,8 +497,8 @@ M.crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
 -------------------------
 -- Place easy dungeon: --
 place_easy = (map) ->
-    MapSeq = MapSequence.create {}
-    InnerMapSeq = MapSequence.create {}
+    MapSeq = MapSequence.create {preallocate: 1}
+    InnerMapSeq = MapSequence.create {preallocate: 1}
     append map.post_game_map, (game_map) ->
         MapSeq\slot_resolve(1, game_map)
     inner_encounter_template = {
@@ -601,7 +601,7 @@ place_easy = (map) ->
 place_medium1a = (map) ->
     local templates
     templates = OldMaps.Dungeon2
-    MapSeq = MapSequence.create {}
+    MapSeq = MapSequence.create {preallocate: 1}
     append map.post_game_map, (game_map) ->
         MapSeq\slot_resolve(1, game_map)
     on_generate_dungeon = (map, floor) ->
@@ -639,7 +639,7 @@ place_medium1a = (map) ->
 
 place_medium1b = (map) ->
     tileset = Tilesets.snake
-    MapSeq = MapSequence.create {}
+    MapSeq = MapSequence.create {preallocate: 1}
     append map.post_game_map, (game_map) ->
         MapSeq\slot_resolve(1, game_map)
     snake_pit_create = (offset = 1) ->

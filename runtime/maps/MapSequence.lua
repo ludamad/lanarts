@@ -9,10 +9,8 @@ function MapSequence:init(--[[Optional]] args)
     self.maps = {}
     self.next_slot = 1
     args = args or {}
-    if args.preallocate then
-        for i=1,args.preallocate do
-            self:slot_create() 
-        end
+    for i=1,args.preallocate or 0 do
+        self:slot_create() 
     end
 end
 
