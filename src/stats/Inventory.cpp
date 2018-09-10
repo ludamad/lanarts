@@ -35,6 +35,7 @@ static Range find_slice_forgive1(Inventory& inv, int start_index, const Func& f_
 static const std::string ONE_TIME = "One-time Use";
 static const std::string EVOCABLE = "Evocable";
 static const std::string KEY = "Key";
+static const std::string LANART = "Lanart";
 
 void Inventory::sort() {
 	auto calc_rank = [](const ItemSlot& slot) -> int {
@@ -56,6 +57,10 @@ void Inventory::sort() {
 		}
 		rank++;
 		if (slot.item.is_equipment()) {
+			return rank;
+		}
+		rank++;
+		if (slot.item_entry().entry_type() == LANART) {
 			return rank;
 		}
 		rank++;

@@ -290,39 +290,36 @@ bool GameWorld::step() {
 
 void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	//save the level context
-	GameMapState* last = gs->get_level();
 	GameMapState* state = get_level(roomid1);
 	//set the level context
-	gs->set_level(state);
-
-	//Keep object alive during move
-	GameInstRef gref(gs->get_instance(id));
-	GameInst* inst = gref.get();
-
-	if (!gref.get()) {
-		return;
-	}
-        LuaValue lua_object = inst->lua_variables;// stash lua object;
-
-	gs->remove_instance(inst, /* Dont trigger on-destroy effects */ false);
-	gref->last_x = x, gref->last_y = y;
-	gref->update_position(x, y);
-
-	gs->set_level(get_level(roomid2));
-        inst->id = 0;
-	gs->add_instance(inst);
-
-	PlayerInst* p;
-	if ((p = dynamic_cast<PlayerInst*>(inst))) {
-		p->update_field_of_view(gs);
-		if (p->is_local_player()) {
-			set_current_level_lazy(roomid2);
+	gs->do_with_map(state, [&]() {
+		auto* inst = gs->get_instance(id);
+		if (!inst) {
+			return;
 		}
-	}
+		//Keep object alive during move
+		GameInstRef gref(inst);
 
-	//restore the level context
-	gs->set_level(last);
-        inst->lua_variables = lua_object;
+		LuaValue lua_object = inst->lua_variables;// stash lua object;
+
+		gs->remove_instance(inst, /* Dont trigger on-destroy effects */ false);
+		gref->last_x = x, gref->last_y = y;
+		gref->update_position(x, y);
+
+		gs->do_with_map(get_level(roomid2), [&](){
+			inst->id = 0;
+			gs->add_instance(inst);
+		});
+
+		PlayerInst* p;
+		if ((p = dynamic_cast<PlayerInst*>(inst))) {
+			p->update_field_of_view(gs);
+			if (p->is_local_player()) {
+				set_current_level_lazy(roomid2);
+			}
+		}
+		inst->lua_variables = lua_object;
+	});
 }
 
 void GameWorld::set_current_level(int roomid) {

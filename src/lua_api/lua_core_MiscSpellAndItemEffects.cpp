@@ -60,11 +60,16 @@ static bool lmap_completion(LuaStackValue lplayer, const char* map_name) {
     return map_completion(lua_api::gamestate(lplayer), lplayer.as<PlayerInst*>(), map_name);
 }
 
+static void lvisit_all_maps(LuaStackValue player) {
+    visit_all_maps(lua_api::gamestate(player.luastate()), player.as<PlayerInst*>());
+}
+
 namespace lua_api {
 	void register_lua_core_MiscSpellAndItemEffects(lua_State* L) {
 		// Mouse API
 		LuaValue module = lua_api::register_lua_submodule(L, "core.MiscSpellAndItemEffects");
 		module["magic_map_effect"].bind_function(magic_map_effect);
         module["map_completion"].bind_function(lmap_completion);
+        module["visit_all_maps"].bind_function(lvisit_all_maps);
 	}
 }

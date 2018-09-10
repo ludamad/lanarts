@@ -82,6 +82,9 @@ public:
         }
     void register_removed_object(GameInst* inst);
 	GameInstRef& get_removed_object(int id);
+	std::vector<GameMapState*>& maps() {
+		return level_states;
+	}
 private:
 	void place_player(GameMapState* map, GameInst* p);
 	bool midstep;
