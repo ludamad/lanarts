@@ -23,9 +23,9 @@
 #include "GameState.h"
 #include "hashset_util.h"
 
-GameInst* const GAMEINST_TOMBSTONE = (GameInst*)1;
+GameInst* GAMEINST_TOMBSTONE = reinterpret_cast<GameInst*>(1);
 
-static bool valid_inst(GameInst* inst) {
+bool valid_inst(GameInst* inst) {
 	return inst > GAMEINST_TOMBSTONE;
 }
 

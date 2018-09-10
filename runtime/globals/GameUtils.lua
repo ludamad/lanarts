@@ -64,3 +64,12 @@ function screens()
     _screen_iter[1] = 0
     return _screen_iter
 end
+
+function noscreen(f)
+    -- In rare cases (namely, debug/cheat codes, which execute as draw events),
+    -- we want the screen to not be set so code meant for the step event does not trip up.
+    local prev_screen = GameState.screen_get()
+    GameState.screen_set(-1)
+    f()
+    GameState.screen_set(prev_screen)
+end

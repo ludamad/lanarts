@@ -155,6 +155,9 @@ public:
     PlayerIOActions& input_source() {
         return io_value;
     }
+
+    // Used by cheat/debug codes
+    void pickup_item(GameState* gs, const GameAction& action);
 private:
     ///////////////////////////
     // ** Private methods ** //
@@ -178,7 +181,6 @@ private:
     //Either finds new target or shifts target
     void shift_autotarget(GameState* gs);
 
-    void pickup_item(GameState* gs, const GameAction& action);
     void drop_item(GameState* gs, const GameAction& action);
     void reposition_item(GameState* gs, const GameAction& action);
     void purchase_from_store(GameState* gs, const GameAction& action);

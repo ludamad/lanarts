@@ -312,6 +312,13 @@ public:
 
 	void loop(lsound::Sound& sound, const char* path);
 	void loop(const char* sound_path);
+	template <typename Function>
+	void do_with_map(GameMapState* map, const Function& func) {
+		auto* prev = get_level();
+        set_level(map);
+		func();
+		set_level(prev);
+	}
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
 

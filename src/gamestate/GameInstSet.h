@@ -20,6 +20,8 @@
 class GameState;
 class SerializeBuffer;
 
+bool valid_inst(GameInst* inst);
+
 class GameInstSet {
 public:
 	enum {
@@ -66,12 +68,15 @@ public:
 
 	template <typename T, typename Func>
 	bool for_each(const Func& func) {
-            for (auto& unit : unit_set) {
-            T* inst = dynamic_cast<T*>(unit.inst);
-            if (inst && !func(inst)) {
-                return false;
+        for (int i = 0; i < unit_capacity; i++) {
+            GameInst* inst = unit_set[i].inst;
+			if (valid_inst(inst)) {
+                T* t_inst = dynamic_cast<T*>(inst);
+                if (t_inst && !func(t_inst)) {
+                    return false;
+                }
             }
-        }
+		}
         return true;
 	}
 private:
