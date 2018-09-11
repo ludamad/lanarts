@@ -71,6 +71,10 @@ namespace lua_api {
 		module["magic_map_effect"].bind_function(magic_map_effect);
         module["map_completion"].bind_function(lmap_completion);
         module["visit_all_maps"].bind_function(lvisit_all_maps);
-        module["use_portal_between_maps"] = [&]
+        module["use_portal_between_maps"] = [&](PlayerInst* player, const char* start_map_label,
+                                            const char* end_map_label) {
+            auto* gs = lua_api::gamestate(L);
+            use_portal_between_maps(gs, player, start_map_label, end_map_label);
+        };
 	}
 }

@@ -55,13 +55,11 @@ inline void visit_all_maps(GameState* gs, PlayerInst* player) {
         std::vector<GameMapState*> maps_copy = world.maps();
         for (auto* map : maps_copy) {
             map->for_each<FeatureInst>([&](FeatureInst* inst) {
-                gs->do_with_map(map, [&](){
-                    bool new_portal = used_portals.find(inst) == used_portals.end();
-                    if (new_portal) {
-                        inst->player_interact(gs, player);
-                        used_portals.insert(inst);
-                    }
-                });
+                bool new_portal = used_portals.find(inst) == used_portals.end();
+                if (new_portal) {
+                    inst->player_interact(gs, player);
+                    used_portals.insert(inst);
+                }
                 return true;
             });
         }
@@ -72,27 +70,22 @@ inline void visit_all_maps(GameState* gs, PlayerInst* player) {
     });
 }
 
-
 inline void use_portal_between_maps(GameState* gs, PlayerInst* player, const char* start_map_label,
                                     const char* end_map_label) {
-    LuaValue map_module = lua_api::import(gs->luastate(), "core.Map");
-    LuaValue original_transfer = map_module["transfer"];
-
     auto* start_map = gs->get_map(start_map_label);
     auto* end_map = gs->get_map(end_map_label);
     if (!start_map) {
         return;
     }
 
-    std::vector<GameMapState*> maps_copy = gs->game_world().maps();
+    LuaValue map_module = lua_api::import(gs->luastate(), "core.Map");
+    LuaValue original_transfer = map_module["transfer"];
     start_map->for_each<FeatureInst>([&](FeatureInst* inst) {
         bool continue_iteration = true;
         // Use 'transfer' to grab the map this takes us to
         map_module["transfer"] = [&](LuaStackValue inst, LuaStackValue map_obj, Pos xy) -> void {
             if (mapstate(map_obj) == end_map) {
-                gs->do_with_map(start_map, [&](){
-                    lcall(original_transfer, inst, map_obj, xy);
-                });
+                lcall(original_transfer, inst, map_obj, xy);
                 continue_iteration = false;
             }
         };

@@ -488,10 +488,10 @@ static bool gmap_radius_place_free(const LuaStackValue& radius,
 }
 
 
-static void gmap_transfer(LuaStackValue inst, LuaStackValue map_obj, Pos xy) {
-    GameState* gs = lua_api::gamestate(inst);
-    level_id current_id = gs->game_world().get_current_level_id();
-    gs->game_world().level_move(inst.as<GameInst*>()->id, xy.x, xy.y, current_id, mapid(map_obj));
+static void gmap_transfer(LuaStackValue linst, LuaStackValue map_obj, Pos xy) {
+    GameState* gs = lua_api::gamestate(linst);
+    auto* inst = linst.as<GameInst*>();
+    gs->game_world().level_move(inst->id, xy.x, xy.y, inst->current_floor, mapid(map_obj));
 }
 
 static void gmap_map_step(LuaStackValue table) {
