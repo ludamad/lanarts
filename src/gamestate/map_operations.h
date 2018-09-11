@@ -22,14 +22,6 @@ inline void map_completion(GameState* gs, PlayerInst* player, GameMapState* map)
             player->pickup_item(gs, action);
             return true;
         });
-        // TODO should FeatureInst be renamed to PortalInst?
-        map->for_each<FeatureInst>([&](FeatureInst* inst) {
-            if (!inst->has_been_used()) {
-                inst->player_interact(gs, player);
-                return false;
-            }
-            return true;
-        });
     });
 }
 

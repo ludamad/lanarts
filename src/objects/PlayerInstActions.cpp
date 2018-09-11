@@ -473,43 +473,43 @@ static bool item_do_lua_pickup(lua_State* L, ItemEntry& type, GameInst* user, in
 }
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
-        // Dead players can't pickup items:
-        if (is_ghost()) {
-            return;
-        }
-   const int PICKUP_RATE = 5;
-   GameInst* inst = gs->get_instance(action.use_id);
-   if (!inst) {
-   	return;
-   }
-   ItemInst* iteminst = dynamic_cast<ItemInst*>(inst);
-   LANARTS_ASSERT(iteminst);
+    // Dead players can't pickup items:
+    if (is_ghost()) {
+        return;
+    }
+    const int PICKUP_RATE = 5;
+    GameInst* inst = gs->get_instance(action.use_id);
+    if (!inst) {
+        return;
+    }
+    ItemInst* iteminst = dynamic_cast<ItemInst*>(inst);
+    LANARTS_ASSERT(iteminst);
 
-   const Item& type = iteminst->item_type();
-   int amnt = iteminst->item_quantity();
+    const Item& type = iteminst->item_type();
+    int amnt = iteminst->item_quantity();
 
-   bool inventory_full = false;
-        if (item_do_lua_pickup(gs->luastate(), type.item_entry(), this, amnt)) {
-                // Do nothing, as commanded by Lua
-        } else if (type.id == get_item_by_name("Gold")) {
-   	gold(gs) += amnt;
+    bool inventory_full = false;
+    if (item_do_lua_pickup(gs->luastate(), type.item_entry(), this, amnt)) {
+        // Do nothing, as commanded by Lua
+    } else if (type.id == get_item_by_name("Gold")) {
+        gold(gs) += amnt;
         play("sound/gold.ogg");
-   } else {
-   	itemslot_t slot = inventory().add(type);
-   	if (slot == -1) {
-   		inventory_full = true;
-   	} else if (projectile_should_autowield(equipment(), type,
-   			this->last_chosen_weaponclass)) {
-   		projectile_smart_equip(inventory(), slot);
-   	}
+    } else {
+        itemslot_t slot = inventory().add(type);
+        if (slot == -1) {
+            inventory_full = true;
+        } else if (projectile_should_autowield(equipment(), type,
+                                               this->last_chosen_weaponclass)) {
+            projectile_smart_equip(inventory(), slot);
+        }
         play("sound/item.ogg");
-   }
+    }
 
-   if (!inventory_full) {
-   	cooldowns().reset_pickup_cooldown(PICKUP_RATE);
-   	gs->remove_instance(iteminst);
-   }
-   inventory().sort();
+    if (!inventory_full) {
+        cooldowns().reset_pickup_cooldown(PICKUP_RATE);
+        gs->remove_instance(iteminst);
+    }
+    inventory().sort();
 }
 
 void PlayerInst::perform_queued_actions(GameState* gs) {

@@ -35,20 +35,18 @@ void reveal_map(GameState* gs, GameMapState* level) {
             }
         }
     }
-    for (auto* inst : level->game_inst_set().to_vector()) {
-        ItemInst* item = dynamic_cast<ItemInst*>(inst);
-        if (item) {
-            item->set_as_seen();
-        }
-        FeatureInst* feature = dynamic_cast<FeatureInst*>(inst);
-        if (feature) {
-            feature->set_as_seen();
-        }
-        StoreInst* store = dynamic_cast<StoreInst*>(inst);
-        if (store) {
-            store->set_as_seen();
-        }
-    }
+    level->for_each<ItemInst>([&](ItemInst* inst){
+        inst->set_as_seen();
+        return true;
+    });
+    level->for_each<FeatureInst>([&](FeatureInst* inst){
+        inst->set_as_seen();
+        return true;
+    });
+    level->for_each<StoreInst>([&](StoreInst* inst){
+        inst->set_as_seen();
+        return true;
+    });
 }
 
 static void magic_map_effect(LuaStackValue linst) {

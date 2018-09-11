@@ -1,5 +1,4 @@
 local MiscSpellAndItemEffects = require "core.MiscSpellAndItemEffects"
-local player = require("core.World").players[1].instance
 local Map = require "core.Map"
 
 local function mock_transfer(f)
@@ -11,6 +10,7 @@ end
 
 return {
     complete_maps = function(maps)
+        local player = require("core.World").players[1].instance
         noscreen(function()
             mock_transfer(function()
                 MiscSpellAndItemEffects.visit_all_maps(player)
