@@ -89,7 +89,11 @@ inline void use_portal_between_maps(GameState* gs, PlayerInst* player, const cha
             if (mapstate(map_obj) == end_map) {
                 gs->do_with_map(end_map, [&]() {
                     lcall(original_transfer, inst, map_obj, xy);
-                    gs->view().sharp_center_on(player->ipos());
+                    gs->for_screens([&]{
+                        if (player == gs->local_player()) {
+                            gs->view().sharp_center_on(player->ipos());
+                        }
+                    });
                 });
                 continue_iteration = false;
             }
