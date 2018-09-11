@@ -6,6 +6,9 @@ utils.complete_maps {
     "Temple 3",
     "Snake Pit 1",
     "Snake Pit 2",
-    go_to = {"Plain Valley", "Outpost 1"}
+    nearest_portal = {
+        from = "Plain Valley", 
+        to = "Outpost 1"
+    }
 }
 

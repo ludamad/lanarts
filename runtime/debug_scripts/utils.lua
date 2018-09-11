@@ -18,11 +18,13 @@ return {
             for _, map_label in ipairs(maps) do
                 MiscSpellAndItemEffects.map_completion(player, map_label)
             end
-            if maps.go_to then
+            if maps.nearest_portal then
                 MiscSpellAndItemEffects.use_portal_between_maps(
-                    player, 
-                    maps.go_to[1],
-                    maps.go_to[2]
+                    player,
+                    -- Use a portal from the 'to' map, possibly counterintuitively.
+                    -- This means we end up on the 'from' map, near the portal we desire.
+                    maps.nearest_portal.to,
+                    maps.nearest_portal.from
                 )
             end
         end)
