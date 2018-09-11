@@ -7,7 +7,7 @@ utils.complete_maps {
     "Outpost 2",
     "Outpost 3",
     nearest_portal = {
-        from = "Outpost 1",
-        to  = "Plain Valley"
+        from = "Plain Valley",
+        to = "Outpost 1"
     }
 }
