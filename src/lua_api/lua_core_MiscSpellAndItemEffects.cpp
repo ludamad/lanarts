@@ -71,5 +71,6 @@ namespace lua_api {
 		module["magic_map_effect"].bind_function(magic_map_effect);
         module["map_completion"].bind_function(lmap_completion);
         module["visit_all_maps"].bind_function(lvisit_all_maps);
+        module["use_portal_between_maps"] = [&]
 	}
 }

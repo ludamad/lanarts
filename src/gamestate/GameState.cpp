@@ -814,6 +814,15 @@ void GameState::loop(const char* sound_path) {
     loop(SOUND_MAP[sound_path], sound_path);
 }
 
+GameMapState* GameState::get_map(const char* map_label) {
+    for (auto* map : world.maps()) {
+        if (map->label() == map_label) {
+            return map;
+        }
+    }
+    return nullptr;
+}
+
 void GameStatePostSerializeData::clear() {
     postponed_insts.clear();
     accepting_data = true;

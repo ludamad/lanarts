@@ -319,6 +319,9 @@ public:
 		func();
 		set_level(prev);
 	}
+
+    GameMapState* get_map(const char* map_label);
+
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
 
