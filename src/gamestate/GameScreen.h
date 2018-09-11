@@ -81,6 +81,9 @@ struct GameScreenSet {
         LANARTS_ASSERT(current_screen == -1);
         current_screen = stash;
     }
+    int screen_index() {
+        return current_screen;
+    }
 private:
     int current_screen = -1;
     // For non-drawing purposes:

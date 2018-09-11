@@ -1,5 +1,5 @@
 local MiscSpellAndItemEffects = require "core.MiscSpellAndItemEffects"
-local player = require("core.World").local_player
+local player = require("core.World").players[1].instance
 local Map = require "core.Map"
 
 local function mock_transfer(f)
@@ -17,6 +17,13 @@ return {
             end)
             for _, map_label in ipairs(maps) do
                 MiscSpellAndItemEffects.map_completion(player, map_label)
+            end
+            if maps.go_to then
+                MiscSpellAndItemEffects.use_portal_between_maps(
+                    player, 
+                    maps.go_to[1],
+                    maps.go_to[2]
+                )
             end
         end)
     end

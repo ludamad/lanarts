@@ -25,7 +25,8 @@ void reveal_map(GameState* gs, GameMapState* level) {
     ldungeon_gen::Operator mark {ldungeon_gen::FLAG_RESERVED2};
     ldungeon_gen::Selector marked {ldungeon_gen::FLAG_RESERVED2};
     ldungeon_gen::area_fully_connected(*source_map, area, unsolid_selector, mark, marked);
-    FOR_EACH_BBOX(area, x, y) {
+    BBox safe_area = area.shrink(1);
+    FOR_EACH_BBOX(safe_area, x, y) {
         if ((*source_map)[{x,y}].matches(marked)) {
             for (int dy = -1; dy <= +1; dy++) {
                 for (int dx = -1; dx <= +1; dx++) {
@@ -71,7 +72,7 @@ namespace lua_api {
 		module["magic_map_effect"].bind_function(magic_map_effect);
         module["map_completion"].bind_function(lmap_completion);
         module["visit_all_maps"].bind_function(lvisit_all_maps);
-        module["use_portal_between_maps"] = [&](PlayerInst* player, const char* start_map_label,
+        module["use_portal_between_maps"] = [=](PlayerInst* player, const char* start_map_label,
                                             const char* end_map_label) {
             auto* gs = lua_api::gamestate(L);
             use_portal_between_maps(gs, player, start_map_label, end_map_label);

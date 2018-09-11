@@ -26,7 +26,7 @@ function M.fadeout_create(args)
 
     function args:on_draw()
         local alpha = (self.duration - self.time_elapsed) / self.duration
-        local sprite = self.sprite or self.sprites[GameState.screen_get()] 
+        local sprite = self.sprite
         ObjectUtils.draw_if_seen(self, sprite, alpha, self.frame, self.direction)
     end
 

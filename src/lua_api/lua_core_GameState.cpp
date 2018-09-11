@@ -170,7 +170,7 @@ static int game_screen_amount(LuaStackValue screen) {
 }
 
 static int game_screen_get(LuaStackValue screen) {
-	return lua_api::gamestate(screen)->screens.amount();
+	return lua_api::gamestate(screen)->screens.screen_index();
 }
 
 static int game_input_handle(lua_State* L) {

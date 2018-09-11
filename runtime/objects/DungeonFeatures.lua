@@ -35,7 +35,7 @@ function Base:init(args)
 end
 function Base:on_draw()
     if Display.object_within_view(self) then
-        local sprite = self.sprite or self.sprites[GameState.screen_get()]
+        local sprite = self.sprite or self.sprites[GameState.screen_get() + 1]
         if sprite ~= nil then
             ObjectUtils.screen_draw(sprite, self.xy, self.alpha, self.frame)
         end

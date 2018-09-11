@@ -55,11 +55,13 @@ inline void visit_all_maps(GameState* gs, PlayerInst* player) {
         std::vector<GameMapState*> maps_copy = world.maps();
         for (auto* map : maps_copy) {
             map->for_each<FeatureInst>([&](FeatureInst* inst) {
-                bool new_portal = used_portals.find(inst) == used_portals.end();
-                if (new_portal) {
-                    inst->player_interact(gs, player);
-                    used_portals.insert(inst);
-                }
+                gs->do_with_map(map, [&]() {
+                    bool new_portal = used_portals.find(inst) == used_portals.end();
+                    if (new_portal) {
+                        inst->player_interact(gs, player);
+                        used_portals.insert(inst);
+                    }
+                });
                 return true;
             });
         }
@@ -85,7 +87,9 @@ inline void use_portal_between_maps(GameState* gs, PlayerInst* player, const cha
         // Use 'transfer' to grab the map this takes us to
         map_module["transfer"] = [&](LuaStackValue inst, LuaStackValue map_obj, Pos xy) -> void {
             if (mapstate(map_obj) == end_map) {
-                lcall(original_transfer, inst, map_obj, xy);
+                gs->do_with_map(end_map, [&]() {
+                    lcall(original_transfer, inst, map_obj, xy);
+                });
                 continue_iteration = false;
             }
         };

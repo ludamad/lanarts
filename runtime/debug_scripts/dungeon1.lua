@@ -6,4 +6,6 @@ utils.complete_maps {
     "Temple 3",
     "Snake Pit 1",
     "Snake Pit 2",
+    go_to = {"Plain Valley", "Outpost 1"}
 }
+
