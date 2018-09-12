@@ -386,6 +386,8 @@ static Pos direction_towards_object(LuaStackValue player, LuaValue filter) {
     return p->direction_towards_object(lua_api::gamestate(player), get_lua_collision_filter(filter));
 }
 
+Pos configure_dir(GameState* gs, PlayerInst* inst, float dx, float dy);
+
 static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(PlayerInst*);
 	LuaValue meta = lua_combatgameinst_metatable(L);
@@ -421,6 +423,9 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
     methods["apply_melee_cooldown"].bind_function(apply_melee_cooldown);
     methods["direction_towards_unexplored"].bind_function(direction_towards_unexplored);
     methods["direction_towards_object"].bind_function(direction_towards_object);
+	methods["configure_dir"] = [=](PlayerInst* inst, PosF xy) -> Pos {
+		return configure_dir(lua_api::gamestate(L), inst, xy.x, xy.y);
+	};
 
 	return meta;
 }
