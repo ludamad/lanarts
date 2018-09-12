@@ -476,8 +476,8 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
     int amnt = iteminst->item_quantity();
 
     bool inventory_full = false;
-
-    if (lcall_def(false, entry.pickup_call, game_item_data.get_raw_data()[entry.name], this, amnt)) {
+    auto ignore_inventory_add = lcall<LuaValue>(entry.pickup_call, game_item_data.get_raw_data()[entry.name], this, amnt);
+    if (!ignore_inventory_add.empty() && !ignore_inventory_add.isnil() && ignore_inventory_add.as<bool>()) {
         // Do nothing, as commanded by Lua
     } else {
         itemslot_t slot = inventory().add(type);

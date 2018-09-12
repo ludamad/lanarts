@@ -7,7 +7,7 @@ Data.item_create {
     name = "Gold", -- An entry named gold must exist, it is handled specially
     spr_item = "gold",
     pickup_func = function(self, user, amount)
-        user\gain_gold(amount)
+        user:gain_gold(amount)
         play_sound("sound/gold.ogg")
         return true -- dont pickup
     end
