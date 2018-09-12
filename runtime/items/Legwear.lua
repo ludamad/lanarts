@@ -7,12 +7,10 @@ Data.equipment_create {
 
     spr_item = "spr_legwear.platelegs",
 
-    spell_cooldown_multiplier = 1.35,
-
-    ranged_cooldown_multiplier = 1.35,
-
     stat_bonuses = { 
         defence = 2,
+        spell_cooldown_multiplier = 1.1,
+        ranged_cooldown_multiplier = 1.1,
     },
 }
 
@@ -35,7 +33,6 @@ Data.equipment_create {
     shop_cost = { 150, 300 },
 
     spr_item = "spr_legwear.gallanthorskirt",
-    stat_bonuses = {magic = 1},
-    spell_cooldown_multiplier = 0.91
+    stat_bonuses = {magic = 1, spell_cooldown_multiplier = 0.91}
 }
 

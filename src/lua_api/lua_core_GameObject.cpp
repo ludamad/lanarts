@@ -413,7 +413,10 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_SETTER(setters, input_source, LuaValue, OBJ->input_source().value = VAL);
 	LUAWRAP_GETTER(getters, input_source, OBJ->input_source().value);
 	LUAWRAP_GETTER(getters, weapon_sprite, res::sprite(OBJ->weapon().weapon_entry().item_sprite));
-    
+
+    methods["gain_gold"] = [=](PlayerInst* obj, int gold) {
+        obj->gold(lua_api::gamestate(L)) += gold;
+    };
 	LUAWRAP_GETTER(methods, within_field_of_view, OBJ->within_field_of_view(luawrap::get<Pos>(L, 2)));
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_focus_player(lua_api::gamestate(L)));
 	LUAWRAP_GETTER(methods, can_benefit_from_rest, OBJ->can_benefit_from_rest());

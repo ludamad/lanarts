@@ -997,7 +997,7 @@ grassy_overworld = () ->
             default_wall: Tile.create(Tilesets.grass.wall, true, true, {FLAG_OVERWORLD})
         }
 
-    create_map_base = (rng) ->
+    return generate_map_node (rng) ->
         template = template_f(rng)
         map = NewMaps.source_map_create {
             :rng
@@ -1009,19 +1009,18 @@ grassy_overworld = () ->
         }
         if not NewMaps.map_try_create(map, rng, template)
             return nil
+        if not overworld_features(map)
+            return nil
+        append map.post_maps, () ->
+            if overworld_spawns(map)
+                return 'reject'
+
         return map
 
-    fill_map = overworld_features
-
-    return generate_map_node(create_map_base, fill_map)
-
 MAX_GENERATE_ITERS = 1000
-generate_map_node = (create_map_base, fill_map) -> NewMaps.try_n_times MAX_GENERATE_ITERS, (rng) ->
-    map = create_map_base(rng)
+generate_map_node = (create_map) -> NewMaps.try_n_times MAX_GENERATE_ITERS, (rng) ->
+    map = create_map(rng)
     if not map
-        return nil
-
-    if not fill_map(map)
         return nil
 
     -- Reject levels that are not fully connected:
@@ -1032,7 +1031,8 @@ generate_map_node = (create_map_base, fill_map) -> NewMaps.try_n_times MAX_GENER
     NewMaps.generate_door_candidates(map, rng, map.regions)
 
     for f in *map.post_maps
-        f()
+        if f() == 'reject' -- TODO consistently use this pattern?
+            return nil
     return {
         :map
         static_area: MapRegion.create({})

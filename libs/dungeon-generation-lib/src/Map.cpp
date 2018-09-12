@@ -91,9 +91,9 @@ namespace ldungeon_gen {
 	void Map::serialize(SerializeBuffer& serializer) const {
 		serializer.write(size());
 		serializer.write_container(_internal_vector());
-		serializer.write_int(groups.size());
 		serializer.write(group_counter);
 		serializer.write(max_group_counter);
+		serializer.write_int(groups.size());
 		for (int i = 0; i < groups.size(); i++) {
 			groups[i].serialize(serializer);
 		}

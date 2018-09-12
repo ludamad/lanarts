@@ -5,7 +5,12 @@ local Map = require "core.Map"
 
 Data.item_create {
     name = "Gold", -- An entry named gold must exist, it is handled specially
-    spr_item = "gold"
+    spr_item = "gold",
+    pickup_func = function(self, user, amount)
+        user\gain_gold(amount)
+        play_sound("sound/gold.ogg")
+        return true -- dont pickup
+    end
 }
 
 Data.item_create {
@@ -158,7 +163,7 @@ Data.item_create {
 
     spr_item = "scroll_exp",
 
-    action_func = function(self, user)
+    pickup_func = function(self, user, amount)
         -- Collect ally players.
         local ally_players = {}
         for _, ally in ipairs(Map.allies_list(user)) do
@@ -167,10 +172,11 @@ Data.item_create {
             end
         end
         -- Grant all of them an XP share.
-        local xp_granted = 100 / #ally_players
+        local xp_granted = (100 * amount) / #ally_players
         for _, ally in ipairs(ally_players) do
             ally:gain_xp(xp_granted)
         end
+        return true -- dont pickup
     end
 }
 

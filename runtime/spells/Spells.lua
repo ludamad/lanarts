@@ -133,6 +133,7 @@ local function ChargeCallback(_, caster)
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 30 + caster.stats.strength then
             num = num + 1
             caster:melee(mon)
+            caster:melee(mon)
             --            local chance = math.max(25, 100 - num * 20)
             --if rand_range(0, 100) < chance then -- decreasing chance of knockback
             local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)

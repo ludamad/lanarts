@@ -21,6 +21,7 @@ local function complete_maps(maps)
 end
 
 local function go_to_portal(nearest_portal)
+    local player = require("core.World").players[1].instance
     noscreen(function()
         MiscSpellAndItemEffects.use_portal_between_maps(
             player,

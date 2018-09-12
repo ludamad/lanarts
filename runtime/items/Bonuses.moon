@@ -25,10 +25,10 @@ ONE_OFF_LOCS = {
 }
 
 BONUS_LOCS = {
-    {0,16}
     {16,16}
     {0,0}
     {16,0}
+    {0,16}
 }
 
 DEFAULT_STAT_BONUSES = {
@@ -90,10 +90,10 @@ compile_bonuses = (base, bonuses) ->
 
     -- Draw item minisprite overlays
     entry.item_draw_func = (options, x, y) =>
-        if #bonus_objs == 1
-            {bx, by} = ONE_OFF_LOCS[1]
-            bonus_objs[1]\item_draw_func({color: with_alpha(options.color, 0.75), scale: {0.75, 0.75}}, x + bx, y + by)
-            return
+        --if #bonus_objs == 1
+        --    {bx, by} = ONE_OFF_LOCS[1]
+        --    bonus_objs[1]\item_draw_func({color: with_alpha(options.color, 0.75), scale: {0.75, 0.75}}, x + bx, y + by)
+        --    return
         options = {color: options.color, scale: {0.5, 0.5}}
         locs = BONUS_LOCS
         for i, bonus in ipairs bonus_objs

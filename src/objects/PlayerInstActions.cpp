@@ -458,20 +458,6 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 
 }
 
-static bool item_do_lua_pickup(lua_State* L, ItemEntry& type, GameInst* user, int amnt) {
-        if (!type.pickup_call.empty() && !type.pickup_call.isnil()) {
-            type.pickup_call.push();
-            luayaml_push_item(L, type.name.c_str());
-            luawrap::push(L, user);
-            lua_pushnumber(L, amnt);
-            lua_call(L, 3, 1);
-            bool ret = lua_toboolean(L, -1);
-            lua_pop(L, 1);
-            return ret;
-        }
-        return false;
-}
-
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
     // Dead players can't pickup items:
     if (is_ghost()) {
@@ -486,14 +472,13 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
     LANARTS_ASSERT(iteminst);
 
     const Item& type = iteminst->item_type();
+    ItemEntry& entry = type.item_entry();
     int amnt = iteminst->item_quantity();
 
     bool inventory_full = false;
-    if (item_do_lua_pickup(gs->luastate(), type.item_entry(), this, amnt)) {
+
+    if (lcall_def(false, entry.pickup_call, game_item_data.get_raw_data()[entry.name], this, amnt)) {
         // Do nothing, as commanded by Lua
-    } else if (type.id == get_item_by_name("Gold")) {
-        gold(gs) += amnt;
-        play("sound/gold.ogg");
     } else {
         itemslot_t slot = inventory().add(type);
         if (slot == -1) {
