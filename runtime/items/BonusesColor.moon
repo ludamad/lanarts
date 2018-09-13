@@ -8,11 +8,11 @@ define_color_bonus = (name) ->
         :name
         shop_cost: {50, 100}
         sprite: tosprite("spr_bonuses.#{name\lower()}")
-        console_draw_func: (obj, get_next) =>
-            draw_color_bound_effect @, obj, get_next, {name},
-                "+1 Strength, +1 Magic, Improved Spells."
-            get_next()
         effect: {
+            console_draw_func: (obj, get_next) =>
+                draw_color_bound_effect @, obj, get_next, {name},
+                    "+1 Strength, +1 Magic, Improved Spells."
+                get_next()
             stat_func: (obj, old, new) =>
                 if of_color obj, name
                     new.strength += @n_derived

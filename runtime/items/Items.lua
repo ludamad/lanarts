@@ -25,7 +25,7 @@ Data.item_create {
         if not GlobalData.keys_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
-        GlobalData.keys_picked_up[self.name] = true 
+        GlobalData.keys_picked_up[self.name] = true
     end,
     prereq_func = function (self, user)
         return false
@@ -46,7 +46,7 @@ Data.item_create {
         if not GlobalData.keys_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
-        GlobalData.keys_picked_up[self.name] = true 
+        GlobalData.keys_picked_up[self.name] = true
     end,
     prereq_func = function (self, user)
         return false
@@ -66,7 +66,7 @@ Data.item_create {
         if not GlobalData.keys_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
-        GlobalData.keys_picked_up[self.name] = true 
+        GlobalData.keys_picked_up[self.name] = true
     end,
     prereq_func = function (self, user)
         return false
@@ -87,7 +87,7 @@ Data.item_create {
         if not GlobalData.keys_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
-        GlobalData.keys_picked_up[self.name] = true 
+        GlobalData.keys_picked_up[self.name] = true
     end,
     prereq_func = function (self, user)
         return false
@@ -132,7 +132,7 @@ Data.item_create {
             end
             return false
         end
-        return user.stats.mp < user.stats.max_mp 
+        return user.stats.mp < user.stats.max_mp
     end,
 
     action_func = function(self, user)
@@ -203,8 +203,8 @@ Data.item_create {
 
     spr_item = "health_potion",
 
-    prereq_func = function (self, user) 
-        return user.stats.hp < user.stats.max_hp 
+    prereq_func = function (self, user)
+        return user.stats.hp < user.stats.max_hp
     end,
 
     action_func = function(self, user)
@@ -317,4 +317,3 @@ Data.item_create {
         EventLog.add_all("The map is revealed!", {255,255,255})
     end
 }
-

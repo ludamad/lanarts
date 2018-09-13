@@ -216,11 +216,7 @@ DataW.weapon_create {
 
     range = 7,
     effects_granted = {
-        {"RedPower", {power=1}},
-        {"BluePower", {power=1}},
-        {"BlackPower", {power=1}},
-        {"GreenPower", {power=1}},
-        {"WhitePower", {power=1}},
+        "RedBonus", "BlueBonus", "BlackBonus", "GreenBonus", "WhiteBonus"
     }
 }
 

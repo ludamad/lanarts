@@ -153,7 +153,7 @@ CoreStats parse_core_stats(const LuaField& value, bool required) {
 	if (!required && value.isnil()) {
 		return core;
 	}
-	core.spell_velocity_multiplier = defaulted(value, "spell_velocity_multiplier", 1.0);
+	core.spell_velocity_multiplier = defaulted(value, "spell_velocity_multiplier", 1.0f);
 
 	core.max_mp = defaulted(value, "mp", 0);
         core.max_hp = defaulted(value, "hp", 0);

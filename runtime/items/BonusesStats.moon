@@ -19,36 +19,44 @@ define_stat_bonus = (name, description, stat_bonuses) ->
 -- TODO NEVER PUT LUXURY IN STORES
 
 define_stat_bonus "Polymath",
-    "Gain Magic & Willpower.",
-    {magic: 1, willpower: 1}
+    "Gain Willpower.",
+    {willpower: 2}
 
-define_stat_bonus "Combat",
-    "Gain Strength & Defence.",
-    {strength: 1, defence: 1}
+define_stat_bonus "Strength",
+    "Gain Strength",
+    {strength: 2}
 
 define_stat_bonus "Heart",
-    "Gain Health and Healing.",
-    {hp: 20, hpregen: 2/60}
+    "Gain Health.",
+    {hp: 30}
 
 define_stat_bonus "Mana",
-    "Gain Mana and Regeneration.",
-    {mp: 20, mpregen: 2/60}
+    "Gain Mana.",
+    {mp: 30}
+
+define_stat_bonus "Regeneration",
+    "Gain Health Regeneration.",
+    {hpregen: 4/60}
+
+define_stat_bonus "Wit",
+    "Gain Mana Regeneration.",
+    {mpregen: 4/60}
 
 define_stat_bonus "Power",
-    "Gain Strength & Magic.",
-    {magic: 1, strength: 1}
+    "Gain Magic.",
+    {magic: 2}
 
 define_stat_bonus "Quickshot",
     "Increase firing rate.",
-    {ranged_cooldown_multiplier: 1/(1.05)}
+    {ranged_cooldown_multiplier: 1/(1.08)}
 
 define_stat_bonus "Quickcast",
     "Increase casting rate.",
-    {spell_cooldown_multiplier: 1/(1.05)}
+    {spell_cooldown_multiplier: 1/(1.08)}
 
 define_stat_bonus "Flurry",
     "Increase melee rate.",
-    {melee_cooldown_multiplier: 1/(1.05)}
+    {melee_cooldown_multiplier: 1/(1.08)}
 
 define_stat_bonus "Speedbolt",
     "Increase spell velocity.",
@@ -56,8 +64,12 @@ define_stat_bonus "Speedbolt",
 
 define_stat_bonus "Savage",
     "Gain Strength, but lose Defence.",
-    {strength: 3, defence: -2}
+    {strength: 4, defence: -2}
 
 define_stat_bonus "Focus",
     "Gain Magic, but lose Willpower.",
-    {magic: 3, willpower: -2}
+    {magic: 4, willpower: -2}
+
+define_stat_bonus "Shield",
+    "Gain Defence.",
+    {defence: 2}

@@ -39,5 +39,3 @@ define_bonus {
     item_draw_func: (options, x, y) =>
         @sprite\draw options, {x, y}
 }
-
-
