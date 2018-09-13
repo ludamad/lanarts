@@ -15,9 +15,9 @@ Data.equipment_create {
 --     name = "Amulet of Protection",
 --     description = "Grants the user increased defences against magical attacks.",
 --     type = "amulet",
--- 
+--
 --     shop_cost = { 180, 240 },
--- 
+--
 --     stat_bonuses = { willpower = 4 },
 --     spr_item = "spr_amulets.protect",
 -- }
@@ -211,15 +211,18 @@ Data.item_create {
     -- TODO implement
     -- TODO use
     spr_item = "spr_runes.rune_snake",
+    prereq_func = function (self, user)
+        return false
+    end,
     sellable = false,
+    stackable = false,
     pickup_func = function(self, user)
         local GlobalData = require "core.GlobalData"
         if not GlobalData.lanarts_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
-        GlobalData.lanarts_picked_up[self.name] = true 
+        GlobalData.lanarts_picked_up[self.name] = true
     end
-
 }
 
 Data.item_create {
@@ -231,14 +234,18 @@ Data.item_create {
     -- TODO implement
     -- TODO use
     spr_item = "spr_runes.rune_tomb",
+    prereq_func = function (self, user)
+        return false
+    end,
     sellable = false,
+    stackable = false,
     effects_granted = {{"GreenPower", {power = 5}}},
     pickup_func = function(self, user)
         local GlobalData = require "core.GlobalData"
         if not GlobalData.lanarts_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
-        GlobalData.lanarts_picked_up[self.name] = true 
+        GlobalData.lanarts_picked_up[self.name] = true
     end
 }
 
@@ -252,14 +259,18 @@ Data.item_create {
     -- TODO implement
     -- TODO use
     spr_item = "spr_runes.rune_abyss",
+    prereq_func = function (self, user)
+        return false
+    end,
     sellable = false,
+    stackable = false,
     stat_bonuses = {strength = 2},
     pickup_func = function(self, user)
         local GlobalData = require "core.GlobalData"
         if not GlobalData.lanarts_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
-        GlobalData.lanarts_picked_up[self.name] = true 
+        GlobalData.lanarts_picked_up[self.name] = true
     end
 }
 
@@ -272,16 +283,19 @@ Data.item_create {
     -- TODO implement
     -- TODO use
     spr_item = "spr_runes.rune_swamp",
+    prereq_func = function (self, user)
+        return false
+    end,
     sellable = false,
+    stackable = false,
     effects_granted = {{"GreenPower", {power = 5}}},
     pickup_func = function(self, user)
         local GlobalData = require "core.GlobalData"
         if not GlobalData.lanarts_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
-        GlobalData.lanarts_picked_up[self.name] = true 
+        GlobalData.lanarts_picked_up[self.name] = true
     end
-
 }
 
 Data.item_create {
@@ -293,14 +307,18 @@ Data.item_create {
     -- TODO implement
     -- TODO use
     spr_item = "spr_runes.rune_demonic_4",
+    prereq_func = function (self, user)
+        return false
+    end,
     sellable = false,
+    stackable = false,
     effects_granted = {{"RedResist", {resist = 5}}},
     pickup_func = function(self, user)
         local GlobalData = require "core.GlobalData"
         if not GlobalData.lanarts_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
-        GlobalData.lanarts_picked_up[self.name] = true 
+        GlobalData.lanarts_picked_up[self.name] = true
     end
 }
 
@@ -313,7 +331,11 @@ Data.item_create {
     -- TODO implement
     -- TODO use
     spr_item = "spr_runes.rune_tartarus",
+    prereq_func = function (self, user)
+        return false
+    end,
     sellable = false,
+    stackable = false,
     melee_cooldown_multiplier = 1/1.08,
     stat_bonuses = {willpower=1},
     pickup_func = function(self, user)
@@ -321,7 +343,7 @@ Data.item_create {
         if not GlobalData.lanarts_picked_up[self.name] then
             play_sound "sound/win sound 2-1.ogg"
         end
-        GlobalData.lanarts_picked_up[self.name] = true 
+        GlobalData.lanarts_picked_up[self.name] = true
     end
 }
 
@@ -334,8 +356,11 @@ Data.item_create {
     -- TODO implement
     -- TODO use
     spr_item = "spr_runes.rune_cerebov",
+    prereq_func = function (self, user)
+        return false
+    end,
     sellable = false,
+    stackable = false,
     spell_cooldown_multiplier = 1/1.05,
     spell_velocity_multiplier = 1.5,
 }
-
