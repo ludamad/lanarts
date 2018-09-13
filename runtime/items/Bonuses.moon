@@ -19,6 +19,7 @@ define_bonus = (bonus) ->
             key: "amount" -- Additive effect, accessed with @value().
         }
         bonus.effects_granted = {{"#{bonus.name}Bonus", {amount: bonus.effect_amount or 1}}}
+    return bonus
 
 ONE_OFF_LOCS = {
     {8,8}

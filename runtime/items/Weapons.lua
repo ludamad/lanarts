@@ -1,4 +1,5 @@
 local DataW = require "DataWrapped"
+require "items.BonusesAll"
 
 -- Projectiles:
 -- This entry is used as the basic 'nothing' equipment slot.
