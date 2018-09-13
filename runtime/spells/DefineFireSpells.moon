@@ -195,7 +195,8 @@ DataW.spell_create {
         GameObject.add_to_level RingOfFire.create({:caster, :duration})
         caster\add_effect "Ring of Flames Stat Boost", duration
     console_draw_func: (get_next) =>
-        damage = math.floor(RingOfFire._damage * 60 / 5)
+        STAT_BOOST = 2  -- TODO playing with this constant
+        damage = math.floor(RingOfFire._damage * 60 / 5 * STAT_BOOST)
         power = @effective_stats().magic + TypeEffectUtils.get_power(@, "Red")
         draw_console_effect get_next(), tosprite("spr_spells.spell_icon_ring_of_flames"), {
             {COL_PALE_GREEN, damage}
@@ -206,7 +207,7 @@ DataW.spell_create {
             {COL_PALE_YELLOW, "Power: "}
             {COL_PALE_GREEN, power}
         }
-    mp_cost: 40
+    mp_cost: 20
     spell_cooldown: 800
     cooldown: 100
 }
