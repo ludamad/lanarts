@@ -205,8 +205,8 @@ Data.equipment_create {
 Data.item_create {
     name = "Snake Lanart",
     description = "Helps open Pixullochia. When equipped, summons a snake on every kill.",
-    type = "lanart",
-    entry_type = "Key",
+    type = "key",
+    entry_type = "Lanart",
 
     -- TODO implement
     -- TODO use
@@ -225,8 +225,8 @@ Data.item_create {
 Data.item_create {
     name = "Tomb Lanart",
     description = "Helps open Pixullochia. When equipped, grants +3 Black Power.",
-    type = "lanart",
-    entry_type = "Key",
+    type = "key",
+    entry_type = "Lanart",
 
     -- TODO implement
     -- TODO use
@@ -246,8 +246,8 @@ Data.item_create {
 Data.item_create {
     name = "War Lanart",
     description = "Helps open Pixullochia. When equipped, grants +2 strength.",
-    type = "lanart",
-    entry_type = "Key",
+    type = "key",
+    entry_type = "Lanart",
 
     -- TODO implement
     -- TODO use
@@ -266,8 +266,8 @@ Data.item_create {
 Data.item_create {
     name = "Swarm Lanart",
     description = "Helps open Pixullochia. When equipped, grants +5 Green Power.",
-    type = "lanart",
-    entry_type = "Key",
+    type = "key",
+    entry_type = "Lanart",
 
     -- TODO implement
     -- TODO use
@@ -287,8 +287,8 @@ Data.item_create {
 Data.item_create {
     name = "Dragon Lanart",
     description = "Helps open Pixullochia. When equipped, grants +5 Red Resistance.",
-    type = "lanart",
-    entry_type = "Key",
+    type = "key",
+    entry_type = "Lanart",
 
     -- TODO implement
     -- TODO use
@@ -307,8 +307,8 @@ Data.item_create {
 Data.item_create {
     name = "Rage Lanart",
     description = "Helps open Pixullochia. When equipped, grants +1 willpower, and +8% melee rate.",
-    type = "lanart",
-    entry_type = "Key",
+    type = "key",
+    entry_type = "Lanart",
 
     -- TODO implement
     -- TODO use
@@ -328,8 +328,8 @@ Data.item_create {
 Data.item_create {
     name = "Obliteration Lanart",
     description = "Helps open Pixullochia. When equipped, grants +50 spell velocity, and +5% casting rate.",
-    type = "lanart",
-    entry_type = "Key",
+    type = "key",
+    entry_type = "Lanart",
 
     -- TODO implement
     -- TODO use
