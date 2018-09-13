@@ -401,7 +401,7 @@ DataW.spell_create {
                     :damage
                     duration: 80
                 }
-            elseif chance(0.05 + 0.01 * r_pow)
+            elseif chance(0.1 + 0.02 * r_pow)
                 SpellUtils.message(@caster, "Fire springs forth from the fire bolt!", COL_PALE_BLUE)
                 GameObject.add_to_level SpawnedFire.create {
                     fire_radius: 0
