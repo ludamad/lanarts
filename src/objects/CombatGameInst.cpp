@@ -414,7 +414,7 @@ EffectiveAttackStats lua_attack_stats_callback(lua_State* L, LuaValue& callback,
 
 bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
         const Item& weapon, bool ignore_cooldowns, float damage_multiplier) {
-    event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d", std::max(0, id), inst->id,     weapon.id);
+    event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d", std::max(0, id), std::max(inst->id, 0),     weapon.id);
 
     bool isdead = false;
     if (!ignore_cooldowns && !cooldowns().can_doaction())
