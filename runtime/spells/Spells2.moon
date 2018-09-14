@@ -23,7 +23,7 @@ DataW.spell_create {
     description: "A low cost neutral bolt of energy. Hits a single target. The bolt can bounce off walls safely."
     projectile: {
         speed: 6
-        damage_multiplier: 0.5
+        damage_multiplier: 0.7
         can_wall_bounce: false
     }
     mp_cost: 0,

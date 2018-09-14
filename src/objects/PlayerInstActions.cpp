@@ -708,8 +708,7 @@ void PlayerInst::_use_item(GameState *gs, const GameAction &action) {
         }
     } else if (equipment().valid_to_use(item)
                && item_check_lua_prereq(L, type, this)) {
-        item_do_lua_action(L, type, this,
-                           Pos(action.action_x, action.action_y), item.amount);
+        lcall(type.inventory_use_func(), game_item_data.get_raw_data()[type.name], this, action.action_x, action.action_y, item.amount);
         gs->for_screens([&]() {
             if (is_focus_player(gs) && !type.inventory_use_message().empty()) {
                 gs->game_chat().add_message(type.inventory_use_message(),
