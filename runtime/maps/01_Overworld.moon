@@ -223,8 +223,8 @@ overdungeon_items_and_enemies = (map_region) ->
             item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, sqr)
 
-            OldMaps.generate_from_enemy_entries(map, OldMaps.hard_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
-            OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        OldMaps.generate_from_enemy_entries(map, OldMaps.hard_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
 
 overworld_items_and_enemies = (map_region) ->
     {:map, :regions} = map_region
@@ -240,9 +240,9 @@ overworld_items_and_enemies = (map_region) ->
             item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, sqr)
 
-            OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 8, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
-            OldMaps.generate_from_enemy_entries(map, OldMaps.medium_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
-            OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 8, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        OldMaps.generate_from_enemy_entries(map, OldMaps.medium_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
 
 place_feature = (map, template, regions=map.regions) ->
    event_log("(RNG #%d) placing feature", map.rng\amount_generated())
@@ -693,6 +693,11 @@ place_medium1b = (map_region) ->
 overdungeon_features = (map_region) ->
     {:map, :regions} = map_region
 
+    OldMapSeq4 = MapSequence.create {preallocate: 1}
+
+    append map.post_game_map, (game_map) ->
+        OldMapSeq4\slot_resolve(1, game_map)
+
     -----------------------------
     -- Purple Dragon lair            --
     place_purple_dragon_lair = () ->
@@ -825,11 +830,9 @@ overdungeon_features = (map_region) ->
 overworld_features = (map_region) ->
     {:map, :regions} = map_region
     OldMapSeq3 = MapSequence.create {preallocate: 1}
-    OldMapSeq4 = MapSequence.create {preallocate: 1}
 
     append map.post_game_map, (game_map) ->
         OldMapSeq3\slot_resolve(1, game_map)
-        OldMapSeq4\slot_resolve(1, game_map)
 
     -------------------------
     -- Place ridges: --
@@ -1035,8 +1038,8 @@ grassy_overworld = () ->
         if not NewMaps.map_try_create(map, rng, template)
             return nil
         full_map_region = {:map, regions: map.regions}
-        overworld_region = {:map, regions: table.filter(map.regions, (r) -> r.conf.is_overworld)
-        overdungeon_region = {:map, regions: table.filter(map.regions, (r) -> not r.conf.is_overworld)
+        overworld_region = {:map, regions: table.filter(map.regions, (r) -> r.conf.is_overworld)}
+        overdungeon_region = {:map, regions: table.filter(map.regions, (r) -> not r.conf.is_overworld)}
         if not overworld_features(overworld_region)
             return nil
         if not overdungeon_features(overdungeon_region)

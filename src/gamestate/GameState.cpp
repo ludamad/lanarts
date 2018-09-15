@@ -566,45 +566,42 @@ void GameState::draw(bool drawhud) {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     screens.for_each_screen( [&]() {
-        adjust_view_to_dragging();
-        if (!get_level()){
-            set_level(world.get_level(0));
-        }
+        do_with_map(local_player()->get_map(this), [&]() {
+            adjust_view_to_dragging();
+            if (!get_level()) {
+                set_level(world.get_level(0));
+            }
 
-        //if (drawhud) {
-        ldraw::display_set_window_region(screens.window_region());
-        //} else {
-        //    ldraw::display_set_window_region(
-        //            BBoxF(0, 0, view().width + game_hud().width(), view().height));
-        //}
+            ldraw::display_set_window_region(screens.window_region());
 
-        get_level()->tiles().pre_draw(this);
+            get_level()->tiles().pre_draw(this);
 
-        std::vector<GameInst *> safe_copy = get_level()->game_inst_set().to_vector();
-        LuaDrawableQueue::Iterator lua_drawables = get_level()->drawable_queue();
+            std::vector<GameInst *> safe_copy = get_level()->game_inst_set().to_vector();
+            LuaDrawableQueue::Iterator lua_drawables = get_level()->drawable_queue();
 
-        for (size_t i = 0; i < safe_copy.size(); i++) {
-            lua_drawables_draw_below_depth(lua_drawables, safe_copy[i]->depth);
-            safe_copy[i]->draw(this);
-        }
-        lua_drawables_draw_rest(lua_drawables);
+            for (size_t i = 0; i < safe_copy.size(); i++) {
+                lua_drawables_draw_below_depth(lua_drawables, safe_copy[i]->depth);
+                safe_copy[i]->draw(this);
+            }
+            lua_drawables_draw_rest(lua_drawables);
 
-        lua_api::luacall_post_draw(L);
+            lua_api::luacall_post_draw(L);
 
-        monster_controller().post_draw(this);
-        get_level()->tiles().post_draw(this);
-        for (size_t i = 0; i < safe_copy.size(); i++) {
-            safe_copy[i]->post_draw(this);
-        }
-        // Set drawing region to full screen:
-        ldraw::display_set_window_region({0,0,game_settings().view_width, game_settings().view_height});
-        if (drawhud) {
-            game_hud().draw(this);
-        }
-        if (screens.amount() > 1) {
-            ldraw::draw_rectangle_outline(COL_WHITE, screens.window_region());
-        }
+            monster_controller().post_draw(this);
+            get_level()->tiles().post_draw(this);
+            for (size_t i = 0; i < safe_copy.size(); i++) {
+                safe_copy[i]->post_draw(this);
+            }
+            // Set drawing region to full screen:
+            ldraw::display_set_window_region({0, 0, game_settings().view_width, game_settings().view_height});
+            if (drawhud) {
+                game_hud().draw(this);
+            }
+            if (screens.amount() > 1) {
+                ldraw::draw_rectangle_outline(COL_WHITE, screens.window_region());
+            }
 ////        ldraw::display_set_window_region(screens.window_region());
+        });
     });
     lua_api::luacall_overlay_draw(L); // Used for debug purposes
 
