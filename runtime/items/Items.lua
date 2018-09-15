@@ -199,7 +199,7 @@ Data.item_create {
     description = "A mantra of unnatural modification, it bestows the user with a permanent, albeit small, increase to defence.",
     use_message = "Defence is bestowed upon you!",
 
-    shop_cost = {55,105},
+    shop_cost = {550,1050},
 
     spr_item = "scroll_defence",
 
@@ -308,7 +308,7 @@ Data.item_create {
     use_message = "Magic is bestowed upon you!",
     description = "A mantra of unnatural modification, it bestows the user with a permanent, albeit small, increase to magic.",
 
-    shop_cost = {55,105},
+    shop_cost = {550,1050},
 
     spr_item = "scroll_magic",
 
