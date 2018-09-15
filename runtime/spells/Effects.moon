@@ -974,9 +974,10 @@ DataW.effect_create {
         @steps += 1
         -- Move forward:
         -- TODO bouncing too much
-        -- @dir_vector = GameObject.simulate_bounce(caster, @dir_vector)
-        -- TODO provide alternate if player is not a PlayerInst
-        @dir_vector = caster\configure_dir(@dir_vector)
+        if caster.configure_dir
+            @dir_vector = caster\configure_dir(@dir_vector)
+        else
+            @dir_vector = GameObject.simulate_bounce(caster, @dir_vector)
         xy = {caster.x + @dir_vector[1], caster.y + @dir_vector[2]}
         if Map.object_tile_check(caster, xy)
             if Map.object_visible(caster)
