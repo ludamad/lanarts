@@ -382,24 +382,24 @@ M.hive_create = (MapSeq) ->
             return if floor == dungeon.N_FLOORS then 0 else 3
     }
 
-M.place_hive = (map, MapSeq) ->
-    door_placer = (map, xy) ->
-        -- nil is passed for the default open sprite
-        MapUtils.spawn_door(map, xy, nil, Vaults._magentite_door, "Magentite Key")
-    next_dungeon = {1}
-    place_dungeon = (map, xy) ->
-        portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
-        c = (MapSeq\forward_portal_add 1, portal, next_dungeon[1], () -> M.hive_create(MapSeq))
-        if World.player_amount > 1
-            append(map.post_maps, c)
-        next_dungeon[1] += 1
-    enemy_placer = (map, xy) ->
-        enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
-        MapUtils.spawn_enemy(map, enemy, xy)
-    vault = SourceMap.area_template_create(Vaults.hive_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.hive, :door_placer, :enemy_placer})
-    if not place_feature(map, vault)
-        return nil
-    return true
+--M.place_hive = (map, MapSeq) ->
+--    door_placer = (map, xy) ->
+--        -- nil is passed for the default open sprite
+--        MapUtils.spawn_door(map, xy, nil, Vaults._magentite_door, "Magentite Key")
+--    next_dungeon = {1}
+--    place_dungeon = (map, xy) ->
+--        portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
+--        c = (MapSeq\forward_portal_add 1, portal, next_dungeon[1], () -> M.hive_create(MapSeq))
+--        if World.player_amount > 1
+--            append(map.post_maps, c)
+--        next_dungeon[1] += 1
+--    enemy_placer = (map, xy) ->
+--        enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
+--        MapUtils.spawn_enemy(map, enemy, xy)
+--    vault = SourceMap.area_template_create(Vaults.hive_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.hive, :door_placer, :enemy_placer})
+--    if not place_feature(map, vault)
+--        return nil
+--    return true
 
 M.crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
     tileset = Tilesets.crypt
@@ -867,7 +867,7 @@ overworld_features = (map_region) ->
                 item_placer = (map, xy) -> MapUtils.spawn_item(map, "Dandelite Key", 1, xy)
                 tileset = Tilesets.snake
                 vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
-                if not place_feature(map, vault, (r) -> true)
+                if not place_feature(map, vault)
                     return nil
                 -----------------------------
             return true
@@ -908,7 +908,7 @@ overworld_features = (map_region) ->
                 MapUtils.spawn_item(map, "Gold", random(2,10), xy)
             tileset = Tilesets.snake
             vault = SourceMap.area_template_create(Vaults.small_random_vault {rng: map.rng, item_placer, :enemy_placer, :gold_placer, :store_placer, :tileset, :door_placer, :tileset})
-            if not place_feature(map, vault, (r) -> true)
+            if not place_feature(map, vault)
                 return false -- Dont reject
     if place_small_vaults()
         print "RETRY: place_small_vaults()"
@@ -932,7 +932,7 @@ overworld_features = (map_region) ->
                 -- nil is passed for the default open sprite
                 MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, 'Azurite Key')
             vault = SourceMap.area_template_create(template {:enemy_placer, :item_placer, :gold_placer, :door_placer})
-            if not place_feature(map, vault, (r) -> true)
+            if not place_feature(map, vault)
                 return true
     -- if place_big_vaults() then return nil
     ---------------------------------
@@ -993,7 +993,7 @@ overworld_features = (map_region) ->
                 -- nil is passed for the default open sprite
                 MapUtils.spawn_door(map, xy)
             vault = SourceMap.area_template_create(template {:enemy_placer, :store_placer, :item_placer, :gold_placer, :door_placer})
-            if not place_feature(map, vault, (r) -> r.conf.is_overworld)
+            if not place_feature(map, vault, regions)
                 -- Dont reject
                 continue
                 -- return true
