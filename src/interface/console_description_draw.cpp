@@ -255,8 +255,6 @@ static void draw_stat_bonuses_overlay(GameState* gs, DescriptionBoxHelper& dbh,
     }
     draw_percentage_modifier(gs, dbh, core.spell_velocity_multiplier,
                              "Spell Velocity: ");
-
-    draw_bonus(gs, dbh, "MP+: ", core.hpregen);
 }
 
 static void draw_cooldown_modifiers_overlay(GameState* gs,
