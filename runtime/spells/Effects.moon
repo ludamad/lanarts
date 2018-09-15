@@ -66,9 +66,12 @@ DataW.effect_create {
                 play_sound "sound/exhausted.ogg"
                 EventLog.add("You are now exhausted...", {255,200,200})
     step_func: (obj) =>
+        if @extensions >= 10
+            EventLog.add("Your rage only grows a tickle...", {200,200,255})
+            return
         diff = math.max(obj.kills - @kill_tracker, 0)
         for i=1,diff
-            @time_left = math.min(@max_time, @time_left + 30)
+            @time_left = math.min(@max_time, @time_left + 45)
             for _ in screens()
                 if obj\is_local_player()
                     EventLog.add("Your rage grows ...", {200,200,255})
