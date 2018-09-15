@@ -269,7 +269,7 @@ M.basic_items = {
     boots(1, ignore_strong: true)
     --bows(5, ignore_strong: true)
     gloves(5, ignore_strong: true)
-    weapons(12) --, ignore_strong: true)
+    weapons(12, {}) --, ignore_strong: true)
     -- M.enchanted_items -- Chance of being moved up a category. See enchanted_items for the weight.
 }
 
