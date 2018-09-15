@@ -53,8 +53,8 @@ consumables = (chance, args) -> _filter {
     :chance
     {
         chance: 95
-        { item: "Arrow",              chance: 5,  amount: {5,10}  }
-        { item: "Silver Arrow",       chance: 4,  amount: {2,6}   }
+        --{ item: "Arrow",              chance: 5,  amount: {5,10}  }
+        --{ item: "Silver Arrow",       chance: 4,  amount: {2,6}   }
         -- Scrolls
         { item: "Haste Scroll",       chance: 2                      }
         -- Potions
@@ -236,7 +236,7 @@ M.store_items = {
     legwear(1, ignore_weak: true)
     boots(1, ignore_weak: true)
     amulets(2, ignore_weak: true)
-    bows(5, ignore_weak: true)
+    --bows(5, ignore_weak: true)
     gloves(5, ignore_weak: true)
     weapons(8, {ignore_weak: true, ignore_medium: true})
 }
@@ -252,7 +252,7 @@ M.enchanted_items = {
     amulets(2, ignore_weak: true)
     legwear(2, ignore_weak: true)
     boots(1, ignore_weak: true)
-    bows(5, ignore_weak: true)
+    --bows(5, ignore_weak: true)
     gloves(3, ignore_weak: true)
     weapons(12, ignore_weak: true, ignore_medium: true)
 }
@@ -262,14 +262,14 @@ M.basic_items = {
     consumables(40, ignore_strong: true)
     rings(2, ignore_strong: true)
     helmets(3, ignore_strong: true)
-    armour(12, ignore_strong: true)
+    armour(4, ignore_strong: true)
     amulets(2, ignore_weak: true)
     belts(1, ignore_strong: true)
     legwear(1, ignore_strong: true)
     boots(1, ignore_strong: true)
-    bows(5, ignore_strong: true)
+    --bows(5, ignore_strong: true)
     gloves(5, ignore_strong: true)
-    weapons(12, ignore_strong: true)
+    weapons(12) --, ignore_strong: true)
     -- M.enchanted_items -- Chance of being moved up a category. See enchanted_items for the weight.
 }
 
