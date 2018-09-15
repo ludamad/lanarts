@@ -566,18 +566,16 @@ void GameState::draw(bool drawhud) {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     screens.for_each_screen( [&]() {
-        do_with_map(local_player()->get_map(this), [&]() {
+        GameMapState* map = local_player()->get_map(this);
+        do_with_map(map, [&]() {
             adjust_view_to_dragging();
-            if (!get_level()) {
-                set_level(world.get_level(0));
-            }
 
             ldraw::display_set_window_region(screens.window_region());
 
-            get_level()->tiles().pre_draw(this);
+            map->tiles().pre_draw(this);
 
-            std::vector<GameInst *> safe_copy = get_level()->game_inst_set().to_vector();
-            LuaDrawableQueue::Iterator lua_drawables = get_level()->drawable_queue();
+            std::vector<GameInst *> safe_copy = map->game_inst_set().to_vector();
+            LuaDrawableQueue::Iterator lua_drawables = map->drawable_queue();
 
             for (size_t i = 0; i < safe_copy.size(); i++) {
                 lua_drawables_draw_below_depth(lua_drawables, safe_copy[i]->depth);
@@ -588,7 +586,7 @@ void GameState::draw(bool drawhud) {
             lua_api::luacall_post_draw(L);
 
             monster_controller().post_draw(this);
-            get_level()->tiles().post_draw(this);
+            map->tiles().post_draw(this);
             for (size_t i = 0; i < safe_copy.size(); i++) {
                 safe_copy[i]->post_draw(this);
             }

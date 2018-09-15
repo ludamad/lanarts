@@ -75,6 +75,7 @@ DataW.spell_create {
     prereq_func: (obj) ->
         return true
     action_func: (obj) ->
+        play_sound "sound/lifelink.ogg"
         n_summoned = 0
         bpower = TypeEffectUtils.get_power(obj, "Black")
         ObjectUtils.nearby_square_iterate obj, (xy) ->

@@ -68,11 +68,11 @@ DataW.effect_create {
     step_func: (obj) =>
         diff = math.max(obj.kills - @kill_tracker, 0)
         for i=1,diff
-            @time_left = math.min(@max_time * 1.5, @time_left + 60)
+            @time_left = math.min(@max_time, @time_left + 30)
             for _ in screens()
                 if obj\is_local_player()
                     EventLog.add("Your rage grows ...", {200,200,255})
-                    play_sound "sound/berserk.ogg"
+                    play_sound "sound/swish-11.wav"
                 if settings.verbose_output
                     EventLog.add("Killed Enemy, berserk time_left = " .. @time_left)
             if obj\has_effect("AmuletBerserker") and chance(0.05) then
@@ -964,7 +964,7 @@ DataW.effect_create {
     fade_out: 10
     init_func: (caster) =>
         if Map.object_visible(caster)
-            play_sound "sound/equip.ogg"
+            play_sound "sound/swish-12.wav"
         @steps = 0
         @n_hits = 0
         @attacked = {} -- No one attacked at first

@@ -231,7 +231,7 @@ Data.item_create {
     description = "A mantra of unnatural modification, it bestows the user with a permanent, albeit small, increase to strength.",
     use_message = "Strength is bestowed upon you!",
 
-    shop_cost = {55,105},
+    shop_cost = {550,1050},
 
     spr_item = "scroll_strength",
 
@@ -245,7 +245,7 @@ Data.item_create  {
     description = "A scroll that captures the power of the winds, it bestows the user with power and speed for a limited duration.",
     use_message = "You feel yourself moving faster and faster!",
 
-    shop_cost = {25,45},
+    shop_cost = {550,1050},
 
     spr_item = "scroll_haste",
 
@@ -260,7 +260,7 @@ Data.item_create  {
     description = "A mantra of unnatural modification, it bestows the user with a permanent, albeit small, increase to will.",
     use_message = "Will is bestowed upon you!",
 
-    shop_cost = {55,105},
+    shop_cost = {550,1050},
 
     spr_item = "scroll_will",
 
