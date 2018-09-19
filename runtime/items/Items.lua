@@ -245,7 +245,7 @@ Data.item_create  {
     description = "A scroll that captures the power of the winds, it bestows the user with power and speed for a limited duration.",
     use_message = "You feel yourself moving faster and faster!",
 
-    shop_cost = {550,1050},
+    shop_cost = {25,35},
 
     spr_item = "scroll_haste",
 

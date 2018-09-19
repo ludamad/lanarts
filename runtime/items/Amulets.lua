@@ -137,7 +137,7 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of the Berserker",
-    description = "Berserked user regenerates 4HP a second, and has 5% chance of summoning a centaur on kill.",
+    description = "Berserked user regenerates +8HP/second a second, and has 5% chance of summoning a centaur on kill.",
     type = "amulet",
 
     shop_cost = { 120, 140 },

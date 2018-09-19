@@ -58,7 +58,7 @@ Data.spell_create(Regeneration)
 local Berserk = {
     name = "Berserk",
     spr_spell = "berserk",
-    description = "Initiate frenzy, gaining +2 defence, +5 willpower, +{Level} strength, +60% melee speed, +25% move speed. Killing enemies grants you longer frenzy, and heals a bit every kill. Afterwards, become exhausted with -3 defence, -3 willpower, -25% action speed, -50% move speed.",
+    description = "Initiate frenzy, gaining +3 defence & willpower, +{Level} strength, +60% melee speed, +25% move speed, and regenerating +8HP/ second. Killing enemies grants you longer frenzy. Afterwards, become exhausted and weak for a short time.",
     mp_cost = 40,
     cooldown = 30,
     spell_cooldown = 400,

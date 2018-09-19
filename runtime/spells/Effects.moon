@@ -50,8 +50,9 @@ DataW.effect_create {
         new.defence = math.max(0, new.defence + 3)
         new.willpower = math.max(0, new.willpower + 3)
         new.melee_cooldown_multiplier /= 1.6
+        new.hpregen += 8 / 60 -- 8 per second 
         if obj\has_effect("AmuletBerserker")
-            new.hpregen = new.hpregen + 4 / 60 -- 4 per second
+            new.hpregen = new.hpregen + 8 / 60 -- 8 per second
         if new.speed < 6
             new.speed = math.max(new.speed * 1.25, 6)
         obj\reset_rest_cooldown()
@@ -84,7 +85,8 @@ DataW.effect_create {
                 eff.monster = "Centaur Hunter"
                 eff.duration = 5
             stats = obj\effective_stats()
-            obj\heal_hp(10 + stats.defence * 2)
+            -- TODO moving towards HP regen++ instead of hp heal
+            --obj\heal_hp(10 + stats.defence * 2)
             @extensions += 1
         @kill_tracker = obj.kills
 }
