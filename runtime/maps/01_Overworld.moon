@@ -855,41 +855,41 @@ overworld_features = (map_region) ->
             return nil
     -------------------------
 
-    if not place_easy(map_region)
-        return nil
+    --if not place_easy(map_region)
+    --    return nil
 
     if not map.rng\random_choice({place_medium1a, place_medium1b})(map_region)
         return nil
     -----------------------------
 
     -------------------------------
-    ---- Place medium dungeon 2: --
-    --place_medium2 = () ->
-    --    templates = OldMaps.Dungeon3
-    --    on_generate_dungeon = (map, floor) ->
-    --        if floor == #templates
-    --            -------------------------
-    --            -- Place key vault     --
-    --            item_placer = (map, xy) -> MapUtils.spawn_item(map, "Dandelite Key", 1, xy)
-    --            tileset = Tilesets.snake
-    --            vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
-    --            if not place_feature(map, vault)
-    --                return nil
-    --            -----------------------------
-    --        return true
-    --    gold_placer = (map, xy) ->
-    --        MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-    --    dungeon = {label: "Outpost", tileset: Tilesets.snake, :templates, on_generate: on_generate_dungeon}
-    --    door_placer = (map, xy) ->
-    --        -- nil is passed for the default open sprite
-    --        MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
-    --    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq3, dungeon)
-    --    vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.snake, :door_placer, :gold_placer, player_spawn_area: false})
-    --    if not place_feature(map, vault, regions)
-    --        return true
-    --if place_medium2()
-    --    print "RETRY: place_medium2()"
-    --    return nil
+    -- Place medium dungeon 2: --
+    place_medium2 = () ->
+        templates = OldMaps.Dungeon3
+        on_generate_dungeon = (map, floor) ->
+            if floor == #templates
+                -------------------------
+                -- Place key vault     --
+                item_placer = (map, xy) -> MapUtils.spawn_item(map, "Dandelite Key", 1, xy)
+                tileset = Tilesets.snake
+                vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
+                if not place_feature(map, vault)
+                    return nil
+                -----------------------------
+            return true
+        gold_placer = (map, xy) ->
+            MapUtils.spawn_item(map, "Gold", random(2,10), xy)
+        dungeon = {label: "Outpost", tileset: Tilesets.snake, :templates, on_generate: on_generate_dungeon}
+        door_placer = (map, xy) ->
+            -- nil is passed for the default open sprite
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
+        place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq3, dungeon)
+        vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.snake, :door_placer, :gold_placer, player_spawn_area: false})
+        if not place_feature(map, vault, regions)
+            return true
+    if place_medium2()
+        print "RETRY: place_medium2()"
+        return nil
     -------------------------------
 
     -------------------------
@@ -1015,12 +1015,32 @@ overworld_features = (map_region) ->
 
 local generate_map_node
 
+initial_overworld_conf = (rng) -> {
+    map_label: "Unassumington"
+    is_overworld: true
+    size: rng\random_choice {{65, 45}, {45, 65}}
+    number_regions: rng\random(5, 7)
+    floor1: OVERWORLD_TILESET.floor1
+    floor2: OVERWORLD_TILESET.floor2
+    wall1: OVERWORLD_TILESET.wall1
+    wall2: OVERWORLD_TILESET.wall2
+    rect_room_num_range: {0,0} -- disable
+    rect_room_size_range: {10,15}
+    rvo_iterations: 100
+    connect_line_width: () -> rng\random(2,6)
+    region_delta_func: spread_region_delta_func
+    arc_chance: 0.05
+    room_radius: () -> rng\random(5,10)
+    -- Dungeon objects/features
+    n_statues: 4
+}
+
 grassy_overworld = () ->
     local conf, schema
 
     template_f = (rng) ->
         event_log("(RNG #%d) Attempting overworld generation", rng\amount_generated())
-        conf or= OVERWORLD_CONF(rng)
+        conf or= initial_overworld_conf(rng) -- OVERWORLD_CONF(rng)
         schema or= rng\random(3)
         return {
             :rng

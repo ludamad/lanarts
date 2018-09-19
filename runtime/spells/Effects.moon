@@ -38,7 +38,7 @@ DataW.effect_create {
 
 DataW.effect_create {
     name: "Berserk"
-    exhausted_duration: 275
+    exhausted_duration: 300
     can_use_rest: false
     can_use_spells: false
     can_use_stairs: false
@@ -84,7 +84,7 @@ DataW.effect_create {
                 eff = obj\add_effect("Summoning", 20)
                 eff.monster = "Centaur Hunter"
                 eff.duration = 5
-            stats = obj\effective_stats()
+            --stats = obj\effective_stats()
             -- TODO moving towards HP regen++ instead of hp heal
             --obj\heal_hp(10 + stats.defence * 2)
             @extensions += 1
