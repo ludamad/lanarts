@@ -882,7 +882,7 @@ overworld_features = (map_region) ->
         dungeon = {label: "Outpost", tileset: Tilesets.snake, :templates, on_generate: on_generate_dungeon}
         door_placer = (map, xy) ->
             -- nil is passed for the default open sprite
-            MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
+            MapUtils.spawn_door(map, xy) -- nil, Vaults._door_key1, "Azurite Key")
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq3, dungeon)
         vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.snake, :door_placer, :gold_placer, player_spawn_area: false})
         if not place_feature(map, vault, regions)
