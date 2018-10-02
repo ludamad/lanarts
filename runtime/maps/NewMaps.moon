@@ -311,9 +311,8 @@ new_rng = () ->
     return require("mtwist").create(seed)
 
 try_n_times = (n, f) ->
-    rng = new_rng()
     for i=1,n
-        ret = f(rng)
+        ret = f()
         if ret
             return ret
         print "** MAP GENERATION ATTEMPT " .. i .. " FAILED, RETRYING **"

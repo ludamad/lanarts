@@ -1015,52 +1015,79 @@ overworld_features = (map_region) ->
 
 local generate_map_node
 
-initial_overworld_conf = (rng) -> {
-    map_label: "Unassumington"
-    is_overworld: true
-    size: rng\random_choice {{65, 45}, {45, 65}}
-    number_regions: rng\random(5, 7)
-    floor1: OVERWORLD_TILESET.floor1
-    floor2: OVERWORLD_TILESET.floor2
-    wall1: OVERWORLD_TILESET.wall1
-    wall2: OVERWORLD_TILESET.wall2
-    rect_room_num_range: {0,0} -- disable
-    rect_room_size_range: {10,15}
-    rvo_iterations: 100
-    connect_line_width: () -> rng\random(2,6)
-    region_delta_func: spread_region_delta_func
-    arc_chance: 0.05
-    room_radius: () -> rng\random(5,10)
-    -- Dungeon objects/features
-    n_statues: 4
-}
+--initial_overworld_conf = (rng) -> {
+--    is_overworld: true
+--    size: rng\random_choice {{65, 45}, {45, 65}}
+--    number_regions: rng\random(5, 7)
+--    floor1: OVERWORLD_TILESET.floor1
+--    floor2: OVERWORLD_TILESET.floor2
+--    wall1: OVERWORLD_TILESET.wall1
+--    wall2: OVERWORLD_TILESET.wall2
+--    rect_room_num_range: {0,0} -- disable
+--    rect_room_size_range: {10,15}
+--    rvo_iterations: 100
+--    connect_line_width: () -> rng\random(2,6)
+--    region_delta_func: spread_region_delta_func
+--    arc_chance: 0.05
+--    room_radius: () -> rng\random(5,10)
+--    -- Dungeon objects/features
+--    n_statues: 4
+--}
 
-grassy_overworld = () ->
-    local conf, schema
+    --template_f = (rng) ->
+    --    event_log("(RNG #%d) Attempting overworld generation", rng\amount_generated())
+    --    conf or= initial_overworld_conf(rng) -- OVERWORLD_CONF(rng)
+    --    return {
+    --        :rng
+    --        subtemplates: {conf}
+    --        seethrough: true
+    --        outer_conf: conf
+    --        shell: 50
+    --    }
 
-    template_f = (rng) ->
-        event_log("(RNG #%d) Attempting overworld generation", rng\amount_generated())
-        conf or= initial_overworld_conf(rng) -- OVERWORLD_CONF(rng)
-        schema or= rng\random(3)
-        return {
-            :rng
-            -- subtemplates: {DUNGEON_CONF(rng, Tilesets.pebble, schema), conf}
-            subtemplates: {conf}
-            seethrough: true
-            outer_conf: conf
-            shell: 50
-            default_wall: Tile.create(Tilesets.grass.wall, true, true, {FLAG_OVERWORLD})
-        }
+grassy_overworld = (rng) ->
+    -- CONFIG
+    arc_chance = 0.05
+    size = rng\random_choice {{65, 45}, {45, 65}}
+    number_regions = rng\random(5, 7)
+    connect_line_width = () -> rng\random(2, 6)
+    default_wall = Tile.create(Tilesets.grass.wall, true, true, {FLAG_OVERWORLD})
+    room_radius = () -> rng\random(5,10)
 
-    return generate_map_node (rng) ->
-        template = template_f(rng)
+    return generate_map_node () ->
         map = NewMaps.source_map_create {
             :rng
             size: {OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE}
-            default_content: template.default_wall.id
+            default_content: default_wall.id
             default_flags: {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH}
             map_label: "Plain Valley"
-            arc_chance: conf.arc_chance
+            :arc_chance
+        }
+        template = nilprotect {
+            :default_wall
+            subtemplates: {nilprotect {
+                is_overworld: true
+                :size
+                :number_regions
+                floor1: OVERWORLD_TILESET.floor1
+                floor2: OVERWORLD_TILESET.floor2
+                wall1: OVERWORLD_TILESET.wall1
+                wall2: OVERWORLD_TILESET.wall2
+                rect_room_num_range: {0,0} -- disable
+                rect_room_size_range: {10,15}
+                rvo_iterations: 100
+                :connect_line_width
+                :room_radius
+                region_delta_func: spread_region_delta_func
+                -- Dungeon objects/features
+                n_statues: 4
+            }}
+            outer_conf: nilprotect {
+                floor1: OVERWORLD_TILESET.floor1
+                floor2: OVERWORLD_TILESET.floor2
+                :connect_line_width
+            }
+            shell: 25
         }
         if not NewMaps.map_try_create(map, rng, template)
             return nil
@@ -1076,8 +1103,8 @@ grassy_overworld = () ->
         return map
 
 MAX_GENERATE_ITERS = 1000
-generate_map_node = (create_map) -> NewMaps.try_n_times MAX_GENERATE_ITERS, (rng) ->
-    map = create_map(rng)
+generate_map_node = (create_map) -> NewMaps.try_n_times MAX_GENERATE_ITERS, () ->
+    map = create_map()
     if not map
         return nil
 
@@ -1086,7 +1113,7 @@ generate_map_node = (create_map) -> NewMaps.try_n_times MAX_GENERATE_ITERS, (rng
         print("ABORT: connection check failed")
         return nil
     
-    NewMaps.generate_door_candidates(map, rng, map.regions)
+    NewMaps.generate_door_candidates(map, map.rng, map.regions)
 
     for f in *map.post_maps
         if f() == 'reject' -- TODO consistently use this pattern?
@@ -1100,7 +1127,7 @@ generate_map_node = (create_map) -> NewMaps.try_n_times MAX_GENERATE_ITERS, (rng
     }
 
 overworld_create = () ->
-    {:map} = grassy_overworld()
+    {:map} = grassy_overworld(NewMaps.new_rng())
     player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
     assert player_spawn_points, "Could not pick player spawn squares!"
     
