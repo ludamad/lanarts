@@ -3,7 +3,7 @@ SourceMap = require "core.SourceMap"
 
 shuffle = (rng, tbl) ->
   for i=#tbl,1,-1 do
-      rand = rng\random(1, #tbl)
+      rand = rng\random(1, #tbl + 1)
       tbl[i], tbl[rand] = tbl[rand], tbl[i]
   return tbl
 
@@ -14,7 +14,7 @@ shuffle_cpy = (rng, tbl) -> shuffle(rng, table.clone(tbl))
 -- Returns the region it was placed in, and the bbox.
 find_bbox = (region_set, size, perimeter={}, n_attempts=100) ->
     {:map, :regions} = region_set
-    shuffled_regions = shuffle_cpy(regions)
+    shuffled_regions = shuffle_cpy(map.rng, regions)
     for i=1,n_attempts
         for region in *shuffled_regions
             {w, h} = size
@@ -27,11 +27,12 @@ find_bbox = (region_set, size, perimeter={}, n_attempts=100) ->
             if top_left
                 {top_x, left_y} = top_left
                 bbox = {top_x, left_y, top_x + w, left_y + h}
-                if SourceMap.rectangle_matches {
+                if SourceMap.rectangle_query {
+                    :map
                     area: bbox
-                    fill_selector: region.selector
+                    fill_selector: region.selector or {}
                     perimeter_width: perimeter.width
-                    perimeter_selector: perimeter.selector
+                    perimeter_selector: perimeter.selector or {}
                 }
                     return {:region, :bbox}
     return nil

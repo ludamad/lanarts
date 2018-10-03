@@ -112,7 +112,7 @@ function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Op
 
     local parts = {"{", --[[sentinel for remove below]] ""}
 
-    for k,v in spairs(val) do
+    for k,v in pairs(val) do
         table.insert(parts, packed and "" or "\n")
 
         if type(k) == "number" then
@@ -150,7 +150,7 @@ function pretty_table_safe(v)
         return
     end
     print '{'
-    for k, v in spairs(v) do
+    for k, v in pairs(v) do
         print('    ', k)
     end
     print '}'

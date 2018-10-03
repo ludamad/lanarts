@@ -2,12 +2,12 @@ MapCompiler = require "maps.MapCompiler"
 import Spread, Shape
     from require "maps.MapElements"
 
-import map_place_object, ellipse_points, 
-    LEVEL_PADDING, Region, RVORegionPlacer, 
-    random_rect_in_rect, random_ellipse_in_ellipse, 
+import map_place_object, ellipse_points,
+    LEVEL_PADDING, Region, RVORegionPlacer,
+    random_rect_in_rect, random_ellipse_in_ellipse,
     ring_region_delta_func, default_region_delta_func, spread_region_delta_func,
-    center_region_delta_func, 
-    towards_region_delta_func, 
+    center_region_delta_func,
+    towards_region_delta_func,
     random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
     Tile, tile_operator from require "maps.GenerateUtils"
 
@@ -27,7 +27,7 @@ OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
 
 -- Generation constants and data
-{   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE, 
+{   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE,
     :FLAG_OVERWORLD, :FLAG_ROOM, :FLAG_NO_ENEMY_SPAWN, :FLAG_NO_ITEM_SPAWN
 } = Vaults
 
@@ -50,8 +50,8 @@ make_rooms_with_tunnels = (map, rng, conf, area) ->
                 return true
             return false
     }
- 
-    oper map, SourceMap.ROOT_GROUP, area 
+
+    oper map, SourceMap.ROOT_GROUP, area
     tunnel_oper = make_tunnel_oper(rng, conf.floor1.id, conf.wall1.id, conf.wall1.seethrough)
 
     tunnel_oper map, SourceMap.ROOT_GROUP, area--{1,1, map.size[1]-1,map.size[2]-1}
@@ -74,13 +74,13 @@ connect_edges = (map, rng, conf, area, edges) ->
         line_width = conf.connect_line_width()
         if line_width <= 2 and p1\ortho_dist(p2) > (rng\random(3,6)+rad1+rad2)
             append flags, SourceMap.FLAG_TUNNEL
-        if p2.id%5 <= 3 
+        if p2.id%5 <= 3
             tile = conf.floor2
             append flags, FLAG_ALTERNATE
-        fapply = nil 
-        --if rng\random(4) < 2 
-         --   fapply = p1.line_connect 
-        --else 
+        fapply = nil
+        --if rng\random(4) < 2
+         --   fapply = p1.line_connect
+        --else
         if chance(map.arc_chance)
             fapply = p1.arc_connect
         else
@@ -119,7 +119,7 @@ generate_area = (map, rng, conf, outer, padding, starting_edges = {}) ->
             if op1 == p1 and op2 == p2 or op2 == p1 and op1 == p2
                 return
         append edges, {p1, p2}
-    for {p1, p2} in *starting_edges 
+    for {p1, p2} in *starting_edges
         add_edge_if_unique(p1, p2)
 
     -- Append all < threshold in distance
@@ -153,16 +153,16 @@ generate_subareas = (template, map, rng, regions, starting_edges = {}) ->
         SourceMap.perimeter_apply {:map,
             area: region\bbox()
             candidate_selector: {matches_all: SourceMap.FLAG_SOLID}, inner_selector: {matches_all: FLAG_ALTERNATE, matches_none: SourceMap.FLAG_SOLID}
-            operator: tile_operator region.conf.wall2 
+            operator: tile_operator region.conf.wall2
         }
 
         -- Generate the rectangular rooms, connected with winding tunnels
     for region in *regions
-        make_rooms_with_tunnels map, rng, region.conf, region\bbox() 
+        make_rooms_with_tunnels map, rng, region.conf, region\bbox()
 
 generate_door_candidates = (map, rng, regions) ->
     SourceMap.perimeter_apply {:map
-        candidate_selector: {matches_none: {SourceMap.FLAG_SOLID}}, 
+        candidate_selector: {matches_none: {SourceMap.FLAG_SOLID}},
         inner_selector: {matches_all: {SourceMap.FLAG_PERIMETER, SourceMap.FLAG_SOLID}}
         operator: {add: FLAG_INNER_PERIMETER}
     }
@@ -175,7 +175,7 @@ generate_door_candidates = (map, rng, regions) ->
     -- Make sure doors dont get created in the overworld components:
     --SourceMap.rectangle_apply {:map, fill_operator: {matches_all: FLAG_OVERWORLD, remove: SourceMap.FLAG_TUNNEL}}
     SourceMap.perimeter_apply {:map,
-        candidate_selector: {matches_all: {SourceMap.FLAG_TUNNEL}, matches_none: {FLAG_ROOM, SourceMap.FLAG_SOLID}}, 
+        candidate_selector: {matches_all: {SourceMap.FLAG_TUNNEL}, matches_none: {FLAG_ROOM, SourceMap.FLAG_SOLID}},
         inner_selector: {matches_all: {FLAG_ROOM}, matches_none: {FLAG_DOOR_CANDIDATE, SourceMap.FLAG_SOLID}}
         operator: {add: FLAG_DOOR_CANDIDATE}
     }
@@ -186,13 +186,13 @@ generate_door_candidates = (map, rng, regions) ->
         }
     filter_random_third = (x1,y1,x2,y2) ->
         w,h = (x2 - x1), (y2 - y1)
-        if rng\random(0,2) == 0 
+        if rng\random(0,2) == 0
             filter_door_candidates(x2 + w/3, y1-1, x2+1, y2+1)
-        if rng\random(0,2) == 0 
+        if rng\random(0,2) == 0
             filter_door_candidates(x1-1, y1-1, x1 + w/3, y2+1)
-        if rng\random(0,2) == 0 
+        if rng\random(0,2) == 0
             filter_door_candidates(x1-1, y1+h/3, x2+1, y2+1)
-        if rng\random(0,2) == 0 
+        if rng\random(0,2) == 0
             filter_door_candidates(x1-1, y1-1, x2+1, y2 - h/3)
     for region in *regions
         -- Unbox the region:

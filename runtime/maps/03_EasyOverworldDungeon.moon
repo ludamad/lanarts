@@ -8,7 +8,7 @@ import map_place_object, ellipse_points,
     random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
     Tile, tile_operator from require "maps.GenerateUtils"
 
-import MapRegion from require "maps.MapRegion"
+{:MapRegion, :from_bbox} = require "maps.MapRegion"
 
 DebugUtils = require "maps.DebugUtils"
 NewMaps = require "maps.NewMaps"
@@ -44,21 +44,18 @@ rng = NewMaps.new_rng()
 
 Rooms = {
     carve: () =>
-        region_set = selector_filter(@region_set, {
-            matches_all: SourceMap.FLAG_SOLID
-            matches_none: SourceMap.FLAG_PERIMETER
-        })
         -- Ensure it is a range
         n_rooms = 40
         event_log("(RNG #%d) generating %d rooms", rng\amount_generated(), n_rooms)
         size = {4, 4}
         for i=1,n_rooms
-            bbox = find_bbox(region_set, size)
+            {:bbox} = find_bbox(@region_set, size)
             if not bbox
                 return false
             SourceMap.rectangle_apply {
+                map: @region_set.map
                 area: bbox
-                fill_operator: {add: SourceMap.FLAG_SEETHROUGH, remove: SourceMap.FLAG_SOLID, content: floor_tile}
+                fill_operator: {add: SourceMap.FLAG_SEETHROUGH, remove: SourceMap.FLAG_SOLID, content: Tilesets.pebble.floor}
             }
         event_log("(RNG #%d) after generating %d rooms", rng\amount_generated(), n_rooms)
         return true
@@ -75,6 +72,14 @@ map = NewMaps.source_map_create {
     default_content: Tilesets.pebble.wall
     default_flags: {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH}
     map_label: "Enclave"
+}
+
+room_selector = {
+    matches_all: SourceMap.FLAG_SOLID
+    matches_none: SourceMap.FLAG_PERIMETER
+}
+Rooms.carve {
+    region_set: {:map, regions: {from_bbox(0,0,40,40)\with_selector(room_selector)}}
 }
 
 return map

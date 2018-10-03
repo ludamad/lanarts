@@ -16,17 +16,19 @@ debug_visualize_step = (map, restart=nil, tw=8, th=8) ->
     {w, h} = map.size
     Display.set_world_region({0, 0, w * tw, h * th})
     step = () ->
-        row = {}
-        for y=1,h
-            SourceMap.get_row_content(map, row, 1, w, y)
-            for x=1,w
-                color = COLORS[(row[x] % #COLORS) + 1]
-                if color == COL_BLACK and row[x] ~= 0
-                    color = COL_GOLD
-                Display.draw_rectangle(color, {(x-1)*tw, (y-1)*th, x*tw, y*th})
-        if Keys.key_pressed('N') or Keys.key_pressed('R')
-            return restart
-        return step
+        require("core.GameState").game_loop () ->
+            row = {}
+            for y=1,h
+                SourceMap.get_row_content(map, row, 1, w, y)
+                for x=1,w
+                    color = COLORS[(row[x] % #COLORS) + 1]
+                    if color == COL_BLACK and row[x] ~= 0
+                        color = COL_GOLD
+                    Display.draw_rectangle(color, {(x-1)*tw, (y-1)*th, x*tw, y*th})
+            if Keys.key_pressed('N') or Keys.key_pressed('R')
+                return true
+            return nil
+        return restart
     return step
 
 debug_show_source_map = (map, tw=8, th=8) ->

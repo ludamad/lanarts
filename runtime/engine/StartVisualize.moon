@@ -14,7 +14,7 @@ game_init = (seed) ->
     GameState.clear_players()
     log "Initializing GameState object..."
     EngineInternal.init_gamestate()
-    random_seed(seed)
+    -- random_seed(seed)
 
 run_visualize = (raw_args) ->
     parser = argparse("lanarts", "Visualize lanarts maps.")

@@ -13,11 +13,11 @@ function M.from_tile_xy(xy)
     return {xy[1]*32+16, xy[2]*32+16}
 end
 
-function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] operator, --[[Optional]] max_attempts) 
+function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] operator, --[[Optional]] max_attempts)
     assert(map)
     assert(not area or #area > 0)
-    local sqr = SourceMap.find_random_square { 
-        rng = map.rng, map = map, area = area, 
+    local sqr = SourceMap.find_random_square {
+        rng = map.rng, map = map, area = area,
         selector = selector or { matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT} },
         operator = operator or { add = SourceMap.FLAG_HAS_OBJECT },
         max_attempts = max_attempts
@@ -25,7 +25,7 @@ function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] oper
     if not sqr then
         return nil
     elseif area then
-        event_log("(RNG #%d) Finding random square in x:%d-%d, y:%d-%d => {%d, %d}", 
+        event_log("(RNG #%d) Finding random square in x:%d-%d, y:%d-%d => {%d, %d}",
             map.rng:amount_generated(), area[1], area[3], area[2], area[4], sqr[1], sqr[2])
     else
         event_log("Finding random square in whole level => {%d, %d}", sqr[1], sqr[2])
@@ -34,7 +34,7 @@ function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] oper
 end
 
 function M.spawn_enemy(map, type, tile_xy, --[[Optional]] team)
-    event_log("Spawning enemy %s at {%d, %d}", 
+    event_log("Spawning enemy %s at {%d, %d}",
         type, tile_xy[1], tile_xy[2])
     local object = GameObject.enemy_create {
         do_init = false,
@@ -47,7 +47,7 @@ function M.spawn_enemy(map, type, tile_xy, --[[Optional]] team)
 end
 
 function M.spawn_epic_store(map, items, tile_xy)
-    event_log("Spawning EPIC store with %d items at {%d, %d}", 
+    event_log("Spawning EPIC store with %d items at {%d, %d}",
         #items, tile_xy[1], tile_xy[2])
     local object = GameObject.store_create {
         xy = M.from_tile_xy(tile_xy),
@@ -59,7 +59,7 @@ function M.spawn_epic_store(map, items, tile_xy)
 end
 
 function M.spawn_store(map, items, tile_xy)
-    event_log("Spawning store with %d items at {%d, %d}", 
+    event_log("Spawning store with %d items at {%d, %d}",
         #items, tile_xy[1], tile_xy[2])
     local object = GameObject.store_create {
         xy = M.from_tile_xy(tile_xy),
@@ -74,7 +74,7 @@ end
 function M.spawn_item(map, type, amount, tile_xy)
     -- Default to 1:
     amount = amount or 1
-    event_log("Spawning item %s (amount=%s) at {%d, %d}", 
+    event_log("Spawning item %s (amount=%s) at {%d, %d}",
         type, amount, tile_xy[1], tile_xy[2])
     local object = GameObject.item_create {
         do_init = false,
@@ -86,19 +86,19 @@ function M.spawn_item(map, type, amount, tile_xy)
     return object
 end
 
-function M.random_store(map, items, area) 
+function M.random_store(map, items, area)
     local sqr = M.random_square(map, area)
     if not sqr then return nil end
     return M.spawn_store(map, items, sqr)
 end
 
-function M.random_item(map, type, amount, area) 
+function M.random_item(map, type, amount, area)
     local sqr = M.random_square(map, area)
     if not sqr then return nil end
     return M.spawn_item(map, type, amount, sqr)
 end
 
-function M.random_enemy(map, type, --[[Optional]] area, --[[Optional]] selector) 
+function M.random_enemy(map, type, --[[Optional]] area, --[[Optional]] selector)
     local sqr = M.random_square(map, area, selector)
     if not sqr then return nil end
     return M.spawn_enemy(map, type, sqr)
@@ -125,14 +125,14 @@ function M.spawn_door(map, sqr, --[[Optional]] open_sprite, --[[Optional]] close
 end
 
 function M.spawn_decoration(map, sprite, sqr, frame, solid)
-    if solid == nil then solid = true end 
+    if solid == nil then solid = true end
     local object = DungeonFeatures.Decoration.create {
         do_init = false,
         xy = M.from_tile_xy(sqr),
         type = DungeonFeatures.Decoration,
         sprite = sprite,
         frame = frame
-    } 
+    }
     if solid then
     end
     table.insert(map.instances, object)
@@ -144,7 +144,7 @@ function M.spawn_chest(map, sqr, contents)
         do_init = false,
         xy = M.from_tile_xy(sqr),
         contents = contents
-    } 
+    }
     table.insert(map.instances, object)
     return object
 end
@@ -163,7 +163,7 @@ function M.spawn_portal(map, sqr, sprite, --[[Optional]] callback, --[[Optional]
     return object
 end
 
-function M.random_portal(map, area, sprite, callback, --[[Optional]] frame) 
+function M.random_portal(map, area, sprite, callback, --[[Optional]] frame)
     local Vaults = require "maps.Vaults"
     local sqr = M.random_square(map, area,
             --[[Selector]] {matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT} })
@@ -172,18 +172,18 @@ function M.random_portal(map, area, sprite, callback, --[[Optional]] frame)
 end
 
 function M.map_create(label, size, content, --[[Optional]] flags)
-    return SourceMap.map_create { 
+    return SourceMap.map_create {
         rng = mtwist.create(random(0, 2 ^ 30)),
-    	label = label, 
-    	size = size, 
-        post_maps = {}, 
-    	flags = flags or SourceMap.FLAG_SOLID, 
+    	label = label,
+    	size = size,
+        post_maps = {},
+    	flags = flags or SourceMap.FLAG_SOLID,
     	content = content,
-    	instances = {} 
+    	instances = {}
     }
 end
 
-function M.pick_player_squares(map, positions) 
+function M.pick_player_squares(map, positions)
     local picked = {}
     assert(#positions > 0, "No player positions!")
     for i=1,World.player_amount do
@@ -196,13 +196,13 @@ function M.pick_player_squares(map, positions)
     end
     return picked
 end
-function M.find_player_positions(map, --[[Optional]] flags) 
+function M.find_player_positions(map, --[[Optional]] flags)
     local positions = {}
     local map_area = bbox_create({0,0},map.size)
     for i=1,World.player_amount do
-        local sqr = M.random_square(map, map_area, 
+        local sqr = M.random_square(map, map_area,
             --[[Selector]] { matches_all = flags, matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT} },
-            --[[Operator]] nil, 
+            --[[Operator]] nil,
             --[[Max attempts]] 10000
         )
         if not sqr then error("Could not find player spawn position for player " .. i .. "!") end
@@ -212,7 +212,7 @@ function M.find_player_positions(map, --[[Optional]] flags)
 end
 
 
-function M.game_map_create(map, wandering_enabled) 
+function M.game_map_create(map, wandering_enabled)
     if wandering_enabled == nil then wandering_enabled = false end
     return Map.create { map = map, label = map.label, instances = map.instances, wandering_enabled = wandering_enabled }
 end
@@ -239,7 +239,7 @@ function M.area_template_to_map(label, filename, padding, legend)
     return map
 end
 
-function M.make_tunnel_oper(rng, floor, wall, wall_seethrough) 
+function M.make_tunnel_oper(rng, floor, wall, wall_seethrough)
     local wall_flags = {SourceMap.FLAG_SOLID, SourceMap.FLAG_TUNNEL, SourceMap.FLAG_PERIMETER}
     local remove_flags = {}
     if wall_seethrough then
@@ -248,14 +248,14 @@ function M.make_tunnel_oper(rng, floor, wall, wall_seethrough)
         append(remove_flags, SourceMap.FLAG_SEETHROUGH)
     end
     return SourceMap.tunnel_operator {
-        validity_selector = { 
+        validity_selector = {
             fill_selector = { matches_all = SourceMap.FLAG_SOLID, matches_none = SourceMap.FLAG_TUNNEL },
             perimeter_selector = { matches_all = SourceMap.FLAG_SOLID, matches_none = SourceMap.FLAG_TUNNEL }
         },
 
         completion_selector = {
             fill_selector = { matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_PERIMETER, SourceMap.FLAG_TUNNEL} },
-            perimeter_selector = { matches_none = SourceMap.FLAG_SOLID } 
+            perimeter_selector = { matches_none = SourceMap.FLAG_SOLID }
         },
         fill_operator = { add = {SourceMap.FLAG_SEETHROUGH, SourceMap.FLAG_TUNNEL}, remove = SourceMap.FLAG_SOLID, content = floor},
         perimeter_operator = { matches_all = SourceMap.FLAG_SOLID, add = wall_flags, remove = remove_flags, content = wall},
@@ -268,9 +268,9 @@ function M.make_tunnel_oper(rng, floor, wall, wall_seethrough)
 end
 
 function M.make_rectangle_criteria()
-        return SourceMap.rectangle_criteria { 
-                fill_selector = { matches_all = SourceMap.FLAG_SOLID, matches_none = SourceMap.FLAG_PERIMETER }, 
-                perimeter_width = 1, 
+        return SourceMap.rectangle_criteria {
+                fill_selector = { matches_all = SourceMap.FLAG_SOLID, matches_none = SourceMap.FLAG_PERIMETER },
+                perimeter_width = 1,
                 perimeter_selector = { matches_all = SourceMap.FLAG_SOLID }
         }
 end
@@ -282,7 +282,7 @@ function M.make_rectangle_oper(floor, wall, wall_seethrough, --[[Optional]] area
         append(wall_flags, SourceMap.FLAG_SEETHROUGH)
         remove_wall_flags = {}
     end
-    return SourceMap.rectangle_operator { 
+    return SourceMap.rectangle_operator {
         area_query = area_query,
         perimeter_width = 1,
        fill_operator = { add = {SourceMap.FLAG_CUSTOM5, SourceMap.FLAG_SEETHROUGH}, remove = {SourceMap.FLAG_SOLID}, content = floor},

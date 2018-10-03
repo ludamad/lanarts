@@ -403,7 +403,7 @@ MapCompiler = newtype {
 
     _shuffle: (tbl) =>
       for i=#tbl,1,-1 do
-          rand = @rng\random(1, #tbl)
+          rand = @rng\random(1, #tbl + 1)
           tbl[i], tbl[rand] = tbl[rand], tbl[i]
       return tbl
 

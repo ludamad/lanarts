@@ -7,13 +7,14 @@ SourceMap = require "core.SourceMap"
 
 -- Define a map region in terms of polygons
 -- Should be within (0, 0) to (map.w, map.h)
+local MapRegion, map_region_bbox
 MapRegion = newtype {
-    init: (polygons, tunnels = {}) =>
+    init: (polygons, tunnels={}, selector=false) =>
         @polygons = assert polygons
         @tunnels = tunnels
-        @selector = false -- No selector
+        @selector = selector
     as_set: (map) => {:map, regions: {@}}
-    with_selector: (selector) => MapRegion.create {polygons: @polygons, tunnels: @tunnels, :selector}
+    with_selector: (selector) => MapRegion.create @polygons, @tunnels, selector
     inner_apply: (args) =>
         {:map, :area, :operator} = args
         for polygon in *@polygons
@@ -25,6 +26,7 @@ MapRegion = newtype {
                 points: polygon
             }
         return nil
+    bbox: () => map_region_bbox(@)
     tunnel_apply: (args) =>
         {:map, :area, :operator} = args
         for {:polygon} in *@tunnels
@@ -223,4 +225,8 @@ main = (raw_args) ->
 
     DebugUtils.debug_show_source_map(map, 1, 1)
 
-return {:MapRegion, :main, :combine_map_regions, :map_regions_bbox, :map_region_bbox}
+from_bbox = (x1,y1,x2,y2) ->
+    polygon = {{x1, y2}, {x2, y2}, {x2, y1}, {x1, y1}}
+    return MapRegion.create({polygon})
+
+return {:MapRegion, :main, :combine_map_regions, :map_regions_bbox, :map_region_bbox, :from_bbox}
