@@ -13,6 +13,16 @@
         - Regenerate level
             - Make levels more like the item table
             - Stable names
+
+ Want one primitive, or a simple hierarchy at most:
+   - Filter:
+     + Binary classifier on a map that allows for the following ops
+     place(filter, feature) -> success
+     apply(filter, operator) -> void
+     matches(filter, selector) -> success
+   - Region:
+     + Full map, that allows all Filter ops plus:
+     combine(connection_scheme, region...) -> success
  */
 
 #ifndef GAMESTATE__MAPDEFENTRY_H

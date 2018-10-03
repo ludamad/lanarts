@@ -642,7 +642,7 @@ place_medium1a = (map_region) ->
         return nil
     door_placer = (map, xy) ->
         -- nil is passed for the default open sprite
-        MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, 'Azurite Key')
+        MapUtils.spawn_door(map, xy) --, nil, Vaults._door_key1, 'Azurite Key')
     place_dungeon = Region1.old_dungeon_placement_function(MapSeq, dungeon)
     vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.temple, :door_placer, :gold_placer, player_spawn_area: true})
     if not place_feature(map, vault, regions)
@@ -677,7 +677,7 @@ place_medium1b = (map_region) ->
                 return if floor == SnakePit.N_FLOORS then 0 else 3
         }
     door_placer = (map, xy) ->
-        MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, 'Azurite Key')
+        MapUtils.spawn_door(map, xy) --, nil, Vaults._door_key1, 'Azurite Key')
     next_dungeon = {1}
     place_dungeon = (map, xy) ->
         portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
@@ -855,8 +855,8 @@ overworld_features = (map_region) ->
             return nil
     -------------------------
 
-    --if not place_easy(map_region)
-    --    return nil
+    if not place_easy(map_region)
+        return nil
 
     if not map.rng\random_choice({place_medium1a, place_medium1b})(map_region)
         return nil
@@ -882,7 +882,7 @@ overworld_features = (map_region) ->
         dungeon = {label: "Outpost", tileset: Tilesets.snake, :templates, on_generate: on_generate_dungeon}
         door_placer = (map, xy) ->
             -- nil is passed for the default open sprite
-            MapUtils.spawn_door(map, xy) -- nil, Vaults._door_key1, "Azurite Key")
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq3, dungeon)
         vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.snake, :door_placer, :gold_placer, player_spawn_area: false})
         if not place_feature(map, vault, regions)
@@ -1112,7 +1112,7 @@ generate_map_node = (create_map) -> NewMaps.try_n_times MAX_GENERATE_ITERS, () -
     if not NewMaps.check_connection(map)
         print("ABORT: connection check failed")
         return nil
-    
+
     NewMaps.generate_door_candidates(map, map.rng, map.regions)
 
     for f in *map.post_maps
@@ -1130,7 +1130,7 @@ overworld_create = () ->
     {:map} = grassy_overworld(NewMaps.new_rng())
     player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
     assert player_spawn_points, "Could not pick player spawn squares!"
-    
+
     game_map = NewMaps.generate_game_map(map)
     for f in *map.post_game_map
         f(game_map)
