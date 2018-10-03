@@ -5,6 +5,8 @@ StartEngine = require "engine.StartEngine"
 EngineHooks = require "engine.EngineBase"
 Settings = require "engine.Settings"
 EventLog = require "ui.EventLog"
+Display = require "core.Display"
+{:debug_visualize_step} = require "maps.DebugUtils"
 
 game_init = (seed) ->
     GameState = require("core.GameState")

@@ -75,7 +75,7 @@ define_equipment_randarts = (rng, level) ->
     R[#R].chance = 100
 
 define_randarts = () ->
-    print "DEFININGING"
+    -- print "DEFININGING"
     rng = require("mtwist").create(HARDCODED_RANDARTS_SEED)
     RandartsUtils.clear_state()
     for level=1,MAX_POWER_LEVEL

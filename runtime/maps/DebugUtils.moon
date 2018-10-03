@@ -13,8 +13,6 @@ _VIS_W, _VIS_H = nil, nil
 _VIS_DEBUG = false
 
 debug_visualize_step = (map, restart=nil, tw=8, th=8) ->
-    if not _VIS_DEBUG
-        return
     {w, h} = map.size
     Display.set_world_region({0, 0, w * tw, h * th})
     step = () ->

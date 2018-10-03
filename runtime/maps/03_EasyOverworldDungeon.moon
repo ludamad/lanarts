@@ -72,7 +72,7 @@ Rooms = {
 map = NewMaps.source_map_create {
     :rng
     size: {40, 40}
-    default_content: Tilesets.pebble.wall.id
+    default_content: Tilesets.pebble.wall
     default_flags: {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH}
     map_label: "Enclave"
 }

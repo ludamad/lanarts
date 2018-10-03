@@ -220,7 +220,7 @@ make_bonus_object = (rng, level, base_score, base_entry) ->
             bonuses\add_bonus("enchantment")
         apply_buffs(bonuses)
         success, score = bonuses\validate(min_score - base_score, max_score - base_score)
-        print base_entry.name, success, score
+        -- print base_entry.name, success, score
         if success
             return bonuses, score + base_score
     error("UNEXPECTED")

@@ -194,7 +194,7 @@ Bonuses = newtype {
                 penalties += 1
             score += sign * dim * dim * 100
 
-        print score, min_score, max_score
+        -- print score, min_score, max_score
         --if n_resists + n_powers > 2 -- reject
         --    return false
         ---- TODO turn off penalties for now via this rejection criteria:
