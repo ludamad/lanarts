@@ -7,7 +7,7 @@ local World = require "core.World"
 local mtwist = require "mtwist"
 local HealingSquare = require("objects.HealingSquare").HealingSquare
 
-local M = {} -- Submodule
+local M = nilprotect {} -- Submodule
 
 function M.from_tile_xy(xy)
     return {xy[1]*32+16, xy[2]*32+16}

@@ -11,6 +11,9 @@ MapRegion = newtype {
     init: (polygons, tunnels = {}) =>
         @polygons = assert polygons
         @tunnels = tunnels
+        @selector = false -- No selector
+    as_set: (map) => {:map, regions: {@}}
+    with_selector: (selector) => MapRegion.create {polygons: @polygons, tunnels: @tunnels, :selector}
     inner_apply: (args) =>
         {:map, :area, :operator} = args
         for polygon in *@polygons

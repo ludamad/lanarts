@@ -42,7 +42,7 @@ M.easy_enemies = {
   {enemy = "Chicken",           chance = 100                                            },
   {enemy = "Cloud Elemental",   chance = 100, group_chance = 33, group_size = 2           },
 }
-  
+
 M.fast_enemies = {
  {enemy = "Giant Spider",      chance = 100,   group_chance = 100, group_size = 3       },
  {enemy = "Ciribot",           chance = 35                                              },
@@ -58,7 +58,7 @@ M.medium_enemies = table.merge(M.medium_animals, {
 --  {enemy = "Unseen Horror",     chance = 5                                             },
 --  {enemy = "Centaur Hunter",      chance = 10                                             }
 })
- 
+
 M.mediumhard_enemies = table.merge(M.medium_animals, {
   {enemy = "Skeleton Fighter",          chance = 50                                              },
   {enemy = "Storm Elemental",   chance = 66,  group_chance = 33, group_size = 4           },
@@ -67,7 +67,7 @@ M.mediumhard_enemies = table.merge(M.medium_animals, {
 --  {enemy = "Unseen Horror",     chance = 5                                             },
 --  {enemy = "Centaur Hunter",      chance = 10                                             },
 })
-  
+
 M.hard_enemies = {
  {enemy = "Storm Elemental",   chance = 20,    group_chance = 100, group_size = 3          },
  {enemy = "Hell Storm",        chance = 5,   group_chance = 33, group_size = 2           },
@@ -100,7 +100,7 @@ local tiny_layout1 = {
         size = {{55,75},{55,76}}, -- {width} by {height},
         rooms =    { padding = 1, amount = 3,  size = {10,12}},
         tunnels =  { padding = 1, width = {1,4}, per_room = 2}
-}        
+}
 local tiny_layout2 = {
         size = {{55,75},{45,76}}, -- {width} by {height},
         rooms =    { padding = 1, amount = 6,  size = {5,12} },
@@ -133,7 +133,7 @@ local varied_layout4 = {
         size = {64, 64},
         rooms =    { padding = 1, amount = 20, size = {8,10}},
         tunnels =  { width = {1,2}, per_room = {2, 5}      }
-} 
+}
 local varied_layout5 = {
         size = {64, 64},
         rooms = {
@@ -151,7 +151,7 @@ local small_layout1 = {
           {padding = 1, amount = {1,2}, size = {5,7}}
         },
         tunnels =  { width = {2,6}, per_room = {2, 3}      }
-}         
+}
 local small_layout2 = {
         size = {{60,80}, {60,80}},
         rooms = {
@@ -168,7 +168,7 @@ local medium_layout1 = {
           , {padding = 4, amount = 20, size = {10,30}},
         },
         tunnels =  { width = {2,6}, per_room = {2, 3}      }
-}         
+}
 local medium_layout2 = {
         size = {{60,80}, {60,80}},
         rooms = {
@@ -186,8 +186,8 @@ local large_layout1 = {
        }
 }
 local large_layout2 = {
-        size = {{60,80}, {60,80}}, 
-        rooms = { padding = 3, amount = 15, size = {8,12} }, 
+        size = {{60,80}, {60,80}},
+        rooms = { padding = 3, amount = 15, size = {8,12} },
         tunnels = { width = {1, 3}, per_room = 9 }
 }
 
@@ -197,10 +197,10 @@ local large_layout3 = {
         tunnels = { width = {1, 3}, per_room = 9}
 }
 
-local tiny_layouts = {tiny_layout1, tiny_layout2, tiny_layout3}   
+local tiny_layouts = {tiny_layout1, tiny_layout2, tiny_layout3}
 M.tiny_layouts = tiny_layouts
 local varied_layouts = {
-  --varied_layout1, varied_layout2, 
+  --varied_layout1, varied_layout2,
   varied_layout3, varied_layout4, varied_layout5
 }
 M.varied_layouts = varied_layouts
@@ -288,7 +288,7 @@ M.Dungeon3 = {
       items = { amount = 5,  group = ItemGroups.basic_items   },
       enemies = {
         -- amount = {12,14},
-        amount = {8, 10}, 
+        amount = {8, 10},
         generated = M.mediumhard_enemies
       }
     }
@@ -345,7 +345,7 @@ M.Dungeon4 = {
         generated = M.harder_enemies
       }
     }
-  
+
   },
  -- -- Level 9
  -- { layout = large_layouts,
@@ -382,7 +382,7 @@ local function generate_items(map, items)
     end
 end
 
-local function size_multiplier(map) 
+local function size_multiplier(map)
     return 1 -- For now, don't make bigger levels. Pixel lock is no longer a thing.
 --    return 1 + random(3, 10) * 0.03 * (World.player_amount - 1)
 end
@@ -399,7 +399,7 @@ function M.enemy_generate(chances)
         if rand <= 0 then
             if entry.enemy == "Ciribot" then
                 local GlobalData = require "core.GlobalData"
-                return GlobalData.midrange_bastard_enemy 
+                return GlobalData.midrange_bastard_enemy
             else
                 return entry.enemy
             end
@@ -416,7 +416,7 @@ function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area
         if spawns > 1 then
             spawns = math.floor(spawns * (1+M.enemy_bonus()))
         end
-        for i=1,spawns do 
+        for i=1,spawns do
             append(ret, MapUtils.random_enemy(map, entry.enemy, area, selector))
         end
     end
@@ -424,7 +424,7 @@ function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area
         local rand = random(1, total_chance)
         for _, entry in ipairs(chances) do
             rand = rand - (entry.chance or 0)
-            if rand <= 0 then 
+            if rand <= 0 then
                 append(ret, MapUtils.random_enemy(map, entry.enemy, area, selector))
                 break
             end
@@ -446,7 +446,7 @@ end
 
 local function generate_enemies(map, enemies)
     local min, max
-    if type(enemies.amount) == 'table' then 
+    if type(enemies.amount) == 'table' then
         min, max = unpack(enemies.amount)
     else
         min, max = enemies.amount, enemies.amount
@@ -489,9 +489,9 @@ local function generate_features(map, --[[Optional]] amount)
             -- nearby 3x3 box
             area = bbox_create( {sqr[1]-1, sqr[2]-1}, {3, 3}),
             fill_selector = {matches_none = {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT}}
-        } 
+        }
         if query then
-            if map.n_healing_squares > 0 and chance(.1) then 
+            if map.n_healing_squares > 0 and chance(.1) then
                 MapUtils.spawn_healing_square(map, sqr)
                 map.n_healing_squares = map.n_healing_squares - 1
             else
@@ -505,12 +505,12 @@ local function generate_features(map, --[[Optional]] amount)
         tries = tries + 1
         if tries >= MAX_TRIES then
             return
-        end 
+        end
     end
 end
 
 local function generate_stores(map)
-    if chance(0.25) then 
+    if chance(0.25) then
         local items = {}
         for i=1,random(5,10) do
             local power_level, randart_chance = 1, 5
@@ -520,7 +520,7 @@ local function generate_stores(map)
     end
 end
 
-local function generate_doors(map) 
+local function generate_doors(map)
     local Vaults = require "maps.Vaults"
     local areas = leaf_group_areas(map)
     for _, area in ipairs(areas) do
@@ -563,7 +563,7 @@ end
 
 local function map_gen_apply(map, placements, wall, floor, __unused_alternate, size, padding)
    event_log("(RNG #%d) before apply room carve oper", map.rng:amount_generated())
-    SourceMap.random_placement_apply { rng = map.rng, map = map, area = get_inner_area(map),
+   SourceMap.random_placement_apply { rng = map.rng, map = map, area = get_inner_area(map),
         child_operator = Dungeons.room_carve_operator(wall, floor, padding or 1),
         size_range = size, amount_of_placements_range = placements,
         create_subgroup = false
@@ -585,7 +585,7 @@ local function generate_rooms(map, rooms, tileset)
     local size_mult = size_multiplier()
     local size = map_call(math.ceil, {rooms.size[1] * size_mult, rooms.size[2] * size_mult})
     -- Compensate for padding
-    event_log("(RNG #%d) size={%d,%d} padding=%d amount = %d, alt_amount = %d", 
+    event_log("(RNG #%d) size={%d,%d} padding=%d amount = %d, alt_amount = %d",
         map.rng:amount_generated(), size[1], size[2], rooms.padding, amounts, alt_amount)
     size = {size[1] + rooms.padding*2, size[2] + rooms.padding*2}
     map_gen_apply(map, {alt_amount, alt_amount}, tileset.wall, tileset.floor_alt, tileset.floor, size, rooms.padding)
@@ -607,8 +607,8 @@ local function generate_layout(map, layout, tileset)
 end
 
 local function generate_from_template(label, template, tileset)
-    return MapUtils.area_template_to_map(label, template, --[[padding]] 4, { 
-           ['x'] = { add = SourceMap.FLAG_SOLID, content = tileset.wall }, 
+    return MapUtils.area_template_to_map(label, template, --[[padding]] 4, {
+           ['x'] = { add = SourceMap.FLAG_SOLID, content = tileset.wall },
            ['.'] = { add = SourceMap.FLAG_SEETHROUGH, content = chance(.5) and tileset.floor_alt or tileset.floor }
     })
 end
@@ -628,13 +628,13 @@ function M.create_map(dungeon, floor)
         map = MapUtils.map_create(label, size, tileset.wall)
         event_log("(RNG #%d) after creating map", map.rng:amount_generated())
         generate_layout(map, layout, tileset)
-    else 
+    else
         local template = random_choice(entry.templates)
         map = generate_from_template(label, template, tileset)
     end
     map.post_maps = {}
     map.template = entry
-    map.n_healing_squares = map.rng:randomf() < 0.2 and map.rng:random(1, 2) or 0 
+    map.n_healing_squares = map.rng:randomf() < 0.2 and map.rng:random(1, 2) or 0
     -- TODO consolidate what is actually expected of maps.
     -- For now, just fake one region for 01_Overworld.moon
     map.regions = { {conf = {}, bbox = function(self) return {0,0, map.size[1], map.size[2]} end}}

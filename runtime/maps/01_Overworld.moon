@@ -31,9 +31,6 @@ Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
 
-import Spread, Shape
-    from require "maps.MapElements"
-
 {:MapCompilerContext, :make_on_player_interact} = require "maps.MapCompilerContext"
 Places = require "maps.Places"
 
@@ -1141,4 +1138,5 @@ overworld_create = () ->
 return {
     :overworld_create
     test_determinism: () -> nil
+    :generate_map_node
 }
