@@ -128,7 +128,7 @@ namespace ldungeon_gen {
 				cntxt->tunneled = false;
 				break;
 			}
-			if (sqr.group == checker.avoid_group || (checker.end_group >= 0 && sqr.group != checker.end_group)) {
+			if (sqr.matches(checker.avoid_selector) || !sqr.matches(checker.end_selector)) {
 				cntxt->tunneled = false;
 				break;
 			}
@@ -261,6 +261,34 @@ namespace ldungeon_gen {
 			t.resize(t.size() * 2);
 	}
 
+	void TunnelGenOperator::try_tunnel(MapPtr map, const BBox& root_rect, Selector root_selector, Selector destination_selector) {
+//		checker.avoid_group = i;
+//		TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, 0.05);
+//		TunnelGenImpl tg(*map, randomizer, checker, filler);
+//
+////						FOR_EACH_BBOX(group.group_area, xx, yy) {
+////						    (*map)[Pos(xx,yy)].flags |= FLAG_RESERVED1;
+////						}
+//		generate_entrance(group.group_area, randomizer,
+//						  std::min(genwidth, 2), p, axis, positive);
+//		if (!rect.contains(p)) {
+//			goto label_give_up_on_group;
+//		}
+//
+//		int val = positive ? +1 : -1;
+//		int dx = axis ? 0 : val, dy = axis ? val : 0;
+//
+//		if (tg.generate(p, dx, dy, btbuff, tsbuff)) {
+//			genpaths[i]++;
+//			nogen_tries = 0;
+//			path_len = 2;
+//			generated = true;
+//		}
+//		if (attempts >= 4) {
+//			path_len += 5;
+//		}
+	}
+
 	bool TunnelGenOperator::apply(MapPtr map, group_t parent_group_id,
 			const BBox& rect) {
 
@@ -292,7 +320,7 @@ namespace ldungeon_gen {
 					int path_len = 2;
 					for (int attempts = 0; attempts < 16 && !generated;
 							attempts++) {
-						checker.avoid_group = i;
+						checker.avoid_selector = Selector(0, 0, Range16 {i, i});
 						TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, 0.05);
 						TunnelGenImpl tg(*map, randomizer, checker, filler);
 

@@ -20,16 +20,15 @@ namespace ldungeon_gen {
 		Selector is_valid_fill, is_valid_perimeter;
 		Selector is_finished_fill, is_finished_perimeter;
 
-		group_t avoid_group; // -1 to not avoid any group
-		group_t end_group; // -1 to join any group
+		Selector avoid_selector;
+		Selector end_selector;
 
 		TunnelCheckSettings(Selector is_valid_fill, Selector is_valid_perimeter,
 				Selector is_finished_fill, Selector is_finished_perimeter,
-				group_t avoid_group = -1, group_t end_group = -1) :
+				Selector avoid_selector = Selector(), Selector end_selector = Selector()) :
 				is_valid_fill(is_valid_fill), is_valid_perimeter(
 						is_valid_perimeter), is_finished_fill(is_finished_fill), is_finished_perimeter(
-						is_finished_perimeter), avoid_group(avoid_group), end_group(
-						end_group) {
+						is_finished_perimeter), avoid_selector(avoid_selector), end_selector(end_selector) {
 		}
 	};
 
@@ -67,6 +66,8 @@ namespace ldungeon_gen {
 
 		virtual bool apply(MapPtr map, group_t parent_group_id,
 				const BBox& rect);
+
+		void try_tunnel(MapPtr map, const BBox& root_rect, Selector root_selector, Selector destination_selector);
 	};
 
 	/* 'xy' determines where to start tunneling from.

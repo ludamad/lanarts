@@ -63,17 +63,23 @@ namespace ldungeon_gen {
 		bool use_must_be_content;
 
 		Selector(uint16_t must_be_on_bits, uint16_t must_be_off_bits,
-				uint16_t must_be_content) :
+				 uint16_t must_be_content,
+				 Range16 must_be_group = Range16(), Range16 cant_be_group = Range16()) :
 						must_be_on_bits(must_be_on_bits),
 						must_be_off_bits(must_be_off_bits),
 						must_be_content(must_be_content),
+						must_be_group(must_be_group),
+						cant_be_group(cant_be_group),
 						use_must_be_content(true) {
 		}
 
-		Selector(uint16_t must_be_on_bits = 0, uint16_t must_be_off_bits = 0) :
+		Selector(uint16_t must_be_on_bits = 0, uint16_t must_be_off_bits = 0,
+				 Range16 must_be_group = Range16(), Range16 cant_be_group = Range16()) :
 						must_be_on_bits(must_be_on_bits),
 						must_be_off_bits(must_be_off_bits),
 						must_be_content(-1),
+						must_be_group(must_be_group),
+						cant_be_group(cant_be_group),
 						use_must_be_content(false) {
 		}
 
