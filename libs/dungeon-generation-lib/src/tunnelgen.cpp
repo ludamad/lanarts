@@ -262,13 +262,14 @@ namespace ldungeon_gen {
 	}
 
 	bool TunnelGenOperator::try_tunnel(MapPtr map, const BBox& root_rect, Selector root_selector,
-                                       Selector destination_selector, int genwidth, int path_len) {
+                                       int genwidth, int path_len, float turn_chance) {
 		std::vector<Square> btbuff;
 		std::vector<TunnelSliceContext> tsbuff;
-        TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, 0.05);
+        TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, turn_chance);
         TunnelGenImpl tg(*map, randomizer, checker, filler);
 		Pos p;
 		bool axis, positive;
+		// TODO use root selector
         generate_entrance(root_rect, randomizer,
                           std::min(genwidth, 2), p, axis, positive);
         if (!root_rect.contains(p)) {
@@ -315,8 +316,8 @@ namespace ldungeon_gen {
 						checker.avoid_selector = Selector(0, 0, Range16 {i, i});
 
 						if (try_tunnel(map, group.group_area,
-									   Selector(), Selector(),
-									   genwidth, path_len)) {
+									   Selector(),
+									   genwidth, path_len, 0.05f)) {
 							genpaths[i]++;
 							nogen_tries = 0;
 							path_len = 2;

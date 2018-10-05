@@ -68,7 +68,7 @@ namespace ldungeon_gen {
 				const BBox& rect);
 
 		bool try_tunnel(MapPtr map, const BBox& root_rect, Selector root_selector,
-						Selector destination_selector, int genwidth, int path_len);
+                        int genwidth, int path_len, float turn_chance);
 	};
 
 	/* 'xy' determines where to start tunneling from.

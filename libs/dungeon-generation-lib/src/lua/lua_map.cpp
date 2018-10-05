@@ -716,10 +716,10 @@ namespace ldungeon_gen {
 		return tunnel_oper->try_tunnel(
 			args["map"].as<MapPtr>(),
 			args["start_area"].as<BBox>(),
-			lua_selector_get(args["start_selector"]),
-			lua_selector_get(args["end_selector"]),
+			Selector(), //lua_selector_get(args["start_selector"]),
 			defaulted(args["width"], 1),
-			defaulted(args["max_length"], 20));
+			defaulted(args["max_length"], 20),
+			defaulted(args["turn_chance"], 0.05f));
 	}
 
 	/* Binding that simply provides random placement in an area, leaves overlap check to child area operator. */

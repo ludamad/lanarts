@@ -32,9 +32,9 @@ namespace ldungeon_gen {
 		}
 
 		return TunnelCheckSettings(vfill_selector, vperimeter_selector,
-				cfill_selector, cperimeter_selector,
-				defaulted(args["avoid_group"], -1),
-				defaulted(args["end_group"], -1));
+				cfill_selector, cperimeter_selector);
+//				defaulted(args["avoid_group"], -1),
+//				defaulted(args["end_group"], -1));
 	}
 
 	static TunnelFillSettings tunnelfill_get(LuaStackValue args) {

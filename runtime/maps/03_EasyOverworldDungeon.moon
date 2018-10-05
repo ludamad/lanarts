@@ -45,7 +45,7 @@ PADDING = 20
 rng = NewMaps.new_rng()
 
 Carver = newtype {
-    init: (@carve) =>
+    init: (@children, @carve) =>
         @compiled = false
         @_compiled_region_set = false
     map_compile: (args) =>
@@ -91,6 +91,7 @@ Rooms = Carver.create {}, () =>
     -- Ensure it is a range
     n_rooms = 40
     event_log("(RNG #%d) generating %d rooms", rng\amount_generated(), n_rooms)
+    regions = {}
     for i=1,n_rooms
         size = {4, 4}
         if @chance(0.2)
@@ -98,17 +99,43 @@ Rooms = Carver.create {}, () =>
         {:bbox} = find_bbox(@region_set, size)
         if not bbox
             return false
+        append regions, from_bbox(unpack(bbox))
         SourceMap.rectangle_apply {
-            map: @region_set.map
+            map: @map
             area: bbox
             fill_operator: {add: SourceMap.FLAG_SEETHROUGH, remove: SourceMap.FLAG_SOLID, content: Tilesets.pebble.floor}
             perimeter_width: 1
             perimeter_operator: {add: SourceMap.FLAG_SEETHROUGH, remove: SourceMap.FLAG_SOLID, content: Tilesets.pebble.floor_alt}
         }
+    for region in *regions
+        if not SourceMap.try_tunnel_apply {
+            map: @map
+            rng: @rng
+            start_area: region\bbox()
+            validity_selector: {
+                fill_selector: {matches_all: SourceMap.FLAG_SOLID, matches_none: SourceMap.FLAG_TUNNEL }
+                perimeter_selector: { matches_all: SourceMap.FLAG_SOLID, matches_none: SourceMap.FLAG_TUNNEL }
+            },
+
+            completion_selector: {
+                fill_selector: { matches_none: { SourceMap.FLAG_SOLID, SourceMap.FLAG_PERIMETER, SourceMap.FLAG_TUNNEL } },
+                perimeter_selector: { matches_none: SourceMap.FLAG_SOLID }
+            },
+
+            fill_operator: { add: {SourceMap.FLAG_TUNNEL, SourceMap.FLAG_SEETHROUGH}, remove: SourceMap.FLAG_SOLID, content: Tilesets.pebble.floor},
+            perimeter_operator: {
+                matches_all: SourceMap.FLAG_SOLID, remove: SourceMap.FLAG_SEETHROUGH,
+                add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_TUNNEL, SourceMap.FLAG_PERIMETER}, content: Tilesets.pebble.wall}
+
+            perimeter_width: 1
+            size_range: {1,1}
+            tunnels_per_room_range: {1,1}
+        }
+            return false
     event_log("(RNG #%d) after generating %d rooms", rng\amount_generated(), n_rooms)
     return true
 
-Tunnels = Filler.create {Rooms}, () =>
+-- Tunnels = Filler.create {Rooms}, () =>
     
 
 return Rooms\map_compile {
