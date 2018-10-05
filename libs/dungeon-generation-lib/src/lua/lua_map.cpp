@@ -706,6 +706,22 @@ namespace ldungeon_gen {
 		return applied;
 	}
 
+	static bool try_tunnel_apply(LuaStackValue args) {
+		using namespace luawrap;
+		LuaStackValue oper = tunnel_operator(args);
+		TunnelGenOperator* tunnel_oper = dynamic_cast<TunnelGenOperator*>(area_operator_get(oper).get());
+		if (!tunnel_oper) {
+			return false;
+		}
+		return tunnel_oper->try_tunnel(
+			args["map"].as<MapPtr>(),
+			args["start_area"].as<BBox>(),
+			lua_selector_get(args["start_selector"]),
+			lua_selector_get(args["end_selector"]),
+			defaulted(args["width"], 1),
+			defaulted(args["max_length"], 20));
+	}
+
 	/* Binding that simply provides random placement in an area, leaves overlap check to child area operator. */
 	static LuaStackValue random_placement_operator(LuaStackValue args) {
 		using namespace luawrap;
@@ -756,6 +772,7 @@ namespace ldungeon_gen {
 		submodule["tunnel_operator"].bind_function(tunnel_operator);
 		submodule["rectangle_apply"].bind_function(rectangle_apply);
 		submodule["tunnel_apply"].bind_function(tunnel_apply);
+		submodule["try_tunnel_apply"].bind_function(try_tunnel_apply);
 		submodule["submap_apply"].bind_function(__submap_apply);
 		submodule["perimeter_apply"].bind_function(__perimeter_apply);
 

@@ -67,7 +67,8 @@ namespace ldungeon_gen {
 		virtual bool apply(MapPtr map, group_t parent_group_id,
 				const BBox& rect);
 
-		void try_tunnel(MapPtr map, const BBox& root_rect, Selector root_selector, Selector destination_selector);
+		bool try_tunnel(MapPtr map, const BBox& root_rect, Selector root_selector,
+						Selector destination_selector, int genwidth, int path_len);
 	};
 
 	/* 'xy' determines where to start tunneling from.
