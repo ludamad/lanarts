@@ -213,6 +213,7 @@ source_map_create = (args) ->
         flags: default_flags
         :map_label
         arc_chance: arc_chance or 0
+        next_group: 0
         wandering_enabled: if wandering_enabled == nil then true else wandering_enabled
         door_locations: {}
         instances: {}

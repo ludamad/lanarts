@@ -82,7 +82,6 @@ MapRegion = newtype {
         return {accum_x / n_points, accum_y / n_points}
 }
 
-
 combine_map_regions = (regions) ->
     c_polygons = {}
     c_tunnels = {}

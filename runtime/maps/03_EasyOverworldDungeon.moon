@@ -36,50 +36,65 @@ Places = require "maps.Places"
     :FLAG_OVERWORLD, :FLAG_ROOM, :FLAG_NO_ENEMY_SPAWN, :FLAG_NO_ITEM_SPAWN
 } = Vaults
 
-{:find_bbox, :find_square, :selector_filter} = require "maps.MapRegionUtils"
+{:find_bbox, :find_square, :selector_filter, :selector_map} = require "maps.MapRegionUtils"
 
 {:generate_map_node} = require "maps.01_Overworld"
 
 rng = NewMaps.new_rng()
 
-Rooms = {
-    carve: () =>
-        -- Ensure it is a range
-        n_rooms = 40
-        event_log("(RNG #%d) generating %d rooms", rng\amount_generated(), n_rooms)
-        size = {4, 4}
-        for i=1,n_rooms
-            {:bbox} = find_bbox(@region_set, size)
-            if not bbox
-                return false
-            SourceMap.rectangle_apply {
-                map: @region_set.map
-                area: bbox
-                fill_operator: {add: SourceMap.FLAG_SEETHROUGH, remove: SourceMap.FLAG_SOLID, content: Tilesets.pebble.floor}
-            }
-        event_log("(RNG #%d) after generating %d rooms", rng\amount_generated(), n_rooms)
-        return true
+Carver = newtype {
+    init: (@carve) =>
+        @compiled = false
+        @_compiled_region_set = false
+    map_compile: (args) =>
+        map_args = table.merge {
+            :rng
+            size: {100, 100}
+            default_content: Tilesets.pebble.wall
+            default_flags: {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH}
+            map_label: "Dungeon"
+        }, args
+        map = NewMaps.source_map_create map_args
+
+        room_selector = {
+            matches_all: SourceMap.FLAG_SOLID
+            matches_none: SourceMap.FLAG_PERIMETER
+        }
+        region_set = {:map, regions: {from_bbox(0,0, map.size[1],map.size[2])\with_selector(room_selector)}}
+        @compile(region_set)
+        return map
+    compile: (@region_set) =>
+        if @compiled
+            return @_compiled_region_set
+        @compiled = true
+        @_compiled_region_set = @_compile()
+        return @_compiled_region_set
+    _compile: () =>
+        @group = @region_set.map.next_group
+        @region_set.map.next_group += 1
+        @carve()
+        @group_range = {@group, @region_set.map.next_group - 1}
+        return selector_map @region_set, (s) ->
+            return table.merge s, {matches_group: @group_range}
 }
 
--- Stairs = {
---     apply: () =>
---         @region_set
--- }
+Rooms = Carver.create () =>
+    -- Ensure it is a range
+    n_rooms = 40
+    event_log("(RNG #%d) generating %d rooms", rng\amount_generated(), n_rooms)
+    size = {4, 4}
+    for i=1,n_rooms
+        {:bbox} = find_bbox(@region_set, size)
+        if not bbox
+            return false
+        SourceMap.rectangle_apply {
+            map: @region_set.map
+            area: bbox
+            fill_operator: {add: SourceMap.FLAG_SEETHROUGH, remove: SourceMap.FLAG_SOLID, content: Tilesets.pebble.floor}
+        }
+    event_log("(RNG #%d) after generating %d rooms", rng\amount_generated(), n_rooms)
+    return true
 
-map = NewMaps.source_map_create {
-    :rng
-    size: {40, 40}
-    default_content: Tilesets.pebble.wall
-    default_flags: {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH}
-    map_label: "Enclave"
+return Rooms\map_compile {
+    size: {40,40}
 }
-
-room_selector = {
-    matches_all: SourceMap.FLAG_SOLID
-    matches_none: SourceMap.FLAG_PERIMETER
-}
-Rooms.carve {
-    region_set: {:map, regions: {from_bbox(0,0,40,40)\with_selector(room_selector)}}
-}
-
-return map

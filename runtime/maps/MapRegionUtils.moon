@@ -44,12 +44,19 @@ find_square = (region_set) ->
     {:region, :bbox} = random_bbox(region_set, {1,1})
     return {:region, square: {bbox[1], bbox[2]}}
 
+selector_map = (region_set, f) ->
+    {:map, :regions} = region_set
+    return {
+        :map
+        regions: map_call ((r) -> r\with_selector(f(r.selector))), regions
+    }
+
 selector_filter = (region_set, selector) ->
     -- TODO allow smarter filtering
     {:map, :regions} = region_set
     return {
         :map
-        regions: map_call(regions, (r) -> r\with_selector(selector))
+        regions: map_call ((r) -> r\with_selector(selector)), regions
     }
 
-return {:find_bbox, :find_square, :selector_filter}
+return {:find_bbox, :find_square, :selector_filter, :selector_map}
