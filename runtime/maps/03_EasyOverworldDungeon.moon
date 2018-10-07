@@ -135,40 +135,8 @@ node_paint_group = () =>
     return true
 
 MAX_TUNNEL_TRIES = 100
-node_place_easy_overworld_rooms = () =>
-    -- Ensure it is a range
-    n_rooms = 5
-    event_log("(RNG #%d) generating %d rooms", @rng\amount_generated(), n_rooms)
-    regions = {}
-    for i=1,n_rooms
-        size = {10, 10}
-        if @chance(0.2)
-            size = {5, 5}
-        result = find_bbox(@region_set, size)
-        if not result
-            return false
-        {:bbox} = result
-        group = @new_group()
-        region = from_bbox(unpack(bbox))
-        region.inner_bbox = shrink(bbox, 1, 1)
-        region.selector = {matches_group: {group, group}}
-        append regions, region
-        SourceMap.rectangle_apply {
-            map: @map
-            area: bbox
-            fill_operator: {
-                :group
-                add: SourceMap.FLAG_SEETHROUGH
-                remove: SourceMap.FLAG_SOLID
-                content: Tilesets.pebble.floor
-            }
-            perimeter_width: 0
-            perimeter_operator: {
-                add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_PERIMETER}
-                remove: SourceMap.FLAG_SEETHROUGH
-                content: Tilesets.pebble.wall
-            }
-        }
+node_connect_rect_rooms = () =>
+    regions = @region_set.regions
     for region in *regions
         tries_without_tunnel = 0
         for j=1,2
@@ -218,7 +186,46 @@ node_place_easy_overworld_rooms = () =>
                     break
                 else
                     tries_without_tunnel += 1
+    return true
+
+node_place_easy_overworld_rooms = () =>
+    -- Ensure it is a range
+    n_rooms = 5
+    event_log("(RNG #%d) generating %d rooms", @rng\amount_generated(), n_rooms)
+    regions = {}
+    for i=1,n_rooms
+        size = {10, 10}
+        if @chance(0.2)
+            size = {5, 5}
+        result = find_bbox(@region_set, size)
+        if not result
+            return false
+        {:bbox} = result
+        group = @new_group()
+        region = from_bbox(unpack(bbox))
+        region.inner_bbox = shrink(bbox, 1, 1)
+        region.selector = {matches_group: {group, group}}
+        append regions, region
+        SourceMap.rectangle_apply {
+            map: @map
+            area: bbox
+            fill_operator: {
+                :group
+                add: SourceMap.FLAG_SEETHROUGH
+                remove: SourceMap.FLAG_SOLID
+                content: Tilesets.pebble.floor
+            }
+            perimeter_width: 0
+            perimeter_operator: {
+                add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_PERIMETER}
+                remove: SourceMap.FLAG_SEETHROUGH
+                content: Tilesets.pebble.wall
+            }
+        }
     event_log("(RNG #%d) after generating %d rooms", @rng\amount_generated(), n_rooms)
+    @region_set = {map: @map, :regions}
+    if not node_connect_rect_rooms(@)
+        return false
     return true
 
 EasyOverworldDungeon = MapDesc.create {
