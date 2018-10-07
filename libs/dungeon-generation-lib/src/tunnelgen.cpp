@@ -261,35 +261,48 @@ namespace ldungeon_gen {
 			t.resize(t.size() * 2);
 	}
 
-	bool TunnelGenOperator::try_tunnel(MapPtr map, const BBox& root_rect, Selector root_selector,
+    bool TunnelGenOperator::try_tunnel(MapPtr map, const BBox& root_rect, Selector root_selector,
                                        int genwidth, int path_len, float turn_chance) {
-		std::vector<Square> btbuff;
-		std::vector<TunnelSliceContext> tsbuff;
-        TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, turn_chance);
-        TunnelGenImpl tg(*map, randomizer, checker, filler);
+//        TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, turn_chance);
+//        TunnelGenImpl tg(*map, randomizer, checker, filler);
+//		std::vector<Square> btbuff;
+//		std::vector<TunnelSliceContext> tsbuff;
+//        Pos p;
+//        bool axis, positive;
+//        // TODO use root selector
+//        generate_entrance(root_rect, randomizer,
+//                          std::min(genwidth, 2), p, axis, positive);
+//        if (!root_rect.contains(p)) {
+//            return false;
+//        }
+//
+//        int val = positive ? +1 : -1;
+//        int dx = axis ? 0 : val, dy = axis ? val : 0;
+//
+//        return tg.generate(p, dx, dy, btbuff, tsbuff);
+
 		Pos p;
 		bool axis, positive;
-		// TODO use root selector
-        generate_entrance(root_rect, randomizer,
-                          std::min(genwidth, 2), p, axis, positive);
-        if (!root_rect.contains(p)) {
-        	return false;
-        }
 
-        int val = positive ? +1 : -1;
-        int dx = axis ? 0 : val, dy = axis ? val : 0;
+		std::vector<Square> btbuff;
+		std::vector<TunnelSliceContext> tsbuff;
+		TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, turn_chance);
+		TunnelGenImpl tg(*map, randomizer, checker, filler);
 
-        return tg.generate(p, dx, dy, btbuff, tsbuff);
-	}
+//						FOR_EACH_BBOX(group.group_area, xx, yy) {
+//						    (*map)[Pos(xx,yy)].flags |= FLAG_RESERVED1;
+//						}
+		generate_entrance(root_rect, randomizer,
+						  std::min(genwidth, 2), p, axis, positive);
+
+		int val = positive ? +1 : -1;
+		int dx = axis ? 0 : val, dy = axis ? val : 0;
+
+		return tg.generate(p, dx, dy, btbuff, tsbuff);
+    }
 
 	bool TunnelGenOperator::apply(MapPtr map, group_t parent_group_id,
 			const BBox& rect) {
-
-		Pos p;
-		bool axis, positive;
-
-		std::vector<Square> btbuff;
-		std::vector<TunnelSliceContext> tsbuff;
 
 		std::vector<int> genpaths(map->groups.size(), 0);
 		std::vector<int> totalpaths(map->groups.size(), 0);
@@ -313,11 +326,30 @@ namespace ldungeon_gen {
 					int path_len = 2;
 					for (int attempts = 0; attempts < 16 && !generated;
 							attempts++) {
+//                        Pos p;
+//                        bool axis, positive;
+//
+//                        std::vector<Square> btbuff;
+//                        std::vector<TunnelSliceContext> tsbuff;
 						checker.avoid_selector = Selector(0, 0, Range16 {i, i});
+//						TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, 0.05);
+//						TunnelGenImpl tg(*map, randomizer, checker, filler);
+//
+////						FOR_EACH_BBOX(group.group_area, xx, yy) {
+////						    (*map)[Pos(xx,yy)].flags |= FLAG_RESERVED1;
+////						}
+//						generate_entrance(group.group_area, randomizer,
+//								std::min(genwidth, 2), p, axis, positive);
+//						if (!rect.contains(p)) {
+//						    goto label_give_up_on_group;
+//						}
+//
+//						int val = positive ? +1 : -1;
+//						int dx = axis ? 0 : val, dy = axis ? val : 0;
 
-						if (try_tunnel(map, group.group_area,
-									   Selector(),
-									   genwidth, path_len, 0.05f)) {
+//						if (tg.generate(p, dx, dy, btbuff, tsbuff)) {
+                        if (try_tunnel(map, group.group_area, Selector(), genwidth, path_len, 0.05f)) {
+//                            int genwidth, int path_len, float turn_chance)) {
 							genpaths[i]++;
 							nogen_tries = 0;
 							path_len = 2;
@@ -328,6 +360,7 @@ namespace ldungeon_gen {
 						}
 					}
 				}
+				label_give_up_on_group:;
 			}
 		}
 
