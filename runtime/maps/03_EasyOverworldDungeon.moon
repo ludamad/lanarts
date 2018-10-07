@@ -171,8 +171,8 @@ Rooms = Carver.create Dungeon, () =>
                 content: Tilesets.pebble.wall
             }
         }
-    tries_without_tunnel = 0
     for region in *regions
+        tries_without_tunnel = 0
         for j=1,2
             while tries_without_tunnel < MAX_TUNNEL_TRIES
                 success = SourceMap.try_tunnel_apply {

@@ -297,9 +297,6 @@ namespace ldungeon_gen {
 //						}
 		generate_entrance(root_rect, randomizer,
 						  std::min(genwidth, 2), p, axis, positive);
-        if (!root_rect.contains(p)) {
-            return false;
-        }
 		int val = positive ? +1 : -1;
 		int dx = axis ? 0 : val, dy = axis ? val : 0;
 
