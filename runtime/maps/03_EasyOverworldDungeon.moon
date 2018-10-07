@@ -44,7 +44,8 @@ PADDING = 10
 ROOT = false -- represents the map root 
 
 event_log = (...) -> print string.format(...)
-rng = require("mtwist").create(os.time())
+rng = rawget(_G, 'rng') or require("mtwist").create(os.time() * 1000 + os.clock())
+rawset(_G, 'rng', rng)
 
 shrink = (bbox, x, y) ->
     {x1,y1,x2,y2} = bbox
@@ -68,8 +69,7 @@ Map = newtype {
             default_flags: {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH}
             map_label: "Dungeon"
         }, @map_args
-        map_args.size[1] += PADDING * 2
-        map_args.size[2] += PADDING * 2
+        map_args.size = vector_add(map_args.size, {PADDING*2, PADDING*2})
         map = NewMaps.source_map_create map_args
 
         room_selector = {
@@ -80,19 +80,16 @@ Map = newtype {
         for child in *@children
             if not child\compile()
                 return nil
+        if not NewMaps.check_connection(map)
+            event_log("Failed connectivity check")
+            return nil
         return map
 }
 
 Carver = newtype {
     init: (@parent, @carve) =>
-        @compiled = false
         @children = {}
         append @parent.children, @
-    --compile: () =>
-    --    if @compiled
-    --        return true
-    --    @compiled = true
-    --    return @_compile()
     new_group: () =>
         @map.next_group += 1
         return @map.next_group
@@ -102,16 +99,9 @@ Carver = newtype {
         if not @carve()
             return false
         for child in *@children
-            -- Keep computing current region set
-            --@group_range = {@group, @map.next_group - 1}
-            --@region_set = selector_map @parent.region_set, (s) ->
-            --    return table.merge s, {matches_group: @group_range}
             if not child\compile()
                 return false
         return true
-        --@group_range = {@group, @map.next_group - 1}
-        --@region_set = selector_map @parent.region_set, (s) ->
-        --    return table.merge s, {matches_group: @group_range}
     chance: (prob) => @region_set.map.rng\chance(prob)
     apply: (args) =>
         args.map = @map
@@ -139,11 +129,11 @@ Dungeon = Carver.create EasyOverworldDungeon, () =>
 MAX_TUNNEL_TRIES = 100
 Rooms = Carver.create Dungeon, () =>
     -- Ensure it is a range
-    n_rooms = 40
+    n_rooms = 5
     event_log("(RNG #%d) generating %d rooms", @rng\amount_generated(), n_rooms)
     regions = {}
     for i=1,n_rooms
-        size = {4, 4}
+        size = {10, 10}
         if @chance(0.2)
             size = {5, 5}
         result = find_bbox(@region_set, size)
