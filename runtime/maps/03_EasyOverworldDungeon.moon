@@ -44,7 +44,7 @@ PADDING = 10
 ROOT = false -- represents the map root 
 
 event_log = (...) -> print string.format(...)
-rng = require("mtwist").create(12312532)
+rng = require("mtwist").create(os.time())
 
 shrink = (bbox, x, y) ->
     {x1,y1,x2,y2} = bbox
@@ -182,6 +182,7 @@ Rooms = Carver.create Dungeon, () =>
                     start_selector: region.selector
                     validity_selector: {
                         fill_selector: {
+                            matches_group: {@parent.group, -1}
                             matches_all: SourceMap.FLAG_SOLID
                             matches_none: SourceMap.FLAG_TUNNEL
                         }
