@@ -56,10 +56,11 @@ shrink = (bbox, x, y) ->
         y2-y
     }
 
-Map = newtype {
+MapDesc = newtype {
     init: (@map_args) =>
         @parent = false
-        @children = {}
+        @children = @map_args.children
+        @map_args.children = nil
         @region_set = false
     compile: () =>
         map_args = table.merge {
@@ -76,8 +77,18 @@ Map = newtype {
             matches_all: SourceMap.FLAG_SOLID
             matches_none: SourceMap.FLAG_PERIMETER
         }
-        @region_set = {:map, regions: {from_bbox(PADDING, PADDING, map.size[1] - PADDING, map.size[2] - PADDING)\with_selector(room_selector)}}
+        @region_set = {
+            :map
+            regions: {
+                from_bbox(
+                    PADDING
+                    PADDING
+                    map.size[1] - PADDING
+                    map.size[2] - PADDING)\with_selector(room_selector)
+            }
+        }
         for child in *@children
+            child.parent = @
             if not child\compile()
                 return nil
         if not NewMaps.check_connection(map)
@@ -86,19 +97,20 @@ Map = newtype {
         return map
 }
 
-Carver = newtype {
-    init: (@parent, @carve) =>
-        @children = {}
-        append @parent.children, @
+MapNode = newtype {
+    init: (args) =>
+        @children = args.children or {}
+        @place = args.place
     new_group: () =>
         @map.next_group += 1
         return @map.next_group
     compile: () =>
         @region_set = @parent.region_set
         @group = @new_group()
-        if not @carve()
+        if not @place()
             return false
         for child in *@children
+            child.parent = @
             if not child\compile()
                 return false
         return true
@@ -112,12 +124,8 @@ Carver = newtype {
         rng: () => @region_set.map.rng
     }
 }
-
-EasyOverworldDungeon = Map.create {
-    size: {40, 40}
-}
-
-Dungeon = Carver.create EasyOverworldDungeon, () =>
+ 
+node_paint_group = () =>
     @apply {
         operator: {group: @group}
     }
@@ -127,7 +135,7 @@ Dungeon = Carver.create EasyOverworldDungeon, () =>
     return true
 
 MAX_TUNNEL_TRIES = 100
-Rooms = Carver.create Dungeon, () =>
+node_place_easy_overworld_rooms = () =>
     -- Ensure it is a range
     n_rooms = 5
     event_log("(RNG #%d) generating %d rooms", @rng\amount_generated(), n_rooms)
@@ -213,6 +221,19 @@ Rooms = Carver.create Dungeon, () =>
     event_log("(RNG #%d) after generating %d rooms", @rng\amount_generated(), n_rooms)
     return true
 
--- Tunnels = Filler.create {Rooms}, () =>
+EasyOverworldDungeon = MapDesc.create {
+    size: {40, 40}
+    children: {
+        MapNode.create {
+            place: () => node_paint_group(@)
+            children: {
+                MapNode.create {
+                    place: () => node_place_easy_overworld_rooms(@)
+                }
+            }
+        }
+    }
+}
 
-return NewMaps.try_n_times 100, () -> EasyOverworldDungeon\compile()
+MAX_MAP_TRIES = 100
+return NewMaps.try_n_times MAX_MAP_TRIES, () -> EasyOverworldDungeon\compile()
