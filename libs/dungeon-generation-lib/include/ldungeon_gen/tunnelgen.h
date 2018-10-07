@@ -48,7 +48,7 @@ namespace ldungeon_gen {
 	};
 
 	struct TunnelGenOperator: public AreaOperatorBase {
-		MTwist randomizer;
+		MTwist& randomizer;
 		TunnelCheckSettings checker;
 		ConditionalOperator fill_oper, perimeter_oper;
 		int padding;

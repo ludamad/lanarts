@@ -42,7 +42,17 @@ Places = require "maps.Places"
 
 PADDING = 20
 
-rng = NewMaps.new_rng()
+event_log = (...) -> print string.format(...)
+rng = require("mtwist").create(12312532)
+
+shrink = (bbox, x, y) ->
+    {x1,y1,x2,y2} = bbox
+    return {
+        x1+x
+        y1+y
+        x2-x
+        y2-y
+    }
 
 Carver = newtype {
     init: (@children, @carve) =>
@@ -73,11 +83,14 @@ Carver = newtype {
         @compiled = true
         @_compiled_region_set = @_compile()
         return @_compiled_region_set
+    new_group: () =>
+        @map.next_group += 1
+        return @map.next_group
     _compile: () =>
-        @group = @region_set.map.next_group
-        @region_set.map.next_group += 1
+        @group = @map.next_group
+        @map.next_group += 1
         @carve()
-        @group_range = {@group, @region_set.map.next_group - 1}
+        @group_range = {@group, @map.next_group - 1}
         return selector_map @region_set, (s) ->
             return table.merge s, {matches_group: @group_range}
     chance: (prob) => @region_set.map.rng\chance(prob)
@@ -89,50 +102,63 @@ Carver = newtype {
 
 Rooms = Carver.create {}, () =>
     -- Ensure it is a range
-    n_rooms = 40
-    event_log("(RNG #%d) generating %d rooms", rng\amount_generated(), n_rooms)
+    n_rooms = 4
+    event_log("(RNG #%d) generating %d rooms", @rng\amount_generated(), n_rooms)
     regions = {}
     for i=1,n_rooms
-        size = {4, 4}
+        size = {16, 16}
         if @chance(0.2)
             size = {5, 5}
         {:bbox} = find_bbox(@region_set, size)
         if not bbox
             return false
-        append regions, from_bbox(unpack(bbox))
+        group = @new_group()
+        region = from_bbox(unpack(bbox))
+        region.inner_bbox = shrink(bbox, 1, 1)
+        region.selector = {matches_group: {group, group}}
+        append regions, region
         SourceMap.rectangle_apply {
             map: @map
             area: bbox
-            fill_operator: {add: SourceMap.FLAG_SEETHROUGH, remove: SourceMap.FLAG_SOLID, content: Tilesets.pebble.floor}
+            fill_operator: {
+                :group
+                add: SourceMap.FLAG_SEETHROUGH
+                remove: SourceMap.FLAG_SOLID
+                content: Tilesets.pebble.floor
+            }
             perimeter_width: 1
-            perimeter_operator: {add: SourceMap.FLAG_SEETHROUGH, remove: SourceMap.FLAG_SOLID, content: Tilesets.pebble.floor_alt}
+            perimeter_operator: {
+                add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_PERIMETER}
+                remove: SourceMap.FLAG_SEETHROUGH
+                content: Tilesets.pebble.wall
+            }
         }
     for region in *regions
-        if not SourceMap.try_tunnel_apply {
+       for i=0,2000
+         SourceMap.try_tunnel_apply {
             map: @map
             rng: @rng
-            start_area: region\bbox()
+            start_area: region.inner_bbox
+            start_selector: region.selector
             validity_selector: {
                 fill_selector: {matches_all: SourceMap.FLAG_SOLID, matches_none: SourceMap.FLAG_TUNNEL }
                 perimeter_selector: { matches_all: SourceMap.FLAG_SOLID, matches_none: SourceMap.FLAG_TUNNEL }
             },
-
             completion_selector: {
                 fill_selector: { matches_none: { SourceMap.FLAG_SOLID, SourceMap.FLAG_PERIMETER, SourceMap.FLAG_TUNNEL } },
                 perimeter_selector: { matches_none: SourceMap.FLAG_SOLID }
             },
-
             fill_operator: { add: {SourceMap.FLAG_TUNNEL, SourceMap.FLAG_SEETHROUGH}, remove: SourceMap.FLAG_SOLID, content: Tilesets.pebble.floor},
             perimeter_operator: {
                 matches_all: SourceMap.FLAG_SOLID, remove: SourceMap.FLAG_SEETHROUGH,
                 add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_TUNNEL, SourceMap.FLAG_PERIMETER}, content: Tilesets.pebble.wall}
 
             perimeter_width: 1
+            max_length: (i % 10 + 1) * 10
             size_range: {1,1}
             tunnels_per_room_range: {1,1}
         }
-            return false
-    event_log("(RNG #%d) after generating %d rooms", rng\amount_generated(), n_rooms)
+    event_log("(RNG #%d) after generating %d rooms", @rng\amount_generated(), n_rooms)
     return true
 
 -- Tunnels = Filler.create {Rooms}, () =>

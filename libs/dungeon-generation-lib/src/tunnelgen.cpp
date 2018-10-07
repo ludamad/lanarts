@@ -9,6 +9,7 @@
 
 #include <lcommon/mtwist.h>
 #include <lcommon/math_util.h>
+#include <iostream>
 
 #include "ldungeon_assert.h"
 #include "tunnelgen.h"
@@ -128,10 +129,10 @@ namespace ldungeon_gen {
 				cntxt->tunneled = false;
 				break;
 			}
-			if (sqr.matches(checker.avoid_selector) || !sqr.matches(checker.end_selector)) {
-				cntxt->tunneled = false;
-				break;
-			}
+//			if (sqr.matches(checker.avoid_selector)) { // || !sqr.matches(checker.end_selector)) {
+//				cntxt->tunneled = false;
+//				break;
+//			}
 		}
 
 		if (cntxt->tunneled) {
@@ -292,6 +293,7 @@ namespace ldungeon_gen {
 //						FOR_EACH_BBOX(group.group_area, xx, yy) {
 //						    (*map)[Pos(xx,yy)].flags |= FLAG_RESERVED1;
 //						}
+        checker.avoid_selector = root_selector;
 		generate_entrance(root_rect, randomizer,
 						  std::min(genwidth, 2), p, axis, positive);
 
@@ -326,30 +328,8 @@ namespace ldungeon_gen {
 					int path_len = 2;
 					for (int attempts = 0; attempts < 16 && !generated;
 							attempts++) {
-//                        Pos p;
-//                        bool axis, positive;
-//
-//                        std::vector<Square> btbuff;
-//                        std::vector<TunnelSliceContext> tsbuff;
-						checker.avoid_selector = Selector(0, 0, Range16 {i, i});
-//						TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, 0.05);
-//						TunnelGenImpl tg(*map, randomizer, checker, filler);
-//
-////						FOR_EACH_BBOX(group.group_area, xx, yy) {
-////						    (*map)[Pos(xx,yy)].flags |= FLAG_RESERVED1;
-////						}
-//						generate_entrance(group.group_area, randomizer,
-//								std::min(genwidth, 2), p, axis, positive);
-//						if (!rect.contains(p)) {
-//						    goto label_give_up_on_group;
-//						}
-//
-//						int val = positive ? +1 : -1;
-//						int dx = axis ? 0 : val, dy = axis ? val : 0;
-
-//						if (tg.generate(p, dx, dy, btbuff, tsbuff)) {
-                        if (try_tunnel(map, group.group_area, Selector(), genwidth, path_len, 0.05f)) {
-//                            int genwidth, int path_len, float turn_chance)) {
+                        if (try_tunnel(map, group.group_area,
+                                       Selector(0, 0, Range16 {i, i}), genwidth, path_len, 0.05f)) {
 							genpaths[i]++;
 							nogen_tries = 0;
 							path_len = 2;

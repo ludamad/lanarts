@@ -74,11 +74,21 @@ public:
 		_amount_generated++;
 		return genrand_int32();
 	}
-	int rand(int max) {
-		if (max == 1)
-			return 0;
-		_amount_generated++;
-		return genrand_int32() % max;
+	int  rand(int max) {
+		// Avoids the modulo-bias problem. Translation of Java's Random.nextInt implementation.
+		int raw = genrand_int31();
+
+		if ((max & -max) == max) { // i.e., max is a power of 2
+			return (int) ((max * (long long)raw) >> 31);
+		}
+		int val = raw % max;
+		// Reject values within a small, problematic range:
+		while (raw - val + (max - 1) < 0) {
+			raw = genrand_int31();
+			val = raw % max;
+		}
+
+		return val;
 	}
 	int rand(int min, int max) {
 		return rand(max - min) + min;
