@@ -313,12 +313,11 @@ new_rng = () ->
 
 try_n_times = (n, f) ->
     for i=1,n
-        ret = f()
+        ret = f(i)
         if ret
             return ret
-        -- print "** MAP GENERATION ATTEMPT " .. i .. " FAILED, RETRYING **"
-    return nil
-    --error("Could not generate a viable map in " .. n .. " tries!")
+        print "** MAP GENERATION ATTEMPT " .. i .. " FAILED, RETRYING **"
+    error("Could not generate a viable map in " .. n .. " tries!")
 
 map_create = (template) ->
     rng = new_rng()

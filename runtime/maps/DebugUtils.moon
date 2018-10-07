@@ -12,19 +12,25 @@ COLORS = {
 _VIS_W, _VIS_H = nil, nil
 _VIS_DEBUG = false
 
-debug_visualize_step = (map, restart=nil, tw=8, th=8) ->
+debug_visualize_step = (map, restart=nil, tw=10, th=10) ->
     {w, h} = map.size
     Display.set_world_region({0, 0, w * tw, h * th})
+    font = font_cached_load "fonts/Gudea-Regular.ttf", 8
+
     step = () ->
         require("core.GameState").game_loop () ->
             row = {}
+            group_row = {}
             for y=1,h
                 SourceMap.get_row_content(map, row, 1, w, y)
+                SourceMap.get_row_groups(map, group_row, 1, w, y)
                 for x=1,w
                     color = COLORS[(row[x] % #COLORS) + 1]
                     if color == COL_BLACK and row[x] ~= 0
                         color = COL_GOLD
-                    Display.draw_rectangle(color, {(x-1)*tw, (y-1)*th, x*tw, y*th})
+                    bbox = {(x-1)*tw, (y-1)*th, x*tw, y*th}
+                    Display.draw_rectangle(color, bbox)
+                    font\draw({color: COL_WHITE}, {bbox[1], bbox[2]}, tostring(group_row[x]))
             if Keys.key_pressed('N') or Keys.key_pressed('R')
                 return true
             return nil

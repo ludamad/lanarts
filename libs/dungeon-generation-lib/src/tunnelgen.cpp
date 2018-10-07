@@ -129,10 +129,10 @@ namespace ldungeon_gen {
 				cntxt->tunneled = false;
 				break;
 			}
-//			if (sqr.matches(checker.avoid_selector)) { // || !sqr.matches(checker.end_selector)) {
-//				cntxt->tunneled = false;
-//				break;
-//			}
+			if (sqr.matches(checker.avoid_selector)) { // || !sqr.matches(checker.end_selector)) {
+				cntxt->tunneled = false;
+				break;
+			}
 		}
 
 		if (cntxt->tunneled) {
@@ -262,7 +262,8 @@ namespace ldungeon_gen {
 			t.resize(t.size() * 2);
 	}
 
-    bool TunnelGenOperator::try_tunnel(MapPtr map, const BBox& root_rect, Selector root_selector,
+    bool TunnelGenOperator::try_tunnel(MapPtr map,
+                                       const BBox& root_rect, Selector root_selector,
                                        int genwidth, int path_len, float turn_chance) {
 //        TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, turn_chance);
 //        TunnelGenImpl tg(*map, randomizer, checker, filler);
@@ -288,15 +289,17 @@ namespace ldungeon_gen {
 		std::vector<Square> btbuff;
 		std::vector<TunnelSliceContext> tsbuff;
 		TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, turn_chance);
+        checker.avoid_selector = root_selector;
 		TunnelGenImpl tg(*map, randomizer, checker, filler);
 
 //						FOR_EACH_BBOX(group.group_area, xx, yy) {
 //						    (*map)[Pos(xx,yy)].flags |= FLAG_RESERVED1;
 //						}
-        checker.avoid_selector = root_selector;
 		generate_entrance(root_rect, randomizer,
 						  std::min(genwidth, 2), p, axis, positive);
-
+        if (!root_rect.contains(p)) {
+            return false;
+        }
 		int val = positive ? +1 : -1;
 		int dx = axis ? 0 : val, dy = axis ? val : 0;
 

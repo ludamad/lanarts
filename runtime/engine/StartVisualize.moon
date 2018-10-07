@@ -33,8 +33,8 @@ run_visualize = (raw_args) ->
         settings: { -- Settings object
             -- Window settings
             fullscreen: false
-            view_width: 640
-            view_height: 480
+            view_width: 800
+            view_height: 800
             -- Font settings
             font: 'fonts/Gudea-Regular.ttf'
             menu_font: 'fonts/alagard_by_pix3m-d6awiwp.ttf'

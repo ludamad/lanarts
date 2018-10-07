@@ -474,6 +474,30 @@ namespace ldungeon_gen {
         return 0;
     }
 
+    /* Retrieve data into a preallocated Lua table */
+    static int lget_row_groups(lua_State* L) {
+        MapPtr map = luawrap::get<MapPtr>(L, 1);
+        // Note, Lua indexing corrections are applied
+        int x1 = luaL_checkinteger(L, 3) - 1;
+        int x2 = luaL_checkinteger(L, 4);
+        int y = luaL_checkinteger(L, 5) - 1;
+        // What to use outside of map bounds?
+        int fill = lua_gettop(L) >= 6 ? luaL_checknumber(L, 6) : 0;
+        int w = map->width(), h = map->height();
+        Pos pos(x1, y);
+        int i = 1;
+        for (; pos.x < x2; pos.x++) {
+            if (pos.y < 0 || pos.y >= h || pos.x < 0 || pos.x >= w) {
+                lua_pushnumber(L, fill);
+            } else {
+                lua_pushnumber(L, (*map)[pos].group);
+            }
+            lua_rawseti(L, 2, i);
+            i++;
+        }
+        return 0;
+    }
+
 	/*****************************************************************************
 	 *                     Area operator helpers                                 *
 	 *****************************************************************************/
@@ -787,6 +811,7 @@ namespace ldungeon_gen {
 		submodule["rectangle_criteria"].bind_function(rectangle_query);
 		submodule["find_random_square"].bind_function(lfind_random_square);
         submodule["get_row_flags"].bind_function(lget_row_flags);
+        submodule["get_row_groups"].bind_function(lget_row_groups);
         submodule["get_row_content"].bind_function(lget_row_content);
         submodule["erode_diagonal_pairs"].bind_function(lerode_diagonal_pairs);
         submodule["area_fully_connected"].bind_function(larea_fully_connected);
