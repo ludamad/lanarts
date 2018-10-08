@@ -172,6 +172,7 @@ set (libraries
 	#	${FREETYPE_LIBRARIES}
         UnitTest++
         backward_object
+        polypartition
         ${BACKTRADE_DEP}
 	${ARCH_LIBS}
 )

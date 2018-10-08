@@ -8,8 +8,10 @@ import map_place_object, ellipse_points,
     random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
     Tile, tile_operator from require "maps.GenerateUtils"
 
-{:MapRegion, :from_bbox} = require "maps.MapRegion"
+MapRegionShapes = require("maps.MapRegionShapes")
+{:MapRegion, :combine_map_regions, :from_bbox} = require "maps.MapRegion"
 
+PolyPartition = require "core.PolyPartition"
 DebugUtils = require "maps.DebugUtils"
 NewMaps = require "maps.NewMaps"
 NewDungeons = require "maps.NewDungeons"
@@ -27,6 +29,7 @@ SourceMap = require "core.SourceMap"
 Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
+PolygonTriangulation = require "maps.PolygonTriangulation"
 
 {:MapCompilerContext, :make_on_player_interact} = require "maps.MapCompilerContext"
 Places = require "maps.Places"
@@ -36,7 +39,7 @@ Places = require "maps.Places"
     :FLAG_OVERWORLD, :FLAG_ROOM, :FLAG_NO_ENEMY_SPAWN, :FLAG_NO_ITEM_SPAWN
 } = Vaults
 
-{:find_bbox, :find_square, :selector_filter, :selector_map} = require "maps.MapRegionUtils"
+{:center, :find_bbox, :find_square, :selector_filter, :selector_map} = require "maps.MapRegionUtils"
 
 {:generate_map_node} = require "maps.01_Overworld"
 
@@ -91,9 +94,9 @@ MapDesc = newtype {
             child.parent = @
             if not child\compile()
                 return nil
-        if not NewMaps.check_connection(map)
-            event_log("Failed connectivity check")
-            return nil
+        --if not NewMaps.check_connection(map)
+        --    event_log("Failed connectivity check")
+        --    return nil
         return map
 }
 
@@ -188,6 +191,103 @@ node_connect_rect_rooms = () =>
                     tries_without_tunnel += 1
     return true
 
+node_place_bbox = () =>
+    size = {10, 10}
+    if @chance(0.2)
+        size = {5, 5}
+    result = find_bbox(@region_set, size)
+    if not result
+        return false
+    {:bbox} = result
+    group = @new_group()
+    region = from_bbox(unpack(bbox))
+    region.inner_bbox = shrink(bbox, 1, 1)
+    region.selector = {matches_group: {group, group}}
+    append regions, region
+    SourceMap.rectangle_apply {
+        map: @map
+        area: bbox
+        fill_operator: {
+            :group
+            add: SourceMap.FLAG_SEETHROUGH
+            remove: SourceMap.FLAG_SOLID
+            content: Tilesets.pebble.floor
+        }
+        perimeter_width: 0
+        perimeter_operator: {
+            add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_PERIMETER}
+            remove: SourceMap.FLAG_SEETHROUGH
+            content: Tilesets.pebble.wall
+        }
+    }
+    return true
+
+_load_map_poly = memoized (name) ->
+    json = require "json"
+    success, data = json.parse(file_as_string "maps/templates/#{name}.json")
+    assert success
+    parts = {}
+    for {:objects} in *data.layers
+        for {:name, :polygon} in *(objects or {})
+            if not polygon
+                continue
+            --d_triangles = PolygonTriangulation.triangulate unpack for {:x, :y} in *polygon
+            --    PolygonTriangulation.Point(x, y)
+            --triangles = for {:p1, :p2, :p3} in *d_triangles
+            --    for {:x, :y} in *{p1, p2, p3}
+            --        {x, y}
+            convex_polys = PolyPartition.decompose [{x, y} for {:x, :y} in *polygon]
+            parts[name or (#parts+1)] = MapRegion.create(convex_polys)
+    return parts
+
+load_map_polys = (name, nx, ny, nw, nh) ->
+    parts = table.deep_clone(_load_map_poly(name))
+    parts.full_map = combine_map_regions [region for _, region in pairs parts]
+    bbox = parts.full_map\bbox()
+    -- Correct into a w by h shape situated at x,y
+    for points in *parts.full_map.polygons
+        for i=1,#points
+            points[i] = MapRegionShapes.transform_point(points[i], nx, ny, nw, nh, bbox)
+    return parts
+
+node_place_spiral = () =>
+    xy = center @region_set
+    polygons = MapRegionShapes.get_shape_polygons('bart', xy[1], xy[2], 40, 40)
+    region = MapRegion.create(polygons)
+    region\rotate @rng\randomf(0, math.pi), xy
+    region\apply {
+        map: @map
+        operator: {
+            group: @group
+            add: SourceMap.FLAG_SEETHROUGH
+            remove: SourceMap.FLAG_SOLID
+            content: Tilesets.pebble.floor
+        }
+    }
+    @region_set = {map: @map, regions: {region}}
+    return true
+
+node_place_map_polys = () =>
+    xy = center @region_set
+    polys = load_map_polys "03_WindingPath", xy[1], xy[2], 150, 100
+    polys.full_map\rotate @rng\randomf(0, math.pi*2), xy
+    for poly in *{
+        polys.full_map
+        --polys.back
+        --polys.front
+        --polys.body
+    }
+        poly\apply {
+            map: @map
+            operator: {
+                group: @new_group()
+                add: SourceMap.FLAG_SEETHROUGH
+                remove: SourceMap.FLAG_SOLID
+                content: Tilesets.pebble.floor
+            }
+        }
+    return true
+
 node_place_easy_overworld_rooms = () =>
     -- Ensure it is a range
     n_rooms = 5
@@ -229,13 +329,14 @@ node_place_easy_overworld_rooms = () =>
     return true
 
 EasyOverworldDungeon = MapDesc.create {
-    size: {40, 40}
+    size: {300, 300}
     children: {
         MapNode.create {
             place: () => node_paint_group(@)
             children: {
                 MapNode.create {
-                    place: () => node_place_easy_overworld_rooms(@)
+                    place: node_place_map_polys
+                    --place: () => node_place_easy_overworld_rooms(@)
                 }
             }
         }

@@ -33,6 +33,7 @@ transform_point = (point, x, y, width, height, bbox) ->
     return {x + px * width, y + py * height}
 
 return {
+    :transform_point
     -- Get a list of convex polygons situated around x, y
     get_shape_polygons: (name, x, y, width, height) ->
         polygons = get_shape_polygons(name)

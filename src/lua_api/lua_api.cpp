@@ -143,6 +143,7 @@ namespace lua_api {
 	void register_lua_core_PathFinding(lua_State* L);
 	void register_lua_core_Keyboard(lua_State* L);
 	void register_lua_core_Gamepad(lua_State* L);
+	void register_lua_core_PolyPartition(lua_State* L);
 	void register_lua_core_GameActions(lua_State* L);
 	void register_lua_core_Mouse(lua_State* L);
 	void register_lua_core_MiscSpellAndItemEffects(lua_State* L);
@@ -195,6 +196,7 @@ namespace lua_api {
 		register_lua_core_GameWorld(L);
 		register_lua_core_Keyboard(L);
 		register_lua_core_Gamepad(L);
+		register_lua_core_PolyPartition(L);
 		register_lua_core_GameActions(L);
 		register_lua_core_MiscSpellAndItemEffects(L);
 		register_lua_core_Mouse(L);
