@@ -217,6 +217,7 @@ source_map_create = (args) ->
         wandering_enabled: if wandering_enabled == nil then true else wandering_enabled
         door_locations: {}
         instances: {}
+        portal_spawns: {}
         post_maps: {}
         post_game_map: {}
         rectangle_rooms: {}

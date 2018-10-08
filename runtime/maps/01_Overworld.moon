@@ -506,6 +506,28 @@ M.crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
 
 -------------------------
 -- Place easy dungeon: --
+
+-- TODO rename
+place_new_easy = (map_region) ->
+    {:map, :regions} = map_region
+    MapSeq = MapSequence.create {preallocate: 1}
+    generate = () ->
+        return require("maps.03_EasyOverworldDungeon").generate {
+            (map, xy) ->
+                portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_hell1")
+                MapSeq\backward_portal_resolve(2, portal, 1)
+        }
+
+    place_dungeon = (map, xy) ->
+        portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_hell1")
+        (MapSeq\forward_portal_add 1, portal, 1, generate)
+    vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.pebble})
+    if not place_feature(map, vault, regions)
+        return nil
+    append map.post_game_map, (game_map) ->
+        MapSeq\slot_resolve(1, game_map)
+    return true
+
 place_easy = (map_region) ->
     {:map, :regions} = map_region
     MapSeq = MapSequence.create {preallocate: 1}
@@ -852,7 +874,7 @@ overworld_features = (map_region) ->
             return nil
     -------------------------
 
-    if not place_easy(map_region)
+    if not place_new_easy(map_region)
         return nil
 
     if not map.rng\random_choice({place_medium1a, place_medium1b})(map_region)
@@ -1136,7 +1158,7 @@ overworld_create = () ->
     return game_map
 
 return {
-    overworld_create: () -> require("maps.03_EasyOverworldDungeon").generate()
+    :overworld_create
     test_determinism: () -> nil
     :generate_map_node
 }

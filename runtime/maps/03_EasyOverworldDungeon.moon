@@ -65,7 +65,7 @@ MapDesc = newtype {
         @children = @map_args.children
         @map_args.children = nil
         @region_set = false
-    compile: () =>
+    compile: (portal_spawns) =>
         map_args = table.merge {
             :rng
             size: {100, 100}
@@ -75,6 +75,7 @@ MapDesc = newtype {
         }, @map_args
         map_args.size = vector_add(map_args.size, {PADDING*2, PADDING*2})
         map = NewMaps.source_map_create map_args
+        map.portal_spawns = portal_spawns
 
         room_selector = {
             matches_all: SourceMap.FLAG_SOLID
@@ -283,6 +284,9 @@ node_place_map_polys = () =>
     bbox = parts.A\bbox()
     {x, y} = MapUtils.random_square(@map, bbox, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
     append @map.player_candidate_squares, {x*32+16,y*32+16}
+    for spawn in *@map.portal_spawns
+        xy = MapUtils.random_square(@map, bbox, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+        spawn(@map, xy)
     return true
 
 node_place_easy_overworld_rooms = () =>
@@ -341,10 +345,12 @@ EasyOverworldDungeon = MapDesc.create {
 }
 
 MAX_MAP_TRIES = 100
-generate = () ->
-    map = NewMaps.try_n_times MAX_MAP_TRIES, () -> EasyOverworldDungeon\compile()
+generate = (portal_spawns) ->
+    map = NewMaps.try_n_times MAX_MAP_TRIES, () -> EasyOverworldDungeon\compile(portal_spawns)
     game_map = NewMaps.generate_game_map(map)
-    World.players_spawn(game_map, map.player_candidate_squares)
+    for post_poned in *map.post_game_map
+        post_poned(game_map)
+    --World.players_spawn(game_map, map.player_candidate_squares)
     return game_map
 
 return {:generate}
