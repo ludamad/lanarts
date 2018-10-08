@@ -1136,7 +1136,7 @@ overworld_create = () ->
     return game_map
 
 return {
-    :overworld_create
+    overworld_create: () -> require("maps.03_EasyOverworldDungeon").generate()
     test_determinism: () -> nil
     :generate_map_node
 }

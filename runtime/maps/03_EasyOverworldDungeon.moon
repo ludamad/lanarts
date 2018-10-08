@@ -8,6 +8,7 @@ import map_place_object, ellipse_points,
     random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
     Tile, tile_operator from require "maps.GenerateUtils"
 
+GeometryUtils = require "maps.GeometryUtils"
 MapRegionShapes = require("maps.MapRegionShapes")
 {:MapRegion, :combine_map_regions, :from_bbox} = require "maps.MapRegion"
 
@@ -29,7 +30,6 @@ SourceMap = require "core.SourceMap"
 Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
-PolygonTriangulation = require "maps.PolygonTriangulation"
 
 {:MapCompilerContext, :make_on_player_interact} = require "maps.MapCompilerContext"
 Places = require "maps.Places"
@@ -69,8 +69,8 @@ MapDesc = newtype {
         map_args = table.merge {
             :rng
             size: {100, 100}
-            default_content: Tilesets.crypt.wall
-            default_flags: {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH}
+            default_content: Tilesets.orc.wall
+            default_flags: {SourceMap.FLAG_SOLID} --, SourceMap.FLAG_SEETHROUGH}
             map_label: "Dungeon"
         }, @map_args
         map_args.size = vector_add(map_args.size, {PADDING*2, PADDING*2})
@@ -94,9 +94,9 @@ MapDesc = newtype {
             child.parent = @
             if not child\compile()
                 return nil
-        --if not NewMaps.check_connection(map)
-        --    event_log("Failed connectivity check")
-        --    return nil
+        if not NewMaps.check_connection(map)
+            event_log("Failed connectivity check")
+            return nil
         return map
 }
 
@@ -228,64 +228,61 @@ _load_map_poly = memoized (name) ->
     assert success
     parts = {}
     for {:objects} in *data.layers
-        for {:name, :polygon} in *(objects or {})
+        for idx, {:x, :y, :name, :polygon} in ipairs (objects or {})
+            ox, oy = x, y
             if not polygon
                 continue
-            --d_triangles = PolygonTriangulation.triangulate unpack for {:x, :y} in *polygon
-            --    PolygonTriangulation.Point(x, y)
-            --triangles = for {:p1, :p2, :p3} in *d_triangles
-            --    for {:x, :y} in *{p1, p2, p3}
-            --        {x, y}
-            convex_polys = PolyPartition.decompose [{x, y} for {:x, :y} in *polygon]
-            parts[name or (#parts+1)] = MapRegion.create(convex_polys)
+            convex_polys = PolyPartition.decompose [{x+ox, y+oy} for {:x, :y} in *polygon]
+            if name == ""
+                error("Need to specify name!")
+                name = tostring(idx)
+            parts[name] = MapRegion.create(convex_polys)
     return parts
 
-load_map_polys = (name, nx, ny, nw, nh) ->
+resolve_parts = (rng, parts) ->
+    possibilities = {}
+    for name, part in pairs parts
+        {prefix, idx} = name\split("_")
+        possibilities[prefix] or= {}
+        append possibilities[prefix], part
+    for k, choices in pairs possibilities
+        possibilities[k] = rng\random_choice(choices)
+    return possibilities
+
+load_map_polys = (name, nx, ny, nw, nh, angle) ->
     parts = table.deep_clone(_load_map_poly(name))
-    parts.full_map = combine_map_regions [region for _, region in pairs parts]
-    bbox = parts.full_map\bbox()
+    parts = resolve_parts(rng, parts)
+    full_map = combine_map_regions [region for _, region in pairs parts]
+    bbox = full_map\bbox()
     -- Correct into a w by h shape situated at x,y
-    for points in *parts.full_map.polygons
+    for points in *full_map.polygons
         for i=1,#points
             points[i] = MapRegionShapes.transform_point(points[i], nx, ny, nw, nh, bbox)
+    full_map\rotate angle, {nx, ny}
     return parts
-
-node_place_spiral = () =>
-    xy = center @region_set
-    polygons = MapRegionShapes.get_shape_polygons('bart', xy[1], xy[2], 40, 40)
-    region = MapRegion.create(polygons)
-    region\rotate @rng\randomf(0, math.pi), xy
-    region\apply {
-        map: @map
-        operator: {
-            group: @group
-            add: SourceMap.FLAG_SEETHROUGH
-            remove: SourceMap.FLAG_SOLID
-            content: Tilesets.pebble.floor
-        }
-    }
-    @region_set = {map: @map, regions: {region}}
-    return true
 
 node_place_map_polys = () =>
     xy = center @region_set
-    polys = load_map_polys "03_WindingPath", xy[1], xy[2], 150, 100
-    polys.full_map\rotate @rng\randomf(0, math.pi*2), xy
-    for poly in *{
-        polys.full_map
-        --polys.back
-        --polys.front
-        --polys.body
-    }
-        poly\apply {
+    parts = load_map_polys "03_WindingPath", xy[1], xy[2], 40, 30, @rng\randomf(-math.pi, math.pi)
+    for name, region in spairs parts
+        region.group = @new_group()
+        content = nilprotect {
+            A: Tilesets.pebble.floor, B: Tilesets.pebble.floor_alt
+            C: Tilesets.orc.floor, D: Tilesets.pebble.floor_alt
+            E: Tilesets.pebble.floor
+        }
+        region\apply {
             map: @map
             operator: {
-                group: @new_group()
+                group: region.group
                 add: SourceMap.FLAG_SEETHROUGH
                 remove: SourceMap.FLAG_SOLID
-                content: Tilesets.pebble.floor
+                content: content[name]
             }
         }
+    bbox = parts.A\bbox()
+    {x, y} = MapUtils.random_square(@map, bbox, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+    append @map.player_candidate_squares, {x*32+16,y*32+16}
     return true
 
 node_place_easy_overworld_rooms = () =>
@@ -329,7 +326,7 @@ node_place_easy_overworld_rooms = () =>
     return true
 
 EasyOverworldDungeon = MapDesc.create {
-    size: {300, 300}
+    size: {60, 60}
     children: {
         MapNode.create {
             place: () => node_paint_group(@)
@@ -344,4 +341,10 @@ EasyOverworldDungeon = MapDesc.create {
 }
 
 MAX_MAP_TRIES = 100
-return NewMaps.try_n_times MAX_MAP_TRIES, () -> EasyOverworldDungeon\compile()
+generate = () ->
+    map = NewMaps.try_n_times MAX_MAP_TRIES, () -> EasyOverworldDungeon\compile()
+    game_map = NewMaps.generate_game_map(map)
+    World.players_spawn(game_map, map.player_candidate_squares)
+    return game_map
+
+return {:generate}

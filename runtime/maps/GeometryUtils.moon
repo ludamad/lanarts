@@ -55,7 +55,7 @@ scale_polygon = (points, scale_x, scale_y) ->
         y = (y - cy)*scale_y + cy
         {x, y}
 
-polygon_bbox = (polygon) -> 
+polygon_bbox = (polygon) ->
     x1,y1 = math.huge, math.huge
     x2,y2 = -math.huge, -math.huge
     for {x, y} in *polygon
