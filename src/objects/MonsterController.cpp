@@ -156,12 +156,14 @@ void MonsterController::pre_step(GameState* gs) {
 
 
         if (actor != NULL && eb.current_action == EnemyBehaviour::CHASING_PLAYER) {
-                event_log("Enemy id=%d has enemy of interest %d", std::max(0,e->id), std::max(0,actor->id));
-                eois.push_back(
-                    EnemyOfInterest(e, actor->id, inst_distance(e, actor))
-                );
+            // Handle hostile/aggro monsters
+            event_log("Enemy id=%d has enemy of interest %d", std::max(0,e->id), std::max(0,actor->id));
+            eois.push_back(
+                EnemyOfInterest(e, actor->id, inst_distance(e, actor))
+            );
         } else {
             e->vx = 0, e->vy = 0;
+            // Ally pathing code
             if (e->has_paths_data() && eb.current_action != EnemyBehaviour::FOLLOWING_PATH) {
                 GameInst* inst = get_nearest_ally(gs, e);
                 if (inst) {
@@ -173,13 +175,13 @@ void MonsterController::pre_step(GameState* gs) {
                     }
                 }
             }
-
+            // Handle inactive/wandering monsters - find new
             if (e->vx == 0 && e->vy == 0) {
                 if (eb.current_action == EnemyBehaviour::INACTIVE) {
-                        monster_wandering(gs, e);
+                    monster_wandering(gs, e);
                 } else {
-                        //if (eb.current_action == EnemyBehaviour::FOLLOWING_PATH)
-                        monster_follow_path(gs, e);
+                    //if (eb.current_action == EnemyBehaviour::FOLLOWING_PATH)
+                    monster_follow_path(gs, e);
                 }
             }
         }

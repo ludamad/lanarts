@@ -332,8 +332,32 @@ void MonsterController::monster_follow_path(GameState* gs, EnemyInst* e) {
 		eb.current_action = EnemyBehaviour::INACTIVE;
 	}
 }
-void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
+
+static Pos monster_wander_position(GameState* gs, EnemyInst* e) {
 	GameTiles& tile = gs->tiles();
+	MTwist& mt = gs->rng();
+
+	if (!e->lua_variables.empty()) {
+		Pos target = lcall_def(Pos(), e->lua_variables["monster_wander_position"], e);
+		if (target != Pos()) {
+			return target;
+		}
+	}
+	int ex = e->x / TILE_SIZE, ey = e->y / TILE_SIZE;
+	Pos target;
+	int tries_left = 3; // arbitrary number
+	do {
+		target.x = squish(ex + mt.rand(-10, 12), 0, tile.tile_width() - 1);
+		target.y = squish(ey + mt.rand(-10, 12), 0, tile.tile_height() - 1);
+		tries_left--;
+	} while (tries_left > 0 && tile.is_solid(target));
+	if (tries_left <= 0) {
+		return Pos();
+	}
+	return target;
+}
+
+void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	MTwist& mt = gs->rng();
 	EnemyBehaviour& eb = e->behaviour();
 	e->vx = 0, e->vy = 0;
@@ -345,10 +369,10 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 		return;
 	}
 	perf_timer_begin(FUNCNAME);
-	bool is_fullpath = false;
+//	bool is_fullpath = false;
 	if (eb.path_cooldown > 0) {
 		eb.path_cooldown--;
-		is_fullpath = false;
+//		is_fullpath = false;
 	}
 	int ex = e->x / TILE_SIZE, ey = e->y / TILE_SIZE;
 
@@ -356,20 +380,9 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 		return; // Avoid pathological cases
 	}
 
-	Pos target;
-	int tries_left = 3; // arbitrary number
-	do {
-		if (!is_fullpath) {
-			target.x = squish(ex + mt.rand(-3, 4), 0, tile.tile_width() - 1);
-			target.y = squish(ey + mt.rand(-3, 4), 0, tile.tile_height() - 1);
-		} else {
-			target.x = mt.rand(tile.tile_width());
-			target.y = mt.rand(tile.tile_height());
-		}
-		tries_left--;
-	} while (tries_left > 0 && tile.is_solid(target));
+	Pos target = monster_wander_position(gs, e);
 
-	if (tries_left == 0) {
+	if (target == Pos(0,0)) {
 		return; // Avoid pathological cases
 	}
 
@@ -379,9 +392,9 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 		return;
 	}
 	eb.current_node = 0;
-	if (is_fullpath) {
-		eb.path_cooldown = EnemyBehaviour::RANDOM_WALK_COOLDOWN/2 + mt.rand(EnemyBehaviour::RANDOM_WALK_COOLDOWN);
-	}
+//	if (is_fullpath) {
+	eb.path_cooldown = EnemyBehaviour::RANDOM_WALK_COOLDOWN/2 + mt.rand(EnemyBehaviour::RANDOM_WALK_COOLDOWN);
+//	}
 	eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
 
 	eb.path_steps = 0;
