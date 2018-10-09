@@ -10,9 +10,12 @@ TYPES = require("spells.TypeEffectUtils").TYPES
 
 _STAT_BONUSES = {
     enchantment: (level) =>
-        for i=1,level
+        --for i=1,level
+        --    @enchantment += @rng\random(0, 2)
+        --@enchantment = math.max(@enchantment, 1)
+        @enchantment = (level - 1) * 3
+        for i=1,3
             @enchantment += @rng\random(0, 2)
-        @enchantment = math.max(@enchantment, 1)
     mp: (level) =>
         for i=1,level
             @stat_bonuses.mp += @rng\random(0, 25)
@@ -161,7 +164,7 @@ Bonuses = newtype {
             @stat_bonuses.defence
             @stat_bonuses.willpower
             @stat_bonuses.magic
-            @enchantment * 2
+            @enchantment / 2
             (1 - @stat_bonuses.spell_velocity_multiplier)  / 0.25
         }
         for k, v in pairs @stat_multipliers
@@ -235,7 +238,7 @@ Bonuses = newtype {
             append base.spells_granted, spell
         if @enchantment > 0
             for i=1,2
-                base.damage.base[i] = math.ceil(base.damage.base[i] * (1 + @enchantment * 0.2))
+                base.damage.base[i] = math.ceil(base.damage.base[i] * (1 + @enchantment * 0.1))
             base.name = "+#{@enchantment} #{base.name}"
         base.shop_cost or= {0,0}
         created = compile_bonuses(base, @newstyle_bonuses)
