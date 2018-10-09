@@ -191,8 +191,8 @@ DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1, n_regions=nil) ->
         n_statues: 4
     }
 
-place_doors_and_statues = (map_region) ->
-    {:map, :regions} = map_region
+place_doors_and_statues = (region_set) ->
+    {:map, :regions} = region_set
 
     for region in *regions
         area = region\bbox()
@@ -206,8 +206,8 @@ place_doors_and_statues = (map_region) ->
             map\square_apply(sqr, {add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT}, remove: SourceMap.FLAG_SEETHROUGH})
             MapUtils.spawn_decoration(map, OldMaps.statue, sqr, random(0,17))
 
-overdungeon_items_and_enemies = (map_region) ->
-    {:map, :regions} = map_region
+overdungeon_items_and_enemies = (region_set) ->
+    {:map, :regions} = region_set
 
     for region in *regions
         area = region\bbox()
@@ -223,8 +223,8 @@ overdungeon_items_and_enemies = (map_region) ->
         OldMaps.generate_from_enemy_entries(map, OldMaps.hard_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
         OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
 
-overworld_items_and_enemies = (map_region) ->
-    {:map, :regions} = map_region
+overworld_items_and_enemies = (region_set) ->
+    {:map, :regions} = region_set
 
     for region in *regions
         area = region\bbox()
@@ -238,8 +238,8 @@ overworld_items_and_enemies = (map_region) ->
             MapUtils.spawn_item(map, item.type, item.amount, sqr)
 
         OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 8, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
-        OldMaps.generate_from_enemy_entries(map, OldMaps.medium_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
-        OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        --OldMaps.generate_from_enemy_entries(map, OldMaps.medium_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        --OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
 
 place_feature = (map, template, regions=map.regions) ->
    event_log("(RNG #%d) placing feature", map.rng\amount_generated())
@@ -508,28 +508,38 @@ M.crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
 -- Place easy dungeon: --
 
 -- TODO rename
-place_new_easy = (map_region) ->
-    {:map, :regions} = map_region
+
+map_linker = (map, map_f) ->
     MapSeq = MapSequence.create {preallocate: 1}
-    generate = () ->
-        return require("maps.03_EasyOverworldDungeon").generate {
-            (map, xy) ->
-                portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_hell1")
-                MapSeq\backward_portal_resolve(2, portal, 1)
-        }
+    append map.post_game_map, (game_map) ->
+        MapSeq\slot_resolve(1, game_map)
+    n_portals = 0
+    return (forward_portal) ->
+        generate  = () ->
+            return map_f for i=1,n_portals
+                (back_portal) -> MapSeq\backward_portal_resolve(2, back_portal, i)
+        n_portals += 1
+        MapSeq\forward_portal_add 1, forward_portal, n_portals, generate
+
+place_entrance_vault = (region_set) ->
+    {:map, :regions} = region_set
+    MapSeq = MapSequence.create {preallocate: 1}
+
+place_new_easy = (region_set) ->
+    {:map, :regions} = region_set
+    forward_link = map_linker map, (back_links) ->
+        return require("maps.03_EasyOverworldDungeon").generate for back_link in *back_links
+            (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, "spr_gates.exit_orc"))
 
     place_dungeon = (map, xy) ->
-        portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_hell1")
-        (MapSeq\forward_portal_add 1, portal, 1, generate)
+        forward_link(MapUtils.spawn_portal(map, xy, "spr_gates.enter_orc"))
     vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.pebble})
     if not place_feature(map, vault, regions)
         return nil
-    append map.post_game_map, (game_map) ->
-        MapSeq\slot_resolve(1, game_map)
     return true
 
-place_easy = (map_region) ->
-    {:map, :regions} = map_region
+place_easy = (region_set) ->
+    {:map, :regions} = region_set
     MapSeq = MapSequence.create {preallocate: 1}
     InnerMapSeq = MapSequence.create {preallocate: 1}
     append map.post_game_map, (game_map) ->
@@ -631,8 +641,8 @@ place_easy = (map_region) ->
         return false
     return true
 
-place_medium1a = (map_region) ->
-    {:map, :regions} = map_region
+place_medium1a = (region_set) ->
+    {:map, :regions} = region_set
     local templates
     templates = OldMaps.Dungeon2
     MapSeq = MapSequence.create {preallocate: 1}
@@ -671,8 +681,8 @@ place_medium1a = (map_region) ->
 ----------------------------------------
 -- Place medium dungeon 1, variant A: --
 
-place_medium1b = (map_region) ->
-    {:map, :regions} = map_region
+place_medium1b = (region_set) ->
+    {:map, :regions} = region_set
     tileset = Tilesets.snake
     MapSeq = MapSequence.create {preallocate: 1}
     append map.post_game_map, (game_map) ->
@@ -709,8 +719,8 @@ place_medium1b = (map_region) ->
         return nil
     return true
 
-overdungeon_features = (map_region) ->
-    {:map, :regions} = map_region
+overdungeon_features = (region_set) ->
+    {:map, :regions} = region_set
 
     OldMapSeq4 = MapSequence.create {preallocate: 1}
 
@@ -845,12 +855,12 @@ overdungeon_features = (map_region) ->
     -------------------------
 
     append map.post_maps, () ->
-        overdungeon_items_and_enemies(map_region)
+        overdungeon_items_and_enemies(region_set)
 
     return true
 
-overworld_features = (map_region) ->
-    {:map, :regions} = map_region
+overworld_features = (region_set) ->
+    {:map, :regions} = region_set
     OldMapSeq3 = MapSequence.create {preallocate: 1}
 
     append map.post_game_map, (game_map) ->
@@ -874,10 +884,10 @@ overworld_features = (map_region) ->
             return nil
     -------------------------
 
-    if not place_new_easy(map_region)
+    if not place_new_easy(region_set)
         return nil
 
-    if not map.rng\random_choice({place_medium1a, place_medium1b})(map_region)
+    if not map.rng\random_choice({place_medium1a, place_medium1b})(region_set)
         return nil
     -----------------------------
 
@@ -1028,7 +1038,7 @@ overworld_features = (map_region) ->
     ---------------------------------
 
     append map.post_maps, () ->
-        overworld_items_and_enemies(map_region)
+        overworld_items_and_enemies(region_set)
 
     return true
 
@@ -1110,11 +1120,11 @@ grassy_overworld = (rng) ->
         }
         if not NewMaps.map_try_create(map, rng, template)
             return nil
-        full_map_region = {:map, regions: map.regions}
+        full_region_set = {:map, regions: map.regions}
         overworld_region = {:map, regions: table.filter(map.regions, (r) -> r.conf.is_overworld)}
         overdungeon_region = {:map, regions: table.filter(map.regions, (r) -> not r.conf.is_overworld)}
         append map.post_maps, () ->
-            place_doors_and_statues(full_map_region)
+            place_doors_and_statues(full_region_set)
         if not overworld_features(overworld_region)
             return nil
         --if not overdungeon_features(overdungeon_region)
