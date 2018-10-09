@@ -42,6 +42,7 @@ function M.spawn_enemy(map, type, tile_xy, --[[Optional]] team)
         type = type,
         team = team -- Default: Team 1
     }
+    map:square_apply(tile_xy, {add = {SourceMap.FLAG_HAS_OBJECT}})
     table.insert(map.instances, object)
     return object
 end

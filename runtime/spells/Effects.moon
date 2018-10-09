@@ -68,7 +68,9 @@ DataW.effect_create {
                 EventLog.add("You are now exhausted...", {255,200,200})
     step_func: (obj) =>
         if @extensions >= 10
-            EventLog.add("Your rage only grows a tickle...", {200,200,255})
+            for _ in screens()
+                if obj\is_local_player()
+                    EventLog.add("Your rage only grows a tickle...", {200,200,255})
             return
         diff = math.max(obj.kills - @kill_tracker, 0)
         for i=1,diff
