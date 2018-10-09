@@ -397,7 +397,7 @@ DataW.weapon_create {
 
     spr_item = "orc axe",
 
-    cooldown = 65,
+    cooldown = 85,
 
     range = 8
 }
