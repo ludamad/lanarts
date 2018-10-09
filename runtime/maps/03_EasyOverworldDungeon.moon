@@ -287,7 +287,17 @@ node_place_map_polys = () =>
     for spawn in *@map.portal_spawns
         xy = MapUtils.random_square(@map, bbox, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
         spawn(@map, xy)
+    bbox = parts.E\bbox()
+    monster_focus_point = MapUtils.random_square(@map, bbox, {matches_group: {parts.E.group, parts.E.group}})
+    if not monster_focus_point
+        return false
+    for i=1,10
+        enemy = MapUtils.random_enemy(@map, "Orc Warrior", bbox, {matches_group: {parts.E.group, parts.E.group}})
+        if not enemy
+            break
+        enemy.monster_wander_position = () => monster_focus_point
     return true
+
 
 node_place_easy_overworld_rooms = () =>
     -- Ensure it is a range

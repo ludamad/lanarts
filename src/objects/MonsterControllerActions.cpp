@@ -336,13 +336,6 @@ void MonsterController::monster_follow_path(GameState* gs, EnemyInst* e) {
 static Pos monster_wander_position(GameState* gs, EnemyInst* e) {
 	GameTiles& tile = gs->tiles();
 	MTwist& mt = gs->rng();
-
-	if (!e->lua_variables.empty()) {
-		Pos target = lcall_def(Pos(), e->lua_variables["monster_wander_position"], e);
-		if (target != Pos()) {
-			return target;
-		}
-	}
 	int ex = e->x / TILE_SIZE, ey = e->y / TILE_SIZE;
 	Pos target;
 	int tries_left = 3; // arbitrary number
@@ -368,7 +361,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	if (!forced_wander && !monsters_wandering_flag) {
 		return;
 	}
-	perf_timer_begin(FUNCNAME);
+	PERF_TIMER();
 //	bool is_fullpath = false;
 	if (eb.path_cooldown > 0) {
 		eb.path_cooldown--;
@@ -380,27 +373,40 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 		return; // Avoid pathological cases
 	}
 
-	Pos target = monster_wander_position(gs, e);
-
-	if (target == Pos(0,0)) {
-		return; // Avoid pathological cases
-	}
-
-	Pos exy = Pos(ex, ey);
-	eb.path = astarcontext.calculate_AStar_path(gs, exy, target, AStarPath::surrounding_region(exy, target, Size(6, 6)));
-	if (eb.path.size() <= 1) {
-		return;
-	}
-	eb.current_node = 0;
+	auto try_wander = [&](Pos target, bool full_path) {
+        Pos exy = Pos(ex, ey);
+        BBox region = AStarPath::surrounding_region(exy, target, Size(6, 6));
+        if (full_path) {
+            region = BBox({0,0}, gs->get_level()->size());
+        }
+        eb.path = astarcontext.calculate_AStar_path(gs, exy, target, region);
+        if (eb.path.size() <= 1) {
+            return false;
+        }
+        eb.current_node = 0;
 //	if (is_fullpath) {
-	eb.path_cooldown = EnemyBehaviour::RANDOM_WALK_COOLDOWN/2 + mt.rand(EnemyBehaviour::RANDOM_WALK_COOLDOWN);
+        eb.path_cooldown = EnemyBehaviour::RANDOM_WALK_COOLDOWN/2 + mt.rand(EnemyBehaviour::RANDOM_WALK_COOLDOWN);
 //	}
-	eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
+        eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
 
-	eb.path_steps = 0;
-	eb.path_start = Pos(e->x, e->y);
+        eb.path_steps = 0;
+        eb.path_start = Pos(e->x, e->y);
 
-	event_log("Path for instance id: %d, (%d path steps), x: %f y: %f target_radius: %f depth %d",
-			std::max(0, e->id), (int)eb.path.size(), e->x, e->y, e->target_radius, e->depth);
-	perf_timer_end(FUNCNAME);
+        event_log("Path for instance id: %d, (%d path steps), x: %f y: %f target_radius: %f depth %d",
+                  std::max(0, e->id), (int)eb.path.size(), e->x, e->y, e->target_radius, e->depth);
+        return true;
+	};
+	bool wandered = false;
+    if (!e->lua_variables.empty()) {
+        Pos target = lcall_def(Pos(), e->lua_variables["monster_wander_position"], e);
+        if (target != Pos()) {
+            wandered |= try_wander(target, true);
+        }
+    }
+    if (!wandered) {
+        Pos target = monster_wander_position(gs, e);
+        if (target != Pos()) {
+            wandered |= try_wander(target, false);
+        }
+    }
 }
