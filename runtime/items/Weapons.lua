@@ -157,9 +157,12 @@ DataW.weapon_create {
     shop_cost = {75, 105},
 
     spr_item = "spr_weapons.staff",
+    alt_action = function(caster, xy, target)
+        caster:try_use_spell("Minor Missile", xy, target)
+    end,
 
-    cooldown = 40,
-    range = 7,
+    cooldown = 60,
+    range = 400,
     effects_granted = {"WeaponManaGainOnKill"}
 }
 
@@ -174,9 +177,12 @@ DataW.weapon_create {
     shop_cost = {75, 105},
 
     spr_item = "spr_weapons.spwpn_staff_of_olgreb",
+    alt_action = function(caster, xy, target)
+        caster:try_use_spell("Minor Missile", xy, target)
+    end,
 
-    cooldown = 40,
-    range = 7,
+    cooldown = 60,
+    range = 400,
     effects_granted = {"WeaponManaGainOnKill"}
 }
 
@@ -187,39 +193,41 @@ DataW.weapon_create {
 
     shop_cost = {125, 255},
     types = {
-        "Bludgeon"
     },
 
     spr_item = "epic staff",
-    
+    alt_action = function(caster, xy, target)
+        caster:try_use_spell("Minor Missile", xy, target)
+    end,
 
     cooldown = 40,
+    range = 400,
     stat_bonuses = {magic = 2, spell_cooldown_multiplier = 0.9},
 
     range = 7
 }
 
-DataW.weapon_create {
-    name = "Gallanthor's 5-Colour Staff",
-    description = "The epic staff of crippled archmage's later perfection of the chromatic arts. Used in the first 500 years of his life.",
-    type = "staves",
-
-    shop_cost = {525, 2055},
-    types = {
-        "Bludgeon"
-    },
-
-    spr_item = "epic staff",
-    
-
-    cooldown = 40,
-    stat_bonuses = {magic = 3, spell_cooldown_multiplier = 0.85},
-
-    range = 7,
-    effects_granted = {
-        "RedBonus", "BlueBonus", "BlackBonus", "GreenBonus", "WhiteBonus"
-    }
-}
+--DataW.weapon_create {
+--    name = "Gallanthor's 5-Colour Staff",
+--    description = "The epic staff of crippled archmage's later perfection of the chromatic arts. Used in the first 500 years of his life.",
+--    type = "staves",
+--
+--    shop_cost = {525, 2055},
+--    types = {
+--        "Bludgeon"
+--    },
+--
+--    spr_item = "epic staff",
+--    
+--
+--    cooldown = 40,
+--    stat_bonuses = {magic = 3, spell_cooldown_multiplier = 0.85},
+--
+--    range = 7,
+--    effects_granted = {
+--        "RedBonus", "BlueBonus", "BlackBonus", "GreenBonus", "WhiteBonus"
+--    }
+--}
 
 DataW.weapon_create {
     name = "Serated Sword",
@@ -314,12 +322,13 @@ DataW.weapon_create {
     type = "short blades",
     types = {"Slashing"},
 
-    shop_cost = {75, 95},
+    shop_cost = {175, 295},
 
     spr_item = "magic sword",
 
     cooldown = 42,
 
+    damage_multiplier = 1.25,
     range = 7,
 
     -- Damage bonus implemented in C++, here is the MP cost:

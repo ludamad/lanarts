@@ -210,19 +210,19 @@ weapons = (chance, args) -> _filter {
         }
         args.ignore_strong or {
             chance: 500
-            { item: "Iron Broadsword",                          chance: 4           }
+            --{ item: "Iron Broadsword",                          chance: 4           }
             { item: "Gallanthor's Crutch",                 chance: 4     }
-            { item: "Serated Sword",      chance: 4                      }
+            --{ item: "Serated Sword",      chance: 4                      }
             { item: "Magic Sword",        chance: 4                     }
 --            { item: "Triple Sword",        chance: 4                      }
 --            { item: "Battle Axe",        chance: 4                      }
-            { item: "Iron Scimitar",        chance: 1                      }
+            --{ item: "Iron Scimitar",        chance: 1                      }
             { item: "Orc Axe",        chance: 4                      }
         }
-        args.ignore_strong or {
-            chance: 1
-            { item: "Gallanthor's 5-Colour Staff",                 chance: 4     }
-        }
+        --args.ignore_strong or {
+        --    chance: 1
+        --    { item: "Gallanthor's 5-Colour Staff",                 chance: 4     }
+        --}
     }
 --    args.ignore_randarts or { item: RANDART("Weapon"), chance: 1}
 }
