@@ -237,7 +237,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 
 	LuaValue methods = luameta_constants(meta);
     methods["is_combat_object"] = true;
-	methods["learn_spell"] = [&](CombatGameInst* inst, const char* spellname) {
+	methods["learn_spell"] = [=](CombatGameInst* inst, const char* spellname) {
 		auto& spell = game_spell_data.get(spellname);
 		if (inst->stats().spells.has_spell(spell.id)) {
 			return;
@@ -245,7 +245,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 		inst->stats().spells.add_spell(spell.id);
 	};
 
-	methods["inventory_get"] = [&](CombatGameInst* inst, int slot_idx) {
+	methods["inventory_get"] = [=](CombatGameInst* inst, int slot_idx) {
 		LuaValue ret = LuaValue::newtable(L);
 		if (slot_idx > inst->inventory().max_size()) {
 			return ret;
@@ -259,7 +259,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 		return ret;
 	};
 
-	methods["inventory_set"] = [&](CombatGameInst* inst, int slot_idx, LuaStackValue slot_data) {
+	methods["inventory_set"] = [=](CombatGameInst* inst, int slot_idx, LuaStackValue slot_data) {
 		if (slot_idx > inst->inventory().max_size()) {
 			return false;
 		}

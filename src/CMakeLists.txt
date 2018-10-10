@@ -3,6 +3,7 @@ PROJECT(project_lanarts)
 
 FIND_LIBRARY(OpenGL REQUIRED)
 
+
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
   # TODO(amitp): I don't know how to set this properly with add_compile_options
   set(SDL2_LIBRARIES "-s USE_SDL=2")

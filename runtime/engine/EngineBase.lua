@@ -88,6 +88,11 @@ function Engine.overlay_draw(...)
     return game_loop.overlay_draw(...)
 end
 
+function Engine.post_pickup(player, slot_idx)
+    local InventoryManagement = Engine.require "engine.InventoryManagement"
+    InventoryManagement.post_pickup(player, slot_idx)
+end
+
 function Engine.game_won(...)
     local events = Engine.require "Events"
 
