@@ -158,6 +158,8 @@ public:
 
     // Used by cheat/debug codes
     void pickup_item(GameState* gs, const GameAction& action);
+    // Used by lua-based item management
+    void sell_item(GameState* gs, const GameAction& action);
 private:
     ///////////////////////////
     // ** Private methods ** //
@@ -176,7 +178,6 @@ private:
     void _channel_spell(GameState *gs, const GameAction &action);
     void _use_rest(GameState *gs, const GameAction &action);
     void _use_item(GameState *gs, const GameAction &action);
-    void sell_item(GameState* gs, const GameAction& action);
 
     //Either finds new target or shifts target
     void shift_autotarget(GameState* gs);

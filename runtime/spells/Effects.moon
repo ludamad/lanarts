@@ -50,9 +50,9 @@ DataW.effect_create {
         new.defence = math.max(0, new.defence + 3)
         new.willpower = math.max(0, new.willpower + 3)
         new.melee_cooldown_multiplier /= 1.6
-        new.hpregen += 8 / 60 -- 8 per second 
+        new.hpregen += 10 / 60 -- 8 per second 
         if obj\has_effect("AmuletBerserker")
-            new.hpregen = new.hpregen + 8 / 60 -- 8 per second
+            new.hpregen = new.hpregen + 10 / 60 -- 8 per second
         if new.speed < 6
             new.speed = math.max(new.speed * 1.25, 6)
         obj\reset_rest_cooldown()

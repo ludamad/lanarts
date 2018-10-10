@@ -27,6 +27,7 @@ class LuaValue {
 public:
 	LuaValue(lua_State* L, const char* global);
 	LuaValue(lua_State* L, int pos);
+
 	LuaValue(const LuaStackValue& svalue);
 	LuaValue(lua_State* L);
 

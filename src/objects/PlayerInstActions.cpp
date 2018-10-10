@@ -483,9 +483,12 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
         itemslot_t slot = inventory().add(type);
         if (slot == -1) {
             inventory_full = true;
-        } else if (projectile_should_autowield(equipment(), type,
+        } else {
+            if (projectile_should_autowield(equipment(), type,
                                                this->last_chosen_weaponclass)) {
-            projectile_smart_equip(inventory(), slot);
+                projectile_smart_equip(inventory(), slot);
+            }
+            lcall(luawrap::globals(gs->luastate())["Engine"]["post_pickup"], this, slot);
         }
         play("sound/item.ogg");
     }

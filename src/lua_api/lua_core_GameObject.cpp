@@ -30,6 +30,8 @@
 #include "objects/CombatGameInst.h"
 #include "objects/ProjectileInst.h"
 
+#include "util/map_container.h"
+
 #include "lua_api.h"
 
 #include "draw/SpriteEntry.h"
@@ -242,6 +244,46 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 		}
 		inst->stats().spells.add_spell(spell.id);
 	};
+
+	methods["inventory_get"] = [&](CombatGameInst* inst, int slot_idx) {
+		LuaValue ret = LuaValue::newtable(L);
+		if (slot_idx > inst->inventory().max_size()) {
+			return ret;
+		}
+		ItemSlot& slot = inst->inventory().get(slot_idx);
+		if (!slot.empty()) {
+			ret["type"] = slot.item_entry().name;
+		}
+		ret["amount"] = slot.item.amount;
+		ret["equipped"] = slot.is_equipped();
+		return ret;
+	};
+
+	methods["inventory_set"] = [&](CombatGameInst* inst, int slot_idx, LuaStackValue slot_data) {
+		if (slot_idx > inst->inventory().max_size()) {
+			return false;
+		}
+		ItemSlot& slot = inst->inventory().get(slot_idx);
+		bool equipped = slot_data["equipped"].to_bool();
+		// Before modifications, try unequip
+		if (!equipped && slot.is_equipped()) {
+			inst->inventory().deequip(slot_idx);
+		}
+		if (slot_data.has("type")) {
+			slot.item = Item {
+				get_item_by_name(slot_data["type"].to_str()),
+				slot_data["amount"].to_int()
+			};
+		} else {
+			slot.clear();
+		}
+		// After modifications, try equip
+		if (equipped && !slot.is_equipped() && slot.item.is_equipment()) {
+			inst->inventory().equip(slot_idx, true);
+		}
+		return true;
+	};
+
 	methods["effective_stats"].bind_function(lapi_gameinst_effectivestats);
     LUAWRAP_GETTER(getters, weapon_range, OBJ->equipment().weapon().weapon_entry().range());
     methods["go_towards_if_free"].bind_function(lapi_go_towards_if_free);
@@ -422,6 +464,11 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(methods, can_benefit_from_rest, OBJ->can_benefit_from_rest());
     LUAWRAP_METHOD(methods, gain_xp, OBJ->stats().gain_xp(luawrap::get<int>(L,2), OBJ));;//players_gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
+	methods["inventory_sell"] = [&](PlayerInst* inst, int slot_idx) {
+		GameAction action;
+		action.use_id = slot_idx;
+		inst->sell_item(lua_api::gamestate(L), action);
+	};
 
     methods["apply_melee_cooldown"].bind_function(apply_melee_cooldown);
     methods["direction_towards_unexplored"].bind_function(direction_towards_unexplored);

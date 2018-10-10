@@ -55,9 +55,9 @@ struct ItemProperties {
 
 // Defined in terms of a base item, applied properties, and a quantity.
 struct Item {
-	item_id id;
+	item_id id = NO_ITEM;
 	ItemProperties properties;
-	int amount;
+	int amount = 0;
 
 	ItemEntry& item_entry() const;
 	EquipmentEntry& equipment_entry() const;
