@@ -765,6 +765,9 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
         });
     }
     inventory().sort();
+    gs->add_instance<AnimatedInst>(
+        ipos() + Pos {10, 0}, res::sprite_id("spr_effects.coin"),
+        25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH);
 }
 
 void PlayerInst::_use_rest(GameState *gs, const GameAction &action) {

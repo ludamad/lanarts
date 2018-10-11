@@ -3,7 +3,7 @@ Map = require "core.Map"
 
 count_inv = (player, f) ->
     count = 0
-    for i=1,math.huge
+    for i=0,math.huge
         slot = player\inventory_get(i)
         if not slot
             break

@@ -246,10 +246,11 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	};
 
 	methods["inventory_get"] = [=](CombatGameInst* inst, int slot_idx) {
-		LuaValue ret = LuaValue::newtable(L);
+		LuaValue ret(L);
 		if (slot_idx < 0 || slot_idx >= inst->inventory().max_size()) {
 			return ret;
 		}
+		ret.newtable();
 		ItemSlot& slot = inst->inventory().get(slot_idx);
 		if (!slot.empty()) {
 			ret["type"] = slot.item_entry().name;
@@ -464,7 +465,7 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(methods, can_benefit_from_rest, OBJ->can_benefit_from_rest());
     LUAWRAP_METHOD(methods, gain_xp, OBJ->stats().gain_xp(luawrap::get<int>(L,2), OBJ));;//players_gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
-	methods["inventory_sell"] = [&](PlayerInst* inst, int slot_idx) {
+	methods["inventory_sell"] = [=](PlayerInst* inst, int slot_idx) {
 		GameAction action;
 		action.use_id = slot_idx;
 		inst->sell_item(lua_api::gamestate(L), action);
