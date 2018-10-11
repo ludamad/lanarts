@@ -76,6 +76,7 @@ void PlayerInst::init(GameState* gs) {
     if (class_stats().class_entry().name == "Necromancer") {
 		inventory().get_natural_weapon() = get_weapon_by_name("Pain");
 	}
+	gs->team_data().register_player(this);
 }
 
 PlayerInst::~PlayerInst() {
@@ -110,6 +111,7 @@ void PlayerInst::deinit(GameState* gs) {
 	CombatGameInst::deinit(gs);
 	current_target = NONE;
 	gs->collision_avoidance().remove_object(collision_simulation_id());
+	gs->team_data().deregister_player(this);
 }
 
 //Either finds new or shifts target

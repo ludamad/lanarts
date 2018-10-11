@@ -276,7 +276,17 @@ static int gmap_allies_list(lua_State* L) {
     return 1;
 }
 
-
+static int gmap_players_on_team(lua_State* L) {
+    GameState* gs = lua_api::gamestate(L);
+    team_id team = lua_tointeger(L, 1);
+    lua_newtable(L);
+    int j = 1;
+    for_players_on_team(gs->team_data(), team, [&](PlayerInst* ally_player) {
+        luawrap::push(L, ally_player);
+        lua_rawseti(L, -2, j++);
+    });
+    return 1;
+}
 
 static int gmap_monsters_seen(lua_State* L) {
     GameState* gs = lua_api::gamestate(L);
@@ -536,6 +546,7 @@ namespace lua_api {
         gmap["monsters_list"].bind_function(gmap_monsters_list);
         gmap["players_list"].bind_function(gmap_players_list);
         gmap["allies_list"].bind_function(gmap_allies_list);
+        gmap["players_on_team"].bind_function(gmap_players_on_team);
         gmap["enemies_list"].bind_function(gmap_enemies_list);
         gmap["monsters_seen"].bind_function(gmap_monsters_seen);
         gmap["monsters"].bind_function(gmap_monsters);

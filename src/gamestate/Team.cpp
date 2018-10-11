@@ -264,3 +264,15 @@ void TeamData::deserialize(GameState* gs, SerializeBuffer& buffer) {
         team.deserialize(gs, buffer);
     }
 }
+
+void TeamData::register_player(PlayerInst* player) {
+    this->teams.at(player->team).player_data.players.push_back(player);
+}
+
+void TeamData::deregister_player(PlayerInst* player) {
+    auto& v = this->teams.at(player->team).player_data.players;
+    auto it = std::find(v.begin(), v.end(), player);
+    if (it != v.end()) {
+        v.erase(it);
+    }
+}

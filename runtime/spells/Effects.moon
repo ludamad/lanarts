@@ -47,12 +47,13 @@ DataW.effect_create {
     effected_sprite: "berserk_effected"
     stat_func: (obj, old, new) =>
         new.strength += obj.stats.level
-        new.defence = math.max(0, new.defence + 3)
-        new.willpower = math.max(0, new.willpower + 3)
+        new.defence = math.max(0, new.defence + 3 + @extensions * 2)
+        new.willpower = math.max(0, new.willpower + 3 + @extensions * 2)
         new.melee_cooldown_multiplier /= 1.6
-        new.hpregen += 10 / 60 -- 8 per second 
+        hp_regen_bonus = (10 + @extensions) / 60 -- 10 per second 
+        new.hpregen += hp_regen_bonus
         if obj\has_effect("AmuletBerserker")
-            new.hpregen = new.hpregen + 10 / 60 -- 8 per second
+            new.hpregen += hp_regen_bonus
         if new.speed < 6
             new.speed = math.max(new.speed * 1.25, 6)
         obj\reset_rest_cooldown()
@@ -70,14 +71,14 @@ DataW.effect_create {
         if @extensions >= 10
             for _ in screens()
                 if obj\is_local_player()
-                    EventLog.add("Your rage only grows a tickle...", {200,200,255})
+                    EventLog.add("Your rage is tickled... but cannot grow further.", {200,200,255})
             return
         diff = math.max(obj.kills - @kill_tracker, 0)
         for i=1,diff
             @time_left = math.min(@max_time * 1.5, @time_left + 45)
             for _ in screens()
                 if obj\is_local_player()
-                    EventLog.add("Your rage grows ...", {200,200,255})
+                    EventLog.add("Your rage grows and your skin thickens...", {200,200,255})
                     play_sound "sound/swish-11.wav"
                 if settings.verbose_output
                     EventLog.add("Killed Enemy, berserk time_left = " .. @time_left)

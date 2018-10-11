@@ -69,6 +69,8 @@ struct TeamData {
     void _ensure(team_id team);
     void _ensure(level_id level, team_id team);
     void add(CombatGameInst* obj);
+    void register_player(PlayerInst* player);
+    void deregister_player(PlayerInst* player);
     void remove(CombatGameInst* obj);
     void serialize(GameState* gs, SerializeBuffer& buffer);
     void deserialize(GameState* gs, SerializeBuffer& buffer);

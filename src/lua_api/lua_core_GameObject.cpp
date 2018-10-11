@@ -247,7 +247,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 
 	methods["inventory_get"] = [=](CombatGameInst* inst, int slot_idx) {
 		LuaValue ret = LuaValue::newtable(L);
-		if (slot_idx > inst->inventory().max_size()) {
+		if (slot_idx < 0 || slot_idx >= inst->inventory().max_size()) {
 			return ret;
 		}
 		ItemSlot& slot = inst->inventory().get(slot_idx);
@@ -260,7 +260,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	};
 
 	methods["inventory_set"] = [=](CombatGameInst* inst, int slot_idx, LuaStackValue slot_data) {
-		if (slot_idx > inst->inventory().max_size()) {
+		if (slot_idx < 0 || slot_idx >= inst->inventory().max_size()) {
 			return false;
 		}
 		ItemSlot& slot = inst->inventory().get(slot_idx);
