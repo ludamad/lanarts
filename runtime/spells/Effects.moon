@@ -130,7 +130,7 @@ DataW.effect_create {
     can_use_spells: false
     stat_func: (obj, old, new) =>
         new.defence += 5
-        new.strength += 3
+        new.strength += 5
         new.speed = 0
     remove_func: (obj) =>
         @callback(obj)

@@ -122,7 +122,7 @@ local PowerStrike = {
     spr_spell = "chargestrike",
     can_cast_with_cooldown = false,
     mp_cost = 30,
-    spell_cooldown = 40,
+    spell_cooldown = 45,
     cooldown = 0, -- Uses cooldown of weapon, favours 40 cooldown weapons
     fallback_to_melee = true,
 }
@@ -132,7 +132,6 @@ local function ChargeCallback(_, caster)
     for _, mon in ipairs(Map.enemies_list(caster)) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 30 + caster.stats.strength then
             num = num + 1
-            caster:melee(mon)
             caster:melee(mon)
             --            local chance = math.max(25, 100 - num * 20)
             --if rand_range(0, 100) < chance then -- decreasing chance of knockback

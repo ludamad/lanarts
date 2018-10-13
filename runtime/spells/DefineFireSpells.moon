@@ -121,7 +121,7 @@ M.SpawnedFire = SpawnedFire
 
 RingOfFire = RingFireBase {
     -- RingFireBase config
-    _damage: 0.5
+    _damage: 0.7
     init: (args) =>
         @damage_cooldowns = OrderedDict() -- takes [index][obj]
         @fireballs = {}
@@ -195,8 +195,7 @@ DataW.spell_create {
         GameObject.add_to_level RingOfFire.create({:caster, :duration})
         caster\add_effect "Ring of Flames Stat Boost", duration
     console_draw_func: (get_next) =>
-        STAT_BOOST = 2  -- TODO playing with this constant
-        damage = math.floor(RingOfFire._damage * 60 / 5 * STAT_BOOST)
+        damage = math.floor(RingOfFire._damage * 60 / 5)
         power = @effective_stats().magic + TypeEffectUtils.get_power(@, "Red")
         draw_console_effect get_next(), tosprite("spr_spells.spell_icon_ring_of_flames"), {
             {COL_PALE_GREEN, damage}
