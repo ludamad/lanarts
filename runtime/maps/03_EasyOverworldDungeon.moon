@@ -47,8 +47,6 @@ PADDING = 10
 ROOT = false -- represents the map root 
 
 event_log = (...) -> print string.format(...)
-rng = rawget(_G, 'rng') or require("mtwist").create(os.time() * 1000 + os.clock())
-rawset(_G, 'rng', rng)
 
 shrink = (bbox, x, y) ->
     {x1,y1,x2,y2} = bbox
@@ -67,7 +65,7 @@ MapDesc = newtype {
         @region_set = false
     compile: (portal_spawns) =>
         map_args = table.merge {
-            :rng
+            rng: NewMaps.new_rng()
             size: {100, 100}
             default_content: Tilesets.orc.wall
             default_flags: {SourceMap.FLAG_SOLID} --, SourceMap.FLAG_SEETHROUGH}

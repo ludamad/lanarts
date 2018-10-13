@@ -1,5 +1,6 @@
 argparse = require "argparse"
 EngineInternal = require "core.EngineInternal"
+Network = require "core.Network"
 ResourceLoading = require "engine.ResourceLoading"
 StartEngine = require "engine.StartEngine"
 EngineHooks = require "engine.EngineBase"
@@ -14,17 +15,14 @@ load_location_is_valid = (load_file) ->
     else
         error("'#{load_file}' does not exist!")
 
-game_init = (args, load_file=nil) ->
+engine_init = (args) ->
     Settings.settings_save(settings)
     GameState = require("core.GameState")
     -- Player config
     GameState.clear_players()
 
-    log "Initializing GameState object..."
-    EngineInternal.init_gamestate()
-    if load_location_is_valid(load_file)
-        GameState.load(load_file)
-    else
+    EngineInternal.start_connection()
+    if settings.connection_type ~= Network.CLIENT
         n_players = (if os.getenv("LANARTS_CONTROLLER") then 0 else 1) + #require("core.Gamepad").ids()
         GameState.register_player(settings.username, settings.class_type, Engine.player_input, true, 0, 0)
         classes = {
@@ -35,6 +33,14 @@ game_init = (args, load_file=nil) ->
         }
         for i=2,n_players
             GameState.register_player("Player " .. i, classes[i], Engine.player_input, true, i - 1, 0)
+
+game_init = (args, load_file=nil) ->
+    log "Initializing GameState object..."
+    EngineInternal.init_gamestate()
+    GameState = require("core.GameState")
+    if load_location_is_valid(load_file)
+        GameState.load(load_file)
+    else
         EngineInternal.start_game()
 
 --Parse lanarts command-line options
@@ -56,15 +62,22 @@ run_lanarts = (raw_args) ->
     -- TODO dont use global 'settings' object
     initial_settings = Settings.settings_load(args.settings)
 
-    local entry_point, game_start, game_step
+    local entry_point, pregame_start, game_start, game_step
     entry_point = () ->
+        if args.load
+            return pregame_start(args.load)
+        else
+            return Engine.menu_start(pregame_start)
+
+    pregame_start = (load_file=nil) ->
+        engine_init(args)
         if args.class
             settings.class_type = args.class
             return game_start()
-        elseif args.load
-            return game_start(args.load)
+        elseif load_file or settings.connection_type ~= 2
+            return game_start(load_file)
         else
-            return Engine.menu_start(game_start)
+            return Engine.pregame_menu_start () -> game_start(load_file)
 
     game_start = (load_file=nil) ->
         return ResourceLoading.ensure_resources_before () ->

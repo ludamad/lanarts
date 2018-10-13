@@ -109,6 +109,11 @@ static int engine_deinit_gamestate(lua_State* L) {
     return 0;
 }
 
+static int engine_start_connection(lua_State* L) {
+    GameState* gs = lua_api::gamestate(L);
+    gs->start_connection();
+    return 0;
+}
 
 int init_resource_data(lua_State *L);
 
@@ -124,5 +129,6 @@ namespace lua_api {
         engine["init_gamestate"].bind_function(engine_init_gamestate);
         engine["deinit_gamestate"].bind_function(engine_deinit_gamestate);
         engine["start_game"].bind_function(engine_start_game);
+        engine["start_connection"].bind_function(engine_start_connection);
 	}
 }

@@ -117,26 +117,26 @@ void GameState::start_connection() {
 		printf("client connected\n");
 		net_send_connection_affirm(connection, settings.username, settings.class_type);
 	}
-	if (settings.conntype == GameSettings::SERVER
-			|| settings.conntype == GameSettings::NONE) {
-	    player_data().register_player(settings.username, NULL, settings.class_type, LuaValue(), /* local player */ true);
-            // Hardcoded for now:
-            int n_extra_players = gamepad_states().size();
-            if (getenv("LANARTS_CONTROLLER")) {
-                n_extra_players -=1; // Remove one player if first player controller is desired
-            }
-            const char* classes[] = {
-                getenv("L2") ? getenv("L2") : "Red Mage",
-                getenv("L3") ? getenv("L3") : "Red Mage",
-                getenv("L4") ? getenv("L4") : "Red Mage",
-                getenv("L5") ? getenv("L5") : "Red Mage",
-            };
-            for (int i = 0 ; i < n_extra_players; i++) {
-                std::string p = "Player ";
-                p += char('0' + (i+2)); // Start at 'player 2'
-                player_data().register_player(p, NULL, classes[i%4], LuaValue(), /* local player */ true);
-            }
-	}
+	//if (settings.conntype == GameSettings::SERVER
+	//		|| settings.conntype == GameSettings::NONE) {
+	//    player_data().register_player(settings.username, NULL, settings.class_type, LuaValue(), /* local player */ true);
+        //    // Hardcoded for now:
+        //    int n_extra_players = gamepad_states().size();
+        //    if (getenv("LANARTS_CONTROLLER")) {
+        //        n_extra_players -=1; // Remove one player if first player controller is desired
+        //    }
+        //    const char* classes[] = {
+        //        getenv("L2") ? getenv("L2") : "Red Mage",
+        //        getenv("L3") ? getenv("L3") : "Red Mage",
+        //        getenv("L4") ? getenv("L4") : "Red Mage",
+        //        getenv("L5") ? getenv("L5") : "Red Mage",
+        //    };
+        //    for (int i = 0 ; i < n_extra_players; i++) {
+        //        std::string p = "Player ";
+        //        p += char('0' + (i+2)); // Start at 'player 2'
+        //        player_data().register_player(p, NULL, classes[i%4], LuaValue(), /* local player */ true);
+        //    }
+	//}
 }
 
 static void _event_log_initialize(GameState* gs, GameSettings& settings) {
@@ -384,9 +384,13 @@ void GameState::start_game() {
     const int WIDTH = settings.view_width / n_x;
     const int HEIGHT = settings.view_height / n_y; // / N_PLAYERS;
     std::vector<BBox> bounding_boxes;
+    int local_player_idx = 0;
     for (PlayerDataEntry &player: player_data().all_players()) {
-        const int x1 = (player.index % n_x) * WIDTH, y1 = (player.index / n_x) * HEIGHT;
+        const int x1 = (local_player_idx % n_x) * WIDTH, y1 = (local_player_idx / n_x) * HEIGHT;
         bounding_boxes.push_back(BBox {x1, y1, x1 + WIDTH, y1 + HEIGHT});
+        if (player.is_local_player) {
+            local_player_idx++;
+        }
     }
     if (bounding_boxes.size() == 3) {
         bounding_boxes[1] = {WIDTH, 0, settings.view_width, settings.view_height};

@@ -48,7 +48,7 @@ public:
 	GameNetConnection(GameState* gs);
 	~GameNetConnection();
 
-	bool initialize_as_client(const conn_callback &callback, const char* host, int port);
+	void initialize_as_client(const conn_callback &callback, const char* host, int port);
 	void initialize_as_server(const conn_callback &callback, int port);
 
 	bool is_connected() {

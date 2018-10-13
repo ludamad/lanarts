@@ -102,7 +102,7 @@ bool GameNetConnection::check_integrity(GameState* gs) {
     return true;
 }
 
-bool GameNetConnection::initialize_as_client(const conn_callback &callback, const char* host, int port) {
+void GameNetConnection::initialize_as_client(const conn_callback &callback, const char* host, int port) {
     LANARTS_ASSERT(!_connection);
     _connection = create_client_connection(host, port);
     _connection->initialize_connection(callback, 1); //1ms timeout for connection attempts

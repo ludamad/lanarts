@@ -108,7 +108,7 @@ end
 function setup_start_menu()
     if os.getenv("LANARTS_CLIENT") then
 	settings.connection_type = Network.CLIENT
-        settings.class_type = ""
+        settings.class_type = "Fighter"
         exit_menu()
         return
     elseif os.getenv("LANARTS_GO") then
@@ -255,7 +255,10 @@ local function menu_step()
         return menu_state.start_func(menu_state.load_file)
     end
 
-    -- (7) Call the menu draw function
+    -- (7) Network poll
+    Network.connections_poll()
+
+    -- (8) Call the menu draw function
     Display.draw_start()
     menu_state.menu:draw( {0, 0} )
     Display.draw_finish()
@@ -274,7 +277,7 @@ return {
         menu_state.start_func = start_game
         return menu_step()
     end,
-    pregame_menu_show = function()
+    pregame_menu_show = function(start_game)
         setup_pregame_menu()
         menu_state.start_func = start_game
         return menu_step()
