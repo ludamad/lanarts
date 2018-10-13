@@ -248,7 +248,7 @@ resolve_parts = (rng, parts) ->
         possibilities[k] = rng\random_choice(choices)
     return possibilities
 
-load_map_polys = (name, nx, ny, nw, nh, angle) ->
+load_map_polys = (rng, name, nx, ny, nw, nh, angle) ->
     parts = table.deep_clone(_load_map_poly(name))
     parts = resolve_parts(rng, parts)
     full_map = combine_map_regions [region for _, region in pairs parts]
@@ -262,7 +262,7 @@ load_map_polys = (name, nx, ny, nw, nh, angle) ->
 
 node_place_map_polys = () =>
     xy = center @region_set
-    parts = load_map_polys "03_WindingPath", xy[1], xy[2], 40, 30, @rng\randomf(-math.pi, math.pi)
+    parts = load_map_polys @rng, "03_WindingPath", xy[1], xy[2], 40, 30, @rng\randomf(-math.pi, math.pi)
     for name, region in spairs parts
         region.group = @new_group()
         content = nilprotect {
