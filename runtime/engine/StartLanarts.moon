@@ -38,6 +38,7 @@ game_init = (args, load_file=nil) ->
     log "Initializing GameState object..."
     EngineInternal.init_gamestate()
     GameState = require("core.GameState")
+    load_file = load_file or os.getenv("MULTI_LOAD_FILE")
     if load_location_is_valid(load_file)
         GameState.load(load_file)
     else
