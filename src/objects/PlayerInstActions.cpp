@@ -533,7 +533,7 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
    bool already_item_here = gs->object_radius_test(dropx, dropy,
    		ItemInst::RADIUS, item_colfilter);
    if (!already_item_here) {
-   	  gs->add_instance<ItemInst>(dropped_item, Pos(dropx, dropy), id);
+   	  get_map(gs)->add_instance<ItemInst>(gs, dropped_item, Pos(dropx, dropy), id);
    	  itemslot.deequip();
    	  itemslot.remove_copies(dropped_item.amount);
    }
@@ -658,16 +658,16 @@ static void item_do_lua_action(lua_State* L, ItemEntry& type, GameInst* user,
 
 
 void PlayerInst::_use_item(GameState *gs, const GameAction &action) {
-   if (!effective_stats().allowed_actions.can_use_items) {
-   	return;
-   }
+    if (!effective_stats().allowed_actions.can_use_items) {
+        return;
+    }
     // Dead players can't use items:
     if (is_ghost()) {
         return;
     }
     itemslot_t slot = action.use_id;
-    ItemSlot& itemslot = inventory().get(slot);
-    Item& item = itemslot.item;
+    ItemSlot &itemslot = inventory().get(slot);
+    Item &item = itemslot.item;
     if (item.amount <= 0) {
         return;
     }
@@ -765,7 +765,8 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
         });
     }
     inventory().sort();
-    gs->add_instance<AnimatedInst>(
+    get_map(gs)->add_instance<AnimatedInst>(
+        gs,
         ipos() + Pos {10, 0}, res::sprite_id("spr_effects.coin"),
         25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH);
 }
