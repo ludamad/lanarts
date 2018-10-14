@@ -326,6 +326,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
         player.action_queue.clear();
         player.action_queue.queue_actions_for_frame(ActionQueue(), frame());
     }
+    lua_api::register_gamestate(this, L);
     is_loading_save() = true;
 }
 
