@@ -216,7 +216,11 @@ end
 
 function M.game_map_create(map, wandering_enabled)
     if wandering_enabled == nil then wandering_enabled = false end
-    return Map.create { map = map, label = map.label, instances = map.instances, wandering_enabled = wandering_enabled }
+    local game_map = Map.create { map = map, label = map.label, instances = map.instances, wandering_enabled = wandering_enabled }
+    for _, post_game_map in ipairs(map.post_game_map) do
+        post_game_map(game_map)
+    end
+    return game_map
 end
 
 function M.area_template_apply(map, area, filename, legend)
