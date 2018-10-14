@@ -359,8 +359,8 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
    }
 
     if (io_value.value.empty()) {
-        luawrap::globals(gs->luastate())["Engine"]["player_input"].push();
-        io_value.init(luawrap::call<LuaValue>(gs->luastate(), this));
+        const auto& engine = luawrap::globals(gs->luastate())["Engine"];
+        io_value.init(lcall<LuaValue>(engine["player_input"], this));
     }
     io_value.poll_input();
 

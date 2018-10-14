@@ -317,6 +317,15 @@ void GameState::deserialize(SerializeBuffer& serializer) {
     }
     luawrap::globals(L)["Engine"]["post_deserialize"].push();
     luawrap::call<void>(L);
+    for (auto& player : player_data().all_players()) {
+        auto* inst = player.player();
+        if (player.is_local_player && (inst->input_source().value.empty() || inst->input_source().value.isnil())) {
+            const auto& engine = luawrap::globals(luastate())["Engine"];
+            inst->input_source().init(lcall<LuaValue>(engine["player_input"], inst));
+        }
+        player.action_queue.clear();
+        player.action_queue.queue_actions_for_frame(ActionQueue(), frame());
+    }
     is_loading_save() = true;
 }
 
