@@ -43,14 +43,16 @@ M = nilprotect {} -- Module
 
 OVERWORLD_VISION_RADIUS = 8
 
-create_overworld_scheme = (tileset) -> {
+local underdungeon_create
+
+create_overworld_scheme = (tileset) -> nilprotect {
     floor1: Tile.create(tileset.floor, false, true, {FLAG_OVERWORLD})
     floor2: Tile.create(tileset.floor_alt, false, true, {FLAG_OVERWORLD})
     wall1: Tile.create(tileset.wall, true, true, {FLAG_OVERWORLD})
     wall2: Tile.create(tileset.wall_alt, true, false)
 }
 
-create_dungeon_scheme = (tileset) -> {
+create_dungeon_scheme = (tileset) -> nilprotect {
     floor1: Tile.create(tileset.floor, false, true, {}, {FLAG_OVERWORLD})
     floor2: Tile.create(tileset.floor_alt, false, true, {}, {FLAG_OVERWORLD})
     wall1: Tile.create(tileset.wall, true, false, {}, {FLAG_OVERWORLD})
@@ -58,6 +60,7 @@ create_dungeon_scheme = (tileset) -> {
 }
 
 OVERWORLD_TILESET = create_overworld_scheme(Tilesets.grass)
+DUNGEON_TILESET = create_dungeon_scheme(Tilesets.pebble)
 
 OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE = 300, 300
 
@@ -899,6 +902,19 @@ overworld_features = (region_set) ->
             if floor == #templates
                 -------------------------
                 -- Place key vault     --
+                --item_placer = (map, xy) -> MapUtils.spawn_item(map, "Dandelite Key", 1, xy)
+
+                forward_link = map_linker map, (back_links) ->
+                    return underdungeon_create for back_link in *back_links
+                        (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, "spr_gates.exit_vaults"))
+                place_dungeon = (map, xy) ->
+                    forward_link(MapUtils.spawn_portal(map, xy, "spr_gates.enter_vaults_open"))
+                item_placer = place_dungeon
+                tileset = Tilesets.snake
+                vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
+                if not place_feature(map, vault)
+                    return nil
+
                 item_placer = (map, xy) -> MapUtils.spawn_item(map, "Dandelite Key", 1, xy)
                 tileset = Tilesets.snake
                 vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
@@ -1074,6 +1090,59 @@ local generate_map_node
     --        shell: 50
     --    }
 
+pebble_overdungeon = (rng) ->
+    -- CONFIG
+    arc_chance = 0.05
+    size = rng\random_choice {{125, 85}, {85, 125}}
+    number_regions = rng\random(5, 7)
+    connect_line_width = () -> rng\random(2, 6)
+    default_wall = Tile.create(Tilesets.pebble.wall, true, true, {SourceMap.FLAG_SOLID})
+    room_radius = () -> rng\random(5,10)
+
+    return generate_map_node () ->
+        map = NewMaps.source_map_create {
+            :rng
+            size: {OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE}
+            default_content: default_wall.id
+            default_flags: {SourceMap.FLAG_SOLID}
+            map_label: "Underdungeon"
+            :arc_chance
+        }
+        template = nilprotect {
+            :default_wall
+            subtemplates: {nilprotect {
+                is_overworld: true
+                :size
+                :number_regions
+                floor1: DUNGEON_TILESET.floor1
+                floor2: DUNGEON_TILESET.floor2
+                wall1: DUNGEON_TILESET.wall1
+                wall2: DUNGEON_TILESET.wall2
+                rect_room_num_range: {4,8} -- disable
+                rect_room_size_range: {10,15}
+                rvo_iterations: 100
+                :connect_line_width
+                :room_radius
+                region_delta_func: spread_region_delta_func
+                -- Dungeon objects/features
+                n_statues: 4
+            }}
+            outer_conf: nilprotect {
+                floor1: DUNGEON_TILESET.floor1
+                floor2: DUNGEON_TILESET.floor2
+                :connect_line_width
+            }
+            shell: 25
+        }
+        if not NewMaps.map_try_create(map, rng, template)
+            return nil
+        full_region_set = {:map, regions: map.regions}
+        append map.post_maps, () ->
+            place_doors_and_statues(full_region_set)
+        if not overdungeon_features(full_region_set)
+            return nil
+        return map
+
 grassy_overworld = (rng) ->
     -- CONFIG
     arc_chance = 0.05
@@ -1127,8 +1196,6 @@ grassy_overworld = (rng) ->
             place_doors_and_statues(full_region_set)
         if not overworld_features(overworld_region)
             return nil
-        --if not overdungeon_features(overdungeon_region)
-        --    return nil
         return map
 
 MAX_GENERATE_ITERS = 1000
@@ -1155,8 +1222,20 @@ generate_map_node = (create_map) -> NewMaps.try_n_times MAX_GENERATE_ITERS, () -
         })
     }
 
+underdungeon_create = (links) ->
+    {:map} = pebble_overdungeon NewMaps.new_rng()
+    for link in *links
+        xy = MapUtils.random_square(map, nil, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+        link(map, xy)
+    game_map = NewMaps.generate_game_map(map)
+    for f in *map.post_game_map
+        f(game_map)
+    return game_map
+
 overworld_create = () ->
-    {:map} = grassy_overworld(NewMaps.new_rng())
+    {:map} = grassy_overworld NewMaps.new_rng()
+    --{x, y} = MapUtils.random_square(map, nil, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+    --append map.player_candidate_squares, {x*32+16,y*32+16}
     player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
     assert player_spawn_points, "Could not pick player spawn squares!"
 

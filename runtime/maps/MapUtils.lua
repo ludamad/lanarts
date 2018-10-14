@@ -177,6 +177,7 @@ function M.map_create(label, size, content, --[[Optional]] flags)
         rng = mtwist.create(random(0, 2 ^ 30)),
     	label = label,
     	size = size,
+        post_game_map = {},
         post_maps = {},
     	flags = flags or SourceMap.FLAG_SOLID,
     	content = content,
