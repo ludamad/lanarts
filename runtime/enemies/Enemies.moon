@@ -259,41 +259,71 @@ DataW.enemy_create {
     }
 }
 
-DataW.enemy_create {
-    name: "Ramitawil"
+DataW.enemy_create summoner_base("Imp", 1, 100, 100) {
+    name: "Waxanarian"
     sprite: "spr_enemies.bosses.boss_bee"
     radius: 20
     xpaward: 100
-    appear_message: "The demonic bee Ramitawil!"
-    defeat_message: "Ramitawil has been vanquished."
+    appear_message: "The demonic bee Waxanarian!"
+    defeat_message: "Waxanarian has been vanquished."
     types: {"Green", "Black"}
+    init_func: enemy_berserker_init
+    step_func: enemy_berserker_step
     stats: {
-        attacks: {{weapon: "Fast Melee"}}
+        attacks: {{weapon: "Basic Melee"}}
         hp: 200
-        hpregen: 0.2
+        hpregen: 0.125
         movespeed: 5
         strength: 25
-        defence: 15
-        willpower: 20
-    }
-    effects_active: {
-        {"PoisonedWeapon", {poison_percentage: 1.00}}
-        {"Spiky", {recoil_percentage: 0.25}}
-        "Enraging"
+        magic: 10
+        defence: 12
+        willpower: 8
     }
     death_func: () =>
-        ItemUtils = require "maps.ItemUtils"
+        item = random_choice {"Will Scroll", "Strength Scroll", "Defence Scroll", "Magic Scroll"}
+        ObjectUtils.spawn_item_near(@, item, 1)
         ObjectUtils.spawn_item_near(@, "Swarm Lanart", 1)
-        -- Spawn 1 level 1 randarts:
-        for i=1,1
-            {:type, :amount} = ItemUtils.randart_generate(1)
-            ObjectUtils.spawn_item_near(@, type, amount)
-        ---- Spawn 1 level 2 randarts:
-        --for i=1,1
-        --    {:type, :amount} = ItemUtils.randart_generate(2)
-        --    ObjectUtils.spawn_item_near(@, type, amount)
-        --ObjectUtils.spawn_item_near(@, "Amulet of Great Pain", 1)
+        ItemUtils = require "maps.ItemUtils"
+        -- Spawn a level 1 randart:
+        {:type, :amount} = ItemUtils.randart_generate(1)
+        ObjectUtils.spawn_item_near(@, type, amount)
 }
+
+--DataW.enemy_create {
+--    name: "Ramitawil"
+--    sprite: "spr_enemies.bosses.boss_bee"
+--    radius: 20
+--    xpaward: 100
+--    appear_message: "The demonic bee Ramitawil!"
+--    defeat_message: "Ramitawil has been vanquished."
+--    types: {"Green", "Black"}
+--    stats: {
+--        attacks: {{weapon: "Fast Melee"}}
+--        hp: 200
+--        hpregen: 0.2
+--        movespeed: 5
+--        strength: 25
+--        defence: 15
+--        willpower: 20
+--    }
+--    effects_active: {
+--        {"PoisonedWeapon", {poison_percentage: 1.00}}
+--        {"Spiky", {recoil_percentage: 0.25}}
+--        "Enraging"
+--    }
+--    death_func: () =>
+--        ItemUtils = require "maps.ItemUtils"
+--        ObjectUtils.spawn_item_near(@, "Swarm Lanart", 1)
+--        -- Spawn 1 level 1 randarts:
+--        for i=1,1
+--            {:type, :amount} = ItemUtils.randart_generate(1)
+--            ObjectUtils.spawn_item_near(@, type, amount)
+--        ---- Spawn 1 level 2 randarts:
+--        --for i=1,1
+--        --    {:type, :amount} = ItemUtils.randart_generate(2)
+--        --    ObjectUtils.spawn_item_near(@, type, amount)
+--        --ObjectUtils.spawn_item_near(@, "Amulet of Great Pain", 1)
+--}
 
 DataW.enemy_create {
     name: "Mouther"

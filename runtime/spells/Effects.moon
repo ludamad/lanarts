@@ -47,8 +47,8 @@ DataW.effect_create {
     effected_sprite: "berserk_effected"
     stat_func: (obj, old, new) =>
         new.strength += obj.stats.level
-        new.defence = math.max(0, new.defence + 3 + @extensions * 2)
-        new.willpower = math.max(0, new.willpower + 3 + @extensions * 2)
+        --new.defence = math.max(0, new.defence + 3 + @extensions * 2)
+        --new.willpower = math.max(0, new.willpower + 3 + @extensions * 2)
         new.melee_cooldown_multiplier /= 1.6
         hp_regen_bonus = (10 + @extensions) / 60 -- 10 per second 
         new.hpregen += hp_regen_bonus

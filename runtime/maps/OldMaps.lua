@@ -287,18 +287,23 @@ M.Dungeon3 = {
     content = {
       items = { amount = 5,  group = ItemGroups.basic_items   },
       enemies = {
-        -- amount = {12,14},
         amount = {8, 10},
-        generated = M.mediumhard_enemies
+        generated = table.merge({
+          {enemy = "Queen Bee",          chance = 5                                              },
+          {enemy = "Giant Bee",     chance = 95                                             },
+        })
       }
     }
   },
-  { layout = varied_layouts,
+  { layout = medium_layouts, -- varied_layouts,
     content = {
       items = { amount = 8,  group = ItemGroups.basic_items   },
       enemies = {
-        amount = {10,12},
-        generated = M.mediumhard_enemies
+        amount = {8, 10},
+        generated = table.merge({
+          {enemy = "Queen Bee",          chance = 5                                              },
+          {enemy = "Giant Bee",     chance = 95                                             },
+        })
       }
     }
   },
@@ -307,7 +312,7 @@ M.Dungeon3 = {
       items = { amount = 4,  group = ItemGroups.enchanted_items   },
       enemies = {
         amount = {13, 15},
-        generated = table.tconcat(M.mediumhard_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
+        generated = table.tconcat(M.mediumhard_enemies, {{enemy = "Waxanarian", guaranteed_spawns = 1}})
       }
     }
   }
