@@ -288,10 +288,11 @@ M.Dungeon3 = {
       items = { amount = 5,  group = ItemGroups.basic_items   },
       enemies = {
         amount = {8, 10},
-        generated = table.merge({
-          {enemy = "Queen Bee",          chance = 5                                              },
-          {enemy = "Giant Bee",     chance = 95                                             },
-        })
+        generated = {
+          {enemy = "Queen Bee",          chance = 10                                              },
+          {enemy = "Poison Bee",          chance = 10                                              },
+          {enemy = "Giant Bee",     chance = 80                                             },
+        }
       }
     }
   },
@@ -300,10 +301,11 @@ M.Dungeon3 = {
       items = { amount = 8,  group = ItemGroups.basic_items   },
       enemies = {
         amount = {8, 10},
-        generated = table.merge({
-          {enemy = "Queen Bee",          chance = 5                                              },
-          {enemy = "Giant Bee",     chance = 95                                             },
-        })
+        generated = {
+          {enemy = "Queen Bee",          chance = 10                                              },
+          {enemy = "Poison Bee",          chance = 10                                              },
+          {enemy = "Giant Bee",     chance = 80                                             },
+        }
       }
     }
   },
@@ -312,7 +314,12 @@ M.Dungeon3 = {
       items = { amount = 4,  group = ItemGroups.enchanted_items   },
       enemies = {
         amount = {13, 15},
-        generated = table.tconcat(M.mediumhard_enemies, {{enemy = "Waxanarian", guaranteed_spawns = 1}})
+        generated = {
+          {enemy = "Queen Bee",          chance = 10                                              },
+          {enemy = "Poison Bee",          chance = 10                                              },
+          {enemy = "Giant Bee",     chance = 80                                             },
+          {enemy = "Waxanarian", guaranteed_spawns = 1}
+        }
       }
     }
   }

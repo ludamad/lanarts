@@ -240,7 +240,31 @@ DataW.enemy_create {
     sprite: "spr_enemies.animals.killer_bee"
     death_sprite: "green blood"
     radius: 10
-    xpaward: 25
+    xpaward: 20
+    appear_message: "A giant killer bee appears!"
+    defeat_message: "The giant bee has buzzed its last buzz."
+    types: {"Green"}
+    stats: {
+        attacks: {{weapon: "Fast Melee"}}
+        hp: 20
+        hpregen: 0.1
+        movespeed: 3
+        strength: 25
+        defence: 0
+        willpower: 12
+    }
+    --effects_active: {
+        --{"PoisonedWeapon", {poison_percentage: 0.25}}
+        --{"Spiky", {recoil_percentage: 0.25}}
+    --}
+}
+
+DataW.enemy_create {
+    name: "Poison Bee"
+    sprite: "spr_enemies.animals.poison_bee"
+    death_sprite: "green blood"
+    radius: 10
+    xpaward: 40
     appear_message: "A giant killer bee appears!"
     defeat_message: "The giant bee has buzzed its last buzz."
     types: {"Green"}
@@ -248,14 +272,14 @@ DataW.enemy_create {
         attacks: {{weapon: "Fast Melee"}}
         hp: 40
         hpregen: 0.1
-        movespeed: 3.5
+        movespeed: 3
         strength: 25
         defence: 0
         willpower: 12
     }
     effects_active: {
         {"PoisonedWeapon", {poison_percentage: 0.25}}
-        {"Spiky", {recoil_percentage: 0.25}}
+        --{"Spiky", {recoil_percentage: 0.25}}
     }
 }
 
