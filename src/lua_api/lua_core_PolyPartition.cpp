@@ -23,9 +23,9 @@
 
 #include <polypartition/polypartition.h>
 
-typedef std::vector<PosF> Polygon;
+typedef std::vector<PosF> _Polygon;
 
-static std::vector<Polygon> decompose(const Polygon& polygons) {
+static std::vector<_Polygon> decompose(const _Polygon& polygons) {
     TPPLPartition pp;
     TPPLPoly tp_poly;
     TPPLPolyList tp_parts;
@@ -34,9 +34,9 @@ static std::vector<Polygon> decompose(const Polygon& polygons) {
         tp_poly[i] = {polygons[i].x, polygons[i].y, i};
     }
     pp.ConvexPartition_HM(&tp_poly, &tp_parts);
-    std::vector<Polygon> ret;
+    std::vector<_Polygon> ret;
     for (TPPLPoly& tp_poly : tp_parts) {
-        Polygon polygon;
+        _Polygon polygon;
         for (size_t i = 0; i < tp_poly.GetNumPoints(); i++) {
             auto point = tp_poly.GetPoint(i);
             polygon.push_back({point.x, point.y});
