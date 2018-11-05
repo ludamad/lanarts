@@ -25,7 +25,7 @@
 #include "draw/TileEntry.h"
 
 
-static int tile_create(LuaStackValue args) {
+int tile_create(LuaStackValue args) {
 	lua_State* L = args.luastate();
 	TileEntry entry;
 	LuaField images = args["images"];
@@ -52,7 +52,7 @@ static int tile_create(LuaStackValue args) {
 }
 
 /* Transforms a dictionary of image lists to a dictionary of tiles */
-static LuaValue tileset_create(LuaStackValue fields) {
+LuaValue tileset_create(LuaStackValue fields) {
 	lua_State* L = fields.luastate();
 	LuaValue tileset(L);
 	tileset.newtable();
@@ -69,10 +69,3 @@ static LuaValue tileset_create(LuaStackValue fields) {
 	return tileset;
 }
 
-namespace lua_api {
-	void register_tiles_api(lua_State* L) {
-		LuaValue data = lua_ensure_protected_table(luawrap::globals(L)["Data"]);
-		data["tile_create"].bind_function(tile_create);
-		data["tileset_create"].bind_function(tileset_create);
-	}
-}

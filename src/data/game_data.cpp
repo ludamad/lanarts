@@ -180,21 +180,32 @@ static void __lua_init(lua_State* L, T& t) {
 		t[i].init(L);
 }
 
+static int ldo_nothing(lua_State* L) {
+	return 0;
+}
+
+int tile_create(LuaStackValue args);
+LuaValue tileset_create(LuaStackValue fields);
+
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames);
-int init_resource_data(lua_State *L) {
-	GameState* gs = lua_api::gamestate(L);
+void init_resource_data_sets(GameState* gs, bool avoid_sprite_loads) {
+    lua_State* L = gs->luastate();
 	// Initialize fonts specified in settings
-	res::font_primary().initialize(gs->game_settings().font, 10);
-    res::font_bigprimary().initialize(gs->game_settings().font, 12);
-	res::font_menu().initialize(gs->game_settings().menu_font, 20);
+    if (!avoid_sprite_loads) {
+        res::font_primary().initialize(gs->game_settings().font, 10);
+        res::font_bigprimary().initialize(gs->game_settings().font, 12);
+        res::font_menu().initialize(gs->game_settings().menu_font, 20);
+    }
     game_class_data.init(L);
     game_effect_data.init(L);
 	game_item_data.init(L);
     game_enemy_data.init(L);
-    game_tile_data.clear();
-    game_tileset_data.init(L);
     game_spell_data.init(L);
-    game_sprite_data.init(L);
+    if (!avoid_sprite_loads) {
+        game_sprite_data.init(L);
+		game_tile_data.clear();
+		game_tileset_data.init(L);
+    }
 
     LuaSpecialValue globals = luawrap::globals(L);
     globals["classes"] = game_class_data.get_raw_data();
@@ -209,8 +220,16 @@ int init_resource_data(lua_State *L) {
 
         // Compatibility
 	DataFiles dfiles = load_datafilenames("datafiles.yaml");
-	load_tile_data(dfiles.tile_files);
-    load_sprite_data(L, dfiles.sprite_files);
+    if (!avoid_sprite_loads) {
+		load_tile_data(dfiles.tile_files);
+        load_sprite_data(L, dfiles.sprite_files);
+		D["tile_create"].bind_function(tile_create);
+		D["tileset_create"].bind_function(tileset_create);
+    } else {
+        // TODO should error?
+		D["tile_create"].bind_function(ldo_nothing);
+		D["tileset_create"].bind_function(ldo_nothing);
+    }
 
     D["enemy_create"].bind_function(lapi_data_create_enemy);
     D["class_create"].bind_function(lapi_data_create_class);
@@ -220,7 +239,6 @@ int init_resource_data(lua_State *L) {
     D["projectile_create"].bind_function(lapi_data_create_projectile);
     D["equipment_create"].bind_function(lapi_data_create_equipment);
     D["weapon_create"].bind_function(lapi_data_create_weapon);
-	return 0;
 }
 
 static void luayaml_push(LuaValue& value, lua_State* L, const char* name) {

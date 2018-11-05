@@ -307,26 +307,34 @@ void LuaSerializeContext::decode() {
 	_decode(buffer->read_byte());
 }
 
+//#define P(x) printf(#x"\n");
+#define P(x)
 void LuaSerializeContext::_decode(int type) {
 	int old_stack = lua_gettop(L) + 1;
 	switch (type) {
 	case LS_NUMBER:
+	    P(LS_NUMBER)
+
 		lua_pushnumber(L, buffer->read_double());
 		LCOMMON_ASSERT(old_stack == lua_gettop(L));
 		return;
 	case LS_BOOL:
+        P(LS_BOOL)
 		lua_pushboolean(L, buffer->read_byte());
 		LCOMMON_ASSERT(old_stack == lua_gettop(L));
 		return;
 	case LS_STRING:
+        P(LS_STRING)
 		decode_string();
 		LCOMMON_ASSERT(old_stack == lua_gettop(L));
 		return;
 	case LS_FUNCTION:
+        P(LS_FUNCTION)
 		decode_function();
 		LCOMMON_ASSERT(old_stack == lua_gettop(L));
 		return;
 	case LS_TABLE:
+        P(LS_TABLE)
 		lua_newtable(L);
 		store_object(-1); // Store immediately to let references resolve
 		decode(); // Decode metatable
@@ -335,12 +343,14 @@ void LuaSerializeContext::_decode(int type) {
 		LCOMMON_ASSERT(old_stack == lua_gettop(L));
 		return;
 	case LS_REF_ID: {
+        P(LS_REF_ID)
         int recorded_type = buffer->read_byte();
 		int id = buffer->read_int();
 		lua_rawgeti(L, this->index_to_obj, id);
 		if (lua_isnil(L, -1)) {
 			lua_pop(L,1);
-                        lua_newtable(L);//luaL_error(L, "LS_REF_ID resolved to nil loading id=%d (problem with serialized Lua value!)", id);
+//                        lua_newtable(L);
+            luaL_error(L, "LS_REF_ID resolved to nil loading id=%d (problem with serialized Lua value!)", id);
 		} //else if (lua_type(L, -1) != recorded_type){
 //	        const char* was = lua_typename(L, lua_type(L, -1));
 //	        const char* expected = lua_typename(L, recorded_type);
@@ -350,18 +360,22 @@ void LuaSerializeContext::_decode(int type) {
 		return;
 	}
 	case LS_REF_NAME:
+        P(LS_REF_NAME)
 		decode_ref_name();
 		LCOMMON_ASSERT(old_stack == lua_gettop(L));
 		return;
 	case LS_REF_METAMETHOD:
+        P(LS_REF_METAMETHOD)
 		decode_ref_metamethod();
 		LCOMMON_ASSERT(old_stack == lua_gettop(L));
 		return;
 	case LS_NIL:
+        P(LS_NIL)
 		lua_pushnil(L);
 		LCOMMON_ASSERT(old_stack == lua_gettop(L));
 		return;
 	case LS_TABLE_END_SENTINEL:
+        P(LS_TABLE_END_SENTINEL)
 		luaL_error(L, "Misplaced table end sentinel (problem with serialized Lua value!)");
 		return;
 	default:

@@ -34,7 +34,7 @@ engine_init = (settings) ->
         EngineInternal.init_gamestate_api(settings)
         require "globals.GameUtils"
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
-        EngineInternal.init_resource_data()
+        EngineInternal.init_resource_data_sets(false) -- don't avoid sprite loads
     return settings
 
 engine_exit = () ->

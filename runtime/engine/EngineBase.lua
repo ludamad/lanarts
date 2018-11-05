@@ -35,6 +35,7 @@ end
 
 function Engine.resources_load(...)
     log "function Engine.resources_load(...)"
+    Engine.resources_loaded = false
 
     local function _req(module)
         local GameState = Engine.require("core.GameState")

@@ -80,6 +80,9 @@ fi
 if handle_flag "--headless" ; then
     export BUILD_HEADLESS=1
 fi
+if handle_flag "--small" || handle_flag "-s" ; then
+    export LANARTS_SMALL=1
+fi
 if handle_flag "--luajit" || handle_flag "-lj" ; then
     export BUILD_LUAJIT=1
 fi

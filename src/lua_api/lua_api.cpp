@@ -181,7 +181,6 @@ namespace lua_api {
 		register_io_api(L);
 		register_net_api(L);
 		register_event_log_api(L);
-		register_tiles_api(L);
 
 		lua_spelltarget_bindings(L);
 

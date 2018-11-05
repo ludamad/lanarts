@@ -123,20 +123,33 @@ run_lanarts = (raw_args) ->
             EngineInternal.init_gamestate_api(initial_settings)
             -- Go back to menu
             return entry_point()
-        -- (4) If F4 is pressed, pause the game
-        if Keys.key_pressed(Keys.F4)
+        -- (4) (DEBUG) If F3 is pressed, pause the game
+        elseif Keys.key_pressed(Keys.F3)
+            -- Save game
+            GameState.save("saves/tempsave.save")
+            -- Allocate a fresh GameState
+            -- Clear all loaded 'maps.*' modules
+            for k,v in pairs package.loaded
+                if k\startswith("maps.") or k\startswith("items.") or k\startswith("spells.") or k\startswith("enemies.") or k\startswith("classes.")
+                    package.loaded[k] = nil
+            EngineInternal.init_resource_data_sets(true) -- avoid sprite loads
+            Engine.resources_load()
+            -- Load game
+            GameState.load("saves/tempsave.save")
+        -- (5) If F4 is pressed, pause the game
+        elseif Keys.key_pressed(Keys.F4)
             GameLoop.loop_control.game_is_paused = not GameLoop.loop_control.game_is_paused
-        -- (5) If Escape is pressed, tell user about shift+escape
-        if Keys.key_pressed(Keys.ESCAPE)
+        -- (6) If Escape is pressed, tell user about shift+escape
+        elseif Keys.key_pressed(Keys.ESCAPE)
             for _ in screens()
                 EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
-        -- (6) Backup save every ~5 minutes
-        if GameState.frame > 0 and GameState.frame % (60 * 60 * 5) == 0  -- Every 5 minutes at 60FPS
+        -- (7) Backup save every ~5 minutes
+        elseif GameState.frame > 0 and GameState.frame % (60 * 60 * 5) == 0  -- Every 5 minutes at 60FPS
             for _ in screens()
                 EventLog.add("BACKING UP SAVE!", COL_WHITE)
             GameState.save((args.save or "saves/savefile.save") .. ".backup." .. GameState.frame)
 
-        -- (7) Loop again
+        -- (8) Loop again
         return game_step
 
     return StartEngine.start_engine {

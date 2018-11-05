@@ -61,7 +61,7 @@ RingFireBase = (extension) -> SpellUtils.spell_object_type table.merge {
         @for_all_rings (x, y) ->
             ObjectUtils.screen_draw(M._fire, {x, y}, alpha / 2, frame)
 }, extension
-M.RingOfFire = RingOfFire
+M.RingFireBase = RingFireBase
 
 -- When something dies from RingOfFire, this is spawned
 local SpawnedFire

@@ -115,14 +115,15 @@ static int engine_start_connection(lua_State* L) {
     return 0;
 }
 
-int init_resource_data(lua_State *L);
-
+void init_resource_data_sets(GameState* gs, bool avoid_sprite_loads);
 namespace lua_api {
     int read_eval_print(lua_State *L);
 	void register_lua_core_EngineInternal(lua_State* L) {
 		LuaValue engine = register_lua_submodule(L, "core.EngineInternal");
         engine["init_subsystems"].bind_function(engine_initialize_subsystems);
-        engine["init_resource_data"].bind_function(init_resource_data);
+        engine["init_resource_data_sets"] = [=](bool avoid_sprite_loads) {
+            init_resource_data_sets(lua_api::gamestate(L), avoid_sprite_loads);
+        };
         engine["run_unittests"].bind_function(run_unittests);
         engine["read_eval_print"].bind_function(read_eval_print);
         engine["init_gamestate_api"].bind_function(engine_init_gamestate_api);
