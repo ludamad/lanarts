@@ -208,7 +208,7 @@ DataW.spell_create {
             {COL_PALE_YELLOW, "Power: "}
             {COL_PALE_GREEN, power}
         }
-    mp_cost: 20
+    mp_cost: 30
     spell_cooldown: 800
     cooldown: 100
 }
