@@ -32,6 +32,7 @@ OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
 
 {:MapCompilerContext, :make_on_player_interact} = require "maps.MapCompilerContext"
+{:MapNode, :MapDesc} = require "maps.MapDesc"
 Places = require "maps.Places"
 
 -- Generation constants and data
@@ -56,85 +57,6 @@ shrink = (bbox, x, y) ->
         x2-x
         y2-y
     }
-
-MapDesc = newtype {
-    init: (@map_args) =>
-        @parent = false
-        @children = @map_args.children
-        @map_args.children = nil
-        @region_set = false
-    compile: (portal_spawns) =>
-        map_args = table.merge {
-            rng: NewMaps.new_rng()
-            size: {100, 100}
-            default_content: Tilesets.orc.wall
-            default_flags: {SourceMap.FLAG_SOLID} --, SourceMap.FLAG_SEETHROUGH}
-            map_label: "Dungeon"
-        }, @map_args
-        map_args.size = vector_add(map_args.size, {PADDING*2, PADDING*2})
-        map = NewMaps.source_map_create map_args
-        map.portal_spawns = portal_spawns
-
-        room_selector = {
-            matches_all: SourceMap.FLAG_SOLID
-            matches_none: SourceMap.FLAG_PERIMETER
-        }
-        @region_set = {
-            :map
-            regions: {
-                from_bbox(
-                    PADDING
-                    PADDING
-                    map.size[1] - PADDING
-                    map.size[2] - PADDING)\with_selector(room_selector)
-            }
-        }
-        for child in *@children
-            child.parent = @
-            if not child\compile()
-                return nil
-        if not NewMaps.check_connection(map)
-            event_log("Failed connectivity check")
-            return nil
-        return map
-}
-
-MapNode = newtype {
-    init: (args) =>
-        @children = args.children or {}
-        @place = args.place
-    new_group: () =>
-        @map.next_group += 1
-        return @map.next_group
-    compile: () =>
-        @region_set = @parent.region_set
-        @group = @new_group()
-        if not @place()
-            return false
-        for child in *@children
-            child.parent = @
-            if not child\compile()
-                return false
-        return true
-    chance: (prob) => @region_set.map.rng\chance(prob)
-    apply: (args) =>
-        args.map = @map
-        for region in *@region_set.regions
-            region\apply(args)
-    get: {
-        map: () => @region_set.map
-        rng: () => @region_set.map.rng
-    }
-}
- 
-node_paint_group = () =>
-    @apply {
-        operator: {group: @group}
-    }
-    matches_group = {@group, @group}
-    @region_set = selector_map @region_set, (s) ->
-        return table.merge s, {:matches_group}
-    return true
 
 MAX_TUNNEL_TRIES = 100
 node_connect_rect_rooms = () =>
@@ -188,37 +110,6 @@ node_connect_rect_rooms = () =>
                     break
                 else
                     tries_without_tunnel += 1
-    return true
-
-node_place_bbox = () =>
-    size = {10, 10}
-    if @chance(0.2)
-        size = {5, 5}
-    result = find_bbox(@region_set, size)
-    if not result
-        return false
-    {:bbox} = result
-    group = @new_group()
-    region = from_bbox(unpack(bbox))
-    region.inner_bbox = shrink(bbox, 1, 1)
-    region.selector = {matches_group: {group, group}}
-    append regions, region
-    SourceMap.rectangle_apply {
-        map: @map
-        area: bbox
-        fill_operator: {
-            :group
-            add: SourceMap.FLAG_SEETHROUGH
-            remove: SourceMap.FLAG_SOLID
-            content: Tilesets.pebble.floor
-        }
-        perimeter_width: 0
-        perimeter_operator: {
-            add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_PERIMETER}
-            remove: SourceMap.FLAG_SEETHROUGH
-            content: Tilesets.pebble.wall
-        }
-    }
     return true
 
 _load_map_poly = memoized (name) ->

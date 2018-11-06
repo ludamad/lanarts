@@ -107,7 +107,7 @@ path_planner = (player) -> nilprotect {
     step: () =>
         @n_till_refresh = math.max @n_till_refresh - 1, 0
     set_path_towards: (obj) =>
-        if obj.destroyed
+        if not obj or obj.destroyed
             @target = false
             @target_map = false
             @stored_path = {}

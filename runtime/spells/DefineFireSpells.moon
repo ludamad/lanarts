@@ -125,6 +125,7 @@ RingOfFire = RingFireBase {
     init: (args) =>
         @damage_cooldowns = OrderedDict() -- takes [index][obj]
         @fireballs = {}
+        @angle_offset = 0
         @base_init(args)
     _create_rings: (radius_bonus = 0) =>
         sub_radius = 20 -- / (1 + @caster_type_power() / 10)
@@ -132,7 +133,7 @@ RingOfFire = RingFireBase {
         radius = sub_radius * n_points / (2 * math.pi) + radius_bonus
         step_angle = (2 * math.pi) / n_points
         return for i=0,n_points-1
-            angle = step_angle * i
+            angle = @angle_offset + step_angle * i
             {math.sin(angle) * radius, math.cos(angle) * radius}
     -- Extra functionality over RingFireBase: creating SpawnedFire
     _on_kill: (obj) =>
@@ -145,7 +146,7 @@ RingOfFire = RingFireBase {
         --}
         --r_pow = TypeEffectUtils.get_power(@caster, 'Red')
         ---- Very rare: Ring of fire creates mana potion.
-        --if chance(0.01 * bounds_percentage(r_pow, 2, 4))
+        --if chance(0.01 dsa* bounds_percentage(r_pow, 2, 4))
         --    SpellUtils.message(@caster, "Your awesome fire magic creates a red mana potion!", COL_PALE_BLUE)
         --    ObjectUtils.spawn_item_near(@caster, "Red Mana Potion", 1, obj.x, obj.y)
         nil
@@ -160,6 +161,7 @@ RingOfFire = RingFireBase {
         if @caster.destroyed or @caster.map ~= @map
             return
         @caster.__vision_radius_override = 9
+        @angle_offset += math.pi / 10 / 10
         @base_on_step()
 
     for_all_rings: (f) =>

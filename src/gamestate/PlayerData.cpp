@@ -33,12 +33,12 @@ void PlayerData::remove_all_players(GameState* gs) {
 			gs->game_world().set_current_level(p->current_floor);
 			gs->remove_instance(p);
 			gs->game_world().set_current_level(oldlevel);
-		}
 
-		// Cleanliness, clear Lua state from players
-		p->inventory().clear();
-		p->lua_variables.clear();
-		p->effects.clear();
+            // Cleanliness, clear Lua state from players
+            p->inventory().clear();
+            p->lua_variables.clear();
+            p->effects.clear();
+        }
 
         // Clear reference to player
 		_players[i].player_inst.clear();
