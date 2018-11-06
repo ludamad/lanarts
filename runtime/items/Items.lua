@@ -234,6 +234,24 @@ Data.item_create {
 }
 
 Data.item_create {
+    name = "Honeycomb",
+    description = "A tasty honeycomb. Restores 100 HP to the user.",
+    type = "potion",
+
+    shop_cost = {45,95},
+
+    spr_item = "spr_keys.honeycomb",
+
+    prereq_func = function (self, user)
+        return user.stats.hp < user.stats.max_hp
+    end,
+
+    action_func = function(self, user)
+        user:heal_hp(100)
+    end
+}
+
+Data.item_create {
     name = "Strength Scroll",
     description = "A mantra of unnatural modification, it bestows the user with a permanent, albeit small, increase to strength.",
     use_message = "Strength is bestowed upon you!",

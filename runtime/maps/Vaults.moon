@@ -1,6 +1,6 @@
 -- Vaults.moon:
 -- Contains schemas for dungeon components that are added via brute force and pattern matching.
--- These components try a bunch of times with the more sophisticated components, and have a fall-back 'simple component'. 
+-- These components try a bunch of times with the more sophisticated components, and have a fall-back 'simple component'.
 
 SourceMap = require "core.SourceMap"
 MapUtils = require "maps.MapUtils"
@@ -633,6 +633,48 @@ Gdcccccecccw.....................................
     }
 }
 
+M.honeycomb = (args) -> {
+    legend: table.merge M.anvil_encounter(args).legend, {
+        'w': {
+            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_HAS_VAULT}
+            matches_none: {FLAGS_HAS_CONTENT}
+            content: TileSets.hive.combs
+        }
+        'i': {add: UNSOLID_ADD, on_placement: args.item_placer, matches_none: SourceMap.FLAG_SOLID}
+    }
+    data: random_choice {[=[
+.w..w..
+ww..ww.
+.......
+..i....
+ww..ww.
+.w..w..
+]=]
+[=[
+.......
+...w...
+.wwwww.
+.wi..w.
+...w...
+...w...
+]=]
+[=[
+.......
+..wwww.
+.wi....
+.wiwww.
+.ww....
+.......
+]=]
+[=[
+.....
+.w...
+.w...
+...w.
+]=]
+    }
+}
+
 M.stone_henge = (args) -> {
     legend: table.merge M.anvil_encounter(args).legend, {
         'w': {
@@ -740,7 +782,7 @@ wwwwww....++.........
 -- - enemy_placer
 -- - store_placer
 -- - item_placer
--- - rng 
+-- - rng
 M.small_random_vault = (args) -> {
     legend: make_legend table.merge(args, {store_placer: random_choice {do_nothing, args.store_placer}}) , {
         '*': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: random_choice {do_nothing, args.gold_placer}, matches_none: FLAGS_HAS_CONTENT}
@@ -825,7 +867,7 @@ M.small_item_vault = (args) -> {
         'e': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.enemy_placer, matches_none: FLAGS_HAS_CONTENT}
         'p': {add: UNSOLID_ADD, content: args.tileset.floor, matches_none: FLAGS_HAS_CONTENT}
         'd': {
-            add: UNSOLID_ADD 
+            add: UNSOLID_ADD
             remove: SourceMap.FLAG_SOLID
             content: args.tileset.floor_alt
             on_placement: args.door_placer

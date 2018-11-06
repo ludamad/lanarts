@@ -143,6 +143,10 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
    		&& core_stats().hp < AUTOUSE_HEALTH_POTION_THRESHOLD) {
    	int item_slot = inventory().find_slot(
    			get_item_by_name("Health Potion"));
+   	if (item_slot == -1) {
+            int item_slot = inventory().find_slot(
+                            get_item_by_name("Honeycomb"));
+        }
    	if (item_slot > -1) {
    		queued_actions.push_back(
    				game_action(gs, this, GameAction::USE_ITEM, item_slot));

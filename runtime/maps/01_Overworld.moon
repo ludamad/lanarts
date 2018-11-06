@@ -532,10 +532,10 @@ place_new_easy = (region_set) ->
     {:map, :regions} = region_set
     forward_link = map_linker map, (back_links) ->
         return require("map_descs.HiveEntrance")\generate for back_link in *back_links
-            (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, "spr_gates.exit_orc"))
+            (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, "spr_gates.hive_gone"))
 
     place_dungeon = (map, xy) ->
-        forward_link(MapUtils.spawn_portal(map, xy, "spr_gates.enter_orc"))
+        forward_link(MapUtils.spawn_portal(map, xy, "spr_gates.hive_portal"))
     vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.pebble})
     if not place_feature(map, vault, regions)
         return nil
@@ -1250,6 +1250,7 @@ overworld_create = () ->
 
 return {
     :overworld_create
+    :place_feature
     test_determinism: () -> nil
     :generate_map_node
 }

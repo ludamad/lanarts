@@ -50,6 +50,7 @@ M.hive = Data.tileset_create {
     floor = { images = Display.images_load "spr_tile_floors/acidic_floor.png%32x32"},
     floor_alt = { images = Display.images_load ("tiles/dngn_floor/snake/snake-a(0-3).png") },
     wall = { images = Display.images_load "spr_tile_walls/beehives.png%32x32" },
+    combs = { images = Display.images_load "spr_tile_walls/combs.png%32x32" }
     wall_alt = { images = Display.images_load "spr_tile_walls/lair.png%32x32" }
 }
 

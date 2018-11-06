@@ -27,6 +27,7 @@ MapSequence = require "maps.MapSequence"
 Vaults = require "maps.Vaults"
 World = require "core.World"
 SourceMap = require "core.SourceMap"
+{:place_feature} = require "maps.01_Overworld"
 Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
@@ -54,7 +55,7 @@ CONTENT_MAP = nilprotect {
 
 node_place_hive_entrance_polys = () =>
     xy = center @region_set
-    parts = load_map_polys @rng, "HiveEntrance", xy[1], xy[2], 80, 50, @rng\randomf(-math.pi, math.pi)
+    parts = load_map_polys @rng, "HiveEntrance", xy[1], xy[2], 60, 40, @rng\randomf(-math.pi, math.pi)
     for name, region in spairs parts
         region.group = @new_group()
         region\apply {
@@ -85,6 +86,16 @@ node_place_hive_entrance_polys = () =>
             item = ItemUtils.item_generate (if i < 8 then ItemGroups.basic_items else ItemGroups.enchanted_items)
             MapUtils.spawn_item(@map, item.type, item.amount, sqr)
         return true
+    add_honeycombs = (regions) ->
+        item_placer = (map, xy) ->
+            if map.rng\chance(0.1)
+                MapUtils.spawn_item(@map, "Honeycomb", 1, xy)
+
+        for i=1,5
+            vault = SourceMap.area_template_create(Vaults.honeycomb {:item_placer})
+            if not place_feature(@map, vault, regions)
+                return true
+        return false
     fill_with_mob = (part, enemies) ->
         {:group} = part
         bbox = part\bbox()
@@ -98,6 +109,8 @@ node_place_hive_entrance_polys = () =>
                 return false
             enemy.monster_wander_position = () => monster_focus_point
         return true
+    if not add_honeycombs({parts.E, parts.F})
+
     if not fill_all()
         return false
     if not fill_with_mob(parts.B, {"Giant Bee", "Giant Bee", "Giant Bee", "Mouther"})
