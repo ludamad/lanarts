@@ -5,6 +5,7 @@ Tilesets = require "tiles.Tilesets"
 {:MapRegion, :combine_map_regions, :from_bbox} = require "maps.MapRegion"
 
 PADDING = 10
+MAX_MAP_TRIES = 100
 
 MapDesc = newtype {
     init: (@map_args) =>
@@ -12,7 +13,13 @@ MapDesc = newtype {
         @children = @map_args.children
         @map_args.children = nil
         @region_set = false
-    compile: (portal_spawns) =>
+    generate: (back_links={}, forward_links={}) =>
+        map = NewMaps.try_n_times MAX_MAP_TRIES, () -> @compile(back_links, forward_links)
+        game_map = NewMaps.generate_game_map(map)
+        for post_poned in *map.post_game_map
+            post_poned(game_map)
+        return game_map
+    compile: (@back_links={}, @forward_links={}) =>
         map_args = table.merge {
             rng: NewMaps.new_rng()
             size: {100, 100}
@@ -22,7 +29,6 @@ MapDesc = newtype {
         }, @map_args
         map_args.size = vector_add(map_args.size, {PADDING*2, PADDING*2})
         map = NewMaps.source_map_create map_args
-        map.portal_spawns = portal_spawns
 
         room_selector = {
             matches_all: SourceMap.FLAG_SOLID

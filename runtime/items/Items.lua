@@ -2,6 +2,7 @@ local TypeEffectUtils = require "spells.TypeEffectUtils"
 local MiscSpellAndItemEffects = require "core.MiscSpellAndItemEffects"
 local EventLog = require "ui.EventLog"
 local Map = require "core.Map"
+local GameObject = require "core.GameObject"
 
 Data.item_create {
     name = "Gold", -- An entry named gold must exist, it is handled specially
@@ -9,6 +10,12 @@ Data.item_create {
     pickup_func = function(self, user, amount)
         user:gain_gold(amount)
         play_sound("sound/gold.ogg")
+        GameObject.animation_create {
+            xy = {user.x + 10, user.y},
+            sprite = "spr_effects.coin32",
+            duration = 25,
+            velocity = {-1, -1}
+        }
         return true -- dont pickup
     end
 }

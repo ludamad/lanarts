@@ -531,7 +531,7 @@ place_entrance_vault = (region_set) ->
 place_new_easy = (region_set) ->
     {:map, :regions} = region_set
     forward_link = map_linker map, (back_links) ->
-        return require("maps.03_EasyOverworldDungeon").generate for back_link in *back_links
+        return require("map_descs.HiveEntrance")\generate for back_link in *back_links
             (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, "spr_gates.exit_orc"))
 
     place_dungeon = (map, xy) ->
@@ -637,7 +637,7 @@ place_easy = (region_set) ->
         -- nil is passed for the default open sprite
         MapUtils.spawn_door(map, xy)
     on_placement = (map) -> InnerMapSeq\slot_resolve(1, map)
-    dungeon = {label: 'Dragon Den', tileset: Tilesets.pebble, :templates, on_generate: on_generate_dungeon, :on_placement}
+    dungeon = {label: 'Outpost', tileset: Tilesets.pebble, :templates, on_generate: on_generate_dungeon, :on_placement}
     place_dungeon = Region1.old_dungeon_placement_function(MapSeq, dungeon)
     vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, :door_placer, tileset: Tilesets.pebble})
     if not place_feature(map, vault, regions) -- (r) -> r.conf.is_overworld)
@@ -887,6 +887,8 @@ overworld_features = (region_set) ->
             return nil
     -------------------------
 
+    -- if not place_easy(region_set)
+    --     return nil
     if not place_new_easy(region_set)
         return nil
 
@@ -924,7 +926,7 @@ overworld_features = (region_set) ->
             return true
         gold_placer = (map, xy) ->
             MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-        dungeon = {label: "Outpost", tileset: Tilesets.hive, :templates, on_generate: on_generate_dungeon}
+        dungeon = {label: "Hive", tileset: Tilesets.hive, :templates, on_generate: on_generate_dungeon}
         door_placer = (map, xy) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")

@@ -22,10 +22,10 @@ WEAPON_BASES = {
     {"Short Bow", 100, SEMIRARE, {"spr_weapons.randart_shortbow"}}
     {"Long Bow", 100, RARE, {"spr_weapons.urand_krishna", "spr_weapons.longbow3"}}
     -- Unclassified base weapons
-    {"Wizard's Staff", 100, UNCOMMON, {"spr_weapons.staff_mummy"}}
+    --{"Wizard's Staff", 100, UNCOMMON, {"spr_weapons.staff_mummy"}}
     {"Flaming Scimitar", 200, RARE, {"spr_weapons.urand_flaming_death"}}
     {"Ice Axe", 200, RARE, {"spr_weapons.urand_frostbite"}}
-    {"Vine Staff", 200, RARE, {"spr_weapons.spwpn_staff_of_olgreb"}}
+    --{"Vine Staff", 200, RARE, {"spr_weapons.spwpn_staff_of_olgreb"}}
     {"Mace of Light", 100, RARE, {"spr_weapons.urand_brilliance"}}
     {"Dark Scythe", 200, RARE, {"spr_weapons.spwpn_scythe_of_curses"}}
 }

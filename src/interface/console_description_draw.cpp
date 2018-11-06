@@ -352,7 +352,7 @@ static void draw_attack_description_overlay(GameState* gs,
                COL_PALE_RED);
 }
 
-static void draw_console_spell_stats(GameState* gs, SpellEntry& entry);
+static void draw_console_spell_stats(GameState* gs, DescriptionBoxHelper& dbh, SpellEntry& entry);
 
 static void draw_weapon_description_overlay(GameState* gs,
                                             DescriptionBoxHelper& dbh, const Weapon& weapon) {
@@ -361,7 +361,7 @@ static void draw_weapon_description_overlay(GameState* gs,
     CoreStats& core = p->effective_stats().core;
 
     if (entry.attack.alt_spell != -1) {
-        draw_console_spell_stats(gs, entry.attack.alt_spell_entry());
+        draw_console_spell_stats(gs, dbh, entry.attack.alt_spell_entry());
     } else {
         draw_attack_description_overlay(gs, dbh, core, entry.attack);
     }
@@ -379,9 +379,8 @@ static void draw_projectile_description_overlay(GameState* gs,
     draw_equipment_description_overlay(gs, dbh, projectile);
 }
 
-static void draw_console_spell_stats(GameState* gs, SpellEntry& entry) {
+static void draw_console_spell_stats(GameState* gs, DescriptionBoxHelper& dbh, SpellEntry& entry) {
     GameTextConsole& console = gs->game_console();
-    DescriptionBoxHelper dbh(console.bounding_box());
     draw_value(gs, dbh, "MP cost: ", entry.mp_cost, COL_PALE_YELLOW,
                COL_PALE_RED);
 
@@ -398,6 +397,7 @@ static void draw_console_spell_stats(GameState* gs, SpellEntry& entry) {
 
 void draw_console_spell_description(GameState* gs, SpellEntry& entry) {
     GameTextConsole& console = gs->game_console();
+    DescriptionBoxHelper dbh(console.bounding_box());
 
     if (console.has_content_already()) {
         return;
@@ -405,7 +405,7 @@ void draw_console_spell_description(GameState* gs, SpellEntry& entry) {
     console.draw_box(gs);
     draw_base_entry_overlay(gs, entry);
 
-    draw_console_spell_stats(gs, entry);
+    draw_console_spell_stats(gs, dbh, entry);
 }
 
 void draw_console_enemy_description(GameState* gs, EnemyEntry& entry) {

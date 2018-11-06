@@ -77,7 +77,7 @@ DataW.enemy_create {
         strength: 15
         defence: 5
         magic: 25
-        willpower: 8
+        willpower: 5
     }
     effects_active: {
         {"PoisonedWeapon", {poison_percentage: 0.25}}
@@ -227,7 +227,7 @@ DataW.enemy_create {
         movespeed: 3
         strength: 20
         defence: 0
-        willpower: 12
+        willpower: 0
     }
     effects_active: {
         {"PoisonedWeapon", {poison_percentage: 0.25}}
@@ -251,7 +251,7 @@ DataW.enemy_create {
         movespeed: 3
         strength: 25
         defence: 0
-        willpower: 12
+        willpower: 0
     }
     --effects_active: {
         --{"PoisonedWeapon", {poison_percentage: 0.25}}
@@ -275,7 +275,7 @@ DataW.enemy_create {
         movespeed: 3
         strength: 25
         defence: 0
-        willpower: 12
+        willpower: 0
     }
     effects_active: {
         {"PoisonedWeapon", {poison_percentage: 0.25}}
@@ -300,7 +300,7 @@ DataW.enemy_create summoner_base("Imp", 1, 100, 100) {
         movespeed: 5
         strength: 25
         magic: 10
-        defence: 12
+        defence: 8
         willpower: 8
     }
     death_func: () =>

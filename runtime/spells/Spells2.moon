@@ -7,7 +7,8 @@ Bresenham = require "core.Bresenham"
 Display = require "core.Display"
 SpellObjects = require "objects.SpellObjects"
 DataW = require "DataWrapped"
-BonusesUtils = require "items.BonusesUtils"
+GameObject = require "core.GameObject"
+
 require "spells.DefineFireSpells"
 require "spells.DefineWhiteSpells"
 require "spells.DefineBlackSpells"
@@ -29,7 +30,12 @@ DataW.spell_create {
         on_damage: (victim, final_damage, victim_died) =>
             if victim_died and @origin
                 play_sound "sound/Powerup9.ogg"
-                BonusesUtils.create_animation {n_animations: 0}, @origin, "spr_effects.mana32", 0.5
+                GameObject.animation_create {
+                    xy: {@origin.x + 10, @origin.y}
+                    sprite: "spr_effects.mana32"
+                    duration: 25
+                    velocity: {-1,-1}
+                }
                 @origin\heal_mp(10)
     }
     mp_cost: 0,
