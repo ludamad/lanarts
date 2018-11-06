@@ -55,7 +55,7 @@ CONTENT_MAP = nilprotect {
 
 node_place_hive_entrance_polys = () =>
     xy = center @region_set
-    parts = load_map_polys @rng, "HiveEntrance", xy[1], xy[2], 60, 40, @rng\randomf(-math.pi, math.pi)
+    parts = load_map_polys @rng, "HiveEntrance", xy[1], xy[2], 70, 70, @rng\randomf(-math.pi, math.pi)
     for name, region in spairs parts
         region.group = @new_group()
         region\apply {
@@ -90,12 +90,11 @@ node_place_hive_entrance_polys = () =>
         item_placer = (map, xy) ->
             if map.rng\chance(0.1)
                 MapUtils.spawn_item(@map, "Honeycomb", 1, xy)
-
-        for i=1,5
+        for i=1,20
             vault = SourceMap.area_template_create(Vaults.honeycomb {:item_placer})
-            if not place_feature(@map, vault, regions)
-                return true
-        return false
+            if not place_feature(@map, vault, @region_set.regions)
+                continue
+        return true
     fill_with_mob = (part, enemies) ->
         {:group} = part
         bbox = part\bbox()
@@ -109,8 +108,8 @@ node_place_hive_entrance_polys = () =>
                 return false
             enemy.monster_wander_position = () => monster_focus_point
         return true
-    if not add_honeycombs({parts.E, parts.F})
-
+    if not add_honeycombs()
+        return false
     if not fill_all()
         return false
     if not fill_with_mob(parts.B, {"Giant Bee", "Giant Bee", "Giant Bee", "Mouther"})
@@ -123,7 +122,7 @@ node_place_hive_entrance_polys = () =>
 
 return MapDesc.create {
     map_label: "Hive Entrance"
-    size: {120, 120}
+    size: {130, 130}
     default_content: Tilesets.hive.wall
     children: {
         MapNode.create {

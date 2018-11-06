@@ -144,7 +144,7 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
    	int item_slot = inventory().find_slot(
    			get_item_by_name("Health Potion"));
    	if (item_slot == -1) {
-            int item_slot = inventory().find_slot(
+            item_slot = inventory().find_slot(
                             get_item_by_name("Honeycomb"));
         }
    	if (item_slot > -1) {

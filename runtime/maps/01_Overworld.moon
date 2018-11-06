@@ -532,11 +532,11 @@ place_new_easy = (region_set) ->
     {:map, :regions} = region_set
     forward_link = map_linker map, (back_links) ->
         return require("map_descs.HiveEntrance")\generate for back_link in *back_links
-            (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, "spr_gates.hive_gone"))
+            (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, "spr_gates.exit_dungeon"))
 
     place_dungeon = (map, xy) ->
         forward_link(MapUtils.spawn_portal(map, xy, "spr_gates.hive_portal"))
-    vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.pebble})
+    vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.hive})
     if not place_feature(map, vault, regions)
         return nil
     return true
@@ -638,7 +638,10 @@ place_easy = (region_set) ->
         MapUtils.spawn_door(map, xy)
     on_placement = (map) -> InnerMapSeq\slot_resolve(1, map)
     dungeon = {label: 'Outpost', tileset: Tilesets.pebble, :templates, on_generate: on_generate_dungeon, :on_placement}
-    place_dungeon = Region1.old_dungeon_placement_function(MapSeq, dungeon)
+    FIRST = true
+    place_dungeon = (map, xy) -> if FIRST
+        Region1.old_dungeon_placement_function(MapSeq, dungeon)(map, xy)
+        FIRST = false
     vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, :door_placer, tileset: Tilesets.pebble})
     if not place_feature(map, vault, regions) -- (r) -> r.conf.is_overworld)
         return false

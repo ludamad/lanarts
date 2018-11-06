@@ -224,14 +224,14 @@ DataW.enemy_create {
         attacks: {{weapon: "Fast Melee"}}
         hp: 60
         hpregen: 0.1
-        movespeed: 3
+        movespeed: 3.5
         strength: 20
         defence: 0
         willpower: 0
     }
     effects_active: {
         {"PoisonedWeapon", {poison_percentage: 0.25}}
-        "Enraging"
+        -- "Enraging"
     }
 }
 
