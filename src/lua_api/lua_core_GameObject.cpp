@@ -463,6 +463,9 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(methods, within_field_of_view, OBJ->within_field_of_view(luawrap::get<Pos>(L, 2)));
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_focus_player(lua_api::gamestate(L)));
 	LUAWRAP_GETTER(methods, can_benefit_from_rest, OBJ->can_benefit_from_rest());
+	methods["gain_level"] = [=](PlayerInst* obj) {
+		obj->gain_xp(lua_api::gamestate(L), obj->class_stats().xpneeded - obj->class_stats().xp);
+	};
     LUAWRAP_METHOD(methods, gain_xp, OBJ->stats().gain_xp(luawrap::get<int>(L,2), OBJ));;//players_gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
 	methods["inventory_sell"] = [=](PlayerInst* inst, int slot_idx) {

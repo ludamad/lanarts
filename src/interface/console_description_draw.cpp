@@ -325,9 +325,9 @@ static void draw_equipment_description_overlay(GameState* gs,
     draw_cooldown_modifiers_overlay(gs, dbh, entry.cooldown_modifiers);
     draw_spells_granted_overlay(gs, dbh, entry.spells_granted);
     draw_effect_modifiers_overlay(gs, dbh, entry.effect_modifiers);
-    if (dbh.get_draw_index() % 2 == 1) {
-        dbh.get_next_draw_position();
-    }
+    //if (dbh.get_draw_index() % 2 == 1) {
+    //    dbh.get_next_draw_position();
+    //}
     call_console_draw_func(entry.console_draw_func, entry.raw, gs->local_player(), dbh);
 }
 
@@ -352,13 +352,19 @@ static void draw_attack_description_overlay(GameState* gs,
                COL_PALE_RED);
 }
 
+static void draw_console_spell_stats(GameState* gs, SpellEntry& entry);
+
 static void draw_weapon_description_overlay(GameState* gs,
                                             DescriptionBoxHelper& dbh, const Weapon& weapon) {
     WeaponEntry& entry = weapon.weapon_entry();
     PlayerInst* p = gs->local_player();
     CoreStats& core = p->effective_stats().core;
 
-    draw_attack_description_overlay(gs, dbh, core, entry.attack);
+    if (entry.attack.alt_spell != -1) {
+        draw_console_spell_stats(gs, entry.attack.alt_spell_entry());
+    } else {
+        draw_attack_description_overlay(gs, dbh, core, entry.attack);
+    }
     draw_equipment_description_overlay(gs, dbh, weapon);
 }
 
@@ -373,6 +379,23 @@ static void draw_projectile_description_overlay(GameState* gs,
     draw_equipment_description_overlay(gs, dbh, projectile);
 }
 
+static void draw_console_spell_stats(GameState* gs, SpellEntry& entry) {
+    GameTextConsole& console = gs->game_console();
+    DescriptionBoxHelper dbh(console.bounding_box());
+    draw_value(gs, dbh, "MP cost: ", entry.mp_cost, COL_PALE_YELLOW,
+               COL_PALE_RED);
+
+    if (!entry.projectile.empty()) {
+        draw_projectile_description_overlay(gs, dbh, entry.projectile);
+    } else {
+        draw_value(gs, dbh, "Cooldown: ", std::max(entry.cooldown, entry.spell_cooldown), COL_PALE_YELLOW,
+                   COL_PALE_RED);
+    }
+    lcall(entry.console_draw_func, gs->local_player(), [&dbh]() -> Pos {
+        return dbh.get_next_draw_position();
+    });
+}
+
 void draw_console_spell_description(GameState* gs, SpellEntry& entry) {
     GameTextConsole& console = gs->game_console();
 
@@ -382,20 +405,7 @@ void draw_console_spell_description(GameState* gs, SpellEntry& entry) {
     console.draw_box(gs);
     draw_base_entry_overlay(gs, entry);
 
-    DescriptionBoxHelper dbh(console.bounding_box());
-    draw_value(gs, dbh, "MP cost: ", entry.mp_cost, COL_PALE_YELLOW,
-               COL_PALE_RED);
-
-    if (!entry.projectile.empty()) {
-        draw_projectile_description_overlay(gs, dbh, entry.projectile);
-    }
-
-    draw_value(gs, dbh, "Cooldown: ", std::max(entry.cooldown, entry.spell_cooldown), COL_PALE_YELLOW,
-               COL_PALE_RED);
-
-    lcall(entry.console_draw_func, gs->local_player(), [&dbh]() -> Pos {
-        return dbh.get_next_draw_position();
-    });
+    draw_console_spell_stats(gs, entry);
 }
 
 void draw_console_enemy_description(GameState* gs, EnemyEntry& entry) {

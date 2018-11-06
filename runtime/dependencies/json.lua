@@ -431,5 +431,6 @@ end
 
 -- Ludamad edit:
 return {
-    parse = parse
+    parse = parse,
+    generate = generate
 }

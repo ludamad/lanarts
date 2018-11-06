@@ -83,6 +83,7 @@ DataW.weapon_create {
     name = "Apprentice Staff",
     description = "A staff of endless minor bolts.",
     type = "staves",
+    alt_spell = "Minor Missile",
 
     types = {
     },
@@ -93,7 +94,7 @@ DataW.weapon_create {
         caster:try_use_spell("Minor Missile", xy, target)
     end,
 
-    cooldown = 60,
+    cooldown = 40,
     range = 400
 }
 
@@ -150,6 +151,7 @@ DataW.weapon_create {
     name = "Wizard's Staff",
     description = "A magical staff that gives MP back for every kill.",
     type = "staves",
+    alt_spell = "Minor Missile",
 
     types = {
         "Bludgeon"
@@ -161,7 +163,7 @@ DataW.weapon_create {
         caster:try_use_spell("Minor Missile", xy, target)
     end,
 
-    cooldown = 60,
+    cooldown = 40,
     range = 400,
     effects_granted = {"WeaponManaGainOnKill"}
 }
@@ -170,6 +172,7 @@ DataW.weapon_create {
     name = "Vine Staff",
     description = "A magical vine staff.",
     type = "staves",
+    alt_spell = "Minor Missile",
 
     types = {
         "Green", "Bludgeon"
@@ -181,7 +184,7 @@ DataW.weapon_create {
         caster:try_use_spell("Minor Missile", xy, target)
     end,
 
-    cooldown = 60,
+    cooldown = 40,
     range = 400,
     effects_granted = {"WeaponManaGainOnKill"}
 }
@@ -191,6 +194,7 @@ DataW.weapon_create {
     description = "The epic staff of crippled archmage Gallanthor. Used in the first 200 years of his life.",
     type = "staves",
 
+    alt_spell = "Minor Missile",
     shop_cost = {125, 255},
     types = {
     },
@@ -202,15 +206,14 @@ DataW.weapon_create {
 
     cooldown = 40,
     range = 400,
-    stat_bonuses = {magic = 2, spell_cooldown_multiplier = 0.9},
-
-    range = 7
+    stat_bonuses = {magic = 2, spell_cooldown_multiplier = 0.9}
 }
 
 --DataW.weapon_create {
 --    name = "Gallanthor's 5-Colour Staff",
 --    description = "The epic staff of crippled archmage's later perfection of the chromatic arts. Used in the first 500 years of his life.",
 --    type = "staves",
+--    alt_spell = "Minor Missile",
 --
 --    shop_cost = {525, 2055},
 --    types = {

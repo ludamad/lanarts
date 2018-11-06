@@ -112,6 +112,15 @@ node_connect_rect_rooms = () =>
                     tries_without_tunnel += 1
     return true
 
+node_paint_group = () =>
+    @apply {
+        operator: {group: @group}
+    }
+    matches_group = {@group, @group}
+    @region_set = selector_map @region_set, (s) ->
+        return table.merge s, {:matches_group}
+    return true
+
 _load_map_poly = memoized (name) ->
     json = require "json"
     success, data = json.parse(file_as_string "maps/templates/#{name}.json")

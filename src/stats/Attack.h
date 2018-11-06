@@ -28,8 +28,11 @@ public:
 		return damage_modifiers.physical_percentage;
 	}
 
+	SpellEntry& alt_spell_entry();
+
 	DamageStats damage_modifiers;
 
+	spell_id alt_spell = -1;
 	LuaValue alt_action;
 	int range = 0, cooldown = 0;
 	sprite_id attack_sprite = -1;

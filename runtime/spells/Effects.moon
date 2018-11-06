@@ -50,7 +50,7 @@ DataW.effect_create {
         --new.defence = math.max(0, new.defence + 3 + @extensions * 2)
         --new.willpower = math.max(0, new.willpower + 3 + @extensions * 2)
         new.melee_cooldown_multiplier /= 1.6
-        hp_regen_bonus = (10 + @extensions) / 60 -- 10 per second 
+        hp_regen_bonus = (10 + @extensions) / 60 -- 10 per second
         new.hpregen += hp_regen_bonus
         if obj\has_effect("AmuletBerserker")
             new.hpregen += hp_regen_bonus
@@ -1084,6 +1084,39 @@ DataW.effect_create {
                     EventLog.add("You are thrown back!", {200,200,255})
             -- mon\remove_effect("Charging")
         return damage
+}
+
+DataW.effect_create {
+    name: "DebugMonsterEvalEffect"
+    init_func: () =>
+        @defender_count = 0
+        @attacker_count = 0
+        @melee_count = 0
+        @projectile_count = 0
+        @receive_melee_count = 0
+    on_defend_func: () =>
+        @defender_count += 1
+    on_attack_func: () =>
+        @attacker_count += 1 
+    --stat_func: () =>
+    --attack_stat_func: () =>
+    --step_func: () ->
+
+    --console_draw_func,
+    --remove_func,
+    --remove_derived_func,
+    --apply_derived_func,
+    --apply_buff_func,
+    on_melee_func: () =>
+        @melee_count += 1
+    on_projectile_func: () =>
+        @projectile_count += 1
+    on_receive_melee_func: () =>
+        @receive_melee_count += 1
+    --on_equip_func,
+    --on_identify_func,
+    --on_uncurse_func,
+    --on_gain_spell_func,
 }
 
 return M

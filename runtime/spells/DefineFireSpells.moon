@@ -193,7 +193,7 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        duration = 350 + 100 * bounds_percentage(TypeEffectUtils.get_power(caster, 'Red'), 0, 4)
+        duration = 450 + 100 * bounds_percentage(TypeEffectUtils.get_power(caster, 'Red'), 0, 4)
         GameObject.add_to_level RingOfFire.create({:caster, :duration})
         caster\add_effect "Ring of Flames Stat Boost", duration
     console_draw_func: (get_next) =>

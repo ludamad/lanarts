@@ -27,7 +27,7 @@ DataW.spell_create {
         can_wall_bounce: false
     }
     mp_cost: 0,
-    cooldown: 60
+    cooldown: 40
 }
 
 -- MAGIC ARROW
@@ -167,8 +167,8 @@ DataW.spell_create {
             target\add_effect("Poison", {
                 time_left: 100,
                 attacker: @caster,
-                damage: caster.stats.magic / 2
-                power: caster.stats.magic * 0.3
+                damage: 8
+                power: caster.stats.magic
                 poison_rate: 25,
                 magic_percentage: 1,
             })

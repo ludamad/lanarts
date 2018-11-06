@@ -229,11 +229,6 @@ static void register_gamesettings(lua_State* L) {
 	luawrap::globals(L)["settings"] = &lua_api::gamestate(L)->game_settings();
 }
 
-static int game_frame(lua_State* L) {
-	lua_pushnumber(L, lua_api::gamestate(L)->frame());
-	return 1;
-}
-
 static int game_lazy_reset(lua_State* L) {
 	lua_api::gamestate(L)->game_world().lazy_reset();
 	return 0;
@@ -325,8 +320,14 @@ namespace lua_api {
 	static void register_game_getters(lua_State* L, LuaValue& game) {
 		LuaValue metatable = luameta_new(L, "game table");
 		LuaValue getters = luameta_getters(metatable);
+		LuaValue setters = luameta_setters(metatable);
 
-		getters["frame"].bind_function(game_frame);
+		getters["frame"] = [=]() {
+			return lua_api::gamestate(L)->frame();
+		};
+		setters["frame"] = [=](LuaStackValue obj, LuaStackValue key, int frame) {
+			lua_api::gamestate(L)->frame() = frame;
+		};
 
 		game.push();
 		metatable.push();

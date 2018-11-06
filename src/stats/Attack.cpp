@@ -16,6 +16,9 @@ Attack parse_attack(const LuaField& field) {
 	atk.cooldown = defaulted(field, "cooldown", 0);
 	atk.range = defaulted(field, "range", 0);
 	atk.alt_action = field["alt_action"];
+	if (!field["alt_spell"].isnil()) {
+		atk.alt_spell = res::spell_id(field["alt_spell"].to_str());
+	}
 	if (!field["on_hit_func"].isnil()) {
 		atk.attack_action.action_func = field["on_hit_func"];
 	}
@@ -23,3 +26,6 @@ Attack parse_attack(const LuaField& field) {
 	return atk;
 }
 
+SpellEntry& Attack::alt_spell_entry() {
+	return res::spell(alt_spell);
+}
