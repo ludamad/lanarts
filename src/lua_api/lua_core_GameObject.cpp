@@ -360,7 +360,10 @@ static LuaValue lua_projectileinst_metatable(lua_State* L) {
 
     LuaValue meta = lua_gameinst_base_metatable(L);
     LuaValue getters = luameta_getters(meta);
-    LUAWRAP_GETTER(getters, vx, OBJ->vx);
+    getters["origin"] = [=](ProjectileInst* obj) {
+    	return obj->origin(lua_api::gamestate(L));
+    };
+	LUAWRAP_GETTER(getters, vx, OBJ->vx);
 	LUAWRAP_GETTER(getters, vy, OBJ->vy);
 	LUAWRAP_GETTER(getters, speed, OBJ->speed);
     return meta;

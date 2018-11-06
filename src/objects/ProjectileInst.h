@@ -34,6 +34,7 @@ public:
 	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
 
+	virtual GameInst* origin(GameState* gs);
 	virtual void update_position(float newx, float newy) {
             x = newx;
             y = newy;

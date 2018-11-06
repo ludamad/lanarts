@@ -1,13 +1,5 @@
 M = {}
 
--- Utility that allows for recycling coroutines
-_coroutine_create = coroutine.create () ->
-    f = coroutine.yield()
-    while f
-        coroutine.yield(f())
-
---M.coroutine_store = () ->
-    
 TASKS = {}
 
 Task = newtype {
@@ -23,7 +15,7 @@ Task = newtype {
 
     start: () =>
         if not @started
-            step_task = () -> 
+            step_task = () ->
                 return @step(step_task)
             append TASKS, step_task
 

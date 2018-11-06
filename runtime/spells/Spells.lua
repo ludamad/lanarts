@@ -1,6 +1,7 @@
 local EventLog = require "ui.EventLog"
 local GameObject = require "core.GameObject"
 local GameState = require "core.GameState"
+local BonusesUtils = require "items.BonusesUtils"
 local Map = require "core.Map"
 local DataW = require "DataWrapped"
 local Bresenham = require "core.Bresenham"
@@ -41,7 +42,7 @@ end
 
 function Regeneration.action_func(caster, x, y)
     caster:add_effect("Regeneration", 60 * 2)
-    GameState.for_screens(function() 
+    GameState.for_screens(function()
         if caster:is_local_player() then
             EventLog.add("You start to regenerate quickly!", {200,200,255})
         else
@@ -138,7 +139,7 @@ local function ChargeCallback(_, caster)
             local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)
                 local thrown = mon:add_effect("Thrown", 40) -- + 10 * str_diff)
                 thrown.angle = vector_direction(caster.xy, mon.xy)
-                for _ in screens() do 
+                for _ in screens() do
                     if caster:is_local_player() then
                         EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
                     end
@@ -150,7 +151,7 @@ end
 
 function PowerStrike.action_func(caster)
     caster:apply_melee_cooldown()
-    for _ in screens() do 
+    for _ in screens() do
         if caster:is_local_player() then
             EventLog.add("You strike wildly in all directions!", {200,200,255})
             play_sound "sound/knockback.ogg"
@@ -228,12 +229,13 @@ function Pain.action_func(caster, x, y, target)
         else
             caster:heal_hp(target:effective_stats().max_hp / 3)
         end
-        SummonUtils.summon_one_hit_monster(caster, target.xy, "Flying Skull") 
+        BonusesUtils.create_animation({n_animations=0}, caster, "spr_effects.health", 0.5)
+        SummonUtils.summon_one_hit_monster(caster, target.xy, "Flying Skull")
     else
         caster:direct_damage(20)
     end
     caster:add_effect("Pained", 50)
-    for _ in screens() do 
+    for _ in screens() do
         if caster:is_local_player() then
             EventLog.add("You attack your enemy's life force directly!", {200,200,255})
         else
@@ -244,7 +246,7 @@ end
 
 function Pain.prereq_func(caster)
     if caster.stats.hp < 35 then
-        for _ in screens() do 
+        for _ in screens() do
             if caster:is_local_player() then
                 EventLog.add("You require more health!", {200,200,255})
             end
@@ -283,7 +285,7 @@ local HealAura = {
 function HealAura.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
     caster:add_effect("Healing Aura", 100).range = HealAura.range
-    for _ in screens() do 
+    for _ in screens() do
         if caster:is_local_player() then
             EventLog.add("You release a healing radiance!", {200,200,255})
         else
@@ -298,7 +300,7 @@ function HealAura.prereq_func(caster)
             return true
         end
     end
-    for _ in screens() do 
+    for _ in screens() do
         if caster:is_local_player() then
             EventLog.add("No allies in sight!", COL_PALE_RED)
         end
@@ -384,7 +386,7 @@ end
 
 function GreaterPain.prereq_func(caster)
     if caster.stats.hp < 80 then
-        for _ in screens() do 
+        for _ in screens() do
             if caster:is_local_player() then
                 EventLog.add("You have less than 80 health!", {255,200,200})
             end
@@ -527,7 +529,7 @@ function CallSpikes.action_func(caster, x, y)
     for _ in screens() do
         if caster:is_local_player() then
             EventLog.add("You create spikes!", {200,200,255})
-        else 
+        else
             EventLog.add(caster.name .. " creates spikes!", {200,200,255})
         end
     end
@@ -579,7 +581,7 @@ function Wallanthor.action_func(caster, x, y)
     for _ in screens() do
         if caster:is_local_player() then
             EventLog.add("You create a wall of pure energy!", {200,200,255})
-        else 
+        else
             EventLog.add(caster.name .. " creates a wall of pure energy!", {200,200,255})
         end
     end

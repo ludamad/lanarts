@@ -215,8 +215,8 @@ void ProjectileInst::step(GameState* gs) {
 				}
 			});
 			float final_damage = 0;
-			victim->damage(gs, effstats, origin, &final_damage);
-			lcall(entry.attack.on_damage, this, victim, final_damage);
+			bool victim_died = victim->damage(gs, effstats, origin, &final_damage);
+			lcall(entry.attack.on_damage, this, victim, final_damage, victim_died);
 		}
 	}
 
@@ -279,6 +279,10 @@ void ProjectileInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 
 bool ProjectileInst::bullet_target_hit2(GameInst* self, GameInst* other) {
 	return ((ProjectileInst*) self)->sole_target == other->id;
+}
+
+GameInst* ProjectileInst::origin(GameState* gs) {
+	return gs->get_instance(origin_id);
 }
 
 
