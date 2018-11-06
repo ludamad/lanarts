@@ -118,7 +118,10 @@ _load_map_poly = memoized (name) ->
             ox, oy = x, y
             if not polygon
                 continue
-            convex_polys = PolyPartition.decompose [{x+ox, y+oy} for {:x, :y} in *polygon]
+            -- Convert to internal polygon format:
+            tuple_format_polygon = [{x+ox, y+oy} for {:x, :y} in *polygon]
+            -- Decompose into convex polygons:
+            convex_polys = PolyPartition.decompose(tuple_format_polygon)
             if name == ""
                 error("Need to specify name!")
                 name = tostring(idx)
@@ -127,19 +130,18 @@ _load_map_poly = memoized (name) ->
 
 resolve_parts = (rng, parts) ->
     possibilities = {}
-    for name, part in pairs parts
+    for name, part in spairs parts
         {prefix, idx} = name\split("_")
-        print("PREFIX", prefix, "IDX", idx)
         possibilities[prefix] or= {}
         append possibilities[prefix], part
-    for k, choices in pairs possibilities
+    for k, choices in spairs possibilities
         possibilities[k] = rng\random_choice(choices)
     return possibilities
 
 load_map_polys = (rng, name, nx, ny, nw, nh, angle) ->
     parts = table.deep_clone(_load_map_poly(name))
     parts = resolve_parts(rng, parts)
-    full_map = combine_map_regions [region for _, region in pairs parts]
+    full_map = combine_map_regions [region for _, region in spairs parts]
     bbox = full_map\bbox()
     -- Correct into a w by h shape situated at x,y
     for points in *full_map.polygons

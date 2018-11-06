@@ -54,7 +54,7 @@ CONTENT_MAP = nilprotect {
 
 node_place_hive_entrance_polys = () =>
     xy = center @region_set
-    parts = load_map_polys @rng, "HiveEntrance", xy[1], xy[2], 40, 30, @rng\randomf(-math.pi, math.pi)
+    parts = load_map_polys @rng, "HiveEntrance", xy[1], xy[2], 80, 50, @rng\randomf(-math.pi, math.pi)
     for name, region in spairs parts
         region.group = @new_group()
         region\apply {
@@ -113,7 +113,7 @@ node_place_hive_entrance_polys = () =>
     return true
 
 return MapDesc.create {
-    size: {100, 100}
+    size: {120, 120}
     children: {
         MapNode.create {
             place: () => node_paint_group(@)

@@ -33,6 +33,7 @@ static std::vector<_Polygon> decompose(const _Polygon& polygons) {
     for (size_t i = 0; i < polygons.size(); i++) {
         tp_poly[i] = {polygons[i].x, polygons[i].y, i};
     }
+    tp_poly.SetOrientation(TPPL_CCW);
     pp.ConvexPartition_HM(&tp_poly, &tp_parts);
     std::vector<_Polygon> ret;
     for (TPPLPoly& tp_poly : tp_parts) {
