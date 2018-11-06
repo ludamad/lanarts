@@ -70,28 +70,28 @@ return {
     checkpoint1 = function()
         complete_checkpoint1()
         go_to_portal {
-            from = "Plain Valley", 
+            from = "Plain Valley",
             to = "Outpost 1"
         }
     end,
     checkpoint2 = function()
         complete_checkpoint2()
         go_to_portal {
-            from = "Plain Valley", 
+            from = "Plain Valley",
             to = "Outpost 1"
         }
     end,
     checkpoint3 = function()
         complete_checkpoint3()
         go_to_portal {
-            from = "Plain Valley", 
+            from = "Plain Valley",
             to = "Gragh's Lair"
         }
     end,
     checkpoint4 = function()
         complete_checkpoint4()
         go_to_portal {
-            from = "Plain Valley", 
+            from = "Plain Valley",
             to = "Crypt"
         }
     end,

@@ -63,7 +63,7 @@ bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
 	EnemyRandomization& er = e->behaviour().randomization;
 
         bool should_randomize_movement = er.should_randomize_movement();
-        if (e->etype().name == "Adder" || e->etype().name == "Ogre Mage" || e->etype().name == "Black Mamba" || e->etype().name == "Cloud Elemental") {
+        if (e->etype().name == "Giant Bee" || e->etype().name == "Queen Bee" || e->etype().name == "Waxanarian" || e->etype().name == "Adder" || e->etype().name == "Ogre Mage" || e->etype().name == "Black Mamba" || e->etype().name == "Cloud Elemental") { // TODO model with effect, at least
                 should_randomize_movement = true; // Always random
         } else if (!has_ranged_attack(e) && gs->get_level()->label() != "Plain Valley") {
 		//Only enable this behaviour for ranged enemies for now, unless in overworld

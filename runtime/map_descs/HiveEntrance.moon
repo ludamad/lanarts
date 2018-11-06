@@ -49,7 +49,7 @@ Places = require "maps.Places"
 CONTENT_MAP = nilprotect {
     A: Tilesets.pebble.floor, B: Tilesets.pebble.floor_alt
     C: Tilesets.orc.floor, D: Tilesets.pebble.floor_alt
-    E: Tilesets.pebble.floor, F: Tilesets.orc.floor, G: Tilesets.orc.floor
+    E: Tilesets.pebble.floor, F: Tilesets.orc.floor
 }
 
 node_place_hive_entrance_polys = () =>
@@ -73,46 +73,43 @@ node_place_hive_entrance_polys = () =>
         xy = MapUtils.random_square(@map, bbox, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
         back_link(@map, xy)
     for forward_link in *@desc.forward_links
-        xy = MapUtils.random_square(@map, nil, {matches_group: {parts.F.group, parts.G.group}, matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+        xy = MapUtils.random_square(@map, nil, {matches_group: parts.F.group, matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
         forward_link(@map, xy)
     fill_all = () ->
         bbox = nil
         selector = {matches_none: {SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}}
-        for type in *["Chicken" for i=1,4]
-            enemy = MapUtils.random_enemy(@map, type, bbox, selector)
-        for i=1,3
+        for i=1,8
             sqr = MapUtils.random_square(@map, bbox, selector)
             if not sqr
-                break
-            item = ItemUtils.item_generate ItemGroups.basic_items
+                return false
+            item = ItemUtils.item_generate (if i < 8 then ItemGroups.basic_items else ItemGroups.enchanted_items)
             MapUtils.spawn_item(@map, item.type, item.amount, sqr)
         return true
-    fill_part_E = (part) ->
+    fill_with_mob = (part, enemies) ->
         {:group} = part
         bbox = part\bbox()
         selector = {matches_group: {group, group}, matches_none: {SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}}
         monster_focus_point = MapUtils.random_square(@map, bbox, selector)
         if not monster_focus_point
             return false
-        for type in *["Super Chicken" for i=1,3]
+        for type in *enemies
             enemy = MapUtils.random_enemy(@map, type, bbox, selector)
             if not enemy
-                break
+                return false
             enemy.monster_wander_position = () => monster_focus_point
-        for i=1,3
-            sqr = MapUtils.random_square(@map, bbox, selector)
-            if not sqr
-                break
-            item = ItemUtils.item_generate ItemGroups.basic_items
-            MapUtils.spawn_item(@map, item.type, item.amount, sqr)
         return true
     if not fill_all()
         return false
-    if not fill_part_E(parts.E)
+    if not fill_with_mob(parts.B, {"Giant Bee", "Giant Bee", "Giant Bee", "Giant Bee"})
+        return false
+    if not fill_with_mob(parts.E, {"Giant Bee", "Giant Bee", "Giant Bee", "Giant Bee", "Queen Bee"})
+        return false
+    if not fill_with_mob(parts.F, {"Giant Bee", "Giant Bee", "Giant Bee", "Giant Bee", "Queen Bee", "Queen Bee"})
         return false
     return true
 
 return MapDesc.create {
+    map_label: "Hive Entrance"
     size: {120, 120}
     children: {
         MapNode.create {
