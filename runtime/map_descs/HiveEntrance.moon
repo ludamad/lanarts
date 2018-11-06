@@ -47,9 +47,9 @@ Places = require "maps.Places"
 {:generate_map_node} = require "maps.01_Overworld"
 
 CONTENT_MAP = nilprotect {
-    A: Tilesets.pebble.floor, B: Tilesets.pebble.floor_alt
-    C: Tilesets.orc.floor, D: Tilesets.pebble.floor_alt
-    E: Tilesets.pebble.floor, F: Tilesets.orc.floor
+    A: Tilesets.hive.floor, B: Tilesets.hive.floor_alt
+    C: Tilesets.orc.floor, D: Tilesets.hive.floor_alt
+    E: Tilesets.hive.floor, F: Tilesets.orc.floor
 }
 
 node_place_hive_entrance_polys = () =>
@@ -100,17 +100,18 @@ node_place_hive_entrance_polys = () =>
         return true
     if not fill_all()
         return false
-    if not fill_with_mob(parts.B, {"Giant Bee", "Giant Bee", "Giant Bee", "Giant Bee"})
+    if not fill_with_mob(parts.B, {"Giant Bee", "Giant Bee", "Giant Bee", "Mouther"})
         return false
-    if not fill_with_mob(parts.E, {"Giant Bee", "Giant Bee", "Giant Bee", "Giant Bee", "Queen Bee"})
+    if not fill_with_mob(parts.E, {"Giant Bee", "Giant Bee", "Giant Bee", "Mouther", "Queen Bee"})
         return false
-    if not fill_with_mob(parts.F, {"Giant Bee", "Giant Bee", "Giant Bee", "Giant Bee", "Queen Bee", "Queen Bee"})
+    if not fill_with_mob(parts.F, {"Giant Bee", "Giant Bee", "Giant Bee", "Mouther", "Queen Bee", "Queen Bee"})
         return false
     return true
 
 return MapDesc.create {
     map_label: "Hive Entrance"
     size: {120, 120}
+    default_content: Tilesets.hive.wall
     children: {
         MapNode.create {
             place: () => node_paint_group(@)
