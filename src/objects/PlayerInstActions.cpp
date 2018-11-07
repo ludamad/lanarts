@@ -232,9 +232,9 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs, bool* finished) {
         for (int dy = -1; dy <= +1; dy++) {
             for (int dx = -1; dx <= +1; dx++) {
                 Pos xy = {x + dx, y + dy};
-//                if (!bounds.contains(xy) || (dx == 0 && dy == 0)) {
-//                    continue;
-//                }
+                if (!bounds.contains(xy) || (dx == 0 && dy == 0)) {
+                    continue;
+                }
                 if (!(*gs->tiles().previously_seen_map())[xy]) {
                     return true;
                 }
