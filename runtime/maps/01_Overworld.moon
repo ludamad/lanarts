@@ -812,6 +812,8 @@ overdungeon_features = (region_set) ->
         return false
     -----------------------------
 
+    if not place_outpost(region_set)
+        return nil
     -----------------------------
     -- Place optional dungeon 2, the crypt: --
     place_crypt = () ->
@@ -888,9 +890,6 @@ overworld_features = (region_set) ->
             print "RETRY: place_outdoor_ridges()"
             return nil
     -------------------------
-
-    if not place_outpost(region_set)
-        return nil
 
     if not map.rng\random_choice({place_medium1a, place_medium1b})(region_set)
         return nil
@@ -1092,7 +1091,7 @@ pebble_overdungeon = (rng) ->
                 wall1: DUNGEON_TILESET.wall1
                 wall2: DUNGEON_TILESET.wall2
                 rect_room_num_range: {4,8} -- disable
-                rect_room_size_range: {10,15}
+                rect_room_size_range: {14,20}
                 rvo_iterations: 100
                 :connect_line_width
                 :room_radius
