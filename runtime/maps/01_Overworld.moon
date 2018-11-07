@@ -533,7 +533,7 @@ place_new_easy = (region_set) ->
     entrance = require("map_descs.HiveEntrance")\linker()
 
     for i=1,3
-        hive_depths\link_linker(entrance, "spr_gates.enter_lair", "spr_gates.exit_lair")
+        entrance\link_linker(hive_depths, "spr_gates.enter_lair", "spr_gates.exit_lair")
 
     place_dungeon = (map, xy) ->
         portal = MapUtils.spawn_portal(map, xy, "spr_gates.hive_portal")

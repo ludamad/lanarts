@@ -26,11 +26,11 @@ MapLinker = newtype {
         fportal = {nil}
         bportal = {nil}
         append other_linker.backwards, (map, xy) ->
-            fportal[1] = MapUtils.spawn_portal(map, xy, to_sprite)
+            fportal[1] = MapUtils.spawn_portal(map, xy, from_sprite)
             fportal[1].on_player_interact = (fportal_, user) ->
                 Map.transfer(user, @get(), bportal[1].xy)
         append @forwards, (map, xy) ->
-            bportal[1] = MapUtils.spawn_portal(map, xy, from_sprite)
+            bportal[1] = MapUtils.spawn_portal(map, xy, to_sprite)
             bportal[1].on_player_interact = (bportal_, user) ->
                 Map.transfer(user, other_linker\get(), fportal[1].xy)
 }
