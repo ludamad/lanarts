@@ -87,7 +87,8 @@ function M.overlay_draw()
 
     if fps then
         local w,h = unpack( Display.display_size )
-        Fonts.small:draw( {origin=Display.RIGHT_BOTTOM}, {w, h}, "FPS: " .. math.floor(fps) )
+        bitmap_draw( {origin=Display.RIGHT_BOTTOM}, {w, h}, "FPS: " .. math.floor(fps) )
+        --Fonts.small:draw( {origin=Display.RIGHT_BOTTOM}, {w, h}, "FPS: " .. math.floor(fps) )
     end
 
     local ms = fps_timer:get_milliseconds()

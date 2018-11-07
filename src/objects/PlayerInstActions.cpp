@@ -771,7 +771,7 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
     inventory().sort();
     get_map(gs)->add_instance<AnimatedInst>(
         gs,
-        ipos() + Pos {10, 0}, res::sprite_id("spr_effects.coin32"),
+        ipos() + Pos {10, 0}, res::sprite_id("spr_effects.coin"),
         25, PosF(-1, -1), PosF(), AnimatedInst::DEPTH);
 }
 

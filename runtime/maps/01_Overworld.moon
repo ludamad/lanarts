@@ -507,7 +507,7 @@ map_linker = (map, map_f) ->
 
 place_underdungeon_vault = (region_set) ->
     {:map, :regions} = region_set
-    underdungeon = MapLinker.create {generate: (backwards) => underdungeon_create(backwards)}
+    underdungeon = MapLinker.create {map_label: "Underdungeon", generate: (backwards) => underdungeon_create(backwards)}
     vault = SourceMap.area_template_create Vaults.sealed_dungeon {
         rng: map.rng,
         tileset: Tilesets.snake
@@ -516,7 +516,7 @@ place_underdungeon_vault = (region_set) ->
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, 'Dandelite Key')
         dungeon_placer: (map, xy) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_vaults_open")
-            underdungeon\link_portal(portal, "spr_gates.exit_vault")
+            underdungeon\link_portal(portal, "spr_gates.exit_dungeon")
     }
     return place_feature(map, vault, regions)
 

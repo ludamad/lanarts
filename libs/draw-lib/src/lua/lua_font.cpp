@@ -75,6 +75,14 @@ void lua_register_font(lua_State* L, const LuaValue& module) {
 	luawrap::install_userdata_type<Font, lua_fontmetatable>();
 
 	module["font_load"].bind_function(font_load);
+	module["bitmap_font_load"] = [=](const char* filename, SizeF char_size,
+									 const std::vector<const char*>& char_strings) {
+		std::vector<char> chars;
+		for (auto* str : char_strings) {
+			chars.push_back(str[0]);
+		}
+		return Font(BitmapFontDesc {filename, char_size, chars});
+	};
 }
 
 }

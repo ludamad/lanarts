@@ -4,6 +4,9 @@
 #include <string>
 #include <lcommon/smartptr.h>
 
+#include <vector>
+#include <lcommon/geometry.h>
+
 struct Colour;
 struct PosF;
 struct SizeF;
@@ -13,6 +16,13 @@ namespace ldraw {
 //private structure:
 struct font_data;
 struct DrawOptions;
+
+struct BitmapFontDesc {
+	// Assumes a square font
+	const char* filename = nullptr;
+	SizeF char_size;
+	std::vector<char> characters;
+};
 
 class Font {
 public:
@@ -25,6 +35,9 @@ public:
 		initialize(filename, height);
 	}
 
+    Font(const BitmapFontDesc& desc) {
+
+	}
 	void initialize(const char* filename, int height);
 	void initialize(const std::string& filename, int height) {
 		initialize(filename.c_str(), height);

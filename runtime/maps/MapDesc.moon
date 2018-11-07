@@ -11,7 +11,9 @@ MapDesc = newtype {
     init: (@map_args) =>
         @parent = false
         @children = @map_args.children
+        @map_label = @map_args.map_label or "Dungeon"
         @map_args.children = nil
+        @map_args.map_label = nil
         @region_set = false
     linker: () =>
         return require("maps.MapLink").MapLinker.create(@)
@@ -27,7 +29,7 @@ MapDesc = newtype {
             size: {100, 100}
             default_content: Tilesets.orc.wall
             default_flags: {SourceMap.FLAG_SOLID} --, SourceMap.FLAG_SEETHROUGH}
-            map_label: "Dungeon"
+            map_label: @map_label
         }, @map_args
         map_args.size = vector_add(map_args.size, {PADDING*2, PADDING*2})
         map = NewMaps.source_map_create map_args

@@ -282,7 +282,7 @@ wffffffw....
 M.skull_surrounded_dungeon = (args) -> {
     legend: make_legend args, {
         's': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT, M.FLAG_NO_ENEMY_SPAWN}
             content: args.tileset.floor
             on_placement: (map, xy) ->
                 MapUtils.spawn_decoration(map, M._warning_skull, xy, 0, false)
@@ -291,7 +291,7 @@ M.skull_surrounded_dungeon = (args) -> {
                     append map.player_candidate_squares, {x*32+16, y*32+16}
         }
         'e': {
-            add: {SourceMap.FLAG_SEETHROUGH}
+            add: {M.FLAG_HAS_VAULT, SourceMap.FLAG_SEETHROUGH}
             content: args.tileset.floor
             on_placement: args.enemy_placer
         }
@@ -314,12 +314,12 @@ M.skull_surrounded_dungeon = (args) -> {
             matches_all: SourceMap.FLAG_SOLID
         }
         'W': {
-            add: SourceMap.FLAG_SOLID
+            add: {M.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}
             content: args.tileset.wall
             matches_none: {FLAGS_HAS_CONTENT}
         }
         'w': {
-            add: SourceMap.FLAG_SOLID
+            add: {M.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}
             content: args.tileset.wall_alt
             matches_none: {FLAGS_HAS_CONTENT}
         }
@@ -530,7 +530,7 @@ M.anvil_encounter = (args) -> {
 M.big_encounter1 = (args) -> {
     legend: table.merge M.anvil_encounter(args).legend, {
         'P': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT, M.FLAG_NO_ENEMY_SPAWN}
             content: TileSets.pebble.wall
         }
         '1': {
@@ -567,7 +567,7 @@ M.big_encounter1 = (args) -> {
 M.big_encounter2 = (args) -> {
     legend: table.merge M.anvil_encounter(args).legend, {
         'P': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT, M.FLAG_NO_ENEMY_SPAWN}
             content: TileSets.pebble.wall
         }
         '1': {

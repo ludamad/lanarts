@@ -94,6 +94,37 @@ char_data::~char_data() {
 	delete[] data;
 }
 
+static void init_bitmap_font(font_data* fd, const BitmapFontDesc& desc) {
+	fd->font_img.initialize(desc.filename);;
+    float ptw = power_of_two_round(fd->font_img.width);
+    float pth = power_of_two_round(fd->font_img.height);
+	fd->h = desc.char_size.h;
+	float x = 0, y = 0;
+	for (char c : desc.characters) {
+		if (c < 0 || c >= 128) {
+			continue;
+		}
+		auto& d = fd->data[tolower(c)];
+		d.imgoffset = 0; // UNUSED
+		d.data = nullptr; // UNUSED
+		d.w = int(desc.char_size.w);
+		d.h = int(desc.char_size.h);
+		d.advance = d.w - 1;
+		d.left = 0;
+		d.move_up = d.h;
+		d.tx1 = x / ptw;
+		d.tx2 = (x + desc.char_size.w) / ptw;
+		d.ty1 = y / pth;
+		d.ty2 = (y + desc.char_size.h) / pth;
+		x += desc.char_size.w;
+		if (x >= fd->font_img.width) {
+			x = 0;
+			y += fd->h;
+		}
+        fd->data[toupper(c)] = d;
+	}
+}
+
 /*Initialize a font of size 'h' from a font file.*/
 void init_font(font_data* fd, const char* fname, unsigned int h) {
 	FT_Library library;
@@ -288,6 +319,11 @@ void Font::drawf_wrapped(const DrawOptions& options, const PosF& position,
 		int maxwidth, const char* fmt, ...) const {
 	VARARG_STR_FORMAT(_print_buffer, fmt);
 	draw_wrapped(options, position, maxwidth, _print_buffer);
+}
+
+Font::Font(const BitmapFontDesc& desc) {
+	_font.set(new font_data);
+	init_bitmap_font(_font.get(), desc);
 }
 
 int Font::draw(const DrawOptions& options, const PosF& position,

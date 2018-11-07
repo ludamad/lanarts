@@ -51,6 +51,21 @@ function DEBUG_BOX_DRAW(self, xy)
     end
 end
 
+local BitMap = nil
+function bitmap_draw(...) 
+    BitMap = BitMap or Display.bitmap_font_load("spr_fonts/foxyhlf.9x8.png", {9,8}, {
+        ' ', '!', '*', '+', ',', '-', '.', '/', '0',
+        '1', '2', '3', '"', '4', '5', '6', '7', '8',
+        '9', ':', ';', '<', '=', '#', '>', '?', '@',
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', '$', 'H',
+        'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+        '%', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
+        '2', '[', '&', '\\', ']', '^', '_', '`', "'",
+        '(', ')', '{', '|', '}', '~'  -- rest unused
+    })
+    return BitMap:draw(...)
+end
+
 --- Takes a color, and returns a color with a transparency of 'alpha'
 -- Colors that already have an alpha will be made more transparent.
 -- @usage with_alpha(COL_WHITE, 0.5)
