@@ -24,6 +24,7 @@ public:
 	virtual void step(GameState* gs);
 	virtual void die(GameState* gs);
 	virtual void draw(GameState* gs);
+	virtual void post_draw(GameState* gs);
 	virtual void copy_to(GameInst* inst) const;
 	virtual EnemyInst* clone() const;
 

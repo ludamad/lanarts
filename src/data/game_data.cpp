@@ -223,14 +223,16 @@ void init_resource_data_sets(GameState* gs, bool avoid_sprite_loads) {
     if (!avoid_sprite_loads) {
 		load_tile_data(dfiles.tile_files);
         load_sprite_data(L, dfiles.sprite_files);
-		D["tile_create"].bind_function(tile_create);
-		D["tileset_create"].bind_function(tileset_create);
+//		D["tile_create"].bind_function(tile_create);
+//		D["tileset_create"].bind_function(tileset_create);
     } else {
-        // TODO should error?
-		D["tile_create"].bind_function(ldo_nothing);
-		D["tileset_create"].bind_function(ldo_nothing);
+//        // TODO should error?
+//		D["tile_create"].bind_function(ldo_nothing);
+//		D["tileset_create"].bind_function(ldo_nothing);
     }
 
+	D["tile_create"].bind_function(tile_create);
+	D["tileset_create"].bind_function(tileset_create);
     D["enemy_create"].bind_function(lapi_data_create_enemy);
     D["class_create"].bind_function(lapi_data_create_class);
     D["item_create"].bind_function(lapi_data_create_item);

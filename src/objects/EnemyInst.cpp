@@ -204,6 +204,10 @@ void EnemyInst::step(GameState* gs) {
 		}
 	});
 }
+void EnemyInst::post_draw(GameState* gs) {
+	CombatGameInst::post_draw(gs);
+	lcall(etype().on_post_draw, this);
+}
 void EnemyInst::draw(GameState* gs) {
 	GameView& view = gs->view();
 	ldraw::Drawable& spr = res::sprite(etype().enemy_sprite);

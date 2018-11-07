@@ -3,9 +3,19 @@ ObjectUtils = require "objects.ObjectUtils"
 DataW = require "DataWrapped"
 GameObject = require "core.GameObject"
 World = require "core.World"
+GameState = require "core.GameState"
+Display = require "core.Display"
 TypeEffectUtils = require "spells.TypeEffectUtils"
 
 random_xy_near = (obj) -> {obj.x + random(-32,32), obj.y + random(-32, 32)}
+
+draw_boss_name = () => -- monster method
+    if Map.object_visible(@)
+        color = with_alpha(COL_WHITE, 0.75)
+        progress = math.abs(1 - (GameState.frame % 100)/50)
+        screen_xy = Display.to_screen_xy({@x, @y - 24 - 8 * progress})
+        bitmap_draw({:color, origin: Display.CENTER}, screen_xy, @name)
+
 -- ELEMENTAL ENEMIES --
 
 -- UNDEAD ENEMIES --
@@ -303,6 +313,7 @@ DataW.enemy_create summoner_base("Imp", 1, 100, 100) {
         defence: 8
         willpower: 8
     }
+    on_post_draw: draw_boss_name
     death_func: () =>
         item = random_choice {"Will Scroll", "Strength Scroll", "Defence Scroll", "Magic Scroll"}
         ObjectUtils.spawn_item_near(@, item, 1)
@@ -335,6 +346,7 @@ DataW.enemy_create summoner_base("Imp", 1, 100, 100) {
 --        {"Spiky", {recoil_percentage: 0.25}}
 --        "Enraging"
 --    }
+--    on_post_draw: draw_boss_name
 --    death_func: () =>
 --        ItemUtils = require "maps.ItemUtils"
 --        ObjectUtils.spawn_item_near(@, "Swarm Lanart", 1)
@@ -512,6 +524,7 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
             @projectile_attack "Purple Dragon Projectile", random_xy_near(@)
             --
             @timeout = 60 * 5
+    on_post_draw: draw_boss_name
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ObjectUtils.spawn_item_near(@, 'Dragon Lanart', 1)
@@ -551,6 +564,7 @@ DataW.enemy_create {
         speed: 8
         spr_attack: "large fire"
     }
+    on_post_draw: draw_boss_name
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ObjectUtils.spawn_item_near(@, "Red Dragonplate", 1)
@@ -581,6 +595,7 @@ DataW.enemy_create summoner_base("Imp", 1, 100, 100) {
         defence: 12
         willpower: 8
     }
+    on_post_draw: draw_boss_name
     death_func: () =>
         item = random_choice {"Will Scroll", "Strength Scroll", "Defence Scroll", "Magic Scroll"}
         ObjectUtils.spawn_item_near(@, item, 1)
@@ -610,6 +625,7 @@ DataW.enemy_create {
         defence: 8
         willpower: 8
     }
+    on_post_draw: draw_boss_name
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         -- Spawn 1 level 1 randarts:
@@ -641,6 +657,7 @@ DataW.enemy_create {
         defence: 8
         willpower: 8
     }
+    on_post_draw: draw_boss_name
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ObjectUtils.spawn_item_near(@, "Obliteration Lanart", 1)

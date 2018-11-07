@@ -35,6 +35,4 @@ bool load_settings_data(GameSettings& settings, const char* filename);
 void save_settings_data(GameSettings& settings, const char* filename);
 DataFiles load_datafilenames(const char* filename);
 
-int init_resource_data_sets(lua_State *L);
-
 #endif /* GAME_DATA_H_ */

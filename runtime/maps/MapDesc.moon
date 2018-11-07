@@ -18,12 +18,15 @@ MapDesc = newtype {
     linker: () =>
         return require("maps.MapLink").MapLinker.create(@)
     generate: (back_links={}, forward_links={}) =>
-        map = NewMaps.try_n_times MAX_MAP_TRIES, () -> @compile(back_links, forward_links)
+        map = @compile(back_links, forward_links)
         game_map = NewMaps.generate_game_map(map)
         for post_poned in *map.post_game_map
             post_poned(game_map)
         return game_map
-    compile: (@back_links={}, @forward_links={}) =>
+    compile: (back_links={}, forward_links={}) =>
+        return NewMaps.try_n_times MAX_MAP_TRIES, () ->
+            return @_compile(back_links, forward_links)
+    _compile: (@back_links={}, @forward_links={}) =>
         map_args = table.merge {
             rng: NewMaps.new_rng()
             size: {100, 100}

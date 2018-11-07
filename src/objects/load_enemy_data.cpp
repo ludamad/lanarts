@@ -61,6 +61,7 @@ static EnemyEntry parse_enemy_type(const LuaStackValue& table) {
     entry.step_event = table["step_func"];
     entry.draw_event = table["draw_func"];
     entry.death_event = table["death_func"];
+    entry.on_post_draw = table["on_post_draw"];
     entry.console_draw_func = table["console_draw_func"];
     entry.target_draw_func = table["target_draw_func"];
 
