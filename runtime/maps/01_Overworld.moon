@@ -383,25 +383,6 @@ M.hive_create = (MapSeq) ->
             return if floor == dungeon.N_FLOORS then 0 else 3
     }
 
---M.place_hive = (map, MapSeq) ->
---    door_placer = (map, xy) ->
---        -- nil is passed for the default open sprite
---        MapUtils.spawn_door(map, xy, nil, Vaults._magentite_door, "Magentite Key")
---    next_dungeon = {1}
---    place_dungeon = (map, xy) ->
---        portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
---        c = (MapSeq\forward_portal_add 1, portal, next_dungeon[1], () -> M.hive_create(MapSeq))
---        if World.player_amount > 1
---            append(map.post_maps, c)
---        next_dungeon[1] += 1
---    enemy_placer = (map, xy) ->
---        enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
---        MapUtils.spawn_enemy(map, enemy, xy)
---    vault = SourceMap.area_template_create(Vaults.hive_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.hive, :door_placer, :enemy_placer})
---    if not place_feature(map, vault)
---        return nil
---    return true
-
 M.crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
     tileset = Tilesets.crypt
     return NewMaps.map_create (rng) -> {
@@ -549,6 +530,8 @@ place_hive = (region_set) ->
     -- Link to hive entrance
     vault = SourceMap.area_template_create Vaults.sealed_dungeon {
         tileset: Tilesets.hive
+        door_placer: (map, xy) ->
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
         dungeon_placer: (map, xy) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.hive_portal")
             entrance\link_portal(portal, "spr_gates.exit_dungeon")
@@ -915,14 +898,14 @@ overworld_features = (region_set) ->
 
     -------------------------------
     -- Place hive: --
-    if place_hive(region_set)
+    if not place_hive(region_set)
         print "RETRY: place_hive()"
         return nil
     -------------------------------
 
     -------------------------------
     -- Place underdungeon: --
-    if place_underdungeon_vault(region_set)
+    if not place_underdungeon_vault(region_set)
         print "RETRY: place_hive()"
         return nil
     -------------------------------
