@@ -16,6 +16,7 @@ SPR_FOLDERS = [
     "spr_classes/icons",
     "spr_doors",
     "spr_keys",
+    "spr_fonts",
     "spr_rings",
     "spr_menu",
     "spr_weapons",

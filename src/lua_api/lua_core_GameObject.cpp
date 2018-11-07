@@ -716,7 +716,9 @@ static GameInst* initialize_object(GameState* gs, GameInst* inst, LuaStackValue 
 		} else {
 			id = args["map"]["_id"].to_int();
 		}
-		gs->add_instance(id, inst);
+		if (id > 0) {
+            gs->add_instance(id, inst);
+        }
 	}
 	return inst;
 }

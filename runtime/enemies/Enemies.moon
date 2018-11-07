@@ -932,11 +932,11 @@ DataW.enemy_create {
     appear_message: "A giant fiery bat surveys the scene."
     defeat_message: "The fire bat has died."
     stats: {
-        hp: 10
+        hp: 15
         hpregen: 0.03
         movespeed: 3
-        strength: 10
-        magic: 10
+        strength: 12
+        magic: 12
         defence: 5
         willpower: 5
     }
@@ -947,7 +947,7 @@ DataW.enemy_create {
         if @timeout <= 0
             for i=1,5
                 @projectile_attack "Fire Bat Projectile", random_xy_near(@)
-            @timeout = 40
+            @timeout = 20
     types: {"Red"}
     projectile: {
         weapon_class: "magic"
@@ -955,7 +955,7 @@ DataW.enemy_create {
         range: 96
         radius: 11
         power: {base: {10, 10}}
-        cooldown: 40
+        cooldown: 20
         speed: 8
         spr_attack: "spr_effects.fireball_small"
     }
