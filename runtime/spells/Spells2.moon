@@ -31,6 +31,7 @@ DataW.spell_create {
             if victim_died and @origin
                 play_sound "sound/Powerup9.ogg"
                 GameObject.animation_create {
+                    map: @origin.map
                     xy: {@origin.x + 10, @origin.y}
                     sprite: "spr_effects.mana32"
                     duration: 25

@@ -11,6 +11,7 @@ Data.item_create {
         user:gain_gold(amount)
         play_sound("sound/gold.ogg")
         GameObject.animation_create {
+            map = user.map,
             xy = {user.x + 10, user.y},
             sprite = "spr_effects.coin32",
             duration = 25,

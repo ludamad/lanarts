@@ -124,7 +124,7 @@ run_lanarts = (raw_args) ->
             -- Go back to menu
             return entry_point()
         -- (4) (DEBUG) If F3 is pressed, pause the game
-        elseif Keys.key_pressed(Keys.F3)
+        elseif false and Keys.key_pressed(Keys.F3)
             -- Save game
             GameState.save("saves/tempsave.save")
             -- Allocate a fresh GameState

@@ -91,7 +91,7 @@ SpawnedFire = RingFireBase {
         nil -- Experiment: Don't chain on deaths
 
     _on_damage: (obj) =>
-        divider = if @fire_radius == 0 then 1 else 3
+        divider = if @fire_radius == 0 then 1 else 1
         if chance(.05 / divider)
             mon_name = SpellUtils.mon_title(obj)
             SpellUtils.message(@caster, "Suddenly, #{mon_name} catches on fire!", COL_PALE_RED)
@@ -261,7 +261,7 @@ DataW.spell_create {
     prereq_func: (caster) -> return true
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
-        caster\add_effect "Dragonform", 300 + 200 * bounds_percentage(caster.stats.level, 0, 10)
+        caster\add_effect "Dragonform", 500 + 300 * bounds_percentage(caster.stats.level, 0, 10)
     console_draw_func: (get_next) =>
         draw_console_effect get_next(), tosprite("fire bolt"), {
             {COL_PALE_GREEN, "4x Fire Bolts"}

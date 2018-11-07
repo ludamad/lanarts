@@ -128,11 +128,6 @@ end
 function Engine.post_serialize()
 end
 
-function Engine.io()
-    --local Gamepad = require "input.Gamepad"
-    --Gamepad.step_for_all()
-end
-
 local GAME_PADS = {}
 
 function Engine.player_input(player)

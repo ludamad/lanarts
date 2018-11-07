@@ -35,6 +35,7 @@ end
 
 local function complete_checkpoint1()
     complete_maps {
+        "Plain Valley",
         "Temple 1",
         "Temple 2",
         "Temple 3",
@@ -46,16 +47,17 @@ end
 local function complete_checkpoint2()
     complete_checkpoint1()
     complete_maps {
-        "Outpost 1",
-        "Outpost 2",
-        "Outpost 3",
+        "Hive Entrance",
+        "Hive Depths"
     }
 end
 
 local function complete_checkpoint3()
     complete_checkpoint2()
     complete_maps {
-        "Plain Valley",
+        "Underdungeon",
+        "Outpost 1",
+        "Outpost 2"
     }
 end
 
@@ -71,27 +73,27 @@ return {
         complete_checkpoint1()
         go_to_portal {
             from = "Plain Valley",
-            to = "Outpost 1"
+            to = "Hive Entrance"
         }
     end,
     checkpoint2 = function()
         complete_checkpoint2()
         go_to_portal {
             from = "Plain Valley",
-            to = "Outpost 1"
+            to = "Underdungeon"
         }
     end,
     checkpoint3 = function()
         complete_checkpoint3()
         go_to_portal {
-            from = "Plain Valley",
+            from = "Underdungeon",
             to = "Gragh's Lair"
         }
     end,
     checkpoint4 = function()
         complete_checkpoint4()
         go_to_portal {
-            from = "Plain Valley",
+            from = "Underdungeon",
             to = "Crypt"
         }
     end,

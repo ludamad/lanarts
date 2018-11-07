@@ -61,10 +61,10 @@
 #include <iostream>
 static int generate_seed() {
 	//the most significant bits of systime are likely to be very similar, mix with clock()
-	int clk = int(clock()) << 22;
+	int64_t clk = int(clock()) << 16;
 	time_t systime;
 	time(&systime);
-	return clk ^ int(systime);
+	return int(clk) ^ int(systime);
 }
 
 static const int GAME_SIDEBAR_WIDTH = 160;
@@ -485,12 +485,6 @@ bool GameState::update_iostate(bool resetprev, bool trigger_event_handling) {
 			if (handle_event(&event, trigger_event_handling)) {
 				return false;
 			}
-		}
-		/* Fire IOEvents for the current step*/
-		LuaField io_callback = luawrap::globals(luastate())["Engine"]["io"];
-		if (!io_callback.isnil()) {
-			io_callback.push();
-			luawrap::call<void>(luastate());
 		}
 	} else {
 		iocontroller.update_iostate(false);

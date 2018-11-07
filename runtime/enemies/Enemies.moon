@@ -511,7 +511,7 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
         if @timeout <= 0
             @projectile_attack "Purple Dragon Projectile", random_xy_near(@)
             --
-            @timeout = if Map.object_visible(@) then 200 else 50
+            @timeout = 60 * 5
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ObjectUtils.spawn_item_near(@, 'Dragon Lanart', 1)
@@ -932,11 +932,11 @@ DataW.enemy_create {
     appear_message: "A giant fiery bat surveys the scene."
     defeat_message: "The fire bat has died."
     stats: {
-        hp: 40
+        hp: 10
         hpregen: 0.03
-        movespeed: 4
-        strength: 20
-        magic: 20
+        movespeed: 3
+        strength: 10
+        magic: 10
         defence: 5
         willpower: 5
     }
@@ -947,7 +947,7 @@ DataW.enemy_create {
         if @timeout <= 0
             for i=1,5
                 @projectile_attack "Fire Bat Projectile", random_xy_near(@)
-            @timeout = 20
+            @timeout = 40
     types: {"Red"}
     projectile: {
         weapon_class: "magic"
@@ -955,7 +955,7 @@ DataW.enemy_create {
         range: 96
         radius: 11
         power: {base: {10, 10}}
-        cooldown: 20
+        cooldown: 40
         speed: 8
         spr_attack: "spr_effects.fireball_small"
     }

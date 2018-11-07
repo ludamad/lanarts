@@ -24,6 +24,7 @@ COLOR_CLASSES = {
 
 create_animation = (obj, sprite, speed=4) =>
     GameObject.animation_create {
+        map: obj.map
         xy: obj.xy
         sprite: sprite
         duration: 25
