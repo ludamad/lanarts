@@ -13,6 +13,8 @@ MapDesc = newtype {
         @children = @map_args.children
         @map_args.children = nil
         @region_set = false
+    linker: () =>
+        return require("maps.MapLink").MapLinker.create(@)
     generate: (back_links={}, forward_links={}) =>
         map = NewMaps.try_n_times MAX_MAP_TRIES, () -> @compile(back_links, forward_links)
         game_map = NewMaps.generate_game_map(map)

@@ -224,7 +224,7 @@ DataW.enemy_create {
         attacks: {{weapon: "Fast Melee"}}
         hp: 60
         hpregen: 0.1
-        movespeed: 3.5
+        movespeed: 3
         strength: 20
         defence: 0
         willpower: 0

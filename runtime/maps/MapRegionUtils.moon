@@ -60,10 +60,13 @@ selector_filter = (region_set, selector) ->
         regions: map_call ((r) -> r\with_selector(selector)), regions
     }
 
+bbox = (region_set) ->
+    return map_regions_bbox(region_set.regions)
+
 center = (region_set) ->
     bbox = map_regions_bbox(region_set.regions)
     x = (bbox[1] + bbox[3]) / 2
     y = (bbox[2] + bbox[4]) / 2
     return {x, y}
 
-return {:center, :find_bbox, :find_square, :selector_filter, :selector_map}
+return {:center, :bbox, :find_bbox, :find_square, :selector_filter, :selector_map}

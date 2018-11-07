@@ -10,7 +10,7 @@ function MapSequence:init(--[[Optional]] args)
     self.next_slot = 1
     args = args or {}
     for i=1,args.preallocate or 0 do
-        self:slot_create() 
+        self:slot_create()
     end
 end
 
@@ -18,8 +18,8 @@ function MapSequence:_slots_ensure(amount)
     local current_amount = #self.maps
     for idx=current_amount+1, amount do
         local back_portals = nil
-        if idx > 1 then 
-            back_portals = self.maps[idx-1].forward_portals 
+        if idx > 1 then
+            back_portals = self.maps[idx-1].forward_portals
         end
         self.maps[idx] = { back_portals = back_portals, forward_portals = PortalSet.create() }
     end
@@ -32,7 +32,7 @@ function MapSequence:slot_create()
     return self.next_slot - 1
 end
 
-function MapSequence._callback_forward_portal_on_player_interact(args, portal, user) 
+function MapSequence._callback_forward_portal_on_player_interact(args, portal, user)
     local self, idx, create_map_function, forward_portals, key = unpack(args)
     self:slot_resolve(idx + 1, self:_get_map_id(idx+1) or create_map_function(portal, user))
     print ("Transferring using portal '" .. (idx + 1) .. "', square = " .. pretty_tostring(forward_portals:get_end(key)))
@@ -45,7 +45,7 @@ function MapSequence:forward_portal_add(idx, portal, key, create_map_function)
     forward_portals:set_start(key, portal.xy)
     local on_player_interact_args = {self, idx, create_map_function, forward_portals, key}
     portal.on_player_interact = Closure.create(on_player_interact_args, MapSequence._callback_forward_portal_on_player_interact)
-    return function() 
+    return function()
         self:slot_resolve(idx + 1, self:_get_map_id(idx+1) or create_map_function(portal))
     end
 end
@@ -54,7 +54,7 @@ function MapSequence:_get_map_id(idx)
     return self.maps[idx].map_id
 end
 
-function MapSequence._callback_backward_portal_on_player_interact(args, portal, user) 
+function MapSequence._callback_backward_portal_on_player_interact(args, portal, user)
     local self, idx, back_portals, key = unpack(args)
     for k,v in pairs(self) do
         print(k,v)

@@ -112,11 +112,11 @@ node_place_hive_entrance_polys = () =>
         return false
     if not fill_all()
         return false
-    if not fill_with_mob(parts.B, {"Giant Bee", "Giant Bee", "Giant Bee", "Mouther"})
+    if not fill_with_mob(parts.B, {"Giant Bee", "Giant Bee", "Giant Bee"})
         return false
-    if not fill_with_mob(parts.E, {"Giant Bee", "Giant Bee", "Giant Bee", "Mouther", "Queen Bee"})
+    if not fill_with_mob(parts.E, {"Giant Bee", "Giant Bee", "Giant Bee", "Queen Bee"})
         return false
-    if not fill_with_mob(parts.F, {"Giant Bee", "Giant Bee", "Giant Bee", "Mouther", "Queen Bee", "Queen Bee"})
+    if not fill_with_mob(parts.F, {"Giant Bee", "Giant Bee", "Giant Bee", "Queen Bee", "Queen Bee"})
         return false
     return true
 
