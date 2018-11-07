@@ -179,6 +179,10 @@ void Font::initialize(const char* filename, int height) {
 	init_font(_font.get(), filename, height);
 }
 
+Font::Font(const BitmapFontDesc& desc) {
+	_font.set(new font_data);
+}
+
 void Font::draw_wrapped(const DrawOptions& options, const PosF& position,
 		int maxwidth, const char* str) const {
 	gl_print_impl(options, *_font, position, maxwidth, true, str);

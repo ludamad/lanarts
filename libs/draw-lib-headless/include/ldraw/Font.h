@@ -35,9 +35,7 @@ public:
 		initialize(filename, height);
 	}
 
-    Font(const BitmapFontDesc& desc) {
-
-	}
+    Font(const BitmapFontDesc& desc);
 	void initialize(const char* filename, int height);
 	void initialize(const std::string& filename, int height) {
 		initialize(filename.c_str(), height);
