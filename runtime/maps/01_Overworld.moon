@@ -617,7 +617,7 @@ place_easy = (region_set) ->
             door_placer = (map, xy) ->
                 -- nil is passed for the default open sprite
                 MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, 'Azurite Key')
-            place_dungeon = Region1.old_dungeon_placement_function(InnerMapSeq, dungeon)
+            place_dungeon = callable_once Region1.old_dungeon_placement_function(InnerMapSeq, dungeon)
             vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.snake, :door_placer, :gold_placer})
             if not place_feature(map, vault)
                 return nil
@@ -680,7 +680,7 @@ place_medium1a = (region_set) ->
     door_placer = (map, xy) ->
         -- nil is passed for the default open sprite
         MapUtils.spawn_door(map, xy) --, nil, Vaults._door_key1, 'Azurite Key')
-    place_dungeon = Region1.old_dungeon_placement_function(MapSeq, dungeon)
+    place_dungeon = callable_once Region1.old_dungeon_placement_function(MapSeq, dungeon)
     vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.temple, :door_placer, :gold_placer, player_spawn_area: true})
     if not place_feature(map, vault, regions)
         return nil
@@ -716,7 +716,7 @@ place_medium1b = (region_set) ->
     door_placer = (map, xy) ->
         MapUtils.spawn_door(map, xy) --, nil, Vaults._door_key1, 'Azurite Key')
     next_dungeon = {1}
-    place_dungeon = (map, xy) ->
+    place_dungeon = callable_once (map, xy) ->
         portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
         c = (MapSeq\forward_portal_add 1, portal, next_dungeon[1], () -> snake_pit_create(1))
         if World.player_amount > 1
@@ -935,7 +935,7 @@ overworld_features = (region_set) ->
         door_placer = (map, xy) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
-        place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq3, dungeon)
+        place_dungeon = callable_once Region1.old_dungeon_placement_function(OldMapSeq3, dungeon)
         vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.hive, :door_placer, :gold_placer, player_spawn_area: false})
         if not place_feature(map, vault, regions)
             return true

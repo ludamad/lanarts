@@ -359,6 +359,18 @@ local function set_gamevar(var, val)
     GlobalData[var] = val
 end
 
+function callable_once(f)
+    local called = false
+    return function(...)
+        if called then
+            return nil
+        else
+            called = true
+            return f(...)
+        end
+    end
+end
+
 GameVar = newtype {
     init = function(self, var, default)
         self.var = assert(var)

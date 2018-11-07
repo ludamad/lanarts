@@ -86,4 +86,4 @@ MapNode = newtype {
     }
 }
 
-return {:MapNode, :MapDesc}
+return nilprotect {:MapNode, :MapDesc}

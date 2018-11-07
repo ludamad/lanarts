@@ -35,14 +35,4 @@ MapLinker = newtype {
                 Map.transfer(user, other_linker\get(), fportal[1].xy)
 }
 
--- forward_link = map_linker map, (back_links) ->
---     return require("map_descs.HiveDepths")\generate for back_link in *back_links
---         (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, "spr_gates.exit_dungeon"))
---
--- place_dungeon = (map, xy) ->
---     forward_link(MapUtils.spawn_portal(map, xy, "spr_gates.hive_portal"))
--- vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.hive})
--- if not place_feature(map, vault, regions)
---     return nil
-
-return {:MapLinker}
+return nilprotect {:MapLinker}
