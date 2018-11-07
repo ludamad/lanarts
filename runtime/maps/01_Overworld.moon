@@ -527,39 +527,17 @@ place_entrance_vault = (region_set) ->
     {:map, :regions} = region_set
     MapSeq = MapSequence.create {preallocate: 1}
 
-place_forwards = (to_sprite, map_desc, from_sprite=nil, n_forward=0) ->
-    linker = nil
-    local forward_link
-    _linker = (map) -> map_linker map, (back_links) ->
-        backwards = for back_link in *back_links
-            (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, from_sprite))
-        forwards = (forward_link for i=1,n_forward)
-        map_desc\generate(backwards, forwards)
-    forward_link = (map, xy) ->
-        linker or= _linker(map)
-        linker(MapUtils.spawn_portal(map, xy, to_sprite))
-    return forward_link
-
 place_new_easy = (region_set) ->
     {:map, :regions} = region_set
     hive_depths = require("map_descs.HiveDepths")\linker()
     entrance = require("map_descs.HiveEntrance")\linker()
 
-    depths_link = map_linker map, (back_links) ->
-        backwards = for back_link in *back_links
-            (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, "spr_gates.exit_lair"))
-        return require("map_descs.HiveDepths")\generate(backwards)
-
-    forward_link = map_linker map, (back_links) ->
-        backwards = for back_link in *back_links
-            (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, "spr_gates.exit_dungeon"))
-        forwards = place_forwards()
-            for i=1,3
-            (map, xy) -> depths_link(MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair"))
-        return require("map_descs.HiveEntrance")\generate(backwards, forwards)
+    for i=1,3
+        hive_depths\link_linker(entrance, "spr_gates.enter_lair", "spr_gates.exit_lair")
 
     place_dungeon = (map, xy) ->
-        forward_link(MapUtils.spawn_portal(map, xy, "spr_gates.hive_portal"))
+        portal = MapUtils.spawn_portal(map, xy, "spr_gates.hive_portal")
+        entrance\link_portal(portal, "spr_gates.exit_dungeon")
     vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.hive})
     if not place_feature(map, vault, regions)
         return nil

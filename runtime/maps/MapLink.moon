@@ -11,12 +11,12 @@ MapLinker = newtype {
     get: () =>
         if not @map
             @map = @map_desc\generate(@backwards, @forwards)
+        return @map
     link_portal: (portal, from_sprite) =>
         -- for defined region -> general entrance
-        return @map
         bportal = {nil}
         portal.on_player_interact = (portal, user) ->
-            Map.transfer(user, @get(), bportal[1])
+            Map.transfer(user, @get(), bportal[1].xy)
         append @backwards, (map, xy) ->
             bportal[1] = MapUtils.spawn_portal(map, xy, from_sprite)
             bportal[1].on_player_interact = (bportal_, user) ->
