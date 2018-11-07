@@ -94,7 +94,7 @@ node_fill_dungeon_room = () =>
             enemy.monster_wander_position = () => monster_focus_point
         return true
     spawn_item_vaults = () ->
-        for type in *{"Azurite Key", "Scroll of Experience", false}
+        for type in *{"Dandelite Key", false, false}
             item_placer = (map, xy) ->
                 amount = 1
                 if not type

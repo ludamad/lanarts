@@ -527,23 +527,25 @@ place_entrance_vault = (region_set) ->
     {:map, :regions} = region_set
     MapSeq = MapSequence.create {preallocate: 1}
 
-place_new_easy = (region_set) ->
+place_hive = (region_set) ->
     {:map, :regions} = region_set
-    hive_depths = require("map_descs.HiveDepths")\linker()
     entrance = require("map_descs.HiveEntrance")\linker()
-
+    -- Link entrance to further depths
+    hive_depths = require("map_descs.HiveDepths")\linker()
     for i=1,3
         entrance\link_linker(hive_depths, "spr_gates.enter_lair", "spr_gates.exit_lair")
-
-    place_dungeon = (map, xy) ->
-        portal = MapUtils.spawn_portal(map, xy, "spr_gates.hive_portal")
-        entrance\link_portal(portal, "spr_gates.exit_dungeon")
-    vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.hive})
+    -- Link to hive entrance
+    vault = SourceMap.area_template_create Vaults.sealed_dungeon {
+        tileset: Tilesets.hive
+        dungeon_placer: (map, xy) ->
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.hive_portal")
+            entrance\link_portal(portal, "spr_gates.exit_dungeon")
+    }
     if not place_feature(map, vault, regions)
-        return nil
+        return false
     return true
 
-place_easy = (region_set) ->
+place_outpost = (region_set) ->
     {:map, :regions} = region_set
     MapSeq = MapSequence.create {preallocate: 1}
     InnerMapSeq = MapSequence.create {preallocate: 1}
@@ -892,9 +894,7 @@ overworld_features = (region_set) ->
             return nil
     -------------------------
 
-    -- if not place_easy(region_set)
-    --     return nil
-    if not place_new_easy(region_set)
+    if not place_outpost(region_set)
         return nil
 
     if not map.rng\random_choice({place_medium1a, place_medium1b})(region_set)
@@ -902,45 +902,9 @@ overworld_features = (region_set) ->
     -----------------------------
 
     -------------------------------
-    -- Place medium dungeon 2: --
-    place_medium2 = () ->
-        templates = OldMaps.Dungeon3
-        on_generate_dungeon = (map, floor) ->
-            if floor == #templates
-                -------------------------
-                -- Place key vault     --
-                --item_placer = (map, xy) -> MapUtils.spawn_item(map, "Dandelite Key", 1, xy)
-
-                forward_link = map_linker map, (back_links) ->
-                    return underdungeon_create for back_link in *back_links
-                        (map, xy) -> back_link(MapUtils.spawn_portal(map, xy, "spr_gates.exit_vaults"))
-                place_dungeon = (map, xy) ->
-                    forward_link(MapUtils.spawn_portal(map, xy, "spr_gates.enter_vaults_open"))
-                item_placer = place_dungeon
-                tileset = Tilesets.snake
-                vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
-                if not place_feature(map, vault)
-                    return nil
-
-                item_placer = (map, xy) -> MapUtils.spawn_item(map, "Dandelite Key", 1, xy)
-                tileset = Tilesets.snake
-                vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
-                if not place_feature(map, vault)
-                    return nil
-                -----------------------------
-            return true
-        gold_placer = (map, xy) ->
-            MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-        dungeon = {label: "Outpost", tileset: Tilesets.hive, :templates, on_generate: on_generate_dungeon}
-        door_placer = (map, xy) ->
-            -- nil is passed for the default open sprite
-            MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
-        place_dungeon = callable_once Region1.old_dungeon_placement_function(OldMapSeq3, dungeon)
-        vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.hive, :door_placer, :gold_placer, player_spawn_area: false})
-        if not place_feature(map, vault, regions)
-            return true
-    if place_medium2()
-        print "RETRY: place_medium2()"
+    -- Place hive: --
+    if place_hive(region_set)
+        print "RETRY: place_hive()"
         return nil
     -------------------------------
 
