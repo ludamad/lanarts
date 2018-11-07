@@ -24,6 +24,7 @@ import make_tunnel_oper, make_rectangle_criteria, make_rectangle_oper
     from MapUtils
 
 MapSequence = require "maps.MapSequence"
+{:MapLinker} = require "maps.MapLink"
 Vaults = require "maps.Vaults"
 World = require "core.World"
 SourceMap = require "core.SourceMap"
@@ -523,9 +524,20 @@ map_linker = (map, map_f) ->
         n_portals += 1
         MapSeq\forward_portal_add 1, forward_portal, n_portals, generate
 
-place_entrance_vault = (region_set) ->
+place_underdungeon_vault = (region_set) ->
     {:map, :regions} = region_set
-    MapSeq = MapSequence.create {preallocate: 1}
+    underdungeon = MapLinker.create {generate: (backwards) => underdungeon_create(backwards)}
+    vault = SourceMap.area_template_create Vaults.sealed_dungeon {
+        rng: map.rng,
+        tileset: Tilesets.snake
+        door_placer: (map, xy) ->
+            -- nil is passed for the default open sprite
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, 'Dandelite Key')
+        dungeon_placer: (map, xy) ->
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_vaults_open")
+            underdungeon\link_portal(portal, "spr_gates.exit_vault")
+    }
+    return place_feature(map, vault, regions)
 
 place_hive = (region_set) ->
     {:map, :regions} = region_set
@@ -904,6 +916,13 @@ overworld_features = (region_set) ->
     -------------------------------
     -- Place hive: --
     if place_hive(region_set)
+        print "RETRY: place_hive()"
+        return nil
+    -------------------------------
+
+    -------------------------------
+    -- Place underdungeon: --
+    if place_underdungeon_vault(region_set)
         print "RETRY: place_hive()"
         return nil
     -------------------------------
