@@ -524,9 +524,9 @@ place_hive = (region_set) ->
     {:map, :regions} = region_set
     entrance = require("map_descs.HiveEntrance")\linker()
     -- Link entrance to further depths
-    hive_depths = require("map_descs.HiveDepths")\linker()
+    depths = require("map_descs.HiveDepths")\linker()
     for i=1,3
-        entrance\link_linker(hive_depths, "spr_gates.enter_lair", "spr_gates.exit_lair")
+        entrance\link_linker(depths, "spr_gates.enter_lair", "spr_gates.exit_lair")
     -- Link to hive entrance
     vault = SourceMap.area_template_create Vaults.sealed_dungeon {
         tileset: Tilesets.hive
@@ -543,13 +543,17 @@ place_hive = (region_set) ->
 place_snake_pit = (region_set) ->
     {:map, :regions} = region_set
     entrance = require("map_descs.SnakePitEntrance")\linker()
+    -- Link entrance to further depths
+    depths = require("map_descs.SnakePitDepths")\linker()
+    for i=1,3
+        entrance\link_linker(depths, "spr_gates.enter_lair", "spr_gates.exit_lair")
     -- Link to snake pit entrance
     vault = SourceMap.area_template_create Vaults.sealed_dungeon {
         tileset: Tilesets.snake
         door_placer: (map, xy) ->
             MapUtils.spawn_door(map, xy)
         dungeon_placer: (map, xy) ->
-            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_snake")
             entrance\link_portal(portal, "spr_gates.exit_dungeon")
         player_spawn_area: true
     }

@@ -31,7 +31,7 @@ OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
 
 -- Generation constants and data
-{   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE,
+{   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE, :FLAG_HAS_VAULT
     :FLAG_OVERWORLD, :FLAG_ROOM, :FLAG_NO_ENEMY_SPAWN, :FLAG_NO_ITEM_SPAWN
 } = Vaults
 
@@ -86,8 +86,8 @@ make_template = (rng, back_links={}, forward_links={}) ->
         _create_stairs_down: (map) =>
             bbox = {0,0,map.size[1],map.size[2]}
             for forward_link in *forward_links
-                xy = MapUtils.random_square(@map, bbox, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
-                forward_link(@map, xy)
+                xy = MapUtils.random_square(map, bbox, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+                forward_link(map, xy)
             return true
         _create_stairs_up: (map) =>
             base_conf = @_default_vault_config()

@@ -215,13 +215,18 @@ static void gl_draw_glyph(const font_data& font, char glyph, const PosF& pos,
 	glVertex2i(pos.x, y2);
 }
 
+struct LineSplit {
+    int width = 0;
+    int eol = 0;
+};
+
 /*Splits up strings, respecting space boundaries & returns maximum width */
 static int process_string(const font_data& font, const char* text,
-		int max_width, std::vector<int>& line_splits) {
+		int max_width, std::vector<LineSplit>& line_splits) {
 	int last_space = 0, ind = 0;
 	int largest_width = 0;
 	int width = 0, width_since_space = 0;
-	unsigned char c;
+	char c;
 
 	while ((c = text[ind]) != '\0') {
 		const char_data& cdata = font.data[c];
@@ -234,13 +239,13 @@ static int process_string(const font_data& font, const char* text,
 		}
 		bool overmax = max_width != -1 && width > max_width;
 		if (c == '\n' || (overmax && !isspace(c))) {
-			line_splits.push_back(last_space + 1);
-			largest_width = std::max(width, largest_width);
+            line_splits.push_back({width - cdata.advance - width_since_space, last_space + 1});
+			largest_width = std::max(width - cdata.advance - width_since_space, largest_width);
 			width = width_since_space;
 		}
 		ind++;
 	}
-	line_splits.push_back(ind);
+	line_splits.push_back({width, ind});
 
 	largest_width = std::max(width, largest_width);
 
@@ -250,7 +255,7 @@ static int process_string(const font_data& font, const char* text,
 //
 /* General gl_print function for others to delegate to */
 static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
-		PosF p, int maxwidth, bool actually_print, const char* text) {
+		PosF offset, int maxwidth, bool actually_print, const char* text) {
 	perf_timer_begin(FUNCNAME);
 
 	LDRAW_ASSERT(options.draw_region == BBoxF());
@@ -258,12 +263,9 @@ static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
 	LDRAW_ASSERT(options.draw_frame == 0.0f);
 	LDRAW_ASSERT(options.draw_scale == SizeF(1.0f, 1.0f));
 
-	std::vector<int> line_splits;
-	int measured_width = process_string(font, text, maxwidth, line_splits);
-	int height = font.h * line_splits.size();
-
-	p = adjusted_for_origin(p, SizeF(measured_width, height),
-			options.draw_origin);
+	std::vector<LineSplit> line_splits;
+	process_string(font, text, maxwidth, line_splits);
+	float height = font.h * line_splits.size();
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, font.font_img.texture);
@@ -273,22 +275,25 @@ static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
 	glBegin(GL_QUADS);
 
 	Size size(0, 0);
-	for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {
+	int i = 0;
+	for (auto& split : line_splits) {
+        PosF p = adjusted_for_origin(offset, SizeF(split.width, height), options.draw_origin);
 		int len = 0;
-		int eol = line_splits[linenum];
 
 		size.h += font.h;
 
-		for (; i < eol && text[i]; i++) {
-			unsigned char chr = text[i];
+		for (; i < split.eol && text[i]; i++) {
+			char chr = text[i];
 			if (chr == '\n') {
 				continue; //skip newline char
 			}
 			const char_data& cdata = font.data[chr];
 			len += cdata.advance;
 			if (actually_print) {
-				Pos drawpos(p.x + len - (cdata.advance - cdata.left),
-						p.y + size.h - cdata.move_up);
+				PosF drawpos = {
+                    p.x + len - (cdata.advance - cdata.left),
+                    p.y + size.h - cdata.move_up
+                };
 				gl_draw_glyph(font, chr, drawpos, options.draw_scale);
 			}
 		}

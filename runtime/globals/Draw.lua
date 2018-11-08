@@ -22,7 +22,7 @@ function draw_colored_parts(font, origin, xy, ...)
     -- Next draw according to origin
     for idx, part in ipairs(parts) do
         local color, text = unpack(part)
-        local position = {adjusted_x + x_coords[idx],  xy[2]} 
+        local position = {adjusted_x + x_coords[idx],  xy[2]}
         font:draw( { color = color, origin = adjusted_origin }, position, text)
     end
 
@@ -52,7 +52,7 @@ function DEBUG_BOX_DRAW(self, xy)
 end
 
 local BitMap = nil
-function bitmap_draw(...) 
+local function init_bmap()
     BitMap = BitMap or Display.bitmap_font_load("spr_fonts/foxyhlf.9x8.png", {9,8}, {
         ' ', '!', '*', '+', ',', '-', '.', '/', '0',
         '1', '2', '3', '"', '4', '5', '6', '7', '8',
@@ -63,9 +63,16 @@ function bitmap_draw(...)
         '2', '[', '&', '\\', ']', '^', '_', '`', "'",
         '(', ')', '{', '|', '}', '~'  -- rest unused
     })
+end
+function bitmap_draw(...)
+    init_bmap()
     return BitMap:draw(...)
 end
 
+function bitmap_draw_wrapped(...)
+    init_bmap()
+    return BitMap:draw_wrapped(...)
+end
 --- Takes a color, and returns a color with a transparency of 'alpha'
 -- Colors that already have an alpha will be made more transparent.
 -- @usage with_alpha(COL_WHITE, 0.5)
@@ -73,5 +80,5 @@ function with_alpha(col, alpha) -- Don't mutate, we might be passed a color cons
     local copy = { unpack(col) }
     -- Assume we have at least 3 components, but may have 4
     copy[4] = (copy[4] and copy[4] or 255 ) * alpha
-    return copy    
+    return copy
 end
