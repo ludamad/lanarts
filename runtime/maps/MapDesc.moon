@@ -4,7 +4,7 @@ SourceMap = require "core.SourceMap"
 Tilesets = require "tiles.Tilesets"
 {:MapRegion, :combine_map_regions, :from_bbox} = require "maps.MapRegion"
 
-PADDING = 10
+DEFAULT_PADDING = 10
 MAX_MAP_TRIES = 100
 
 MapDesc = newtype {
@@ -12,7 +12,9 @@ MapDesc = newtype {
         @parent = false
         @children = @map_args.children
         @map_label = @map_args.map_label or "Dungeon"
+        @padding = @map_args.padding or DEFAULT_PADDING
         @map_args.children = nil
+        @map_args.padding = nil
         @map_args.map_label = nil
         @region_set = false
     linker: () =>
@@ -34,7 +36,7 @@ MapDesc = newtype {
             default_flags: {SourceMap.FLAG_SOLID} --, SourceMap.FLAG_SEETHROUGH}
             map_label: @map_label
         }, @map_args
-        map_args.size = vector_add(map_args.size, {PADDING*2, PADDING*2})
+        map_args.size = vector_add(map_args.size, {@padding*2, @padding*2})
         map = NewMaps.source_map_create map_args
 
         room_selector = {
@@ -45,10 +47,10 @@ MapDesc = newtype {
             :map
             regions: {
                 from_bbox(
-                    PADDING
-                    PADDING
-                    map.size[1] - PADDING
-                    map.size[2] - PADDING)\with_selector(room_selector)
+                    @padding
+                    @padding
+                    map.size[1] - @padding
+                    map.size[2] - @padding)\with_selector(room_selector)
             }
         }
         for child in *@children

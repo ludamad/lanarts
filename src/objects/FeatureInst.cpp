@@ -44,6 +44,7 @@ void FeatureInst::draw(GameState* gs) {
 	            ldraw::DrawOptions().origin(ldraw::CENTER), on_screen(gs, ipos()));
 	    }
     }
+    GameInst::draw(gs);
 }
 
 void FeatureInst::step(GameState* gs) {

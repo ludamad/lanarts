@@ -486,16 +486,45 @@ end
 
 M.statue = Display.animation_create(Display.images_load "features/sprites/statues/statue(0-17).png", 1.0)
 
-local function generate_features(map, --[[Optional]] amount)
+local function generate_features(map, links, --[[Optional]] amount)
     local areas = leaf_group_areas(map)
     amount = amount or random(5,10)
     local i = 0
     local tries, MAX_TRIES = 1, 10
     local Vaults = require "maps.Vaults"
+
+    for _, link in ipairs(links) do
+        local placed = false
+        for i=1,MAX_TRIES do
+            local area = random_choice(areas)
+            local sqr = MapUtils.random_square(map, area)
+            if not sqr then
+                print "No square"
+                return false
+            end
+            if SourceMap.rectangle_query {
+                map = map,
+                -- nearby 3x3 box
+                area = bbox_create( {sqr[1]-1, sqr[2]-1}, {3, 3}),
+                fill_selector = {matches_none = {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT}}
+            } then
+                link(map, sqr)
+                placed = true
+                break
+            end
+        end
+        if not placed then
+            print "No placement"
+            return false
+        end
+    end
+
     while i < amount do
         local area = random_choice(areas)
         local sqr = MapUtils.random_square(map, area)
-        if not sqr then return end
+        if not sqr then
+            break
+        end
         local query = SourceMap.rectangle_query {
             map = map,
             -- nearby 3x3 box
@@ -516,9 +545,10 @@ local function generate_features(map, --[[Optional]] amount)
         end
         tries = tries + 1
         if tries >= MAX_TRIES then
-            return
+            return false
         end
     end
+    return true
 end
 
 local function generate_stores(map)
@@ -560,12 +590,15 @@ local function get_inner_area(map)
     return bbox_create({PADDING, PADDING}, {w - PADDING*2, h - PADDING * 2})
 end
 
-local function generate_content(map, content, tileset)
+local function generate_content(map, content, tileset, links)
     generate_items(map, content.items)
     generate_enemies(map, content.enemies)
-    generate_features(map)
+    if not generate_features(map, links) then
+        return false
+    end
     generate_doors(map)
     generate_stores(map)
+    return true
 end
 
 local function generate_tunnels(map, tunnels, tileset)
@@ -625,7 +658,54 @@ local function generate_from_template(label, template, tileset)
     })
 end
 
-function M.create_map(dungeon, floor)
+function M.create_map_desc(entry)
+    local label = entry.label
+    local tileset = entry.tileset
+    assert(entry.layout, "Template not supported!")
+    local layout = random_choice(entry.layout)
+    event_log("Picking layout " .. pretty_tostring(layout))
+    local size = map_call(range_resolve, layout.size)
+    local size_mult = (size_multiplier() + 1) / 2
+    size = {math.ceil(size[1] * size_mult), math.ceil(size[2] * size_mult)}
+
+    local MapDesc = require("maps.MapDesc").MapDesc
+    local MapNode = require("maps.MapDesc").MapNode
+    return MapDesc.create {
+        map_label = label,
+        default_content = tileset.wall,
+        wandering_enabled = entry.wandering,
+        size = size,
+        padding = 0,
+        children = {
+            MapNode.create {
+                place = function (node)
+                    local map = node.map
+                    generate_layout(map, layout, tileset)
+                    map.post_maps = {}
+                    map.template = entry
+                    map.n_healing_squares = map.rng:randomf() < 0.2 and map.rng:random(1, 2) or 0
+                    -- TODO consolidate what is actually expected of maps.
+                    -- For now, just fake one region for 01_Overworld.moon
+                    map.regions = { {conf = {}, bbox = function(self) return {0,0, map.size[1], map.size[2]} end}}
+                    event_log("(RNG #%d) calling dungeon.on_generate", map.rng:amount_generated())
+                    if entry.on_generate and not entry.on_generate(map) then
+                        print("on_generate() failed")
+                        return false
+                    end
+                    event_log("(RNG #%d) generating content", map.rng:amount_generated())
+                    assert(node.desc.back_links and node.desc.forward_links)
+                    local links = table.tconcat(node.desc.back_links, node.desc.forward_links)
+                    assert(links)
+                    return generate_content(map, entry.content, tileset, links)
+                end
+            }
+        }
+    }
+end
+
+function M.create_map(dungeon, floor, --[[Optional]] back_links, --[[Optional]] forward_links)
+    back_links = back_links or {}
+    forward_links = forward_links or {}
     local label = dungeon.label .. " " .. floor
     local entry = dungeon.templates[floor]
     local tileset = dungeon.tileset
@@ -655,7 +735,7 @@ function M.create_map(dungeon, floor)
         return nil
     end
     event_log("(RNG #%d) generating content", map.rng:amount_generated())
-    generate_content(map, entry.content, tileset)
+    generate_content(map, entry.content, tileset, table.tconcat(back_links, forward_links))
     return map
 end
 
