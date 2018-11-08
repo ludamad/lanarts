@@ -61,7 +61,7 @@ MapRegionAdapter = newtype {
         @subregions = {}
     add: (subregion) => error("Not emulated")
     get: {
-        points: () => 
+        points: () =>
             @_points or= require("maps.GeometryUtils").convex_hull @region.polygons
             return @_points
     }
@@ -98,7 +98,7 @@ MapRegionAdapter = newtype {
         if @y > y+h or y > @y+@h
             return false
         return true
- 
+
     center: () =>
         return math.floor(@x+@w/2), math.floor(@y+@h/2)
     -- Create a line between the two regions
@@ -139,7 +139,7 @@ Region = newtype {
         @subregions = {}
     add: (subregion) => append @subregions, subregion
     get: {
-        points: () => 
+        points: () =>
             @_points or= ellipse_points(@x, @y, @w, @h, @n_points, @angle)
             return @_points
     }
@@ -176,7 +176,7 @@ Region = newtype {
         if @y > y+h or y > @y+@h
             return false
         return true
- 
+
     center: () =>
         return math.floor(@x+@w/2), math.floor(@y+@h/2)
     -- Create a line between the two regions
@@ -229,10 +229,10 @@ subregion_minimum_spanning_tree = (R, acceptable_distf = nil) ->
         min_sqr_dist = math.huge
         min_i, min_j = nil, nil
         sub_i, sub_j = nil, nil
-        for i=1,#R do if C[i] 
+        for i=1,#R do if C[i]
             for j=1,#R do if not C[j]
                 SI,SJ = R[i].subregions,R[j].subregions
-                for si in *SI 
+                for si in *SI
                     for sj in *SJ
                         sqr_dist = si\square_distance(sj)
                         if acceptable_distf and sqr_dist < acceptable_distf(si, sj)^2
@@ -260,7 +260,7 @@ region_minimum_spanning_tree = (R) ->
         -- Find the next edge to add:
         min_sqr_dist = math.huge
         min_i, min_j = nil, nil
-        for i=1,#R do if C[i] 
+        for i=1,#R do if C[i]
             for j=1,#R do if not C[j]
                 sqr_dist = R[i]\square_distance(R[j])
                 if sqr_dist < min_sqr_dist
@@ -297,7 +297,7 @@ RVORegionPlacer = newtype {
         for region in *@regions
             vx,vy = @rvo\get_velocity(region.id)
             region.x, region.y = region.x + vx, region.y + vy
-    steps: (n) => 
+    steps: (n) =>
         for i=1,n do @step()
         @finish()
     finish: () =>
@@ -352,9 +352,9 @@ tile_operator = (tile, data = {}) ->
     data.content = tile.id
     data.add or= {}
     data.remove or= {}
-    if type(data.add) ~= "table" 
+    if type(data.add) ~= "table"
         data.add = {data.add}
-    if type(data.remove) ~= "table" 
+    if type(data.remove) ~= "table"
         data.remove = {data.remove}
     for flag in *tile.add_flags do append(data.add, flag)
     for flag in *tile.remove_flags do append(data.remove, flag)
@@ -374,7 +374,7 @@ center_region_delta_func = (map, rng, outer) ->
 
 default_region_delta_func = (map, rng, outer) ->
     center_x, center_y = outer\center()
-    local vfunc 
+    local vfunc
     type = rng\random(0, 2) -- Only first two for now
     if type == 0
         return () => math.sign_of(@x - center_x)*2, math.sign_of(@y - center_y)*2
@@ -395,7 +395,7 @@ ring_region_delta_func = (map, rng, outer) ->
 
 return {
     :LEVEL_PADDING, :ellipse_points, :Region, :RVORegionPlacer, :MapRegionAdapter
-    :subregion_minimum_spanning_tree, :region_minimum_spanning_tree, 
+    :subregion_minimum_spanning_tree, :region_minimum_spanning_tree,
     :spread_region_delta_func
     :center_region_delta_func
     :rectangle_points
@@ -404,7 +404,7 @@ return {
     :skewed_ellipse_points
     :towards_region_delta_func
     :random_rect_in_rect, :random_ellipse_in_ellipse, :Tile, :tile_operator
-    :region_intersects, :random_region_add 
+    :region_intersects, :random_region_add
     :default_region_delta_func
     :ring_region_delta_func
 }

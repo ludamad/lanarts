@@ -263,8 +263,16 @@ map_try_create = (map, rng, template) ->
     -- No rvo for now
     major_regions\steps(1500)
 
+    tx1,ty1,tx2,ty2 = math.huge,math.huge,-math.huge,-math.huge
+    for r in *major_regions.regions
+        {rx1,ry1,rx2,ry2} = r\bbox()
+        tx1, ty1 = math.min(tx1, rx1), math.min(ty1, ry1)
+        tx2, ty2 = math.max(tx2, rx2), math.max(ty2, ry2)
+    tdx, tdy = ((mw-tx2) - tx1)/2, ((mh-ty2) - ty1)/2
+
     -- Apply the regions:
     for r in *major_regions.regions
+        r.x, r.y = r.x + tdx, r.y + tdy
         {rx1,ry1,rx2,ry2} = r\bbox()
         event_log("(RNG #%d) after RVO, have region at (%d,%d,%d,%d)", rng\amount_generated(), rx1, ry1, rx2, ry2)
         r._points = false

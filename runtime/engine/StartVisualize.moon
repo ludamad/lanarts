@@ -14,19 +14,21 @@ game_init = (seed) ->
     GameState.clear_players()
     log "Initializing GameState object..."
     EngineInternal.init_gamestate()
+    random_seed(seed)
 
 run_visualize = (raw_args) ->
     parser = argparse("lanarts", "Visualize lanarts maps.")
     parser\option("--seed", "Starting seed.", "12345678")
     parser\option("--map_desc", "Map desc module.", "map_descs.HiveEntrance")
     args = parser\parse(raw_args)
-
+    seed = tonumber(args.seed)
     game_start = () ->
         return ResourceLoading.ensure_resources_before () ->
             -- (1) Init game
-            game_init(tonumber(args.seed))
+            game_init(seed)
             -- (2) Transfer to visualize loop
             map = require(args.map_desc)\compile()
+            seed += 1
             return debug_visualize_step(map, game_start)
 
     return StartEngine.start_engine {

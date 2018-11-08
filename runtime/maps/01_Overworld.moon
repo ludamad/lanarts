@@ -540,6 +540,23 @@ place_hive = (region_set) ->
         return false
     return true
 
+place_snake_pit = (region_set) ->
+    {:map, :regions} = region_set
+    entrance = require("map_descs.SnakePitEntrance")\linker()
+    -- Link to snake pit entrance
+    vault = SourceMap.area_template_create Vaults.sealed_dungeon {
+        tileset: Tilesets.snake
+        door_placer: (map, xy) ->
+            MapUtils.spawn_door(map, xy)
+        dungeon_placer: (map, xy) ->
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
+            entrance\link_portal(portal, "spr_gates.exit_dungeon")
+        player_spawn_area: true
+    }
+    if not place_feature(map, vault, regions)
+        return false
+    return true
+
 place_outpost = (region_set) ->
     {:map, :regions} = region_set
     MapSeq = MapSequence.create {preallocate: 1}
@@ -891,7 +908,8 @@ overworld_features = (region_set) ->
             return nil
     -------------------------
 
-    if not map.rng\random_choice({place_medium1a, place_medium1b})(region_set)
+    -- if not map.rng\random_choice({place_medium1a, place_medium1b})(region_set)
+    if not map.rng\random_choice({place_snake_pit})(region_set)
         return nil
     -----------------------------
 
