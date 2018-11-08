@@ -250,6 +250,7 @@ if (PNG_FOUND)
     "/\\* +(#define +FT_CONFIG_OPTION_USE_PNG) +\\*/" "\\1"
     FTOPTION_H "${FTOPTION_H}")
 endif ()
+set(HARFBUZZ_FOUND FALSE)
 if (HARFBUZZ_FOUND)
   string(REGEX REPLACE
     "/\\* +(#define +FT_CONFIG_OPTION_USE_HARFBUZZ) +\\*/" "\\1"

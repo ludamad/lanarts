@@ -692,6 +692,10 @@ function M.create_map_desc(entry)
                         print("on_generate() failed")
                         return false
                     end
+                    if rawget(node.desc, "on_generate") and not node.desc.on_generate(map) then
+                        print("on_generate() failed")
+                        return false
+                    end
                     event_log("(RNG #%d) generating content", map.rng:amount_generated())
                     assert(node.desc.back_links and node.desc.forward_links)
                     local links = table.tconcat(node.desc.back_links, node.desc.forward_links)
