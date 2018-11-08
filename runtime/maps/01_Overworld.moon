@@ -692,12 +692,11 @@ temple_map_descs = () ->
         }
         OldMaps.create_map_desc(template)
 
-_temple_map_descs = temple_map_descs()
+{TEMPLE_ENTRANCE, TEMPLE_CHAMBER, TEMPLE_SANCTUM} = temple_map_descs()
 
 place_temple = (region_set) ->
     {:map, :regions} = region_set
-    linkers = [desc\linker() for desc in *_temple_map_descs]
-    {entrance, chamber, sanctum} = linkers
+    entrance, chamber, sanctum = TEMPLE_ENTRANCE\linker(), TEMPLE_CHAMBER\linker(), TEMPLE_SANCTUM\linker()
     for i=1,3
         entrance\link_linker(chamber, "spr_gates.enter", "spr_gates.return")
         chamber\link_linker(sanctum, "spr_gates.enter", "spr_gates.return")
@@ -1255,5 +1254,5 @@ return {
     :place_feature
     test_determinism: () -> nil
     :generate_map_node
-    :_temple_map_descs
+    :TEMPLE_ENTRANCE, :TEMPLE_CHAMBER, :TEMPLE_SANCTUM
 }

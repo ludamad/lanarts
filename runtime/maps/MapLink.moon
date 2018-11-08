@@ -5,11 +5,18 @@ MapUtils = require "maps.MapUtils"
 Display = require "core.Display"
 GameState = require "core.GameState"
 
+CLOSE_THRESHOLD = 64
+
 portal_set_label = (portal, label, is_down_arrow) ->
-    color = with_alpha(COL_WHITE, 0.75)
-    arrow_color = with_alpha(COL_WHITE, 0.75)
-    portal.on_post_draw = () =>
+    portal.on_draw = () =>
         progress = math.abs(1 - (GameState.frame % 100)/50)
+        alpha = 0.75
+        for obj in *Map.rectangle_collision_check(@map, {@x - CLOSE_THRESHOLD, @y - CLOSE_THRESHOLD, @x+CLOSE_THRESHOLD, @y+CLOSE_THRESHOLD}, @)
+            if obj.is_enemy == false
+                alpha = 0.25
+                break
+        color = with_alpha(is_down_arrow and COL_PALE_RED or COL_PALE_GREEN, alpha)
+        arrow_color = with_alpha(COL_WHITE, alpha)
         if Map.object_visible(@)
             screen_xy = Display.to_screen_xy({@x, @y - 8 - 8 * progress})
             bitmap_draw_wrapped({:color, origin: Display.CENTER_BOTTOM}, screen_xy, 96, label)
