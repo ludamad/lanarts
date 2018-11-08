@@ -628,7 +628,7 @@ outpost_map_descs = () ->
 
 {OUTPOST_ENTRANCE, OUTPOST_STOCKROOM} = outpost_map_descs()
 
-place_outpost2 = (region_set) ->
+place_outpost = (region_set) ->
     {:map, :regions} = region_set
     entrance, stockroom = OUTPOST_ENTRANCE\linker(), OUTPOST_STOCKROOM\linker()
     ogre_lair = OGRE_LAIR\linker()
@@ -660,113 +660,6 @@ place_outpost2 = (region_set) ->
             entrance\link_portal(portal, "spr_gates.exit_dungeon")
         player_spawn_area: true
     }
-
-place_outpost = (region_set) ->
-    {:map, :regions} = region_set
-    MapSeq = MapSequence.create {preallocate: 1}
-    InnerMapSeq = MapSequence.create {preallocate: 1}
-    append map.post_game_map, (game_map) ->
-        MapSeq\slot_resolve(1, game_map)
-    inner_encounter_template = {
-       {
-            layout: {{size: {60,40}, rooms: {padding:0,amount:40,size:{3,7}},tunnels:{padding:0, width:{1,3},per_room: 5}}}
-            content: {
-                items: {amount: 8, group: ItemGroups.enchanted_items}
-                enemies: {
-                    wandering: true
-                    amount: 0
-                    generated: {
-                      {enemy: "Ogre Mage",         guaranteed_spawns: 5}
-                      {enemy: "Orc Warrior",       guaranteed_spawns: 3}
-                      {enemy: "Adder",             guaranteed_spawns: 5}
-                    }
-                }
-            }
-        }
-    }
-    templates = OldMaps.Dungeon1
-    -------------------------------------------------
-    -- Inner dungeon generation for dungeon 1      --
-    on_generate_dungeon = (map, floor) ->
-        if floor == #templates
-            -------------------------
-            -- Place key vault     --
-            for i=1,2
-                item_placer = (map, xy) ->
-                    item = ItemUtils.item_generate ItemGroups.basic_items
-                    MapUtils.spawn_item(map, item.type, item.amount, xy)
-                tileset = Tilesets.pebble
-
-                vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
-                if not place_feature(map, vault)
-                    return nil
-
-            area = {0,0,map.size[1],map.size[2]}
-            for i=1,4
-                sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
-                if not sqr
-                    return nil
-                Region1.generate_store(map, sqr)
-
-            sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
-            if not sqr
-                return nil
-            --MapUtils.spawn_enemy(map, "Red Dragon", sqr)
-            -------------------------
-
-        else if floor == 1
-            -------------------------
-            -- Place inner dungeon vault     --
-            on_generate_dungeon = (map, floor) ->
-                ----------------------------------------------------------
-                for i=1,3
-                    item = ItemUtils.randart_generate(1)
-                    item_placer = (map, xy) -> MapUtils.spawn_item(map, item.type, item.amount, xy)
-                    tileset = Tilesets.snake
-                    vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
-                    if not place_feature(map, vault)
-                        return nil
-                ----------------------------------------------------------
-                return true
-            spawn_portal = safe_portal_spawner(Tilesets.snake)
-            dungeon = {label: 'Ogre Lair', tileset: Tilesets.snake, templates: inner_encounter_template, on_generate: on_generate_dungeon, :spawn_portal, sprite_out: Region1.stair_kinds_index(5, 7)}
-            gold_placer = (map, xy) ->
-                MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-            door_placer = (map, xy) ->
-                -- nil is passed for the default open sprite
-                MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, 'Azurite Key')
-            place_dungeon = callable_once Region1.old_dungeon_placement_function(InnerMapSeq, dungeon)
-            vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.snake, :door_placer, :gold_placer})
-            if not place_feature(map, vault)
-                return nil
-            --vault = SourceMap.area_template_create(Vaults.dungeon_tunnel {tileset: Tilesets.snake, :door_placer, :gold_placer})
-            --if not place_feature(map, vault)
-            --    return nil
-            -------------------------
-            -- Ensure connectivity because we messed with dungeon features:
-            if not SourceMap.area_fully_connected {
-                :map,
-                unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
-                mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
-                marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
-            }
-                return nil
-        return true
-    -------------------------------------------------
-    door_placer = (map, xy) ->
-        -- nil is passed for the default open sprite
-        MapUtils.spawn_door(map, xy)
-    on_placement = (map) -> InnerMapSeq\slot_resolve(1, map)
-    dungeon = {label: 'Outpost', tileset: Tilesets.pebble, :templates, on_generate: on_generate_dungeon, :on_placement}
-    FIRST = true
-    place_dungeon = (map, xy) -> if FIRST
-        Region1.old_dungeon_placement_function(MapSeq, dungeon)(map, xy)
-        FIRST = false
-    vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, :door_placer, tileset: Tilesets.pebble})
-    if not place_feature(map, vault, regions) -- (r) -> r.conf.is_overworld)
-        return false
-    return true
-
 
 temple_map_descs = () ->
     return for floor,base in ipairs(OldMaps.Dungeon2)
@@ -854,6 +747,41 @@ place_temple = (region_set) ->
 --         return nil
 --     return true
 
+-----------------------------
+-- Gragh's lair            --
+place_graghs_lair = () ->
+    Seq = MapSequence.create {preallocate: 1}
+    create = (offset = 1) ->
+        dungeon = require("maps.GraghsLair")
+        return NewDungeons.make_linear_dungeon {
+            MapSeq: Seq
+            :offset
+            dungeon_template: dungeon.TEMPLATE
+            sprite_up: (floor) -> "spr_gates.exit_lair"
+            sprite_down: (floor) -> "spr_gates.enter"
+            portals_up: (floor) -> 3
+            portals_down: (floor) -> 0
+        }
+    tileset = Tilesets.lair
+    door_placer = (map, xy) ->
+        MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
+    next_dungeon = {1}
+    place_dungeon = (map, xy) ->
+        portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
+        c = (Seq\forward_portal_add 1, portal, next_dungeon[1], () -> create(1))
+        if World.player_amount > 1
+            append map.post_maps, c
+        next_dungeon[1] += 1
+    enemy_placer = (map, xy) ->
+        enemy = OldMaps.enemy_generate({{enemy: "Sheep", chance: 100}})
+        MapUtils.spawn_enemy(map, enemy, xy)
+    vault = SourceMap.area_template_create(Vaults.graghs_lair_entrance {dungeon_placer: place_dungeon, :tileset, :door_placer, :enemy_placer, player_spawn_area: false})
+    if not place_feature(map, vault, regions)
+        return true
+    append map.post_game_map, (game_map) ->
+        Seq\slot_resolve(1, game_map)
+-----------------------------
+
 overdungeon_features = (region_set) ->
     {:map, :regions} = region_set
 
@@ -900,11 +828,6 @@ overdungeon_features = (region_set) ->
         create = (offset = 1) ->
             -- Place Hive inside the lair:
             HiveSeq = MapSequence.create {preallocate: 1}
-            on_generate = (map, floor) ->
-                --if floor == 1
-                --    if not M.place_hive(map, HiveSeq)
-                --        return nil
-                return true
             on_finish = (game_map, floor) ->
                 if floor == 1
                     HiveSeq\slot_resolve(1, game_map)
@@ -913,7 +836,7 @@ overdungeon_features = (region_set) ->
                 MapSeq: Seq
                 :offset
                 dungeon_template: dungeon.TEMPLATE
-                :on_generate, :on_finish
+                :on_finish
                 sprite_up: (floor) -> "spr_gates.exit_lair"
                 sprite_down: (floor) -> "spr_gates.enter"
                 portals_up: (floor) -> 3
@@ -942,7 +865,7 @@ overdungeon_features = (region_set) ->
         return false
     -----------------------------
 
-    if not place_outpost2(region_set)
+    if not place_outpost(region_set)
         return false
     -----------------------------
     -- Place optional dungeon 2, the crypt: --
@@ -1021,8 +944,7 @@ overworld_features = (region_set) ->
             return nil
     -------------------------
 
-    --if not map.rng\random_choice({place_snake_pit, place_temple})(region_set)
-    if not map.rng\random_choice({place_outpost2})(region_set)
+    if not map.rng\random_choice({place_snake_pit, place_temple})(region_set)
         return nil
     -----------------------------
 

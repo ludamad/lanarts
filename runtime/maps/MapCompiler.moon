@@ -32,7 +32,7 @@ MapCompiler = newtype {
         @post_poned = {}
         @label = assert (args.label or @label)
         @root_node = assert (args.root or @root_node) -- Take from base class
-        @rng = assert args.rng
+        @rng = args.rng or require('mtwist').create(random(0,2^30))
         -- Maps from node -> data
         @_children = {}
         @_regions = {}
@@ -506,7 +506,7 @@ MapCompiler = newtype {
                 return true
         return false
     -- Creates a game map
-    compile: (args) =>
+    compile: () =>
         gmap = Map.create {
             map: @map
             label: @map.label
@@ -521,54 +521,17 @@ MapCompiler = newtype {
                 for p in *World.players
                     p.instance\gain_xp(tonumber(os.getenv "LANARTS_XP"))
         return gmap
+    linker: () =>
+        desc = {
+            generate: (_self, back_links={}, forward_links={}) ->
+                args = {:back_links, :forward_links}
+                if not @prepare()
+                    error("Map generation completely failed!!")
+                @generate(args)
+                return @compile(args)
+            map_label: @label
+        }
+        return require("maps.MapLinks").MapLinker.create(desc)
 }
 
-display = (compiler) ->
-    compiler\prepare()
-    DebugUtils.enable_visualization(800, 600)
-    DebugUtils.debug_show_source_map(compiler.map)
-
-main = (raw_args) ->
-    {:DragonLair} = require 'maps.Places'
-    rng = require('mtwist').create(os.time())
-    for i=1,10
-        compiler = DragonLair.create {
-            label: "Demo"
-            :rng
-        }
-        display(compiler)
-
-    --TileSets = require "tiles.Tilesets"
-    ---- AreaTemplate -> MapAreaSet -> Map
-    --area = Spread {
-    --    regions: for i=1,3
-    --        Shape {
-    --            shape: 'deformed_ellipse'
-    --            size: {(i+5) * 10, (i+5) * 10}
-    --        }
-    --    connection_scheme: 'direct'
-    --    spread_scheme: 'box2d'
-    --}
-    --compiler = MapCompiler.create {
-    --    label: "Demo"
-    --    :rng,
-    --    root: area
-    --    generate: (args) =>
-    --}
-    --compiler.tileset = TileSets.lair
-
-    --i = 1
-    --compiler\prepare()
-    ----compiler\for_all_nodes (node) =>
-    ----    @apply node, {
-    ----        operator: {
-    ----            remove: SourceMap.FLAG_SOLID
-    ----            add: SourceMap.FLAG_SEETHROUGH
-    ----            content: i
-    ----        }
-    ----    }
-    ----    i += 1
-    --DebugUtils.enable_visualization(800, 600)
-    --DebugUtils.debug_show_source_map(compiler.map)
-
-return {:MapCompiler, :main}
+return {:MapCompiler}
