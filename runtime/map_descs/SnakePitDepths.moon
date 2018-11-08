@@ -47,7 +47,6 @@ snake_pit_floor_plan = (rng) -> {
     floor2: Tile.create(Tilesets.snake.floor_alt, false, true, {}, {FLAG_OVERWORLD})
     wall1: Tile.create(Tilesets.snake.wall, true, false, {}, {FLAG_OVERWORLD})
     wall2: Tile.create(Tilesets.snake.wall_alt, true, false, {}, {FLAG_OVERWORLD})
-    n_statues: 4
     size: {45, 45}
     n_subareas: 3
     n_enemies: 0
@@ -59,7 +58,7 @@ snake_pit_floor_plan = (rng) -> {
     }
     item_groups: {{ItemGroups.basic_items, 8}, {{item: "Scroll of Experience", chance: 100}, 1}}
     number_regions: 2
-    room_radius: () -> 7
+    room_radius: () -> rng\randomf(7,12)
     rect_room_num_range: {0, 0}
     rect_room_size_range: {1, 1}
     n_statues: 4

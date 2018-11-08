@@ -11,10 +11,10 @@ portal_set_label = (portal, label, is_down_arrow) ->
     portal.on_post_draw = () =>
         progress = math.abs(1 - (GameState.frame % 100)/50)
         if Map.object_visible(@)
-            screen_xy = Display.to_screen_xy({@x, @y - 24 - 8 * progress})
-            bitmap_draw_wrapped({:color, origin: Display.CENTER}, screen_xy, 96, label)
+            screen_xy = Display.to_screen_xy({@x, @y - 8 - 8 * progress})
+            bitmap_draw_wrapped({:color, origin: Display.CENTER_BOTTOM}, screen_xy, 96, label)
             sprite = tosprite(if is_down_arrow then "spr_menu.down" else "spr_menu.up")
-            sprite\draw({color: arrow_color, origin: Display.CENTER}, vector_add(screen_xy, {0,19}))
+            sprite\draw({color: arrow_color, origin: Display.CENTER_BOTTOM}, vector_add(screen_xy, {0,19}))
 
 MapLinker = newtype {
     -- TODO if we ever want two defined-region map links, we need to revisit this

@@ -47,7 +47,6 @@ snake_pit_floor_plan = (rng) -> {
     floor2: Tile.create(Tilesets.snake.floor_alt, false, true, {}, {FLAG_OVERWORLD})
     wall1: Tile.create(Tilesets.snake.wall, true, false, {}, {FLAG_OVERWORLD})
     wall2: Tile.create(Tilesets.snake.wall_alt, true, false, {}, {FLAG_OVERWORLD})
-    n_statues: 0
     size: {rng\random(25,45), rng\random(25,45)}
     n_subareas: 3
     n_enemies: 0
