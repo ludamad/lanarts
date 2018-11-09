@@ -126,6 +126,7 @@ RingOfFire = RingFireBase {
         @damage_cooldowns = OrderedDict() -- takes [index][obj]
         @fireballs = {}
         @angle_offset = 0
+        @cooldown = 30
         @base_init(args)
     _create_rings: (radius_bonus = 0) =>
         sub_radius = 20 -- / (1 + @caster_type_power() / 10)
