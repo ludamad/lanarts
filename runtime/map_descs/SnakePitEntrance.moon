@@ -99,19 +99,19 @@ make_template = (rng, back_links={}, forward_links={}) ->
         on_create_source_map: (map) =>
             if not @_create_stairs_up(map)
                 print("ABORT: stairs up")
-                return nil
+                return false
             if not @_create_stairs_down(map)
                 print("ABORT: stairs down")
-                return nil
+                return false
             if not @_spawn_statues(map)
                 print("ABORT: statues")
-                return nil
+                return false
             if not @_spawn_items(map)
                 print("ABORT: items")
-                return nil
+                return false
             if not @_spawn_enemies(map)
                 print("ABORT: enemies")
-                return nil
+                return false
             NewMaps.generate_door_candidates(map, rng, map.regions)
             return true
     }

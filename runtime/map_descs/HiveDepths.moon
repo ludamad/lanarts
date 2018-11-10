@@ -14,8 +14,6 @@ MapRegionShapes = require("maps.MapRegionShapes")
 
 PolyPartition = require "core.PolyPartition"
 DebugUtils = require "maps.DebugUtils"
-NewMaps = require "maps.NewMaps"
-NewDungeons = require "maps.NewDungeons"
 Tilesets = require "tiles.Tilesets"
 MapUtils = require "maps.MapUtils"
 ItemUtils = require "maps.ItemUtils"
@@ -44,8 +42,6 @@ Places = require "maps.Places"
 {:center, :bbox, :find_bbox, :find_square, :selector_filter, :selector_map} = require "maps.MapRegionUtils"
 
 {:load_map_polys, :node_paint_group} = require "maps.MapNodeFills"
-
-{:generate_map_node} = require "maps.01_Overworld"
 
 node_dungeon_room_template = () =>
     area_temp = SourceMap.area_template_create {
