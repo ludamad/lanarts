@@ -27,7 +27,7 @@ MapSequence = require "maps.MapSequence"
 Vaults = require "maps.Vaults"
 World = require "core.World"
 SourceMap = require "core.SourceMap"
-{:place_feature, :place_vault} = require "maps.01_Overworld"
+{:place_feature, :place_vault, :DUNGEON_CONF} = require "maps.01_Overworld"
 Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
@@ -96,7 +96,7 @@ make_template = (rng, back_links, forward_links) -> {
     --    enemy_placer = (map, xy) ->
     --        enemy = OldMaps.enemy_generate(OldMaps.strong_undead)
     --        MapUtils.spawn_enemy(map, enemy, xy)
-    _place_down_chambers = () ->
+    _place_down_chambers: () ->
         for link in *forward_links
             if not place_vault map, Vaults.hell_dungeon {
                 dungeon_placer: link
@@ -109,7 +109,7 @@ make_template = (rng, back_links, forward_links) -> {
                     MapUtils.spawn_enemy(map, enemy, xy)
             }
                 return false
-            return true
+        return true
     _create_stairs_up: (map) =>
         for link in *back_links
             if place_vault map, Vaults.crypt_entrance_vault {
@@ -137,14 +137,19 @@ make_template = (rng, back_links, forward_links) -> {
         return true
     on_create_source_map: (map) =>
         if not @_place_down_chambers(map)
+            print("Chamber fail")
             return false
         if not @_create_encounter_rooms(map)
+            print("Encounter fail")
             return false
         if not @_create_stairs_up(map)
+            print("Stairs up fail")
             return false
         if not @_spawn_items(map)
+            print("Items fail")
             return false
         if not @_spawn_enemies(map)
+            print("Enemies fail")
             return false
         NewMaps.generate_door_candidates(map, rng, map.regions)
         return true
@@ -152,7 +157,7 @@ make_template = (rng, back_links, forward_links) -> {
 
 return MapDesc.create {
     map_label: "Crypt"
-    size: {110, 110}
+    size: {130, 130}
     default_content: Tilesets.crypt.wall
     children: {
         MapNode.create {
@@ -165,4 +170,4 @@ return MapDesc.create {
                 return true
         }
     }
-}}
+}

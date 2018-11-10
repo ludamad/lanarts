@@ -970,4 +970,5 @@ return {
     :OGRE_LAIR
     :OUTPOST_ENTRANCE, :OUTPOST_STOCKROOM
     :underdungeon_create
+    :DUNGEON_CONF
 }

@@ -27,7 +27,7 @@ MapSequence = require "maps.MapSequence"
 Vaults = require "maps.Vaults"
 World = require "core.World"
 SourceMap = require "core.SourceMap"
-{:place_feature, :place_vault} = require "maps.01_Overworld"
+{:place_feature, :place_vault, :DUNGEON_CONF} = require "maps.01_Overworld"
 Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
@@ -46,7 +46,7 @@ Places = require "maps.Places"
 {:load_map_polys, :node_paint_group} = require "maps.MapNodeFills"
 
 tileset = Tilesets.hell
-hell_create = (rng, back_links, forward_links) -> {
+make_template = (rng, back_links, forward_links) -> {
     map_label: "Hell"
     subtemplates: {DUNGEON_CONF(rng, tileset, 3)}
     w: 200, h: 200
@@ -54,7 +54,6 @@ hell_create = (rng, back_links, forward_links) -> {
     outer_conf: DUNGEON_CONF(rng, tileset)
     shell: 10
     default_wall: Tile.create(tileset.wall, true, true, {})
-    post_poned: {}
     _create_stairs_up: (map) =>
         for link in *table.tconcat(back_links, forward_links)
             if not place_vault map, Vaults.hell_entrance_vault {
@@ -107,10 +106,6 @@ hell_create = (rng, back_links, forward_links) -> {
             return nil
         NewMaps.generate_door_candidates(map, rng, map.regions)
         return true
-    on_create_game_map: (game_map) =>
-        for f in *@post_poned
-            f(game_map)
-        Map.set_vision_radius(game_map, 6)
 }
 
 return MapDesc.create {
