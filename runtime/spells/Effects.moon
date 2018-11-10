@@ -530,8 +530,8 @@ for equip_slot in *{"", "Armour", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
                     if caster\is_local_player()
                         EventLog.add("You regain health for killing!", COL_PALE_BLUE)
                 caster\heal_hp(5 + caster.stats.level)
-                play_sound "sound/Powerup9.ogg"
-                BonusesUtils.create_animation {n_animations: 0}, caster, "spr_effects.health32", 0.5
+                play_sound "sound/swish-10.wav"
+                BonusesUtils.create_animation {n_animations: 0}, caster, "spr_effects.health", 0.5
                 @kill_tracker += 1
     }
     DataW.effect_create {
@@ -545,8 +545,8 @@ for equip_slot in *{"", "Armour", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
                     if caster\is_local_player()
                         EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
                 caster\heal_mp(5 + caster.stats.level)
-                play_sound "sound/Powerup9.ogg"
-                BonusesUtils.create_animation {n_animations: 0}, caster, "spr_effects.mana32", 0.5
+                play_sound "sound/swish-10.wav"
+                BonusesUtils.create_animation {n_animations: 0}, caster, "spr_effects.mana", 0.5
                 @kill_tracker += 1
     }
 

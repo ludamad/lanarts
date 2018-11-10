@@ -29,11 +29,11 @@ DataW.spell_create {
         can_wall_bounce: false
         on_damage: (victim, final_damage, victim_died) =>
             if victim_died and @origin
-                play_sound "sound/Powerup9.ogg"
+                play_sound "sound/swish-10.wav"
                 GameObject.animation_create {
                     map: @origin.map
                     xy: {@origin.x + 10, @origin.y}
-                    sprite: "spr_effects.mana32"
+                    sprite: "spr_effects.mana"
                     duration: 25
                     velocity: {-1,-1}
                 }
