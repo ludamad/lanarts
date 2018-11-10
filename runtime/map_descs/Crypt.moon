@@ -96,14 +96,14 @@ make_template = (rng, back_links, forward_links) -> {
     --    enemy_placer = (map, xy) ->
     --        enemy = OldMaps.enemy_generate(OldMaps.strong_undead)
     --        MapUtils.spawn_enemy(map, enemy, xy)
-    _place_down_chambers: () ->
+    _place_down_chambers: (map) =>
         for link in *forward_links
             if not place_vault map, Vaults.hell_dungeon {
                 dungeon_placer: link
                 tileset: Tilesets.hell
                 door_placer: (map, xy) ->
                     -- nil is passed for the default open sprite
-                    MapUtils.spawn_door(map, xy, nil, Vaults._magentite_door, "Magentite Key")
+                    MapUtils.spawn_door(map, xy, nil, Vaults._door_magentite, "Magentite Key")
                 enemy_placer: (map, xy) ->
                     enemy = OldMaps.enemy_generate(OldMaps.strong_undead)
                     MapUtils.spawn_enemy(map, enemy, xy)

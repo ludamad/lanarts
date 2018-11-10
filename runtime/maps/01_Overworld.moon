@@ -576,7 +576,7 @@ overdungeon_features = (region_set) ->
         return false
     -----------------------------
 
-    if not place_graghs_lair()
+    if not place_graghs_lair(region_set)
         return false
 
     -------------------------
@@ -936,6 +936,8 @@ underdungeon_create = (links) ->
     {:map} = pebble_overdungeon NewMaps.new_rng()
     for link in *links
         xy = MapUtils.random_square(map, nil, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+        if not xy
+            return false
         link(map, xy)
     game_map = NewMaps.generate_game_map(map)
     for f in *map.post_game_map

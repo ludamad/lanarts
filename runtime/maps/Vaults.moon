@@ -112,7 +112,7 @@ M.ridge_dungeon = (args) -> {
             content: args.tileset.floor
         }
         'D': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT, M.FLAG_HAS_OBJECT}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT, SourceMap.FLAG_HAS_OBJECT}
             matches_none: {FLAGS_HAS_CONTENT}
             content: args.tileset.floor
             on_placement: args.dungeon_placer
@@ -296,19 +296,19 @@ M.skull_surrounded_dungeon = (args) -> {
             on_placement: args.enemy_placer
         }
         'D': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT, M.FLAG_HAS_OBJECT}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT, SourceMap.FLAG_HAS_OBJECT}
             content: args.tileset.floor
             matches_none: {FLAGS_HAS_CONTENT}
             on_placement: args.dungeon_placer
         }
         '1': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT, M.FLAG_HAS_OBJECT}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT, SourceMap.FLAG_HAS_OBJECT}
             content: args.tileset.wall
             matches_none: {FLAGS_HAS_CONTENT}
             matches_all: SourceMap.FLAG_SOLID
         }
         '2': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT, M.FLAG_HAS_OBJECT}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT, SourceMap.FLAG_HAS_OBJECT}
             content: args.tileset.wall_alt
             matches_none: {FLAGS_HAS_CONTENT}
             matches_all: SourceMap.FLAG_SOLID
