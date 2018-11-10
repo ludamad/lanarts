@@ -85,7 +85,7 @@ make_template = (rng, back_links, forward_links) -> {
     --    Seq = MapSequence.create {preallocate: 1}
     --    door_placer = (map, xy) ->
     --        -- nil is passed for the default open sprite
-    --        MapUtils.spawn_door(map, xy, nil, Vaults._magentite_door, "Magentite Key")
+    --        MapUtils.spawn_door(map, xy, nil, Vaults._door_magentite, "Magentite Key")
     --    next_dungeon = {1}
     --    place_dungeon = (map, xy) ->
     --        portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_hell1")

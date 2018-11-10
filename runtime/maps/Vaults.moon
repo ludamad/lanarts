@@ -7,7 +7,7 @@ MapUtils = require "maps.MapUtils"
 TileSets = require "tiles.Tilesets"
 Display = require "core.Display"
 
-M = {}
+M = nilprotect {}
 
 M.FLAG_ALTERNATE = SourceMap.FLAG_CUSTOM1
 M.FLAG_INNER_PERIMETER = SourceMap.FLAG_CUSTOM2

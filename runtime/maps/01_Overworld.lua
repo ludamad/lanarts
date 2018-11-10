@@ -787,7 +787,7 @@ M.crypt_create = function(MapSeq, seq_idx, number_entrances)
         })
         local door_placer
         door_placer = function(map, xy)
-          return MapUtils.spawn_door(map, xy, nil, Vaults._magentite_door, "Magentite Key")
+          return MapUtils.spawn_door(map, xy, nil, Vaults._door_magentite, "Magentite Key")
         end
         local next_dungeon = {
           1
