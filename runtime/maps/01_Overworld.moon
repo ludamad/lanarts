@@ -497,22 +497,6 @@ M.crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
             Map.set_vision_radius(game_map, 6)
     }
 
--------------------------
--- Place easy dungeon: --
-
--- TODO rename
-map_linker = (map, map_f) ->
-    MapSeq = MapSequence.create {preallocate: 1}
-    append map.post_game_map, (game_map) ->
-        MapSeq\slot_resolve(1, game_map)
-    n_portals = 0
-    return (forward_portal) ->
-        generate = () ->
-            return map_f for i=1,n_portals
-                (back_portal) -> MapSeq\backward_portal_resolve(2, back_portal, i)
-        n_portals += 1
-        MapSeq\forward_portal_add 1, forward_portal, n_portals, generate
-
 place_underdungeon_vault = (region_set) ->
     {:map, :regions} = region_set
     underdungeon = MapLinker.create {map_label: "Underdungeon", generate: (backwards) => underdungeon_create(backwards)}
@@ -652,13 +636,12 @@ place_outpost = (region_set) ->
         entrance\link_linker(stockroom, "spr_gates.enter", "spr_gates.return")
 
     return place_vault_in region_set, Vaults.sealed_dungeon {
-        tileset: Tilesets.temple
+        tileset: Tilesets.snake
         gold_placer: (map, xy) -> nil -- dont need gold here
         door_placer: (map, xy) -> MapUtils.spawn_door(map, xy)
         dungeon_placer: callable_once (map, xy) ->
-            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_temple")
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.desolation_portal")
             entrance\link_portal(portal, "spr_gates.exit_dungeon")
-        player_spawn_area: true
     }
 
 temple_map_descs = () ->
@@ -749,38 +732,40 @@ place_temple = (region_set) ->
 
 -----------------------------
 -- Gragh's lair            --
-place_graghs_lair = () ->
-    Seq = MapSequence.create {preallocate: 1}
-    create = (offset = 1) ->
-        dungeon = require("maps.GraghsLair")
-        return NewDungeons.make_linear_dungeon {
-            MapSeq: Seq
-            :offset
-            on_generate: do_nothing
-            dungeon_template: dungeon.TEMPLATE
-            sprite_up: (floor) -> "spr_gates.exit_lair"
-            sprite_down: (floor) -> "spr_gates.enter"
-            portals_up: (floor) -> 3
-            portals_down: (floor) -> 0
-        }
-    tileset = Tilesets.lair
-    door_placer = (map, xy) ->
-        MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
-    next_dungeon = {1}
-    place_dungeon = (map, xy) ->
-        portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
-        c = (Seq\forward_portal_add 1, portal, next_dungeon[1], () -> create(1))
-        if World.player_amount > 1
-            append map.post_maps, c
-        next_dungeon[1] += 1
-    enemy_placer = (map, xy) ->
-        enemy = OldMaps.enemy_generate({{enemy: "Sheep", chance: 100}})
-        MapUtils.spawn_enemy(map, enemy, xy)
-    vault = SourceMap.area_template_create(Vaults.graghs_lair_entrance {dungeon_placer: place_dungeon, :tileset, :door_placer, :enemy_placer, player_spawn_area: false})
-    if not place_feature(map, vault, regions)
-        return true
-    append map.post_game_map, (game_map) ->
-        Seq\slot_resolve(1, game_map)
+place_graghs_lair = (region_set) ->
+    {:map, :regions} = region_set
+    entrance, chamber, sanctum = TEMPLE_ENTRANCE\linker(), TEMPLE_CHAMBER\linker(), TEMPLE_SANCTUM\linker()
+    for i=1,3
+        entrance\link_linker(chamber, "spr_gates.enter", "spr_gates.return")
+        chamber\link_linker(sanctum, "spr_gates.enter", "spr_gates.return")
+
+    vault = SourceMap.area_template_create Vaults.sealed_dungeon {
+        tileset: Tilesets.temple
+        gold_placer: (map, xy) -> nil -- dont need gold here
+        door_placer: (map, xy) -> MapUtils.spawn_door(map, xy)
+        dungeon_placer: callable_once (map, xy) ->
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_temple")
+            entrance\link_portal(portal, "spr_gates.exit_dungeon")
+        player_spawn_area: true
+    }
+
+    return place_vault_in region_set, Vaults.graghs_lair_entrance {
+        tileset: Tilesets.hell
+        dungeon_placer: (map, xy) ->
+            -- Make portal
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.volcano_portal")
+            other_portal = cc\add_pending_portal name, (feature, compiler) ->
+                MapUtils.random_portal(compiler.map, nil, "spr_gates.volcano_exit")
+            other_portal\connect {feature: portal, label: "root"}
+            portal.on_player_interact = make_on_player_interact(cc, other_portal)
+            return portal
+        door_placer: (map, xy) ->
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
+        enemy_placer: (map, xy) ->
+            enemy = OldMaps.enemy_generate({{enemy: "Fire Bat", chance: 100}})
+            MapUtils.spawn_enemy(map, enemy, xy)
+    }
+    return place_feature(map, vault, regions)
 -----------------------------
 
 overdungeon_features = (region_set) ->
@@ -802,7 +787,7 @@ overdungeon_features = (region_set) ->
                 cc\register("root", () -> game_map)
             return cc
         cc = create_compiler_context()
-        vault = SourceMap.area_template_create(Vaults.graghs_lair_entrance {
+        return place_vault_in region_set, Vaults.graghs_lair_entrance {
             tileset: Tilesets.hell
             dungeon_placer: (map, xy) ->
                 -- Make portal
@@ -817,55 +802,9 @@ overdungeon_features = (region_set) ->
             enemy_placer: (map, xy) ->
                 enemy = OldMaps.enemy_generate({{enemy: "Fire Bat", chance: 100}})
                 MapUtils.spawn_enemy(map, enemy, xy)
-        })
-        return place_feature(map, vault, regions)
+        }
     if not place_purple_dragon_lair()
         return false
-
-    -----------------------------
-    -- Gragh's lair            --
-    place_graghs_lair = () ->
-        Seq = MapSequence.create {preallocate: 1}
-        create = (offset = 1) ->
-            -- Place Hive inside the lair:
-            HiveSeq = MapSequence.create {preallocate: 1}
-            on_finish = (game_map, floor) ->
-                if floor == 1
-                    HiveSeq\slot_resolve(1, game_map)
-            dungeon = require("maps.GraghsLair")
-            return NewDungeons.make_linear_dungeon {
-                MapSeq: Seq
-                :offset
-                dungeon_template: dungeon.TEMPLATE
-                on_generate: () -> true
-                :on_finish
-                sprite_up: (floor) -> "spr_gates.exit_lair"
-                sprite_down: (floor) -> "spr_gates.enter"
-                portals_up: (floor) -> 3
-                portals_down: (floor) -> 0
-            }
-        tileset = Tilesets.lair
-        door_placer = (map, xy) ->
-            MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
-        next_dungeon = {1}
-        place_dungeon = (map, xy) ->
-            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
-            c = (Seq\forward_portal_add 1, portal, next_dungeon[1], () -> create(1))
-            if World.player_amount > 1
-                append map.post_maps, c
-            next_dungeon[1] += 1
-        enemy_placer = (map, xy) ->
-            enemy = OldMaps.enemy_generate({{enemy: "Sheep", chance: 100}})
-            MapUtils.spawn_enemy(map, enemy, xy)
-        vault = SourceMap.area_template_create(Vaults.graghs_lair_entrance {dungeon_placer: place_dungeon, :tileset, :door_placer, :enemy_placer, player_spawn_area: false})
-        if not place_feature(map, vault, regions)
-            return true
-        append map.post_game_map, (game_map) ->
-            Seq\slot_resolve(1, game_map)
-    if place_graghs_lair()
-        print "RETRY: place_graghs_lair()"
-        return false
-    -----------------------------
 
     if not place_outpost(region_set)
         return false

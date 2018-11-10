@@ -71,7 +71,6 @@ make_template = (rng, back_links={}, forward_links={}) ->
     return NewDungeons.make_dungeon_template {
         tileset: Tilesets.snake
         :subtemplates
-        -- :connector
         w: plan.size[1] * 3.5 + 10
         h: plan.size[2] * 3.5 + 10
         _enemy_entries: () =>
@@ -101,8 +100,8 @@ make_template = (rng, back_links={}, forward_links={}) ->
         _create_stairs_down: (map) =>
             bbox = {0,0,map.size[1],map.size[2]}
             for forward_link in *forward_links
-                xy = MapUtils.random_square(@map, bbox, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
-                forward_link(@map, xy)
+                xy = MapUtils.random_square(map, bbox, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+                forward_link(map, xy)
             return true
         _create_stairs_up: (map) =>
             base_conf = @_default_vault_config()
