@@ -556,26 +556,22 @@ overdungeon_features = (region_set) ->
     -----------------------------
     -- Place optional dungeon 2, the crypt: --
     place_crypt = () ->
-        CryptSeq = MapSequence.create {preallocate: 1}
-        door_placer = (map, xy) ->
-            -- nil is passed for the default open sprite
-            MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
-        next_dungeon = {1}
-        place_dungeon = (map, xy) ->
-            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_crypt")
-            c = (CryptSeq\forward_portal_add 1, portal, next_dungeon[1], () -> M.crypt_create(CryptSeq, 2))
-            if World.player_amount > 1
-                append map.post_game_map, c
-            next_dungeon[1] += 1
-        enemy_placer = (map, xy) ->
-            enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
-            MapUtils.spawn_enemy(map, enemy, xy)
-        vault = SourceMap.area_template_create(Vaults.crypt_dungeon {dungeon_placer: place_dungeon, tileset: Tilesets.crypt, :door_placer, :enemy_placer, player_spawn_area: false})
-        if not place_feature(map, vault, regions)
-            return true
-        append map.post_game_map, (game_map) ->
-            CryptSeq\slot_resolve(1, game_map)
-    if place_crypt()
+        crypt = require("map_descs.Crypt")\linker()
+        hell = require("map_descs.Hell")\linker()
+        crypt\link_linker(hell)
+        return place_vault_in region_set, Vaults.crypt_dungeon {
+            tileset: Tilesets.crypt
+            door_placer: (map, xy) ->
+                -- nil is passed for the default open sprite
+                MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
+            dungeon_placer: (map, xy) ->
+                portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_crypt")
+                crypt\link_portal(portal)
+            enemy_placer: (map, xy) ->
+                enemy = OldMaps.enemy_generate(OldMaps.strong_undead)
+                MapUtils.spawn_enemy(map, enemy, xy)
+        }
+    if not place_crypt()
         print "RETRY: place_crypt()"
         return false
     -----------------------------
