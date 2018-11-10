@@ -445,7 +445,7 @@ place_outpost = (region_set) ->
         door_placer: (map, xy) -> MapUtils.spawn_door(map, xy)
         dungeon_placer: callable_once (map, xy) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.desolation_portal")
-            entrance\link_portal(portal, "spr_gates.exit_dungeon")
+            entrance\link_portal(portal, "spr_gates.exit_crypt")
     }
 
 temple_map_descs = () ->
@@ -504,7 +504,7 @@ place_graghs_lair = (region_set) ->
         dungeon_placer: (map, xy) ->
             -- Make portal
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_slime")
-            lair\link_portal(portal)
+            lair\link_portal(portal, 'spr_gates.exit_crypt')
         door_placer: (map, xy) ->
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
         enemy_placer: (map, xy) ->
@@ -558,7 +558,7 @@ overdungeon_features = (region_set) ->
     place_crypt = () ->
         crypt = require("map_descs.Crypt")\linker()
         hell = require("map_descs.Hell")\linker()
-        crypt\link_linker(hell)
+        crypt\link_linker(hell, 'spr_gates.enter_hell3', 'spr_gates.return_hell')
         return place_vault_in region_set, Vaults.crypt_dungeon {
             tileset: Tilesets.crypt
             door_placer: (map, xy) ->
@@ -566,7 +566,7 @@ overdungeon_features = (region_set) ->
                 MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
             dungeon_placer: (map, xy) ->
                 portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_crypt")
-                crypt\link_portal(portal)
+                crypt\link_portal(portal, 'spr_gates.exit_crypt')
             enemy_placer: (map, xy) ->
                 enemy = OldMaps.enemy_generate(OldMaps.strong_undead)
                 MapUtils.spawn_enemy(map, enemy, xy)

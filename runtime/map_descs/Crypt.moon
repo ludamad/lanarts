@@ -112,7 +112,7 @@ make_template = (rng, back_links, forward_links) -> {
         return true
     _create_stairs_up: (map) =>
         for link in *back_links
-            if place_vault map, Vaults.crypt_entrance_vault {
+            if not place_vault map, Vaults.crypt_entrance_vault {
                 rng: map.rng
                 item_placer: link
                 door_placer: (map, xy) -> MapUtils.spawn_door(map, xy)

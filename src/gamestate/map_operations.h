@@ -46,6 +46,7 @@ inline void visit_all_maps(GameState* gs, PlayerInst* player) {
         previous_portal_size = (int)used_portals.size();
         std::vector<GameMapState*> maps_copy = world.maps();
         for (auto* map : maps_copy) {
+            printf("visiting %s\n", map->label().c_str());
             map->for_each<FeatureInst>([&](FeatureInst* inst) {
                 gs->do_with_map(map, [&]() {
                     bool new_portal = used_portals.find(inst) == used_portals.end();
