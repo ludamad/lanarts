@@ -44,6 +44,13 @@ game_init = (args, load_file=nil) ->
     else
         EngineInternal.start_game()
 
+dump_globals = () ->
+    -- TODO make a file?
+    setmetatable(_G, nil)
+    for k, v in spairs(_G)
+        print "      \"#{k}\""
+    os.exit()
+
 --Parse lanarts command-line options
 run_lanarts = (raw_args) ->
     log "Running Lanarts main function"

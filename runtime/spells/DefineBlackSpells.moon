@@ -1,12 +1,4 @@
-EventLog = require "ui.EventLog"
 ObjectUtils = require "objects.ObjectUtils"
-GameObject = require "core.GameObject"
-GameState = require "core.GameState"
-Map = require "core.Map"
-World = require "core.World"
-Bresenham = require "core.Bresenham"
-Display = require "core.Display"
-SpellObjects = require "objects.SpellObjects"
 DataW = require "DataWrapped"
 require "spells.DefineFireSpells"
 require "spells.DefineWhiteSpells"
@@ -84,4 +76,3 @@ DataW.spell_create {
             n_summoned += 1
             return n_summoned >= 10 + obj.stats.level * 3 + bpower * 2
 }
-

@@ -1,11 +1,3 @@
-EventLog = require "ui.EventLog"
-GameObject = require "core.GameObject"
-GameState = require "core.GameState"
-Map = require "core.Map"
-World = require "core.World"
-Bresenham = require "core.Bresenham"
-Display = require "core.Display"
-SpellObjects = require "objects.SpellObjects"
 DataW = require "DataWrapped"
 
 DataW.spell_create {

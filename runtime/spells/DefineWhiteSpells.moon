@@ -1,6 +1,4 @@
-EventLog = require "ui.EventLog"
 GameObject = require "core.GameObject"
-GameState = require "core.GameState"
 Map = require "core.Map"
 Display = require "core.Display"
 DataW = require "DataWrapped"
@@ -22,7 +20,6 @@ try_stun = (caster, mon, cooldown=nil) ->
     if chance(resist)
         if not mon.is_enemy
             white_power = -5
-        mon\add_effect("Stunned", cooldown or (100 + white_power * 10) * resist)
         mon\add_effect("Stunned", cooldown or (100 + white_power * 10) * resist)
         if Map.object_visible(mon)
             play_sound "sound/ringfire-hit.ogg"
@@ -103,7 +100,7 @@ DataW.spell_create {
             prob = interpolate(white_power, 0, 5, 0.05, 0.2)
             if chance(prob)
                 try_stun(@caster, target, 30)
-            
+
     }
     mp_cost: 20,
     cooldown: 65
@@ -147,7 +144,7 @@ draw_console_text = (xy, texts) ->
         x += font_cached_load(settings.font, 10)\draw {
             :color
             origin: Display.LEFT_CENTER
-        }, {x, y}, text 
+        }, {x, y}, text
     return nil
 
 
@@ -190,7 +187,7 @@ DataW.spell_create {
             @x += dx
             @y += dy
             @cx, @cy = @caster.x, @caster.y
-        on_deinit: () => 
+        on_deinit: () =>
             GameObject.add_to_level Flash.create({caster: @caster, duration: 30, damage: 10, xy: @xy})
         redamage_cooldown: 40 -- Cooldown for when enemies are damaged again by effect
     }
@@ -236,7 +233,7 @@ DataW.effect_create {
 --        ----caster\add_effect("Blinding Light", 500 + TypeEffectUtils.get_power(caster,"White")*100)
 --        play_sound "sound/ludaze.ogg"
 --    autotarget_func: (caster) -> caster.x, caster.y
---    prereq_func: (caster) -> 
+--    prereq_func: (caster) ->
 --        for mon in *(Map.enemies_list caster)
 --            if Map.object_visible(mon, mon.xy, caster)
 --                return true
