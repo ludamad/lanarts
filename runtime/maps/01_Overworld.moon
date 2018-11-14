@@ -444,7 +444,7 @@ place_outpost = (region_set) ->
         door_placer: (map, xy) -> MapUtils.spawn_door(map, xy)
         dungeon_placer: callable_once (map, xy) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.desolation_portal")
-            entrance\link_portal(portal, "spr_gates.exit_crypt")
+            entrance\link_portal(portal, "spr_gates.exit_dungeon")
     }
 
 temple_map_descs = () ->
@@ -480,7 +480,7 @@ place_temple = (region_set) ->
         entrance\link_linker(chamber, "spr_gates.enter", "spr_gates.return")
         chamber\link_linker(sanctum, "spr_gates.enter", "spr_gates.return")
 
-    vault = SourceMap.area_template_create Vaults.sealed_dungeon {
+    return place_vault_in region_set, Vaults.sealed_dungeon {
         tileset: Tilesets.temple
         gold_placer: (map, xy) -> nil -- dont need gold here
         door_placer: (map, xy) -> MapUtils.spawn_door(map, xy)
@@ -490,7 +490,28 @@ place_temple = (region_set) ->
         player_spawn_area: true
     }
 
-    return place_feature(map, vault, regions)
+PIXULLOCHIA_ENTRANCE = OldMaps.create_map_desc table.merge OldMaps.Dungeon4[1], {
+    tileset: Tilesets.pixulloch
+    label: "Pixullochia Entrance"
+}
+
+place_pixullochia = (region_set) ->
+    {:map, :regions} = region_set
+    entrance = PIXULLOCHIA_ENTRANCE\linker()
+    sanctum = require("map_descs.PixullochiaDepths")\linker()
+    for i=1,3
+        entrance\link_linker(sanctum, "spr_gates.enter", "spr_gates.return")
+
+    return place_vault_in region_set, Vaults.hell_dungeon {
+        tileset: Tilesets.pixulloch
+        enemy_placer: (map, xy) ->
+            enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
+            MapUtils.spawn_enemy(map, enemy, xy)
+        door_placer: (map, xy) -> MapUtils.spawn_lanarts_door(map, xy)
+        dungeon_placer: (map, xy) ->
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.zig_portal")
+            entrance\link_portal(portal, "spr_gates.exit_dungeon")
+    }
 
 -----------------------------
 -- Gragh's lair            --
@@ -503,7 +524,7 @@ place_graghs_lair = (region_set) ->
         dungeon_placer: (map, xy) ->
             -- Make portal
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_slime")
-            lair\link_portal(portal, 'spr_gates.exit_crypt')
+            lair\link_portal(portal, 'spr_gates.exit_dungeon')
         door_placer: (map, xy) ->
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
         enemy_placer: (map, xy) ->
@@ -565,7 +586,7 @@ overdungeon_features = (region_set) ->
                 MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
             dungeon_placer: (map, xy) ->
                 portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_crypt")
-                crypt\link_portal(portal, 'spr_gates.exit_crypt')
+                crypt\link_portal(portal, 'spr_gates.exit_dungeon')
             enemy_placer: (map, xy) ->
                 enemy = OldMaps.enemy_generate(OldMaps.strong_undead)
                 MapUtils.spawn_enemy(map, enemy, xy)
@@ -578,25 +599,27 @@ overdungeon_features = (region_set) ->
     if not place_graghs_lair(region_set)
         return false
 
-    -------------------------
-    -- Place hard dungeon: --
-    place_hard = () ->
-        tileset = Tilesets.pixulloch
-        dungeon = {label: 'Pixullochia', :tileset, templates: OldMaps.Dungeon4, spawn_portal: safe_portal_spawner(tileset)}
-        door_placer = (map, xy) ->
-            -- nil is passed for the default open sprite
-            MapUtils.spawn_lanarts_door(map, xy)
-        enemy_placer = (map, xy) ->
-            enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
-            MapUtils.spawn_enemy(map, enemy, xy)
-        place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq4, dungeon)
-        vault = SourceMap.area_template_create(Vaults.skull_surrounded_dungeon {dungeon_placer: place_dungeon, :enemy_placer, :door_placer, :tileset, player_spawn_area: false})
-        if not place_feature(map, vault, regions)
-            return true
-    if place_hard()
-        print "RETRY: place_hard()"
-        return nil
-    -------------------------
+    ---------------------------
+    ---- Place hard dungeon: --
+    --place_hard = () ->
+    --    tileset = Tilesets.pixulloch
+    --    dungeon = {label: 'Pixullochia', :tileset, templates: OldMaps.Dungeon4, spawn_portal: safe_portal_spawner(tileset)}
+    --    door_placer = (map, xy) ->
+    --        -- nil is passed for the default open sprite
+    --        MapUtils.spawn_lanarts_door(map, xy)
+    --    enemy_placer = (map, xy) ->
+    --        enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
+    --        MapUtils.spawn_enemy(map, enemy, xy)
+    --    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq4, dungeon)
+    --    vault = SourceMap.area_template_create(Vaults.skull_surrounded_dungeon {dungeon_placer: place_dungeon, :enemy_placer, :door_placer, :tileset, player_spawn_area: false})
+    --    if not place_feature(map, vault, regions)
+    --        return true
+    --if place_hard()
+    --    print "RETRY: place_hard()"
+    --    return nil
+    ---------------------------
+    if not place_pixullochia(region_set)
+        return false
 
     append map.post_maps, () ->
         overdungeon_items_and_enemies(region_set)
@@ -957,7 +980,7 @@ overworld_create = () ->
     Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
     return game_map
 
-return {
+return nilprotect {
     :overworld_create
     :place_feature
     :place_vault, :place_vault_in
@@ -968,4 +991,5 @@ return {
     :OUTPOST_ENTRANCE, :OUTPOST_STOCKROOM
     :underdungeon_create
     :DUNGEON_CONF
+    :PIXULLOCHIA_ENTRANCE
 }

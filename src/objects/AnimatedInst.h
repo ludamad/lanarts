@@ -15,6 +15,14 @@
 
 const int DONT_DRAW_SPRITE = -1;
 
+
+inline static void assert_normal_text(const char* c) {
+	while (*c) {
+		LANARTS_ASSERT(*c >= 0 && *c < 128);
+		c++;
+	}
+}
+
 class AnimatedInst: public GameInst {
 public:
 	enum {
@@ -29,6 +37,7 @@ public:
 					orientation.x), orienty(orientation.y), sprite(sprite), timeleft(
 					animatetime), animatetime(animatetime), text(text) {
 		animateframe = -1;
+		assert_normal_text(text.c_str());
 		vx = round(vx * 256.0f) / 256.0f;
 		vy = round(vy * 256.0f) / 256.0f;
 		LANARTS_ASSERT(animatetime!= 0);
