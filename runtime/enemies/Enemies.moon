@@ -383,9 +383,9 @@ DataW.enemy_create {
         cooldown: 105
         range: 300
         alt_action: (xy, target) =>
-            for obj in *Map.radius_collision_check(@map, 15, @xy)
+            for obj in *Map.radius_collision_check(@map, 8, @xy)
                 if obj.is_enemy == false
-                    return -- Dont attack -- too deadly around players
+                    return -- Dont attack if player overlapping -- too deadly around players
             @projectile_attack("Mephitize")
     }
 }

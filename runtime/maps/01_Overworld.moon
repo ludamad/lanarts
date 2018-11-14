@@ -15,7 +15,6 @@ import map_place_object, ellipse_points,
 import MapRegion from require "maps.MapRegion"
 
 NewMaps = require "maps.NewMaps"
-NewDungeons = require "maps.NewDungeons"
 Tilesets = require "tiles.Tilesets"
 MapUtils = require "maps.MapUtils"
 ItemUtils = require "maps.ItemUtils"

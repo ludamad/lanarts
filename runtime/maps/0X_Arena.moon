@@ -16,7 +16,6 @@ MapRegionShapes = require("maps.MapRegionShapes")
 PolyPartition = require "core.PolyPartition"
 DebugUtils = require "maps.DebugUtils"
 NewMaps = require "maps.NewMaps"
-NewDungeons = require "maps.NewDungeons"
 Tilesets = require "tiles.Tilesets"
 MapUtils = require "maps.MapUtils"
 ItemUtils = require "maps.ItemUtils"
