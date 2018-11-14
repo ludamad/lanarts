@@ -125,24 +125,6 @@ DragonLair = newtype {
             MapUtils.spawn_chest(@map, sqr, items)
 }
 
-Arena = newtype {
-    parent: MapCompiler
-    root_node: cave()
-    tileset: TileSets.lair
-    -- Called before compile() is called
-    generate: (args) =>
-        enemies = args.enemies or loadstring(os.getenv "ARENA_ENEMIES")() or {}
-        for enemy, amount in spairs enemies
-            for i=1,amount
-                sqr = MapUtils.random_square(@map, nil)
-                MapUtils.spawn_enemy(@map, enemy, sqr)
-        items = args.items or loadstring(os.getenv "ARENA_ITEMS")() or {}
-        for type, amount in spairs items
-            sqr = MapUtils.random_square(@map, nil)
-            MapUtils.spawn_item(@map, type, amount, sqr)
-}
-
-
 SimpleRoom = newtype {
     parent: MapCompiler
     root_node: Shape {
@@ -204,4 +186,4 @@ create_isolated = (args) ->
     -- Compile the map
     return cc\get(args)
 
-return nilprotect {:DragonLair, :DragonLairFoyer, :Arena, :SimpleRoom, :create_isolated, :ChickenCoop}
+return nilprotect {:DragonLair, :DragonLairFoyer, :SimpleRoom, :create_isolated, :ChickenCoop}

@@ -32,7 +32,7 @@ game_init = (seed, class_name, monster_spawns, input_func, level) ->
     EngineInternal.init_gamestate()
     random_seed(seed)
     Engine.first_map_create = () ->
-        return require("maps.0X_Arena").generate_and_spawn(monster_spawns)
+        return require("map_descs.DebugArena")\generate_and_spawn(monster_spawns)
     EngineInternal.start_game()
 
     -- Set up input for first game step

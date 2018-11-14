@@ -95,7 +95,7 @@ node_place_easy_overworld_rooms = () =>
     @region_set = {map: @map, :regions}
     return true
 
-Arena = MapDesc.create {
+DebugArena = MapDesc.create {
     size: {20, 20}
     children: {
         MapNode.create {
@@ -106,8 +106,8 @@ Arena = MapDesc.create {
 
 MAX_MAP_TRIES = 100
 generate = (portal_spawns, monster_spawns) ->
-    Arena.monster_spawns = monster_spawns
-    map = NewMaps.try_n_times MAX_MAP_TRIES, () -> Arena\compile(portal_spawns)
+    DebugArena.monster_spawns = monster_spawns
+    map = NewMaps.try_n_times MAX_MAP_TRIES, () -> DebugArena\compile(portal_spawns)
     game_map = NewMaps.generate_game_map(map)
     {x, y} = MapUtils.random_square(map, nil, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
     append map.player_candidate_squares, {x*32+16,y*32+16}
@@ -116,9 +116,9 @@ generate = (portal_spawns, monster_spawns) ->
         post_poned(game_map)
     return game_map, player_spawn_points
 
-generate_and_spawn = (monster_spawns) ->
+DebugArena.generate_and_spawn = (monster_spawns) =>
     game_map, player_spawn_points = generate({}, monster_spawns)
     World.players_spawn(game_map, player_spawn_points)
     return game_map
 
-return {:generate, :generate_and_spawn}
+return DebugArena
