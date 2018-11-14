@@ -34,7 +34,7 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Crystalline Plate",
-    description = "An armour made of heavy but magically unburdensome crystals. Slows down movement speed considerably.",
+    description = "An armour made of heavy but magically unburdensome crystals.",
     type = "armour",
 
     shop_cost = {295,305},
@@ -44,8 +44,7 @@ Data.equipment_create {
     stat_bonuses = { 
         defence = 3,
         willpower = 3,
-    },
-    effects_granted = {"Encumbered"}
+    }
 }
 
 Data.equipment_create {

@@ -125,22 +125,22 @@ static bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 	int attack_id = -1;
 	int smallest_range = TOO_LARGE_RANGE;
 	float dist = distance_between(Pos(inst->x, inst->y),
-			Pos(target->x, target->y));
+								  Pos(target->x, target->y));
 	int radii = inst->target_radius + target->target_radius;
 
 	for (int i = 0; i < attacks.size(); i++) {
 		WeaponEntry& wentry = attacks[i].weapon.weapon_entry();
 		int range = wentry.range();
 		if (!attacks[i].projectile.empty()) {
-                    ProjectileEntry& pentry = attacks[i].projectile_entry();
-                    range = std::max(range, pentry.range());
-		    if (!estats.allowed_actions.can_use_spells) {
-                        continue;
-                    }
+			ProjectileEntry& pentry = attacks[i].projectile_entry();
+			range = std::max(range, pentry.range());
+			if (!estats.allowed_actions.can_use_spells) {
+				continue;
+			}
 		} else if (!estats.allowed_actions.can_use_weapons) {
-                    continue;
-                }
-                event_log("attack_ai_choice radii=%d range=%d smallrange=%d ", radii, range, smallest_range);
+			continue;
+		}
+		event_log("attack_ai_choice radii=%d range=%d smallrange=%d ", radii, range, smallest_range);
 		if (radii + range >= dist && range < smallest_range) {
 			attack_id = i;
 			smallest_range = range;
@@ -243,7 +243,8 @@ void MonsterController::set_monster_headings(GameState* gs,
 			}
 			if (has_fear) {
 			    // Don't stop moving near if have fear.
-			} else if (!attack.is_ranged()) {
+			} else if (!attack.is_ranged() && attack.weapon_entry().range() < 100) {
+			    // TODO clean up mess of 100 range clause
 				e->vx = 0, e->vy = 0;
 			} else {
 				int close = 40;
@@ -255,7 +256,12 @@ void MonsterController::set_monster_headings(GameState* gs,
 					e->vx = 0, e->vy = 0;
 				}
 			}
-			e->attack(gs, p, attack);
+
+			if (!wentry.attack.alt_action.isnil()) {
+				lcall(wentry.attack.alt_action, e, p->pos(), p);
+			} else {
+				e->attack(gs, p, attack);
+			}
 
 		}
 		if (gs->tile_radius_test(e->x, e->y, TILE_SIZE / 2 + 4)) {

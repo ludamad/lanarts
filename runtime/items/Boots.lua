@@ -43,7 +43,7 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Troll Boots",
-    description = "Heavy boots that enchant the user which regenerative properties and extra strength, but significantly reduce movement speed.",
+    description = "Heavy boots that enchant the user which regenerative properties and extra strength.",
     type = "boots",
 
     shop_cost = { 120, 200 },
@@ -54,8 +54,7 @@ Data.equipment_create {
         hpregen = 2 / 60,
         strength = 1,
         defence = 3,
-    },
-    effects_granted = {"Encumbered"}
+    }
 }
 
 Data.equipment_create {

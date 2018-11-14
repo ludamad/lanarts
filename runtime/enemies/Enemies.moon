@@ -370,9 +370,6 @@ DataW.enemy_create {
     defeat_message: "The mouther has been shut."
     types: {"Green", "Black"}
     stats: {
-        attacks: {
-            {projectile: "Mephitize"}
-        }
         hp: 40
         hpregen: 0.03
         movespeed: 1
@@ -382,8 +379,14 @@ DataW.enemy_create {
         magic: 25
         willpower: 0
     }
-    effects_active: {
-        {"PoisonedWeapon", {poison_percentage: 0.25}}
+    weapon: {
+        cooldown: 105
+        range: 300
+        alt_action: (xy, target) =>
+            for obj in *Map.radius_collision_check(@map, 15, @xy)
+                if obj.is_enemy == false
+                    return -- Dont attack -- too deadly around players
+            @projectile_attack("Mephitize")
     }
 }
 
