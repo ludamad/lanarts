@@ -570,25 +570,29 @@ namespace GameInstWrap {
 //            return 2;
 //        }
 
-		GameInst* test_inst = NULL;
+        GameInst* test_inst = NULL;
         if ((*udata)->id > 0) {
             test_inst = gs->get_level((*udata)->current_floor)->game_inst_set().get_instance((*udata)->id);
         } else {
             GameInstRef ref = gs->game_world().get_removed_object(-(*udata)->id);
             test_inst = ref.get();
         }
-                if ((*udata) != test_inst) {
-                    throw std::runtime_error(format("Attempt to save GameInst that cannot be found at level %d, id %d!", (*udata)->current_floor, (*udata)->id));
-                }
-		lua_pushinteger(L, (*udata)->id);
-		lua_pushinteger(L, (*udata)->current_floor);
-		return 2;
-	}
+        if ((*udata) != test_inst) {
+            return 0;
+            //throw std::runtime_error(format("Attempt to save GameInst that cannot be found at level %d, id %d!", (*udata)->current_floor, (*udata)->id));
+        }
+        lua_pushinteger(L, (*udata)->id);
+        lua_pushinteger(L, (*udata)->current_floor);
+        return 2;
+    }
 
     static LuaValue ref_metatable(lua_State* L);
 
 	static int __load(lua_State* L) {
         GameState* gs = lua_api::gamestate(L);
+        //if (lua_isnil(L, 2)) {
+        //    return 0;
+        //}
 	    // Get our coordinates:
         int id = luaL_checkinteger(L, 2);
         int current_floor = luaL_checkinteger(L, 3);
@@ -717,8 +721,12 @@ static GameInst* initialize_object(GameState* gs, GameInst* inst, LuaStackValue 
 			id = args["map"]["_id"].to_int();
 		}
 		if (id < 0) {
-                    delete inst;
-                    return nullptr;
+		    id = gs->game_world().get_current_level_id();
+                    //delete inst;
+                    //return nullptr;
+                }
+                if (id < 0) {
+                    printf("ID < 0!!\n");
                 }
                 gs->add_instance(id, inst);
 	}
