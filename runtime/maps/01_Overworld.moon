@@ -599,25 +599,6 @@ overdungeon_features = (region_set) ->
     if not place_graghs_lair(region_set)
         return false
 
-    ---------------------------
-    ---- Place hard dungeon: --
-    --place_hard = () ->
-    --    tileset = Tilesets.pixulloch
-    --    dungeon = {label: 'Pixullochia', :tileset, templates: OldMaps.Dungeon4, spawn_portal: safe_portal_spawner(tileset)}
-    --    door_placer = (map, xy) ->
-    --        -- nil is passed for the default open sprite
-    --        MapUtils.spawn_lanarts_door(map, xy)
-    --    enemy_placer = (map, xy) ->
-    --        enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
-    --        MapUtils.spawn_enemy(map, enemy, xy)
-    --    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq4, dungeon)
-    --    vault = SourceMap.area_template_create(Vaults.skull_surrounded_dungeon {dungeon_placer: place_dungeon, :enemy_placer, :door_placer, :tileset, player_spawn_area: false})
-    --    if not place_feature(map, vault, regions)
-    --        return true
-    --if place_hard()
-    --    print "RETRY: place_hard()"
-    --    return nil
-    ---------------------------
     if not place_pixullochia(region_set)
         return false
 

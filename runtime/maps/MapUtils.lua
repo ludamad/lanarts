@@ -296,4 +296,6 @@ function M.make_rectangle_oper(floor, wall, wall_seethrough, --[[Optional]] area
     }
 end
 
+
+
 return M
