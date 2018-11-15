@@ -686,7 +686,7 @@ function M.create_map_desc(entry)
                     map.template = entry
                     map.n_healing_squares = map.rng:randomf() < 0.2 and map.rng:random(1, 2) or 0
                     -- TODO consolidate what is actually expected of maps.
-                    -- For now, just fake one region for 01_Overworld.moon
+                    -- For now, just fake one region for World.moon
                     map.regions = { {conf = {}, bbox = function(self) return {0,0, map.size[1], map.size[2]} end}}
                     event_log("(RNG #%d) calling dungeon.on_generate", map.rng:amount_generated())
                     if entry.on_generate and not entry.on_generate(map) then
@@ -733,7 +733,7 @@ function M.create_map(dungeon, floor, --[[Optional]] back_links, --[[Optional]] 
     map.template = entry
     map.n_healing_squares = map.rng:randomf() < 0.2 and map.rng:random(1, 2) or 0
     -- TODO consolidate what is actually expected of maps.
-    -- For now, just fake one region for 01_Overworld.moon
+    -- For now, just fake one region for World.moon
     map.regions = { {conf = {}, bbox = function(self) return {0,0, map.size[1], map.size[2]} end}}
     event_log("(RNG #%d) calling dungeon.on_generate", map.rng:amount_generated())
     if dungeon.on_generate and not dungeon.on_generate(map, floor) then
