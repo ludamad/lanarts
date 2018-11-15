@@ -5,7 +5,7 @@ ItemGroups = require "maps.ItemGroups"
 
 Vaults = require "maps.Vaults"
 SourceMap = require "core.SourceMap"
-{:place_vault, :place_vault_in} = require "core.VaultUtils"
+{:place_vault, :place_vault_in} = require "maps.VaultUtils"
 
 {:MapNode, :MapDesc} = require "maps.MapDesc"
 

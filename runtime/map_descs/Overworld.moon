@@ -33,8 +33,6 @@ create_overworld_scheme = (tileset) -> nilprotect {
 
 OVERWORLD_TILESET = create_overworld_scheme(Tilesets.grass)
 
-OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE = 300, 300
-
 place_doors_and_statues = (region_set) ->
     {:map, :regions} = region_set
 
@@ -223,17 +221,18 @@ overworld_features = (region_set) ->
 
 return MapDesc.create {
     map_label: "Plain Valley"
-    size: {OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE}
+    size: {120, 120}
     default_content: Tilesets.grass.wall
     default_flags: {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH}
     arc_chance: 0.05
     children: {
         MapNode.create {
             place: () =>
-                size = @rng\random_choice {{65, 45}, {45, 65}}
-                number_regions = @rng\random(5, 7)
-                connect_line_width = () -> @rng\random(2, 6)
-                room_radius = () -> @rng\random(5,10)
+                number_regions = 5 + @rng\random(0, 3) + @rng\random(0, 3) + @rng\random(0, 3)
+                connect_line_width = () -> 1 + @rng\random(0, 4) + @rng\random(0, 4) + @rng\random(0, 4) + @rng\random(0, 4)
+                room_radius = () -> 5 + @rng\random(0,4) + @rng\random(0, 4) + @rng\random(0, 4)
+                factor = math.sqrt(number_regions / 5)
+                size = {85 * factor, 85 * factor}
                 template = nilprotect {
                     default_wall: Tile.create(Tilesets.grass.wall, true, true, {FLAG_OVERWORLD})
                     subtemplates: {nilprotect {

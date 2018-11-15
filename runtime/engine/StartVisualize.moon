@@ -27,6 +27,7 @@ run_visualize = (raw_args) ->
             -- (1) Init game
             game_init(seed)
             -- (2) Transfer to visualize loop
+            package.loaded[args.map_desc] = nil -- Ensure fresh load of file
             map = require(args.map_desc)\compile()
             seed += 1
             return debug_visualize_step(map, game_start)

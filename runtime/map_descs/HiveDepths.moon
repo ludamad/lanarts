@@ -97,7 +97,6 @@ node_fill_dungeon_room = () =>
                     {:type, :amount} = ItemUtils.item_generate ItemGroups.enchanted_items
                 MapUtils.spawn_item(map, type, amount, xy)
             tileset = Tilesets.hive
-            vault = SourceMap.area_template_create(
             if not place_vault_in @region_set, Vaults.small_item_vault {
                 rng: @map.rng
                 :item_placer
