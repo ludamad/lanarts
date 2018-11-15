@@ -107,12 +107,13 @@ function Engine.event_occurred(...)
 end
 
 function Engine.first_map_create(...)
-    if os.getenv("LINEAR_MODE") then
-        local linear_mode = Engine.require "maps.LinearMode"
-        return linear_mode.first_map_create()
-    end
-    local region1 = Engine.require "maps.01_Overworld"
-    local map = region1.overworld_create(...)
+    -- if os.getenv("LINEAR_MODE") then
+    --     local linear_mode = Engine.require "maps.LinearMode"
+    --     return linear_mode.first_map_create()
+    -- end
+    -- local region1 = Engine.require "maps.01_Overworld"
+    -- local map = region1.overworld_create(...)
+    local map = Engine.require("map_descs.World").generate()
     return map
 end
 

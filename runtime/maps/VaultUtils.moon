@@ -33,11 +33,12 @@ attempt_placement = (region_set, template) ->
 attempt_placement_n_times = (region_set, template, n) ->
     for i=1,n
         event_log("(RNG #%d) placement=%d", region_set.map.rng\amount_generated(), i)
-        if attempt_placement(template)
+        if attempt_placement(region_set, template)
             return true
     return false
 
 place_vault_in = (region_set, vault, n_tries=N_TRIES) ->
+    vault.map = region_set.map
     template = SourceMap.area_template_create(vault)
     return attempt_placement_n_times(region_set, template, n_tries)
 
