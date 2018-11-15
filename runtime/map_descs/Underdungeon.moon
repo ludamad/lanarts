@@ -107,7 +107,7 @@ return MapDesc.create {
     children: {
         MapNode.create {
             place: () =>
-                size = @rng\random_choice {{65, 45}, {45, 65}}
+                size = @rng\random_choice {{200, 180}, {180, 200}}
                 number_regions = @rng\random(5, 7)
                 connect_line_width = () -> @rng\random(2, 6)
                 room_radius = () -> @rng\random(5,10)

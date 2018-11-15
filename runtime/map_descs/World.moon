@@ -95,15 +95,15 @@ place_graghs_lair = (region_set) ->
 place_underdungeon = (region_set) ->
     underdungeon =  require("map_descs.Underdungeon")\linker {
         root: (node) ->
-            -- if not place_outpost(node.region_set)
-            --     return false
-            -- if not place_crypt(node.region_set)
-            --     print "RETRY: place_crypt()"
-            --     return false
-            -- if not place_graghs_lair(node.region_set)
-            --     return false
-            -- if not place_pixullochia(node.region_set)
-            --     return false
+            if not place_outpost(node.region_set)
+                return false
+            if not place_crypt(node.region_set)
+                print "RETRY: place_crypt()"
+                return false
+            if not place_graghs_lair(node.region_set)
+                return false
+            if not place_pixullochia(node.region_set)
+                return false
             return true
     }
 
