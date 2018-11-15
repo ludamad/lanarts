@@ -599,10 +599,10 @@ return nilprotect {
     :place_vault, :place_vault_in
     test_determinism: () -> nil
     :generate_map_node
-    :TEMPLE_ENTRANCE, :TEMPLE_CHAMBER, :TEMPLE_SANCTUM
-    :OGRE_LAIR
-    :OUTPOST_ENTRANCE, :OUTPOST_STOCKROOM
-    :underdungeon_create
+    -- :TEMPLE_ENTRANCE, :TEMPLE_CHAMBER, :TEMPLE_SANCTUM
+    -- :OGRE_LAIR
+    -- :OUTPOST_ENTRANCE, :OUTPOST_STOCKROOM
+    -- :underdungeon_create
     :DUNGEON_CONF
-    :PIXULLOCHIA_ENTRANCE
+    -- :PIXULLOCHIA_ENTRANCE
 }

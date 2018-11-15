@@ -104,7 +104,7 @@ overworld_features = (region_set) ->
             store_placer = (map, xy) ->
                 Region1.generate_store(map, xy)
             item_placer = (map, xy) ->
-                if map.rng.chance(.1)
+                if map.rng\chance(.1)
                     MapUtils.spawn_item(map, "Scroll of Experience", 1, xy)
                 else
                     item = ItemUtils.item_generate ItemGroups.basic_items

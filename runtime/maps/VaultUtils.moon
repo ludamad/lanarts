@@ -44,7 +44,7 @@ place_vault_in = (region_set, vault, n_tries=N_TRIES) ->
 
 place_vault = (map, vault, n_tries) ->
     regions = map.regions
-    return place_vault({:map, :regions}, vault, n_tries)
+    return place_vault_in({:map, :regions}, vault, n_tries)
 
 return nilprotect {
     :place_vault

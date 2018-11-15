@@ -2,14 +2,7 @@
 -- Generates the game maps, starting with high-level details (places that will be in the game)
 -- and then generating actual tiles.
 ----
-import map_place_object, ellipse_points,
-    LEVEL_PADDING, Region, RVORegionPlacer,
-    random_rect_in_rect, random_ellipse_in_ellipse,
-    ring_region_delta_func, default_region_delta_func, spread_region_delta_func,
-    center_region_delta_func,
-    towards_region_delta_func,
-    random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
-    Tile, tile_operator from require "maps.GenerateUtils"
+{:Tile, :default_region_delta_func} = require "maps.GenerateUtils"
 
 NewMaps = require "maps.NewMaps"
 NewDungeons = require("maps.NewDungeons")
@@ -17,26 +10,17 @@ NewDungeons = require("maps.NewDungeons")
 
 Tilesets = require "tiles.Tilesets"
 MapUtils = require "maps.MapUtils"
-ItemUtils = require "maps.ItemUtils"
 ItemGroups = require "maps.ItemGroups"
-import make_tunnel_oper, make_rectangle_criteria, make_rectangle_oper
-    from MapUtils
 
-MapSequence = require "maps.MapSequence"
 Vaults = require "maps.Vaults"
-World = require "core.World"
 SourceMap = require "core.SourceMap"
-Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
-Region1 = require "maps.Region1"
 
 -- Generation constants and data
 {   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE, :FLAG_HAS_VAULT
     :FLAG_OVERWORLD, :FLAG_ROOM, :FLAG_NO_ENEMY_SPAWN, :FLAG_NO_ITEM_SPAWN
 } = Vaults
 
-
-M = nilprotect {} -- Module
 
 snake_pit_floor_plan = (rng) -> {
     rvo_iterations: 20

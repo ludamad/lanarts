@@ -2,7 +2,7 @@
 -- Generates the game maps, starting with high-level details (places that will be in the game)
 -- and then generating actual tiles.
 ----
-{:Tile} = require "maps.GenerateUtils"
+{:Tile, :default_region_delta_func} = require "maps.GenerateUtils"
 NewMaps = require "maps.NewMaps"
 NewDungeons = require("maps.NewDungeons")
 {:MapDesc, :MapNode} = require("maps.MapDesc")

@@ -38,22 +38,23 @@ place_outpost = (region_set) ->
             entrance\link_portal(portal, "spr_gates.exit_dungeon")
     }
 
-place_temple = (region_set) ->
-    entrance = require("map_descs.OutpostEntrance")\linker()
-    chamber = require("map_descs.OutpostChamber")\linker()
-    sanctum = require("map_descs.OutpostSanctum")\linker()
-    for i=1,3
-        entrance\link_linker(chamber, "spr_gates.enter", "spr_gates.return")
-        chamber\link_linker(sanctum, "spr_gates.enter", "spr_gates.return")
-
-    return place_vault_in region_set, Vaults.sealed_dungeon {
-        tileset: Tilesets.temple
-        gold_placer: (map, xy) -> nil -- dont need gold here
-        door_placer: (map, xy) -> MapUtils.spawn_door(map, xy)
-        dungeon_placer: callable_once (map, xy) ->
-            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_temple")
-            entrance\link_portal(portal, "spr_gates.exit_dungeon")
-        player_spawn_area: true
+-----------------------------
+-- Place optional dungeon 2, the crypt: --
+place_crypt = (region_set) ->
+    crypt = require("map_descs.Crypt")\linker()
+    hell = require("map_descs.Hell")\linker()
+    crypt\link_linker(hell, 'spr_gates.enter_hell3', 'spr_gates.return_hell')
+    return place_vault_in region_set, Vaults.crypt_dungeon {
+        tileset: Tilesets.crypt
+        door_placer: (map, xy) ->
+            -- nil is passed for the default open sprite
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
+        dungeon_placer: (map, xy) ->
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_crypt")
+            crypt\link_portal(portal, 'spr_gates.exit_dungeon')
+        enemy_placer: (map, xy) ->
+            enemy = OldMaps.enemy_generate(OldMaps.strong_undead)
+            MapUtils.spawn_enemy(map, enemy, xy)
     }
 
 place_pixullochia = (region_set) ->
@@ -92,10 +93,23 @@ place_graghs_lair = (region_set) ->
     }
 
 place_underdungeon = (region_set) ->
-    {:map, :regions} = region_set
-    underdungeon = MapLinker.create {map_label: "Underdungeon", generate: (backwards) => underdungeon_create(backwards)}
+    underdungeon =  require("map_descs.Underdungeon")\linker {
+        root: (node) ->
+            -- if not place_outpost(node.region_set)
+            --     return false
+            -- if not place_crypt(node.region_set)
+            --     print "RETRY: place_crypt()"
+            --     return false
+            -- if not place_graghs_lair(node.region_set)
+            --     return false
+            -- if not place_pixullochia(node.region_set)
+            --     return false
+            return true
+    }
+
+    -- MapLinker.create {map_label: "Underdungeon", generate: (backwards) => underdungeon_create(backwards)}
     return place_vault_in region_set, Vaults.sealed_dungeon {
-        rng: map.rng,
+        rng: region_set.map.rng,
         tileset: Tilesets.snake
         door_placer: (map, xy) ->
             -- nil is passed for the default open sprite
@@ -110,7 +124,6 @@ place_underdungeon = (region_set) ->
 -------------------------------------------------------------------------------
 
 place_hive = (region_set) ->
-    {:map, :regions} = region_set
     entrance = require("map_descs.HiveEntrance")\linker()
     -- Link entrance to further depths
     depths = require("map_descs.HiveDepths")\linker()
@@ -126,8 +139,25 @@ place_hive = (region_set) ->
             entrance\link_portal(portal, "spr_gates.exit_dungeon")
     }
 
+place_temple = (region_set) ->
+    entrance = require("map_descs.TempleEntrance")\linker()
+    chamber = require("map_descs.TempleChamber")\linker()
+    sanctum = require("map_descs.TempleSanctum")\linker()
+    for i=1,3
+        entrance\link_linker(chamber, "spr_gates.enter", "spr_gates.return")
+        chamber\link_linker(sanctum, "spr_gates.enter", "spr_gates.return")
+
+    return place_vault_in region_set, Vaults.sealed_dungeon {
+        tileset: Tilesets.temple
+        gold_placer: (map, xy) -> nil -- dont need gold here
+        door_placer: (map, xy) -> MapUtils.spawn_door(map, xy)
+        dungeon_placer: callable_once (map, xy) ->
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_temple")
+            entrance\link_portal(portal, "spr_gates.exit_dungeon")
+        player_spawn_area: true
+    }
+
 place_snake_pit = (region_set) ->
-    {:map, :regions} = region_set
     entrance = require("map_descs.SnakePitEntrance")\linker()
     -- Link entrance to further depths
     depths = require("map_descs.SnakePitDepths")\linker()
@@ -149,6 +179,13 @@ return {
         player_spawn_points = nil
         overworld = require("map_descs.Overworld")\linker {
             root: () =>
+                first_dungeon = @rng\random_choice {place_temple, place_snake_pit}
+                if not first_dungeon(@region_set)
+                    return false
+                if not place_hive(@region_set)
+                    return false
+                if not place_underdungeon(@region_set)
+                    return false
                 player_spawn_points = MapUtils.pick_player_squares(@map, @map.player_candidate_squares)
                 assert player_spawn_points, "Could not pick player spawn squares!"
                 return true

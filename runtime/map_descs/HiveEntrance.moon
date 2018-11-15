@@ -1,51 +1,18 @@
-import map_place_object, ellipse_points,
-    LEVEL_PADDING, Region, RVORegionPlacer,
-    random_rect_in_rect, random_ellipse_in_ellipse,
-    ring_region_delta_func, default_region_delta_func, spread_region_delta_func,
-    center_region_delta_func,
-    towards_region_delta_func,
-    rectangle_points,
-    random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
-    Tile, tile_operator from require "maps.GenerateUtils"
-
-GeometryUtils = require "maps.GeometryUtils"
-MapRegionShapes = require("maps.MapRegionShapes")
-{:MapRegion, :combine_map_regions, :from_bbox} = require "maps.MapRegion"
-
-PolyPartition = require "core.PolyPartition"
-DebugUtils = require "maps.DebugUtils"
-NewMaps = require "maps.NewMaps"
-NewDungeons = require "maps.NewDungeons"
 Tilesets = require "tiles.Tilesets"
 MapUtils = require "maps.MapUtils"
 ItemUtils = require "maps.ItemUtils"
 ItemGroups = require "maps.ItemGroups"
-import make_tunnel_oper, make_rectangle_criteria, make_rectangle_oper
-    from MapUtils
 
-MapSequence = require "maps.MapSequence"
 Vaults = require "maps.Vaults"
-World = require "core.World"
 SourceMap = require "core.SourceMap"
 {:place_feature} = require "maps.01_Overworld"
-Map = require "core.Map"
-OldMaps = require "maps.OldMaps"
-Region1 = require "maps.Region1"
 
-{:MapCompilerContext, :make_on_player_interact} = require "maps.MapCompilerContext"
 {:MapNode, :MapDesc} = require "maps.MapDesc"
-Places = require "maps.Places"
 
 -- Generation constants and data
-{   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE,
-    :FLAG_OVERWORLD, :FLAG_ROOM, :FLAG_NO_ENEMY_SPAWN, :FLAG_NO_ITEM_SPAWN
-} = Vaults
-
-{:center, :find_bbox, :find_square, :selector_filter, :selector_map} = require "maps.MapRegionUtils"
-
+{ :FLAG_INNER_PERIMETER } = Vaults
+{:center} = require "maps.MapRegionUtils"
 {:load_map_polys, :node_paint_group} = require "maps.MapNodeFills"
-
-{:generate_map_node} = require "maps.01_Overworld"
 
 CONTENT_MAP = nilprotect {
     A: Tilesets.hive.floor, B: Tilesets.hive.floor_alt
@@ -87,9 +54,9 @@ node_place_hive_entrance_polys = () =>
             MapUtils.spawn_item(@map, item.type, item.amount, sqr)
         return true
     add_honeycombs = (regions) ->
-        item_placer = (map, xy) ->
-            if map.rng\chance(0.1)
-                MapUtils.spawn_item(@map, "Honeycomb", 1, xy)
+        item_placer = (map_, xy_) ->
+            if map_.rng\chance(0.1)
+                MapUtils.spawn_item(@map, "Honeycomb", 1, xy_)
         for i=1,20
             vault = SourceMap.area_template_create(Vaults.honeycomb {:item_placer})
             if not place_feature(@map, vault, @region_set.regions)

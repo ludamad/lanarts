@@ -38,9 +38,11 @@ MapDesc = newtype {
             default_content: Tilesets.orc.wall
             default_flags: {SourceMap.FLAG_SOLID} --, SourceMap.FLAG_SEETHROUGH}
             map_label: @map_label
+            post_map: {}
         }, @map_args
         map_args.size = vector_add(map_args.size, {@padding*2, @padding*2})
         map = NewMaps.source_map_create map_args
+        map.post_map = {}
 
         room_selector = {
             matches_all: SourceMap.FLAG_SOLID
