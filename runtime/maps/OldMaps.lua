@@ -678,6 +678,7 @@ function M.create_map_desc(entry)
         padding = 0,
         children = {
             MapNode.create {
+                tag = "root",
                 place = function (node)
                     local map = node.map
                     generate_layout(map, layout, tileset)

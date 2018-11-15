@@ -21,17 +21,17 @@ portal_set_label = (portal, label, is_down_arrow) ->
             screen_xy = Display.to_screen_xy({@x, @y - 8 - 8 * progress})
             bitmap_draw_wrapped({:color, origin: Display.CENTER_BOTTOM}, screen_xy, 96, label)
             sprite = tosprite(if is_down_arrow then "spr_menu.down" else "spr_menu.up")
-            sprite\draw({color: arrow_color, origin: Display.CENTER_BOTTOM}, vector_add(screen_xy, {0,19}))
+            sprite\draw({color: arrow_color, origin: Display .CENTER_BOTTOM}, vector_add(screen_xy, {0,19}))
 
 MapLinker = newtype {
     -- TODO if we ever want two defined-region map links, we need to revisit this
-    init: (@map_desc) =>
+    init: (@map_desc, @generate_hooks={}) =>
         @backwards, @forwards = {}, {}
         @map = false
         assert @label()
     get: () =>
         if not @map
-            @map = @map_desc\generate(@backwards, @forwards)
+            @map = @map_desc\generate(@backwards, @forwards, @generate_hooks)
         return @map
     label: () =>
         return @map_desc.map_label

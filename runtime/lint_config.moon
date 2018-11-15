@@ -27,6 +27,7 @@ return {
       "DEBUG_BOX_DRAW"
       "DEBUG_LAYOUTS"
       "Engine"
+      "event_log"
       "Fonts"
       "Game"
       "GameVar"

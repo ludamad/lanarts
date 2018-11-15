@@ -1,54 +1,28 @@
-import map_place_object, ellipse_points,
-    LEVEL_PADDING, Region, RVORegionPlacer,
-    random_rect_in_rect, random_ellipse_in_ellipse,
-    ring_region_delta_func, default_region_delta_func, spread_region_delta_func,
-    center_region_delta_func,
-    towards_region_delta_func,
-    rectangle_points,
-    random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
-    Tile, tile_operator from require "maps.GenerateUtils"
-
-GeometryUtils = require "maps.GeometryUtils"
-MapRegionShapes = require("maps.MapRegionShapes")
-{:MapRegion, :combine_map_regions, :from_bbox} = require "maps.MapRegion"
 {:MapNode, :MapDesc} = require "maps.MapDesc"
 
-PolyPartition = require "core.PolyPartition"
-DebugUtils = require "maps.DebugUtils"
+{:Tile} = require "maps.GenerateUtils"
 NewMaps = require "maps.NewMaps"
 Tilesets = require "tiles.Tilesets"
 MapUtils = require "maps.MapUtils"
 ItemUtils = require "maps.ItemUtils"
 ItemGroups = require "maps.ItemGroups"
-import make_tunnel_oper, make_rectangle_criteria, make_rectangle_oper
-    from MapUtils
-
-MapSequence = require "maps.MapSequence"
 Vaults = require "maps.Vaults"
-World = require "core.World"
 SourceMap = require "core.SourceMap"
-Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
-Region1 = require "maps.Region1"
 
 {:MapCompilerContext, :make_on_player_interact} = require "maps.MapCompilerContext"
 Places = require "maps.Places"
 
 -- Generation constants and data
-{   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE,
-    :FLAG_OVERWORLD, :FLAG_ROOM, :FLAG_NO_ENEMY_SPAWN, :FLAG_NO_ITEM_SPAWN
-} = Vaults
+{ :FLAG_INNER_PERIMETER, :FLAG_NO_ENEMY_SPAWN } = Vaults
 
-{:center, :find_bbox, :find_square, :selector_filter, :selector_map} = require "maps.MapRegionUtils"
-
-{:generate_map_node} = require "maps.01_Overworld"
+{:generate_map_node, :place_vault_in} = require "maps.01_Overworld"
 
 overdungeon_items_and_enemies = (region_set) ->
     {:map, :regions} = region_set
 
     for region in *regions
         area = region\bbox()
-        conf = region.conf
         for i=1,OldMaps.adjusted_item_amount(10) do
             sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
             if not sqr
@@ -61,13 +35,6 @@ overdungeon_items_and_enemies = (region_set) ->
         OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
 
 overdungeon_features = (region_set) ->
-    {:map, :regions} = region_set
-
-    OldMapSeq4 = MapSequence.create {preallocate: 1}
-
-    append map.post_game_map, (game_map) ->
-        OldMapSeq4\slot_resolve(1, game_map)
-
     -----------------------------
     -- Purple Dragon lair            --
     place_purple_dragon_lair = () ->
@@ -75,7 +42,7 @@ overdungeon_features = (region_set) ->
         create_compiler_context = () ->
             cc = MapCompilerContext.create()
             cc\register(name, Places.DragonLair)
-            append map.post_game_map, (game_map) ->
+            append region_set.map.post_game_map, (game_map) ->
                 cc\register("root", () -> game_map)
             return cc
         cc = create_compiler_context()
@@ -187,26 +154,24 @@ pebble_overdungeon = (rng) ->
             return nil
         return map
 
-
 return MapDesc.create {
-    size: {20, 20}
+    size: {200, 200}
     children: {
         MapNode.create {
+            tag: 'root'
             place: node_place_easy_overworld_rooms
         }
     }
 }
 
-underdungeon_create = (links) ->
-    {:map} = pebble_overdungeon NewMaps.new_rng()
-    for link in *links
-        xy = MapUtils.random_square(map, nil, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
-        if not xy
-            return false
-        link(map, xy)
-    game_map = NewMaps.generate_game_map(map)
-    for f in *map.post_game_map
-        f(game_map)
-    return game_map
-
-
+-- underdungeon_create = (links) ->
+--     {:map} = pebble_overdungeon NewMaps.new_rng()
+--     for link in *links
+--         xy = MapUtils.random_square(map, nil, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+--         if not xy
+--             return false
+--         link(map, xy)
+--     game_map = NewMaps.generate_game_map(map)
+--     for f in *map.post_game_map
+--         f(game_map)
+--     return game_map
