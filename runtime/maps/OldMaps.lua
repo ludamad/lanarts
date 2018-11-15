@@ -69,13 +69,14 @@ M.mediumhard_enemies = table.merge(M.medium_animals, {
 })
 
 M.hard_enemies = {
- {enemy = "Storm Elemental",   chance = 20,    group_chance = 100, group_size = 3          },
- {enemy = "Hell Storm",        chance = 5,   group_chance = 33, group_size = 2           },
- {enemy = "Super Chicken",     chance = 100                                             },
- {enemy = "Skeleton",            chance = 75                                              },
+ --{enemy = "Storm Elemental",   chance = 20,    group_chance = 100, group_size = 3          },
+ {enemy = "Hell Storm",        chance = 30,   group_chance = 33, group_size = 2           },
+ {enemy = "Super Chicken",     chance = 50                                             },
+ --{enemy = "Skeleton",            chance = 75                                              },
  {enemy = "Ciribot",           chance = 75                                              },
  {enemy = "Golem",             guaranteed_spawns = 1                                    },
--- {enemy = "Centaur Hunter",      chance = 30                                              },
+ {enemy = "Centaur Hunter",      chance = 5                                              },
+ {enemy = "Hydra",             chance = 5                                             },
 -- {enemy = "Unseen Horror",     chance = 10,   group_chance = 33, group_size = 2           }
 }
 
@@ -87,7 +88,7 @@ M.harder_enemies = {
   {enemy = "Executioner",           chance = 30,                                           },
   {enemy = "Mana Sapper",            chance =5                                             },
   {enemy = "Giant Chicken",             guaranteed_spawns = 1, group_chance = 100, group_size = 3 },
-  {enemy = "Hydra",             chance = 20                                             },
+  {enemy = "Hydra",             chance =20                                             },
 --  {enemy = "Unseen Horror",     chance = 10,  group_chance = 33, group_size = 2           }
 }
 

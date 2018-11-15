@@ -34,13 +34,13 @@ underdungeon_items_and_enemies = (region_set) ->
         for i=1,OldMaps.adjusted_item_amount(10) do
             sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
             if not sqr
-                break
+                return false
             map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
             item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, sqr)
 
-        OldMaps.generate_from_enemy_entries(map, OldMaps.hard_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
-        OldMaps.generate_from_enemy_entries(map, OldMaps.fast_enemies, 10, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        OldMaps.generate_from_enemy_entries(map, OldMaps.hard_enemies, 20, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+    return true
 
 place_doors_and_statues = (region_set) ->
     {:map, :regions} = region_set
@@ -88,8 +88,8 @@ underdungeon_features = (region_set, back_links, forward_links) ->
     if not place_purple_dragon_lair()
         return false
 
-    append region_set.map.post_maps, () ->
-        underdungeon_items_and_enemies(region_set)
+    if not underdungeon_items_and_enemies(region_set)
+        return false
 
     for link in *table.tconcat(back_links, forward_links)
         xy = MapUtils.random_square(region_set.map, nil, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
@@ -107,10 +107,11 @@ return MapDesc.create {
     children: {
         MapNode.create {
             place: () =>
-                size = @rng\random_choice {{200, 180}, {180, 200}}
-                number_regions = @rng\random(5, 7)
-                connect_line_width = () -> @rng\random(2, 6)
-                room_radius = () -> @rng\random(5,10)
+                number_regions = 5 + @rng\random(0, 4) + @rng\random(0, 4) + @rng\random(0, 4)
+                connect_line_width = () -> 1 + @rng\random(0, 4) + @rng\random(0, 4) + @rng\random(0, 4) + @rng\random(0, 4)
+                room_radius = () -> 5 + @rng\random(0,4) + @rng\random(0, 4) + @rng\random(0, 4)
+                factor = math.sqrt(number_regions / 5)
+                size = {100, 100}
                 template = nilprotect {
                     default_wall:  Tile.create(Tilesets.underdungeon.wall, true, true, {SourceMap.FLAG_SOLID})
                     subtemplates: {nilprotect {
@@ -121,14 +122,14 @@ return MapDesc.create {
                         floor2: DUNGEON_TILESET.floor2
                         wall1: DUNGEON_TILESET.wall1
                         wall2: DUNGEON_TILESET.wall2
-                        rect_room_num_range: {4,8} -- disable
+                        rect_room_num_range: {4,8}
                         rect_room_size_range: {14,20}
                         rvo_iterations: 100
                         :connect_line_width
                         :room_radius
                         region_delta_func: spread_region_delta_func
                         -- Dungeon objects/features
-                        n_statues: 4
+                        n_statues: 4 * factor
                     }}
                     outer_conf: nilprotect {
                         floor1: DUNGEON_TILESET.floor1

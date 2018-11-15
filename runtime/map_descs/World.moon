@@ -174,9 +174,14 @@ place_snake_pit = (region_set) ->
         player_spawn_area: true
     }
 
+
 return {
     generate: () ->
         player_spawn_points = nil
+        -- TODO support hooking into arbitrary rooms
+        --if os.getenv "DESC"
+        --    require(os.getenv "DESC")\linker {
+        --    }
         overworld = require("map_descs.Overworld")\linker {
             root: () =>
                 first_dungeon = @rng\random_choice {place_temple, place_snake_pit}
