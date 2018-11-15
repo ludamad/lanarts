@@ -9,7 +9,6 @@ local TileSets = require "tiles.Tilesets"
 local MapUtils = require "maps.MapUtils"
 local dungeons = require "maps.Dungeons"
 local PortalSet = require "maps.PortalSet"
-local MapSequence = require "maps.MapSequence"
 
 local ItemUtils = require "maps.ItemUtils"
 local ItemGroups = require "maps.ItemGroups"
@@ -274,8 +273,6 @@ M._anvil = Display.image_load "features/sprites/anvil.png"
 local OVERWORLD_VISION_RADIUS = 10
 function M.overworld_create()   
     local tileset = TileSets.grass
-    local OldMapSeq1 = MapSequence.create {preallocate = 1}
-    local OldMapSeq2 = MapSequence.create {preallocate = 1}
     local temple_sequences = {}
     local dirthole_sequences = {}
 
@@ -304,15 +301,7 @@ function M.overworld_create()
            ['t'] = { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.temple.floor }, 
            ['T'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE,
                on_placement = function(map, xy)
-                    local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 11))
-                    local seq_len = #temple_sequences
-                    temple_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
-                    local c = temple_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
-                        function() 
-                            return temple_level_create("Temple", 1, temple_sequences, TileSets.temple, {"Skeleton", "Centaur Hunter"})
-                    end)
-                    table.insert(portals, c)
-                    table.insert(undecided_squares, xy)
+                    -- Temple
                end},
 
            --Entrance to Dungeon 1: easier monsters
@@ -382,14 +371,7 @@ function M.overworld_create()
            --Entrance to 'Mines': a connecting mini-dungeon
            ['G'] =  { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
                on_placement = function(map, xy)
-                    local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(0, 2))
-                    local seq_len = #dirthole_sequences
-                    dirthole_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
-                    local c = dirthole_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
-                        function()
-                            return temple_level_create("Mines", 1, dirthole_sequences, TileSets.pebble, {"Golem", "Zombie"})
-                    end)
-                    table.insert(portals, c)
+                    -- dirthole
                end}
     })
 

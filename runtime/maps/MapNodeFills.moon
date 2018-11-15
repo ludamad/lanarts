@@ -22,7 +22,6 @@ ItemGroups = require "maps.ItemGroups"
 import make_tunnel_oper, make_rectangle_criteria, make_rectangle_oper
     from MapUtils
 
-MapSequence = require "maps.MapSequence"
 Vaults = require "maps.Vaults"
 World = require "core.World"
 SourceMap = require "core.SourceMap"
