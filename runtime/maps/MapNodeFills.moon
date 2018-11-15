@@ -41,8 +41,6 @@ Places = require "maps.Places"
 
 {:center, :find_bbox, :find_square, :selector_filter, :selector_map} = require "maps.MapRegionUtils"
 
-{:generate_map_node} = require "maps.01_Overworld"
-
 MAX_TUNNEL_TRIES = 100
 -- TODO find a home for this
 node_connect_rect_rooms = () =>

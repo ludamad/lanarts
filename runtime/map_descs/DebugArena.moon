@@ -41,8 +41,6 @@ Places = require "maps.Places"
 
 {:center, :find_bbox, :find_square, :selector_filter, :selector_map} = require "maps.MapRegionUtils"
 
-{:generate_map_node} = require "maps.01_Overworld"
-
 PADDING = 10
 
 event_log = (...) -> print string.format(...)

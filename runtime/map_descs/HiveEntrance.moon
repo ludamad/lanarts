@@ -5,7 +5,7 @@ ItemGroups = require "maps.ItemGroups"
 
 Vaults = require "maps.Vaults"
 SourceMap = require "core.SourceMap"
-{:place_feature} = require "maps.01_Overworld"
+{:place_vault, :place_vault_in} = require "core.VaultUtils"
 
 {:MapNode, :MapDesc} = require "maps.MapDesc"
 
@@ -58,8 +58,7 @@ node_place_hive_entrance_polys = () =>
             if map_.rng\chance(0.1)
                 MapUtils.spawn_item(@map, "Honeycomb", 1, xy_)
         for i=1,20
-            vault = SourceMap.area_template_create(Vaults.honeycomb {:item_placer})
-            if not place_feature(@map, vault, @region_set.regions)
+            if not place_vault_in @region_set, Vaults.honeycomb {:item_placer}
                 continue
         return true
     fill_with_mob = (part, enemies) ->

@@ -1,4 +1,5 @@
 ----
+-- TODO scrap this module completely!
 -- Generates the game maps, starting with high-level details (places that will be in the game)
 -- and then generating actual tiles.
 ----
@@ -183,7 +184,6 @@ DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1, n_regions=nil) ->
             C.rect_room_size_range = {7,15}
 
     return table.merge C, {
-        map_label: "A Dungeon"
         size: if schema == 4 then {85, 85} else {65,65}
         rvo_iterations: 20
         n_stairs_down: 3

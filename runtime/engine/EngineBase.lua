@@ -72,8 +72,6 @@ end
 function Engine.game_start(...)
     -- Dont intercept the actual game loop, that's being tested:
     local game_loop = Engine.require "GameLoop"
-    -- require("maps.01_Overworld").test_determinism()
-
     return game_loop.run_loop(...)
 end
 

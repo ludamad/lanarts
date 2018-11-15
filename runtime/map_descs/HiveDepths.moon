@@ -25,7 +25,7 @@ MapSequence = require "maps.MapSequence"
 Vaults = require "maps.Vaults"
 World = require "core.World"
 SourceMap = require "core.SourceMap"
-{:place_feature} = require "maps.01_Overworld"
+{:place_vault_in} = require "maps.VaultUtils"
 Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
@@ -97,8 +97,12 @@ node_fill_dungeon_room = () =>
                     {:type, :amount} = ItemUtils.item_generate ItemGroups.enchanted_items
                 MapUtils.spawn_item(map, type, amount, xy)
             tileset = Tilesets.hive
-            vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: @map.rng, :item_placer, :tileset})
-            if not place_feature(@map, vault, @region_set.regions)
+            vault = SourceMap.area_template_create(
+            if not place_vault_in @region_set, Vaults.small_item_vault {
+                rng: @map.rng
+                :item_placer
+                :tileset
+            }
                 return false
         return true
     if not spawn_enemies {

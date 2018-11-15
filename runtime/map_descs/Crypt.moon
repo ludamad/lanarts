@@ -27,7 +27,7 @@ MapSequence = require "maps.MapSequence"
 Vaults = require "maps.Vaults"
 World = require "core.World"
 SourceMap = require "core.SourceMap"
-{:place_feature, :place_vault, :DUNGEON_CONF} = require "maps.01_Overworld"
+{:place_vault, :place_vault_in} = require "core.VaultUtils"
 Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
@@ -45,12 +45,41 @@ Places = require "maps.Places"
 
 {:load_map_polys, :node_paint_group} = require "maps.MapNodeFills"
 
+DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema, n_regions=nil) ->
+    -- TODO refactor the heck out of this
+    C = {
+        floor1: Tile.create(tileset.floor, false, true, {}, {FLAG_OVERWORLD})
+        floor2: Tile.create(tileset.floor_alt, false, true, {}, {FLAG_OVERWORLD})
+        wall1: Tile.create(tileset.wall, true, false, {}, {FLAG_OVERWORLD})
+        wall2: Tile.create(tileset.wall_alt, true, false, {}, {FLAG_OVERWORLD})
+    }
+    if schema
+        C.number_regions = n_regions or rng\random(13,18)
+        C.room_radius = () ->
+            r = 5
+            for j=1,rng\random(5,10) do r += rng\randomf(0, 1)
+            return r
+        C.rect_room_num_range = {10,10}
+        C.rect_room_size_range = {7,15}
+
+    return table.merge C, {
+        size: if schema then {65, 65} else {85,85}
+        rvo_iterations: 20
+        n_stairs_down: 3
+        n_stairs_up: 0
+        connect_line_width: () -> 2 + (if rng\random(5) == 4 then 1 else 0)
+        region_delta_func: default_region_delta_func
+        -- Dungeon objects/features
+        n_statues: 4
+    }
+
+
 make_template = (rng, back_links, forward_links) -> {
     map_label: "Crypt"
     w: 110, h: 100
     seethrough: false
-    outer_conf: DUNGEON_CONF(rng, Tilesets.crypt, nil, 10)
-    subtemplates: {DUNGEON_CONF(rng, Tilesets.crypt, 4, 10)}
+    outer_conf: DUNGEON_CONF(rng, Tilesets.crypt, false, 10)
+    subtemplates: {DUNGEON_CONF(rng, Tilesets.crypt, true, 10)}
     shell: 10
     default_wall: Tile.create(Tilesets.crypt.wall, true, true, {})
     _create_encounter_rooms: (map) =>

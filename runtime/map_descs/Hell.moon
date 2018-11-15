@@ -27,7 +27,6 @@ MapSequence = require "maps.MapSequence"
 Vaults = require "maps.Vaults"
 World = require "core.World"
 SourceMap = require "core.SourceMap"
-{:place_feature, :place_vault, :DUNGEON_CONF} = require "maps.01_Overworld"
 Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
@@ -44,6 +43,73 @@ Places = require "maps.Places"
 {:center, :bbox, :find_bbox, :find_square, :selector_filter, :selector_map} = require "maps.MapRegionUtils"
 
 {:load_map_polys, :node_paint_group} = require "maps.MapNodeFills"
+
+DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1, n_regions=nil) ->
+    -- TODO refactor
+    C = {
+        floor1: Tile.create(tileset.floor, false, true, {}, {FLAG_OVERWORLD})
+        floor2: Tile.create(tileset.floor_alt, false, true, {}, {FLAG_OVERWORLD})
+        wall1: Tile.create(tileset.wall, true, false, {}, {FLAG_OVERWORLD})
+        wall2: Tile.create(tileset.wall_alt, true, false, {}, {FLAG_OVERWORLD})
+    }
+    -- Rectangle-heavy or polygon-heavy?
+    switch schema -- rng\random(3)
+        when 3
+            -- Few, bigger, rooms?
+            C.number_regions = n_regions or rng\random(15,20)
+            C.room_radius = () ->
+                r = 8
+                for j=1,rng\random(5,10) do r += rng\randomf(0, 1)
+                return r
+            C.rect_room_num_range = {2,2}
+            C.rect_room_size_range = {7,15}
+        when 4
+            -- Few, big, rooms?
+            C.number_regions = n_regions or rng\random(13,18)
+            C.room_radius = () ->
+                r = 5
+                for j=1,rng\random(5,10) do r += rng\randomf(0, 1)
+                return r
+            C.rect_room_num_range = {10,10}
+            C.rect_room_size_range = {7,15}
+        when 0
+            -- Few, big, rooms?
+            C.number_regions = n_regions or rng\random(15,20)
+            C.room_radius = () ->
+                r = 4
+                for j=1,rng\random(5,10) do r += rng\randomf(0, 1)
+                return r
+            C.rect_room_num_range = {10,10}
+            C.rect_room_size_range = {7,15}
+        when 1
+            -- Mix?
+            C.number_regions = n_regions or rng\random(15,20)
+            C.room_radius = () ->
+                r = 2
+                for j=1,rng\random(0,10) do r += rng\randomf(0, 1)
+                return r
+            C.rect_room_num_range = {2,10}
+            C.rect_room_size_range = {7,15}
+        when 2
+            -- Mostly rectangular rooms?
+            C.number_regions = n_regions or rng\random(2,7)
+            C.room_radius = () ->
+                r = 2
+                for j=1,rng\random(0,10) do r += rng\randomf(0, 1)
+                return r
+            C.rect_room_num_range = {10,15}
+            C.rect_room_size_range = {7,15}
+
+    return table.merge C, {
+        size: if schema == 4 then {85, 85} else {65,65}
+        rvo_iterations: 20
+        n_stairs_down: 3
+        n_stairs_up: 0
+        connect_line_width: () -> 2 + (if rng\random(5) == 4 then 1 else 0)
+        region_delta_func: default_region_delta_func
+        -- Dungeon objects/features
+        n_statues: 4
+    }
 
 tileset = Tilesets.hell
 make_template = (rng, back_links, forward_links) -> {
