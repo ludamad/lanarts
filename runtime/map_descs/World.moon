@@ -110,7 +110,7 @@ place_underdungeon = (region_set) ->
     -- MapLinker.create {map_label: "Underdungeon", generate: (backwards) => underdungeon_create(backwards)}
     return place_vault_in region_set, Vaults.sealed_dungeon {
         rng: region_set.map.rng,
-        tileset: Tilesets.snake
+        tileset: Tilesets.underdungeon
         door_placer: (map, xy) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, 'Dandelite Key')

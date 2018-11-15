@@ -23,7 +23,6 @@ ItemGroups = require "maps.ItemGroups"
 import make_tunnel_oper, make_rectangle_criteria, make_rectangle_oper
     from MapUtils
 
-MapSequence = require "maps.MapSequence"
 Vaults = require "maps.Vaults"
 World = require "core.World"
 SourceMap = require "core.SourceMap"
@@ -31,6 +30,7 @@ Map = require "core.Map"
 OldMaps = require "maps.OldMaps"
 Region1 = require "maps.Region1"
 
+{:place_vault} = require "maps.VaultUtils"
 {:MapCompilerContext, :make_on_player_interact} = require "maps.MapCompilerContext"
 {:MapNode, :MapDesc} = require "maps.MapDesc"
 Places = require "maps.Places"

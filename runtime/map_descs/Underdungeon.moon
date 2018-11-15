@@ -24,9 +24,9 @@ create_dungeon_scheme = (tileset) -> nilprotect {
     wall2: Tile.create(tileset.wall_alt, true, false, {}, {FLAG_OVERWORLD})
 }
 
-DUNGEON_TILESET = create_dungeon_scheme(Tilesets.pebble)
+DUNGEON_TILESET = create_dungeon_scheme(Tilesets.underdungeon)
 
-overdungeon_items_and_enemies = (region_set) ->
+underdungeon_items_and_enemies = (region_set) ->
     {:map, :regions} = region_set
 
     for region in *regions
@@ -57,7 +57,7 @@ place_doors_and_statues = (region_set) ->
             map\square_apply(sqr, {add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT}, remove: SourceMap.FLAG_SEETHROUGH})
             MapUtils.spawn_decoration(map, OldMaps.statue, sqr, random(0,17))
 
-overdungeon_features = (region_set, back_links, forward_links) ->
+underdungeon_features = (region_set, back_links, forward_links) ->
     -----------------------------
     -- Purple Dragon lair            --
     place_purple_dragon_lair = () ->
@@ -89,7 +89,7 @@ overdungeon_features = (region_set, back_links, forward_links) ->
         return false
 
     append region_set.map.post_maps, () ->
-        overdungeon_items_and_enemies(region_set)
+        underdungeon_items_and_enemies(region_set)
 
     for link in *table.tconcat(back_links, forward_links)
         xy = MapUtils.random_square(region_set.map, nil, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
@@ -101,7 +101,7 @@ overdungeon_features = (region_set, back_links, forward_links) ->
 return MapDesc.create {
     map_label: "Underdungeon"
     size: {200, 200}
-    default_content: Tilesets.pebble.wall
+    default_content: Tilesets.underdungeon.wall
     default_flags: {SourceMap.FLAG_SOLID}
     arc_chance: 0.05
     children: {
@@ -112,7 +112,7 @@ return MapDesc.create {
                 connect_line_width = () -> @rng\random(2, 6)
                 room_radius = () -> @rng\random(5,10)
                 template = nilprotect {
-                    default_wall:  Tile.create(Tilesets.pebble.wall, true, true, {SourceMap.FLAG_SOLID})
+                    default_wall:  Tile.create(Tilesets.underdungeon.wall, true, true, {SourceMap.FLAG_SOLID})
                     subtemplates: {nilprotect {
                         is_overworld: true
                         :size
@@ -144,7 +144,7 @@ return MapDesc.create {
                 NewMaps.generate_door_candidates(@map, @map.rng, @map.regions)
                 append @map.post_maps, () ->
                     return place_doors_and_statues(@region_set)
-                if not overdungeon_features(@region_set, @desc.back_links, @desc.forward_links)
+                if not underdungeon_features(@region_set, @desc.back_links, @desc.forward_links)
                     return false
                 return true
         }

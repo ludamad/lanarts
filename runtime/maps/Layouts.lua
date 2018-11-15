@@ -1,3 +1,4 @@
+-- TODO consider this as a way of force-connecting more in the Overworld?
 local SourceMap = require "core.SourceMap"
 local MapUtils = require "maps.MapUtils"
 

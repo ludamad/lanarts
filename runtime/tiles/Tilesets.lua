@@ -61,6 +61,12 @@ M.pixulloch = Data.tileset_create {
     wall_alt = { images = Display.images_load "spr_tile_walls/spider.png%32x32" }
 }
 
+M.underdungeon = Data.tileset_create {
+    floor = { images = Display.images_load "spr_tile_floors/frozen.png%32x32" },
+    floor_alt = { images = Display.images_load "spr_tile_floors/green_bones.png%32x32" },
+    wall = { images = Display.images_load "spr_tile_walls/slime1.png%32x32" },
+    wall_alt = { images = Display.images_load "spr_tile_walls/slime2.png%32x32" }
+}
 
 M.orc = Data.tileset_create {
     floor = { images = Display.images_load "spr_tile_floors/orc.png%32x32" },
