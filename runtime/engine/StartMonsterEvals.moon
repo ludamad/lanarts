@@ -103,7 +103,8 @@ run_bot_tests = (raw_args) ->
     parser\option("--steps", "Maximum number of steps to take.", 10000)
     parser\option("--event_log", "Event log to write to.", nil)
     parser\option("--seed", "Starting seed.", "12345678")
-    parser\option("--xp", "Bot XP.", "Fighter")
+    parser\option("--level", "Player level.", 1)
+    parser\option("--monster", "Monster to fight.", nil)
     parser\option("--comparison_event_log", "Event log to compare to.", nil)
     args = parser\parse(raw_args)
 
@@ -120,12 +121,18 @@ run_bot_tests = (raw_args) ->
         stats = {}
         level_eval_step = (level, next_level) ->
             return _iterate CONFIGS, monster_eval_step(level, stats), next_level
-        return _iterate {1,2,3,4,5,6,7,8,9,10}, level_eval_step, () ->
+        return _iterate {args.level}, level_eval_step, () ->
+            print pretty_tostring(stats, 0, false)
             file_dump_csv("saves/monster_stats.csv", stats)
             return game_exit("Done.")
 
     monster_eval_step = (level, stats) -> (config, next_config) ->
-        monster_names = table.sorted_key_list(enemies)
+        local monster_names
+        if args.monster
+            monster_names = {args.monster}
+        else
+            error("Need to specify monster!") -- TODO
+            monster_names = table.sorted_key_list(enemies)
         step = (monster_name, next_monster) ->
             print('level', level, 'config', config.name, 'mon', monster_name)
             on_finish = () ->
