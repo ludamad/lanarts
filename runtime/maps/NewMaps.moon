@@ -130,6 +130,15 @@ generate_area = (map, rng, conf, outer, padding, starting_edges = {}) ->
                 add_edge_if_unique p1, p2
     connect_edges map, rng, conf, outer\bbox(), edges
 
+    for region in *R.regions
+        if map.rng\chance .5
+            SourceMap.perimeter_apply {:map,
+                area: region\bbox()
+                candidate_selector: {matches_all: SourceMap.FLAG_SOLID}, inner_selector: {matches_all: FLAG_ALTERNATE, matches_none: SourceMap.FLAG_SOLID}
+                operator: tile_operator outer.conf.wall2
+            }
+
+
 generate_subareas = (template, map, rng, regions, starting_edges = {}) ->
     conf = template.outer_conf
     -- Generate the polygonal rooms, connected with lines & arcs
@@ -148,14 +157,7 @@ generate_subareas = (template, map, rng, regions, starting_edges = {}) ->
         operator: {add: SourceMap.FLAG_PERIMETER}
     }
 
-    for region in *regions
-        SourceMap.perimeter_apply {:map,
-            area: region\bbox()
-            candidate_selector: {matches_all: SourceMap.FLAG_SOLID}, inner_selector: {matches_all: FLAG_ALTERNATE, matches_none: SourceMap.FLAG_SOLID}
-            operator: tile_operator region.conf.wall2
-        }
-
-        -- Generate the rectangular rooms, connected with winding tunnels
+    -- Generate the rectangular rooms, connected with winding tunnels
     for region in *regions
         make_rooms_with_tunnels map, rng, region.conf, region\bbox()
 
