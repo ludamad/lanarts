@@ -65,15 +65,12 @@ connect_edges = (map, rng, conf, area, edges) ->
         if p2.id%5 <= 3
             tile = conf.floor2
             append flags, FLAG_ALTERNATE
-        fapply = nil
-        --if rng\random(4) < 2
-         --   fapply = p1.line_connect
-        --else
-        -- if chance(map.arc_chance)
-        --     fapply = p1.arc_connect
-        -- else
-        -- TODO reintroduce arc connections
-        fapply = p1.line_connect
+        local fapply
+        if chance(map.arc_chance)
+            fapply = p1.arc_connect
+        else
+            -- TODO reintroduce arc connections
+            fapply = p1.line_connect
         fapply p1, {
             :map, :area, target: p2, :line_width
             operator: (tile_operator tile, {matches_none: FLAG_ALTERNATE, matches_all: SourceMap.FLAG_SOLID, add: flags})
@@ -123,44 +120,44 @@ generate_area = (map, rng, conf, outer, padding, starting_edges = {}) ->
         }
 
     -- Connect all the closest region pairs:
-    -- edges = region_minimum_spanning_tree(R.regions)
-    -- add_edge_if_unique = (p1,p2) ->
-    --     for {op1, op2} in *edges
-    --         if op1 == p1 and op2 == p2 or op2 == p1 and op1 == p2
-    --             return
-    --     append edges, {p1, p2}
-    -- for {p1, p2} in *starting_edges
-    --     add_edge_if_unique(p1, p2)
-    --
-    -- -- Append all < threshold in distance
-    -- for i=1,#R.regions
-    --     for j=i+1,#R.regions do if rng\random(0,3) == 1
-    --         p1, p2 = R.regions[i], R.regions[j]
-    --         dist = math.sqrt( (p2.x-p1.x)^2+(p2.y-p1.y)^2)
-    --         if dist < rng\random(5,15)
-    --             add_edge_if_unique p1, p2
-    pos_pairs = B2WorldUtils.connect_map_regions {
-        regions: [region\as_map_region() for region in *R.regions]
-        create_graph: (create_edge) ->
-            try_edge = () ->
-                index_a, index_b = rng\random(1, #R.regions + 1), rng\random(1, #R.regions + 1)
-                if index_a == index_b
-                    return false
-                return create_edge(index_a, index_b)
-            edge = () ->
-                for i=1,100
-                    if try_edge()
-                        return true
-                return false
-            for i=1,#R.regions*2
-                if not edge()
-                    return false
-            return true
-    }
-    if not pos_pairs
-        return false
-    connect_edges_with_pos_pairs(map, rng, conf, outer\bbox(), pos_pairs)
-    -- connect_edges map, rng, conf, outer\bbox(), edges
+    edges = region_minimum_spanning_tree(R.regions)
+    add_edge_if_unique = (p1,p2) ->
+        for {op1, op2} in *edges
+            if op1 == p1 and op2 == p2 or op2 == p1 and op1 == p2
+                return
+        append edges, {p1, p2}
+    for {p1, p2} in *starting_edges
+        add_edge_if_unique(p1, p2)
+
+    -- Append all < threshold in distance
+    for i=1,#R.regions
+        for j=i+1,#R.regions do if rng\random(0,3) == 1
+            p1, p2 = R.regions[i], R.regions[j]
+            dist = math.sqrt( (p2.x-p1.x)^2+(p2.y-p1.y)^2)
+            if dist < rng\random(5,15)
+                add_edge_if_unique p1, p2
+    --pos_pairs = B2WorldUtils.connect_map_regions {
+    --    regions: [region\as_map_region() for region in *R.regions]
+    --    create_graph: (create_edge) ->
+    --        try_edge = () ->
+    --            index_a, index_b = rng\random(1, #R.regions + 1), rng\random(1, #R.regions + 1)
+    --            if index_a == index_b
+    --                return false
+    --            return create_edge(index_a, index_b)
+    --        edge = () ->
+    --            for i=1,100
+    --                if try_edge()
+    --                    return true
+    --            return false
+    --        for i=1,#R.regions*2
+    --            if not edge()
+    --                return false
+    --        return true
+    --}
+    --if not pos_pairs
+    --    return false
+    -- connect_edges_with_pos_pairs(map, rng, conf, outer\bbox(), pos_pairs)
+    connect_edges map, rng, conf, outer\bbox(), edges
 
     for region in *R.regions
         if map.rng\chance .5
