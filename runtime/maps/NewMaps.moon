@@ -1,7 +1,3 @@
-MapCompiler = require "maps.MapCompiler"
-import Spread, Shape
-    from require "maps.MapElements"
-
 import map_place_object, ellipse_points,
     LEVEL_PADDING, Region, RVORegionPlacer,
     random_rect_in_rect, random_ellipse_in_ellipse,
@@ -11,24 +7,17 @@ import map_place_object, ellipse_points,
     random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
     Tile, tile_operator from require "maps.GenerateUtils"
 
-TileSets = require "tiles.Tilesets"
 MapUtils = require "maps.MapUtils"
-ItemUtils = require "maps.ItemUtils"
-ItemGroups = require "maps.ItemGroups"
 import make_tunnel_oper, make_rectangle_criteria, make_rectangle_oper
     from MapUtils
 
+B2WorldUtils = require "maps.B2WorldUtils"
 Vaults = require "maps.Vaults"
-World = require "core.World"
 SourceMap = require "core.SourceMap"
 Map = require "core.Map"
-OldMaps = require "maps.OldMaps"
-Region1 = require "maps.Region1"
 
 -- Generation constants and data
-{   :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE,
-    :FLAG_OVERWORLD, :FLAG_ROOM, :FLAG_NO_ENEMY_SPAWN, :FLAG_NO_ITEM_SPAWN
-} = Vaults
+{ :FLAG_ALTERNATE, :FLAG_INNER_PERIMETER, :FLAG_DOOR_CANDIDATE, :FLAG_ROOM } = Vaults
 
 make_rooms_with_tunnels = (map, rng, conf, area) ->
     oper = SourceMap.random_placement_operator {
@@ -36,15 +25,15 @@ make_rooms_with_tunnels = (map, rng, conf, area) ->
         rng: rng, :area
         amount_of_placements_range: conf.rect_room_num_range
         create_subgroup: false
-        child_operator: (map, subgroup, bounds) ->
+        child_operator: (map_, subgroup, bounds) ->
             --Purposefully convoluted for test purposes
             queryfn = () ->
                 query = make_rectangle_criteria()
-                return query(map, subgroup, bounds)
+                return query(map_, subgroup, bounds)
             local oper
             oper = make_rectangle_oper(conf.floor2.id, conf.wall2.id, conf.wall2.seethrough, queryfn)
-            if oper(map, subgroup, bounds)
-                append map.rectangle_rooms, bounds
+            if oper(map_, subgroup, bounds)
+                append map_.rectangle_rooms, bounds
                 --place_instances(rng, map, bounds)
                 return true
             return false
@@ -80,12 +69,34 @@ connect_edges = (map, rng, conf, area, edges) ->
         --if rng\random(4) < 2
          --   fapply = p1.line_connect
         --else
-        if chance(map.arc_chance)
-            fapply = p1.arc_connect
-        else
-            fapply = p1.line_connect
+        -- if chance(map.arc_chance)
+        --     fapply = p1.arc_connect
+        -- else
+        -- TODO reintroduce arc connections
+        fapply = p1.line_connect
         fapply p1, {
             :map, :area, target: p2, :line_width
+            operator: (tile_operator tile, {matches_none: FLAG_ALTERNATE, matches_all: SourceMap.FLAG_SOLID, add: flags})
+        }
+
+connect_edges_with_pos_pairs = (map, rng, conf, area, pos_pairs) ->
+    for {p1, p2} in *pos_pairs
+        tile = conf.floor1
+        flags = {}
+        line_width = conf.connect_line_width()
+        if line_width <= 2
+            append flags, SourceMap.FLAG_TUNNEL
+        if rng\chance(0.2)
+            tile = conf.floor2
+            append flags, FLAG_ALTERNATE
+        fapply = nil
+        if false --chance(map.arc_chance)
+            fapply = SourceMap.arc_apply
+        else
+            fapply = SourceMap.line_apply
+        assert p1 and p2
+        fapply {
+            :map, :area, from_xy: p1, to_xy: p2, :line_width
             operator: (tile_operator tile, {matches_none: FLAG_ALTERNATE, matches_all: SourceMap.FLAG_SOLID, add: flags})
         }
 
@@ -112,23 +123,44 @@ generate_area = (map, rng, conf, outer, padding, starting_edges = {}) ->
         }
 
     -- Connect all the closest region pairs:
-    edges = region_minimum_spanning_tree(R.regions)
-    add_edge_if_unique = (p1,p2) ->
-        for {op1, op2} in *edges
-            if op1 == p1 and op2 == p2 or op2 == p1 and op1 == p2
-                return
-        append edges, {p1, p2}
-    for {p1, p2} in *starting_edges
-        add_edge_if_unique(p1, p2)
-
-    -- Append all < threshold in distance
-    for i=1,#R.regions
-        for j=i+1,#R.regions do if rng\random(0,3) == 1
-            p1, p2 = R.regions[i], R.regions[j]
-            dist = math.sqrt( (p2.x-p1.x)^2+(p2.y-p1.y)^2)
-            if dist < rng\random(5,15)
-                add_edge_if_unique p1, p2
-    connect_edges map, rng, conf, outer\bbox(), edges
+    -- edges = region_minimum_spanning_tree(R.regions)
+    -- add_edge_if_unique = (p1,p2) ->
+    --     for {op1, op2} in *edges
+    --         if op1 == p1 and op2 == p2 or op2 == p1 and op1 == p2
+    --             return
+    --     append edges, {p1, p2}
+    -- for {p1, p2} in *starting_edges
+    --     add_edge_if_unique(p1, p2)
+    --
+    -- -- Append all < threshold in distance
+    -- for i=1,#R.regions
+    --     for j=i+1,#R.regions do if rng\random(0,3) == 1
+    --         p1, p2 = R.regions[i], R.regions[j]
+    --         dist = math.sqrt( (p2.x-p1.x)^2+(p2.y-p1.y)^2)
+    --         if dist < rng\random(5,15)
+    --             add_edge_if_unique p1, p2
+    pos_pairs = B2WorldUtils.connect_map_regions {
+        regions: [region\as_map_region() for region in *R.regions]
+        create_graph: (create_edge) ->
+            try_edge = () ->
+                index_a, index_b = rng\random(1, #R.regions + 1), rng\random(1, #R.regions + 1)
+                if index_a == index_b
+                    return false
+                return create_edge(index_a, index_b)
+            edge = () ->
+                for i=1,100
+                    if try_edge()
+                        return true
+                return false
+            for i=1,#R.regions*2
+                if not edge()
+                    return false
+            return true
+    }
+    if not pos_pairs
+        return false
+    connect_edges_with_pos_pairs(map, rng, conf, outer\bbox(), pos_pairs)
+    -- connect_edges map, rng, conf, outer\bbox(), edges
 
     for region in *R.regions
         if map.rng\chance .5
@@ -137,13 +169,14 @@ generate_area = (map, rng, conf, outer, padding, starting_edges = {}) ->
                 candidate_selector: {matches_all: SourceMap.FLAG_SOLID}, inner_selector: {matches_all: FLAG_ALTERNATE, matches_none: SourceMap.FLAG_SOLID}
                 operator: tile_operator outer.conf.wall2
             }
-
+    return true
 
 generate_subareas = (template, map, rng, regions, starting_edges = {}) ->
     conf = template.outer_conf
     -- Generate the polygonal rooms, connected with lines & arcs
     for region in *regions
-        generate_area map, rng, region.conf, region, template.shell, starting_edges
+        if not generate_area map, rng, region.conf, region, template.shell, starting_edges
+            return false
 
     edges = subregion_minimum_spanning_tree(regions, () -> rng\random(12) + rng\random(12))
     connect_edges map, rng, conf, nil, edges
@@ -160,6 +193,7 @@ generate_subareas = (template, map, rng, regions, starting_edges = {}) ->
     -- Generate the rectangular rooms, connected with winding tunnels
     for region in *regions
         make_rooms_with_tunnels map, rng, region.conf, region\bbox()
+    return true
 
 generate_door_candidates = (map, rng, regions) ->
     SourceMap.perimeter_apply {:map
@@ -170,7 +204,7 @@ generate_door_candidates = (map, rng, regions) ->
     for region in *regions
         if region.conf.is_overworld or region.conf.is_small_overworld
             for subregion in *region.subregions
-                region\apply {:map
+                subregion\apply {:map
                     operator: {remove: SourceMap.FLAG_TUNNEL}
                 }
     -- Make sure doors dont get created in the overworld components:
@@ -243,7 +277,7 @@ map_try_create = (map, rng, template) ->
     {mw, mh} = map.size
     outer = Region.create(1+PW,1+PH,mw-PW,mh-PH)
     -- Generate regions in a large area, crop them later
-    rect = {{1+PW, 1+PH}, {mw-PW, 1+PH}, {mw-PW, mh-PH}, {1+PW, mh-PH}}
+    -- rect = {{1+PW, 1+PH}, {mw-PW, 1+PH}, {mw-PW, mh-PH}, {1+PW, mh-PH}}
     rect2 = {{1+PW, mh-PH}, {mw-PW, mh-PH}, {mw-PW, 1+PH}, {1+PW, 1+PH}}
     major_regions = RVORegionPlacer.create {rect2}
 

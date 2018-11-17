@@ -1,7 +1,6 @@
 -- Box2D generation utilities
 B2GenerateUtils = require "maps.B2GenerateUtils"
 GenerateUtils = require "maps.GenerateUtils"
-GeometryUtils = require "maps.GeometryUtils"
 DebugUtils = require "maps.DebugUtils"
 SourceMap = require "core.SourceMap"
 

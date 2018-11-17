@@ -153,6 +153,13 @@ Region = newtype {
         dx, dy = cx - ocx, cy - ocy
         return math.max math.abs(dx),math.abs(dy)
 
+    all_polys: (polys={}) =>
+        append polys, @_points
+        for subregion in *@subregions
+            subregion\all_polys(polys)
+        return polys
+    as_map_region: () =>
+        return require('maps.MapRegion').MapRegion.create(@all_polys())
     square_distance: (o) =>
         cx,cy = @center()
         ocx, ocy = o\center()
