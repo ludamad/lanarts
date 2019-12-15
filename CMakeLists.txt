@@ -73,6 +73,8 @@ if(WIN32)
         add_definitions("-mwindows")
     endif()
      SET (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+ else()
+SET (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
 endif()
 
 # Enable tests

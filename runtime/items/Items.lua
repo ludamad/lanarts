@@ -162,6 +162,19 @@ Data.item_create {
     end
 }
 
+local function scroll_of_exp_func(self, user)
+    -- Collect ally players.
+    local ally_players = {user}
+    for _, ally in ipairs(Map.allies_list(user)) do
+        append(ally_players, ally)
+    end
+    -- Grant all of them an XP share.
+    local xp_granted = 100 / #ally_players
+    for _, ally in ipairs(ally_players) do
+        ally:gain_xp(xp_granted)
+    end
+end
+
 Data.item_create {
     name = "Scroll of Experience",
     description = "Grants 100XP for the user's party.",
@@ -172,34 +185,14 @@ Data.item_create {
     spr_item = "scroll_exp",
 
     pickup_func = function(self, user, amount)
-        -- Collect ally players.
-        local ally_players = {}
-        for _, ally in ipairs(Map.allies_list(user)) do
-            if not ally.is_enemy then
-                append(ally_players, ally)
-            end
-        end
-        -- Grant all of them an XP share.
-        local xp_granted = (100 * amount) / #ally_players
-        for _, ally in ipairs(ally_players) do
-            ally:gain_xp(xp_granted)
+        play_sound "sound/win sound 2-1.ogg"
+        EventLog.add_all("Experience is bestowed upon you!", {255,255,255})
+        for i=1,amount do
+            scroll_of_exp_func(self, user, amount)
         end
         return true -- dont pickup
     end,
-    action_func_= function(self, user, amount)
-        -- Collect ally players.
-        local ally_players = {}
-        for _, ally in ipairs(Map.allies_list(user)) do
-            if not ally.is_enemy then
-                append(ally_players, ally)
-            end
-        end
-        -- Grant all of them an XP share.
-        local xp_granted = (100 * amount) / #ally_players
-        for _, ally in ipairs(ally_players) do
-            ally:gain_xp(xp_granted)
-        end
-    end
+    action_func = scroll_of_exp_func
 }
 
 Data.item_create {

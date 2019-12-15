@@ -51,7 +51,7 @@ namespace luawrap {
 			lua_getmetatable(L, idx);
 			lua_pushlightuserdata(L, (void*) meta);
 			lua_gettable(L, LUA_REGISTRYINDEX);
-			bool eq = lua_rawequal(L, -2, -1);
+			bool eq = (bool)lua_rawequal(L, -2, -1);
 			lua_pop(L, 2);
 			return eq;
 		}
