@@ -60,7 +60,7 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
        // );
       MAIN_WINDOW = SDL_CreateWindow(
         window_name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, 
-        SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
+        SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN /*_DESKTOP*/ : 0)
       );
       // Create an OpenGL context associated with the window.
       SDL_GL_CreateContext(MAIN_WINDOW);

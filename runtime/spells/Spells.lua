@@ -230,7 +230,9 @@ function Pain.action_func(caster, x, y, target)
             caster:heal_hp(target:effective_stats().max_hp / 3)
         end
         BonusesUtils.create_animation({n_animations=0}, caster, "spr_effects.health", 0.5)
-        SummonUtils.summon_one_hit_monster(caster, target.xy, "Flying Skull")
+        if caster.stats.level > 1 then
+            SummonUtils.summon_one_hit_monster(caster, target.xy, "Flying Skull")
+        end
     else
         caster:direct_damage(20)
     end
