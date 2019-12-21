@@ -123,7 +123,7 @@ local PowerStrike = {
     spr_spell = "chargestrike",
     can_cast_with_cooldown = false,
     mp_cost = 30,
-    spell_cooldown = 200,
+    spell_cooldown = 150,
     cooldown = 0, -- Uses cooldown of weapon, favours 40 cooldown weapons
     fallback_to_melee = true,
 }
@@ -131,7 +131,7 @@ local PowerStrike = {
 local function ChargeCallback(_, caster)
     for _, mon in ipairs(Map.enemies_list(caster)) do
         local dist = vector_distance(mon.xy, caster.xy)
-        local range = 30 + caster.stats.strength + caster.stats.level * 5
+        local range = 30 + caster.stats.strength + caster.stats.level * 20
         if dist < mon.target_radius + caster.target_radius + range then
             -- Perform two melee attacks on each monster
             caster:melee(mon)
