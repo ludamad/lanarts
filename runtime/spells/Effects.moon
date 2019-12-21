@@ -40,8 +40,8 @@ DataW.effect_create {
     name: "Berserk"
     exhausted_duration: 300
     can_use_rest: false
-    can_use_spells: false
-    can_use_stairs: false
+    can_use_spells: true
+    can_use_stairs: true
     fade_out: 5
     effected_colour: {255,160,160}
     effected_sprite: "berserk_effected"
@@ -176,10 +176,8 @@ DataW.effect_create {
                 obj.x, obj.y = x, y
         @steps += 1
     stat_func: (obj, old, new) =>
-        immune = @steps > @duration * 2 and (obj.name == "Red Dragon" or obj.name == "Pixulloch")
-        if not immune
-            new.speed = 0
-            obj.stats.attack_cooldown = 2
+        new.speed = 0
+        obj.stats.attack_cooldown = 2
     fade_out: 5
 }
 

@@ -123,28 +123,28 @@ local PowerStrike = {
     spr_spell = "chargestrike",
     can_cast_with_cooldown = false,
     mp_cost = 30,
-    spell_cooldown = 45,
+    spell_cooldown = 200,
     cooldown = 0, -- Uses cooldown of weapon, favours 40 cooldown weapons
     fallback_to_melee = true,
 }
 
 local function ChargeCallback(_, caster)
-    local num = 0
     for _, mon in ipairs(Map.enemies_list(caster)) do
-        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 30 + caster.stats.strength then
-            num = num + 1
+        local dist = vector_distance(mon.xy, caster.xy)
+        local range = 30 + caster.stats.strength + caster.stats.level * 5
+        if dist < mon.target_radius + caster.target_radius + range then
+            -- Perform two melee attacks on each monster
             caster:melee(mon)
-            --            local chance = math.max(25, 100 - num * 20)
-            --if rand_range(0, 100) < chance then -- decreasing chance of knockback
+            caster:melee(mon)
             local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)
-                local thrown = mon:add_effect("Thrown", 40) -- + 10 * str_diff)
-                thrown.angle = vector_direction(caster.xy, mon.xy)
-                for _ in screens() do
-                    if caster:is_local_player() then
-                        EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
-                    end
+            -- Stun enemies longer based on strength difference 
+            local thrown = mon:add_effect("Thrown", 40 + 10 * str_diff + caster.stats.level * 5)
+            thrown.angle = vector_direction(caster.xy, mon.xy)
+            for _ in screens() do
+                if caster:is_local_player() then
+                    EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
                 end
-            --end
+            end
         end
     end
 end

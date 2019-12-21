@@ -266,16 +266,19 @@ DataW.spell_create {
     name: "Summon Dark Aspect",
     types: {"Black"}
     spr_spell: "spr_spells.summon",
-    description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower.",
-    description: "You summon a dark companion, at the cost of mana. The companion is stronger depending on the caster's willpower.",
-    --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
-    mp_cost: 10,
+    description: "You summon a dark companion, at the cost of health. The companion is stronger depending on the caster's willpower.",
+    mp_cost: 0,
     cooldown: 45,
     can_cast_with_held_key: false,
     fallback_to_melee: false,
     spell_cooldown: 200
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) ->
+        --if caster.stats.hp < 50 then
+        --    for _ in screens()
+        --        if caster:is_local_player()
+        --            EventLog.add("You require more health!", {200,200,255})
+        --    return false
         if not caster\has_effect "Necromancer"
             if caster\is_local_player()
                 EventLog.add("You must be a necromancer to cast this spell!", {200,200,255})
