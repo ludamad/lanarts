@@ -137,8 +137,8 @@ Data.class_create {
     sprites: {"fighter", "fighter2", "spr_enemies.humanoid.dwarf"},
     available_spells: {
         { spell: "Berserk", level_needed: 1 },
-        { spell: "Power Strike", level_needed: 2 },
-        { spell: "Dash Attack", level_needed: 3 },
+        { spell: "Dash Attack", level_needed: 2 },
+        { spell: "Power Strike", level_needed: 3 },
     },
     start_stats: {
         movespeed: 4,

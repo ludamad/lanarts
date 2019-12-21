@@ -45,12 +45,21 @@ DataW.effect_create {
     fade_out: 5
     effected_colour: {255,160,160}
     effected_sprite: "berserk_effected"
+    on_melee_func: (attacker, defender, damage) =>
+        -- Give some extra time for simply hitting enemies in melee
+        -- Favours high melee speed??
+        if attacker.stats.level >= 3
+            @time_left = math.min(@max_time * 1.5, @time_left + 5)
+        return damage
     stat_func: (obj, old, new) =>
-        new.strength += obj.stats.level
-        --new.defence = math.max(0, new.defence + 3 + @extensions * 2)
-        --new.willpower = math.max(0, new.willpower + 3 + @extensions * 2)
+        -- 2 Strength points during berserk for each levelup
+        new.strength += obj.stats.level * 2
+        -- Greater defences during berserk
+        -- 3 defence points during berserk for each levelup
+        new.defence = math.max(0, new.defence + obj.stats.level * 3)
+        new.willpower = math.max(0, new.willpower + obj.stats.level * 3)
         new.melee_cooldown_multiplier /= 1.6
-        hp_regen_bonus = (10 + @extensions) / 60 -- 10 per second
+        hp_regen_bonus = (10 + 4 * obj.stats.level) / 60 -- 10 + 4 * levelup per second
         new.hpregen += hp_regen_bonus
         if obj\has_effect("AmuletBerserker")
             new.hpregen += hp_regen_bonus
@@ -984,13 +993,14 @@ DataW.effect_create {
         @dir_vector = {math.cos(args.angle) * 16, math.sin(args.angle) * 16}
     step_func: (caster) =>
         @steps += 1
-        -- Move forward:
-        -- TODO bouncing too much
+        -- Move forward best as possible:
+        dxy = @dir_vector
         if caster.configure_dir
-            @dir_vector = caster\configure_dir(@dir_vector)
-        else
+            dxy = caster\configure_dir(dxy)
+        if dxy[1] == @dir_vector[1] and dxy[2] == @dir_vector[2]
             @dir_vector = GameObject.simulate_bounce(caster, @dir_vector)
-        xy = {caster.x + @dir_vector[1], caster.y + @dir_vector[2]}
+            dxy = @dir_vector
+        xy = {caster.x + dxy[1], caster.y + dxy[2]}
         if Map.object_tile_check(caster, xy)
             if Map.object_visible(caster)
                 play_sound "sound/door.ogg"

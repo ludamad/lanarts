@@ -314,10 +314,9 @@ DataW.spell_create {
     name: "Dash Attack",
     types: {"Green"}
     spr_spell: "expedite",
-    description: "Dash in a straight line, hitting all enemies in your path. Bounces if you hit a wall, doing increasing damage." -- Can still perform abilities while dashing.",
-    --description: "You summon a dark companion, at the cost of health and mana. The companion is stronger depending on the caster's willpower. Dies quickly outside of summoner view.",
-    mp_cost: 8
-    cooldown: 60
+    description: "Dash in a straight line, hitting all enemies in your path."
+    mp_cost: 2
+    cooldown: 30
     can_cast_with_held_key: false
     fallback_to_melee: true
     spell_cooldown: 15
