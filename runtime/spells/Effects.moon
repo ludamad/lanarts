@@ -48,8 +48,12 @@ DataW.effect_create {
     on_melee_func: (attacker, defender, damage) =>
         -- Give some extra time for simply hitting enemies in melee
         -- Favours high melee speed??
-        if attacker.stats.level >= 3
+        if attacker.stats.level >= 2
+            EventLog.add("Your rage grows from combat...", {200,200,255})
             @time_left = math.min(@max_time * 1.5, @time_left + 5)
+        
+        if chance(.1)
+            defender\add_effect("Stun", 20 + attacker.stats.level)
         return damage
     stat_func: (obj, old, new) =>
         -- 2 Strength points during berserk for each levelup
@@ -87,7 +91,7 @@ DataW.effect_create {
             @time_left = math.min(@max_time * 1.5, @time_left + 45)
             for _ in screens()
                 if obj\is_local_player()
-                    EventLog.add("Your rage grows and your skin thickens...", {200,200,255})
+                    EventLog.add("Your rage grows from killing...", {200,200,255})
                     play_sound "sound/swish-11.wav"
                 if settings.verbose_output
                     EventLog.add("Killed Enemy, berserk time_left = " .. @time_left)
