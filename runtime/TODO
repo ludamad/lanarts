@@ -1,4 +1,10 @@
-- add mechanical distinction to item types
+-- Dec 21, 2019
+- Have dedicated part of the UI for highlighting all the important health bar totals
+- Especially players and bosses
+- Add extra (side?) content in the overworld and underworld
+
+---
+add mechanical distinction to item types
 - have one base weapon type per category
 - add weapon enchants - death skull on hit 
     - Can you enchant your hand?

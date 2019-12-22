@@ -161,6 +161,17 @@ DataW.effect_create {
 }
 
 DataW.effect_create {
+    name: "Stun"
+    effected_sprite: "spr_effects.pain_mirror"
+    effected_colour: {200,200,200}
+    duration: 15
+    stat_func: (obj, old, new) =>
+        new.speed = 0
+        obj.stats.attack_cooldown = 2
+    fade_out: 5
+}
+
+DataW.effect_create {
     name: "Thrown"
     effected_sprite: "spr_effects.pain_mirror"
     effected_colour: {200,200,200}
@@ -912,6 +923,19 @@ DataW.effect_create {
         return damage
 }
 
+DataW.effect_create {
+    name: "StunWeapon"
+    console_draw_func: (player, get_next) =>
+        draw_weapon_console_effect(player, M._fleeing, "+10% chance of stun", get_next())
+    on_melee_func: (attacker, defender, damage) =>
+        if defender\has_effect("Stun")
+            return damage
+        if chance(.1 * @n_derived)
+            thrown = defender\add_effect("Stun", 20)
+            thrown.angle = vector_direction({attacker.x, attacker.y}, {defender.x, defender.y})
+        return damage
+}
+
 share_damage = (target, damage, min_health) ->
     -- TODO
     min_health = 0
@@ -1030,9 +1054,9 @@ DataW.effect_create {
     stat_func: (caster, old, new) =>
         new.speed = 0
         --caster.stats.attack_cooldown = 2
-        new.strength += 2
-        new.defence += 15
-        new.willpower += 15
+        new.strength += caster.stats.level
+        new.defence += caster.stats.level * 5
+        new.willpower += caster.stats.level * 5
 }
 
 enemy_init = (enemy) -> nil

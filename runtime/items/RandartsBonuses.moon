@@ -53,6 +53,7 @@ _EFFECT_BONUSES = {
     VampiricWeapon: (level) => append @effects, {"VampiricWeapon", 1} -- Fixed value
     ConfusingWeapon: (level) => append @effects, {"ConfusingWeapon", 1} -- Fixed value
     KnockbackWeapon: (level) => append @effects, {"KnockbackWeapon", 1} -- Fixed value
+    StunWeapon: (level) => append @effects, {"StunWeapon", 1} -- Fixed value
     PoisonedWeapon: (level) =>
         poison_percentage = 0
         for i =1,level

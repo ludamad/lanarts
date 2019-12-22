@@ -9,7 +9,7 @@ EventLog = require "ui.EventLog"
 GameObject = require "core.GameObject"
 BonusesUtils = require "items.BonusesUtils"
 
--- Knockback: Stun bonus (description from effect)
+-- Knockback: Disperse and stun bonus (description from effect)
 define_bonus {
     name: "Knockback"
     shop_cost: {50, 100}
@@ -20,7 +20,18 @@ define_bonus {
         @sprite\draw options, {x - 20, y}
 }
 
--- Poison: Stun bonus (description from effect)
+-- Stun: Stun bonus (description from effect)
+define_bonus {
+    name: "Stun"
+    shop_cost: {50, 100}
+    sprite: tosprite "spr_effects.fleeing"
+    effects_granted: {"StunWeapon"}
+    item_draw_func: (options, x, y) =>
+        options = table.merge options, {scale: {1,1}}
+        @sprite\draw options, {x - 20, y}
+}
+
+-- Poison: Damage over time bonus (description from effect)
 define_bonus {
     name: "Poison"
     shop_cost: {100, 200}

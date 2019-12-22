@@ -157,6 +157,10 @@ Data.item_create {
 
     spr_item = "spr_scrolls.fear",
 
+    prereq_func = function(self, user) 
+        return not user:has_effect("Fear Aura")
+    end,
+
     action_func = function(self, user)
         user:add_effect("Fear Aura", 800).range = 120
     end
@@ -267,6 +271,10 @@ Data.item_create  {
     shop_cost = {25,35},
 
     spr_item = "scroll_haste",
+
+    prereq_func = function(self, user) 
+        return not user:has_effect("Haste")
+    end,
 
     action_func = function(self, user)
         play_sound "sound/haste.ogg"
