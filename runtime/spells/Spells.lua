@@ -60,9 +60,9 @@ local Berserk = {
     name = "Berserk",
     spr_spell = "berserk",
     description = "Initiate frenzy, greatly increasing attack speed and stats temporarily. Killing enemies grants you longer frenzy. Afterwards, become exhausted and weak for a short time.",
-    mp_cost = 25,
+    mp_cost = 35,
     cooldown = 30,
-    spell_cooldown = 400,
+    spell_cooldown = 600,
     can_cast_with_held_key = false,
     fallback_to_melee = false
 }

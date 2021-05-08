@@ -27,9 +27,9 @@ engine_init = (args) ->
         GameState.register_player(settings.username, settings.class_type, Engine.player_input, true, 0, 0)
         classes = {
             args.class,
-            args.class2 or "Pyrocaster",
-            args.class3 or "Necromancer",
-            args.class4 or "Fighter"
+            args.class2 or "Fighter",
+            args.class3 or "Stormcaller",
+            args.class4 or "Pyrocaster"
         }
         for i=2,n_players
             GameState.register_player("Player " .. i, classes[i], Engine.player_input, true, i - 1, 0)

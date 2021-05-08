@@ -5,17 +5,12 @@ PROJECT(project_ldraw)
 FIND_LIBRARY(OpenGL REQUIRED)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
-  set(FREETYPE_INCLUDE_DIRS "/Users/adomurad/sources/freetype2/build/include/freetype" "/Users/adomurad/sources/freetype2/include/freetype" "/Users/adomurad/sources/freetype2/include"
-      )
-
-  set(FREETYPE_LIBRARIES "/Users/adomurad/sources/freetype2/build/libfreetype.a")
-
-  set(SDL2_LIBRARIES "-s USE_SDL=2")
-  set(SDL2_IMAGE_LIBRARIES "-s USE_SDL_IMAGE=2")
-else ()
-endif ()
-
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    #set(FREETYPE_INCLUDE_DIRS "-s USE_FREETYPE=1")
+    #set(FREETYPE_LIBRARIES "-s USE_FREETYPE=1")
+    #set(SDL2_LIBRARIES "-s USE_SDL=2")
+    set(FREETYPE_INCLUDE_DIRS "/home/adomurad/sources/emsdk/upstream/emscripten/cache/sysroot/include/freetype2")
+    # set(SDL2_IMAGE_LIBRARIES "-s USE_SDL_IMAGE=2")
+elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(ARCH_LIBS 
         mingw32
 		
@@ -26,6 +21,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 	mingw32  m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid
         ws2_32 
     )
+    set(FREETYPE_INCLUDE_DIRS ${DEPS}/freetype/include)
 else()
     set(ARCH_LIBS 
 	${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
@@ -46,11 +42,10 @@ include_directories(
 	"${SRC}/luawrap-lib/include"
 	${DEPS}/UnitTest++
 	${DEPS}/lua
-	${DEPS}/freetype/include
 	"${DEPS}/sdl2/include"
 	"${DEPS}/sdl2-image"
 	${OpenGL_INCLUDE_DIRS} 		
-	# ${FREETYPE_INCLUDE_DIRS} 
+	${FREETYPE_INCLUDE_DIRS} 
 	freetype
 )
 

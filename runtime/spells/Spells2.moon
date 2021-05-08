@@ -318,7 +318,7 @@ DataW.spell_create {
     types: {"Green"}
     spr_spell: "expedite",
     description: "Dash in a straight line, hitting all enemies in your path."
-    mp_cost: 3
+    mp_cost: 6
     cooldown: 30
     can_cast_with_held_key: false
     fallback_to_melee: true

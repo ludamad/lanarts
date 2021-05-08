@@ -26,25 +26,28 @@
 
 #include "lua_api.h"
 
+static int event_log_add_all(lua_State* L) {
+	int nargs = lua_gettop(L);
+	GameState* gs = lua_api::gamestate(L);
+	Colour col = nargs >= 2 ? LuaStackValue(L, 2).as<Colour>() : Colour();
+	const char* msg = LuaStackValue(L, 1).to_str();
+	gs->for_screens([&]() {
+		gs->game_chat().add_message(msg, col);
+	});
+	return 0;
+}
+
 static int event_log_add(lua_State* L) {
 	int nargs = lua_gettop(L);
 	GameState* gs = lua_api::gamestate(L);
+	if (gs->screens.screen_index() < 0) {
+		// No current screen - translate into a call to event_log_add_all
+		return event_log_add_all(L);
+	}
 	Colour col = nargs >= 2 ? LuaStackValue(L, 2).as<Colour>() : Colour();
 	gs->game_chat().add_message(LuaStackValue(L, 1).to_str(), col);
 	return 0;
 }
-
-static int event_log_add_all(lua_State* L) {
-	int nargs = lua_gettop(L);
-	GameState* gs = lua_api::gamestate(L);
-    Colour col = nargs >= 2 ? LuaStackValue(L, 2).as<Colour>() : Colour();
-    const char* msg = LuaStackValue(L, 1).to_str();
-    gs->for_screens([&]() {
-        gs->game_chat().add_message(msg, col);
-    });
-	return 0;
-}
-
 
 static std::vector<ldraw::Image> images_load(const char* pattern) {
 	std::vector<ldraw::Image> ret;

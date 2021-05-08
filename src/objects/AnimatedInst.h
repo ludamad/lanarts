@@ -37,7 +37,7 @@ public:
 					orientation.x), orienty(orientation.y), sprite(sprite), timeleft(
 					animatetime), animatetime(animatetime), text(text) {
 		animateframe = -1;
-		assert_normal_text(text.c_str());
+		//assert_normal_text(text.c_str());
 		vx = round(vx * 256.0f) / 256.0f;
 		vy = round(vy * 256.0f) / 256.0f;
 		LANARTS_ASSERT(animatetime!= 0);

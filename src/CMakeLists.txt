@@ -5,15 +5,14 @@ FIND_LIBRARY(OpenGL REQUIRED)
 
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
-  # TODO(amitp): I don't know how to set this properly with add_compile_options
-  set(SDL2_LIBRARIES "-s USE_SDL=2")
-  set(SDL2_IMAGE_LIBRARIES "-s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[\\\"png\\\"]")
-  set(SDL2MIXER_LIBRARIES "-s USE_OGG=1 -s USE_VORBIS=1")
-  set(FREETYPE_INCLUDE_DIRS "/Users/adomurad/sources/freetype2/build/include"  "/Users/adomurad/sources/freetype2/include/freetype")
-  set(FREETYPE_LIBRARIES "/Users/adomurad/sources/freetype2/build/libfreetype.a")
-else ()
-endif ()
-if ($ENV{BUILD_HEADLESS})
+    ## TODO(amitp): I don't know how to set this properly with add_compile_options
+    #set(SDL2_LIBRARIES "-s USE_SDL=2")
+  #set(SDL2_IMAGE_LIBRARIES "-s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[\\\"png\\\"]")
+  #set(SDL2MIXER_LIBRARIES "-s USE_OGG=1 -s USE_VORBIS=1")
+  set(FREETYPE_INCLUDE_DIRS "/home/adomurad/sources/emsdk/upstream/emscripten/cache/sysroot/include/freetype2")
+  #set(FREETYPE_LIBRARIES "-s USE_FREETYPE=1")
+    set(ARCH_LIBS)
+elseif ($ENV{BUILD_HEADLESS})
     set(ARCH_LIBS)
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     if ($ENV{BUILD_FEDORA_CROSS})
@@ -176,6 +175,7 @@ set (libraries
         polypartition
         ${BACKTRADE_DEP}
 	${ARCH_LIBS}
+        imgui
 )
 
 target_link_libraries( lanarts 
