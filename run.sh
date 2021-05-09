@@ -92,6 +92,9 @@ fi
 if handle_flag "--sanitize"  ; then
     export BUILD_SANITIZE=1
 fi
+if handle_flag "--emscripten"  ; then
+    export BUILD_EMSCRIPTEN=1
+fi
 if handle_flag "--profile-gen" || handle_flag "--pgen" ; then
     export BUILD_OPTIMIZE=1
     export BUILD_PROF_GEN=1
@@ -132,6 +135,9 @@ function build_lanarts(){
     if [ $BUILD_PROF_GEN ] ; then
         BUILD_DIR="${BUILD_DIR}_profgen"
     fi
+    if [ $BUILD_EMSCRIPTEN ] ; then
+        BUILD_DIR="${BUILD_DIR}_emscripten"
+    fi
     if [ $BUILD_PROF_USE ] ; then
         BUILD_DIR="${BUILD_DIR}_profuse"
     fi
@@ -146,7 +152,9 @@ function build_lanarts(){
     mkdir -p $BUILD_DIR
     ln -s $BUILD_DIR build
     cd $BUILD_DIR
-    if [ $BUILD_MINGW ] ; then
+    if [ $BUILD_EMSCRIPTEN ] ; then
+	emcmake cmake ..
+    elif [ $BUILD_MINGW ] ; then
         if python -mplatform | grep fedora ; then
             export BUILD_FEDORA_CROSS=1
             mingw32-cmake  -Wno-dev .. | colorify '1;33'

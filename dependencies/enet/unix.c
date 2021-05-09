@@ -49,7 +49,11 @@
 #endif
 
 #ifndef HAS_SOCKLEN_T
+#ifdef __EMSCRIPTEN__
+typedef unsigned int socklen_t;
+#else
 typedef int socklen_t;
+#endif
 #endif
 
 #ifndef MSG_NOSIGNAL

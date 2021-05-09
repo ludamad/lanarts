@@ -6,6 +6,8 @@
 #include <lcommon/math_util.h>
 #include <lcommon/fatal_error.h>
 
+#include "imgui.h"
+
 #include <SDL_opengl.h>
 
 //Surpress some multiple definition warnings:
@@ -15,64 +17,102 @@
 #include "ldraw_assert.h"
 
 #include "GLImage.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
-/* Utility function for conversion between SDL surfaces and GL surfaces */
-static GLuint SDL_GL_LoadTexture(SDL_Surface *surface, GLfloat *texcoord) {
-	GLuint texture;
-	int w, h;
-	SDL_Surface *image;
-	SDL_Rect area;
-	Uint32 saved_flags;
-	Uint8 saved_alpha;
+struct StbImage {
+    GLuint texture;
+    int width, height;
+};
 
-	/* Use the surface width and height expanded to powers of 2 */
-	w = power_of_two_round(surface->w);
-	h = power_of_two_round(surface->h);
-	texcoord[0] = 0.0f; /* Min X */
-	texcoord[1] = 0.0f; /* Min Y */
-	texcoord[2] = (GLfloat)surface->w / w; /* Max X */
-	texcoord[3] = (GLfloat)surface->h / h; /* Max Y */
+// Simple helper function to load an image into a OpenGL texture with common settings
+StbImage load_texture(const char* filename) {
+    // Load from file
+    int image_width = 0;
+    int image_height = 0;
+    unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
+    if (image_data == nullptr) {
+        return {0, 0, 0};
+    }
 
-	image = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN /* OpenGL RGBA masks */
-			0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000
-#else
-			0xFF000000,
-			0x00FF0000,
-			0x0000FF00,
-			0x000000FF
+    // Create a OpenGL texture identifier
+    GLuint image_texture;
+    glGenTextures(1, &image_texture);
+    glBindTexture(GL_TEXTURE_2D, image_texture);
+
+    // Setup filtering parameters for display
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
+
+    // Upload pixels into texture
+#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 #endif
-			);
-	if (image == NULL) {
-		return 0;
-	}
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+    stbi_image_free(image_data);
 
-	/* Save the alpha blending attributes */
-	SDL_GetSurfaceAlphaMod(surface, &saved_alpha);
-	SDL_SetSurfaceAlphaMod(surface, 255);
-        SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE); 
-
-	/* Copy the surface into the GL texture image */
-	area.x = 0;
-	area.y = 0;
-	area.w = surface->w;
-	area.h = surface->h;
-	SDL_BlitSurface(surface, &area, image, &area);
-
-	/* Restore the alpha blending attributes */
-    SDL_SetSurfaceAlphaMod(surface, saved_alpha);
-
-	/* Create an OpenGL texture for the image */
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-			image->pixels);
-	SDL_FreeSurface(image); /* No longer needed */
-
-	return texture;
+    return {image_texture, image_width, image_height};
 }
+/* Utility function for conversion between SDL surfaces and GL surfaces */
+//static GLuint SDL_GL_LoadTexture(SDL_Surface *surface, GLfloat *texcoord) {
+//    load_texture()
+//	GLuint texture;
+//	int w, h;
+//	SDL_Surface *image;
+//	SDL_Rect area;
+//	Uint32 saved_flags;
+//	Uint8 saved_alpha;
+//
+//	/* Use the surface width and height expanded to powers of 2 */
+//	w = power_of_two_round(surface->w);
+//	h = power_of_two_round(surface->h);
+//	texcoord[0] = 0.0f; /* Min X */
+//	texcoord[1] = 0.0f; /* Min Y */
+//	texcoord[2] = (GLfloat)surface->w / w; /* Max X */
+//	texcoord[3] = (GLfloat)surface->h / h; /* Max Y */
+//
+//	image = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32,
+//#if SDL_BYTEORDER == SDL_LIL_ENDIAN /* OpenGL RGBA masks */
+//			0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000
+//#else
+//			0xFF000000,
+//			0x00FF0000,
+//			0x0000FF00,
+//			0x000000FF
+//#endif
+//			);
+//	if (image == NULL) {
+//		return 0;
+//	}
+//
+//	/* Save the alpha blending attributes */
+//	SDL_GetSurfaceAlphaMod(surface, &saved_alpha);
+//	SDL_SetSurfaceAlphaMod(surface, 255);
+//        SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
+//
+//	/* Copy the surface into the GL texture image */
+//	area.x = 0;
+//	area.y = 0;
+//	area.w = surface->w;
+//	area.h = surface->h;
+//	SDL_BlitSurface(surface, &area, image, &area);
+//
+//	/* Restore the alpha blending attributes */
+//    SDL_SetSurfaceAlphaMod(surface, saved_alpha);
+//
+//	/* Create an OpenGL texture for the image */
+//	glGenTextures(1, &texture);
+//	glBindTexture(GL_TEXTURE_2D, texture);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+//			image->pixels);
+//	SDL_FreeSurface(image); /* No longer needed */
+//
+//	return texture;
+//}
 
 GLImage::~GLImage() {
 	if (texture) {
@@ -86,33 +126,32 @@ void GLImage::initialize(const std::string& filename) {
 	}
 
 	/* Load the image using SDL_image library */
-	SDL_Surface* image = IMG_Load(filename.c_str());
-	if (image == NULL) {
+    StbImage image = load_texture(filename.c_str());
+	if (image.texture == 0) {
 		printf("Image '%s' could not be loaded\n", filename.c_str());
-		printf("SDL reported: '%s'\n", IMG_GetError());
 		fatal_error();
 	}
 
-	width = image->w;
-	height = image->h;
+	width = image.width;
+	height = image.height;
 
 	/* Convert the image into an OpenGL texture */
 	GLfloat texcoord[4];
-	texture = SDL_GL_LoadTexture(image, texcoord);
-
+	texture = image.texture;
+    texcoord[0] = 0.0f; /* Min X */
+    texcoord[1] = 0.0f; /* Min Y */
+    texcoord[2] = ((GLfloat)image.width) / power_of_two_round(image.width); /* Max X */
+    texcoord[3] = ((GLfloat)image.height) / power_of_two_round(image.height); /* Max Y */
         texw = texh = 0;
 	if (texture != NULL) {
                 texw = texcoord[2];
                 texh = texcoord[3];
         // If images cannot be loaded by OpenGL, error, except if in headless mode:
-	} else if (getenv("LANARTS_HEADLESS") == NULL) {
+	} else if (getenv("LANARTS_HEADLESS") == nullptr) {
 		printf("Texture from image '%s' (%dx%d) could not be loaded (%s)\n",
 				filename.c_str(), width, height, SDL_GetError());
 		fatal_error(); // Don't fatal error for now! TODO conditional on environment variable?
-        }
-
-	/* We don't need the original image anymore */
-	SDL_FreeSurface(image);
+	}
 }
 
 static void gl_subimage_from_bytes(GLImage& img, const BBox& region, char* data,
@@ -163,35 +202,6 @@ static void gl_image_from_bytes(GLImage& img, const Size& size, char* data,
 	glDisable(GL_TEXTURE_2D);
 }
 
-static void glVertex(const PosF& pos) {
-	glVertex2i(pos.x, pos.y);
-}
-
-static void gl_draw_image(GLuint texture, const Colour& c, const BBoxF& texbox,
-		const QuadF& imgbox) {
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glColor4ub(c.r, c.g, c.b, c.a);
-
-	glBegin(GL_QUADS);
-	//Draw our four points, clockwise.
-	glTexCoord2f(texbox.x1, texbox.y1);
-	glVertex(imgbox.pos[0]);
-
-	glTexCoord2f(texbox.x2, texbox.y1);
-	glVertex(imgbox.pos[1]);
-
-	glTexCoord2f(texbox.x2, texbox.y2);
-	glVertex(imgbox.pos[2]);
-
-	glTexCoord2f(texbox.x1, texbox.y2);
-	glVertex(imgbox.pos[3]);
-
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
-}
-
 void GLImage::subimage_from_bytes(const BBox& region, char* data, int type) {
 	gl_subimage_from_bytes(*this, region, data, type);
 }
@@ -223,68 +233,37 @@ void GLImage::draw(const ldraw::DrawOptions& options, const PosF& pos) {
 
 	QuadF quad(adjusted, options.draw_angle);
 
-	gl_draw_image(texture, options.draw_colour.clamp(),
-			draw_region.scaled(texw / width, texh / height),
-			quad.translated(pos));
-}
+	Colour colour = options.draw_colour.clamp();
+    BBoxF region = draw_region.scaled(1.0f / width, 1.0f / height);
+	QuadF q = quad.translated(pos);
 
-
-struct BatchDrawer {
-    bool mid_draw = false;
-    GLuint last_texture = (GLuint)-1;
-
-    void start_draw(GLuint texture) {
-        if (last_texture != texture) {
-            end_draw();
-            last_texture = texture;
-            glBindTexture(GL_TEXTURE_2D, texture);
-            glBegin(GL_QUADS);
-            glColor4ub(255, 255, 255, 255);
-            mid_draw = true;
-        }
-    }
-    void start_batch() {
-        glEnable(GL_TEXTURE_2D);
-    }
-    void end_batch() {
-        end_draw();
-        glDisable(GL_TEXTURE_2D);
-    }
-private:
-    void end_draw() {
-        if (mid_draw) {
-            glEnd();
-            mid_draw = false;
-        }
-    }
-};
-
-static BatchDrawer batch_drawer;
-
-void GLImage::start_batch_draw() {
-    batch_drawer = BatchDrawer();
-    batch_drawer.start_batch();
-}
-
-void GLImage::batch_draw(const BBoxF& bbox, const PosF& pos) {
-    QuadF imgbox = QuadF({0,0,32,32}, 0).translated(pos);
-    auto texbox = bbox.scaled(texw / width, texh / height);
-    batch_drawer.start_draw(texture);
-
-    //Draw our four points, clockwise.
-    glTexCoord2f(texbox.x1, texbox.y1);
-    glVertex(imgbox.pos[0]);
-
-    glTexCoord2f(texbox.x2, texbox.y1);
-    glVertex(imgbox.pos[1]);
-
-    glTexCoord2f(texbox.x2, texbox.y2);
-    glVertex(imgbox.pos[2]);
-
-    glTexCoord2f(texbox.x1, texbox.y2);
-    glVertex(imgbox.pos[3]);
-}
-
-void GLImage::end_batch_draw() {
-    batch_drawer.end_batch();
+//	ImGui::GetForegroundDrawList()->AddQuadFilled(
+//		ImVec2(draw_region.x1, draw_region.y1),
+//		ImVec2(draw_region.x2, draw_region.y1),
+//		ImVec2(draw_region.x2, draw_region.y2),
+//		ImVec2(draw_region.x1, draw_region.y2),
+//		colour.as_rgba()
+//	);
+//
+//	ImGui::GetForegroundDrawList()->AddImage(
+//         (void*)(unsigned long)texture,
+//         ImVec2(draw_region.x1, draw_region.y1),
+//         ImVec2(draw_region.x2, draw_region.y2)
+//    );
+    //printf("[%f %f %f %f]\n", q.pos[0].x, q.pos[0].y, q.pos[3].x, q.pos[3].y);
+	ImGui::GetForegroundDrawList()->AddImageQuad(
+		(void*)(unsigned long)texture,
+        ImVec2(q.pos[0].x, q.pos[0].y),
+        ImVec2(q.pos[1].x, q.pos[1].y),
+        ImVec2(q.pos[2].x, q.pos[2].y),
+        ImVec2(q.pos[3].x, q.pos[3].y),
+		ImVec2(region.x1, region.y1),
+		ImVec2(region.x2, region.y1),
+		ImVec2(region.x2, region.y2),
+		ImVec2(region.x1, region.y2),
+		colour.as_rgba()
+	);
+//	gl_draw_image(texture, options.draw_colour.clamp(),
+//			draw_region.scaled(texw / width, texh / height),
+//			quad.translated(pos));
 }

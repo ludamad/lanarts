@@ -61,13 +61,3 @@ void GLImage::image_from_bytes(const Size& size, char* data) {
 
 void GLImage::draw(const ldraw::DrawOptions& options, const PosF& pos) {
 }
-
-
-void GLImage::start_batch_draw() {
-}
-
-void GLImage::batch_draw(const BBoxF& bbox, const PosF& pos) {
-}
-
-void GLImage::end_batch_draw() {
-}

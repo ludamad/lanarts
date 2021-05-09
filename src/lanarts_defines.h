@@ -12,7 +12,11 @@
 #include <cstdlib>
 
 // The preferred assert statement to use, for ease of re-implementation
+#ifdef NDEBUG
+#define LANARTS_ASSERT(x)
+#else
 #define LANARTS_ASSERT(x) assert(x)
+#endif
 
 #ifdef _MSC_VER
 #define round(x) floor(x + 0.5f)

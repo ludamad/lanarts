@@ -36,6 +36,11 @@ set( SRC ../)
 set( DEPS ../../dependencies)
 
 
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/examples@/")
+endif()
+
 include_directories(
 	include/ldraw/
 	"${SRC}/common-lib/include"
@@ -43,6 +48,7 @@ include_directories(
 	${DEPS}/UnitTest++
 	${DEPS}/lua
 	"${DEPS}/sdl2/include"
+	"${DEPS}/imgui"
 	"${DEPS}/sdl2-image"
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS} 
@@ -65,7 +71,7 @@ file(GLOB ldraw_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 add_library( ldraw
 		STATIC
-             ${ldraw_src} )
+             ${ldraw_src} src/opengl/stb_image.h)
 
          message(STATUS ${SDL2_LIBRARY})
 set(LINKEDDEPS
@@ -77,6 +83,8 @@ set(LINKEDDEPS
 	${OPENGL_gl_LIBRARY}
 	# ${FREETYPE_LIBRARIES}
 	freetype
+        imgui
+        dl
 )
 
 add_executable( ldraw_ex ${ldraw_examples} )

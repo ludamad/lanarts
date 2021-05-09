@@ -29,6 +29,7 @@
 #include "Font.h"
 
 static bool handle_event(SDL_Event* event) {
+	ldraw::process_event(event);
 	SDL_Keycode keycode = event->key.keysym.sym;
 	SDL_Keymod keymod = (SDL_Keymod) event->key.keysym.mod;
 

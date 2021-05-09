@@ -35,9 +35,6 @@ struct GLImage {
 	void draw(const PosF& pos) {
 		draw(ldraw::DrawOptions(), pos);
 	}
-	static void start_batch_draw();
-	void batch_draw(const BBoxF& region, const PosF& pos);
-        static void end_batch_draw();
 
 	int width, height;
 };

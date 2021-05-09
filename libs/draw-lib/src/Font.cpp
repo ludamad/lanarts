@@ -16,6 +16,7 @@
 
 #include "DrawOptions.h"
 
+#include "imgui.h"
 #include "Font.h"
 #include "ldraw_assert.h"
 
@@ -96,8 +97,10 @@ char_data::~char_data() {
 
 static void init_bitmap_font(font_data* fd, const BitmapFontDesc& desc) {
 	fd->font_img.initialize(desc.filename);;
-    float ptw = power_of_two_round(fd->font_img.width);
-    float pth = power_of_two_round(fd->font_img.height);
+//    float ptw = power_of_two_round(fd->font_img.width);
+//    float pth = power_of_two_round(fd->font_img.height);
+    float ptw = fd->font_img.width;
+    float pth = fd->font_img.height;
 	fd->h = desc.char_size.h;
 	float x = 0, y = 0;
 	for (char c : desc.characters) {
@@ -193,26 +196,21 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
  ******************************************************************/
 
 static void gl_draw_glyph(const font_data& font, char glyph, const PosF& pos,
-		const SizeF& scale) {
+		const SizeF& scale, Colour colour) {
 	const GLImage& img = font.font_img;
 	const char_data& data = font.data[glyph];
 	if (data.w == 0 || data.h == 0) {
 		return;
 	}
 	float x2 = pos.x + data.w * scale.w, y2 = pos.y + data.h * scale.h;
-
-	//Draw our four points, clockwise.
-	glTexCoord2f(data.tx1, data.ty1);
-	glVertex2i(pos.x, pos.y);
-
-	glTexCoord2f(data.tx2, data.ty1);
-	glVertex2i(x2, pos.y);
-
-	glTexCoord2f(data.tx2, data.ty2);
-	glVertex2i(x2, y2);
-
-	glTexCoord2f(data.tx1, data.ty2);
-	glVertex2i(pos.x, y2);
+	ImGui::GetForegroundDrawList()->AddImage(
+		(void*)(unsigned long)img.texture,
+		ImVec2(pos.x, pos.y),
+		ImVec2(x2, y2),
+		ImVec2(data.tx1, data.ty1),
+		ImVec2(data.tx2, data.ty2),
+		colour.as_rgba()
+	);
 }
 
 struct LineSplit {
@@ -267,13 +265,6 @@ static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
 	process_string(font, text, maxwidth, line_splits);
 	float height = font.h * line_splits.size();
 
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, font.font_img.texture);
-
-	const Colour& c = options.draw_colour;
-	glColor4ub(c.r, c.g, c.b, c.a);
-	glBegin(GL_QUADS);
-
 	Size size(0, 0);
 	int i = 0;
 	for (auto& split : line_splits) {
@@ -294,14 +285,12 @@ static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
                     p.x + len - (cdata.advance - cdata.left),
                     p.y + size.h - cdata.move_up
                 };
-				gl_draw_glyph(font, chr, drawpos, options.draw_scale);
+				gl_draw_glyph(font, chr, drawpos, options.draw_scale, options.draw_colour);
 			}
 		}
 		size.w = std::max(len, size.w);
 		size.h += 1;
 	}
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
 	perf_timer_end(FUNCNAME);
 	return size;
 }

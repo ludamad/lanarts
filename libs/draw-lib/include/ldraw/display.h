@@ -7,6 +7,7 @@
 #ifndef LDRAW_DISPLAY_H_
 #define LDRAW_DISPLAY_H_
 
+#include <SDL.h>
 #include <lcommon/geometry.h>
 
 namespace ldraw {
@@ -25,6 +26,7 @@ Size screen_size();
 Size display_size();
 void reset_blend_func();
 Size window_size();
+void process_event(const SDL_Event* event);
 
 }
         

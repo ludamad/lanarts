@@ -24,6 +24,7 @@ struct Colour {
 	Colour mult_alpha(float alpha) const;
 	Colour multiply(const Colour& o) const;
 	Colour clamp() const;
+	unsigned int as_rgba() const;
 };
 
 #endif /* COLOUR_H_ */

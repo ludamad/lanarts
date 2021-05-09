@@ -88,37 +88,35 @@ void GameTiles::copy_to(GameTiles & t) const {
 }
 
 void GameTiles::pre_draw(GameState* gs, bool reveal_all) {
-	perf_timer_begin(FUNCNAME);
-
-	Size size = this->size();
-    GameView view = gs->view();
-    view.width += gs->game_hud().sidebar_content_area().width();
-	view.world_width = gs->get_level()->width();
-	view.world_height = gs->get_level()->height();
-    BBox region = view.tile_region_covered();
-
-	if (region.x2 >= size.w) {
-		region.x2 = size.w - 1;
-	}
-	if (region.y2 >= size.h) {
-		region.y2 = size.h - 1;
-	}
-	// Reveal all if no players present:
-	reveal_all |= gs->player_data().all_players().empty();
-
-        GLImage::start_batch_draw();
-	for (int y = region.y1; y <= region.y2; y++) {
-		for (int x = region.x1; x <= region.x2; x++) {
-			Tile& tile = get(Pos(x, y));
-			const ldraw::Image& img = res::tile(tile.tile).img(tile.subtile);
-			if (reveal_all || was_seen(Pos(x, y))) {
-                            img.batch_draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
-			}
-		}
-	}
-        GLImage::end_batch_draw();
-
-	perf_timer_end(FUNCNAME);
+//	perf_timer_begin(FUNCNAME);
+//
+//	Size size = this->size();
+//    GameView view = gs->view();
+//    view.width += gs->game_hud().sidebar_content_area().width();
+//	view.world_width = gs->get_level()->width();
+//	view.world_height = gs->get_level()->height();
+//    BBox region = view.tile_region_covered();
+//
+//	if (region.x2 >= size.w) {
+//		region.x2 = size.w - 1;
+//	}
+//	if (region.y2 >= size.h) {
+//		region.y2 = size.h - 1;
+//	}
+//	// Reveal all if no players present:
+//	reveal_all |= gs->player_data().all_players().empty();
+//
+//	for (int y = region.y1; y <= region.y2; y++) {
+//		for (int x = region.x1; x <= region.x2; x++) {
+//			Tile& tile = get(Pos(x, y));
+//			const ldraw::Image& img = res::tile(tile.tile).img(tile.subtile);
+//			if (reveal_all || was_seen(Pos(x, y))) {
+//                            img.draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
+//			}
+//		}
+//	}
+//
+//	perf_timer_end(FUNCNAME);
 }
 
 void GameTiles::step(GameState* gs) {
@@ -152,73 +150,73 @@ void GameTiles::step(GameState* gs) {
 }
 void GameTiles::post_draw(GameState* gs) {
 
-	Size size = this->size();
-	GameView view = gs->view();
-	view.width += gs->game_hud().sidebar_content_area().width();
-
-	BBox region = view.tile_region_covered();
-
-	if (region.x2 >= size.w) {
-		region.x2 = size.w - 1;
-	}
-	if (region.y2 >= size.h) {
-		region.y2 = size.h - 1;
-	}
-
-	const int sub_sqrs = VISION_SUBSQRS;
-
-	if (/*gs->key_down_state(SDLK_BACKQUOTE) ||*/!gs->level_has_player()) {
-		return;
-	}
-	perf_timer_begin(FUNCNAME);
-
-	fov& mainfov = *gs->local_player()->field_of_view;
-	char matches[sub_sqrs * sub_sqrs];
-	for (int y = region.y1; y <= region.y2; y++) {
-		for (int x = region.x1; x <= region.x2; x++) {
-			bool has_match = false, has_free = false;
-			bool is_other_match = false;
-			Tile& tile = get(Pos(x, y));
-
-			std::vector<PlayerInst*> players = gs->players_in_level();
-
-			for (int i = 0; i < players.size(); i++) {
-				fov& f = *players[i]->field_of_view;
-				f.matches(x, y, matches);
-				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
-					if (matches[i]) {
-						if (&f == &mainfov)
-							has_match = true;
-						else
-							is_other_match = true;
-					} else {
-						has_free = true;
-					}
-				}
-			}
-
-			//Do not draw black if we have a match, and we see a wall
-			if (!has_match) {
-				BBox tilebox(
-						Pos(x * TILE_SIZE - view.x, y * TILE_SIZE - view.y),
-						res::tile(tile.tile).size());
-				using namespace ldraw;
-				// ldungeon_gen::Map& src_map = *gs->get_level()->source_map();
-				// gs->font().drawf(DrawOptions(Colour(0,255,0)), tilebox.center(), "%d", src_map[Pos(x, y)].group);
-				if (!is_other_match) {
-					if (!was_seen(Pos(x, y))) {
-						ldraw::draw_rectangle(Colour(0, 0, 0), tilebox);
-					} else {
-						// Previously seen
-						ldraw::draw_rectangle(Colour(0, 0, 0, 180), tilebox);
-					}
-				} else {
-					ldraw::draw_rectangle(Colour(0, 0, 0, 60), tilebox);
-				}
-			}
-		}
-	}
-	perf_timer_end(FUNCNAME);
+//	Size size = this->size();
+//	GameView view = gs->view();
+//	view.width += gs->game_hud().sidebar_content_area().width();
+//
+//	BBox region = view.tile_region_covered();
+//
+//	if (region.x2 >= size.w) {
+//		region.x2 = size.w - 1;
+//	}
+//	if (region.y2 >= size.h) {
+//		region.y2 = size.h - 1;
+//	}
+//
+//	const int sub_sqrs = VISION_SUBSQRS;
+//
+//	if (/*gs->key_down_state(SDLK_BACKQUOTE) ||*/!gs->level_has_player()) {
+//		return;
+//	}
+//	perf_timer_begin(FUNCNAME);
+//
+//	fov& mainfov = *gs->local_player()->field_of_view;
+//	char matches[sub_sqrs * sub_sqrs];
+//	for (int y = region.y1; y <= region.y2; y++) {
+//		for (int x = region.x1; x <= region.x2; x++) {
+//			bool has_match = false, has_free = false;
+//			bool is_other_match = false;
+//			Tile& tile = get(Pos(x, y));
+//
+//			std::vector<PlayerInst*> players = gs->players_in_level();
+//
+//			for (int i = 0; i < players.size(); i++) {
+//				fov& f = *players[i]->field_of_view;
+//				f.matches(x, y, matches);
+//				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
+//					if (matches[i]) {
+//						if (&f == &mainfov)
+//							has_match = true;
+//						else
+//							is_other_match = true;
+//					} else {
+//						has_free = true;
+//					}
+//				}
+//			}
+//
+//			//Do not draw black if we have a match, and we see a wall
+//			if (!has_match) {
+//				BBox tilebox(
+//						Pos(x * TILE_SIZE - view.x, y * TILE_SIZE - view.y),
+//						res::tile(tile.tile).size());
+//				using namespace ldraw;
+//				// ldungeon_gen::Map& src_map = *gs->get_level()->source_map();
+//				// gs->font().drawf(DrawOptions(Colour(0,255,0)), tilebox.center(), "%d", src_map[Pos(x, y)].group);
+//				if (!is_other_match) {
+//					if (!was_seen(Pos(x, y))) {
+//						ldraw::draw_rectangle(Colour(0, 0, 0), tilebox);
+//					} else {
+//						// Previously seen
+//						ldraw::draw_rectangle(Colour(0, 0, 0, 180), tilebox);
+//					}
+//				} else {
+//					ldraw::draw_rectangle(Colour(0, 0, 0, 60), tilebox);
+//				}
+//			}
+//		}
+//	}
+//	perf_timer_end(FUNCNAME);
 }
 
 void GameTiles::serialize(SerializeBuffer& serializer) {

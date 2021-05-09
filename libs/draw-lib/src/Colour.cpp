@@ -5,6 +5,8 @@
 
 #include <lcommon/math_util.h>
 
+#include "imgui.h"
+
 #include "Colour.h"
 
 Colour Colour::mute_colour(float val) const {
@@ -37,3 +39,7 @@ Colour Colour::clamp() const {
 			squish(a, 0, 256));
 }
 
+unsigned int Colour::as_rgba() const {
+	return ImGui::ColorConvertFloat4ToU32({r, g, b, a});
+	// return ((unsigned int)r) +  ((unsigned int)g) * 255u +  ((unsigned int)b) * 255u * 255u + ((unsigned int)a) * 255u * 255u * 255u;
+}

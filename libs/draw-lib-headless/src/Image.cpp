@@ -54,10 +54,6 @@ void Image::initialize(const Size& size, const BBoxF& draw_region,
 	_rotates = rotates;
 }
 
-void Image::batch_draw(const PosF& pos) const {
-    _image->batch_draw(_draw_region, pos);
-}
-
 void Image::draw(const DrawOptions& options, const PosF& pos) const {
 	DrawOptions adjusted_options(options);
 	BBoxF region(options.draw_region);

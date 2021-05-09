@@ -56,6 +56,7 @@ else()
     set(ARCH_LIBS 
 	${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
         freetype
+        dl
     )
 endif()
 set( LIBS ../libs)
