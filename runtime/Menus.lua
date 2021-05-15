@@ -24,6 +24,7 @@ local text_button_params = {
     click_box_padding = 5
 }
 
+local did_show_savefile = false
 -- The initial loading screen:
 local function start_menu_create(on_start_click, on_join_click, on_load_click, on_score_click)
     local menu = InstanceBox.create( { size = Display.display_size } )
@@ -60,6 +61,9 @@ local function start_menu_create(on_start_click, on_join_click, on_load_click, o
             {0, y_position}
         )
         y_position = y_position + 50
+        did_show_savefile = true
+    else
+        did_show_savefile = false
     end
 
     menu:add_instance(
@@ -107,7 +111,7 @@ end
 
 function setup_start_menu()
     if os.getenv("LANARTS_CLIENT") then
-	settings.connection_type = Network.CLIENT
+	    settings.connection_type = Network.CLIENT
         settings.class_type = "Fighter"
         exit_menu()
         return
@@ -116,7 +120,7 @@ function setup_start_menu()
         exit_menu()
         return
     elseif os.getenv("LANARTS_SERVER") then
-	settings.connection_type = Network.SERVER
+	    settings.connection_type = Network.SERVER
         settings.class_type = "Fighter"
         exit_menu()
         return
@@ -127,7 +131,9 @@ function setup_start_menu()
     menu_state.menu = InstanceBox.create( { size = Display.display_size } )
 
     menu_state.back = function()
-        exit_menu(--[[Quit game]] true)
+        if not __EMSCRIPTEN then
+            exit_menu(--[[Quit game]] true)
+        end
     end
 
     local function on_load_click()
@@ -144,9 +150,24 @@ function setup_start_menu()
     end
     menu_state.continue = on_continue
 
+    local start_menu = start_menu_create(
+        --[[New Game Button]] setup_settings_menu, 
+        --[[Join Game Button]] setup_lobby_menu,
+        --[[Load Game Button]] on_load_click, 
+        --[[Highscores Button]] setup_scores_menu
+    )
+    if __EMSCRIPTEN then
+        -- Poll to see if file becomes available (eventually move to desktop too with a delay?)
+        local base_start_menu_step = start_menu.step
+        function start_menu:step(xy) -- Makeshift inheritance
+            base_start_menu_step(self, xy)
+            if not did_show_savefile and file_exists("saves/savefile.save") then
+                setup_start_menu()
+            end
+        end
+    end
     menu_state.menu:add_instance(
-        start_menu_create( --[[New Game Button]] setup_settings_menu, --[[Join Game Button]] setup_lobby_menu,
-            --[[Load Game Button]] on_load_click, --[[Highscores Button]] setup_scores_menu),
+        start_menu,
         Display.CENTER
     )
 end
@@ -238,7 +259,7 @@ local function menu_step()
     end
 
     -- (4) Handle escape & enter
-    if Keys.key_pressed(Keys.ESCAPE) and menu_state.back then
+    if not __EMSCRIPTEN and Keys.key_pressed(Keys.ESCAPE) and menu_state.back then
         menu_state.back()
     elseif Keys.key_pressed(Keys.ENTER) and menu_state.continue then
         menu_state.continue()

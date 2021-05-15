@@ -27,9 +27,12 @@ function events.PlayerDeath(player)
         end
         return false
     else
-        if #World.players == 1 then
-            GameState.wait(100)
-            DeathScreen.show()
+        -- TODO Refactor to alter game loop so it can run in emscripten
+        if not __EMSCRIPTEN then
+            if #World.players == 1 then
+                GameState.wait(100)
+                DeathScreen.show()
+            end
         end
         GameState.score_board_store()
         return true

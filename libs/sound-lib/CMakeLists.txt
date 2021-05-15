@@ -40,7 +40,7 @@ set(LINKEDLIBS
 )
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
-    add_definitions(-s USE_OGG=1 -s USE_VORBIS=1)
+    #add_definitions(-s USE_OGG=1 -s USE_VORBIS=1)
 endif()
 
 #add_executable( lsound_tests main.cpp)

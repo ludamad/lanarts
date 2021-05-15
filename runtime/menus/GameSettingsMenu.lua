@@ -385,31 +385,34 @@ local function center_setting_fields_create()
 
         fields:clear()
 
-        fields:add_instance( connection_toggle_create() )
+        if not __EMSCRIPTEN then
+            fields:add_instance( connection_toggle_create() )
+        end
 
         if current_setting ~= Network.CLIENT then
             fields:add_instance( respawn_toggle_create() )
         end
 
-        if current_setting ~= Network.CLIENT then
-            fields:add_instance( speed_toggle_create() )
+        if not __EMSCRIPTEN then
+            if current_setting ~= Network.CLIENT then
+                fields:add_instance( speed_toggle_create() )
+            end
+
+            if current_setting == Network.CLIENT then
+                fields:add_instance( host_IP_field_create() )
+            end
+
+            if current_setting == Network.SERVER then
+                fields:add_instance( frame_action_repeat_toggle_create() )
+            end
+
+            local name_field = name_field_create( settings_text_field_params() )
+            fields:add_instance(name_field)
+
+            if current_setting ~= Network.NONE then
+                fields:add_instance( connection_port_field_create() )
+            end
         end
-
-        if current_setting == Network.CLIENT then
-            fields:add_instance( host_IP_field_create() )
-        end
-
-        if current_setting == Network.SERVER then
-           fields:add_instance( frame_action_repeat_toggle_create() )
-        end
-
-        local name_field = name_field_create( settings_text_field_params() )
-        fields:add_instance(name_field)
-
-        if current_setting ~= Network.NONE then
-            fields:add_instance( connection_port_field_create() )
-        end
-
     end
 
     add_fields() -- Do initial creation

@@ -40,6 +40,9 @@ Colour Colour::clamp() const {
 }
 
 unsigned int Colour::as_rgba() const {
-	return ImGui::ColorConvertFloat4ToU32({r, g, b, a});
-	// return ((unsigned int)r) +  ((unsigned int)g) * 255u +  ((unsigned int)b) * 255u * 255u + ((unsigned int)a) * 255u * 255u * 255u;
+	ImU32 out = ((ImU32)r) << IM_COL32_R_SHIFT;
+	out |= ((ImU32)g) << IM_COL32_G_SHIFT;
+	out |= ((ImU32)b) << IM_COL32_B_SHIFT;
+	out |= ((ImU32)a) << IM_COL32_A_SHIFT;
+	return out;
 }

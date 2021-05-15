@@ -60,10 +60,14 @@ void renew(T* obj, Args... args) {
     new (obj) T(args...);
 }
 
+void ensure_fs_init();
+
 static void engine_init_gamestate_api(LuaValue lsettings) {
     lua_State* L = lsettings.luastate();
     GameSettings settings; // Initialized with defaults
     settings.parse(lsettings);
+
+    ensure_fs_init();
     bool can_create_saves = ensure_directory("saves");
     if (!can_create_saves) {
         printf("Problem creating save directory, will not be able to create save files!\n");

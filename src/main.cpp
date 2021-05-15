@@ -135,6 +135,7 @@ static void run_engine_Main(int argc, const char **argv) {
 
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop_arg(run_lua_value, (void*)new LuaValue(step_func), 0, 0);
+    // emscripten_set_main_loop_timing(EM_TIMING_SETTIMEOUT, 16);
 #else
     while (true) {
         step_func.push();

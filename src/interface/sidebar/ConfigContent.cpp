@@ -26,7 +26,9 @@ void ConfigContent::draw(GameState* gs) const {
 	draw_option_box(gs, entry_box, settings.autouse_health_potions,
 			res::sprite_id("health_potion"), "Auto-Use Health Potions");
 	entry_box = entry_box.translated(0, TILE_SIZE);
+#ifndef __EMSCRIPTEN__
 	draw_speed_box(gs, entry_box);
+#endif
 }
 
 bool ConfigContent::handle_io(GameState* gs, ActionQueue& queued_actions) {

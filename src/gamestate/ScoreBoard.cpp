@@ -47,8 +47,7 @@ ScoreBoard::ScoreBoard(const std::string& filename) :
 		_filename(filename) {
 }
 
-ScoreBoard::~ScoreBoard() {
-}
+ScoreBoard::~ScoreBoard() = default;
 
 void ScoreBoard::store_entry(const ScoreBoardEntry& entry) {
 	std::vector<ScoreBoardEntry> entries;
@@ -65,16 +64,16 @@ std::vector<ScoreBoardEntry> ScoreBoard::fetch_entries() const {
 
 void ScoreBoard::store_entry(std::vector<ScoreBoardEntry>& entries,
 		const ScoreBoardEntry& entry) {
-	for (int i = 0; i < entries.size(); i++) {
+	for (ScoreBoardEntry& e : entries) {
 		// Test if timestamp & name match an existing entry
-		if (entries[i].name == entry.name
-				&& entries[i].timestamp == entry.timestamp) {
+		if (e.name == entry.name
+				&& e.timestamp == entry.timestamp) {
 			// Do we trump this entry ?
-			if (entries[i].score_stats.deepest_floor
+			if (e.score_stats.deepest_floor
 					<= entry.score_stats.deepest_floor
-					&& entries[i].score_stats.kills
+					&& e.score_stats.kills
 							<= entry.score_stats.kills) {
-				entries[i] = entry;
+                e = entry;
 			}
 			return;
 		}
@@ -85,7 +84,7 @@ void ScoreBoard::store_entry(std::vector<ScoreBoardEntry>& entries,
 }
 void ScoreBoard::read_entries(std::vector<ScoreBoardEntry>& entries) const {
 	FILE* entry_file = fopen(_filename.c_str(), "rb");
-	if (entry_file == NULL) {
+	if (entry_file == nullptr) {
 		return; // Interpret non-existent as empty
 	}
 
@@ -127,7 +126,7 @@ ScoreBoard ScoreBoard::get_instance() {
 void ScoreBoard::write_entries(const std::vector<ScoreBoardEntry>& entries) {
 	FILE* entry_file = fopen(_filename.c_str(), "wb");
 
-	if (entry_file == NULL) {
+	if (entry_file == nullptr) {
 		// Failure, just log and move on
 		printf("ScoreBoard::write_entries failed to open file '%s'\n",
 				_filename.c_str());

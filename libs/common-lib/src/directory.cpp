@@ -38,7 +38,9 @@ bool is_directory(const char* path) {
 	return (stat(path, &st) == 0 && S_ISDIR(st.st_mode));
 }
 
+void ensure_fs_init();
 bool create_directory(const char* path) {
+	ensure_fs_init();
 	return mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == 0;
 }
 

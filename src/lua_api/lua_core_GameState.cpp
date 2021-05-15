@@ -1,8 +1,3 @@
-/*
- * lua_misc.cpp:
- *  Misc. functions that have limited general usage
- */
-
 #include <ldraw/lua_ldraw.h>
 #include <ldraw/display.h>
 
@@ -22,17 +17,52 @@
 #include "lua_api.h"
 #include <lcommon/sdl_headless_support.h>
 
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+// TODO use for settings save as well
+void ensure_fs_sync() {
+    EM_ASM(
+				// save
+				FS.syncfs(false, console.error);
+    );
+}
+void ensure_fs_init() {
+    static bool initialized = false;
+    if (!initialized) {
+        initialized = true;
+        // Mount '/saves' as IDBFS so that it persists
+        EM_ASM(
+						FS.mkdir('/saves');
+						FS.mount(IDBFS, {}, '/saves');
+						// populate
+						FS.syncfs(true, console.error);
+        );
+    }
+}
+#else
+void ensure_fs_sync() {
+}
+void ensure_fs_init() {
+}
+#endif
+
+
 static void game_save(LuaStackValue filename) {
+	ensure_fs_init();
 	FILE* file = fopen(filename.as<const char*>(), "wb");
 	SerializeBuffer sb(file, SerializeBuffer::OUTPUT);
 	lua_api::gamestate(filename)->serialize(sb);
 	sb.flush();
 	fclose(file);
+	ensure_fs_sync();
 }
 
 static int game_score_board_store(lua_State* L) {
+	ensure_fs_init();
 	score_board_store(lua_api::gamestate(L),
-			lua_gettop(L) >= 1 ? lua_toboolean(L, 1) : false);
+			lua_gettop(L) >= 1 ? (bool)lua_toboolean(L, 1) : false);
+	ensure_fs_sync();
 	return 0;
 }
 
@@ -41,17 +71,14 @@ static int game_mark_loading(lua_State* L) {
     return 0;
 }
 static void game_load(LuaStackValue filename) {
-        // std::ifstream file(filename, std::ios::binary | std::ios::ate);
-        // std::streamsize size = file.tellg();
-        // file.seekg(0, std::ios::beg);
-        // std::vector<char> buffer(size);
-        // file.read(buffer.data(), size);
+	ensure_fs_init();
 	FILE* file = fopen(filename.as<const char*>(), "rb");
 	SerializeBuffer sb(file, SerializeBuffer::INPUT);
 	lua_api::gamestate(filename)->deserialize(sb);
 	// Ensure game state is set to 'loading'; this signals that the game state should not be started anew
 	lua_api::gamestate(filename)->is_loading_save() = true;
 	fclose(file);
+	ensure_fs_sync();
 }
 
 // Call on main thread

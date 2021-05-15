@@ -231,9 +231,15 @@ int IOController::handle_event(SDL_Event* event) {
 	switch (event->type) {
 	case SDL_KEYDOWN: {
 	    iostate.keymod = SDL_Keymod(event->key.keysym.mod);
+#ifdef __EMSCRIPTEN__
+		if (ctrl_held() && key == SDLK_ESCAPE) {
+			done = 1;
+		}
+#else
 		if (shift_held() && key == SDLK_ESCAPE) {
 			done = 1;
 		}
+#endif
 		iostate.key_down_states[key] = true;
 		iostate.key_press_states[key] = true;
 		break;
@@ -358,7 +364,11 @@ bool IOController::user_has_exit() const {
 }
 
 bool IOController::user_has_requested_exit() {
+#ifdef __EMSCRIPTEN__
+	return ctrl_held() && key_down_state(SDLK_ESCAPE);
+#else
 	return shift_held() && key_down_state(SDLK_ESCAPE);
+#endif
 }
 
 void IOController::set_key_down_state(int keyval) {

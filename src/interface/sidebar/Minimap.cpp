@@ -165,42 +165,42 @@ static BBox find_portion(Pos center, Size desired_size, Size world_size) {
 
 // Draws a minimap from the contents of gs->tile_grid()
 void Minimap::draw(GameState* gs) {
-//	perf_timer_begin(FUNCNAME);
-//
-//	int ptw = power_of_two_round(MINIMAP_DIM_MAX), pth = power_of_two_round(MINIMAP_DIM_MAX);
-//	if (!minimap_arr) {
-//		minimap_arr = new char[ptw * pth * 4];
-//	}
-//
-//	init_minimap_buff(minimap_arr, ptw, pth);
-//
-//	// Portion of world displayed on minimap
-//	BBox world_portion = drawn_tile_region(gs, gs->view());
-//	world2minimapbuffer(gs, minimap_arr, world_portion, world_portion.width(), world_portion.height(), ptw, pth);
-//
-//	std::vector<PlayerInst*> players_in_level = gs->player_data().players_in_level(gs->get_level()->id());
-//	for (int i = 0; i < players_in_level.size(); i++) {
-//		PlayerInst* player = players_in_level[i];
-//		int arr_x = (player->x / TILE_SIZE) - world_portion.x1, arr_y = (player->y / TILE_SIZE) - world_portion.y1;
-//		fill_buff2d(minimap_arr, ptw, pth, arr_x, arr_y, player->is_focus_player(gs) ? COL_YELLOW : COL_BABY_BLUE, 1, 1);
-//	}
-//	minimap_buff.from_bytes(Size(ptw, pth), minimap_arr);
-//
-//	BBox draw_region = image_draw_region(gs, gs->view());
-//
-//	// Prevent blurriness when scaling
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//	BBox bbox = minimap_bounds(gs);
-//	minimap_buff.draw(ldraw::DrawOptions(draw_region).scale(SizeF(scale,scale)), bbox.left_top());
-//	if (bbox.contains(gs->mouse_pos())) {
-//		if (gs->mouse_left_click()) {
-//			scale *= 2;
-//			if (scale > 8) {
-//				scale = 1;
-//			}
-//		}
-//	}
-//	perf_timer_end(FUNCNAME);
+	perf_timer_begin(FUNCNAME);
+
+	int ptw = power_of_two_round(MINIMAP_DIM_MAX), pth = power_of_two_round(MINIMAP_DIM_MAX);
+	if (!minimap_arr) {
+		minimap_arr = new char[ptw * pth * 4];
+	}
+
+	init_minimap_buff(minimap_arr, ptw, pth);
+
+	// Portion of world displayed on minimap
+	BBox world_portion = drawn_tile_region(gs, gs->view());
+	world2minimapbuffer(gs, minimap_arr, world_portion, world_portion.width(), world_portion.height(), ptw, pth);
+
+	std::vector<PlayerInst*> players_in_level = gs->player_data().players_in_level(gs->get_level()->id());
+	for (int i = 0; i < players_in_level.size(); i++) {
+		PlayerInst* player = players_in_level[i];
+		int arr_x = (player->x / TILE_SIZE) - world_portion.x1, arr_y = (player->y / TILE_SIZE) - world_portion.y1;
+		fill_buff2d(minimap_arr, ptw, pth, arr_x, arr_y, player->is_focus_player(gs) ? COL_YELLOW : COL_BABY_BLUE, 1, 1);
+	}
+	minimap_buff.from_bytes(Size(ptw, pth), minimap_arr);
+
+	BBox draw_region = image_draw_region(gs, gs->view());
+
+	// Prevent blurriness when scaling
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	BBox bbox = minimap_bounds(gs);
+	minimap_buff.draw(ldraw::DrawOptions(draw_region).scale(SizeF(scale,scale)), bbox.left_top());
+	if (bbox.contains(gs->mouse_pos())) {
+		if (gs->mouse_left_click()) {
+			scale *= 2;
+			if (scale > 8) {
+				scale = 1;
+			}
+		}
+	}
+	perf_timer_end(FUNCNAME);
 }
 
 Pos Minimap::minimap_xy_to_world_xy(GameState* gs, const GameView& view, Pos xy) const {

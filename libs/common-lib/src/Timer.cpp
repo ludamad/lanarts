@@ -8,10 +8,7 @@
 
 #include <SDL.h>
 
-#if defined (__TODO_EMSCRIPTEN__)
-#include <emscripten/emscripten.h>
-#include <emscripten/html5.h>
-#elif defined(__unix__)
+#if defined(__unix__)
 #include <sys/time.h>
 #elif defined(_WIN32)
 #include <windows.h>
@@ -51,9 +48,7 @@ Timer::Timer() {
 }
 
 void Timer::start() {
-#if defined(__TODO_EMSCRIPTEN__)
-    microseconds_since_epoch = (unsigned)(emscripten_performance_now()*1000);
-#elif defined(__unix__) || defined(_WIN32)
+#if defined(__unix__) || defined(_WIN32)
 	timeval timev;
 	gettimeofday(&timev, NULL);
 	microseconds_since_epoch = timev.tv_sec * 1000 * 1000 + timev.tv_usec;
