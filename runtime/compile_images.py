@@ -6,8 +6,8 @@ import sys
 from collections import OrderedDict, defaultdict
 
 #os.system("convert -crop 32x32 image.png temporary.png")
-print "local Display = require 'core.Display'"
-print "local M = nilprotect {}"
+print("local Display = require 'core.Display'")
+print("local M = nilprotect {}")
 
 SPR_FOLDERS = [
     "spr_books",
@@ -54,7 +54,7 @@ for spr in SPR_FOLDERS:
 used_ids = defaultdict(lambda: None)
 resources = []
 for spr_folder in SPR_FOLDERS:
-    print "-- " + spr_folder + " resource loads:"
+    print("-- " + spr_folder + " resource loads:")
     for basename in os.listdir(spr_folder):
         if basename.startswith("."): # Hidden file? Skip
             continue
@@ -71,19 +71,19 @@ for spr_folder in SPR_FOLDERS:
         if len(filename.split(".")) > 3:
             assert filename.split(".")[2] == "dir"
             dims = filename.split(".")[1]
-            print "M['" + full_id + "'] = Display.directional_create(Display.images_load '" + filename + "%" + dims +"')"
+            print("M['" + full_id + "'] = Display.directional_create(Display.images_load '" + filename + "%" + dims +"')")
         elif len(filename.split(".")) > 2:
             dims = filename.split(".")[1]
-            print "M['" + full_id + "'] = Display.animation_create(Display.images_load '" + filename + "%" + dims +"', 0.1)"
+            print("M['" + full_id + "'] = Display.animation_create(Display.images_load '" + filename + "%" + dims +"', 0.1)")
         else:
-            print "M['" + full_id + "'] = Display.image_load '" + filename + "'"
-        print "yield_point()"
-    print ""
+            print("M['" + full_id + "'] = Display.image_load '" + filename + "'")
+        print("yield_point()")
+    print("")
 resources.sort()
 
-print "M.resource_id_list = {"
+print("M.resource_id_list = {")
 for id in resources:
-    print "    '" + id + "',"
-print "}"
+    print("    '" + id + "',")
+print("}")
 
-print "return M"
+print("return M")

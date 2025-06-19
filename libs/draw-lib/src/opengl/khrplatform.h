@@ -146,7 +146,7 @@
 /*
  * Using <stdint.h>
  */
-#include "../../../../../../../../usr/lib/gcc/x86_64-redhat-linux/8/include/stdint.h"
+#include <stdint.h>
 typedef int32_t                 khronos_int32_t;
 typedef uint32_t                khronos_uint32_t;
 typedef int64_t                 khronos_int64_t;

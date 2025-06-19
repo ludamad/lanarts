@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 PROJECT(project_ldraw)
 
-FIND_LIBRARY(OpenGL REQUIRED)
+find_package(OpenGL REQUIRED)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     #set(FREETYPE_INCLUDE_DIRS "-s USE_FREETYPE=1")
@@ -23,13 +23,15 @@ elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     )
     set(FREETYPE_INCLUDE_DIRS ${DEPS}/freetype/include)
 else()
+    INCLUDE(FindPkgConfig)
+    PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+    PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
+    PKG_SEARCH_MODULE(SDL2MIXER REQUIRED SDL2_mixer>=2.0.0)
+    link_directories(${SDL2_LIBRARY_DIRS} ${SDL2IMAGE_LIBRARY_DIRS} ${SDL2MIXER_LIBRARY_DIRS})
     set(ARCH_LIBS 
 	${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} 
     )
-    INCLUDE(FindPkgConfig)
     include(FindFreetype)
-    PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-    PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 endif()
 
 set( SRC ../)

@@ -7,7 +7,7 @@ set(BOX2D_BUILD_STATIC ON)
 set(BOX2D_BUILD_EXAMPLES OFF)
 set(BOX2D_INSTALL OFF)
 
-FIND_LIBRARY(OpenGL REQUIRED)
+find_package(OpenGL REQUIRED)
 add_subdirectory(vendor/Box2D)
 
 file(GLOB MODULE_SOURCES src/*.cpp src/bind/*.cpp src/bind/dub/*.cpp src)

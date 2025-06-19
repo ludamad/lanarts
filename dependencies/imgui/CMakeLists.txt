@@ -17,7 +17,16 @@ set(IMGUI_SOURCES ${srcs})
 
 include_directories(imgui 
     ${root}
-    "${root}/../sdl2/include"
 )
+
+if (APPLE)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SDL2 REQUIRED sdl2)
+    include_directories(${SDL2_INCLUDE_DIRS})
+else()
+    include_directories("${root}/../sdl2/include")
+endif()
+
 add_definitions(-DIMGUI_DISABLE_INCLUDE_IMCONFIG_H)
+add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 

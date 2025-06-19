@@ -1,7 +1,15 @@
 cmake_minimum_required(VERSION 3.5)
 PROJECT(project_lanarts)
 
-FIND_LIBRARY(OpenGL REQUIRED)
+find_package(OpenGL REQUIRED)
+
+if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SDL2 REQUIRED sdl2)
+    pkg_check_modules(SDL2IMAGE REQUIRED SDL2_image)
+    pkg_check_modules(SDL2MIXER REQUIRED SDL2_mixer)
+    link_directories(${SDL2_LIBRARY_DIRS} ${SDL2IMAGE_LIBRARY_DIRS} ${SDL2MIXER_LIBRARY_DIRS})
+endif()
 
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
@@ -178,6 +186,10 @@ set (libraries
 	${ARCH_LIBS}
         imgui
 )
+
+if (APPLE)
+    list(APPEND libraries "-framework CoreFoundation")
+endif()
 
 target_link_libraries( lanarts 
     ${libraries}
