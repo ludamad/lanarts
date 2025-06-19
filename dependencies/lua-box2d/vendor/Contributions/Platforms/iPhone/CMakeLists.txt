@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.5)
 
 set(BOX2D_VERSION 2.1.0)
 set(BOX2D_BUILD_STATIC true)

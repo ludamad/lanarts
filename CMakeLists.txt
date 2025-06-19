@@ -1,7 +1,7 @@
 # Top-level cmake file. All settings are inherited by children cmake files.
 # Recursively includes all children cmake files using add_subdirectory(...)
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.5)
 
 if ($ENV{BUILD_OPTIMIZE})
     message("Building release... no debug symbols will be available.")

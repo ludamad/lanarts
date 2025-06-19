@@ -2,7 +2,7 @@
 #
 # Please see the file LICENSE.txt in the source's root directory.
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 3.5)
 
 project(PhysicsFS)
 set(PHYSFS_VERSION 2.1.0)

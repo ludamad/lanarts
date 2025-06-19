@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.6 )
+cmake_minimum_required(VERSION 3.5)
 PROJECT(project_lua_enet)
 
 set( lua_enet_src

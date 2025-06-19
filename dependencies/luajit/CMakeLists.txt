@@ -7,7 +7,7 @@
 # NOTE: This build is currently only supporting x86 targets, for other targets use the original makefile. Please do not submit bugs to the LuaJIT author in case this build fails, instead use http://github.com/LuaDist/luajit
 
 project ( luajit C ASM)
-cmake_minimum_required ( VERSION 2.8 )
+cmake_minimum_required(VERSION 3.5)
 include ( cmake/dist.cmake )
 
 #add_definitions(-fno-sanitize=address)

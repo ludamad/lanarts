@@ -6,7 +6,7 @@
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
-cmake_minimum_required(VERSION 2.4.4)
+cmake_minimum_required(VERSION 3.5)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 if(UNIX AND NOT DEFINED CMAKE_BUILD_TYPE)
@@ -289,7 +289,7 @@ endif()
 
 # If CMake > 2.4.x, we set a variable used below to export
 # targets to an export file.
-# TODO: Use VERSION_GREATER after our cmake_minimum_required >= 2.6.2
+# TODO: Use VERSION_GREATER after our cmake_minimum_required(VERSION 3.5)
 if(CMAKE_MAJOR_VERSION GREATER 1 AND CMAKE_MINOR_VERSION GREATER 4)
   set(PNG_EXPORT_RULE EXPORT libpng)
 elseif(CMAKE_MAJOR_VERSION GREATER 2) # future proof

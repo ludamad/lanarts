@@ -5,7 +5,7 @@
 # Please note that the package source code is licensed under its own license.
 
 project ( lpeg C )
-cmake_minimum_required ( VERSION 2.8 )
+cmake_minimum_required(VERSION 3.5)
 include ( cmake/dist.cmake )
 include ( lua )
 

@@ -73,7 +73,7 @@ build_opts="-DWITH_ZLIB=0 \
 # create test project CMakeLists.txt
 
 cat >$tmpdir/CMakeLists.txt << END
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.5)
 project(freetype-cmake-testbuild)
 
 find_package(Freetype REQUIRED CONFIG)
