@@ -366,11 +366,15 @@ local function aggregate_summary_rows(summaries)
         end
 
         local controlled_frames = math.max(1, aggregate.sums.controlled_frames or 0)
-        row.combat_frame_rate = format_rate((aggregate.sums.combat_frames or 0) / controlled_frames)
+        local combat_frames = aggregate.sums.combat_frames or 0
+        local kills = aggregate.sums.kills or 0
+        row.combat_frame_rate = format_rate(combat_frames / controlled_frames)
         row.explore_frame_rate = format_rate((aggregate.sums.explore_frames or 0) / controlled_frames)
         row.rest_frame_rate = format_rate((aggregate.sums.rest_frames or 0) / controlled_frames)
         row.idle_frame_rate = format_rate((aggregate.sums.idle_frames or 0) / controlled_frames)
         row.portal_stop_frame_rate = format_rate((aggregate.sums.portal_stop_frames or 0) / controlled_frames)
+        row.kills_per_1000_controlled_frames = format_rate(kills / controlled_frames * 1000)
+        row.kills_per_1000_combat_frames = format_rate(combat_frames > 0 and kills / combat_frames * 1000 or 0)
         rows[#rows + 1] = row
     end
     return rows
@@ -458,6 +462,20 @@ local REPORT_METRICS = {
         label = "kills",
         direction = "higher",
     },
+    {
+        key = "kills_per_1000_combat_frames",
+        label = "kills per 1000 combat frames",
+        direction = "higher",
+    },
+}
+
+local BASELINE_METRICS = {}
+for _, metric in ipairs(REPORT_METRICS) do
+    BASELINE_METRICS[#BASELINE_METRICS + 1] = metric
+end
+BASELINE_METRICS[#BASELINE_METRICS + 1] = {
+    key = "combat_frame_rate",
+    label = "combat contact rate",
 }
 
 local function report_severity(metric, delta)
@@ -485,7 +503,7 @@ end
 
 local function metric_baselines(class_rows, start_level)
     local baselines = {}
-    for _, metric in ipairs(REPORT_METRICS) do
+    for _, metric in ipairs(BASELINE_METRICS) do
         local total = 0
         local count = 0
         for _, row in ipairs(class_rows) do
@@ -606,6 +624,32 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
             )
         end
 
+        local combat_rate = tonumber(row.combat_frame_rate) or 0
+        local combat_rate_baseline = baselines.combat_frame_rate or 0
+        local combat_rate_delta_pct = combat_rate_baseline ~= 0
+            and (combat_rate - combat_rate_baseline) / math.abs(combat_rate_baseline)
+            or 0
+        local low_combat_contact = combat_rate_baseline > 0
+            and combat_rate_delta_pct <= -relative_threshold
+        if combat_rate_baseline > 0 and math.abs(combat_rate_delta_pct) >= relative_threshold then
+            local severity = low_combat_contact and "warning" or "info"
+            add_report_row(
+                rows,
+                class_name,
+                severity,
+                "contact",
+                "combat_frame_rate",
+                combat_rate,
+                combat_rate_baseline,
+                string.format(
+                    "%s combat contact rate is %.1f%% versus %.1f%% baseline; raw kill totals may reflect encounter exposure.",
+                    class_name,
+                    combat_rate * 100,
+                    combat_rate_baseline * 100
+                )
+            )
+        end
+
         for _, metric in ipairs(REPORT_METRICS) do
             local value = tonumber(row[metric.key]) or 0
             local baseline = baselines[metric.key] or 0
@@ -616,6 +660,15 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                 flagged = math.abs(delta) >= metric.absolute_delta_threshold
             else
                 flagged = math.abs(delta_pct) >= relative_threshold
+            end
+            if flagged and metric.key == "avg_kills" and delta < 0 and low_combat_contact then
+                local combat_kill_rate = tonumber(row.kills_per_1000_combat_frames) or 0
+                local combat_kill_baseline = baselines.kills_per_1000_combat_frames or 0
+                if combat_kill_baseline > 0
+                    and combat_kill_rate >= combat_kill_baseline * (1 - relative_threshold)
+                then
+                    flagged = false
+                end
             end
             if flagged then
                 add_report_row(
@@ -792,6 +845,9 @@ local function run_balance(raw_args)
         write_csv(args.aggregate_out, class_rows, {
             "class", "start_level", "runs", "wins", "deaths", "step_limits", "bot_stalls",
             "game_loop_exits", "win_rate", "death_rate", "outcome_counts",
+            "combat_frame_rate", "explore_frame_rate", "rest_frame_rate",
+            "idle_frame_rate", "portal_stop_frame_rate",
+            "kills_per_1000_controlled_frames", "kills_per_1000_combat_frames",
         })
         write_csv(args.spell_stats_out, spell_stat_rows, {
             "class", "start_level", "spell", "class_runs", "runs_using", "use_rate",

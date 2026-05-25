@@ -14,6 +14,11 @@ Balance simulations:
     The JSON output contains the run list plus class, spell, and report rows.
     Necromancer runs also emit Pain and Baleful Regeneration behavior counters
     in the run and aggregate tables.
+    Aggregate rows include raw pacing metrics and kills per 1000 combat frames
+    so low kill totals can be separated from low encounter contact.
+    The report emits contact warnings when combat-frame exposure is far from
+    baseline and suppresses raw-kill underperformance flags when combat-adjusted
+    kill rate is still in range.
     Ability-order totals are kept in the raw tables for behavior analysis, but
     are not used as cross-class balance report flags.
     Item-order totals are also raw telemetry; inventory access differs by class.
