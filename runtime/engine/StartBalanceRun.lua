@@ -26,6 +26,24 @@ local function split_csv(value)
     return result
 end
 
+local function parse_levels(value)
+    local result = {}
+    for _, part in ipairs(split_csv(value)) do
+        local level = tonumber(part)
+        if level and level >= 1 then
+            result[#result + 1] = math.floor(level)
+        end
+    end
+    if #result == 0 then
+        result[#result + 1] = 1
+    end
+    return result
+end
+
+local function group_key(class_name, start_level)
+    return tostring(class_name or "") .. "\n" .. tostring(start_level or 1)
+end
+
 local function parse_bool(value)
     value = tostring(value or ""):lower()
     return value == "1" or value == "true" or value == "yes" or value == "on"
@@ -177,6 +195,7 @@ local function sample_run(run, telemetry, samples, reason)
         run_id = run.run_id,
         seed = run.seed,
         class = run.class_name,
+        start_level = run.start_level or 1,
         frame = GameState.frame,
         reason = reason or "interval",
         level = snap.level,
@@ -215,6 +234,7 @@ local function summarize_run(run, telemetry, outcome)
         run_id = run.run_id,
         seed = run.seed,
         class = run.class_name,
+        start_level = run.start_level or 1,
         outcome = outcome,
         frames = GameState.frame,
         level = snap.level or 0,
@@ -265,6 +285,7 @@ local function flatten_spell_rows(run, telemetry)
             run_id = run.run_id,
             seed = run.seed,
             class = run.class_name,
+            start_level = run.start_level or 1,
             spell = spell,
             orders = count,
         }
@@ -298,17 +319,20 @@ local function aggregate_summary_rows(summaries)
     local groups = {}
     for _, row in ipairs(summaries) do
         local class_name = row.class or ""
-        local aggregate = groups[class_name]
+        local start_level = tonumber(row.start_level) or 1
+        local key = group_key(class_name, start_level)
+        local aggregate = groups[key]
         if not aggregate then
             aggregate = {
                 class = class_name,
+                start_level = start_level,
                 runs = 0,
                 outcomes = {},
                 sums = {},
                 mins = {},
                 maxes = {},
             }
-            groups[class_name] = aggregate
+            groups[key] = aggregate
         end
 
         aggregate.runs = aggregate.runs + 1
@@ -319,11 +343,12 @@ local function aggregate_summary_rows(summaries)
     end
 
     local rows = {}
-    for _, class_name in ipairs(sorted_group_keys(groups)) do
-        local aggregate = groups[class_name]
+    for _, key in ipairs(sorted_group_keys(groups)) do
+        local aggregate = groups[key]
         local runs = math.max(1, aggregate.runs)
         local row = {
-            class = class_name,
+            class = aggregate.class,
+            start_level = aggregate.start_level,
             runs = aggregate.runs,
             wins = aggregate.outcomes.won or 0,
             deaths = aggregate.outcomes.death or 0,
@@ -354,7 +379,8 @@ end
 local function class_run_counts(summaries)
     local counts = {}
     for _, row in ipairs(summaries) do
-        counts[row.class] = (counts[row.class] or 0) + 1
+        local key = group_key(row.class, row.start_level)
+        counts[key] = (counts[key] or 0) + 1
     end
     return counts
 end
@@ -363,11 +389,14 @@ local function aggregate_spell_rows(spell_rows, summaries)
     local run_counts = class_run_counts(summaries)
     local groups = {}
     for _, row in ipairs(spell_rows) do
-        local key = tostring(row.class or "") .. "\n" .. tostring(row.spell or "")
+        local run_group = group_key(row.class, row.start_level)
+        local key = run_group .. "\n" .. tostring(row.spell or "")
         local aggregate = groups[key]
         if not aggregate then
             aggregate = {
                 class = row.class,
+                start_level = tonumber(row.start_level) or 1,
+                run_group = run_group,
                 spell = row.spell,
                 runs_using = 0,
                 total_orders = 0,
@@ -384,11 +413,12 @@ local function aggregate_spell_rows(spell_rows, summaries)
     local rows = {}
     for _, key in ipairs(sorted_group_keys(groups)) do
         local aggregate = groups[key]
-        local class_runs = math.max(1, run_counts[aggregate.class] or 0)
+        local class_runs = math.max(1, run_counts[aggregate.run_group] or 0)
         rows[#rows + 1] = {
             class = aggregate.class,
+            start_level = aggregate.start_level,
             spell = aggregate.spell,
-            class_runs = run_counts[aggregate.class] or 0,
+            class_runs = run_counts[aggregate.run_group] or 0,
             runs_using = aggregate.runs_using,
             use_rate = format_rate(aggregate.runs_using / class_runs),
             total_orders = aggregate.total_orders,
@@ -428,11 +458,6 @@ local REPORT_METRICS = {
         label = "kills",
         direction = "higher",
     },
-    {
-        key = "avg_item_orders_total",
-        label = "item orders",
-        direction = "lower",
-    },
 }
 
 local function report_severity(metric, delta)
@@ -458,14 +483,16 @@ local function report_message(class_name, metric, value, baseline, delta_pct)
     )
 end
 
-local function metric_baselines(class_rows)
+local function metric_baselines(class_rows, start_level)
     local baselines = {}
     for _, metric in ipairs(REPORT_METRICS) do
         local total = 0
         local count = 0
         for _, row in ipairs(class_rows) do
-            total = total + (tonumber(row[metric.key]) or 0)
-            count = count + 1
+            if not start_level or (tonumber(row.start_level) or 1) == start_level then
+                total = total + (tonumber(row[metric.key]) or 0)
+                count = count + 1
+            end
         end
         baselines[metric.key] = count > 0 and total / count or 0
     end
@@ -488,14 +515,27 @@ local function add_report_row(rows, class_name, severity, category, metric, valu
     }
 end
 
+local function report_class_name(row)
+    local class_name = row.class or ""
+    local start_level = tonumber(row.start_level) or 1
+    if start_level > 1 then
+        return string.format("%s L%d", class_name, start_level)
+    end
+    return class_name
+end
+
 local function balance_report_rows(class_rows, min_runs, relative_threshold)
     local rows = {}
-    local baselines = metric_baselines(class_rows)
+    local baselines_by_level = {}
     min_runs = min_runs or 3
     relative_threshold = relative_threshold or 0.25
 
     for _, row in ipairs(class_rows) do
-        local class_name = row.class or ""
+        local class_name = report_class_name(row)
+        local start_level = tonumber(row.start_level) or 1
+        baselines_by_level[start_level] = baselines_by_level[start_level]
+            or metric_baselines(class_rows, start_level)
+        local baselines = baselines_by_level[start_level]
         local runs = tonumber(row.runs) or 0
         if runs < min_runs then
             add_report_row(
@@ -625,6 +665,18 @@ local function game_init(run, telemetry, bot_options)
     EngineInternal.init_gamestate()
     random_seed(run.seed)
     EngineInternal.start_game()
+    local entry = World.players[1]
+    local player = entry and entry.instance
+    for _ = 2, (run.start_level or 1) do
+        if player then
+            player:gain_level()
+        end
+    end
+    if player then
+        local estats = player:effective_stats()
+        player.stats.hp = estats.max_hp
+        player.stats.mp = estats.max_mp
+    end
     GameState.input_capture()
     if not GameState.input_handle() then
         error("Game exited during initial input handling.")
@@ -663,18 +715,21 @@ local function install_run_hooks(events_module, base_player_death, base_monster_
     end
 end
 
-local function build_runs(classes, runs_per_class, seed)
+local function build_runs(classes, levels, runs_per_class, seed)
     local runs = {}
     local run_id = 1
     for _, class_name in ipairs(classes) do
-        for idx = 1, runs_per_class do
-            runs[#runs + 1] = {
-                run_id = run_id,
-                class_name = class_name,
-                seed = seed + run_id - 1,
-                class_run_index = idx,
-            }
-            run_id = run_id + 1
+        for _, start_level in ipairs(levels) do
+            for idx = 1, runs_per_class do
+                runs[#runs + 1] = {
+                    run_id = run_id,
+                    class_name = class_name,
+                    start_level = start_level,
+                    seed = seed + run_id - 1,
+                    class_run_index = idx,
+                }
+                run_id = run_id + 1
+            end
         end
     end
     return runs
@@ -686,6 +741,7 @@ local function run_balance(raw_args)
     parser:option("--runs", "Runs per class.", "1")
     parser:option("--seed", "First simulation seed.", "12345678")
     parser:option("--classes", "Comma-separated classes to run.", DEFAULT_CLASSES)
+    parser:option("--levels", "Comma-separated starting levels to run.", "1")
     parser:option("--spell_policy", "Spell selection policy: mixed, priority, round_robin, none.", "mixed")
     parser:option("--sample_interval", "Frame interval for timeseries samples.", "300")
     parser:option("--out", "Summary CSV output.", "saves/balance_runs.csv")
@@ -702,7 +758,7 @@ local function run_balance(raw_args)
 
     local max_steps = tonumber(args.steps)
     local sample_interval = tonumber(args.sample_interval)
-    local runs = build_runs(split_csv(args.classes), tonumber(args.runs), tonumber(args.seed))
+    local runs = build_runs(split_csv(args.classes), parse_levels(args.levels), tonumber(args.runs), tonumber(args.seed))
     local summaries = {}
     local samples = {}
     local spell_rows = {}
@@ -719,26 +775,26 @@ local function run_balance(raw_args)
         local spell_stat_rows = aggregate_spell_rows(spell_rows, summaries)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
         write_csv(args.out, summaries, {
-            "run_id", "seed", "class", "outcome", "frames", "level", "xp",
+            "run_id", "seed", "class", "start_level", "outcome", "frames", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
         })
         write_csv(args.samples_out, samples, {
-            "run_id", "seed", "class", "frame", "reason", "level", "xp",
+            "run_id", "seed", "class", "start_level", "frame", "reason", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
         })
-        write_csv(args.spells_out, spell_rows, {"run_id", "seed", "class", "spell", "orders"})
+        write_csv(args.spells_out, spell_rows, {"run_id", "seed", "class", "start_level", "spell", "orders"})
         write_csv(args.aggregate_out, class_rows, {
-            "class", "runs", "wins", "deaths", "step_limits", "bot_stalls",
+            "class", "start_level", "runs", "wins", "deaths", "step_limits", "bot_stalls",
             "game_loop_exits", "win_rate", "death_rate", "outcome_counts",
         })
         write_csv(args.spell_stats_out, spell_stat_rows, {
-            "class", "spell", "class_runs", "runs_using", "use_rate",
+            "class", "start_level", "spell", "class_runs", "runs_using", "use_rate",
             "total_orders", "avg_orders_per_run", "avg_orders_per_using_run",
             "max_orders_in_run",
         })
@@ -817,10 +873,11 @@ local function run_balance(raw_args)
                     spell_rows[#spell_rows + 1] = row
                 end
                 print(string.format(
-                    "Run %d seed=%d class=%s outcome=%s frames=%d level=%d kills=%d",
+                    "Run %d seed=%d class=%s start_level=%d outcome=%s frames=%d level=%d kills=%d",
                     summary.run_id,
                     summary.seed,
                     summary.class,
+                    summary.start_level,
                     summary.outcome,
                     summary.frames,
                     summary.level,

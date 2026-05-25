@@ -5,6 +5,7 @@ e2e_tests:
 
 Balance simulations:
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --classes Fighter,Necromancer,Pyrocaster,Stormcaller
+    ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --levels 1,3
 
     Outputs default to saves/balance_runs.csv, saves/balance_samples.csv,
     saves/balance_spells.csv, saves/balance_classes.csv,
@@ -15,4 +16,7 @@ Balance simulations:
     in the run and aggregate tables.
     Ability-order totals are kept in the raw tables for behavior analysis, but
     are not used as cross-class balance report flags.
+    Item-order totals are also raw telemetry; inventory access differs by class.
+    Multi-level sweeps produce separate class and spell aggregate rows per
+    starting level, which is useful for checking later spell unlocks.
     Use --min_report_runs and --report_delta_pct to tune report sensitivity.

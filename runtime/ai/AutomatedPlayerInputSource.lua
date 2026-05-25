@@ -477,12 +477,12 @@ function AutomatedPlayerInputSource:step()
     local enemies = visible_enemies(self.player)
     self.telemetry.max_visible_enemies = math.max(self.telemetry.max_visible_enemies or 0, #enemies)
 
-    if is_on_portal(self.player) then
-        self:_record_scalar("portal_stop_frames")
+    if self:_combat_action(enemies) then
         self:_clear_stall_state()
         return
     end
-    if self:_combat_action(enemies) then
+    if is_on_portal(self.player) then
+        self:_record_scalar("portal_stop_frames")
         self:_clear_stall_state()
         return
     end
