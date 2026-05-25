@@ -9,6 +9,8 @@
 
 #include "display.h"
 
+union SDL_Event;
+
 static Size RENDER_SIZE;
 static Size WINDOW_SIZE;
 static bool IS_FULLSCREEN;
@@ -70,4 +72,7 @@ void ldraw::reset_blend_func() {
 
 Size ldraw::window_size() {
     return WINDOW_SIZE;
+}
+
+void ldraw::process_event(const SDL_Event* event) {
 }

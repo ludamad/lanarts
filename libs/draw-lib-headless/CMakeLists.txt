@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 
 PROJECT(project_ldraw)
 
-include(FindFreetype)
-
 set( SRC ../)
 set( DEPS ../../dependencies)
 
@@ -14,7 +12,6 @@ include_directories(
 	"${SRC}/luawrap-lib/include"
 	${DEPS}/UnitTest++
 	${DEPS}/lua
-	${FREETYPE_INCLUDE_DIRS} 
 )
 
 file(GLOB ldraw_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
@@ -37,7 +34,6 @@ set(LINKEDDEPS
 	luawrap
 	lcommon
 	lua
-	${FREETYPE_LIBRARIES}
 )
 
 add_definitions(--std=c++14)

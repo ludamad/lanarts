@@ -9,6 +9,8 @@
 
 #include <lcommon/geometry.h>
 
+union SDL_Event;
+
 namespace ldraw {
 
 void display_initialize(const char* window_name, const Size& draw_area_size,
@@ -25,6 +27,7 @@ Size screen_size();
 Size display_size();
 void reset_blend_func();
 Size window_size();
+void process_event(const SDL_Event* event);
 
 }
         

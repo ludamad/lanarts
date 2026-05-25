@@ -28,6 +28,7 @@ end
 
 local last_timer
 local HEADLESS = os.getenv("LANARTS_HEADLESS")
+local PRINT_FRAME_TIMING = os.getenv("LANARTS_FRAME_TIMING")
 function M.game_step(steponly)
     if HEADLESS then
         steponly = true
@@ -57,7 +58,9 @@ function M.game_step(steponly)
 
     local surplus = settings.time_per_step - timer:get_milliseconds()
 
-    print(timer:get_milliseconds(), " MS => ", last_timer and last_timer:get_milliseconds())
+    if PRINT_FRAME_TIMING then
+        print(timer:get_milliseconds(), " MS => ", last_timer and last_timer:get_milliseconds())
+    end
     perf.timing_begin("**Surplus**")
     last_timer = timer
     if not HEADLESS and not __EMSCRIPTEN then
