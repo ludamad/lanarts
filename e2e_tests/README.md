@@ -14,6 +14,7 @@ Balance simulations:
     The JSON output contains the run list plus class, spell, and report rows.
     Necromancer runs also emit Pain and Baleful Regeneration behavior counters
     in the run and aggregate tables.
+    Pyrocaster runs emit Ring of Flames combat-positioning counters.
     Aggregate rows include raw pacing metrics and kills per 1000 combat frames
     so low kill totals can be separated from low encounter contact.
     The report emits contact warnings when combat-frame exposure is far from

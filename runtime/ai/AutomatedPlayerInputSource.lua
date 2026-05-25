@@ -15,6 +15,8 @@ local DEFAULTS = {
     necromancer_regen_hp_pct = 0.42,
     necromancer_retreat_hp_pct = 0.22,
     necromancer_pain_range = 72,
+    pyrocaster_ring_min_range = 30,
+    pyrocaster_ring_max_range = 62,
     ranged_keepaway = 80,
     melee_close = 46,
     stuck_end_frames = 720,
@@ -328,6 +330,35 @@ function AutomatedPlayerInputSource:_combat_move(enemies, ordered_spell)
     return false
 end
 
+function AutomatedPlayerInputSource:_pyrocaster_ring_move(enemies, ordered_spell)
+    local closest = enemies[1]
+    if not closest then
+        return false
+    end
+    local player = self.player
+    local dist = math.sqrt(distance_sqr(player, closest))
+    local toward = direction_between(player, closest, 6)
+    local using_ring = player:has_effect("Ring of Flames Stat Boost")
+        or (ordered_spell and ordered_spell.name == "Ring of Flames")
+
+    if not using_ring then
+        return self:_combat_move(enemies, ordered_spell ~= nil)
+    end
+
+    self:_record_scalar("pyrocaster_ring_combat_frames")
+    if hp_pct(player) < self.options.retreat_hp_pct then
+        return self:_set_move(reverse_direction(toward))
+    end
+    if dist > self.options.pyrocaster_ring_max_range then
+        self:_record_scalar("pyrocaster_ring_close_frames")
+        return self:_set_move(toward)
+    elseif dist < self.options.pyrocaster_ring_min_range then
+        self:_record_scalar("pyrocaster_ring_reposition_frames")
+        return self:_set_move(reverse_direction(toward))
+    end
+    return false
+end
+
 function AutomatedPlayerInputSource:_necromancer_combat_action(enemies)
     local player = self.player
     local closest = enemies[1]
@@ -369,6 +400,24 @@ function AutomatedPlayerInputSource:_necromancer_combat_action(enemies)
     return true
 end
 
+function AutomatedPlayerInputSource:_pyrocaster_combat_action(enemies)
+    if self:_try_emergency_item(enemies) then
+        return true
+    end
+
+    local spell = self:_choose_spell(enemies)
+    if spell then
+        self:_order_spell(spell)
+        self:_pyrocaster_ring_move(enemies, spell)
+        return true
+    end
+
+    self:set("should_use_weapon", true)
+    self:_record_scalar("weapon_orders")
+    self:_pyrocaster_ring_move(enemies, nil)
+    return true
+end
+
 function AutomatedPlayerInputSource:_combat_action(enemies)
     if #enemies == 0 then
         return false
@@ -377,6 +426,9 @@ function AutomatedPlayerInputSource:_combat_action(enemies)
 
     if self.player.class_name == "Necromancer" then
         return self:_necromancer_combat_action(enemies)
+    end
+    if self.player.class_name == "Pyrocaster" then
+        return self:_pyrocaster_combat_action(enemies)
     end
 
     if self:_try_emergency_item(enemies) then

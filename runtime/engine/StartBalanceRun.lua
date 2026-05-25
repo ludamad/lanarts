@@ -223,6 +223,9 @@ local function sample_run(run, telemetry, samples, reason)
         necromancer_pain_during_regen_orders = telemetry.necromancer_pain_during_regen_orders or 0,
         necromancer_regen_combat_frames = telemetry.necromancer_regen_combat_frames or 0,
         necromancer_retreat_frames = telemetry.necromancer_retreat_frames or 0,
+        pyrocaster_ring_combat_frames = telemetry.pyrocaster_ring_combat_frames or 0,
+        pyrocaster_ring_close_frames = telemetry.pyrocaster_ring_close_frames or 0,
+        pyrocaster_ring_reposition_frames = telemetry.pyrocaster_ring_reposition_frames or 0,
     }
 end
 
@@ -270,6 +273,9 @@ local function summarize_run(run, telemetry, outcome)
         necromancer_pain_during_regen_orders = telemetry.necromancer_pain_during_regen_orders or 0,
         necromancer_regen_combat_frames = telemetry.necromancer_regen_combat_frames or 0,
         necromancer_retreat_frames = telemetry.necromancer_retreat_frames or 0,
+        pyrocaster_ring_combat_frames = telemetry.pyrocaster_ring_combat_frames or 0,
+        pyrocaster_ring_close_frames = telemetry.pyrocaster_ring_close_frames or 0,
+        pyrocaster_ring_reposition_frames = telemetry.pyrocaster_ring_reposition_frames or 0,
         max_same_square_frames = telemetry.max_same_square_frames or 0,
         max_visible_enemies = telemetry.max_visible_enemies or 0,
         spell_orders = encode_counts(telemetry.spell_orders),
@@ -301,6 +307,8 @@ local SUMMARY_METRICS = {
     "unstick_frames", "portal_stop_frames", "necromancer_close_frames",
     "necromancer_pain_orders", "necromancer_pain_during_regen_orders",
     "necromancer_regen_combat_frames", "necromancer_retreat_frames",
+    "pyrocaster_ring_combat_frames", "pyrocaster_ring_close_frames",
+    "pyrocaster_ring_reposition_frames",
     "max_same_square_frames", "max_visible_enemies",
 }
 
