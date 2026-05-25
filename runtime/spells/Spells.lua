@@ -76,7 +76,7 @@ function Berserk.autotarget_func(caster)
 end
 
 function Berserk.action_func(caster, x, y)
-    caster:add_effect("Berserk", 130 + math.min(3, caster.stats.level) * 30)
+    caster:add_effect("Berserk", 110 + math.min(3, caster.stats.level) * 20)
     for _ in screens() do
         if caster:is_local_player() then
             play_sound "sound/berserk.ogg"

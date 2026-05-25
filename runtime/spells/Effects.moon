@@ -56,14 +56,12 @@ DataW.effect_create {
             defender\add_effect("Stun", 20 + attacker.stats.level)
         return damage
     stat_func: (obj, old, new) =>
-        -- 2 Strength points during berserk for each levelup
-        new.strength += obj.stats.level * 2
+        new.strength += obj.stats.level
         -- Greater defences during berserk
-        -- 3 defence points during berserk for each levelup
-        new.defence = math.max(0, new.defence + obj.stats.level * 3)
-        new.willpower = math.max(0, new.willpower + obj.stats.level * 3)
-        new.melee_cooldown_multiplier /= 1.6
-        hp_regen_bonus = (10 + 4 * obj.stats.level) / 60 -- 10 + 4 * levelup per second
+        new.defence = math.max(0, new.defence + obj.stats.level * 2)
+        new.willpower = math.max(0, new.willpower + obj.stats.level * 2)
+        new.melee_cooldown_multiplier /= 1.4
+        hp_regen_bonus = (6 + 2 * obj.stats.level) / 60 -- Per 60 frames
         new.hpregen += hp_regen_bonus
         if obj\has_effect("AmuletBerserker")
             new.hpregen += hp_regen_bonus
@@ -88,7 +86,7 @@ DataW.effect_create {
             return
         diff = math.max(obj.kills - @kill_tracker, 0)
         for i=1,diff
-            @time_left = math.min(@max_time * 1.5, @time_left + 45)
+            @time_left = math.min(@max_time * 1.5, @time_left + 30)
             for _ in screens()
                 if obj\is_local_player()
                     EventLog.add("Your rage grows from killing...", {200,200,255})

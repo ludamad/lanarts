@@ -116,7 +116,7 @@ DataW.spell_create {
     types: {"White"}
     projectile: SpellUtils.passing_projectile {
         speed: 5
-        damage_multiplier: 1
+        damage_multiplier: 1.5
         n_steps: 500 / 8
         can_wall_bounce: true
         redamage_cooldown: 40 -- Cooldown for when enemies are damaged again by effect

@@ -13,6 +13,7 @@ MAGE_START_STATS = {
         weapon: "Apprentice Staff"
         inventory: {
             {item: "Mana Potion"}
+            {item: "Health Potion"}
         }
     }
 }
@@ -25,6 +26,11 @@ MAGE_GAIN_STATS = {
     strength: 1,
     defence: 1,
     willpower: 2
+}
+
+STORMCALLER_START_STATS = table.merge MAGE_START_STATS, {
+    hp: 120,
+    defence: 6,
 }
 
 Data.class_create {
@@ -57,7 +63,7 @@ Data.class_create {
         {spell: "Chain Lightning", level_needed: 2},
         {spell: "Tornado Storm", level_needed: 3},
     },
-    start_stats: MAGE_START_STATS
+    start_stats: STORMCALLER_START_STATS
     gain_per_level: MAGE_GAIN_STATS
 }
 
@@ -146,7 +152,7 @@ Data.class_create {
         mp: 60,
         hpregen: 4 / 60, -- Per 60 frames
         mpregen: 2 / 60, -- Per 60 frames
-        strength: 7,
+        strength: 6,
         defence: 7,
         willpower: 4,
         magic: 4,
