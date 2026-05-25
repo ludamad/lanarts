@@ -86,7 +86,7 @@ DataW.effect_create {
             return
         diff = math.max(obj.kills - @kill_tracker, 0)
         for i=1,diff
-            @time_left = math.min(@max_time * 1.5, @time_left + 30)
+            @time_left = math.min(@max_time * 1.5, @time_left + 20)
             for _ in screens()
                 if obj\is_local_player()
                     EventLog.add("Your rage grows from killing...", {200,200,255})

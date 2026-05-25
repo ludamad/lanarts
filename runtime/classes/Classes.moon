@@ -29,7 +29,7 @@ MAGE_GAIN_STATS = {
 }
 
 STORMCALLER_START_STATS = table.merge MAGE_START_STATS, {
-    hp: 120,
+    hp: 130,
     defence: 6,
 }
 
