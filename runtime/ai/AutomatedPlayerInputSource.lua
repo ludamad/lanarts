@@ -417,29 +417,35 @@ function AutomatedPlayerInputSource:_random_direction()
 end
 
 function AutomatedPlayerInputSource:_travel_action()
-    if #self.queued_movements > 0 then
+    local force_unstick = self.same_square_frames > 80
+    if force_unstick then
+        self.queued_movements = {}
+    elseif #self.queued_movements > 0 then
         return self:_set_move(table.remove(self.queued_movements, 1))
     end
 
-    local dir = self.ai_state:get_next_direction()
-    if not dir then
-        dir = self.player:direction_towards_unexplored()
-    end
-    if not dir then
-        dir = self.ai_state:get_next_wander_direction()
-    end
-    if not dir then
+    local dir
+    if force_unstick then
         dir = self:_random_direction()
-        if self.same_square_frames > 80 then
-            self:_record_scalar("unstick_frames")
-        else
+        self:_record_scalar("unstick_frames")
+    else
+        dir = self.ai_state:get_next_direction()
+        if not dir then
+            dir = self.player:direction_towards_unexplored()
+        end
+        if not dir then
+            dir = self.ai_state:get_next_wander_direction()
+        end
+        if not dir then
+            dir = self:_random_direction()
             self:_record_scalar("random_walk_frames")
         end
     end
 
     if dir then
         self:_record_scalar("explore_frames")
-        for _ = 1, 3 do
+        local queued_repeats = force_unstick and 0 or 3
+        for _ = 1, queued_repeats do
             self.queued_movements[#self.queued_movements + 1] = dir
         end
         return self:_set_move(dir)
