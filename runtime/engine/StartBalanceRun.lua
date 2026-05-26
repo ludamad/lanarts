@@ -170,6 +170,41 @@ end
 
 local LOADOUT_PRESETS = {
     none = {},
+    gragh = {
+        default = {
+            "Health Potion*2",
+            "Mana Potion",
+        },
+        Fighter = {
+            "Iron Broadsword",
+            "Chainmail",
+            "Leather Gloves",
+            "Iron Helmet",
+            "Leather Boots",
+            "Belt of Protection",
+            "Ring of Vitality",
+        },
+        Necromancer = {
+            "Apprentice Staff",
+            "Robe",
+            "Wizard's Ring",
+            "Amulet of Great Pain",
+        },
+        Pyrocaster = {
+            "Apprentice Staff",
+            "Red Robe",
+            "Wizard's Hat",
+            "Ring of Spells",
+            "Amulet of Greater Fire",
+        },
+        Stormcaller = {
+            "Wizard's Staff",
+            "White Robe",
+            "Wizard's Hat",
+            "Ring of Spells",
+            "Amulet of Light",
+        },
+    },
     late = {
         default = {
             "Health Potion*3",
@@ -284,7 +319,12 @@ local function normalize_loadout_preset(value)
         preset = "none"
     end
     if not LOADOUT_PRESETS[preset] then
-        error("Invalid --loadout_preset '" .. preset .. "'. Expected one of: late, none.")
+        local names = {}
+        for name, _ in pairs(LOADOUT_PRESETS) do
+            names[#names + 1] = name
+        end
+        table.sort(names)
+        error("Invalid --loadout_preset '" .. preset .. "'. Expected one of: " .. table.concat(names, ", ") .. ".")
     end
     return preset
 end
