@@ -100,6 +100,15 @@ local function mp_pct(player)
     return player.stats.mp / max_mp
 end
 
+local function active_summon_count(player)
+    local effect = player:get_effect("Summoner")
+    return effect and (effect.n_summons or 0) or 0
+end
+
+local function max_dark_aspects(player)
+    return math.max(1, math.ceil((player:effective_stats().willpower - 4) / 2))
+end
+
 local function known_spells(player)
     local result = {}
     for _, entry in ipairs(player.def.available_spells or {}) do
@@ -224,12 +233,18 @@ function AutomatedPlayerInputSource:_spell_reasonable(name, enemies)
         return closest_dist <= 96
     elseif name == "Dash Attack" then
         return closest_dist >= 28
-    elseif name == "Summon Dark Aspect" or name == "Link of Loyalty" then
+    elseif name == "Summon Dark Aspect" then
         return pct > self.options.retreat_hp_pct
+            and not player:has_effect("Summoning")
+            and active_summon_count(player) < max_dark_aspects(player)
+    elseif name == "Link of Loyalty" then
+        return pct > self.options.retreat_hp_pct
+            and not player:has_effect("Summoning")
+            and active_summon_count(player) < 2
     elseif name == "Unlink" then
         return pct < self.options.emergency_hp_pct
     elseif name == "Skeleton Army" then
-        return #enemies > 0
+        return #enemies >= 2 and pct > self.options.retreat_hp_pct
     end
     return true
 end
@@ -384,6 +399,11 @@ function AutomatedPlayerInputSource:_necromancer_combat_action(enemies)
     if pct < self.options.necromancer_retreat_hp_pct and not regenerating then
         self:_record_scalar("necromancer_retreat_frames")
         return self:_set_move(reverse_direction(toward))
+    end
+
+    local spell = self:_choose_spell(enemies)
+    if spell and spell.name ~= "Baleful Regeneration" then
+        return self:_order_spell(spell)
     end
 
     if dist > self.options.necromancer_pain_range then
