@@ -360,17 +360,6 @@ local function spell_names(player)
     return ""
 end
 
-local function visible_enemy_count(player)
-    load_core_modules()
-    local count = 0
-    for _, enemy in ipairs(Map.enemies_list(player)) do
-        if not enemy.destroyed and Map.object_visible(enemy, enemy.xy, player) then
-            count = count + 1
-        end
-    end
-    return count
-end
-
 local function hostile_alive_enemy(player, enemy)
     if not enemy or enemy.destroyed or not enemy.stats then
         return false
@@ -382,6 +371,17 @@ local function hostile_alive_enemy(player, enemy)
         return false
     end
     return true
+end
+
+local function visible_enemy_count(player)
+    load_core_modules()
+    local count = 0
+    for _, enemy in ipairs(Map.enemies_list(player)) do
+        if hostile_alive_enemy(player, enemy) and Map.object_visible(enemy, enemy.xy, player) then
+            count = count + 1
+        end
+    end
+    return count
 end
 
 local function effective_max_hp(obj)
@@ -413,6 +413,17 @@ local function alive_enemy_state(player, enemies)
     return counts, hp, max_hp
 end
 
+local function hostile_alive_enemy_count(player)
+    load_core_modules()
+    local count = 0
+    for _, enemy in ipairs(Map.enemies_list(player)) do
+        if hostile_alive_enemy(player, enemy) then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 local function player_snapshot()
     load_core_modules()
     local entry = World.players[1]
@@ -427,7 +438,7 @@ local function player_snapshot()
     return {
         player = player,
         map_label = map_label,
-        enemies_alive = #enemies,
+        enemies_alive = hostile_alive_enemy_count(player),
         visible_enemies = visible_enemy_count(player),
         alive_enemy_counts = encode_counts(alive_enemy_counts),
         alive_enemy_hp = encode_counts(alive_enemy_hp),
@@ -640,17 +651,19 @@ local function aggregate_summary_rows(summaries)
     for _, key in ipairs(sorted_group_keys(groups)) do
         local aggregate = groups[key]
         local runs = math.max(1, aggregate.runs)
+        local wins = (aggregate.outcomes.won or 0) + (aggregate.outcomes.cleared or 0)
         local row = {
             class = aggregate.class,
             start_level = aggregate.start_level,
             loadout = aggregate.loadout,
             runs = aggregate.runs,
-            wins = aggregate.outcomes.won or 0,
+            wins = wins,
+            clears = aggregate.outcomes.cleared or 0,
             deaths = aggregate.outcomes.death or 0,
             step_limits = aggregate.outcomes.step_limit or 0,
             bot_stalls = aggregate.outcomes.bot_stalled or 0,
             game_loop_exits = aggregate.outcomes.game_loop_exit or 0,
-            win_rate = format_rate((aggregate.outcomes.won or 0) / runs),
+            win_rate = format_rate(wins / runs),
             death_rate = format_rate((aggregate.outcomes.death or 0) / runs),
             outcome_counts = encode_counts(aggregate.outcomes),
         }
@@ -1509,7 +1522,7 @@ local function run_balance(raw_args)
         })
         write_csv(args.spells_out, spell_rows, {"run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "spell", "orders"})
         write_csv(args.aggregate_out, class_rows, {
-            "class", "start_level", "loadout", "runs", "wins", "deaths", "step_limits", "bot_stalls",
+            "class", "start_level", "loadout", "runs", "wins", "clears", "deaths", "step_limits", "bot_stalls",
             "game_loop_exits", "win_rate", "death_rate", "outcome_counts",
             "combat_frame_rate", "explore_frame_rate", "rest_frame_rate",
             "idle_frame_rate", "portal_stop_frame_rate",
@@ -1537,7 +1550,7 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 5,
+                schema_version = 6,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
                 loadout_preset = loadout_preset,
@@ -1646,6 +1659,13 @@ local function run_balance(raw_args)
 
             local entry = World.players[1]
             local player = entry and entry.instance
+            if not run_state.done and args.start_map_desc and args.start_map_desc ~= ""
+                and player and hostile_alive_enemy_count(player) == 0 then
+                run_state.outcome = "cleared"
+                run_state.done = true
+                return step
+            end
+
             local source = player and player.input_source
             if source and source.should_end and source:should_end() then
                 run_state.outcome = "bot_stalled"
