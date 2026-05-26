@@ -621,7 +621,7 @@ DataW.enemy_create {
     types: {"Red", "Bludgeon"}
     resistances: {
         Red: -2
-        White: -2
+        White: 1
         Black: 2
         Bludgeon: 1
     }
