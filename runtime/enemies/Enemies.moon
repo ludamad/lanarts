@@ -896,7 +896,7 @@ DataW.enemy_create {
     name: "Hell Storm"
     sprite: "hell storm"
     radius: 14
-    xpaward: 40
+    xpaward: 55
     appear_message: "A raging storm elemental appears!"
     defeat_message: "The raging storm elemental dissipates."
     stats: {
