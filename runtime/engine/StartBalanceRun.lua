@@ -465,6 +465,20 @@ local function hostile_alive_enemy_count(player)
     return count
 end
 
+local function hostile_alive_enemy_named_count(player, name)
+    load_core_modules()
+    if not name or name == "" then
+        return 0
+    end
+    local count = 0
+    for _, enemy in ipairs(Map.enemies_list(player)) do
+        if hostile_alive_enemy(player, enemy) and enemy.name == name then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 local function player_snapshot()
     load_core_modules()
     local entry = World.players[1]
@@ -517,6 +531,7 @@ local function sample_run(run, telemetry, samples, reason)
         start_level = run.start_level or 1,
         loadout = run.loadout_name or "",
         bot_profile = run.bot_profile or telemetry.skill_profile or "",
+        objective_enemy = run.objective_enemy or "",
         frame = GameState.frame,
         reason = reason or "interval",
         level = snap.level,
@@ -576,6 +591,7 @@ local function summarize_run(run, telemetry, outcome)
         start_level = run.start_level or 1,
         loadout = run.loadout_name or "",
         bot_profile = run.bot_profile or telemetry.skill_profile or "",
+        objective_enemy = run.objective_enemy or "",
         outcome = outcome,
         frames = GameState.frame,
         level = snap.level or 0,
@@ -715,6 +731,7 @@ local function aggregate_summary_rows(summaries)
         local start_level = tonumber(row.start_level) or 1
         local loadout = row.loadout or ""
         local bot_profile = row.bot_profile or ""
+        local objective_enemy = row.objective_enemy or ""
         local key = group_key(class_name, start_level, loadout, bot_profile)
         local aggregate = groups[key]
         if not aggregate then
@@ -723,6 +740,7 @@ local function aggregate_summary_rows(summaries)
                 start_level = start_level,
                 loadout = loadout,
                 bot_profile = bot_profile,
+                objective_enemy = objective_enemy,
                 runs = 0,
                 outcomes = {},
                 sums = {},
@@ -749,6 +767,7 @@ local function aggregate_summary_rows(summaries)
             start_level = aggregate.start_level,
             loadout = aggregate.loadout,
             bot_profile = aggregate.bot_profile,
+            objective_enemy = aggregate.objective_enemy,
             runs = aggregate.runs,
             wins = wins,
             clears = aggregate.outcomes.cleared or 0,
@@ -1566,7 +1585,7 @@ local function install_run_hooks(events_module, base_player_death, base_monster_
     end
 end
 
-local function add_run(runs, run_id, class_name, start_level, seed, seed_group, class_run_index, loadout)
+local function add_run(runs, run_id, class_name, start_level, seed, seed_group, class_run_index, loadout, objective_enemy)
     runs[#runs + 1] = {
         run_id = run_id,
         class_name = class_name,
@@ -1576,17 +1595,18 @@ local function add_run(runs, run_id, class_name, start_level, seed, seed_group, 
         class_run_index = class_run_index,
         loadout_name = loadout.name,
         loadout_specs = loadout.specs_by_class[class_name] or {},
+        objective_enemy = objective_enemy or "",
     }
 end
 
-local function build_runs(classes, levels, runs_per_class, seed, seed_mode, loadout)
+local function build_runs(classes, levels, runs_per_class, seed, seed_mode, loadout, objective_enemy)
     local runs = {}
     local run_id = 1
     if seed_mode == "unique" then
         for _, class_name in ipairs(classes) do
             for _, start_level in ipairs(levels) do
                 for idx = 1, runs_per_class do
-                    add_run(runs, run_id, class_name, start_level, seed + run_id - 1, run_id, idx, loadout)
+                    add_run(runs, run_id, class_name, start_level, seed + run_id - 1, run_id, idx, loadout, objective_enemy)
                     run_id = run_id + 1
                 end
             end
@@ -1597,7 +1617,7 @@ local function build_runs(classes, levels, runs_per_class, seed, seed_mode, load
                 local seed_group = (level_idx - 1) * runs_per_class + idx
                 local paired_seed = seed + seed_group - 1
                 for _, class_name in ipairs(classes) do
-                    add_run(runs, run_id, class_name, start_level, paired_seed, seed_group, idx, loadout)
+                    add_run(runs, run_id, class_name, start_level, paired_seed, seed_group, idx, loadout, objective_enemy)
                     run_id = run_id + 1
                 end
             end
@@ -1620,6 +1640,7 @@ local function run_balance(raw_args)
     parser:option("--loadout_label", "Optional label for this loadout in outputs.", "")
     parser:option("--spell_policy", "Spell selection policy: mixed, priority, round_robin, none.", "mixed")
     parser:option("--bot_profile", "Automated-player skill profile: perfect, skilled, human, or sloppy.", "perfect")
+    parser:option("--objective_enemy", "Optional enemy name that completes start-map-desc runs when no copies remain alive.", "")
     parser:option("--sample_interval", "Frame interval for timeseries samples.", "300")
     parser:option("--draw_interval", "Frame interval for drawing visual capture frames. Use with LANARTS_SCREENSHOT_DIR.", "0")
     parser:option("--out", "Summary CSV output.", "saves/balance_runs.csv")
@@ -1653,7 +1674,7 @@ local function run_balance(raw_args)
         custom_specs = custom_loadout_specs,
         specs_by_class = specs_by_class,
     }
-    local runs = build_runs(classes, parse_levels(args.levels), tonumber(args.runs), tonumber(args.seed), seed_mode, loadout)
+    local runs = build_runs(classes, parse_levels(args.levels), tonumber(args.runs), tonumber(args.seed), seed_mode, loadout, args.objective_enemy)
     for _, run in ipairs(runs) do
         run.bot_profile = args.bot_profile
     end
@@ -1676,7 +1697,7 @@ local function run_balance(raw_args)
         local enemy_stat_rows = aggregate_enemy_rows(summaries)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
         write_csv(args.out, summaries, {
-            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "outcome", "frames", "level", "xp",
+            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "objective_enemy", "outcome", "frames", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
@@ -1691,7 +1712,7 @@ local function run_balance(raw_args)
             "alive_enemy_hp", "alive_enemy_max_hp",
         })
         write_csv(args.samples_out, samples, {
-            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "frame", "reason", "level", "xp",
+            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "objective_enemy", "frame", "reason", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "alive_enemy_counts",
@@ -1712,7 +1733,7 @@ local function run_balance(raw_args)
             "damage_share",
         })
         write_csv(args.aggregate_out, class_rows, {
-            "class", "start_level", "loadout", "bot_profile", "runs", "wins", "clears", "deaths", "step_limits", "bot_stalls",
+            "class", "start_level", "loadout", "bot_profile", "objective_enemy", "runs", "wins", "clears", "deaths", "step_limits", "bot_stalls",
             "game_loop_exits", "win_rate", "death_rate", "outcome_counts",
             "combat_frame_rate", "explore_frame_rate", "rest_frame_rate",
             "idle_frame_rate", "portal_stop_frame_rate",
@@ -1867,6 +1888,12 @@ local function run_balance(raw_args)
 
             local entry = World.players[1]
             local player = entry and entry.instance
+            if not run_state.done and args.objective_enemy and args.objective_enemy ~= ""
+                and player and hostile_alive_enemy_named_count(player, args.objective_enemy) == 0 then
+                run_state.outcome = "cleared"
+                run_state.done = true
+                return step
+            end
             if not run_state.done and args.start_map_desc and args.start_map_desc ~= ""
                 and player and hostile_alive_enemy_count(player) == 0 then
                 run_state.outcome = "cleared"
