@@ -35,3 +35,17 @@ Balance simulations:
     Multi-level sweeps produce separate class and spell aggregate rows per
     starting level, which is useful for checking later spell unlocks.
     Use --min_report_runs and --report_delta_pct to tune report sensitivity.
+
+Monster simulations:
+    ./run.sh --headless engine.StartMonsterEvals --steps 1000 --runs 3 --level 1 --monster GiantRat,Hound,CloudElemental
+    ./run.sh --headless engine.StartMonsterEvals --steps 1000 --runs 3 --levels 1,3 --monster all --configs BaseFighter,BaseNecromancer
+
+    Monster names can use compact aliases with spaces removed, such as
+    GiantRat, CloudElemental, or BlackMamba. Outputs default to
+    saves/monster_stats.csv, saves/monster_aggregate.csv,
+    saves/monster_report.csv, and saves/monster_stats.json. Raw rows contain
+    one arena duel per config, monster, run, and player level. Aggregate rows
+    report kill rate, step-limit rate, average damage taken, damage per 1000
+    frames, damage per XP, and XP per 100 damage. The report flags enemies
+    that are unusually durable, unusually damaging, or poor XP rewards
+    relative to the other enemies in the same config and level sweep.
