@@ -653,7 +653,7 @@ DataW.enemy_create {
     stats: {
         attacks: {{projectile: "Skullthrow"}}
         hp: 200
-        hpregen: 0.25
+        hpregen: 0.18
         movespeed: 3
         strength: 25
         magic: 10
@@ -683,8 +683,8 @@ DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 1, 
     stats: {
         attacks: {{ weapon: "Basic Melee"}}
         movespeed: 3.5
-        hp: 240
-        hpregen: 0.15
+        hp: 225
+        hpregen: 0.08
         strength: 25
         magic: 30
         defence: 16
