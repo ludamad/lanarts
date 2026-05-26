@@ -140,6 +140,9 @@ local function visible_enemies(player)
         end
     end
     table.sort(result, function(a, b)
+        if a.unique ~= b.unique then
+            return a.unique
+        end
         return distance_sqr(player, a) < distance_sqr(player, b)
     end)
     return result
