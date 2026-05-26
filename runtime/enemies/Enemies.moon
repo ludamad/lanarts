@@ -300,6 +300,7 @@ DataW.enemy_create summoner_base("Imp", 1, 140, 70) {
     xpaward: 150
     appear_message: "The demonic bee Waxanarian!"
     defeat_message: "Waxanarian has been vanquished."
+    unique: true
     types: {"Green", "Black"}
     init_func: enemy_berserker_init
     step_func: enemy_berserker_step
