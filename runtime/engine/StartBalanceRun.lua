@@ -49,6 +49,14 @@ local function parse_bool(value)
     return value == "1" or value == "true" or value == "yes" or value == "on"
 end
 
+local function normalize_seed_mode(value)
+    value = tostring(value or "paired"):lower()
+    if value == "paired" or value == "unique" then
+        return value
+    end
+    error("Invalid --seed_mode '" .. tostring(value) .. "'. Expected paired or unique.")
+end
+
 local function csv_escape(value)
     if value == nil then
         return ""
@@ -193,7 +201,9 @@ local function sample_run(run, telemetry, samples, reason)
     local necromancer_pain_orders = telemetry.necromancer_pain_orders or 0
     samples[#samples + 1] = {
         run_id = run.run_id,
-        seed = run.seed,
+        seed = tostring(run.seed),
+        seed_group = run.seed_group,
+        class_run_index = run.class_run_index,
         class = run.class_name,
         start_level = run.start_level or 1,
         frame = GameState.frame,
@@ -235,7 +245,9 @@ local function summarize_run(run, telemetry, outcome)
     local necromancer_pain_orders = telemetry.necromancer_pain_orders or 0
     return {
         run_id = run.run_id,
-        seed = run.seed,
+        seed = tostring(run.seed),
+        seed_group = run.seed_group,
+        class_run_index = run.class_run_index,
         class = run.class_name,
         start_level = run.start_level or 1,
         outcome = outcome,
@@ -289,7 +301,9 @@ local function flatten_spell_rows(run, telemetry)
     for spell, count in pairs(telemetry.spell_orders or {}) do
         rows[#rows + 1] = {
             run_id = run.run_id,
-            seed = run.seed,
+            seed = tostring(run.seed),
+            seed_group = run.seed_group,
+            class_run_index = run.class_run_index,
             class = run.class_name,
             start_level = run.start_level or 1,
             spell = spell,
@@ -792,20 +806,38 @@ local function install_run_hooks(events_module, base_player_death, base_monster_
     end
 end
 
-local function build_runs(classes, levels, runs_per_class, seed)
+local function add_run(runs, run_id, class_name, start_level, seed, seed_group, class_run_index)
+    runs[#runs + 1] = {
+        run_id = run_id,
+        class_name = class_name,
+        start_level = start_level,
+        seed = seed,
+        seed_group = seed_group,
+        class_run_index = class_run_index,
+    }
+end
+
+local function build_runs(classes, levels, runs_per_class, seed, seed_mode)
     local runs = {}
     local run_id = 1
-    for _, class_name in ipairs(classes) do
-        for _, start_level in ipairs(levels) do
+    if seed_mode == "unique" then
+        for _, class_name in ipairs(classes) do
+            for _, start_level in ipairs(levels) do
+                for idx = 1, runs_per_class do
+                    add_run(runs, run_id, class_name, start_level, seed + run_id - 1, run_id, idx)
+                    run_id = run_id + 1
+                end
+            end
+        end
+    else
+        for level_idx, start_level in ipairs(levels) do
             for idx = 1, runs_per_class do
-                runs[#runs + 1] = {
-                    run_id = run_id,
-                    class_name = class_name,
-                    start_level = start_level,
-                    seed = seed + run_id - 1,
-                    class_run_index = idx,
-                }
-                run_id = run_id + 1
+                local seed_group = (level_idx - 1) * runs_per_class + idx
+                local paired_seed = seed + seed_group - 1
+                for _, class_name in ipairs(classes) do
+                    add_run(runs, run_id, class_name, start_level, paired_seed, seed_group, idx)
+                    run_id = run_id + 1
+                end
             end
         end
     end
@@ -817,6 +849,7 @@ local function run_balance(raw_args)
     parser:option("--steps", "Maximum frames per run.", "20000")
     parser:option("--runs", "Runs per class.", "1")
     parser:option("--seed", "First simulation seed.", "12345678")
+    parser:option("--seed_mode", "Seed scheduling: paired reuses each seed across classes; unique uses a fresh seed for every run.", "paired")
     parser:option("--classes", "Comma-separated classes to run.", DEFAULT_CLASSES)
     parser:option("--levels", "Comma-separated starting levels to run.", "1")
     parser:option("--spell_policy", "Spell selection policy: mixed, priority, round_robin, none.", "mixed")
@@ -835,7 +868,8 @@ local function run_balance(raw_args)
 
     local max_steps = tonumber(args.steps)
     local sample_interval = tonumber(args.sample_interval)
-    local runs = build_runs(split_csv(args.classes), parse_levels(args.levels), tonumber(args.runs), tonumber(args.seed))
+    local seed_mode = normalize_seed_mode(args.seed_mode)
+    local runs = build_runs(split_csv(args.classes), parse_levels(args.levels), tonumber(args.runs), tonumber(args.seed), seed_mode)
     local summaries = {}
     local samples = {}
     local spell_rows = {}
@@ -852,20 +886,20 @@ local function run_balance(raw_args)
         local spell_stat_rows = aggregate_spell_rows(spell_rows, summaries)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
         write_csv(args.out, summaries, {
-            "run_id", "seed", "class", "start_level", "outcome", "frames", "level", "xp",
+            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "outcome", "frames", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
         })
         write_csv(args.samples_out, samples, {
-            "run_id", "seed", "class", "start_level", "frame", "reason", "level", "xp",
+            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "frame", "reason", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
         })
-        write_csv(args.spells_out, spell_rows, {"run_id", "seed", "class", "start_level", "spell", "orders"})
+        write_csv(args.spells_out, spell_rows, {"run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "spell", "orders"})
         write_csv(args.aggregate_out, class_rows, {
             "class", "start_level", "runs", "wins", "deaths", "step_limits", "bot_stalls",
             "game_loop_exits", "win_rate", "death_rate", "outcome_counts",
@@ -884,7 +918,8 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 1,
+                schema_version = 2,
+                seed_mode = seed_mode,
                 runs = json_runs,
                 class_stats = class_rows,
                 spell_stats = spell_stat_rows,
@@ -953,7 +988,7 @@ local function run_balance(raw_args)
                     spell_rows[#spell_rows + 1] = row
                 end
                 print(string.format(
-                    "Run %d seed=%d class=%s start_level=%d outcome=%s frames=%d level=%d kills=%d",
+                    "Run %d seed=%s class=%s start_level=%d outcome=%s frames=%d level=%d kills=%d",
                     summary.run_id,
                     summary.seed,
                     summary.class,

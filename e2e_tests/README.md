@@ -12,6 +12,12 @@ Balance simulations:
     saves/balance_spell_stats.csv, saves/balance_report.csv, and
     saves/balance_runs.json relative to the runtime directory.
     The JSON output contains the run list plus class, spell, and report rows.
+    By default, --seed_mode paired reuses each seed across every class for a
+    given starting level and run index. Use --seed_mode unique for independent
+    seeds per run.
+    Run, sample, and spell rows include seed_group and class_run_index columns
+    for paired comparisons. In JSON, seed values are strings so exact large
+    seeds survive serialization.
     Necromancer runs also emit Pain and Baleful Regeneration behavior counters
     in the run and aggregate tables.
     Pyrocaster runs emit Ring of Flames combat-positioning counters.
