@@ -615,13 +615,13 @@ DataW.enemy_create {
     defeat_message: "Gragh yells goodbye!"
     sprite: "spr_enemies.bosses.gragh"
     radius: 18
-    xpaward: 200
+    xpaward: 250
     unique: true
     types: {"Red", "Bludgeon"}
     stats: {
         attacks: {{weapon: "Basic Melee"}}
         hp: 150
-        hpregen: 0.25
+        hpregen: 0.18
         movespeed: 3.5
         strength: 40
         magic: 10
