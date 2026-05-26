@@ -948,7 +948,7 @@ DataW.enemy_create {
     sprite: "spr_enemies.animals.fire_bat"
     death_sprite: "blood"
     radius: 12
-    xpaward: 8
+    xpaward: 12
     appear_message: "A giant fiery bat surveys the scene."
     defeat_message: "The fire bat has died."
     stats: {
@@ -965,9 +965,9 @@ DataW.enemy_create {
     step_func: () =>
         @timeout -= 1
         if @timeout <= 0
-            for i=1,5
+            for i=1,3
                 @projectile_attack "Fire Bat Projectile", random_xy_near(@)
-            @timeout = 20
+            @timeout = 30
     types: {"Red"}
     projectile: {
         weapon_class: "magic"
