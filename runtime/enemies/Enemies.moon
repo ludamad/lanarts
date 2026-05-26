@@ -155,15 +155,15 @@ DataW.enemy_create {
         }
         hp: 10
         hpregen: 0
-        movespeed: 5
+        movespeed: 3.5
         -- base stats:
-        strength: 15
+        strength: 10
         defence: 0
-        magic: 15
+        magic: 10
         willpower: 0
    }
    effects_active: {
-        {"PoisonedWeapon", {poison_percentage: 0.25}}
+        {"PoisonedWeapon", {poison_percentage: 0.1}}
    }
 }
 
@@ -196,7 +196,7 @@ summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) ->
                 @n_steps += 1
 }
 
-DataW.enemy_create summoner_base("Mummy", 5) {
+DataW.enemy_create summoner_base("Mummy", 3, 90) {
     name: "Mummoner"
     sprite: "spr_enemies.undead.greater_mummy"
     radius: 11

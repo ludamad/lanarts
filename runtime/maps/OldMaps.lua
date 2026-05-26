@@ -12,10 +12,10 @@ M.weak_undead = {
 }
 
 M.strong_undead = {
-  {enemy = "Gaseous Ghost",          chance = 25, guaranteed_spawns = 3                                            },
-  {enemy = "Mummoner",          chance = 100                                            },
-  {enemy = "Crypt Keeper",          chance = 25, guaranteed_spawns = 3                                            },
-  {enemy = "Mummy",          guaranteed_spawns = 65                                           },
+  {enemy = "Gaseous Ghost",          chance = 25, guaranteed_spawns = 2                                            },
+  {enemy = "Mummoner",          chance = 35, guaranteed_spawns = 2                                            },
+  {enemy = "Crypt Keeper",          chance = 25, guaranteed_spawns = 2                                            },
+  {enemy = "Mummy",          chance = 65, guaranteed_spawns = 18                                           },
 }
 M.weak_hell = {
 }
