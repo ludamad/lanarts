@@ -672,7 +672,7 @@ DataW.enemy_create {
     effects_active: {{"Pain Aura", {damage: 25, range: 40}}}
 }
 
-DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 3, 100, 200, 25) {
+DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 1, 180, 150, 20) {
     name: "Pixulloch"
     appear_message: "Pixulloch laughs at your feeble presence!"
     defeat_message: "Pixulloch has been defeated! Consider the game won. For now."
@@ -683,19 +683,19 @@ DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 3, 
     stats: {
         attacks: {{ weapon: "Basic Melee"}}
         movespeed: 3.5
-        hp: 500
+        hp: 275
         hpregen: 0.15
         strength: 25
         magic: 30
-        defence: 20
-        willpower: 20
+        defence: 16
+        willpower: 16
     }
     types: {"Black"}
     projectile: { -- Adds to 'attacks'
         weapon_class: "magic"
         damage_type: {magic: 0.5, physical: 0.5}
         range: 300
-        cooldown: 70
+        cooldown: 90
         speed: 8
         spr_attack: "blue blast"
     }

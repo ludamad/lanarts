@@ -85,10 +85,8 @@ node_fill_dungeon_room = () =>
                 return false
         return true
     if not spawn_enemies {
-        "Golem"
         "Executioner"
         "Hell Storm"
-        "Hydra"
         "Pixulloch"
     }
         return false
