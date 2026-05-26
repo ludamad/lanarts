@@ -1061,7 +1061,7 @@ local function report_message(class_name, metric, value, baseline, delta_pct)
     )
 end
 
-local function metric_baselines(class_rows, start_level, loadout)
+local function metric_baselines(class_rows, start_level, loadout, bot_profile)
     local baselines = {}
     for _, metric in ipairs(BASELINE_METRICS) do
         local total = 0
@@ -1069,7 +1069,8 @@ local function metric_baselines(class_rows, start_level, loadout)
         for _, row in ipairs(class_rows) do
             local same_level = not start_level or (tonumber(row.start_level) or 1) == start_level
             local same_loadout = (row.loadout or "") == (loadout or "")
-            if same_level and same_loadout then
+            local same_profile = (row.bot_profile or "") == (bot_profile or "")
+            if same_level and same_loadout and same_profile then
                 total = total + (tonumber(row[metric.key]) or 0)
                 count = count + 1
             end
@@ -1099,7 +1100,11 @@ local function report_class_name(row)
     local class_name = row.class or ""
     local start_level = tonumber(row.start_level) or 1
     local loadout = row.loadout or ""
+    local bot_profile = row.bot_profile or ""
     local suffix = loadout ~= "" and (" " .. loadout) or ""
+    if bot_profile ~= "" then
+        suffix = suffix .. " " .. bot_profile
+    end
     if start_level > 1 then
         return string.format("%s L%d%s", class_name, start_level, suffix)
     end
@@ -1116,9 +1121,10 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
         local class_name = report_class_name(row)
         local start_level = tonumber(row.start_level) or 1
         local loadout = row.loadout or ""
-        local baseline_key = tostring(start_level) .. "\n" .. loadout
+        local bot_profile = row.bot_profile or ""
+        local baseline_key = tostring(start_level) .. "\n" .. loadout .. "\n" .. bot_profile
         baselines_by_group[baseline_key] = baselines_by_group[baseline_key]
-            or metric_baselines(class_rows, start_level, loadout)
+            or metric_baselines(class_rows, start_level, loadout, bot_profile)
         local baselines = baselines_by_group[baseline_key]
         local runs = tonumber(row.runs) or 0
         if runs < min_runs then
