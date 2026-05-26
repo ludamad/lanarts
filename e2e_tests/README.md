@@ -27,7 +27,8 @@ Balance simulations:
     baseline and suppresses raw-kill underperformance flags when combat-adjusted
     kill rate is still in range. It also suppresses combat-efficiency
     underperformance flags for high-contact runs when overall kill pacing is in
-    range.
+    range, and emits pacing context instead of a class-balance failure when
+    combat efficiency is low but overall kill pace is still healthy.
     Ability-order totals are kept in the raw tables for behavior analysis, but
     are not used as cross-class balance report flags.
     Item-order totals are also raw telemetry; inventory access differs by class.
