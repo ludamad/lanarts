@@ -152,7 +152,8 @@ add_contact_metric = (aggregate, row, metric) ->
         aggregate.contact_maxes[metric] = value
 
 SUMMARY_METRICS = {
-    "frames", "player_damage", "enemy_hp", "enemy_max_hp", "enemy_hp_pct",
+    "frames", "player_damage", "gross_player_damage", "net_player_damage",
+    "player_healing", "min_player_hp", "enemy_hp", "enemy_max_hp", "enemy_hp_pct",
     "defender_count", "attacker_count", "melee_count",
     "projectile_count", "receive_melee_count", "enemy_count_alive"
 }
@@ -216,6 +217,14 @@ aggregate_stats = (stats) ->
         contact_damage_per_1000_frames = safe_div(aggregate.contact_sums.player_damage, aggregate.contact_sums.frames) * 1000
         contact_damage_per_xp = safe_div(contact_avg_damage, math.max(1, aggregate.xpaward))
         contact_xp_per_100_damage = safe_div(aggregate.xpaward * 100, contact_avg_damage)
+        avg_gross_damage = safe_div(aggregate.sums.gross_player_damage, runs)
+        avg_net_damage = safe_div(aggregate.sums.net_player_damage, runs)
+        avg_healing = safe_div(aggregate.sums.player_healing, runs)
+        avg_min_player_hp = safe_div(aggregate.sums.min_player_hp, runs)
+        contact_avg_gross_damage = safe_div(aggregate.contact_sums.gross_player_damage, contact_runs)
+        contact_avg_net_damage = safe_div(aggregate.contact_sums.net_player_damage, contact_runs)
+        contact_avg_healing = safe_div(aggregate.contact_sums.player_healing, contact_runs)
+        contact_avg_min_player_hp = safe_div(aggregate.contact_sums.min_player_hp, contact_runs)
         append rows, {
             config_name: aggregate.config_name
             level: aggregate.level
@@ -234,6 +243,11 @@ aggregate_stats = (stats) ->
             avg_player_damage: format_rate avg_damage
             min_player_damage: aggregate.mins.player_damage or 0
             max_player_damage: aggregate.maxes.player_damage or 0
+            avg_gross_player_damage: format_rate avg_gross_damage
+            avg_net_player_damage: format_rate avg_net_damage
+            avg_player_healing: format_rate avg_healing
+            avg_min_player_hp: format_rate avg_min_player_hp
+            min_player_hp: aggregate.mins.min_player_hp or 0
             damage_per_1000_frames: format_rate damage_per_1000_frames
             damage_per_xp: format_rate damage_per_xp
             xp_per_100_damage: format_rate xp_per_100_damage
@@ -243,6 +257,11 @@ aggregate_stats = (stats) ->
             contact_avg_player_damage: format_rate contact_avg_damage
             contact_min_player_damage: aggregate.contact_mins.player_damage or 0
             contact_max_player_damage: aggregate.contact_maxes.player_damage or 0
+            contact_avg_gross_player_damage: format_rate contact_avg_gross_damage
+            contact_avg_net_player_damage: format_rate contact_avg_net_damage
+            contact_avg_player_healing: format_rate contact_avg_healing
+            contact_avg_min_player_hp: format_rate contact_avg_min_player_hp
+            contact_min_player_hp: aggregate.contact_mins.min_player_hp or 0
             contact_damage_per_1000_frames: format_rate contact_damage_per_1000_frames
             contact_damage_per_xp: format_rate contact_damage_per_xp
             contact_xp_per_100_damage: format_rate contact_xp_per_100_damage
@@ -438,6 +457,48 @@ _iterate = (tbl, f, next) ->
             return f(val, iterate)
     return iterate
 
+active_player = () ->
+    player_entry = World.players and World.players[1]
+    return player_entry and player_entry.instance
+
+make_run_state = () ->
+    {
+        gross_player_damage: 0
+        player_healing: 0
+        min_player_hp: nil
+    }
+
+capture_player_hp = (run_state) ->
+    player = active_player()
+    return nil unless run_state and player and player.stats
+    hp = player.stats.hp
+    if run_state.min_player_hp == nil or hp < run_state.min_player_hp
+        run_state.min_player_hp = hp
+    return hp
+
+record_player_hp_delta = (run_state, before_hp) ->
+    player = active_player()
+    return unless run_state and before_hp and player and player.stats
+    after_hp = player.stats.hp
+    if after_hp < before_hp
+        run_state.gross_player_damage += before_hp - after_hp
+    elseif after_hp > before_hp
+        run_state.player_healing += after_hp - before_hp
+    if run_state.min_player_hp == nil or after_hp < run_state.min_player_hp
+        run_state.min_player_hp = after_hp
+
+necromancer_eval_input = () =>
+    player = @player
+    if player and player.stats
+        max_hp = player\effective_stats().max_hp
+        frame = require("core.GameState").frame or 0
+        if player.stats.hp < max_hp and not player\has_effect("Baleful Regeneration")
+            if (rawget(@, "regen_retry_at") or 0) <= frame
+                @set("use_spell_slot", 0)
+                rawset(@, "regen_retry_at", frame + 45)
+                return
+    @set("should_use_weapon", true)
+
 CONFIGS = {
     {
         name: "BaseFighter"
@@ -448,8 +509,7 @@ CONFIGS = {
     {
         name: "BaseNecromancer"
         class: "Necromancer"
-        input: () =>
-            @set("should_use_weapon", true)
+        input: necromancer_eval_input
     }
     {
         name: "BaseStormcaller"
@@ -465,7 +525,7 @@ CONFIGS = {
     }
 }
 
-dump_stats = (config_name, monster, seed, run_index, outcome) ->
+dump_stats = (config_name, monster, seed, run_index, outcome, run_state) ->
     GameState = require("core.GameState")
     player = World.players[1].instance
     enemy_hp, enemy_max_hp = 0, 0
@@ -475,6 +535,10 @@ dump_stats = (config_name, monster, seed, run_index, outcome) ->
         enemy_max_hp += stats.max_hp
     { :defender_count, :attacker_count, :melee_count,
       :projectile_count, :receive_melee_count } = player\get_effect("DebugMonsterEvalEffect")
+    net_player_damage = math.max(0, player.stats.max_hp - player.stats.hp)
+    gross_player_damage = math.max(run_state and run_state.gross_player_damage or 0, net_player_damage)
+    player_healing = run_state and run_state.player_healing or 0
+    min_player_hp = run_state and run_state.min_player_hp or player.stats.hp
     return {
         :config_name
         :run_index
@@ -484,7 +548,11 @@ dump_stats = (config_name, monster, seed, run_index, outcome) ->
         xpaward: enemy_xpaward(monster)
         outcome: outcome or "unknown"
         frames: GameState.frame
-        player_damage: player.stats.max_hp - player.stats.hp
+        player_damage: gross_player_damage
+        :gross_player_damage
+        :net_player_damage
+        :player_healing
+        :min_player_hp
         :enemy_hp, :enemy_max_hp
         enemy_hp_pct: safe_div(enemy_hp, math.max(1, enemy_max_hp))
         enemy_count_alive: #enemies_alive
@@ -532,7 +600,9 @@ run_bot_tests = (raw_args) ->
             report_rows = build_report(aggregate_rows, args.report_delta_pct, args.min_report_runs)
             write_csv args.out, stats, {
                 "config_name", "run_index", "seed", "level", "monster", "xpaward",
-                "outcome", "frames", "player_damage", "enemy_hp", "enemy_max_hp",
+                "outcome", "frames", "player_damage", "gross_player_damage",
+                "net_player_damage", "player_healing", "min_player_hp",
+                "enemy_hp", "enemy_max_hp",
                 "enemy_hp_pct", "enemy_count_alive", "defender_count", "attacker_count",
                 "melee_count", "projectile_count", "receive_melee_count"
             }
@@ -541,9 +611,13 @@ run_bot_tests = (raw_args) ->
                 "enemy_kill_rate", "step_limit_rate", "no_contact_step_limit_rate", "player_death_rate",
                 "avg_frames", "min_frames", "max_frames",
                 "avg_player_damage", "min_player_damage", "max_player_damage",
+                "avg_gross_player_damage", "avg_net_player_damage", "avg_player_healing",
+                "avg_min_player_hp", "min_player_hp",
                 "damage_per_1000_frames", "damage_per_xp", "xp_per_100_damage",
                 "contact_avg_frames", "contact_min_frames", "contact_max_frames",
                 "contact_avg_player_damage", "contact_min_player_damage", "contact_max_player_damage",
+                "contact_avg_gross_player_damage", "contact_avg_net_player_damage",
+                "contact_avg_player_healing", "contact_avg_min_player_hp", "contact_min_player_hp",
                 "contact_damage_per_1000_frames", "contact_damage_per_xp", "contact_xp_per_100_damage",
                 "avg_enemy_hp_pct", "avg_enemy_count_alive",
                 "avg_defender_count", "avg_attacker_count", "avg_melee_count",
@@ -555,7 +629,7 @@ run_bot_tests = (raw_args) ->
             }
             if args.json_out and args.json_out != ""
                 file_dump_json args.json_out, {
-                    schema_version: 1
+                    schema_version: 2
                     seed: tostring(args.seed)
                     runs_per_config_monster: tonumber(args.runs)
                     raw: stats
@@ -579,17 +653,18 @@ run_bot_tests = (raw_args) ->
             seed = tonumber(args.seed) + run_index - 1
             step = (monster_name, next_monster) ->
                 print('run', run_index, 'seed', seed, 'level', level, 'config', config.name, 'mon', monster_name)
+                run_state = make_run_state()
                 on_finish = (outcome) ->
-                    append stats, dump_stats(config.name, monster_name, seed, run_index, outcome)
+                    append stats, dump_stats(config.name, monster_name, seed, run_index, outcome, run_state)
                     return next_monster()
                 -- Continue simulation iteration:
                 game_init(seed, config.class, {monster_name}, config.input, level)
-                return game_step(on_finish)
+                return game_step(on_finish, run_state)
             return _iterate monster_names, step, next_run
         runs = [i for i=1,tonumber(args.runs)]
         return _iterate runs, run_eval_step, next_config
 
-    game_step = (next_sim) ->
+    game_step = (next_sim, run_state) ->
         step = () ->
             -- (1) Load dependencies
             GameState = require("core.GameState")
@@ -598,6 +673,7 @@ run_bot_tests = (raw_args) ->
             -- Monster evals are simulation-only; drawing in headless runs can
             -- still hit platform GL paths on some machines.
             step_only = true
+            before_hp = capture_player_hp(run_state)
             if #Map.enemies_list(World.players[1].instance) == 0
                 return next_sim("enemy_killed")
             -- (3) Check if we are at final frame:
@@ -607,7 +683,9 @@ run_bot_tests = (raw_args) ->
             -- (4) Run game loop & and see if game
             -- should be saved + exited
             if not GameLoop.game_step(step_only)
+                record_player_hp_delta(run_state, before_hp)
                 return next_sim("game_loop_exit")
+            record_player_hp_delta(run_state, before_hp)
 
             -- (5) Loop again
             return step

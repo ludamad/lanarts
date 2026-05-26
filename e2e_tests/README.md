@@ -51,3 +51,7 @@ Monster simulations:
     engaged, and the report uses those contact metrics when flagging enemies
     that are unusually durable, unusually damaging, or poor XP rewards relative
     to the other enemies in the same config and level sweep.
+    Player damage is tracked as observed gross HP loss, with net HP loss,
+    healing, and minimum HP also emitted so regenerative playstyles are still
+    visible. BaseNecromancer uses Pain while opportunistically casting Baleful
+    Regeneration, matching its intended sustain-through-damage loop.
