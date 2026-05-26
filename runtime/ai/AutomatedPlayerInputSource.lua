@@ -39,6 +39,7 @@ local RANGED_CLASSES = {
 }
 
 local CLASS_KEEPAWAY = {
+    Pyrocaster = 112,
     Stormcaller = 112,
     ["Blue Mage"] = 96,
 }
@@ -245,10 +246,14 @@ function AutomatedPlayerInputSource:_spell_reasonable(name, enemies)
     elseif name == "Dragonform" then
         return pct > self.options.retreat_hp_pct and not player:has_effect("Dragonform")
     elseif name == "Ring of Flames" then
+        for _, enemy in ipairs(enemies) do
+            if enemy.unique then
+                return false
+            end
+        end
         return pct > self.options.ranged_emergency_hp_pct
             and #enemies <= 2
             and closest_dist <= self.options.pyrocaster_ring_max_range
-            and (not closest.unique or #enemies == 1)
             and not player:has_effect("Ring of Flames Stat Boost")
     elseif name == "Power Strike" then
         return closest_dist <= 96
@@ -377,7 +382,7 @@ function AutomatedPlayerInputSource:_pyrocaster_ring_move(enemies, ordered_spell
     local using_ring = player:has_effect("Ring of Flames Stat Boost")
         or (ordered_spell and ordered_spell.name == "Ring of Flames")
 
-    if not using_ring or (closest.unique and hp_pct(player) < self.options.ranged_emergency_hp_pct) then
+    if not using_ring or closest.unique then
         return self:_combat_move(enemies, ordered_spell ~= nil)
     end
 
