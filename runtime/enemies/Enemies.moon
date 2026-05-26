@@ -365,13 +365,13 @@ DataW.enemy_create {
     name: "Mouther"
     sprite: "spr_enemies.animals.tyrant_leech"
     radius: 11
-    xpaward: 15
+    xpaward: 20
     appear_message: "You hear a mouther start screeching!"
     defeat_message: "The mouther has been shut."
     types: {"Green", "Black"}
     stats: {
         hp: 40
-        hpregen: 0.03
+        hpregen: 0.01
         movespeed: 1
         -- base stats:
         strength: 25
@@ -1134,7 +1134,7 @@ DataW.enemy_create {
     appear_message: "A hostile chicken appears!"
     defeat_message: "The chicken may as well be fried."
     types: {"Green"}
-    weapon: {cooldown: 20, damage: 11}
+    weapon: {cooldown: 25, damage: 9}
     stats: {
         hp: 25
         hpregen: 0.04
