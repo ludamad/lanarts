@@ -1127,6 +1127,10 @@ BASELINE_METRICS[#BASELINE_METRICS + 1] = {
     key = "kills_per_1000_controlled_frames",
     label = "kills per 1000 controlled frames",
 }
+BASELINE_METRICS[#BASELINE_METRICS + 1] = {
+    key = "avg_frames",
+    label = "clear frames",
+}
 
 local function report_severity(metric, delta)
     if delta == 0 then
@@ -1399,6 +1403,36 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                         baseline,
                         string.format(
                             "%s combat kill rate is %.3f versus %.3f baseline under lower contact, but overall kill pacing is in range.",
+                            class_name,
+                            value,
+                            baseline
+                        )
+                    )
+                end
+            end
+            if flagged and metric.key == "kills_per_1000_combat_frames" and delta > 0 then
+                local win_rate = tonumber(row.win_rate) or 0
+                local win_baseline = baselines.win_rate or 0
+                local death_rate = tonumber(row.death_rate) or 0
+                local death_baseline = baselines.death_rate or 0
+                local avg_frames = tonumber(row.avg_frames) or 0
+                local frames_baseline = baselines.avg_frames or 0
+                local worse_survival = (win_baseline > 0 and win_rate < win_baseline)
+                    or death_rate > death_baseline
+                local not_materially_faster = frames_baseline > 0
+                    and avg_frames >= frames_baseline * (1 - relative_threshold)
+                if worse_survival and not_materially_faster then
+                    flagged = false
+                    add_report_row(
+                        rows,
+                        class_name,
+                        "info",
+                        "pacing",
+                        metric.key,
+                        value,
+                        baseline,
+                        string.format(
+                            "%s combat kill rate is %.3f versus %.3f baseline, but survival is worse and objective clear time is not materially faster.",
                             class_name,
                             value,
                             baseline
