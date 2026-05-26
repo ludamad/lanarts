@@ -348,7 +348,7 @@ DataW.effect_create {
         if hp >= max_hp
             caster\remove_effect("Baleful Regeneration")
         else
-            regen_rate = hpregen * (if caster\has_effect("AmuletGreatPain") then 29 else 14)
+            regen_rate = hpregen * (if caster\has_effect("AmuletGreatPain") then 21 else 10)
             caster\heal_hp(regen_rate)
 }
 
