@@ -365,7 +365,7 @@ DataW.enemy_create {
     name: "Mouther"
     sprite: "spr_enemies.animals.tyrant_leech"
     radius: 11
-    xpaward: 20
+    xpaward: 25
     appear_message: "You hear a mouther start screeching!"
     defeat_message: "The mouther has been shut."
     types: {"Green", "Black"}
@@ -376,7 +376,7 @@ DataW.enemy_create {
         -- base stats:
         strength: 25
         defence: 0
-        magic: 25
+        magic: 20
         willpower: 0
     }
     weapon: {
@@ -844,13 +844,13 @@ DataW.enemy_create {
     appear_message: "A cloud elemental floats onto the scene."
     defeat_message: "The cloud elemental dissolves."
     radius: 12
-    xpaward: 15
+    xpaward: 20
     stats: {
         movespeed: 2
         hp: 25
         hpregen: 0.02
         strength: 5
-        magic: 20
+        magic: 17
         defence: 4
         willpower: 5
     }
