@@ -81,13 +81,11 @@ DataW.effect_create {
     stat_func: (obj, old, new) =>
         new.strength += obj.stats.level
         -- Greater defences during berserk
-        new.defence = math.max(0, new.defence + obj.stats.level * 2)
-        new.willpower = math.max(0, new.willpower + obj.stats.level * 2)
-        new.melee_cooldown_multiplier /= 1.4
-        hp_regen_bonus = (6 + 2 * obj.stats.level) / 60 -- Per 60 frames
-        new.hpregen += hp_regen_bonus
+        new.defence = math.max(0, new.defence + obj.stats.level)
+        new.willpower = math.max(0, new.willpower + obj.stats.level)
+        new.melee_cooldown_multiplier /= 1.25
         if obj\has_effect("AmuletBerserker")
-            new.hpregen += hp_regen_bonus
+            new.hpregen += 8 / 60 -- Per 60 frames
         if new.speed < 6
             new.speed = math.max(new.speed * 1.25, 6)
         obj\reset_rest_cooldown()
@@ -1080,8 +1078,8 @@ DataW.effect_create {
         new.speed = 0
         --caster.stats.attack_cooldown = 2
         new.strength += caster.stats.level
-        new.defence += caster.stats.level * 5
-        new.willpower += caster.stats.level * 5
+        new.defence += caster.stats.level
+        new.willpower += caster.stats.level
 }
 
 enemy_init = (enemy) -> nil
