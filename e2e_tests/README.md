@@ -44,9 +44,18 @@ Balance simulations:
     enemies from rare enemies that dominate run pacing when they appear.
     Multi-level sweeps produce separate class and spell aggregate rows per
     starting level, which is useful for checking later spell unlocks.
+    Level 5 is already late game for player characters; prefer using loadout
+    presets at level 5 over raising the player level when testing late maps.
     Use --start_map_desc to start every run in a specific map descriptor, for
     example map_descs.PixullochiaDepths, when testing late-game enemy pools
     without waiting for portal traversal.
+    Use --loadout_preset late to give each class a representative equipped
+    late-game kit without inflating the starting level. Use --loadout to append
+    comma-separated item specs such as `Health Potion*3,Hydra Ring`, and
+    --loadout_label to name the build in the output tables.
+    Class, spell, and enemy aggregates are grouped by class, starting level,
+    and loadout so equipped late-map sweeps are not baselined against starter
+    gear runs.
     Use --min_report_runs and --report_delta_pct to tune report sensitivity.
 
 Monster simulations:

@@ -40,8 +40,12 @@ local function parse_levels(value)
     return result
 end
 
-local function group_key(class_name, start_level)
-    return tostring(class_name or "") .. "\n" .. tostring(start_level or 1)
+local function group_key(class_name, start_level, loadout)
+    return table.concat({
+        tostring(class_name or ""),
+        tostring(start_level or 1),
+        tostring(loadout or ""),
+    }, "\n")
 end
 
 local function parse_bool(value)
@@ -163,6 +167,188 @@ local function sorted_group_keys(groups)
     return keys
 end
 
+local LOADOUT_PRESETS = {
+    none = {},
+    late = {
+        default = {
+            "Health Potion*3",
+            "Mana Potion*2",
+        },
+        Fighter = {
+            "Gragh's Club",
+            "Red Dragonplate",
+            "Steel Gloves",
+            "Iron Helmet",
+            "Platelegs",
+            "Jack Boots",
+            "Belt of Slaying",
+            "Ring of Vampirism",
+            "Ring of Vitality",
+            "Amulet of Healing",
+        },
+        Templar = {
+            "Mace of Light",
+            "Crystalline Plate",
+            "Steel Gloves",
+            "Iron Helmet",
+            "Platelegs",
+            "Jack Boots",
+            "Belt of Protection",
+            "Ring of Stone",
+            "Ring of Vitality",
+            "Amulet of Fortification",
+        },
+        Rogue = {
+            "Iron Scimitar",
+            "Leather Armour",
+            "Leather Gloves",
+            "Leather Boots",
+            "Dank Belt",
+            "Ring of Vampirism",
+            "Hydra Ring",
+            "Amulet of Fear",
+        },
+        Necromancer = {
+            "Runed Robe",
+            "Wizard's Ring",
+            "Hydra Ring",
+            "Moonstone Ring",
+            "Wishful Belt",
+            "Amulet of Great Pain",
+        },
+        Pyrocaster = {
+            "Gallanthor's Crutch",
+            "Red Robe",
+            "Runed Gloves",
+            "Wizard's Hat",
+            "Magic Skirt",
+            "Wishful Belt",
+            "Magician's Ring",
+            "Ring of Spells",
+            "Amulet of Greater Fire",
+        },
+        Stormcaller = {
+            "Wizard's Staff",
+            "White Robe",
+            "Runed Gloves",
+            "Wizard's Hat",
+            "Magic Skirt",
+            "Wishful Belt",
+            "Magician's Ring",
+            "Ring of Spells",
+            "Amulet of Light",
+        },
+    },
+}
+
+local function parse_item_spec(value)
+    local spec = tostring(value or ""):gsub("^%s+", ""):gsub("%s+$", "")
+    if spec == "" then
+        return nil
+    end
+    local item, amount = spec:match("^(.-)%*([0-9]+)$")
+    if item then
+        item = item:gsub("^%s+", ""):gsub("%s+$", "")
+        return {item = item, amount = math.max(1, tonumber(amount) or 1)}
+    end
+    return {item = spec, amount = 1}
+end
+
+local function parse_loadout_specs(value)
+    local specs = {}
+    for _, part in ipairs(split_csv(value)) do
+        local spec = parse_item_spec(part)
+        if spec then
+            specs[#specs + 1] = spec
+        end
+    end
+    return specs
+end
+
+local function append_loadout_specs(dest, specs)
+    for _, raw_spec in ipairs(specs or {}) do
+        local spec = type(raw_spec) == "table" and raw_spec or parse_item_spec(raw_spec)
+        if spec and spec.item and spec.item ~= "" then
+            dest[#dest + 1] = {
+                item = spec.item,
+                amount = math.max(1, tonumber(spec.amount) or 1),
+            }
+        end
+    end
+end
+
+local function normalize_loadout_preset(value)
+    local preset = tostring(value or "none")
+    if preset == "" then
+        preset = "none"
+    end
+    if not LOADOUT_PRESETS[preset] then
+        error("Invalid --loadout_preset '" .. preset .. "'. Expected one of: late, none.")
+    end
+    return preset
+end
+
+local function loadout_name(preset, custom_specs, explicit_label)
+    if explicit_label and explicit_label ~= "" then
+        return explicit_label
+    end
+    local parts = {}
+    if preset and preset ~= "none" then
+        parts[#parts + 1] = preset
+    end
+    if custom_specs and #custom_specs > 0 then
+        parts[#parts + 1] = "custom"
+    end
+    return table.concat(parts, "+")
+end
+
+local function loadout_specs_for_class(preset_name, custom_specs, class_name)
+    local specs = {}
+    local preset = LOADOUT_PRESETS[preset_name or "none"] or {}
+    append_loadout_specs(specs, preset.default)
+    append_loadout_specs(specs, preset[class_name])
+    append_loadout_specs(specs, custom_specs)
+    return specs
+end
+
+local function inventory_capacity(player)
+    for slot_idx = 0, 255 do
+        if not player:inventory_get(slot_idx) then
+            return slot_idx
+        end
+    end
+    return 256
+end
+
+local function item_is_equippable(item_name)
+    local GameData = require "core.GameData"
+    local item_data = GameData.item_definer(item_name)
+    local method = item_data and item_data.__method
+    return method == "weapon_create"
+        or method == "equipment_create"
+        or method == "projectile_create"
+end
+
+local function apply_loadout(player, specs)
+    if not player or not specs or #specs == 0 then
+        return
+    end
+    local capacity = inventory_capacity(player)
+    for slot_idx = 0, capacity - 1 do
+        player:inventory_set(slot_idx, {equipped = false})
+    end
+    for idx, spec in ipairs(specs) do
+        if idx > capacity then
+            error("Loadout has more items than inventory slots.")
+        end
+        player:inventory_set(idx - 1, {
+            type = spec.item,
+            amount = spec.amount,
+            equipped = item_is_equippable(spec.item),
+        })
+    end
+end
+
 local function spell_names(player)
     if not player or player.destroyed then
         return ""
@@ -231,6 +417,7 @@ local function sample_run(run, telemetry, samples, reason)
         class_run_index = run.class_run_index,
         class = run.class_name,
         start_level = run.start_level or 1,
+        loadout = run.loadout_name or "",
         frame = GameState.frame,
         reason = reason or "interval",
         level = snap.level,
@@ -277,6 +464,7 @@ local function summarize_run(run, telemetry, outcome)
         class_run_index = run.class_run_index,
         class = run.class_name,
         start_level = run.start_level or 1,
+        loadout = run.loadout_name or "",
         outcome = outcome,
         frames = GameState.frame,
         level = snap.level or 0,
@@ -335,6 +523,7 @@ local function flatten_spell_rows(run, telemetry)
             class_run_index = run.class_run_index,
             class = run.class_name,
             start_level = run.start_level or 1,
+            loadout = run.loadout_name or "",
             spell = spell,
             orders = count,
         }
@@ -371,12 +560,14 @@ local function aggregate_summary_rows(summaries)
     for _, row in ipairs(summaries) do
         local class_name = row.class or ""
         local start_level = tonumber(row.start_level) or 1
-        local key = group_key(class_name, start_level)
+        local loadout = row.loadout or ""
+        local key = group_key(class_name, start_level, loadout)
         local aggregate = groups[key]
         if not aggregate then
             aggregate = {
                 class = class_name,
                 start_level = start_level,
+                loadout = loadout,
                 runs = 0,
                 outcomes = {},
                 sums = {},
@@ -400,6 +591,7 @@ local function aggregate_summary_rows(summaries)
         local row = {
             class = aggregate.class,
             start_level = aggregate.start_level,
+            loadout = aggregate.loadout,
             runs = aggregate.runs,
             wins = aggregate.outcomes.won or 0,
             deaths = aggregate.outcomes.death or 0,
@@ -434,7 +626,7 @@ end
 local function class_run_counts(summaries)
     local counts = {}
     for _, row in ipairs(summaries) do
-        local key = group_key(row.class, row.start_level)
+        local key = group_key(row.class, row.start_level, row.loadout)
         counts[key] = (counts[key] or 0) + 1
     end
     return counts
@@ -444,13 +636,14 @@ local function aggregate_spell_rows(spell_rows, summaries)
     local run_counts = class_run_counts(summaries)
     local groups = {}
     for _, row in ipairs(spell_rows) do
-        local run_group = group_key(row.class, row.start_level)
+        local run_group = group_key(row.class, row.start_level, row.loadout)
         local key = run_group .. "\n" .. tostring(row.spell or "")
         local aggregate = groups[key]
         if not aggregate then
             aggregate = {
                 class = row.class,
                 start_level = tonumber(row.start_level) or 1,
+                loadout = row.loadout or "",
                 run_group = run_group,
                 spell = row.spell,
                 runs_using = 0,
@@ -472,6 +665,7 @@ local function aggregate_spell_rows(spell_rows, summaries)
         rows[#rows + 1] = {
             class = aggregate.class,
             start_level = aggregate.start_level,
+            loadout = aggregate.loadout,
             spell = aggregate.spell,
             class_runs = run_counts[aggregate.run_group] or 0,
             runs_using = aggregate.runs_using,
@@ -492,12 +686,14 @@ local function aggregate_enemy_rows(summaries)
     for _, row in ipairs(summaries) do
         local class_name = row.class or ""
         local start_level = tonumber(row.start_level) or 1
-        local run_group = group_key(class_name, start_level)
+        local loadout = row.loadout or ""
+        local run_group = group_key(class_name, start_level, loadout)
         local class_total = class_totals[run_group]
         if not class_total then
             class_total = {
                 class = class_name,
                 start_level = start_level,
+                loadout = loadout,
                 runs = 0,
                 kills = 0,
                 visible_enemy_frames = 0,
@@ -532,6 +728,7 @@ local function aggregate_enemy_rows(summaries)
                 group = {
                     class = class_name,
                     start_level = start_level,
+                    loadout = loadout,
                     monster = monster,
                     run_group = run_group,
                     runs_visible = 0,
@@ -566,6 +763,7 @@ local function aggregate_enemy_rows(summaries)
         rows[#rows + 1] = {
             class = group.class,
             start_level = group.start_level,
+            loadout = group.loadout,
             monster = group.monster,
             runs = class_total.runs or 0,
             runs_visible = group.runs_visible,
@@ -658,13 +856,15 @@ local function report_message(class_name, metric, value, baseline, delta_pct)
     )
 end
 
-local function metric_baselines(class_rows, start_level)
+local function metric_baselines(class_rows, start_level, loadout)
     local baselines = {}
     for _, metric in ipairs(BASELINE_METRICS) do
         local total = 0
         local count = 0
         for _, row in ipairs(class_rows) do
-            if not start_level or (tonumber(row.start_level) or 1) == start_level then
+            local same_level = not start_level or (tonumber(row.start_level) or 1) == start_level
+            local same_loadout = (row.loadout or "") == (loadout or "")
+            if same_level and same_loadout then
                 total = total + (tonumber(row[metric.key]) or 0)
                 count = count + 1
             end
@@ -693,24 +893,28 @@ end
 local function report_class_name(row)
     local class_name = row.class or ""
     local start_level = tonumber(row.start_level) or 1
+    local loadout = row.loadout or ""
+    local suffix = loadout ~= "" and (" " .. loadout) or ""
     if start_level > 1 then
-        return string.format("%s L%d", class_name, start_level)
+        return string.format("%s L%d%s", class_name, start_level, suffix)
     end
-    return class_name
+    return class_name .. suffix
 end
 
 local function balance_report_rows(class_rows, min_runs, relative_threshold)
     local rows = {}
-    local baselines_by_level = {}
+    local baselines_by_group = {}
     min_runs = min_runs or 3
     relative_threshold = relative_threshold or 0.25
 
     for _, row in ipairs(class_rows) do
         local class_name = report_class_name(row)
         local start_level = tonumber(row.start_level) or 1
-        baselines_by_level[start_level] = baselines_by_level[start_level]
-            or metric_baselines(class_rows, start_level)
-        local baselines = baselines_by_level[start_level]
+        local loadout = row.loadout or ""
+        local baseline_key = tostring(start_level) .. "\n" .. loadout
+        baselines_by_group[baseline_key] = baselines_by_group[baseline_key]
+            or metric_baselines(class_rows, start_level, loadout)
+        local baselines = baselines_by_group[baseline_key]
         local runs = tonumber(row.runs) or 0
         if runs < min_runs then
             add_report_row(
@@ -1030,6 +1234,7 @@ local function game_init(run, telemetry, bot_options)
         end
     end
     if player then
+        apply_loadout(player, run.loadout_specs)
         local estats = player:effective_stats()
         player.stats.hp = estats.max_hp
         player.stats.mp = estats.max_mp
@@ -1086,7 +1291,7 @@ local function install_run_hooks(events_module, base_player_death, base_monster_
     end
 end
 
-local function add_run(runs, run_id, class_name, start_level, seed, seed_group, class_run_index)
+local function add_run(runs, run_id, class_name, start_level, seed, seed_group, class_run_index, loadout)
     runs[#runs + 1] = {
         run_id = run_id,
         class_name = class_name,
@@ -1094,17 +1299,19 @@ local function add_run(runs, run_id, class_name, start_level, seed, seed_group, 
         seed = seed,
         seed_group = seed_group,
         class_run_index = class_run_index,
+        loadout_name = loadout.name,
+        loadout_specs = loadout.specs_by_class[class_name] or {},
     }
 end
 
-local function build_runs(classes, levels, runs_per_class, seed, seed_mode)
+local function build_runs(classes, levels, runs_per_class, seed, seed_mode, loadout)
     local runs = {}
     local run_id = 1
     if seed_mode == "unique" then
         for _, class_name in ipairs(classes) do
             for _, start_level in ipairs(levels) do
                 for idx = 1, runs_per_class do
-                    add_run(runs, run_id, class_name, start_level, seed + run_id - 1, run_id, idx)
+                    add_run(runs, run_id, class_name, start_level, seed + run_id - 1, run_id, idx, loadout)
                     run_id = run_id + 1
                 end
             end
@@ -1115,7 +1322,7 @@ local function build_runs(classes, levels, runs_per_class, seed, seed_mode)
                 local seed_group = (level_idx - 1) * runs_per_class + idx
                 local paired_seed = seed + seed_group - 1
                 for _, class_name in ipairs(classes) do
-                    add_run(runs, run_id, class_name, start_level, paired_seed, seed_group, idx)
+                    add_run(runs, run_id, class_name, start_level, paired_seed, seed_group, idx, loadout)
                     run_id = run_id + 1
                 end
             end
@@ -1133,6 +1340,9 @@ local function run_balance(raw_args)
     parser:option("--classes", "Comma-separated classes to run.", DEFAULT_CLASSES)
     parser:option("--levels", "Comma-separated starting levels to run.", "1")
     parser:option("--start_map_desc", "Optional map_desc module to start each run in, such as map_descs.PixullochiaDepths.", nil)
+    parser:option("--loadout_preset", "Equipment preset for each class: none or late.", "none")
+    parser:option("--loadout", "Comma-separated item specs to add to every run, using Item or Item*COUNT.", "")
+    parser:option("--loadout_label", "Optional label for this loadout in outputs.", "")
     parser:option("--spell_policy", "Spell selection policy: mixed, priority, round_robin, none.", "mixed")
     parser:option("--sample_interval", "Frame interval for timeseries samples.", "300")
     parser:option("--out", "Summary CSV output.", "saves/balance_runs.csv")
@@ -1151,7 +1361,20 @@ local function run_balance(raw_args)
     local max_steps = tonumber(args.steps)
     local sample_interval = tonumber(args.sample_interval)
     local seed_mode = normalize_seed_mode(args.seed_mode)
-    local runs = build_runs(split_csv(args.classes), parse_levels(args.levels), tonumber(args.runs), tonumber(args.seed), seed_mode)
+    local classes = split_csv(args.classes)
+    local loadout_preset = normalize_loadout_preset(args.loadout_preset)
+    local custom_loadout_specs = parse_loadout_specs(args.loadout)
+    local specs_by_class = {}
+    for _, class_name in ipairs(classes) do
+        specs_by_class[class_name] = loadout_specs_for_class(loadout_preset, custom_loadout_specs, class_name)
+    end
+    local loadout = {
+        name = loadout_name(loadout_preset, custom_loadout_specs, args.loadout_label),
+        preset = loadout_preset,
+        custom_specs = custom_loadout_specs,
+        specs_by_class = specs_by_class,
+    }
+    local runs = build_runs(classes, parse_levels(args.levels), tonumber(args.runs), tonumber(args.seed), seed_mode, loadout)
     local summaries = {}
     local samples = {}
     local spell_rows = {}
@@ -1169,7 +1392,7 @@ local function run_balance(raw_args)
         local enemy_stat_rows = aggregate_enemy_rows(summaries)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
         write_csv(args.out, summaries, {
-            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "outcome", "frames", "level", "xp",
+            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "outcome", "frames", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
@@ -1177,27 +1400,27 @@ local function run_balance(raw_args)
             "monster_kills", "visible_enemy_frames",
         })
         write_csv(args.samples_out, samples, {
-            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "frame", "reason", "level", "xp",
+            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "frame", "reason", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
         })
-        write_csv(args.spells_out, spell_rows, {"run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "spell", "orders"})
+        write_csv(args.spells_out, spell_rows, {"run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "spell", "orders"})
         write_csv(args.aggregate_out, class_rows, {
-            "class", "start_level", "runs", "wins", "deaths", "step_limits", "bot_stalls",
+            "class", "start_level", "loadout", "runs", "wins", "deaths", "step_limits", "bot_stalls",
             "game_loop_exits", "win_rate", "death_rate", "outcome_counts",
             "combat_frame_rate", "explore_frame_rate", "rest_frame_rate",
             "idle_frame_rate", "portal_stop_frame_rate",
             "kills_per_1000_controlled_frames", "kills_per_1000_combat_frames",
         })
         write_csv(args.spell_stats_out, spell_stat_rows, {
-            "class", "start_level", "spell", "class_runs", "runs_using", "use_rate",
+            "class", "start_level", "loadout", "spell", "class_runs", "runs_using", "use_rate",
             "total_orders", "avg_orders_per_run", "avg_orders_per_using_run",
             "max_orders_in_run",
         })
         write_csv(args.enemy_stats_out, enemy_stat_rows, {
-            "class", "start_level", "monster", "runs", "runs_visible", "runs_killing",
+            "class", "start_level", "loadout", "monster", "runs", "runs_visible", "runs_killing",
             "xpaward", "kills", "visible_enemy_frames",
             "avg_kills_per_run", "avg_visible_enemy_frames_per_run",
             "kill_share", "visible_frame_share", "xp_from_kills", "xp_share",
@@ -1211,9 +1434,12 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 3,
+                schema_version = 4,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
+                loadout_preset = loadout_preset,
+                loadout = loadout.name,
+                loadout_specs_by_class = specs_by_class,
                 runs = json_runs,
                 class_stats = class_rows,
                 spell_stats = spell_stat_rows,
