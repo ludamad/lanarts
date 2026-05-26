@@ -538,6 +538,22 @@ necromancer_eval_input = () =>
                 return
     @set("should_use_weapon", true)
 
+pyrocaster_eval_input = () =>
+    player = @player
+    if player and player.stats
+        frame = require("core.GameState").frame or 0
+        if player.stats.level >= 3 and not player\has_effect("Dragonform")
+            if (rawget(@, "dragon_retry_at") or 0) <= frame
+                @set("use_spell_slot", 2)
+                rawset(@, "dragon_retry_at", frame + 90)
+                return
+        if player.stats.level >= 2 and not player\has_effect("Ring of Flames Stat Boost")
+            if (rawget(@, "ring_retry_at") or 0) <= frame
+                @set("use_spell_slot", 1)
+                rawset(@, "ring_retry_at", frame + 90)
+                return
+    @set("use_spell_slot", 0)
+
 CONFIGS = {
     {
         name: "BaseFighter"
@@ -563,8 +579,7 @@ CONFIGS = {
         name: "BasePyrocaster"
         class: "Pyrocaster"
         primary_damage_type: "Red"
-        input: () =>
-            @set("use_spell_slot", 0)
+        input: pyrocaster_eval_input
     }
 }
 
