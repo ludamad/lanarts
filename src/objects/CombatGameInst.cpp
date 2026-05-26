@@ -74,7 +74,6 @@ bool CombatGameInst::damage(GameState* gs, float fdmg, CombatGameInst* attacker)
 
         if (attacker != NULL && team != PLAYER_TEAM && e_this) {
             int attacker_xp = attacker->gain_xp_from(gs, this);
-            attacker->signal_killed_enemy();
 //            PlayerData& pc = gs->player_data();
 //            double xpworth = this->xpworth();
 //            double n_killed = double(pc.n_enemy_killed(e_this->enemy_type()) - 1) / pc.all_players().size();
