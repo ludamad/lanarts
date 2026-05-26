@@ -149,6 +149,17 @@ SUMMARY_METRICS = {
     "projectile_count", "receive_melee_count", "enemy_count_alive"
 }
 
+CONTACT_METRICS = {
+    "defender_count", "attacker_count", "melee_count",
+    "projectile_count", "receive_melee_count"
+}
+
+had_contact = (row) ->
+    return true if (tonumber(row.player_damage) or 0) > 0
+    for metric in *CONTACT_METRICS
+        return true if (tonumber(row[metric]) or 0) > 0
+    return false
+
 aggregate_stats = (stats) ->
     groups = {}
     for row in *stats
@@ -168,7 +179,10 @@ aggregate_stats = (stats) ->
             }
             groups[key] = aggregate
         aggregate.runs += 1
-        aggregate.outcomes[row.outcome or "unknown"] = (aggregate.outcomes[row.outcome or "unknown"] or 0) + 1
+        outcome = row.outcome or "unknown"
+        if outcome == "step_limit" and not had_contact(row)
+            outcome = "no_contact_step_limit"
+        aggregate.outcomes[outcome] = (aggregate.outcomes[outcome] or 0) + 1
         for metric in *SUMMARY_METRICS
             add_metric(aggregate, row, metric)
 
@@ -189,6 +203,7 @@ aggregate_stats = (stats) ->
             xpaward: aggregate.xpaward
             enemy_kill_rate: format_rate safe_div(aggregate.outcomes.enemy_killed or 0, runs)
             step_limit_rate: format_rate safe_div(aggregate.outcomes.step_limit or 0, runs)
+            no_contact_step_limit_rate: format_rate safe_div(aggregate.outcomes.no_contact_step_limit or 0, runs)
             player_death_rate: format_rate safe_div(aggregate.outcomes.player_death or 0, runs)
             avg_frames: format_rate avg_frames
             min_frames: aggregate.mins.frames or 0
@@ -239,6 +254,7 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
         key = config_level_key(row.config_name, row.level)
         kill_rate = tonumber(row.enemy_kill_rate) or 0
         step_limit_rate = tonumber(row.step_limit_rate) or 0
+        no_contact_step_limit_rate = tonumber(row.no_contact_step_limit_rate) or 0
         damage_per_xp = tonumber(row.damage_per_xp) or 0
         damage_rate = tonumber(row.damage_per_1000_frames) or 0
         avg_frames = tonumber(row.avg_frames) or 0
@@ -260,6 +276,21 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 delta: row.step_limit_rate
                 delta_pct: row.step_limit_rate
                 message: "#{row.monster} survives to the step limit in #{row.step_limit_rate} of #{row.config_name} L#{row.level} runs."
+            }
+
+        if no_contact_step_limit_rate > 0
+            append reports, {
+                severity: "info"
+                category: "contact"
+                config_name: row.config_name
+                level: row.level
+                monster: row.monster
+                metric: "no_contact_step_limit_rate"
+                value: row.no_contact_step_limit_rate
+                baseline: "0.000"
+                delta: row.no_contact_step_limit_rate
+                delta_pct: row.no_contact_step_limit_rate
+                message: "#{row.monster} had no combat contact before the step limit in #{row.no_contact_step_limit_rate} of #{row.config_name} L#{row.level} runs."
             }
 
         if threat_baseline > 0 and damage_per_xp > threat_baseline * (1 + delta_pct)
@@ -475,7 +506,7 @@ run_bot_tests = (raw_args) ->
             }
             write_csv args.aggregate_out, aggregate_rows, {
                 "config_name", "level", "monster", "runs", "xpaward",
-                "enemy_kill_rate", "step_limit_rate", "player_death_rate",
+                "enemy_kill_rate", "step_limit_rate", "no_contact_step_limit_rate", "player_death_rate",
                 "avg_frames", "min_frames", "max_frames",
                 "avg_player_damage", "min_player_damage", "max_player_damage",
                 "damage_per_1000_frames", "damage_per_xp", "xp_per_100_damage",
