@@ -18,6 +18,8 @@ local DEFAULTS = {
     pyrocaster_ring_min_range = 30,
     pyrocaster_ring_max_range = 62,
     ranged_keepaway = 80,
+    gragh_keepaway_bonus = 28,
+    charging_keepaway_bonus = 24,
     melee_close = 46,
     stuck_end_frames = 720,
 }
@@ -42,6 +44,11 @@ local CLASS_KEEPAWAY = {
     Pyrocaster = 112,
     Stormcaller = 112,
     ["Blue Mage"] = 96,
+}
+
+local CLOSE_RANGE_CLASSES = {
+    Fighter = true,
+    Necromancer = true,
 }
 
 local SPELL_RETRY_DELAYS = {
@@ -98,6 +105,23 @@ end
 
 local function reverse_direction(dir)
     return {-dir[1], -dir[2]}
+end
+
+local function direction_from_vector(dx, dy, deadzone)
+    deadzone = deadzone or 0
+    if math.abs(dx) < deadzone then
+        dx = 0
+    end
+    if math.abs(dy) < deadzone then
+        dy = 0
+    end
+    if dx ~= 0 then
+        dx = dx / math.abs(dx)
+    end
+    if dy ~= 0 then
+        dy = dy / math.abs(dy)
+    end
+    return {dx, dy}
 end
 
 local function hp_pct(player)
@@ -221,6 +245,50 @@ function AutomatedPlayerInputSource:_record_visible_enemies(enemies)
     for _, enemy in ipairs(enemies or {}) do
         self:_record_counter("visible_enemy_frames", enemy.name)
     end
+end
+
+function AutomatedPlayerInputSource:_keepaway_for(enemy)
+    local player = self.player
+    local keepaway = CLASS_KEEPAWAY[player.class_name] or self.options.ranged_keepaway
+    if enemy and enemy.name == "Gragh" then
+        keepaway = keepaway + self.options.gragh_keepaway_bonus
+    end
+    if enemy and enemy.has_effect and enemy:has_effect("Charging") then
+        keepaway = keepaway + self.options.charging_keepaway_bonus
+    end
+    return keepaway
+end
+
+function AutomatedPlayerInputSource:_ranged_avoid_direction(enemies)
+    local player = self.player
+    local x, y = 0, 0
+    local too_close = false
+    local close_gragh = false
+
+    for _, enemy in ipairs(enemies) do
+        local keepaway = self:_keepaway_for(enemy)
+        local dx, dy = player.x - enemy.x, player.y - enemy.y
+        local dist = math.sqrt(dx * dx + dy * dy)
+        if dist < keepaway then
+            too_close = true
+            if enemy.name == "Gragh" then
+                close_gragh = true
+            end
+            local len = math.max(1, dist)
+            local weight = (keepaway - dist) / math.max(1, keepaway)
+            x = x + dx / len * weight
+            y = y + dy / len * weight
+        end
+    end
+
+    if not too_close then
+        return nil
+    end
+    self:_record_scalar("ranged_close_enemy_frames")
+    if close_gragh then
+        self:_record_scalar("ranged_close_gragh_frames")
+    end
+    return direction_from_vector(x, y, 0.05)
 end
 
 function AutomatedPlayerInputSource:_set_move(dir)
@@ -375,11 +443,14 @@ function AutomatedPlayerInputSource:_combat_move(enemies, ordered_spell)
     if hp_pct(player) < self.options.retreat_hp_pct then
         return self:_set_move(reverse_direction(toward))
     end
-    local keepaway = CLASS_KEEPAWAY[player.class_name] or self.options.ranged_keepaway
-    if RANGED_CLASSES[player.class_name] and dist < keepaway then
-        return self:_set_move(reverse_direction(toward))
+    if RANGED_CLASSES[player.class_name] then
+        local avoid = self:_ranged_avoid_direction(enemies)
+        if avoid then
+            self:_record_scalar("ranged_keepaway_frames")
+            return self:_set_move(avoid)
+        end
     end
-    if not ordered_spell and dist > self.options.melee_close then
+    if not ordered_spell and CLOSE_RANGE_CLASSES[player.class_name] and dist > self.options.melee_close then
         return self:_set_move(toward)
     end
     return false
