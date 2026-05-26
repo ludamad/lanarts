@@ -1416,7 +1416,7 @@ DataW.enemy_create {
     types: {"Black"}
     weapon: {cooldown: 40, damage: 10}
     stats: {
-        hp: 40
+        hp: 35
         hpregen: 0
         movespeed: 2
         strength: 2
