@@ -46,7 +46,7 @@ DataW.enemy_create {
     name: "Mana Sapper"
     sprite: "spr_enemies.demons.manasapper"
     radius: 11
-    xpaward: 50
+    xpaward: 65
     appear_message: "A mana sapper comes onto the scene!"
     defeat_message: "The mana sapper dies."
     types: {"Black"}
@@ -54,14 +54,14 @@ DataW.enemy_create {
         attacks: {
             {projectile: "Minor Missile"}
         }
-        hp: 100
+        hp: 80
         hpregen: 0.03
         movespeed: 1
         -- base stats:
-        magic: 45
-        defence: 25
+        magic: 35
+        defence: 18
         strength: 45
-        willpower: 25
+        willpower: 18
     }
     effects_active: {"Sap Aura"}
 }
