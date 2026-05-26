@@ -1573,7 +1573,7 @@ DataW.enemy_create {
     radius: 12
     xpaward: 60
     types: {"Black"}
-    weapon: {cooldown: 20}
+    weapon: {cooldown: 20, damage: 5}
     stats: {
         movespeed: 4.0
         hp: 70
