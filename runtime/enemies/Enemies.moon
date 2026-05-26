@@ -620,10 +620,10 @@ DataW.enemy_create {
     types: {"Red", "Bludgeon"}
     stats: {
         attacks: {{weapon: "Basic Melee"}}
-        hp: 150
-        hpregen: 0.18
-        movespeed: 3.5
-        strength: 40
+        hp: 120
+        hpregen: 0.02
+        movespeed: 2.9
+        strength: 28
         magic: 10
         defence: 8
         willpower: 8

@@ -43,31 +43,23 @@ graghs_lair_plan = (rng) -> {
     floor2: Tile.create(Tilesets.lair.floor_alt, false, true, {}, {FLAG_OVERWORLD})
     wall1: Tile.create(Tilesets.lair.wall, true, false, {}, {FLAG_OVERWORLD})
     wall2: Tile.create(Tilesets.lair.wall_alt, true, false, {}, {FLAG_OVERWORLD})
-    enemy_entries: {
-        {enemy: "Adder", guaranteed_spawns: 6, chance: 100}
-        {enemy: "Black Mamba", guaranteed_spawns: 2, chance: 25}
-        {enemy: "Mouther", guaranteed_spawns: 2}
-    }
-    item_groups: {{ItemGroups.basic_items, 8}}
-    number_regions: 2
-    room_radius: () ->  13
-    rect_room_num_range: {0, 0}
-    rect_room_size_range: {1, 1}
-    n_statues: 4
     n_subareas: 1
     size: {100, 100}
     n_items: 4
     n_enemies: 0
     n_stores: 2
     n_epic_stores: 2
-    n_encounter_vaults: 3
+    n_encounter_vaults: 0
     enemy_entries: {
-        {enemy: "Sheep", guaranteed_spawns: 5, chance: 100}
-        {enemy: "Mouther", guaranteed_spawns: 4}
-        {enemy: "Black Mamba", guaranteed_spawns: 4}
-        {enemy: "Hydra", guaranteed_spawns: 1}
+        {enemy: "Sheep", guaranteed_spawns: 2, chance: 65}
+        {enemy: "Mouther", guaranteed_spawns: 1, chance: 15}
+        {enemy: "Black Mamba", guaranteed_spawns: 1, chance: 20}
         {enemy: "Gragh", guaranteed_spawns: 1}
-        {enemy: "Elephant", guaranteed_spawns: 5}
+    }
+    encounter_enemy_entries: {
+        {enemy: "Sheep", chance: 60}
+        {enemy: "Mouther", chance: 15}
+        {enemy: "Black Mamba", chance: 25}
     }
     item_groups: {{ItemGroups.enchanted_items, 4}}
     number_regions: 5
@@ -95,6 +87,17 @@ make_template = (rng, back_links={}, forward_links={}) ->
             return plan.n_encounter_vaults
         _encounter_vault: () =>
             return Vaults.crypt_encounter_vault
+        _create_encounter_rooms: (map) =>
+            default_config = @_default_vault_config {door_sprite: NewDungeons._runed_door_sprite, door_key: "dummykey"}
+            encounter_enemy_placer = (map, xy) ->
+                enemy = OldMaps.enemy_generate(plan.encounter_enemy_entries)
+                MapUtils.spawn_enemy(map, enemy, xy)
+            for i =1,@_n_encounter_vaults()
+                conf = table.merge(default_config, {rng: map.rng, enemy_placer: encounter_enemy_placer})
+                vault = SourceMap.area_template_create(@_encounter_vault() conf)
+                if not NewDungeons.place_feature(map, vault)
+                    return nil
+            return true
         _item_groups: () =>
             return plan.item_groups
         _create_stairs_down: (map) =>
