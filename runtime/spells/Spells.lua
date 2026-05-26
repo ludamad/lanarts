@@ -133,10 +133,10 @@ local function ChargeCallback(_, caster)
         local dist = vector_distance(mon.xy, caster.xy)
         local range = 30 + caster.stats.strength + caster.stats.level * 20
         if dist < mon.target_radius + caster.target_radius + range then
-            -- Perform two melee attacks on each monster
-            caster:melee(mon)
+            -- Perform two melee attacks on normal monsters; bosses resist the follow-up hit.
             caster:melee(mon)
             if not mon.unique then
+                caster:melee(mon)
                 local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)
                 -- Stun enemies longer based on strength difference
                 local thrown = mon:add_effect("Thrown", 40 + 10 * str_diff + caster.stats.level * 5)
