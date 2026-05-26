@@ -40,11 +40,12 @@ local function parse_levels(value)
     return result
 end
 
-local function group_key(class_name, start_level, loadout)
+local function group_key(class_name, start_level, loadout, bot_profile)
     return table.concat({
         tostring(class_name or ""),
         tostring(start_level or 1),
         tostring(loadout or ""),
+        tostring(bot_profile or ""),
     }, "\n")
 end
 
@@ -475,6 +476,7 @@ local function sample_run(run, telemetry, samples, reason)
         class = run.class_name,
         start_level = run.start_level or 1,
         loadout = run.loadout_name or "",
+        bot_profile = run.bot_profile or telemetry.skill_profile or "",
         frame = GameState.frame,
         reason = reason or "interval",
         level = snap.level,
@@ -533,6 +535,7 @@ local function summarize_run(run, telemetry, outcome)
         class = run.class_name,
         start_level = run.start_level or 1,
         loadout = run.loadout_name or "",
+        bot_profile = run.bot_profile or telemetry.skill_profile or "",
         outcome = outcome,
         frames = GameState.frame,
         level = snap.level or 0,
@@ -563,6 +566,11 @@ local function summarize_run(run, telemetry, outcome)
         damage_event_total = telemetry.damage_event_total or 0,
         damage_taken_by_source = encode_counts(telemetry.damage_taken_by_source),
         damage_events_by_source = encode_counts(telemetry.damage_events_by_source),
+        reaction_hold_frames = telemetry.reaction_hold_frames or 0,
+        movement_noise_frames = telemetry.movement_noise_frames or 0,
+        spell_skip_frames = telemetry.spell_skip_frames or 0,
+        item_skip_frames = telemetry.item_skip_frames or 0,
+        weapon_skip_frames = telemetry.weapon_skip_frames or 0,
         controlled_frames = telemetry.controlled_frames or 0,
         hunt_enemy_frames = telemetry.hunt_enemy_frames or 0,
         ranged_keepaway_frames = telemetry.ranged_keepaway_frames or 0,
@@ -603,6 +611,7 @@ local function flatten_spell_rows(run, telemetry)
             class = run.class_name,
             start_level = run.start_level or 1,
             loadout = run.loadout_name or "",
+            bot_profile = run.bot_profile or telemetry.skill_profile or "",
             spell = spell,
             orders = count,
         }
@@ -622,6 +631,7 @@ local function flatten_damage_rows(run, telemetry)
             class = run.class_name,
             start_level = run.start_level or 1,
             loadout = run.loadout_name or "",
+            bot_profile = run.bot_profile or telemetry.skill_profile or "",
             source = source,
             damage = format_rate(damage),
             events = events[source] or 0,
@@ -634,6 +644,8 @@ local SUMMARY_METRICS = {
     "frames", "level", "xp", "hp_pct", "mp_pct", "kills", "player_kills", "deaths",
     "deepest_floor", "current_floor", "spell_orders_total", "ability_orders_total", "weapon_orders",
     "item_orders_total", "damage_taken_total", "damage_event_total",
+    "reaction_hold_frames", "movement_noise_frames", "spell_skip_frames",
+    "item_skip_frames", "weapon_skip_frames",
     "controlled_frames", "hunt_enemy_frames", "combat_frames",
     "explore_frames", "rest_frames", "idle_frames", "random_walk_frames",
     "unstick_frames", "portal_stop_frames", "ranged_keepaway_frames",
@@ -662,13 +674,15 @@ local function aggregate_summary_rows(summaries)
         local class_name = row.class or ""
         local start_level = tonumber(row.start_level) or 1
         local loadout = row.loadout or ""
-        local key = group_key(class_name, start_level, loadout)
+        local bot_profile = row.bot_profile or ""
+        local key = group_key(class_name, start_level, loadout, bot_profile)
         local aggregate = groups[key]
         if not aggregate then
             aggregate = {
                 class = class_name,
                 start_level = start_level,
                 loadout = loadout,
+                bot_profile = bot_profile,
                 runs = 0,
                 outcomes = {},
                 sums = {},
@@ -694,6 +708,7 @@ local function aggregate_summary_rows(summaries)
             class = aggregate.class,
             start_level = aggregate.start_level,
             loadout = aggregate.loadout,
+            bot_profile = aggregate.bot_profile,
             runs = aggregate.runs,
             wins = wins,
             clears = aggregate.outcomes.cleared or 0,
@@ -729,7 +744,7 @@ end
 local function class_run_counts(summaries)
     local counts = {}
     for _, row in ipairs(summaries) do
-        local key = group_key(row.class, row.start_level, row.loadout)
+        local key = group_key(row.class, row.start_level, row.loadout, row.bot_profile)
         counts[key] = (counts[key] or 0) + 1
     end
     return counts
@@ -739,7 +754,7 @@ local function aggregate_spell_rows(spell_rows, summaries)
     local run_counts = class_run_counts(summaries)
     local groups = {}
     for _, row in ipairs(spell_rows) do
-        local run_group = group_key(row.class, row.start_level, row.loadout)
+        local run_group = group_key(row.class, row.start_level, row.loadout, row.bot_profile)
         local key = run_group .. "\n" .. tostring(row.spell or "")
         local aggregate = groups[key]
         if not aggregate then
@@ -747,6 +762,7 @@ local function aggregate_spell_rows(spell_rows, summaries)
                 class = row.class,
                 start_level = tonumber(row.start_level) or 1,
                 loadout = row.loadout or "",
+                bot_profile = row.bot_profile or "",
                 run_group = run_group,
                 spell = row.spell,
                 runs_using = 0,
@@ -769,6 +785,7 @@ local function aggregate_spell_rows(spell_rows, summaries)
             class = aggregate.class,
             start_level = aggregate.start_level,
             loadout = aggregate.loadout,
+            bot_profile = aggregate.bot_profile,
             spell = aggregate.spell,
             class_runs = run_counts[aggregate.run_group] or 0,
             runs_using = aggregate.runs_using,
@@ -787,7 +804,7 @@ local function aggregate_damage_rows(damage_rows, summaries)
     local class_damage = {}
     local groups = {}
     for _, row in ipairs(damage_rows) do
-        local run_group = group_key(row.class, row.start_level, row.loadout)
+        local run_group = group_key(row.class, row.start_level, row.loadout, row.bot_profile)
         class_damage[run_group] = (class_damage[run_group] or 0) + (tonumber(row.damage) or 0)
         local key = run_group .. "\n" .. tostring(row.source or "")
         local aggregate = groups[key]
@@ -796,6 +813,7 @@ local function aggregate_damage_rows(damage_rows, summaries)
                 class = row.class,
                 start_level = tonumber(row.start_level) or 1,
                 loadout = row.loadout or "",
+                bot_profile = row.bot_profile or "",
                 run_group = run_group,
                 source = row.source,
                 runs_hit = 0,
@@ -821,6 +839,7 @@ local function aggregate_damage_rows(damage_rows, summaries)
             class = aggregate.class,
             start_level = aggregate.start_level,
             loadout = aggregate.loadout,
+            bot_profile = aggregate.bot_profile,
             source = aggregate.source,
             class_runs = run_counts[aggregate.run_group] or 0,
             runs_hit = aggregate.runs_hit,
@@ -845,13 +864,15 @@ local function aggregate_enemy_rows(summaries)
         local class_name = row.class or ""
         local start_level = tonumber(row.start_level) or 1
         local loadout = row.loadout or ""
-        local run_group = group_key(class_name, start_level, loadout)
+        local bot_profile = row.bot_profile or ""
+        local run_group = group_key(class_name, start_level, loadout, bot_profile)
         local class_total = class_totals[run_group]
         if not class_total then
             class_total = {
                 class = class_name,
                 start_level = start_level,
                 loadout = loadout,
+                bot_profile = bot_profile,
                 runs = 0,
                 kills = 0,
                 visible_enemy_frames = 0,
@@ -893,6 +914,7 @@ local function aggregate_enemy_rows(summaries)
                     class = class_name,
                     start_level = start_level,
                     loadout = loadout,
+                    bot_profile = bot_profile,
                     monster = monster,
                     run_group = run_group,
                     runs_visible = 0,
@@ -939,6 +961,7 @@ local function aggregate_enemy_rows(summaries)
             class = group.class,
             start_level = group.start_level,
             loadout = group.loadout,
+            bot_profile = group.bot_profile,
             monster = group.monster,
             runs = class_total.runs or 0,
             runs_visible = group.runs_visible,
@@ -1550,6 +1573,7 @@ local function run_balance(raw_args)
     parser:option("--loadout", "Comma-separated item specs to add to every run, using Item or Item*COUNT.", "")
     parser:option("--loadout_label", "Optional label for this loadout in outputs.", "")
     parser:option("--spell_policy", "Spell selection policy: mixed, priority, round_robin, none.", "mixed")
+    parser:option("--bot_profile", "Automated-player skill profile: perfect, skilled, human, or sloppy.", "perfect")
     parser:option("--sample_interval", "Frame interval for timeseries samples.", "300")
     parser:option("--out", "Summary CSV output.", "saves/balance_runs.csv")
     parser:option("--samples_out", "Timeseries sample CSV output.", "saves/balance_samples.csv")
@@ -1582,6 +1606,9 @@ local function run_balance(raw_args)
         specs_by_class = specs_by_class,
     }
     local runs = build_runs(classes, parse_levels(args.levels), tonumber(args.runs), tonumber(args.seed), seed_mode, loadout)
+    for _, run in ipairs(runs) do
+        run.bot_profile = args.bot_profile
+    end
     local summaries = {}
     local samples = {}
     local spell_rows = {}
@@ -1601,20 +1628,22 @@ local function run_balance(raw_args)
         local enemy_stat_rows = aggregate_enemy_rows(summaries)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
         write_csv(args.out, summaries, {
-            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "outcome", "frames", "level", "xp",
+            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "outcome", "frames", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "damage_taken_total", "damage_event_total", "damage_taken_by_source",
             "damage_events_by_source",
+            "reaction_hold_frames", "movement_noise_frames", "spell_skip_frames",
+            "item_skip_frames", "weapon_skip_frames",
             "hunt_enemy_frames", "ranged_keepaway_frames", "ranged_close_enemy_frames",
             "ranged_close_gragh_frames",
             "monster_kills", "visible_enemy_frames", "alive_enemy_counts",
             "alive_enemy_hp", "alive_enemy_max_hp",
         })
         write_csv(args.samples_out, samples, {
-            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "frame", "reason", "level", "xp",
+            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "frame", "reason", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "alive_enemy_counts",
@@ -1622,33 +1651,37 @@ local function run_balance(raw_args)
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "damage_taken_total", "damage_event_total", "damage_taken_by_source",
             "damage_events_by_source",
+            "reaction_hold_frames", "movement_noise_frames", "spell_skip_frames",
+            "item_skip_frames", "weapon_skip_frames",
             "hunt_enemy_frames", "ranged_keepaway_frames", "ranged_close_enemy_frames",
             "ranged_close_gragh_frames",
         })
-        write_csv(args.spells_out, spell_rows, {"run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "spell", "orders"})
+        write_csv(args.spells_out, spell_rows, {"run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "spell", "orders"})
         write_csv(args.damage_stats_out, damage_stat_rows, {
-            "class", "start_level", "loadout", "source", "class_runs", "runs_hit",
+            "class", "start_level", "loadout", "bot_profile", "source", "class_runs", "runs_hit",
             "hit_rate", "total_damage", "total_events", "avg_damage_per_run",
             "avg_damage_per_hit_run", "avg_events_per_run", "max_damage_in_run",
             "damage_share",
         })
         write_csv(args.aggregate_out, class_rows, {
-            "class", "start_level", "loadout", "runs", "wins", "clears", "deaths", "step_limits", "bot_stalls",
+            "class", "start_level", "loadout", "bot_profile", "runs", "wins", "clears", "deaths", "step_limits", "bot_stalls",
             "game_loop_exits", "win_rate", "death_rate", "outcome_counts",
             "combat_frame_rate", "explore_frame_rate", "rest_frame_rate",
             "idle_frame_rate", "portal_stop_frame_rate",
             "kills_per_1000_controlled_frames", "kills_per_1000_combat_frames",
             "avg_damage_taken_total", "avg_damage_event_total",
+            "avg_reaction_hold_frames", "avg_movement_noise_frames",
+            "avg_spell_skip_frames", "avg_item_skip_frames", "avg_weapon_skip_frames",
             "avg_ranged_keepaway_frames", "avg_ranged_close_enemy_frames",
             "avg_ranged_close_gragh_frames",
         })
         write_csv(args.spell_stats_out, spell_stat_rows, {
-            "class", "start_level", "loadout", "spell", "class_runs", "runs_using", "use_rate",
+            "class", "start_level", "loadout", "bot_profile", "spell", "class_runs", "runs_using", "use_rate",
             "total_orders", "avg_orders_per_run", "avg_orders_per_using_run",
             "max_orders_in_run",
         })
         write_csv(args.enemy_stats_out, enemy_stat_rows, {
-            "class", "start_level", "loadout", "monster", "runs", "runs_visible", "runs_killing",
+            "class", "start_level", "loadout", "bot_profile", "monster", "runs", "runs_visible", "runs_killing",
             "xpaward", "kills", "visible_enemy_frames",
             "runs_alive_at_end", "alive_at_end", "end_hp", "end_max_hp",
             "avg_kills_per_run", "avg_visible_enemy_frames_per_run",
@@ -1664,9 +1697,10 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 8,
+                schema_version = 9,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
+                bot_profile = args.bot_profile,
                 loadout_preset = loadout_preset,
                 loadout = loadout.name,
                 loadout_specs_by_class = specs_by_class,
@@ -1722,6 +1756,7 @@ local function run_balance(raw_args)
         local bot_options = {
             seed = run.seed + 991,
             spell_policy = args.spell_policy,
+            skill_profile = args.bot_profile,
             start_map_desc = args.start_map_desc,
         }
 

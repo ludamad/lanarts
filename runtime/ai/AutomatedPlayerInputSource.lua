@@ -5,8 +5,14 @@ local ExploreUtils = require "tests.ExploreUtils"
 
 local DEFAULTS = {
     seed = 12345678,
+    skill_profile = "perfect",
     spell_policy = "mixed",
     spell_retry_delay = 18,
+    decision_interval = 1,
+    spell_skip_chance = 0,
+    item_skip_chance = 0,
+    weapon_skip_chance = 0,
+    movement_noise_chance = 0,
     emergency_hp_pct = 0.35,
     ranged_emergency_hp_pct = 0.60,
     emergency_mp_pct = 0.20,
@@ -22,6 +28,31 @@ local DEFAULTS = {
     charging_keepaway_bonus = 24,
     melee_close = 46,
     stuck_end_frames = 720,
+}
+
+local SKILL_PROFILES = {
+    perfect = {},
+    skilled = {
+        decision_interval = 2,
+        spell_skip_chance = 0.04,
+        item_skip_chance = 0.04,
+        weapon_skip_chance = 0.02,
+        movement_noise_chance = 0.02,
+    },
+    human = {
+        decision_interval = 4,
+        spell_skip_chance = 0.12,
+        item_skip_chance = 0.14,
+        weapon_skip_chance = 0.06,
+        movement_noise_chance = 0.07,
+    },
+    sloppy = {
+        decision_interval = 7,
+        spell_skip_chance = 0.25,
+        item_skip_chance = 0.28,
+        weapon_skip_chance = 0.14,
+        movement_noise_chance = 0.14,
+    },
 }
 
 local CLASS_SPELL_PRIORITIES = {
@@ -62,13 +93,33 @@ local SPELL_RETRY_DELAYS = {
 
 local AutomatedPlayerInputSource = newtype({parent = ProgrammableInputSource})
 
+local function merge_into(dest, source)
+    for k, v in pairs(source or {}) do
+        dest[k] = v
+    end
+end
+
 local function merge_defaults(opts)
     local result = {}
-    for k, v in pairs(DEFAULTS) do
-        result[k] = v
+    merge_into(result, DEFAULTS)
+    local profile_name = (opts and (opts.skill_profile or opts.bot_profile)) or result.skill_profile
+    local profile = SKILL_PROFILES[profile_name]
+    if not profile then
+        error("Invalid automated player skill profile '" .. tostring(profile_name) .. "'")
     end
-    for k, v in pairs(opts or {}) do
-        result[k] = v
+    merge_into(result, profile)
+    merge_into(result, opts)
+    result.skill_profile = profile_name
+    return result
+end
+
+local function copy_value(value)
+    if type(value) ~= "table" then
+        return value
+    end
+    local result = {}
+    for k, v in pairs(value) do
+        result[k] = copy_value(v)
     end
     return result
 end
@@ -220,11 +271,13 @@ function AutomatedPlayerInputSource:init(player, telemetry, opts)
     ProgrammableInputSource.init(self, player)
     self.telemetry = telemetry or {}
     self.options = merge_defaults(opts)
+    self.telemetry.skill_profile = self.options.skill_profile
     self.ai_state = ExploreUtils.ai_state(player)
     self.rng = require("mtwist").create(self.options.seed)
     self.queued_movements = {}
     self.spell_retry_at = {}
     self.round_robin_index = 1
+    self.last_decision_input = false
     self.last_x = player.x
     self.last_y = player.y
     self.same_square_frames = 0
@@ -239,6 +292,34 @@ end
 
 function AutomatedPlayerInputSource:_record_scalar(key, amount)
     increment(self.telemetry, key, amount)
+end
+
+function AutomatedPlayerInputSource:_chance(probability)
+    if not probability or probability <= 0 then
+        return false
+    end
+    return self.rng:random(0, 1000000) <= probability * 1000000
+end
+
+function AutomatedPlayerInputSource:_record_decision()
+    self.last_decision_input = copy_value(self.input)
+    -- Item inputs are edge-triggered for human controls, so do not hold them
+    -- across reaction-delay frames.
+    self.last_decision_input.use_item_slot = -1
+    self.last_decision_input.sell_item_slot = -1
+end
+
+function AutomatedPlayerInputSource:_repeat_previous_decision()
+    local interval = self.options.decision_interval or 1
+    if interval <= 1 or not self.last_decision_input then
+        return false
+    end
+    if (self.ticks - 1) % interval == 0 then
+        return false
+    end
+    self.input = copy_value(self.last_decision_input)
+    self:_record_scalar("reaction_hold_frames")
+    return true
 end
 
 function AutomatedPlayerInputSource:_record_visible_enemies(enemies)
@@ -293,6 +374,10 @@ end
 
 function AutomatedPlayerInputSource:_set_move(dir)
     if dir and (dir[1] ~= 0 or dir[2] ~= 0) then
+        if self:_chance(self.options.movement_noise_chance) then
+            dir = self:_random_direction()
+            self:_record_scalar("movement_noise_frames")
+        end
         self:set("move_direction", dir)
         return true
     end
@@ -304,6 +389,11 @@ function AutomatedPlayerInputSource:_spell_throttled(name)
 end
 
 function AutomatedPlayerInputSource:_order_spell(spell)
+    if self:_chance(self.options.spell_skip_chance) then
+        self:_record_scalar("spell_skip_frames")
+        self:_record_counter("spell_skips", spell.name)
+        return false
+    end
     self:set("use_spell_slot", spell.slot)
     self.spell_retry_at[spell.name] = self.ticks + (SPELL_RETRY_DELAYS[spell.name] or self.options.spell_retry_delay)
     self:_record_counter("spell_orders", spell.name)
@@ -415,6 +505,11 @@ function AutomatedPlayerInputSource:_try_emergency_item(enemies)
     if hp_pct(player) < hp_threshold then
         local slot, item = inventory_slot(player, {["Health Potion"] = true, Honeycomb = true})
         if slot then
+            if self:_chance(self.options.item_skip_chance) then
+                self:_record_scalar("item_skip_frames")
+                self:_record_counter("item_skips", item)
+                return false
+            end
             self:set("use_item_slot", slot)
             self:_record_counter("item_orders", item)
             return true
@@ -423,12 +518,33 @@ function AutomatedPlayerInputSource:_try_emergency_item(enemies)
     if enemies and #enemies > 0 and mp_pct(player) < self.options.emergency_mp_pct then
         local slot, item = inventory_slot(player, {["Mana Potion"] = true})
         if slot then
+            if self:_chance(self.options.item_skip_chance) then
+                self:_record_scalar("item_skip_frames")
+                self:_record_counter("item_skips", item)
+                return false
+            end
             self:set("use_item_slot", slot)
             self:_record_counter("item_orders", item)
             return true
         end
     end
     return false
+end
+
+function AutomatedPlayerInputSource:_try_weapon(reason_key)
+    if self:_chance(self.options.weapon_skip_chance) then
+        self:_record_scalar("weapon_skip_frames")
+        if reason_key then
+            self:_record_scalar(reason_key .. "_skipped_orders")
+        end
+        return false
+    end
+    self:set("should_use_weapon", true)
+    self:_record_scalar("weapon_orders")
+    if reason_key then
+        self:_record_scalar(reason_key)
+    end
+    return true
 end
 
 function AutomatedPlayerInputSource:_combat_move(enemies, ordered_spell)
@@ -526,9 +642,9 @@ function AutomatedPlayerInputSource:_necromancer_combat_action(enemies)
         return self:_set_move(toward)
     end
 
-    self:set("should_use_weapon", true)
-    self:_record_scalar("weapon_orders")
-    self:_record_scalar("necromancer_pain_orders")
+    if not self:_try_weapon("necromancer_pain_orders") then
+        return false
+    end
     if regenerating then
         self:_record_scalar("necromancer_pain_during_regen_orders")
     end
@@ -547,8 +663,9 @@ function AutomatedPlayerInputSource:_pyrocaster_combat_action(enemies)
         return true
     end
 
-    self:set("should_use_weapon", true)
-    self:_record_scalar("weapon_orders")
+    if not self:_try_weapon() then
+        return false
+    end
     self:_pyrocaster_ring_move(enemies, nil)
     return true
 end
@@ -577,8 +694,9 @@ function AutomatedPlayerInputSource:_combat_action(enemies)
         return true
     end
 
-    self:set("should_use_weapon", true)
-    self:_record_scalar("weapon_orders")
+    if not self:_try_weapon() then
+        return false
+    end
     self:_combat_move(enemies, false)
     return true
 end
@@ -674,6 +792,9 @@ end
 function AutomatedPlayerInputSource:step()
     self.ticks = self.ticks + 1
     self:_record_scalar("controlled_frames")
+    if self:_repeat_previous_decision() then
+        return
+    end
     self.ai_state:step()
     self:_update_stuck_state()
 
@@ -683,22 +804,27 @@ function AutomatedPlayerInputSource:step()
 
     if self:_combat_action(enemies) then
         self:_clear_stall_state()
+        self:_record_decision()
         return
     end
     if is_on_portal(self.player) then
         self:_record_scalar("portal_stop_frames")
         self:_clear_stall_state()
+        self:_record_decision()
         return
     end
     if self:_try_rest_if_needed(enemies) then
         self:_clear_stall_state()
+        self:_record_decision()
         return
     end
     if self:_travel_action() then
+        self:_record_decision()
         return
     end
 
     self:_record_scalar("idle_frames")
+    self:_record_decision()
 end
 
 function AutomatedPlayerInputSource:should_end()
