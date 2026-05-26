@@ -60,6 +60,9 @@ normalize_key = (value) ->
     normalized = string.gsub(lowered, "[^%w]", "")
     return normalized
 
+uses_net_damage_for_threat = (config_name) ->
+    normalize_key(config_name)\find("necromancer", 1, true) != nil
+
 csv_escape = (value) ->
     return "" if value == nil
     value = tostring(value)
@@ -448,6 +451,20 @@ aggregate_stats = (stats) ->
         contact_avg_net_damage = safe_div(aggregate.contact_sums.net_player_damage, contact_runs)
         contact_avg_healing = safe_div(aggregate.contact_sums.player_healing, contact_runs)
         contact_avg_min_player_hp = safe_div(aggregate.contact_sums.min_player_hp, contact_runs)
+        net_damage_per_1000_frames = safe_div(aggregate.sums.net_player_damage, aggregate.sums.frames) * 1000
+        net_damage_per_xp = safe_div(avg_net_damage, math.max(1, aggregate.xpaward))
+        contact_net_damage_per_1000_frames = safe_div(aggregate.contact_sums.net_player_damage, aggregate.contact_sums.frames) * 1000
+        contact_net_damage_per_xp = safe_div(contact_avg_net_damage, math.max(1, aggregate.xpaward))
+        net_threat_mode = uses_net_damage_for_threat(aggregate.config_name)
+        threat_damage_mode = if net_threat_mode then "net" else "gross"
+        avg_threat_damage = if net_threat_mode then avg_net_damage else avg_damage
+        threat_damage_per_1000_frames = if net_threat_mode then net_damage_per_1000_frames else damage_per_1000_frames
+        threat_damage_per_xp = if net_threat_mode then net_damage_per_xp else damage_per_xp
+        contact_avg_threat_damage = if net_threat_mode then contact_avg_net_damage else contact_avg_damage
+        contact_threat_damage_per_1000_frames = if net_threat_mode then contact_net_damage_per_1000_frames else contact_damage_per_1000_frames
+        contact_threat_damage_per_xp = if net_threat_mode then contact_net_damage_per_xp else contact_damage_per_xp
+        threat_xp_per_100_damage = safe_div(aggregate.xpaward * 100, avg_threat_damage)
+        contact_threat_xp_per_100_damage = safe_div(aggregate.xpaward * 100, contact_avg_threat_damage)
         append rows, {
             config_name: aggregate.config_name
             level: aggregate.level
@@ -482,6 +499,13 @@ aggregate_stats = (stats) ->
             damage_per_1000_frames: format_rate damage_per_1000_frames
             damage_per_xp: format_rate damage_per_xp
             xp_per_100_damage: format_rate xp_per_100_damage
+            net_damage_per_1000_frames: format_rate net_damage_per_1000_frames
+            net_damage_per_xp: format_rate net_damage_per_xp
+            threat_damage_mode: threat_damage_mode
+            avg_threat_player_damage: format_rate avg_threat_damage
+            threat_damage_per_1000_frames: format_rate threat_damage_per_1000_frames
+            threat_damage_per_xp: format_rate threat_damage_per_xp
+            threat_xp_per_100_damage: format_rate threat_xp_per_100_damage
             contact_avg_frames: format_rate contact_avg_frames
             contact_min_frames: aggregate.contact_mins.frames or 0
             contact_max_frames: aggregate.contact_maxes.frames or 0
@@ -496,6 +520,12 @@ aggregate_stats = (stats) ->
             contact_damage_per_1000_frames: format_rate contact_damage_per_1000_frames
             contact_damage_per_xp: format_rate contact_damage_per_xp
             contact_xp_per_100_damage: format_rate contact_xp_per_100_damage
+            contact_net_damage_per_1000_frames: format_rate contact_net_damage_per_1000_frames
+            contact_net_damage_per_xp: format_rate contact_net_damage_per_xp
+            contact_avg_threat_player_damage: format_rate contact_avg_threat_damage
+            contact_threat_damage_per_1000_frames: format_rate contact_threat_damage_per_1000_frames
+            contact_threat_damage_per_xp: format_rate contact_threat_damage_per_xp
+            contact_threat_xp_per_100_damage: format_rate contact_threat_xp_per_100_damage
             avg_enemy_hp_pct: format_rate safe_div(aggregate.sums.enemy_hp_pct, runs)
             avg_enemy_count_alive: format_rate safe_div(aggregate.sums.enemy_count_alive, runs)
             avg_defender_count: format_rate safe_div(aggregate.sums.defender_count, runs)
@@ -558,15 +588,28 @@ with_matchup_context = (row, data) ->
     data.primary_resistance_multiplier = row.primary_resistance_multiplier or ""
     data.spawn_count = row.spawn_count or ""
     data.monster_spawns = row.monster_spawns or ""
+    data.threat_damage_mode = row.threat_damage_mode or ""
+    data.contact_avg_gross_player_damage = row.contact_avg_gross_player_damage or ""
+    data.contact_avg_net_player_damage = row.contact_avg_net_player_damage or ""
+    data.contact_avg_player_healing = row.contact_avg_player_healing or ""
     return data
+
+threat_damage_label = (row) ->
+    if (row.threat_damage_mode or "") == "net"
+        return "net contact damage"
+    return "contact damage"
+
+threat_damage_note = (row) ->
+    return "" unless (row.threat_damage_mode or "") == "net"
+    return " Gross contact damage #{row.contact_avg_gross_player_damage}, healing #{row.contact_avg_player_healing}."
 
 build_report = (aggregate_rows, delta_pct, min_report_runs, inactive_warning_severity) ->
     delta_pct = tonumber(delta_pct) or 0.5
     min_report_runs = tonumber(min_report_runs) or 1
     inactive_warning_severity = normalize_inactive_warning_severity(inactive_warning_severity)
     reports = {}
-    damage_per_xp_mean = mean_by_config_level(aggregate_rows, "contact_damage_per_xp")
-    damage_rate_mean = mean_by_config_level(aggregate_rows, "contact_damage_per_1000_frames")
+    damage_per_xp_mean = mean_by_config_level(aggregate_rows, "contact_threat_damage_per_xp")
+    damage_rate_mean = mean_by_config_level(aggregate_rows, "contact_threat_damage_per_1000_frames")
     frames_mean = mean_by_config_level(aggregate_rows, "contact_avg_frames")
 
     for row in *aggregate_rows
@@ -576,8 +619,8 @@ build_report = (aggregate_rows, delta_pct, min_report_runs, inactive_warning_sev
         step_limit_rate = tonumber(row.step_limit_rate) or 0
         no_contact_step_limit_rate = tonumber(row.no_contact_step_limit_rate) or 0
         contact_runs = tonumber(row.contact_runs) or 0
-        damage_per_xp = tonumber(row.contact_damage_per_xp) or 0
-        damage_rate = tonumber(row.contact_damage_per_1000_frames) or 0
+        damage_per_xp = tonumber(row.contact_threat_damage_per_xp) or 0
+        damage_rate = tonumber(row.contact_threat_damage_per_1000_frames) or 0
         avg_frames = tonumber(row.contact_avg_frames) or 0
         xpaward = tonumber(row.xpaward) or 0
         threat_baseline = damage_per_xp_mean[key] or 0
@@ -621,12 +664,12 @@ build_report = (aggregate_rows, delta_pct, min_report_runs, inactive_warning_sev
                 config_name: row.config_name
                 level: row.level
                 monster: row.monster
-                metric: "contact_damage_per_xp"
-                value: row.contact_damage_per_xp
+                metric: "contact_threat_damage_per_xp"
+                value: row.contact_threat_damage_per_xp
                 baseline: format_rate threat_baseline
                 delta: format_rate(damage_per_xp - threat_baseline)
                 delta_pct: format_rate safe_div(damage_per_xp - threat_baseline, threat_baseline)
-                message: "#{row.monster} deals #{row.contact_damage_per_xp} contact damage per XP versus #{format_rate(threat_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}#{source_note(row)}"
+                message: "#{row.monster} deals #{row.contact_threat_damage_per_xp} #{threat_damage_label(row)} per XP versus #{format_rate(threat_baseline)} baseline for #{row.config_name} L#{row.level}.#{threat_damage_note(row)}#{matchup_note(row)}#{source_note(row)}"
             }
 
         if xpaward <= 0 and damage_rate > 0
@@ -651,27 +694,27 @@ build_report = (aggregate_rows, delta_pct, min_report_runs, inactive_warning_sev
                 config_name: row.config_name
                 level: row.level
                 monster: row.monster
-                metric: "contact_damage_per_1000_frames"
-                value: row.contact_damage_per_1000_frames
+                metric: "contact_threat_damage_per_1000_frames"
+                value: row.contact_threat_damage_per_1000_frames
                 baseline: format_rate damage_baseline
                 delta: format_rate(damage_rate - damage_baseline)
                 delta_pct: format_rate safe_div(damage_rate - damage_baseline, damage_baseline)
-                message: "#{row.monster} contact damage pace is #{row.contact_damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}#{source_note(row)}"
+                message: "#{row.monster} #{threat_damage_label(row)} pace is #{row.contact_threat_damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}.#{threat_damage_note(row)}#{matchup_note(row)}#{source_note(row)}"
             }
 
-        if contact_runs > 0 and damage_baseline > 0 and damage_rate < damage_baseline * (1 - delta_pct)
+        if kill_rate == 1 and contact_runs > 0 and damage_baseline > 0 and damage_rate < damage_baseline * (1 - delta_pct)
             append reports, with_matchup_context row, {
                 severity: "info"
                 category: "underthreat"
                 config_name: row.config_name
                 level: row.level
                 monster: row.monster
-                metric: "contact_damage_per_1000_frames"
-                value: row.contact_damage_per_1000_frames
+                metric: "contact_threat_damage_per_1000_frames"
+                value: row.contact_threat_damage_per_1000_frames
                 baseline: format_rate damage_baseline
                 delta: format_rate(damage_rate - damage_baseline)
                 delta_pct: format_rate safe_div(damage_rate - damage_baseline, damage_baseline)
-                message: "#{row.monster} contact damage pace is only #{row.contact_damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}#{source_note(row)}"
+                message: "#{row.monster} #{threat_damage_label(row)} pace is only #{row.contact_threat_damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}.#{threat_damage_note(row)}#{matchup_note(row)}#{source_note(row)}"
             }
 
         if kill_rate == 1 and frame_baseline > 0 and avg_frames > frame_baseline * (1 + delta_pct)
@@ -969,11 +1012,19 @@ run_bot_tests = (raw_args) ->
                 "avg_gross_player_damage", "avg_net_player_damage", "avg_player_healing",
                 "avg_min_player_hp", "min_player_hp",
                 "damage_per_1000_frames", "damage_per_xp", "xp_per_100_damage",
+                "net_damage_per_1000_frames", "net_damage_per_xp",
+                "threat_damage_mode", "avg_threat_player_damage",
+                "threat_damage_per_1000_frames", "threat_damage_per_xp",
+                "threat_xp_per_100_damage",
                 "contact_avg_frames", "contact_min_frames", "contact_max_frames",
                 "contact_avg_player_damage", "contact_min_player_damage", "contact_max_player_damage",
                 "contact_avg_gross_player_damage", "contact_avg_net_player_damage",
                 "contact_avg_player_healing", "contact_avg_min_player_hp", "contact_min_player_hp",
                 "contact_damage_per_1000_frames", "contact_damage_per_xp", "contact_xp_per_100_damage",
+                "contact_net_damage_per_1000_frames", "contact_net_damage_per_xp",
+                "contact_avg_threat_player_damage",
+                "contact_threat_damage_per_1000_frames", "contact_threat_damage_per_xp",
+                "contact_threat_xp_per_100_damage",
                 "avg_enemy_hp_pct", "avg_enemy_count_alive",
                 "avg_defender_count", "avg_attacker_count", "avg_melee_count",
                 "avg_projectile_count", "avg_receive_melee_count"
@@ -983,11 +1034,13 @@ run_bot_tests = (raw_args) ->
                 "spawn_count", "monster_spawns", "source_status", "source_refs",
                 "config_primary_type", "monster_types", "primary_resistance",
                 "primary_resistance_multiplier",
+                "threat_damage_mode", "contact_avg_gross_player_damage",
+                "contact_avg_net_player_damage", "contact_avg_player_healing",
                 "metric", "value", "baseline", "delta", "delta_pct", "message"
             }
             if args.json_out and args.json_out != ""
                 file_dump_json args.json_out, {
-                    schema_version: 5
+                    schema_version: 6
                     seed: tostring(args.seed)
                     runs_per_config_monster: tonumber(args.runs)
                     runs_per_config_encounter: tonumber(args.runs)
