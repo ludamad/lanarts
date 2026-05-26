@@ -623,6 +623,32 @@ record_player_hp_delta = (run_state, before_hp) ->
     if run_state.min_player_hp == nil or after_hp < run_state.min_player_hp
         run_state.min_player_hp = after_hp
 
+nearest_enemy = (player) ->
+    return nil, 0 unless player
+    closest, closest_dist = nil, nil
+    for enemy in *Map.enemies_list(player)
+        continue if enemy.destroyed
+        dx, dy = enemy.x - player.x, enemy.y - player.y
+        dist = dx * dx + dy * dy
+        if not closest_dist or dist < closest_dist
+            closest = enemy
+            closest_dist = dist
+    return closest, closest_dist or 0
+
+move_toward_nearest_enemy = (source, desired_range) ->
+    player = source and source.player
+    enemy, dist = nearest_enemy(player)
+    return false unless enemy
+    desired_range = desired_range or 48
+    return false if dist <= desired_range * desired_range
+    dx, dy = enemy.x - player.x, enemy.y - player.y
+    deadzone = 6
+    dirx = if math.abs(dx) < deadzone then 0 elseif dx > 0 then 1 else -1
+    diry = if math.abs(dy) < deadzone then 0 elseif dy > 0 then 1 else -1
+    return false if dirx == 0 and diry == 0
+    source\set("move_direction", {dirx, diry})
+    return true
+
 necromancer_eval_input = () =>
     player = @player
     if player and player.stats
@@ -633,6 +659,7 @@ necromancer_eval_input = () =>
                 @set("use_spell_slot", 0)
                 rawset(@, "regen_retry_at", frame + 45)
                 return
+    move_toward_nearest_enemy(@, 72)
     @set("should_use_weapon", true)
 
 pyrocaster_eval_input = () =>
@@ -649,6 +676,7 @@ pyrocaster_eval_input = () =>
                 @set("use_spell_slot", 1)
                 rawset(@, "ring_retry_at", frame + 90)
                 return
+    move_toward_nearest_enemy(@, 62)
     @set("use_spell_slot", 0)
 
 CONFIGS = {
@@ -657,6 +685,7 @@ CONFIGS = {
         class: "Fighter"
         primary_damage_type: "Bludgeon"
         input: () =>
+            move_toward_nearest_enemy(@, 40)
             @set("should_use_weapon", true)
     }
     {
@@ -670,6 +699,7 @@ CONFIGS = {
         class: "Stormcaller"
         primary_damage_type: "White"
         input: () =>
+            move_toward_nearest_enemy(@, 120)
             @set("use_spell_slot", 0)
     }
     {
