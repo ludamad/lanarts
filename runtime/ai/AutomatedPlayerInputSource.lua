@@ -28,7 +28,7 @@ local CLASS_SPELL_PRIORITIES = {
     Rogue = {"Dash Attack"},
     Necromancer = {"Baleful Regeneration", "Summon Dark Aspect", "Skeleton Army", "Link of Loyalty", "Unlink"},
     Pyrocaster = {"Dragonform", "Ring of Flames", "Fire Bolt"},
-    Stormcaller = {"Tornado Storm", "Chain Lightning", "Energy Spear"},
+    Stormcaller = {"Energy Spear", "Chain Lightning", "Tornado Storm"},
     ["Blue Mage"] = {"Water Bolt"},
 }
 
