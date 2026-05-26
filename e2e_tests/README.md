@@ -28,8 +28,8 @@ Balance simulations:
     Aggregate rows include raw pacing metrics and kills per 1000 combat frames
     so low kill totals can be separated from low encounter contact.
     The report emits contact warnings when combat-frame exposure is far from
-    baseline and suppresses raw-kill underperformance flags when combat-adjusted
-    kill rate is still in range. It also suppresses combat-efficiency
+    baseline and emits pacing context instead of raw-kill balance flags when
+    combat-adjusted kill rate is still in range. It also suppresses combat-efficiency
     underperformance flags for high-contact runs when overall kill pacing is in
     range, and emits pacing context instead of a class-balance failure when
     combat efficiency is low but overall kill pace is still healthy.
