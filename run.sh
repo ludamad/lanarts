@@ -84,7 +84,9 @@ fi
 if handle_flag "--small" || handle_flag "-s" ; then
     export LANARTS_SMALL=1
 fi
+LANARTS_REQUEST_AUDIO=0
 if handle_flag "--audio" ; then
+    LANARTS_REQUEST_AUDIO=1
     export LANARTS_ENABLE_AUDIO=1
 fi
 if handle_flag "--luajit" || handle_flag "-lj" ; then
@@ -197,7 +199,8 @@ fi
 function run_lanarts(){
     cd runtime
     export vblank_mode=0
-    if [ -z "$LANARTS_ENABLE_AUDIO" ] ; then
+    if [ "$LANARTS_REQUEST_AUDIO" != "1" ] ; then
+        unset LANARTS_ENABLE_AUDIO
         export LANARTS_MUTE_AUDIO=1
         export SDL_AUDIODRIVER=dummy
     fi

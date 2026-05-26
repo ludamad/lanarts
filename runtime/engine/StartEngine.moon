@@ -3,6 +3,10 @@ Tasks = require "networking.Tasks"
 Display = require "core.Display"
 ResourceLoading = require "engine.ResourceLoading"
 
+env_truthy = (name) ->
+    value = os.getenv(name)
+    value and value != "" and value != "0"
+
 -- Adapt the settings object based on context
 -- Initialize the game state object
 engine_init = (settings) ->
@@ -29,7 +33,7 @@ engine_init = (settings) ->
     if os.getenv("LANARTS_INVINCIBLE")
         settings.invincible = true
 
-    if os.getenv("LANARTS_MUTE_AUDIO")
+    if env_truthy("LANARTS_MUTE_AUDIO") or not env_truthy("LANARTS_ENABLE_AUDIO")
         settings.volume = 0
 
     log "Initializing GameState api..."

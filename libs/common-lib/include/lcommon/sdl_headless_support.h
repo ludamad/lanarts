@@ -23,6 +23,7 @@
 #define Mix_CloseAudio() 0
 #define Mix_FreeChunk(x) 0
 #define Mix_FreeMusic(x) 0
+#define Mix_HaltChannel(x) 0
 #define Mix_HaltMusic() 0
 #define Mix_Init(x) 0
 #define Mix_Quit() 0

@@ -13,9 +13,16 @@
 namespace lsound {
 	static double CURRENT_VOLUME = 0.0;
 
-	static bool env_mute_audio() {
-		const char* value = getenv("LANARTS_MUTE_AUDIO");
+	static bool env_truthy(const char* name) {
+		const char* value = getenv(name);
 		return value != NULL && value[0] != '\0' && value[0] != '0';
+	}
+
+	static bool env_mute_audio() {
+		if (env_truthy("LANARTS_MUTE_AUDIO")) {
+			return true;
+		}
+		return !env_truthy("LANARTS_ENABLE_AUDIO");
 	}
 
 	static double clamped_volume(double volume) {
