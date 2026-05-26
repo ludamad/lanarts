@@ -479,18 +479,18 @@ DataW.enemy_create {
     effects_active: {"Enraging"}
 }
 
-DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
+DataW.enemy_create summoner_base("Fire Bat", 3, 160, 100) {
     name: "Purple Dragon"
     appear_message: "A frighteningly large purple dragon comes into view!"
     defeat_message: "You have slain the purple dragon!"
     sprite: "purple dragon"
     radius: 27
-    xpaward: 150
+    xpaward: 300
     types: {"Red"}
     unique: true
     stats: {
         hp: 220
-        hpregen: 0.1
+        hpregen: 0.04
         movespeed: 2.5
         strength: 20
         magic: 20
@@ -515,7 +515,7 @@ DataW.enemy_create summoner_base("Fire Bat", 5, 100, 100) {
                 GameObject.destroy(@)
     }
     resistances: {
-        Red: 2
+        Red: 1
         Blue: -1.25
         Green: 0
     }
