@@ -1066,7 +1066,7 @@ DataW.enemy_create {
     sprite: "hydra"
     death_sprite: "dead hydra"
     radius: 17
-    xpaward: 30
+    xpaward: 50
     appear_message: "A hydra appears!"
     defeat_message: "The hydra is vanquished."
     types: {"Green"}
