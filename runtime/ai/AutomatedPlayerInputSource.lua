@@ -259,6 +259,24 @@ local function nearest_alive_enemy(player)
     return best
 end
 
+local function nearest_alive_enemy_named(player, name)
+    if not name or name == "" then
+        return nil
+    end
+    local best, best_dist
+    for _, enemy in ipairs(Map.enemies_list(player)) do
+        if not enemy.destroyed and enemy.is_enemy ~= false
+            and enemy.team ~= player.team and enemy.name == name then
+            local dist = distance_sqr(player, enemy)
+            if not best_dist or dist < best_dist then
+                best = enemy
+                best_dist = dist
+            end
+        end
+    end
+    return best
+end
+
 local function is_on_portal(player)
     local collisions = Map.rectangle_collision_check(
         player.map,
@@ -766,7 +784,17 @@ function AutomatedPlayerInputSource:_travel_action()
         dir = self:_random_direction()
         self:_record_scalar("unstick_frames")
     else
-        dir = self.ai_state:get_next_direction()
+        local objective = nearest_alive_enemy_named(self.player, self.options.objective_enemy)
+        if objective then
+            self.ai_state.path_planner:set_path_towards(objective)
+            dir = self.ai_state.path_planner:next_direction_towards()
+            if dir then
+                self:_record_scalar("objective_hunt_enemy_frames")
+            end
+        end
+        if not dir then
+            dir = self.ai_state:get_next_direction()
+        end
         if not dir and self.options.start_map_desc and self.options.start_map_desc ~= "" then
             local target = nearest_alive_enemy(self.player)
             if target then

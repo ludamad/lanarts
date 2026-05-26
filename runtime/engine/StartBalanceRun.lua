@@ -566,6 +566,7 @@ local function sample_run(run, telemetry, samples, reason)
         ranged_keepaway_frames = telemetry.ranged_keepaway_frames or 0,
         ranged_close_enemy_frames = telemetry.ranged_close_enemy_frames or 0,
         ranged_close_gragh_frames = telemetry.ranged_close_gragh_frames or 0,
+        objective_hunt_enemy_frames = telemetry.objective_hunt_enemy_frames or 0,
         necromancer_close_frames = telemetry.necromancer_close_frames or 0,
         necromancer_pain_orders = necromancer_pain_orders,
         necromancer_pain_during_regen_orders = telemetry.necromancer_pain_during_regen_orders or 0,
@@ -632,6 +633,7 @@ local function summarize_run(run, telemetry, outcome)
         ranged_keepaway_frames = telemetry.ranged_keepaway_frames or 0,
         ranged_close_enemy_frames = telemetry.ranged_close_enemy_frames or 0,
         ranged_close_gragh_frames = telemetry.ranged_close_gragh_frames or 0,
+        objective_hunt_enemy_frames = telemetry.objective_hunt_enemy_frames or 0,
         combat_frames = telemetry.combat_frames or 0,
         explore_frames = telemetry.explore_frames or 0,
         rest_frames = telemetry.rest_frames or 0,
@@ -705,7 +707,7 @@ local SUMMARY_METRICS = {
     "controlled_frames", "hunt_enemy_frames", "combat_frames",
     "explore_frames", "rest_frames", "idle_frames", "random_walk_frames",
     "unstick_frames", "portal_stop_frames", "ranged_keepaway_frames",
-    "ranged_close_enemy_frames", "ranged_close_gragh_frames", "necromancer_close_frames",
+    "ranged_close_enemy_frames", "ranged_close_gragh_frames", "objective_hunt_enemy_frames", "necromancer_close_frames",
     "necromancer_pain_orders", "necromancer_pain_during_regen_orders",
     "necromancer_regen_combat_frames", "necromancer_retreat_frames",
     "pyrocaster_ring_combat_frames", "pyrocaster_ring_close_frames",
@@ -1641,6 +1643,7 @@ local function run_balance(raw_args)
     parser:option("--spell_policy", "Spell selection policy: mixed, priority, round_robin, none.", "mixed")
     parser:option("--bot_profile", "Automated-player skill profile: perfect, skilled, human, or sloppy.", "perfect")
     parser:option("--objective_enemy", "Optional enemy name that completes start-map-desc runs when no copies remain alive.", "")
+    parser:option("--hunt_objective", "If true, path directly toward --objective_enemy while it is off-screen.", "false")
     parser:option("--sample_interval", "Frame interval for timeseries samples.", "300")
     parser:option("--draw_interval", "Frame interval for drawing visual capture frames. Use with LANARTS_SCREENSHOT_DIR.", "0")
     parser:option("--out", "Summary CSV output.", "saves/balance_runs.csv")
@@ -1827,6 +1830,7 @@ local function run_balance(raw_args)
             spell_policy = args.spell_policy,
             skill_profile = args.bot_profile,
             start_map_desc = args.start_map_desc,
+            objective_enemy = parse_bool(args.hunt_objective) and args.objective_enemy or "",
         }
 
         if not Events then
