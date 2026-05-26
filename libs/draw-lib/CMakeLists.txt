@@ -50,6 +50,7 @@ include_directories(
 	${DEPS}/UnitTest++
 	${DEPS}/lua
 	"${DEPS}/sdl2/include"
+	"${DEPS}/freetype/include"
 	"${DEPS}/imgui"
 	"${DEPS}/sdl2-image"
 	${OpenGL_INCLUDE_DIRS} 		
