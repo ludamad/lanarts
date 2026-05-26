@@ -293,11 +293,11 @@ DataW.enemy_create {
     }
 }
 
-DataW.enemy_create summoner_base("Imp", 1, 100, 100) {
+DataW.enemy_create summoner_base("Imp", 1, 140, 70) {
     name: "Waxanarian"
     sprite: "spr_enemies.bosses.boss_bee"
     radius: 20
-    xpaward: 100
+    xpaward: 150
     appear_message: "The demonic bee Waxanarian!"
     defeat_message: "Waxanarian has been vanquished."
     types: {"Green", "Black"}
@@ -549,7 +549,7 @@ DataW.enemy_create {
     unique: true
     types: {"Red"}
     stats: {
-        hp: 220
+        hp: 205
         hpregen: 0.1
         movespeed: 2.5
         strength: 35
