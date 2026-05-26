@@ -8,11 +8,11 @@ local DEFAULTS = {
     spell_policy = "mixed",
     spell_retry_delay = 18,
     emergency_hp_pct = 0.35,
-    ranged_emergency_hp_pct = 0.50,
+    ranged_emergency_hp_pct = 0.60,
     emergency_mp_pct = 0.20,
     regen_hp_pct = 0.65,
     retreat_hp_pct = 0.28,
-    necromancer_regen_hp_pct = 0.42,
+    necromancer_regen_hp_pct = 0.60,
     necromancer_retreat_hp_pct = 0.22,
     necromancer_pain_range = 72,
     pyrocaster_ring_min_range = 30,
@@ -41,6 +41,15 @@ local RANGED_CLASSES = {
 local CLASS_KEEPAWAY = {
     Stormcaller = 112,
     ["Blue Mage"] = 96,
+}
+
+local SPELL_RETRY_DELAYS = {
+    ["Dragonform"] = 650,
+    ["Ring of Flames"] = 520,
+    ["Fire Bolt"] = 35,
+    ["Energy Spear"] = 35,
+    ["Chain Lightning"] = 65,
+    ["Tornado Storm"] = 300,
 }
 
 local AutomatedPlayerInputSource = newtype({parent = ProgrammableInputSource})
@@ -140,9 +149,6 @@ local function visible_enemies(player)
         end
     end
     table.sort(result, function(a, b)
-        if a.unique ~= b.unique then
-            return a.unique
-        end
         return distance_sqr(player, a) < distance_sqr(player, b)
     end)
     return result
@@ -216,7 +222,7 @@ end
 
 function AutomatedPlayerInputSource:_order_spell(spell)
     self:set("use_spell_slot", spell.slot)
-    self.spell_retry_at[spell.name] = self.ticks + self.options.spell_retry_delay
+    self.spell_retry_at[spell.name] = self.ticks + (SPELL_RETRY_DELAYS[spell.name] or self.options.spell_retry_delay)
     self:_record_counter("spell_orders", spell.name)
     self:_record_counter("spell_slot_orders", tostring(spell.slot))
     return true
@@ -238,6 +244,12 @@ function AutomatedPlayerInputSource:_spell_reasonable(name, enemies)
         return pct > self.options.retreat_hp_pct and not player:has_effect("Berserk")
     elseif name == "Dragonform" then
         return pct > self.options.retreat_hp_pct and not player:has_effect("Dragonform")
+    elseif name == "Ring of Flames" then
+        return pct > self.options.ranged_emergency_hp_pct
+            and #enemies <= 2
+            and closest_dist <= self.options.pyrocaster_ring_max_range
+            and (not closest.unique or #enemies == 1)
+            and not player:has_effect("Ring of Flames Stat Boost")
     elseif name == "Power Strike" then
         return closest_dist <= 96
     elseif name == "Dash Attack" then
@@ -365,7 +377,7 @@ function AutomatedPlayerInputSource:_pyrocaster_ring_move(enemies, ordered_spell
     local using_ring = player:has_effect("Ring of Flames Stat Boost")
         or (ordered_spell and ordered_spell.name == "Ring of Flames")
 
-    if not using_ring then
+    if not using_ring or (closest.unique and hp_pct(player) < self.options.ranged_emergency_hp_pct) then
         return self:_combat_move(enemies, ordered_spell ~= nil)
     end
 
