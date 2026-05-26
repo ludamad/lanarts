@@ -683,7 +683,7 @@ DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 1, 
     stats: {
         attacks: {{ weapon: "Basic Melee"}}
         movespeed: 3.5
-        hp: 225
+        hp: 215
         hpregen: 0.08
         strength: 25
         magic: 30
