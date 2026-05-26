@@ -229,7 +229,7 @@ local LOADOUT_PRESETS = {
         },
         Stormcaller = {
             "Wizard's Staff",
-            "White Robe",
+            "Robe of Vitality",
             "Runed Gloves",
             "Wizard's Hat",
             "Magic Skirt",
