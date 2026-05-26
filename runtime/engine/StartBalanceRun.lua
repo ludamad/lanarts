@@ -479,6 +479,26 @@ local function hostile_alive_enemy_named_count(player, name)
     return count
 end
 
+local function attach_objective_damage_tracker(player, objective_enemy, telemetry)
+    load_core_modules()
+    if not player or not objective_enemy or objective_enemy == "" then
+        return
+    end
+    for _, enemy in ipairs(Map.enemies_list(player)) do
+        if hostile_alive_enemy(player, enemy) and enemy.name == objective_enemy
+            and not enemy:has_effect("BalanceDamageTracker") then
+            enemy:add_effect("BalanceDamageTracker", {
+                time_left = 10000000,
+                telemetry = telemetry,
+                damage_by_source_key = "objective_damage_by_source",
+                events_by_source_key = "objective_damage_events_by_source",
+                damage_total_key = "objective_damage_total",
+                event_total_key = "objective_damage_event_total",
+            })
+        end
+    end
+end
+
 local function player_snapshot()
     load_core_modules()
     local entry = World.players[1]
@@ -562,6 +582,10 @@ local function sample_run(run, telemetry, samples, reason)
         damage_event_total = telemetry.damage_event_total or 0,
         damage_taken_by_source = encode_counts(telemetry.damage_taken_by_source),
         damage_events_by_source = encode_counts(telemetry.damage_events_by_source),
+        objective_damage_total = format_rate(telemetry.objective_damage_total or 0),
+        objective_damage_event_total = telemetry.objective_damage_event_total or 0,
+        objective_damage_by_source = encode_counts(telemetry.objective_damage_by_source),
+        objective_damage_events_by_source = encode_counts(telemetry.objective_damage_events_by_source),
         hunt_enemy_frames = telemetry.hunt_enemy_frames or 0,
         ranged_keepaway_frames = telemetry.ranged_keepaway_frames or 0,
         ranged_close_enemy_frames = telemetry.ranged_close_enemy_frames or 0,
@@ -623,6 +647,10 @@ local function summarize_run(run, telemetry, outcome)
         damage_event_total = telemetry.damage_event_total or 0,
         damage_taken_by_source = encode_counts(telemetry.damage_taken_by_source),
         damage_events_by_source = encode_counts(telemetry.damage_events_by_source),
+        objective_damage_total = format_rate(telemetry.objective_damage_total or 0),
+        objective_damage_event_total = telemetry.objective_damage_event_total or 0,
+        objective_damage_by_source = encode_counts(telemetry.objective_damage_by_source),
+        objective_damage_events_by_source = encode_counts(telemetry.objective_damage_events_by_source),
         reaction_hold_frames = telemetry.reaction_hold_frames or 0,
         movement_noise_frames = telemetry.movement_noise_frames or 0,
         spell_skip_frames = telemetry.spell_skip_frames or 0,
@@ -677,10 +705,10 @@ local function flatten_spell_rows(run, telemetry)
     return rows
 end
 
-local function flatten_damage_rows(run, telemetry)
+local function flatten_damage_rows(run, telemetry, damage_by_source_key, events_by_source_key)
     local rows = {}
-    local events = telemetry.damage_events_by_source or {}
-    for source, damage in pairs(telemetry.damage_taken_by_source or {}) do
+    local events = telemetry[events_by_source_key or "damage_events_by_source"] or {}
+    for source, damage in pairs(telemetry[damage_by_source_key or "damage_taken_by_source"] or {}) do
         rows[#rows + 1] = {
             run_id = run.run_id,
             seed = tostring(run.seed),
@@ -702,6 +730,7 @@ local SUMMARY_METRICS = {
     "frames", "level", "xp", "hp_pct", "mp_pct", "kills", "player_kills", "deaths",
     "deepest_floor", "current_floor", "spell_orders_total", "ability_orders_total", "weapon_orders",
     "item_orders_total", "damage_taken_total", "damage_event_total",
+    "objective_damage_total", "objective_damage_event_total",
     "reaction_hold_frames", "movement_noise_frames", "spell_skip_frames",
     "item_skip_frames", "weapon_skip_frames",
     "controlled_frames", "hunt_enemy_frames", "combat_frames",
@@ -1534,6 +1563,7 @@ local function game_init(run, telemetry, bot_options)
         player.stats.hp = estats.max_hp
         player.stats.mp = estats.max_mp
         player:add_effect("BalanceDamageTracker", {time_left = 10000000, telemetry = telemetry})
+        attach_objective_damage_tracker(player, run.objective_enemy, telemetry)
     end
     GameState.input_capture()
     if not GameState.input_handle() then
@@ -1652,6 +1682,7 @@ local function run_balance(raw_args)
     parser:option("--aggregate_out", "Class aggregate CSV output.", "saves/balance_classes.csv")
     parser:option("--spell_stats_out", "Spell aggregate CSV output.", "saves/balance_spell_stats.csv")
     parser:option("--damage_stats_out", "Damage source aggregate CSV output.", "saves/balance_damage_stats.csv")
+    parser:option("--objective_damage_stats_out", "Objective damage source aggregate CSV output.", "saves/balance_objective_damage_stats.csv")
     parser:option("--enemy_stats_out", "Enemy aggregate CSV output.", "saves/balance_enemy_stats.csv")
     parser:option("--report_out", "Balance report CSV output.", "saves/balance_report.csv")
     parser:option("--min_report_runs", "Minimum runs per class before balance flags are considered stable.", "3")
@@ -1685,6 +1716,7 @@ local function run_balance(raw_args)
     local samples = {}
     local spell_rows = {}
     local damage_rows = {}
+    local objective_damage_rows = {}
     local json_runs = {}
     local Events
     local base_player_death
@@ -1697,6 +1729,7 @@ local function run_balance(raw_args)
         local class_rows = aggregate_summary_rows(summaries)
         local spell_stat_rows = aggregate_spell_rows(spell_rows, summaries)
         local damage_stat_rows = aggregate_damage_rows(damage_rows, summaries)
+        local objective_damage_stat_rows = aggregate_damage_rows(objective_damage_rows, summaries)
         local enemy_stat_rows = aggregate_enemy_rows(summaries)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
         write_csv(args.out, summaries, {
@@ -1707,6 +1740,8 @@ local function run_balance(raw_args)
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "damage_taken_total", "damage_event_total", "damage_taken_by_source",
             "damage_events_by_source",
+            "objective_damage_total", "objective_damage_event_total",
+            "objective_damage_by_source", "objective_damage_events_by_source",
             "reaction_hold_frames", "movement_noise_frames", "spell_skip_frames",
             "item_skip_frames", "weapon_skip_frames",
             "hunt_enemy_frames", "ranged_keepaway_frames", "ranged_close_enemy_frames",
@@ -1723,6 +1758,8 @@ local function run_balance(raw_args)
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "damage_taken_total", "damage_event_total", "damage_taken_by_source",
             "damage_events_by_source",
+            "objective_damage_total", "objective_damage_event_total",
+            "objective_damage_by_source", "objective_damage_events_by_source",
             "reaction_hold_frames", "movement_noise_frames", "spell_skip_frames",
             "item_skip_frames", "weapon_skip_frames",
             "hunt_enemy_frames", "ranged_keepaway_frames", "ranged_close_enemy_frames",
@@ -1735,6 +1772,12 @@ local function run_balance(raw_args)
             "avg_damage_per_hit_run", "avg_events_per_run", "max_damage_in_run",
             "damage_share",
         })
+        write_csv(args.objective_damage_stats_out, objective_damage_stat_rows, {
+            "class", "start_level", "loadout", "bot_profile", "source", "class_runs", "runs_hit",
+            "hit_rate", "total_damage", "total_events", "avg_damage_per_run",
+            "avg_damage_per_hit_run", "avg_events_per_run", "max_damage_in_run",
+            "damage_share",
+        })
         write_csv(args.aggregate_out, class_rows, {
             "class", "start_level", "loadout", "bot_profile", "objective_enemy", "runs", "wins", "clears", "deaths", "step_limits", "bot_stalls",
             "game_loop_exits", "win_rate", "death_rate", "outcome_counts",
@@ -1742,6 +1785,7 @@ local function run_balance(raw_args)
             "idle_frame_rate", "portal_stop_frame_rate",
             "kills_per_1000_controlled_frames", "kills_per_1000_combat_frames",
             "avg_damage_taken_total", "avg_damage_event_total",
+            "avg_objective_damage_total", "avg_objective_damage_event_total",
             "avg_reaction_hold_frames", "avg_movement_noise_frames",
             "avg_spell_skip_frames", "avg_item_skip_frames", "avg_weapon_skip_frames",
             "avg_ranged_keepaway_frames", "avg_ranged_close_enemy_frames",
@@ -1769,7 +1813,7 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 9,
+                schema_version = 10,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
                 bot_profile = args.bot_profile,
@@ -1780,18 +1824,20 @@ local function run_balance(raw_args)
                 class_stats = class_rows,
                 spell_stats = spell_stat_rows,
                 damage_stats = damage_stat_rows,
+                objective_damage_stats = objective_damage_stat_rows,
                 enemy_stats = enemy_stat_rows,
                 balance_report = report_rows,
             })
         end
         print(string.format(
-            "Balance run complete: %d runs, %d samples. Wrote %s, %s, %s, %s, %s, %s, %s, %s, %s.",
+            "Balance run complete: %d runs, %d samples. Wrote %s, %s, %s, %s, %s, %s, %s, %s, %s, %s.",
             #summaries,
             #samples,
             args.out,
             args.samples_out,
             args.spells_out,
             args.damage_stats_out,
+            args.objective_damage_stats_out,
             args.aggregate_out,
             args.spell_stats_out,
             args.enemy_stats_out,
@@ -1823,6 +1869,8 @@ local function run_balance(raw_args)
             visible_enemy_frames = {},
             damage_taken_by_source = {},
             damage_events_by_source = {},
+            objective_damage_by_source = {},
+            objective_damage_events_by_source = {},
         }
         local run_state = {done = false, outcome = "step_limit"}
         local bot_options = {
@@ -1855,6 +1903,9 @@ local function run_balance(raw_args)
                 end
                 for _, row in ipairs(flatten_damage_rows(run, telemetry)) do
                     damage_rows[#damage_rows + 1] = row
+                end
+                for _, row in ipairs(flatten_damage_rows(run, telemetry, "objective_damage_by_source", "objective_damage_events_by_source")) do
+                    objective_damage_rows[#objective_damage_rows + 1] = row
                 end
                 print(string.format(
                     "Run %d seed=%s class=%s start_level=%d outcome=%s frames=%d level=%d kills=%d",
@@ -1892,6 +1943,7 @@ local function run_balance(raw_args)
 
             local entry = World.players[1]
             local player = entry and entry.instance
+            attach_objective_damage_tracker(player, args.objective_enemy, telemetry)
             if not run_state.done and args.objective_enemy and args.objective_enemy ~= ""
                 and player and hostile_alive_enemy_named_count(player, args.objective_enemy) == 0 then
                 run_state.outcome = "cleared"

@@ -10,26 +10,36 @@ DataW = require "DataWrapped"
 TypeEffectUtils = require "spells.TypeEffectUtils"
 BonusesUtils = require "items.BonusesUtils"
 
+damage_source_name = (attacker, defender) ->
+    source = "Unattributed"
+    if attacker
+        if attacker == defender
+            source = "Self"
+        elseif attacker.name and attacker.name ~= ""
+            source = attacker.name
+    return source
+
 DataW.effect_create {
     name: "BalanceDamageTracker"
     apply_func: (obj, args) =>
         @telemetry = args and args.telemetry
+        @damage_by_source_key = (args and args.damage_by_source_key) or "damage_taken_by_source"
+        @events_by_source_key = (args and args.events_by_source_key) or "damage_events_by_source"
+        @damage_total_key = (args and args.damage_total_key) or "damage_taken_total"
+        @event_total_key = (args and args.event_total_key) or "damage_event_total"
     on_receive_damage_func: (attacker, defender, damage) =>
         telemetry = @telemetry
         if not telemetry or not damage or damage <= 0
             return damage
-        source = "Unattributed"
-        if attacker
-            if attacker == defender
-                source = "Self"
-            elseif attacker.name and attacker.name ~= ""
-                source = attacker.name
-        telemetry.damage_taken_by_source or= {}
-        telemetry.damage_events_by_source or= {}
-        telemetry.damage_taken_by_source[source] = (telemetry.damage_taken_by_source[source] or 0) + damage
-        telemetry.damage_events_by_source[source] = (telemetry.damage_events_by_source[source] or 0) + 1
-        telemetry.damage_taken_total = (telemetry.damage_taken_total or 0) + damage
-        telemetry.damage_event_total = (telemetry.damage_event_total or 0) + 1
+        source = damage_source_name(attacker, defender)
+        damage_by_source = telemetry[@damage_by_source_key] or {}
+        events_by_source = telemetry[@events_by_source_key] or {}
+        telemetry[@damage_by_source_key] = damage_by_source
+        telemetry[@events_by_source_key] = events_by_source
+        damage_by_source[source] = (damage_by_source[source] or 0) + damage
+        events_by_source[source] = (events_by_source[source] or 0) + 1
+        telemetry[@damage_total_key] = (telemetry[@damage_total_key] or 0) + damage
+        telemetry[@event_total_key] = (telemetry[@event_total_key] or 0) + 1
         return damage
 }
 
