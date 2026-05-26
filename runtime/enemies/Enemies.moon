@@ -735,34 +735,34 @@ DataW.enemy_create {
     sprite: "spr_enemies.humanoid.centaur_warrior"
     death_sprite: "blood"
     radius: 12
-    xpaward: 60
+    xpaward: 80
     appear_message: "A centaur marksman readies his bow."
     defeat_message: "The centaur marksman has been defeated."
     stats: {
-        hp: 100
+        hp: 90
         hpregen: 0.02
         movespeed: 4
-        strength: 30
-        defence: 16
-        willpower: 16
+        strength: 24
+        defence: 12
+        willpower: 12
     }
     effects_active: {"StopOnceInRange"}
     types: {"Green"}
     projectile: {
         weapon_class: 'bows'
         damage_type: {physical: 1.0}
-        cooldown: 30
+        cooldown: 40
         types: {"Piercing"}
         speed: 9
         spr_attack: 'nessos arrows'
         power: {base: {10, 10}}
         on_hit_func: (target, atkstats) =>
-            if chance(.25 * TypeEffectUtils.get_resistance(target, 'Green'))
+            if chance(.15 * TypeEffectUtils.get_resistance(target, 'Green'))
                 target\add_effect "Poison", {
-                    time_left: 100
+                    time_left: 80
                     poison_rate: 25
                     attacker: @caster
-                    damage: 30
+                    damage: 20
                     power: @caster\effective_stats().strength
                     magic_percentage: 0
                 }
@@ -812,17 +812,17 @@ DataW.enemy_create {
    name: "Hell Forged"
    sprite: "hell forged"
    radius: 12
-   xpaward: 50
+   xpaward: 90
    appear_message: "A hell-forged creature appears before you!"
    defeat_message: "The hell-forged is destroyed."
    stats: {
        movespeed: 3.5
-       hp: 125
+       hp: 110
        hpregen: 0.01
-       strength: 45
-       magic: 45
-       defence: 25
-       willpower: 25
+       strength: 36
+       magic: 36
+       defence: 18
+       willpower: 18
    }
    types: {"Red"}
    projectile: {
@@ -830,7 +830,7 @@ DataW.enemy_create {
        damage_type: {magic: 0.5, physical: 0.5}
        range: 250
        radius: 11
-       cooldown: 40
+       cooldown: 50
        speed: 8
        spr_attack: "large fire"
    }
