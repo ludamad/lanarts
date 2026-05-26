@@ -844,13 +844,13 @@ DataW.enemy_create {
     appear_message: "A cloud elemental floats onto the scene."
     defeat_message: "The cloud elemental dissolves."
     radius: 12
-    xpaward: 5
+    xpaward: 15
     stats: {
         movespeed: 2
         hp: 25
         hpregen: 0.02
         strength: 5
-        magic: 25
+        magic: 20
         defence: 4
         willpower: 5
     }
@@ -1410,13 +1410,13 @@ DataW.enemy_create {
     name: "Skeleton"
     sprite: "skeleton"
     radius: 11
-    xpaward: 10
+    xpaward: 15
     appear_message: "A re-animated skeleton appears!"
     defeat_message: "The skeleton is broken unto a pile of bones."
     types: {"Black"}
-    weapon: {cooldown: 40, damage: 12}
+    weapon: {cooldown: 40, damage: 10}
     stats: {
-        hp: 50
+        hp: 40
         hpregen: 0
         movespeed: 2
         strength: 2
