@@ -1655,7 +1655,7 @@ DataW.enemy_create {
     name: "Ciribot"
     sprite: "ciribot"
     radius: 14
-    xpaward: 30
+    xpaward: 40
     appear_message: "A strange blue metallic creature appears!"
     defeat_message: "The blue metallic creature is broken into scrap."
     types: {"White"}
