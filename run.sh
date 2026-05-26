@@ -1,4 +1,6 @@
-cd `dirname $0`
+#!/usr/bin/env bash
+
+cd "$(dirname "$0")"
 
 # Good practice -- exit completely on any bad exit code:
 set -e
@@ -32,21 +34,20 @@ function colorify() {
 # Returns true if flag was removed.
 ###############################################################################
 
-args="$@" # Create a mutable copy of the program arguments
+args=("$@") # Create a mutable copy of the program arguments
 function handle_flag(){
     flag=$1
-    local new_args
+    local new_args=()
     local got
     got=1 # False!
-    for arg in $args ; do
-        if [ $arg = $flag ] ; then
-            args="${args/$flag/}"
+    for arg in "${args[@]}" ; do
+        if [ "$arg" = "$flag" ] ; then
             got=0 # True!
         else
-            new_args="$new_args $arg"
+            new_args+=("$arg")
         fi
     done
-    args="$new_args"
+    args=("${new_args[@]}")
     return $got # False!
 }
 
@@ -195,9 +196,9 @@ function run_lanarts(){
     export vblank_mode=0
     if handle_flag "--gdb" || handle_flag "-g" ; then
         echo "Wrapping in GDB:" | colorify '1;35'
-        gdb -silent -x ../debug.gdb --args ../build/src/lanarts $args
+        gdb -silent -x ../debug.gdb --args ../build/src/lanarts "${args[@]}"
     else
-        exec ../build/src/lanarts $args
+        exec ../build/src/lanarts "${args[@]}"
     fi
     cd ..
 }
