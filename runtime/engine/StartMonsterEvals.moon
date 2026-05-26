@@ -143,6 +143,14 @@ add_metric = (aggregate, row, metric) ->
     if aggregate.maxes[metric] == nil or value > aggregate.maxes[metric]
         aggregate.maxes[metric] = value
 
+add_contact_metric = (aggregate, row, metric) ->
+    value = tonumber(row[metric]) or 0
+    aggregate.contact_sums[metric] = (aggregate.contact_sums[metric] or 0) + value
+    if aggregate.contact_mins[metric] == nil or value < aggregate.contact_mins[metric]
+        aggregate.contact_mins[metric] = value
+    if aggregate.contact_maxes[metric] == nil or value > aggregate.contact_maxes[metric]
+        aggregate.contact_maxes[metric] = value
+
 SUMMARY_METRICS = {
     "frames", "player_damage", "enemy_hp", "enemy_max_hp", "enemy_hp_pct",
     "defender_count", "attacker_count", "melee_count",
@@ -171,35 +179,50 @@ aggregate_stats = (stats) ->
                 level: tonumber(row.level) or 1
                 monster: row.monster
                 runs: 0
+                contact_runs: 0
                 xpaward: tonumber(row.xpaward) or 0
                 outcomes: {}
                 sums: {}
                 mins: {}
                 maxes: {}
+                contact_sums: {}
+                contact_mins: {}
+                contact_maxes: {}
             }
             groups[key] = aggregate
         aggregate.runs += 1
+        contact = had_contact(row)
+        aggregate.contact_runs += 1 if contact
         outcome = row.outcome or "unknown"
-        if outcome == "step_limit" and not had_contact(row)
+        if outcome == "step_limit" and not contact
             outcome = "no_contact_step_limit"
         aggregate.outcomes[outcome] = (aggregate.outcomes[outcome] or 0) + 1
         for metric in *SUMMARY_METRICS
             add_metric(aggregate, row, metric)
+            add_contact_metric(aggregate, row, metric) if contact
 
     rows = {}
     for key in *sorted_group_keys(groups)
         aggregate = groups[key]
         runs = math.max(1, aggregate.runs)
+        contact_runs = math.max(1, aggregate.contact_runs)
         avg_frames = safe_div(aggregate.sums.frames, runs)
         avg_damage = safe_div(aggregate.sums.player_damage, runs)
         damage_per_1000_frames = safe_div(aggregate.sums.player_damage, aggregate.sums.frames) * 1000
         damage_per_xp = safe_div(avg_damage, math.max(1, aggregate.xpaward))
         xp_per_100_damage = safe_div(aggregate.xpaward * 100, avg_damage)
+        contact_avg_frames = safe_div(aggregate.contact_sums.frames, contact_runs)
+        contact_avg_damage = safe_div(aggregate.contact_sums.player_damage, contact_runs)
+        contact_damage_per_1000_frames = safe_div(aggregate.contact_sums.player_damage, aggregate.contact_sums.frames) * 1000
+        contact_damage_per_xp = safe_div(contact_avg_damage, math.max(1, aggregate.xpaward))
+        contact_xp_per_100_damage = safe_div(aggregate.xpaward * 100, contact_avg_damage)
         append rows, {
             config_name: aggregate.config_name
             level: aggregate.level
             monster: aggregate.monster
             runs: aggregate.runs
+            contact_runs: aggregate.contact_runs
+            contact_run_rate: format_rate safe_div(aggregate.contact_runs, runs)
             xpaward: aggregate.xpaward
             enemy_kill_rate: format_rate safe_div(aggregate.outcomes.enemy_killed or 0, runs)
             step_limit_rate: format_rate safe_div(aggregate.outcomes.step_limit or 0, runs)
@@ -214,6 +237,15 @@ aggregate_stats = (stats) ->
             damage_per_1000_frames: format_rate damage_per_1000_frames
             damage_per_xp: format_rate damage_per_xp
             xp_per_100_damage: format_rate xp_per_100_damage
+            contact_avg_frames: format_rate contact_avg_frames
+            contact_min_frames: aggregate.contact_mins.frames or 0
+            contact_max_frames: aggregate.contact_maxes.frames or 0
+            contact_avg_player_damage: format_rate contact_avg_damage
+            contact_min_player_damage: aggregate.contact_mins.player_damage or 0
+            contact_max_player_damage: aggregate.contact_maxes.player_damage or 0
+            contact_damage_per_1000_frames: format_rate contact_damage_per_1000_frames
+            contact_damage_per_xp: format_rate contact_damage_per_xp
+            contact_xp_per_100_damage: format_rate contact_xp_per_100_damage
             avg_enemy_hp_pct: format_rate safe_div(aggregate.sums.enemy_hp_pct, runs)
             avg_enemy_count_alive: format_rate safe_div(aggregate.sums.enemy_count_alive, runs)
             avg_defender_count: format_rate safe_div(aggregate.sums.defender_count, runs)
@@ -245,9 +277,9 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
     delta_pct = tonumber(delta_pct) or 0.5
     min_report_runs = tonumber(min_report_runs) or 1
     reports = {}
-    damage_per_xp_mean = mean_by_config_level(aggregate_rows, "damage_per_xp")
-    damage_rate_mean = mean_by_config_level(aggregate_rows, "damage_per_1000_frames")
-    frames_mean = mean_by_config_level(aggregate_rows, "avg_frames")
+    damage_per_xp_mean = mean_by_config_level(aggregate_rows, "contact_damage_per_xp")
+    damage_rate_mean = mean_by_config_level(aggregate_rows, "contact_damage_per_1000_frames")
+    frames_mean = mean_by_config_level(aggregate_rows, "contact_avg_frames")
 
     for row in *aggregate_rows
         continue if (tonumber(row.runs) or 0) < min_report_runs
@@ -255,9 +287,9 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
         kill_rate = tonumber(row.enemy_kill_rate) or 0
         step_limit_rate = tonumber(row.step_limit_rate) or 0
         no_contact_step_limit_rate = tonumber(row.no_contact_step_limit_rate) or 0
-        damage_per_xp = tonumber(row.damage_per_xp) or 0
-        damage_rate = tonumber(row.damage_per_1000_frames) or 0
-        avg_frames = tonumber(row.avg_frames) or 0
+        damage_per_xp = tonumber(row.contact_damage_per_xp) or 0
+        damage_rate = tonumber(row.contact_damage_per_1000_frames) or 0
+        avg_frames = tonumber(row.contact_avg_frames) or 0
         xpaward = tonumber(row.xpaward) or 0
         threat_baseline = damage_per_xp_mean[key] or 0
         damage_baseline = damage_rate_mean[key] or 0
@@ -300,12 +332,12 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 config_name: row.config_name
                 level: row.level
                 monster: row.monster
-                metric: "damage_per_xp"
-                value: row.damage_per_xp
+                metric: "contact_damage_per_xp"
+                value: row.contact_damage_per_xp
                 baseline: format_rate threat_baseline
                 delta: format_rate(damage_per_xp - threat_baseline)
                 delta_pct: format_rate safe_div(damage_per_xp - threat_baseline, threat_baseline)
-                message: "#{row.monster} deals #{row.damage_per_xp} damage per XP versus #{format_rate(threat_baseline)} baseline for #{row.config_name} L#{row.level}."
+                message: "#{row.monster} deals #{row.contact_damage_per_xp} contact damage per XP versus #{format_rate(threat_baseline)} baseline for #{row.config_name} L#{row.level}."
             }
 
         if xpaward <= 0 and damage_rate > 0
@@ -330,12 +362,12 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 config_name: row.config_name
                 level: row.level
                 monster: row.monster
-                metric: "damage_per_1000_frames"
-                value: row.damage_per_1000_frames
+                metric: "contact_damage_per_1000_frames"
+                value: row.contact_damage_per_1000_frames
                 baseline: format_rate damage_baseline
                 delta: format_rate(damage_rate - damage_baseline)
                 delta_pct: format_rate safe_div(damage_rate - damage_baseline, damage_baseline)
-                message: "#{row.monster} damage pace is #{row.damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}."
+                message: "#{row.monster} contact damage pace is #{row.contact_damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}."
             }
 
         if kill_rate == 1 and frame_baseline > 0 and avg_frames > frame_baseline * (1 + delta_pct)
@@ -345,12 +377,12 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 config_name: row.config_name
                 level: row.level
                 monster: row.monster
-                metric: "avg_frames"
-                value: row.avg_frames
+                metric: "contact_avg_frames"
+                value: row.contact_avg_frames
                 baseline: format_rate frame_baseline
                 delta: format_rate(avg_frames - frame_baseline)
                 delta_pct: format_rate safe_div(avg_frames - frame_baseline, frame_baseline)
-                message: "#{row.monster} takes #{row.avg_frames} frames to kill versus #{format_rate(frame_baseline)} baseline for #{row.config_name} L#{row.level}."
+                message: "#{row.monster} takes #{row.contact_avg_frames} contact frames to kill versus #{format_rate(frame_baseline)} baseline for #{row.config_name} L#{row.level}."
             }
 
     table.sort reports, (a, b) ->
@@ -505,11 +537,14 @@ run_bot_tests = (raw_args) ->
                 "melee_count", "projectile_count", "receive_melee_count"
             }
             write_csv args.aggregate_out, aggregate_rows, {
-                "config_name", "level", "monster", "runs", "xpaward",
+                "config_name", "level", "monster", "runs", "contact_runs", "contact_run_rate", "xpaward",
                 "enemy_kill_rate", "step_limit_rate", "no_contact_step_limit_rate", "player_death_rate",
                 "avg_frames", "min_frames", "max_frames",
                 "avg_player_damage", "min_player_damage", "max_player_damage",
                 "damage_per_1000_frames", "damage_per_xp", "xp_per_100_damage",
+                "contact_avg_frames", "contact_min_frames", "contact_max_frames",
+                "contact_avg_player_damage", "contact_min_player_damage", "contact_max_player_damage",
+                "contact_damage_per_1000_frames", "contact_damage_per_xp", "contact_xp_per_100_damage",
                 "avg_enemy_hp_pct", "avg_enemy_count_alive",
                 "avg_defender_count", "avg_attacker_count", "avg_melee_count",
                 "avg_projectile_count", "avg_receive_melee_count"

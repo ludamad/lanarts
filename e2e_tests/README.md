@@ -45,7 +45,9 @@ Monster simulations:
     saves/monster_stats.csv, saves/monster_aggregate.csv,
     saves/monster_report.csv, and saves/monster_stats.json. Raw rows contain
     one arena duel per config, monster, run, and player level. Aggregate rows
-    report kill rate, step-limit rate, average damage taken, damage per 1000
-    frames, damage per XP, and XP per 100 damage. The report flags enemies
-    that are unusually durable, unusually damaging, or poor XP rewards
-    relative to the other enemies in the same config and level sweep.
+    report kill rate, step-limit rate, contact rate, average damage taken,
+    damage per 1000 frames, damage per XP, and XP per 100 damage. Contact
+    adjusted variants of these metrics exclude runs where the arena duel never
+    engaged, and the report uses those contact metrics when flagging enemies
+    that are unusually durable, unusually damaging, or poor XP rewards relative
+    to the other enemies in the same config and level sweep.
