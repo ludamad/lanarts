@@ -42,6 +42,10 @@ Balance simulations:
     starting level, and monster type, including XP share and kills per 1000
     visible enemy frames. This is useful for separating frequent-but-healthy
     enemies from rare enemies that dominate run pacing when they appear.
+    Run and sample rows also include alive_enemy_counts, alive_enemy_hp, and
+    alive_enemy_max_hp, and enemy stats aggregate end-of-run survival and HP
+    remaining. Use those fields to distinguish enemies that barely survive
+    from enemies that remain mostly untouched when a run ends.
     Multi-level sweeps produce separate class and spell aggregate rows per
     starting level, which is useful for checking later spell unlocks.
     Level 5 is already late game for player characters; prefer using loadout

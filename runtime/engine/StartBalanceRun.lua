@@ -371,6 +371,48 @@ local function visible_enemy_count(player)
     return count
 end
 
+local function hostile_alive_enemy(player, enemy)
+    if not enemy or enemy.destroyed or not enemy.stats then
+        return false
+    end
+    if enemy.is_enemy == false then
+        return false
+    end
+    if player and enemy.team == player.team then
+        return false
+    end
+    return true
+end
+
+local function effective_max_hp(obj)
+    local ok, estats = pcall(function()
+        return obj:effective_stats()
+    end)
+    local max_hp = ok and estats and tonumber(estats.max_hp) or 0
+    if max_hp <= 0 and obj.stats then
+        max_hp = tonumber(obj.stats.max_hp) or 0
+    end
+    if max_hp <= 0 and obj.stats then
+        max_hp = tonumber(obj.stats.hp) or 0
+    end
+    return math.max(0, max_hp)
+end
+
+local function alive_enemy_state(player, enemies)
+    local counts = {}
+    local hp = {}
+    local max_hp = {}
+    for _, enemy in ipairs(enemies or {}) do
+        if hostile_alive_enemy(player, enemy) then
+            local name = enemy.name or "unknown"
+            counts[name] = (counts[name] or 0) + 1
+            hp[name] = (hp[name] or 0) + math.max(0, tonumber(enemy.stats.hp) or 0)
+            max_hp[name] = (max_hp[name] or 0) + effective_max_hp(enemy)
+        end
+    end
+    return counts, hp, max_hp
+end
+
 local function player_snapshot()
     load_core_modules()
     local entry = World.players[1]
@@ -381,11 +423,15 @@ local function player_snapshot()
     local estats = player:effective_stats()
     local map_label = player.map and Map.map_label(player.map) or ""
     local enemies = Map.enemies_list(player)
+    local alive_enemy_counts, alive_enemy_hp, alive_enemy_max_hp = alive_enemy_state(player, enemies)
     return {
         player = player,
         map_label = map_label,
         enemies_alive = #enemies,
         visible_enemies = visible_enemy_count(player),
+        alive_enemy_counts = encode_counts(alive_enemy_counts),
+        alive_enemy_hp = encode_counts(alive_enemy_hp),
+        alive_enemy_max_hp = encode_counts(alive_enemy_max_hp),
         hp = player.stats.hp,
         max_hp = estats.max_hp,
         mp = player.stats.mp,
@@ -436,6 +482,9 @@ local function sample_run(run, telemetry, samples, reason)
         map_label = snap.map_label,
         enemies_alive = snap.enemies_alive,
         visible_enemies = snap.visible_enemies,
+        alive_enemy_counts = snap.alive_enemy_counts,
+        alive_enemy_hp = snap.alive_enemy_hp,
+        alive_enemy_max_hp = snap.alive_enemy_max_hp,
         spells_known = snap.spells_known,
         spell_orders_total = spell_orders_total,
         ability_orders_total = spell_orders_total + necromancer_pain_orders,
@@ -483,6 +532,9 @@ local function summarize_run(run, telemetry, outcome)
         map_label = snap.map_label or "",
         enemies_alive = snap.enemies_alive or 0,
         visible_enemies = snap.visible_enemies or 0,
+        alive_enemy_counts = snap.alive_enemy_counts or "",
+        alive_enemy_hp = snap.alive_enemy_hp or "",
+        alive_enemy_max_hp = snap.alive_enemy_max_hp or "",
         spells_known = snap.spells_known or "",
         spell_orders_total = spell_orders_total,
         ability_orders_total = spell_orders_total + necromancer_pain_orders,
@@ -710,6 +762,9 @@ local function aggregate_enemy_rows(summaries)
 
         local kills = decode_counts(row.monster_kills)
         local visible_frames = decode_counts(row.visible_enemy_frames)
+        local alive_counts = decode_counts(row.alive_enemy_counts)
+        local alive_hp = decode_counts(row.alive_enemy_hp)
+        local alive_max_hp = decode_counts(row.alive_enemy_max_hp)
         local seen = {}
         for monster, count in pairs(kills) do
             seen[monster] = true
@@ -719,6 +774,9 @@ local function aggregate_enemy_rows(summaries)
         for monster, frames in pairs(visible_frames) do
             seen[monster] = true
             class_total.visible_enemy_frames = class_total.visible_enemy_frames + frames
+        end
+        for monster, _ in pairs(alive_counts) do
+            seen[monster] = true
         end
 
         for monster, _ in pairs(seen) do
@@ -735,6 +793,10 @@ local function aggregate_enemy_rows(summaries)
                     runs_killing = 0,
                     kills = 0,
                     visible_enemy_frames = 0,
+                    runs_alive_at_end = 0,
+                    alive_at_end = 0,
+                    end_hp = 0,
+                    end_max_hp = 0,
                     xpaward = enemy_xpaward(monster),
                     xp_from_kills = 0,
                 }
@@ -743,14 +805,21 @@ local function aggregate_enemy_rows(summaries)
 
             local kill_count = kills[monster] or 0
             local frame_count = visible_frames[monster] or 0
+            local alive_count = alive_counts[monster] or 0
             if kill_count > 0 then
                 group.runs_killing = group.runs_killing + 1
             end
             if frame_count > 0 then
                 group.runs_visible = group.runs_visible + 1
             end
+            if alive_count > 0 then
+                group.runs_alive_at_end = group.runs_alive_at_end + 1
+            end
             group.kills = group.kills + kill_count
             group.visible_enemy_frames = group.visible_enemy_frames + frame_count
+            group.alive_at_end = group.alive_at_end + alive_count
+            group.end_hp = group.end_hp + (alive_hp[monster] or 0)
+            group.end_max_hp = group.end_max_hp + (alive_max_hp[monster] or 0)
             group.xp_from_kills = group.xp_from_kills + kill_count * group.xpaward
         end
     end
@@ -771,8 +840,15 @@ local function aggregate_enemy_rows(summaries)
             xpaward = group.xpaward,
             kills = group.kills,
             visible_enemy_frames = group.visible_enemy_frames,
+            runs_alive_at_end = group.runs_alive_at_end,
+            alive_at_end = group.alive_at_end,
+            end_hp = format_rate(group.end_hp),
+            end_max_hp = format_rate(group.end_max_hp),
             avg_kills_per_run = format_rate(group.kills / runs),
             avg_visible_enemy_frames_per_run = format_rate(group.visible_enemy_frames / runs),
+            avg_alive_at_end_per_run = format_rate(group.alive_at_end / runs),
+            avg_end_hp_per_run = format_rate(group.end_hp / runs),
+            avg_end_hp_pct_when_alive = format_rate(safe_div(group.end_hp, group.end_max_hp)),
             kill_share = format_rate(safe_div(group.kills, class_total.kills)),
             visible_frame_share = format_rate(safe_div(group.visible_enemy_frames, class_total.visible_enemy_frames)),
             xp_from_kills = group.xp_from_kills,
@@ -1397,13 +1473,15 @@ local function run_balance(raw_args)
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
-            "monster_kills", "visible_enemy_frames",
+            "monster_kills", "visible_enemy_frames", "alive_enemy_counts",
+            "alive_enemy_hp", "alive_enemy_max_hp",
         })
         write_csv(args.samples_out, samples, {
             "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "frame", "reason", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
-            "enemies_alive", "visible_enemies", "spells_known",
+            "enemies_alive", "visible_enemies", "alive_enemy_counts",
+            "alive_enemy_hp", "alive_enemy_max_hp", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
         })
         write_csv(args.spells_out, spell_rows, {"run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "spell", "orders"})
@@ -1422,7 +1500,9 @@ local function run_balance(raw_args)
         write_csv(args.enemy_stats_out, enemy_stat_rows, {
             "class", "start_level", "loadout", "monster", "runs", "runs_visible", "runs_killing",
             "xpaward", "kills", "visible_enemy_frames",
+            "runs_alive_at_end", "alive_at_end", "end_hp", "end_max_hp",
             "avg_kills_per_run", "avg_visible_enemy_frames_per_run",
+            "avg_alive_at_end_per_run", "avg_end_hp_per_run", "avg_end_hp_pct_when_alive",
             "kill_share", "visible_frame_share", "xp_from_kills", "xp_share",
             "kills_per_1000_visible_enemy_frames",
             "kills_per_1000_controlled_frames",
@@ -1434,7 +1514,7 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 4,
+                schema_version = 5,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
                 loadout_preset = loadout_preset,
