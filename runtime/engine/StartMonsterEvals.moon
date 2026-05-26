@@ -74,21 +74,105 @@ monster_aliases = () ->
         aliases[normalize_key(name)] = name
     return aliases
 
+resolve_monster_name = (part, aliases) ->
+    aliases = aliases or monster_aliases()
+    resolved = aliases[normalize_key(part)]
+    if not resolved
+        error("Unknown monster '#{part}'. Use compact aliases like GiantRat, or --monster all.")
+    return resolved
+
 parse_monster_names = (value) ->
     parts = split_csv(value)
-    error("Need --monster NAME,LIST or --monster all.") if #parts == 0
+    return {} if #parts == 0
     return table.sorted_key_list(enemies) if #parts == 1 and normalize_key(parts[1]) == "all"
 
     aliases = monster_aliases()
     names, seen = {}, {}
     for part in *parts
-        resolved = aliases[normalize_key(part)]
-        if not resolved
-            error("Unknown monster '#{part}'. Use compact aliases like GiantRat, or --monster all.")
+        resolved = resolve_monster_name(part, aliases)
         if not seen[resolved]
             seen[resolved] = true
             append names, resolved
     return names
+
+pack_label = (spawns) ->
+    counts, ordered = {}, {}
+    for name in *spawns
+        unless counts[name]
+            counts[name] = 0
+            append ordered, name
+        counts[name] += 1
+    parts = {}
+    for name in *ordered
+        count = counts[name]
+        append parts, if count > 1 then "#{name} x#{count}" else name
+    return table.concat(parts, " + ")
+
+encounter_types = (spawns) ->
+    seen, ordered = {}, {}
+    for monster in *spawns
+        entry = enemies and enemies[monster]
+        continue unless entry and entry.types
+        for type in *entry.types
+            unless seen[type]
+                seen[type] = true
+                append ordered, type
+    return table.concat(ordered, "|")
+
+make_encounter = (name, spawns) ->
+    xpaward = 0
+    for monster in *spawns
+        entry = enemies and enemies[monster]
+        xpaward += tonumber(entry and entry.xpaward) or 0
+    return {
+        :name
+        :spawns
+        spawn_count: #spawns
+        monster_spawns: table.concat(spawns, "|")
+        :xpaward
+        monster_types: encounter_types(spawns)
+    }
+
+parse_pack_spawn = (part, aliases) ->
+    part = tostring(part or "")\gsub("^%s+", "")\gsub("%s+$", "")
+    error("Empty monster in --pack spec.") if part == ""
+    name_part, count_part = part\match("^(.-)%*(%d+)$")
+    count = tonumber(count_part) or 1
+    name = name_part or part
+    resolved = resolve_monster_name(name, aliases)
+    spawns = {}
+    for i=1,count
+        append spawns, resolved
+    return spawns
+
+parse_pack_specs = (value) ->
+    encounters = {}
+    return encounters if not value or tostring(value) == ""
+    aliases = monster_aliases()
+    for raw_spec in tostring(value)\gmatch("[^;]+")
+        spec = raw_spec\gsub("^%s+", "")\gsub("%s+$", "")
+        continue if spec == ""
+        label, body = spec\match("^([^=:]+)[:=](.+)$")
+        unless body
+            body = spec
+            label = nil
+        spawns = {}
+        for part in body\gmatch("[^+]+")
+            for monster in *parse_pack_spawn(part, aliases)
+                append spawns, monster
+        error("Pack '#{spec}' did not resolve to any monsters.") if #spawns == 0
+        label = label and label\gsub("^%s+", "")\gsub("%s+$", "")
+        append encounters, make_encounter(label and label != "" and label or pack_label(spawns), spawns)
+    return encounters
+
+parse_encounters = (monster_value, pack_value) ->
+    encounters = {}
+    for monster in *parse_monster_names(monster_value)
+        append encounters, make_encounter(monster, {monster})
+    for encounter in *parse_pack_specs(pack_value)
+        append encounters, encounter
+    error("Need --monster NAME,LIST, --monster all, or --pack LABEL=Monster+Monster*COUNT.") if #encounters == 0
+    return encounters
 
 parse_config_names = (value) ->
     names = split_csv(value)
@@ -132,6 +216,13 @@ enemy_primary_resistance = (monster, primary_type) ->
     entry = enemies and enemies[monster]
     raw = entry and entry.resistances and entry.resistances[primary_type]
     return tonumber(raw) or 0
+
+encounter_primary_resistance = (encounter, primary_type) ->
+    return 0 unless encounter and encounter.spawns and #encounter.spawns > 0
+    total = 0
+    for monster in *encounter.spawns
+        total += enemy_primary_resistance(monster, primary_type)
+    return safe_div(total, #encounter.spawns)
 
 resistance_multiplier = (raw_resist) ->
     raw_resist = tonumber(raw_resist) or 0
@@ -199,6 +290,8 @@ aggregate_stats = (stats) ->
                 monster: row.monster
                 runs: 0
                 contact_runs: 0
+                spawn_count: tonumber(row.spawn_count) or 1
+                monster_spawns: row.monster_spawns or row.monster
                 xpaward: tonumber(row.xpaward) or 0
                 config_primary_type: row.config_primary_type or ""
                 monster_types: row.monster_types or ""
@@ -254,6 +347,8 @@ aggregate_stats = (stats) ->
             runs: aggregate.runs
             contact_runs: aggregate.contact_runs
             contact_run_rate: format_rate safe_div(aggregate.contact_runs, runs)
+            spawn_count: aggregate.spawn_count
+            monster_spawns: aggregate.monster_spawns
             xpaward: aggregate.xpaward
             config_primary_type: aggregate.config_primary_type
             monster_types: aggregate.monster_types
@@ -329,6 +424,8 @@ with_matchup_context = (row, data) ->
     data.monster_types = row.monster_types or ""
     data.primary_resistance = row.primary_resistance or ""
     data.primary_resistance_multiplier = row.primary_resistance_multiplier or ""
+    data.spawn_count = row.spawn_count or ""
+    data.monster_spawns = row.monster_spawns or ""
     return data
 
 build_report = (aggregate_rows, delta_pct, min_report_runs) ->
@@ -583,12 +680,13 @@ CONFIGS = {
     }
 }
 
-dump_stats = (config, monster, seed, run_index, outcome, run_state) ->
+dump_stats = (config, encounter, seed, run_index, outcome, run_state) ->
     GameState = require("core.GameState")
     config_name = config.name
     config_primary_type = config.primary_damage_type or ""
-    primary_resistance = enemy_primary_resistance(monster, config_primary_type)
+    primary_resistance = encounter_primary_resistance(encounter, config_primary_type)
     primary_resistance_multiplier = resistance_multiplier(primary_resistance)
+    monster = encounter.name
     player = World.players[1].instance
     enemy_hp, enemy_max_hp = 0, 0
     enemies_alive = Map.enemies_list(player)
@@ -607,9 +705,11 @@ dump_stats = (config, monster, seed, run_index, outcome, run_state) ->
         seed: tostring(seed)
         level: player.stats.level
         :monster
-        xpaward: enemy_xpaward(monster)
+        spawn_count: encounter.spawn_count
+        monster_spawns: encounter.monster_spawns
+        xpaward: encounter.xpaward
         :config_primary_type
-        monster_types: enemy_types(monster)
+        monster_types: encounter.monster_types
         :primary_resistance
         :primary_resistance_multiplier
         outcome: outcome or "unknown"
@@ -635,6 +735,7 @@ run_bot_tests = (raw_args) ->
     parser\option("--level", "Player level.", 1)
     parser\option("--levels", "Comma-separated player levels. Overrides --level when set.", nil)
     parser\option("--monster", "Monster to fight. Use comma-separated compact names like GiantRat,Hound or all.", nil)
+    parser\option("--pack", "Encounter packs. Format Label=Monster+Monster*COUNT;Other=Hydra+Golem.", nil)
     parser\option("--configs", "Comma-separated eval configs.", DEFAULT_CONFIGS)
     parser\option("--out", "Raw monster run CSV output.", "saves/monster_stats.csv")
     parser\option("--aggregate_out", "Aggregate monster balance CSV output.", "saves/monster_aggregate.csv")
@@ -657,15 +758,16 @@ run_bot_tests = (raw_args) ->
     config_eval_step = () ->
         stats = {}
         selected_configs = parse_configs(args.configs)
-        selected_monsters = parse_monster_names(args.monster)
+        selected_encounters = parse_encounters(args.monster, args.pack)
         selected_levels = if args.levels then parse_levels(args.levels) else parse_levels(args.level)
         level_eval_step = (level, next_level) ->
-            return _iterate selected_configs, monster_eval_step(level, stats, selected_monsters), next_level
+            return _iterate selected_configs, monster_eval_step(level, stats, selected_encounters), next_level
         return _iterate selected_levels, level_eval_step, () ->
             aggregate_rows = aggregate_stats(stats)
             report_rows = build_report(aggregate_rows, args.report_delta_pct, args.min_report_runs)
             write_csv args.out, stats, {
-                "config_name", "run_index", "seed", "level", "monster", "xpaward",
+                "config_name", "run_index", "seed", "level", "monster", "spawn_count",
+                "monster_spawns", "xpaward",
                 "config_primary_type", "monster_types", "primary_resistance",
                 "primary_resistance_multiplier",
                 "outcome", "frames", "player_damage", "gross_player_damage",
@@ -675,7 +777,8 @@ run_bot_tests = (raw_args) ->
                 "melee_count", "projectile_count", "receive_melee_count"
             }
             write_csv args.aggregate_out, aggregate_rows, {
-                "config_name", "level", "monster", "runs", "contact_runs", "contact_run_rate", "xpaward",
+                "config_name", "level", "monster", "runs", "contact_runs", "contact_run_rate",
+                "spawn_count", "monster_spawns", "xpaward",
                 "config_primary_type", "monster_types", "primary_resistance",
                 "primary_resistance_multiplier",
                 "enemy_kill_rate", "step_limit_rate", "no_contact_step_limit_rate", "player_death_rate",
@@ -695,15 +798,18 @@ run_bot_tests = (raw_args) ->
             }
             write_csv args.report_out, report_rows, {
                 "severity", "category", "config_name", "level", "monster",
+                "spawn_count", "monster_spawns",
                 "config_primary_type", "monster_types", "primary_resistance",
                 "primary_resistance_multiplier",
                 "metric", "value", "baseline", "delta", "delta_pct", "message"
             }
             if args.json_out and args.json_out != ""
                 file_dump_json args.json_out, {
-                    schema_version: 3
+                    schema_version: 4
                     seed: tostring(args.seed)
                     runs_per_config_monster: tonumber(args.runs)
+                    runs_per_config_encounter: tonumber(args.runs)
+                    pack_specs: args.pack
                     raw: stats
                     aggregate: aggregate_rows
                     report: report_rows
@@ -720,19 +826,19 @@ run_bot_tests = (raw_args) ->
                 print string.format("... %d more report rows in %s", #report_rows - 10, args.report_out)
             return game_exit("Done.")
 
-    monster_eval_step = (level, stats, monster_names) -> (config, next_config) ->
+    monster_eval_step = (level, stats, encounters) -> (config, next_config) ->
         run_eval_step = (run_index, next_run) ->
             seed = tonumber(args.seed) + run_index - 1
-            step = (monster_name, next_monster) ->
-                print('run', run_index, 'seed', seed, 'level', level, 'config', config.name, 'mon', monster_name)
+            step = (encounter, next_encounter) ->
+                print('run', run_index, 'seed', seed, 'level', level, 'config', config.name, 'mon', encounter.name)
                 run_state = make_run_state()
                 on_finish = (outcome) ->
-                    append stats, dump_stats(config, monster_name, seed, run_index, outcome, run_state)
-                    return next_monster()
+                    append stats, dump_stats(config, encounter, seed, run_index, outcome, run_state)
+                    return next_encounter()
                 -- Continue simulation iteration:
-                game_init(seed, config.class, {monster_name}, config.input, level)
+                game_init(seed, config.class, encounter.spawns, config.input, level)
                 return game_step(on_finish, run_state)
-            return _iterate monster_names, step, next_run
+            return _iterate encounters, step, next_run
         runs = [i for i=1,tonumber(args.runs)]
         return _iterate runs, run_eval_step, next_config
 

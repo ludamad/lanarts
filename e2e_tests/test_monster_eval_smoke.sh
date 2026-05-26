@@ -8,6 +8,7 @@ trap "{ rm -rf \"$temp_dir\"; }" EXIT
     --runs 1 \
     --level 1 \
     --monster GiantRat,Hound \
+    --pack "RatPack=GiantRat*2" \
     --configs BaseFighter \
     --out="$temp_dir/monster_runs.csv" \
     --aggregate_out="$temp_dir/monster_aggregate.csv" \
