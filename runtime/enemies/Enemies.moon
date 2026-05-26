@@ -1190,7 +1190,7 @@ DataW.enemy_create {
     death_sprite: "blood"
     sprite: "spr_enemies.animals.chicken_giant"
     radius: 32
-    xpaward: 20
+    xpaward: 40
     appear_message: "An unnaturally giant chicken appears!"
     defeat_message: "The giant chicken topples over."
     types: {"Green"}
