@@ -70,7 +70,8 @@ get_effect_stat = (obj, type, default = 0) ->
 COLORS = {'White','Black','Green','Red','Blue'}
 
 get_bonus = (obj, bonus) ->
-    if not table.contains COLORS, bonus
+    color = bonus\match("^(%a+)Bonus$") or bonus
+    if not table.contains COLORS, color
         return 0
     eff = obj\get_effect(bonus)
     return if eff then eff.n_derived else 0
