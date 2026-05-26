@@ -1702,7 +1702,7 @@ DataW.enemy_create {
     sprite: "jester"
     death_sprite: "green blood"
     radius: 12
-    xpaward: 75
+    xpaward: 85
     appear_message: "An odd and quick creature appears!"
     defeat_message: "The odd and quick creature has been destroyed."
     types: {"Black"}
