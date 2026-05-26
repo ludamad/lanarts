@@ -1581,6 +1581,7 @@ local function run_balance(raw_args)
     parser:option("--spell_policy", "Spell selection policy: mixed, priority, round_robin, none.", "mixed")
     parser:option("--bot_profile", "Automated-player skill profile: perfect, skilled, human, or sloppy.", "perfect")
     parser:option("--sample_interval", "Frame interval for timeseries samples.", "300")
+    parser:option("--draw_interval", "Frame interval for drawing visual capture frames. Use with LANARTS_SCREENSHOT_DIR.", "0")
     parser:option("--out", "Summary CSV output.", "saves/balance_runs.csv")
     parser:option("--samples_out", "Timeseries sample CSV output.", "saves/balance_samples.csv")
     parser:option("--spells_out", "Spell order CSV output.", "saves/balance_spells.csv")
@@ -1597,6 +1598,7 @@ local function run_balance(raw_args)
 
     local max_steps = tonumber(args.steps)
     local sample_interval = tonumber(args.sample_interval)
+    local draw_interval = tonumber(args.draw_interval)
     local seed_mode = normalize_seed_mode(args.seed_mode)
     local classes = split_csv(args.classes)
     local loadout_preset = normalize_loadout_preset(args.loadout_preset)
@@ -1811,6 +1813,10 @@ local function run_balance(raw_args)
             if sample_interval and sample_interval > 0 and GameState.frame > 0
                 and GameState.frame % sample_interval == 0 then
                 sample_run(run, telemetry, samples, "interval")
+            end
+            if draw_interval and draw_interval > 0 and GameState.frame > 0
+                and GameState.frame % draw_interval == 0 then
+                GameState.draw()
             end
 
             if not GameLoop.game_step(true) then

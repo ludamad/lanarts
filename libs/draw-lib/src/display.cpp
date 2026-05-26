@@ -5,6 +5,8 @@
 
 #include <SDL.h>
 #include <cstdlib>
+#include <cstdio>
+#include <vector>
 
 #undef GL_GLEXT_VERSION
 #ifndef __EMSCRIPTEN__
@@ -25,6 +27,7 @@
 static SDL_Window *MAIN_WINDOW = NULL;
 static SDL_GLContext MAIN_GL_CONTEXT = NULL;
 static Size RENDER_SIZE;
+static int SCREENSHOT_INDEX = 0;
 
 static bool should_use_vsync() {
     const char* value = getenv("LANARTS_VSYNC");
@@ -229,6 +232,32 @@ void ldraw::display_draw_finish() {
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    const char* screenshot_dir = getenv("LANARTS_SCREENSHOT_DIR");
+    if (screenshot_dir && screenshot_dir[0] != '\0') {
+        int limit = getenv("LANARTS_SCREENSHOT_LIMIT") ? atoi(getenv("LANARTS_SCREENSHOT_LIMIT")) : 0;
+        if (limit <= 0 || SCREENSHOT_INDEX < limit) {
+            int w = 0, h = 0;
+            SDL_GL_GetDrawableSize(MAIN_WINDOW, &w, &h);
+            if (w > 0 && h > 0) {
+                std::vector<unsigned char> pixels(w * h * 3);
+                glPixelStorei(GL_PACK_ALIGNMENT, 1);
+                glReadBuffer(GL_BACK);
+                glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+
+                char path[1024];
+                snprintf(path, sizeof(path), "%s/frame_%05d.ppm", screenshot_dir, SCREENSHOT_INDEX);
+                FILE* file = fopen(path, "wb");
+                if (file) {
+                    fprintf(file, "P6\n%d %d\n255\n", w, h);
+                    for (int y = h - 1; y >= 0; --y) {
+                        fwrite(&pixels[y * w * 3], 1, w * 3, file);
+                    }
+                    fclose(file);
+                    SCREENSHOT_INDEX++;
+                }
+            }
+        }
+    }
     SDL_GL_SwapWindow(MAIN_WINDOW);
 }
 
