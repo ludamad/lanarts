@@ -138,16 +138,16 @@ DataW.projectile_create {
     weapon_class: "magic"
     spr_spell: "spr_spells.skullthrow"
     types: {"Black"}
-    range: 300
+    range: 160
     damage_type: {magic: 0.5, physical: 0.5}
     speed: 7.25
     can_wall_bounce: true
     mp_cost: 4
 
-    cooldown: 35
+    cooldown: 80
     on_hit_func: (target, atkstats) =>
         target\add_effect("Poison", {
-            time_left: 100,
+            time_left: 20,
             damage: atkstats.damage,
             attacker: @caster,
             power: atkstats.power,

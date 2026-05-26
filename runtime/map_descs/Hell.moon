@@ -112,6 +112,16 @@ DUNGEON_CONF = (rng, tileset = Tilesets.pebble, schema = 1, n_regions=nil) ->
     }
 
 tileset = Tilesets.hell
+
+HELL_ENEMIES = {
+    {enemy: "Hell Storm", chance: 8}
+    {enemy: "Centaur Marksman", chance: 4}
+    {enemy: "Hell Forged", chance: 12}
+    {enemy: "Executioner", chance: 36, guaranteed_spawns: 1}
+    {enemy: "Mana Sapper", chance: 6}
+    {enemy: "Stara", guaranteed_spawns: 1}
+}
+
 make_template = (rng, back_links, forward_links) -> {
     map_label: "Hell"
     subtemplates: {DUNGEON_CONF(rng, tileset, 3)}
@@ -134,7 +144,7 @@ make_template = (rng, back_links, forward_links) -> {
         return true
     _spawn_enemies: (map) =>
         area = {0,0,map.size[1],map.size[2]}
-        OldMaps.generate_from_enemy_entries(map, OldMaps.strong_hell, 25, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        OldMaps.generate_from_enemy_entries(map, HELL_ENEMIES, 2, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
         return true
     _spawn_items: (map) =>
         area = {0,0,map.size[1],map.size[2]}
@@ -190,4 +200,3 @@ return MapDesc.create {
         }
     }
 }
-

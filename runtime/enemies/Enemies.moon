@@ -652,7 +652,7 @@ DataW.enemy_create {
     types: {"Black"}
     stats: {
         attacks: {{projectile: "Skullthrow"}}
-        hp: 200
+        hp: 160
         hpregen: 0.18
         movespeed: 3
         strength: 25
@@ -669,7 +669,7 @@ DataW.enemy_create {
         for i=1,1
             {:type, :amount} = ItemUtils.randart_generate(2)
             ObjectUtils.spawn_item_near(@, type, amount)
-    effects_active: {{"Pain Aura", {damage: 25, range: 40}}}
+    effects_active: {{"Pain Aura", {damage: 20, range: 40}}}
 }
 
 DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 1, 180, 150, 20) {
