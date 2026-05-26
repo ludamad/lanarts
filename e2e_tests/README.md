@@ -55,3 +55,7 @@ Monster simulations:
     healing, and minimum HP also emitted so regenerative playstyles are still
     visible. BaseNecromancer uses Pain while opportunistically casting Baleful
     Regeneration, matching its intended sustain-through-damage loop.
+    Monster rows also include the config's primary damage type, the monster's
+    types, and the monster's resistance to that primary damage. Report messages
+    call out resisted primary matchups so elemental-counter warnings can be
+    separated from raw enemy overtuning.

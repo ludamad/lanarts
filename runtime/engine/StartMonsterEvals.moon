@@ -122,6 +122,24 @@ enemy_xpaward = (monster) ->
     entry = enemies and enemies[monster]
     return tonumber(entry and entry.xpaward) or 0
 
+enemy_types = (monster) ->
+    entry = enemies and enemies[monster]
+    return "" unless entry and entry.types
+    table.concat(entry.types, "|")
+
+enemy_primary_resistance = (monster, primary_type) ->
+    return 0 unless primary_type and primary_type != ""
+    entry = enemies and enemies[monster]
+    raw = entry and entry.resistances and entry.resistances[primary_type]
+    return tonumber(raw) or 0
+
+resistance_multiplier = (raw_resist) ->
+    raw_resist = tonumber(raw_resist) or 0
+    return 1.5 if raw_resist <= -100
+    return 0.5 if raw_resist >= 100
+    resist = math.max(math.min(math.floor(raw_resist), 5), -5)
+    1 - resist / 10
+
 sorted_group_keys = (groups) ->
     keys = {}
     for key, _ in pairs(groups)
@@ -182,6 +200,10 @@ aggregate_stats = (stats) ->
                 runs: 0
                 contact_runs: 0
                 xpaward: tonumber(row.xpaward) or 0
+                config_primary_type: row.config_primary_type or ""
+                monster_types: row.monster_types or ""
+                primary_resistance: tonumber(row.primary_resistance) or 0
+                primary_resistance_multiplier: tonumber(row.primary_resistance_multiplier) or 1
                 outcomes: {}
                 sums: {}
                 mins: {}
@@ -233,6 +255,10 @@ aggregate_stats = (stats) ->
             contact_runs: aggregate.contact_runs
             contact_run_rate: format_rate safe_div(aggregate.contact_runs, runs)
             xpaward: aggregate.xpaward
+            config_primary_type: aggregate.config_primary_type
+            monster_types: aggregate.monster_types
+            primary_resistance: format_rate aggregate.primary_resistance
+            primary_resistance_multiplier: format_rate aggregate.primary_resistance_multiplier
             enemy_kill_rate: format_rate safe_div(aggregate.outcomes.enemy_killed or 0, runs)
             step_limit_rate: format_rate safe_div(aggregate.outcomes.step_limit or 0, runs)
             no_contact_step_limit_rate: format_rate safe_div(aggregate.outcomes.no_contact_step_limit or 0, runs)
@@ -292,6 +318,19 @@ mean_by_config_level = (rows, metric) ->
         means[key] = safe_div(group.sum, group.count)
     return means
 
+matchup_note = (row) ->
+    primary_resistance = tonumber(row.primary_resistance) or 0
+    primary_type = row.config_primary_type or ""
+    return "" unless primary_type != "" and primary_resistance > 0
+    " #{row.monster} resists #{primary_type} damage (resist #{row.primary_resistance}, multiplier #{row.primary_resistance_multiplier})."
+
+with_matchup_context = (row, data) ->
+    data.config_primary_type = row.config_primary_type or ""
+    data.monster_types = row.monster_types or ""
+    data.primary_resistance = row.primary_resistance or ""
+    data.primary_resistance_multiplier = row.primary_resistance_multiplier or ""
+    return data
+
 build_report = (aggregate_rows, delta_pct, min_report_runs) ->
     delta_pct = tonumber(delta_pct) or 0.5
     min_report_runs = tonumber(min_report_runs) or 1
@@ -315,7 +354,7 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
         frame_baseline = frames_mean[key] or 0
 
         if step_limit_rate > 0
-            append reports, {
+            append reports, with_matchup_context row, {
                 severity: "warning"
                 category: "toughness"
                 config_name: row.config_name
@@ -326,11 +365,11 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: "0.000"
                 delta: row.step_limit_rate
                 delta_pct: row.step_limit_rate
-                message: "#{row.monster} survives to the step limit in #{row.step_limit_rate} of #{row.config_name} L#{row.level} runs."
+                message: "#{row.monster} survives to the step limit in #{row.step_limit_rate} of #{row.config_name} L#{row.level} runs.#{matchup_note(row)}"
             }
 
         if no_contact_step_limit_rate > 0
-            append reports, {
+            append reports, with_matchup_context row, {
                 severity: "info"
                 category: "contact"
                 config_name: row.config_name
@@ -341,11 +380,11 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: "0.000"
                 delta: row.no_contact_step_limit_rate
                 delta_pct: row.no_contact_step_limit_rate
-                message: "#{row.monster} had no combat contact before the step limit in #{row.no_contact_step_limit_rate} of #{row.config_name} L#{row.level} runs."
+                message: "#{row.monster} had no combat contact before the step limit in #{row.no_contact_step_limit_rate} of #{row.config_name} L#{row.level} runs.#{matchup_note(row)}"
             }
 
         if threat_baseline > 0 and damage_per_xp > threat_baseline * (1 + delta_pct)
-            append reports, {
+            append reports, with_matchup_context row, {
                 severity: "warning"
                 category: "reward"
                 config_name: row.config_name
@@ -356,11 +395,11 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: format_rate threat_baseline
                 delta: format_rate(damage_per_xp - threat_baseline)
                 delta_pct: format_rate safe_div(damage_per_xp - threat_baseline, threat_baseline)
-                message: "#{row.monster} deals #{row.contact_damage_per_xp} contact damage per XP versus #{format_rate(threat_baseline)} baseline for #{row.config_name} L#{row.level}."
+                message: "#{row.monster} deals #{row.contact_damage_per_xp} contact damage per XP versus #{format_rate(threat_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}"
             }
 
         if xpaward <= 0 and damage_rate > 0
-            append reports, {
+            append reports, with_matchup_context row, {
                 severity: "warning"
                 category: "reward"
                 config_name: row.config_name
@@ -371,11 +410,11 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: ""
                 delta: ""
                 delta_pct: ""
-                message: "#{row.monster} deals damage but awards no XP in #{row.config_name} L#{row.level} evals."
+                message: "#{row.monster} deals damage but awards no XP in #{row.config_name} L#{row.level} evals.#{matchup_note(row)}"
             }
 
         if damage_baseline > 0 and damage_rate > damage_baseline * (1 + delta_pct)
-            append reports, {
+            append reports, with_matchup_context row, {
                 severity: "info"
                 category: "threat"
                 config_name: row.config_name
@@ -386,11 +425,11 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: format_rate damage_baseline
                 delta: format_rate(damage_rate - damage_baseline)
                 delta_pct: format_rate safe_div(damage_rate - damage_baseline, damage_baseline)
-                message: "#{row.monster} contact damage pace is #{row.contact_damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}."
+                message: "#{row.monster} contact damage pace is #{row.contact_damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}"
             }
 
         if kill_rate == 1 and frame_baseline > 0 and avg_frames > frame_baseline * (1 + delta_pct)
-            append reports, {
+            append reports, with_matchup_context row, {
                 severity: "info"
                 category: "durability"
                 config_name: row.config_name
@@ -401,7 +440,7 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: format_rate frame_baseline
                 delta: format_rate(avg_frames - frame_baseline)
                 delta_pct: format_rate safe_div(avg_frames - frame_baseline, frame_baseline)
-                message: "#{row.monster} takes #{row.contact_avg_frames} contact frames to kill versus #{format_rate(frame_baseline)} baseline for #{row.config_name} L#{row.level}."
+                message: "#{row.monster} takes #{row.contact_avg_frames} contact frames to kill versus #{format_rate(frame_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}"
             }
 
     table.sort reports, (a, b) ->
@@ -503,30 +542,38 @@ CONFIGS = {
     {
         name: "BaseFighter"
         class: "Fighter"
+        primary_damage_type: "Bludgeon"
         input: () =>
             @set("should_use_weapon", true)
     }
     {
         name: "BaseNecromancer"
         class: "Necromancer"
+        primary_damage_type: "Black"
         input: necromancer_eval_input
     }
     {
         name: "BaseStormcaller"
         class: "Stormcaller"
+        primary_damage_type: "White"
         input: () =>
             @set("use_spell_slot", 0)
     }
     {
         name: "BasePyrocaster"
         class: "Pyrocaster"
+        primary_damage_type: "Red"
         input: () =>
             @set("use_spell_slot", 0)
     }
 }
 
-dump_stats = (config_name, monster, seed, run_index, outcome, run_state) ->
+dump_stats = (config, monster, seed, run_index, outcome, run_state) ->
     GameState = require("core.GameState")
+    config_name = config.name
+    config_primary_type = config.primary_damage_type or ""
+    primary_resistance = enemy_primary_resistance(monster, config_primary_type)
+    primary_resistance_multiplier = resistance_multiplier(primary_resistance)
     player = World.players[1].instance
     enemy_hp, enemy_max_hp = 0, 0
     enemies_alive = Map.enemies_list(player)
@@ -546,6 +593,10 @@ dump_stats = (config_name, monster, seed, run_index, outcome, run_state) ->
         level: player.stats.level
         :monster
         xpaward: enemy_xpaward(monster)
+        :config_primary_type
+        monster_types: enemy_types(monster)
+        :primary_resistance
+        :primary_resistance_multiplier
         outcome: outcome or "unknown"
         frames: GameState.frame
         player_damage: gross_player_damage
@@ -600,6 +651,8 @@ run_bot_tests = (raw_args) ->
             report_rows = build_report(aggregate_rows, args.report_delta_pct, args.min_report_runs)
             write_csv args.out, stats, {
                 "config_name", "run_index", "seed", "level", "monster", "xpaward",
+                "config_primary_type", "monster_types", "primary_resistance",
+                "primary_resistance_multiplier",
                 "outcome", "frames", "player_damage", "gross_player_damage",
                 "net_player_damage", "player_healing", "min_player_hp",
                 "enemy_hp", "enemy_max_hp",
@@ -608,6 +661,8 @@ run_bot_tests = (raw_args) ->
             }
             write_csv args.aggregate_out, aggregate_rows, {
                 "config_name", "level", "monster", "runs", "contact_runs", "contact_run_rate", "xpaward",
+                "config_primary_type", "monster_types", "primary_resistance",
+                "primary_resistance_multiplier",
                 "enemy_kill_rate", "step_limit_rate", "no_contact_step_limit_rate", "player_death_rate",
                 "avg_frames", "min_frames", "max_frames",
                 "avg_player_damage", "min_player_damage", "max_player_damage",
@@ -625,11 +680,13 @@ run_bot_tests = (raw_args) ->
             }
             write_csv args.report_out, report_rows, {
                 "severity", "category", "config_name", "level", "monster",
+                "config_primary_type", "monster_types", "primary_resistance",
+                "primary_resistance_multiplier",
                 "metric", "value", "baseline", "delta", "delta_pct", "message"
             }
             if args.json_out and args.json_out != ""
                 file_dump_json args.json_out, {
-                    schema_version: 2
+                    schema_version: 3
                     seed: tostring(args.seed)
                     runs_per_config_monster: tonumber(args.runs)
                     raw: stats
@@ -655,7 +712,7 @@ run_bot_tests = (raw_args) ->
                 print('run', run_index, 'seed', seed, 'level', level, 'config', config.name, 'mon', monster_name)
                 run_state = make_run_state()
                 on_finish = (outcome) ->
-                    append stats, dump_stats(config.name, monster_name, seed, run_index, outcome, run_state)
+                    append stats, dump_stats(config, monster_name, seed, run_index, outcome, run_state)
                     return next_monster()
                 -- Continue simulation iteration:
                 game_init(seed, config.class, {monster_name}, config.input, level)
