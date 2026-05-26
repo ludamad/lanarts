@@ -933,6 +933,39 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
     return rows
 end
 
+local function nearest_enemy_distance_sqr(source_map, xy)
+    local best
+    for _, obj in ipairs(source_map.instances or {}) do
+        if obj.is_enemy ~= false and obj.stats and obj.x and obj.y then
+            local dx = obj.x - xy[1]
+            local dy = obj.y - xy[2]
+            local dist = dx * dx + dy * dy
+            if not best or dist < best then
+                best = dist
+            end
+        end
+    end
+    return best or 0
+end
+
+local function pick_start_spawn_square(source_map, selector)
+    local MapUtils = require "maps.MapUtils"
+    local best_square
+    local best_score
+    for _ = 1, 96 do
+        local square = MapUtils.random_square(source_map, nil, selector, {})
+        if square then
+            local xy = MapUtils.from_tile_xy(square)
+            local score = nearest_enemy_distance_sqr(source_map, xy)
+            if not best_score or score > best_score then
+                best_square = square
+                best_score = score
+            end
+        end
+    end
+    return best_square
+end
+
 local function generate_start_map_desc(desc_name)
     load_core_modules()
     local NewMaps = require "maps.NewMaps"
@@ -942,18 +975,20 @@ local function generate_start_map_desc(desc_name)
 
     local desc = require(desc_name)
     local source_map = desc:compile()
+    local spawn_selector = {
+        matches_none = {
+            SourceMap.FLAG_SOLID,
+            SourceMap.FLAG_HAS_OBJECT,
+            Vaults.FLAG_HAS_VAULT,
+        },
+    }
     local spawn_points = {}
     for idx = 1, World.player_amount do
-        local square = MapUtils.random_square(source_map, nil, {
-            matches_none = {
-                SourceMap.FLAG_SOLID,
-                SourceMap.FLAG_HAS_OBJECT,
-                Vaults.FLAG_HAS_VAULT,
-            },
-        })
+        local square = pick_start_spawn_square(source_map, spawn_selector)
         if not square then
             error("Could not find player spawn for --start_map_desc " .. tostring(desc_name) .. ".")
         end
+        source_map:square_apply(square, {add = {SourceMap.FLAG_HAS_OBJECT}})
         spawn_points[idx] = MapUtils.from_tile_xy(square)
     end
 
