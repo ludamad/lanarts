@@ -1134,7 +1134,7 @@ DataW.enemy_create {
     appear_message: "A hostile chicken appears!"
     defeat_message: "The chicken may as well be fried."
     types: {"Green"}
-    weapon: {cooldown: 25, damage: 9}
+    weapon: {cooldown: 35, damage: 9}
     stats: {
         hp: 25
         hpregen: 0.04
