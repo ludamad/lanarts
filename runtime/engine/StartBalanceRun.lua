@@ -781,6 +781,20 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
             )
         end
 
+        local death_rate = tonumber(row.death_rate) or 0
+        if runs >= min_runs and death_rate >= 0.50 then
+            add_report_row(
+                rows,
+                class_name,
+                "critical",
+                "survival",
+                "death_rate",
+                death_rate,
+                0.50,
+                string.format("%s died in %.1f%% of runs.", class_name, death_rate * 100)
+            )
+        end
+
         local combat_rate = tonumber(row.combat_frame_rate) or 0
         local combat_rate_baseline = baselines.combat_frame_rate or 0
         local combat_rate_delta_pct = combat_rate_baseline ~= 0
@@ -919,6 +933,38 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
     return rows
 end
 
+local function generate_start_map_desc(desc_name)
+    load_core_modules()
+    local NewMaps = require "maps.NewMaps"
+    local MapUtils = require "maps.MapUtils"
+    local SourceMap = require "core.SourceMap"
+    local Vaults = require "maps.Vaults"
+
+    local desc = require(desc_name)
+    local source_map = desc:compile()
+    local spawn_points = {}
+    for idx = 1, World.player_amount do
+        local square = MapUtils.random_square(source_map, nil, {
+            matches_none = {
+                SourceMap.FLAG_SOLID,
+                SourceMap.FLAG_HAS_OBJECT,
+                Vaults.FLAG_HAS_VAULT,
+            },
+        })
+        if not square then
+            error("Could not find player spawn for --start_map_desc " .. tostring(desc_name) .. ".")
+        end
+        spawn_points[idx] = MapUtils.from_tile_xy(square)
+    end
+
+    local game_map = NewMaps.generate_game_map(source_map)
+    for _, post_game_map in ipairs(source_map.post_game_map or {}) do
+        post_game_map(game_map)
+    end
+    World.players_spawn(game_map, spawn_points)
+    return game_map
+end
+
 local function game_init(run, telemetry, bot_options)
     load_core_modules()
     GameState.clear_players()
@@ -935,6 +981,11 @@ local function game_init(run, telemetry, bot_options)
 
     EngineInternal.init_gamestate()
     random_seed(run.seed)
+    if bot_options.start_map_desc and bot_options.start_map_desc ~= "" then
+        EngineHooks.first_map_create = function()
+            return generate_start_map_desc(bot_options.start_map_desc)
+        end
+    end
     EngineInternal.start_game()
     local entry = World.players[1]
     local player = entry and entry.instance
@@ -1046,6 +1097,7 @@ local function run_balance(raw_args)
     parser:option("--seed_mode", "Seed scheduling: paired reuses each seed across classes; unique uses a fresh seed for every run.", "paired")
     parser:option("--classes", "Comma-separated classes to run.", DEFAULT_CLASSES)
     parser:option("--levels", "Comma-separated starting levels to run.", "1")
+    parser:option("--start_map_desc", "Optional map_desc module to start each run in, such as map_descs.PixullochiaDepths.", nil)
     parser:option("--spell_policy", "Spell selection policy: mixed, priority, round_robin, none.", "mixed")
     parser:option("--sample_interval", "Frame interval for timeseries samples.", "300")
     parser:option("--out", "Summary CSV output.", "saves/balance_runs.csv")
@@ -1126,6 +1178,7 @@ local function run_balance(raw_args)
             file_dump_json(args.json_out, {
                 schema_version = 3,
                 seed_mode = seed_mode,
+                start_map_desc = args.start_map_desc,
                 runs = json_runs,
                 class_stats = class_rows,
                 spell_stats = spell_stat_rows,
@@ -1174,6 +1227,7 @@ local function run_balance(raw_args)
         local bot_options = {
             seed = run.seed + 991,
             spell_policy = args.spell_policy,
+            start_map_desc = args.start_map_desc,
         }
 
         if not Events then

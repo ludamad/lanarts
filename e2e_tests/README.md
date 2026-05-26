@@ -33,6 +33,8 @@ Balance simulations:
     underperformance flags for high-contact runs when overall kill pacing is in
     range, and emits pacing context instead of a class-balance failure when
     combat efficiency is low but overall kill pace is still healthy.
+    It also emits an absolute survival flag when a class dies in at least half
+    of stable runs, even if every class is failing at the same rate.
     Ability-order totals are kept in the raw tables for behavior analysis, but
     are not used as cross-class balance report flags.
     Item-order totals are also raw telemetry; inventory access differs by class.
@@ -42,6 +44,9 @@ Balance simulations:
     enemies from rare enemies that dominate run pacing when they appear.
     Multi-level sweeps produce separate class and spell aggregate rows per
     starting level, which is useful for checking later spell unlocks.
+    Use --start_map_desc to start every run in a specific map descriptor, for
+    example map_descs.PixullochiaDepths, when testing late-game enemy pools
+    without waiting for portal traversal.
     Use --min_report_runs and --report_delta_pct to tune report sensitivity.
 
 Monster simulations:
