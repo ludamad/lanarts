@@ -405,6 +405,10 @@ function AutomatedPlayerInputSource:_necromancer_combat_action(enemies)
         return self:_order_spell(regen)
     end
 
+    if self:_try_emergency_item(enemies) then
+        return true
+    end
+
     if pct < self.options.necromancer_retreat_hp_pct and not regenerating then
         self:_record_scalar("necromancer_retreat_frames")
         return self:_set_move(reverse_direction(toward))
