@@ -164,6 +164,20 @@ local function inventory_slot(player, wanted)
     return nil
 end
 
+local function nearest_alive_enemy(player)
+    local best, best_dist
+    for _, enemy in ipairs(Map.enemies_list(player)) do
+        if not enemy.destroyed and enemy.is_enemy ~= false and enemy.team ~= player.team then
+            local dist = distance_sqr(player, enemy)
+            if not best_dist or dist < best_dist then
+                best = enemy
+                best_dist = dist
+            end
+        end
+    end
+    return best
+end
+
 local function is_on_portal(player)
     local collisions = Map.rectangle_collision_check(
         player.map,
@@ -532,6 +546,16 @@ function AutomatedPlayerInputSource:_travel_action()
         self:_record_scalar("unstick_frames")
     else
         dir = self.ai_state:get_next_direction()
+        if not dir and self.options.start_map_desc and self.options.start_map_desc ~= "" then
+            local target = nearest_alive_enemy(self.player)
+            if target then
+                self.ai_state.path_planner:set_path_towards(target)
+                dir = self.ai_state.path_planner:next_direction_towards()
+                if dir then
+                    self:_record_scalar("hunt_enemy_frames")
+                end
+            end
+        end
         if not dir then
             dir = self.player:direction_towards_unexplored()
         end

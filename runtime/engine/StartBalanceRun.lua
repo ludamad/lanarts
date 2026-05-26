@@ -501,6 +501,7 @@ local function sample_run(run, telemetry, samples, reason)
         ability_orders_total = spell_orders_total + necromancer_pain_orders,
         weapon_orders = telemetry.weapon_orders or 0,
         item_orders_total = count_values(telemetry.item_orders),
+        hunt_enemy_frames = telemetry.hunt_enemy_frames or 0,
         necromancer_close_frames = telemetry.necromancer_close_frames or 0,
         necromancer_pain_orders = necromancer_pain_orders,
         necromancer_pain_during_regen_orders = telemetry.necromancer_pain_during_regen_orders or 0,
@@ -552,6 +553,7 @@ local function summarize_run(run, telemetry, outcome)
         weapon_orders = telemetry.weapon_orders or 0,
         item_orders_total = count_values(telemetry.item_orders),
         controlled_frames = telemetry.controlled_frames or 0,
+        hunt_enemy_frames = telemetry.hunt_enemy_frames or 0,
         combat_frames = telemetry.combat_frames or 0,
         explore_frames = telemetry.explore_frames or 0,
         rest_frames = telemetry.rest_frames or 0,
@@ -597,7 +599,7 @@ end
 local SUMMARY_METRICS = {
     "frames", "level", "xp", "hp_pct", "mp_pct", "kills", "player_kills", "deaths",
     "deepest_floor", "current_floor", "spell_orders_total", "ability_orders_total", "weapon_orders",
-    "item_orders_total", "controlled_frames", "combat_frames",
+    "item_orders_total", "controlled_frames", "hunt_enemy_frames", "combat_frames",
     "explore_frames", "rest_frames", "idle_frames", "random_walk_frames",
     "unstick_frames", "portal_stop_frames", "necromancer_close_frames",
     "necromancer_pain_orders", "necromancer_pain_during_regen_orders",
@@ -1509,6 +1511,7 @@ local function run_balance(raw_args)
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
+            "hunt_enemy_frames",
             "monster_kills", "visible_enemy_frames", "alive_enemy_counts",
             "alive_enemy_hp", "alive_enemy_max_hp",
         })
@@ -1519,6 +1522,7 @@ local function run_balance(raw_args)
             "enemies_alive", "visible_enemies", "alive_enemy_counts",
             "alive_enemy_hp", "alive_enemy_max_hp", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
+            "hunt_enemy_frames",
         })
         write_csv(args.spells_out, spell_rows, {"run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "spell", "orders"})
         write_csv(args.aggregate_out, class_rows, {
@@ -1550,7 +1554,7 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 6,
+                schema_version = 7,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
                 loadout_preset = loadout_preset,
