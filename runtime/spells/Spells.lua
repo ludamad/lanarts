@@ -136,13 +136,15 @@ local function ChargeCallback(_, caster)
             -- Perform two melee attacks on each monster
             caster:melee(mon)
             caster:melee(mon)
-            local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)
-            -- Stun enemies longer based on strength difference 
-            local thrown = mon:add_effect("Thrown", 40 + 10 * str_diff + caster.stats.level * 5)
-            thrown.angle = vector_direction(caster.xy, mon.xy)
-            for _ in screens() do
-                if caster:is_local_player() then
-                    EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
+            if not mon.unique then
+                local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)
+                -- Stun enemies longer based on strength difference
+                local thrown = mon:add_effect("Thrown", 40 + 10 * str_diff + caster.stats.level * 5)
+                thrown.angle = vector_direction(caster.xy, mon.xy)
+                for _ in screens() do
+                    if caster:is_local_player() then
+                        EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
+                    end
                 end
             end
         end
