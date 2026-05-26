@@ -370,11 +370,13 @@ add_contact_metric = (aggregate, row, metric) ->
 SUMMARY_METRICS = {
     "frames", "player_damage", "gross_player_damage", "net_player_damage",
     "player_healing", "min_player_hp", "enemy_hp", "enemy_max_hp", "enemy_hp_pct",
+    "sapped_frames", "sapped_frame_rate",
     "defender_count", "attacker_count", "melee_count",
     "projectile_count", "receive_melee_count", "enemy_count_alive"
 }
 
 CONTACT_METRICS = {
+    "sapped_frames",
     "defender_count", "attacker_count", "melee_count",
     "projectile_count", "receive_melee_count"
 }
@@ -451,6 +453,10 @@ aggregate_stats = (stats) ->
         contact_avg_net_damage = safe_div(aggregate.contact_sums.net_player_damage, contact_runs)
         contact_avg_healing = safe_div(aggregate.contact_sums.player_healing, contact_runs)
         contact_avg_min_player_hp = safe_div(aggregate.contact_sums.min_player_hp, contact_runs)
+        avg_sapped_frames = safe_div(aggregate.sums.sapped_frames, runs)
+        sapped_frames_per_1000_frames = safe_div(aggregate.sums.sapped_frames, aggregate.sums.frames) * 1000
+        contact_avg_sapped_frames = safe_div(aggregate.contact_sums.sapped_frames, contact_runs)
+        contact_sapped_frames_per_1000_frames = safe_div(aggregate.contact_sums.sapped_frames, aggregate.contact_sums.frames) * 1000
         net_damage_per_1000_frames = safe_div(aggregate.sums.net_player_damage, aggregate.sums.frames) * 1000
         net_damage_per_xp = safe_div(avg_net_damage, math.max(1, aggregate.xpaward))
         contact_net_damage_per_1000_frames = safe_div(aggregate.contact_sums.net_player_damage, aggregate.contact_sums.frames) * 1000
@@ -496,6 +502,8 @@ aggregate_stats = (stats) ->
             avg_player_healing: format_rate avg_healing
             avg_min_player_hp: format_rate avg_min_player_hp
             min_player_hp: aggregate.mins.min_player_hp or 0
+            avg_sapped_frames: format_rate avg_sapped_frames
+            sapped_frames_per_1000_frames: format_rate sapped_frames_per_1000_frames
             damage_per_1000_frames: format_rate damage_per_1000_frames
             damage_per_xp: format_rate damage_per_xp
             xp_per_100_damage: format_rate xp_per_100_damage
@@ -517,6 +525,8 @@ aggregate_stats = (stats) ->
             contact_avg_player_healing: format_rate contact_avg_healing
             contact_avg_min_player_hp: format_rate contact_avg_min_player_hp
             contact_min_player_hp: aggregate.contact_mins.min_player_hp or 0
+            contact_avg_sapped_frames: format_rate contact_avg_sapped_frames
+            contact_sapped_frames_per_1000_frames: format_rate contact_sapped_frames_per_1000_frames
             contact_damage_per_1000_frames: format_rate contact_damage_per_1000_frames
             contact_damage_per_xp: format_rate contact_damage_per_xp
             contact_xp_per_100_damage: format_rate contact_xp_per_100_damage
@@ -592,6 +602,8 @@ with_matchup_context = (row, data) ->
     data.contact_avg_gross_player_damage = row.contact_avg_gross_player_damage or ""
     data.contact_avg_net_player_damage = row.contact_avg_net_player_damage or ""
     data.contact_avg_player_healing = row.contact_avg_player_healing or ""
+    data.contact_avg_sapped_frames = row.contact_avg_sapped_frames or ""
+    data.contact_sapped_frames_per_1000_frames = row.contact_sapped_frames_per_1000_frames or ""
     return data
 
 threat_damage_label = (row) ->
@@ -622,6 +634,7 @@ build_report = (aggregate_rows, delta_pct, min_report_runs, inactive_warning_sev
         damage_per_xp = tonumber(row.contact_threat_damage_per_xp) or 0
         damage_rate = tonumber(row.contact_threat_damage_per_1000_frames) or 0
         avg_frames = tonumber(row.contact_avg_frames) or 0
+        sapped_rate = tonumber(row.contact_sapped_frames_per_1000_frames) or 0
         xpaward = tonumber(row.xpaward) or 0
         threat_baseline = damage_per_xp_mean[key] or 0
         damage_baseline = damage_rate_mean[key] or 0
@@ -655,6 +668,21 @@ build_report = (aggregate_rows, delta_pct, min_report_runs, inactive_warning_sev
                 delta: row.no_contact_step_limit_rate
                 delta_pct: row.no_contact_step_limit_rate
                 message: "#{row.monster} had no combat contact before the step limit in #{row.no_contact_step_limit_rate} of #{row.config_name} L#{row.level} runs.#{matchup_note(row)}#{source_note(row)}"
+            }
+
+        if sapped_rate > 0
+            append reports, with_matchup_context row, {
+                severity: "info"
+                category: "utility"
+                config_name: row.config_name
+                level: row.level
+                monster: row.monster
+                metric: "contact_sapped_frames_per_1000_frames"
+                value: row.contact_sapped_frames_per_1000_frames
+                baseline: "0.000"
+                delta: row.contact_sapped_frames_per_1000_frames
+                delta_pct: ""
+                message: "#{row.monster} kept #{row.config_name} L#{row.level} Sapped for #{row.contact_sapped_frames_per_1000_frames} frames per 1000 contact frames. Average Sapped frames: #{row.contact_avg_sapped_frames}.#{source_note(row)}"
             }
 
         if threat_baseline > 0 and damage_per_xp > threat_baseline * (1 + delta_pct)
@@ -794,6 +822,7 @@ make_run_state = () ->
         gross_player_damage: 0
         player_healing: 0
         min_player_hp: nil
+        sapped_frames: 0
     }
 
 capture_player_hp = (run_state) ->
@@ -814,6 +843,12 @@ record_player_hp_delta = (run_state, before_hp) ->
         run_state.player_healing += after_hp - before_hp
     if run_state.min_player_hp == nil or after_hp < run_state.min_player_hp
         run_state.min_player_hp = after_hp
+
+record_player_status = (run_state) ->
+    player = active_player()
+    return unless run_state and player
+    if player\has_effect("Sapped")
+        run_state.sapped_frames += 1
 
 nearest_enemy = (player) ->
     return nil, 0 unless player
@@ -921,6 +956,8 @@ dump_stats = (config, encounter, seed, run_index, outcome, run_state) ->
     gross_player_damage = math.max(run_state and run_state.gross_player_damage or 0, net_player_damage)
     player_healing = run_state and run_state.player_healing or 0
     min_player_hp = run_state and run_state.min_player_hp or player.stats.hp
+    sapped_frames = run_state and run_state.sapped_frames or 0
+    sapped_frame_rate = safe_div(sapped_frames, math.max(1, GameState.frame))
     return {
         :config_name
         :run_index
@@ -943,6 +980,8 @@ dump_stats = (config, encounter, seed, run_index, outcome, run_state) ->
         :net_player_damage
         :player_healing
         :min_player_hp
+        :sapped_frames
+        :sapped_frame_rate
         :enemy_hp, :enemy_max_hp
         enemy_hp_pct: safe_div(enemy_hp, math.max(1, enemy_max_hp))
         enemy_count_alive: #enemies_alive
@@ -997,6 +1036,7 @@ run_bot_tests = (raw_args) ->
                 "primary_resistance_multiplier",
                 "outcome", "frames", "player_damage", "gross_player_damage",
                 "net_player_damage", "player_healing", "min_player_hp",
+                "sapped_frames", "sapped_frame_rate",
                 "enemy_hp", "enemy_max_hp",
                 "enemy_hp_pct", "enemy_count_alive", "defender_count", "attacker_count",
                 "melee_count", "projectile_count", "receive_melee_count"
@@ -1011,6 +1051,7 @@ run_bot_tests = (raw_args) ->
                 "avg_player_damage", "min_player_damage", "max_player_damage",
                 "avg_gross_player_damage", "avg_net_player_damage", "avg_player_healing",
                 "avg_min_player_hp", "min_player_hp",
+                "avg_sapped_frames", "sapped_frames_per_1000_frames",
                 "damage_per_1000_frames", "damage_per_xp", "xp_per_100_damage",
                 "net_damage_per_1000_frames", "net_damage_per_xp",
                 "threat_damage_mode", "avg_threat_player_damage",
@@ -1020,6 +1061,7 @@ run_bot_tests = (raw_args) ->
                 "contact_avg_player_damage", "contact_min_player_damage", "contact_max_player_damage",
                 "contact_avg_gross_player_damage", "contact_avg_net_player_damage",
                 "contact_avg_player_healing", "contact_avg_min_player_hp", "contact_min_player_hp",
+                "contact_avg_sapped_frames", "contact_sapped_frames_per_1000_frames",
                 "contact_damage_per_1000_frames", "contact_damage_per_xp", "contact_xp_per_100_damage",
                 "contact_net_damage_per_1000_frames", "contact_net_damage_per_xp",
                 "contact_avg_threat_player_damage",
@@ -1036,11 +1078,12 @@ run_bot_tests = (raw_args) ->
                 "primary_resistance_multiplier",
                 "threat_damage_mode", "contact_avg_gross_player_damage",
                 "contact_avg_net_player_damage", "contact_avg_player_healing",
+                "contact_avg_sapped_frames", "contact_sapped_frames_per_1000_frames",
                 "metric", "value", "baseline", "delta", "delta_pct", "message"
             }
             if args.json_out and args.json_out != ""
                 file_dump_json args.json_out, {
-                    schema_version: 6
+                    schema_version: 7
                     seed: tostring(args.seed)
                     runs_per_config_monster: tonumber(args.runs)
                     runs_per_config_encounter: tonumber(args.runs)
@@ -1097,8 +1140,10 @@ run_bot_tests = (raw_args) ->
             -- should be saved + exited
             if not GameLoop.game_step(step_only)
                 record_player_hp_delta(run_state, before_hp)
+                record_player_status(run_state)
                 return next_sim("game_loop_exit")
             record_player_hp_delta(run_state, before_hp)
+            record_player_status(run_state)
 
             -- (5) Loop again
             return step
