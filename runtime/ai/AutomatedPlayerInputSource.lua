@@ -72,8 +72,8 @@ local RANGED_CLASSES = {
 }
 
 local CLASS_KEEPAWAY = {
-    Pyrocaster = 112,
-    Stormcaller = 112,
+    Pyrocaster = 144,
+    Stormcaller = 120,
     ["Blue Mage"] = 96,
 }
 
@@ -92,6 +92,12 @@ local SPELL_RETRY_DELAYS = {
 }
 
 local AutomatedPlayerInputSource = newtype({parent = ProgrammableInputSource})
+
+local MOVE_DIRECTIONS = {
+    {-1, -1}, {0, -1}, {1, -1},
+    {-1, 0},           {1, 0},
+    {-1, 1},  {0, 1},  {1, 1},
+}
 
 local function merge_into(dest, source)
     for k, v in pairs(source or {}) do
@@ -369,7 +375,33 @@ function AutomatedPlayerInputSource:_ranged_avoid_direction(enemies)
     if close_gragh then
         self:_record_scalar("ranged_close_gragh_frames")
     end
-    return direction_from_vector(x, y, 0.05)
+    local direct = direction_from_vector(x, y, 0.05)
+    local best_dir, best_score = direct, -math.huge
+    for _, dir in ipairs(MOVE_DIRECTIONS) do
+        local xy = {player.x + dir[1] * 16, player.y + dir[2] * 16}
+        if not Map.object_tile_check(player, xy) then
+            local score = 0
+            for _, enemy in ipairs(enemies) do
+                local keepaway = self:_keepaway_for(enemy)
+                local current_dist = math.sqrt(distance_sqr(player, enemy))
+                local dx, dy = xy[1] - enemy.x, xy[2] - enemy.y
+                local next_dist = math.sqrt(dx * dx + dy * dy)
+                local pressure = math.max(0, keepaway - current_dist) / math.max(1, keepaway)
+                score = score + (next_dist - current_dist) * (1 + pressure * 2)
+                if next_dist < keepaway then
+                    score = score - (keepaway - next_dist) * 0.5
+                end
+            end
+            if direct and dir[1] == direct[1] and dir[2] == direct[2] then
+                score = score + 2
+            end
+            if score > best_score then
+                best_score = score
+                best_dir = dir
+            end
+        end
+    end
+    return best_dir
 end
 
 function AutomatedPlayerInputSource:_set_move(dir)
