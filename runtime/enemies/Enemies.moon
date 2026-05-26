@@ -683,7 +683,7 @@ DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 1, 
     stats: {
         attacks: {{ weapon: "Basic Melee"}}
         movespeed: 3.5
-        hp: 275
+        hp: 250
         hpregen: 0.15
         strength: 25
         magic: 30
@@ -695,7 +695,7 @@ DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 1, 
         weapon_class: "magic"
         damage_type: {magic: 0.5, physical: 0.5}
         range: 300
-        cooldown: 90
+        cooldown: 135
         speed: 8
         spr_attack: "blue blast"
     }
