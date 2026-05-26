@@ -12,6 +12,7 @@ trap "{ rm -rf \"$temp_dir\"; }" EXIT
     --spells_out="$temp_dir/balance_spells.csv" \
     --aggregate_out="$temp_dir/balance_classes.csv" \
     --spell_stats_out="$temp_dir/balance_spell_stats.csv" \
+    --enemy_stats_out="$temp_dir/balance_enemy_stats.csv" \
     --report_out="$temp_dir/balance_report.csv" \
     --json_out="$temp_dir/balance_runs.json" \
     $@
@@ -21,5 +22,6 @@ test -s "$temp_dir/balance_samples.csv"
 test -s "$temp_dir/balance_spells.csv"
 test -s "$temp_dir/balance_classes.csv"
 test -s "$temp_dir/balance_spell_stats.csv"
+test -s "$temp_dir/balance_enemy_stats.csv"
 test -s "$temp_dir/balance_report.csv"
 test -s "$temp_dir/balance_runs.json"

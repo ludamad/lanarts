@@ -9,9 +9,10 @@ Balance simulations:
 
     Outputs default to saves/balance_runs.csv, saves/balance_samples.csv,
     saves/balance_spells.csv, saves/balance_classes.csv,
-    saves/balance_spell_stats.csv, saves/balance_report.csv, and
-    saves/balance_runs.json relative to the runtime directory.
-    The JSON output contains the run list plus class, spell, and report rows.
+    saves/balance_spell_stats.csv, saves/balance_enemy_stats.csv,
+    saves/balance_report.csv, and saves/balance_runs.json relative to the
+    runtime directory. The JSON output contains the run list plus class, spell,
+    enemy, and report rows.
     By default, --seed_mode paired reuses each seed across every class for a
     given starting level and run index. Use --seed_mode unique for independent
     seeds per run.
@@ -20,6 +21,9 @@ Balance simulations:
     seeds survive serialization.
     Necromancer runs also emit Pain and Baleful Regeneration behavior counters
     in the run and aggregate tables.
+    Run `kills` count hostile monster deaths credited to the party, so
+    Necromancer summons are included in pacing. Direct player last-hits are
+    preserved separately as `player_kills`.
     Pyrocaster runs emit Ring of Flames combat-positioning counters.
     Aggregate rows include raw pacing metrics and kills per 1000 combat frames
     so low kill totals can be separated from low encounter contact.
@@ -32,6 +36,10 @@ Balance simulations:
     Ability-order totals are kept in the raw tables for behavior analysis, but
     are not used as cross-class balance report flags.
     Item-order totals are also raw telemetry; inventory access differs by class.
+    Enemy stats aggregate kills and visible-enemy-frame exposure per class,
+    starting level, and monster type, including XP share and kills per 1000
+    visible enemy frames. This is useful for separating frequent-but-healthy
+    enemies from rare enemies that dominate run pacing when they appear.
     Multi-level sweeps produce separate class and spell aggregate rows per
     starting level, which is useful for checking later spell unlocks.
     Use --min_report_runs and --report_delta_pct to tune report sensitivity.

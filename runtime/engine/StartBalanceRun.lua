@@ -118,6 +118,17 @@ local function encode_counts(counts)
     return table.concat(parts, "|")
 end
 
+local function decode_counts(value)
+    local counts = {}
+    for part in tostring(value or ""):gmatch("[^|]+") do
+        local key, raw_count = part:match("^(.*):([^:]*)$")
+        if key and key ~= "" then
+            counts[key] = (counts[key] or 0) + (tonumber(raw_count) or 0)
+        end
+    end
+    return counts
+end
+
 local function count_values(counts)
     local total = 0
     for _, value in pairs(counts or {}) do
@@ -128,6 +139,19 @@ end
 
 local function format_rate(value)
     return string.format("%.3f", value or 0)
+end
+
+local function safe_div(num, denom)
+    if not denom or denom == 0 then
+        return 0
+    end
+    return (num or 0) / denom
+end
+
+local function enemy_xpaward(name)
+    local enemy_defs = rawget(_G, "enemies")
+    local entry = enemy_defs and enemy_defs[name]
+    return tonumber(entry and entry.xpaward) or 0
 end
 
 local function sorted_group_keys(groups)
@@ -198,6 +222,7 @@ local function sample_run(run, telemetry, samples, reason)
         return
     end
     local spell_orders_total = count_values(telemetry.spell_orders)
+    local hostile_kills = count_values(telemetry.monster_kills)
     local necromancer_pain_orders = telemetry.necromancer_pain_orders or 0
     samples[#samples + 1] = {
         run_id = run.run_id,
@@ -216,7 +241,8 @@ local function sample_run(run, telemetry, samples, reason)
         mp = snap.mp,
         max_mp = snap.max_mp,
         mp_pct = snap.mp_pct,
-        kills = snap.kills,
+        kills = hostile_kills,
+        player_kills = snap.kills,
         deaths = snap.deaths,
         deepest_floor = snap.deepest_floor,
         current_floor = snap.current_floor,
@@ -242,6 +268,7 @@ end
 local function summarize_run(run, telemetry, outcome)
     local snap = player_snapshot() or {}
     local spell_orders_total = count_values(telemetry.spell_orders)
+    local hostile_kills = count_values(telemetry.monster_kills)
     local necromancer_pain_orders = telemetry.necromancer_pain_orders or 0
     return {
         run_id = run.run_id,
@@ -260,7 +287,8 @@ local function summarize_run(run, telemetry, outcome)
         mp = snap.mp or 0,
         max_mp = snap.max_mp or 0,
         mp_pct = snap.mp_pct or "0.000",
-        kills = snap.kills or 0,
+        kills = hostile_kills,
+        player_kills = snap.kills or 0,
         deaths = snap.deaths or 0,
         deepest_floor = snap.deepest_floor or 0,
         current_floor = snap.current_floor or 0,
@@ -293,6 +321,7 @@ local function summarize_run(run, telemetry, outcome)
         spell_orders = encode_counts(telemetry.spell_orders),
         item_orders = encode_counts(telemetry.item_orders),
         monster_kills = encode_counts(telemetry.monster_kills),
+        visible_enemy_frames = encode_counts(telemetry.visible_enemy_frames),
     }
 end
 
@@ -314,7 +343,7 @@ local function flatten_spell_rows(run, telemetry)
 end
 
 local SUMMARY_METRICS = {
-    "frames", "level", "xp", "hp_pct", "mp_pct", "kills", "deaths",
+    "frames", "level", "xp", "hp_pct", "mp_pct", "kills", "player_kills", "deaths",
     "deepest_floor", "current_floor", "spell_orders_total", "ability_orders_total", "weapon_orders",
     "item_orders_total", "controlled_frames", "combat_frames",
     "explore_frames", "rest_frames", "idle_frames", "random_walk_frames",
@@ -451,6 +480,108 @@ local function aggregate_spell_rows(spell_rows, summaries)
             avg_orders_per_run = format_rate(aggregate.total_orders / class_runs),
             avg_orders_per_using_run = format_rate(aggregate.total_orders / math.max(1, aggregate.runs_using)),
             max_orders_in_run = aggregate.max_orders_in_run,
+        }
+    end
+    return rows
+end
+
+local function aggregate_enemy_rows(summaries)
+    local class_totals = {}
+    local enemy_groups = {}
+
+    for _, row in ipairs(summaries) do
+        local class_name = row.class or ""
+        local start_level = tonumber(row.start_level) or 1
+        local run_group = group_key(class_name, start_level)
+        local class_total = class_totals[run_group]
+        if not class_total then
+            class_total = {
+                class = class_name,
+                start_level = start_level,
+                runs = 0,
+                kills = 0,
+                visible_enemy_frames = 0,
+                xp_from_kills = 0,
+                controlled_frames = 0,
+                combat_frames = 0,
+            }
+            class_totals[run_group] = class_total
+        end
+
+        class_total.runs = class_total.runs + 1
+        class_total.controlled_frames = class_total.controlled_frames + (tonumber(row.controlled_frames) or 0)
+        class_total.combat_frames = class_total.combat_frames + (tonumber(row.combat_frames) or 0)
+
+        local kills = decode_counts(row.monster_kills)
+        local visible_frames = decode_counts(row.visible_enemy_frames)
+        local seen = {}
+        for monster, count in pairs(kills) do
+            seen[monster] = true
+            class_total.kills = class_total.kills + count
+            class_total.xp_from_kills = class_total.xp_from_kills + count * enemy_xpaward(monster)
+        end
+        for monster, frames in pairs(visible_frames) do
+            seen[monster] = true
+            class_total.visible_enemy_frames = class_total.visible_enemy_frames + frames
+        end
+
+        for monster, _ in pairs(seen) do
+            local key = run_group .. "\n" .. monster
+            local group = enemy_groups[key]
+            if not group then
+                group = {
+                    class = class_name,
+                    start_level = start_level,
+                    monster = monster,
+                    run_group = run_group,
+                    runs_visible = 0,
+                    runs_killing = 0,
+                    kills = 0,
+                    visible_enemy_frames = 0,
+                    xpaward = enemy_xpaward(monster),
+                    xp_from_kills = 0,
+                }
+                enemy_groups[key] = group
+            end
+
+            local kill_count = kills[monster] or 0
+            local frame_count = visible_frames[monster] or 0
+            if kill_count > 0 then
+                group.runs_killing = group.runs_killing + 1
+            end
+            if frame_count > 0 then
+                group.runs_visible = group.runs_visible + 1
+            end
+            group.kills = group.kills + kill_count
+            group.visible_enemy_frames = group.visible_enemy_frames + frame_count
+            group.xp_from_kills = group.xp_from_kills + kill_count * group.xpaward
+        end
+    end
+
+    local rows = {}
+    for _, key in ipairs(sorted_group_keys(enemy_groups)) do
+        local group = enemy_groups[key]
+        local class_total = class_totals[group.run_group] or {}
+        local runs = math.max(1, class_total.runs or 0)
+        rows[#rows + 1] = {
+            class = group.class,
+            start_level = group.start_level,
+            monster = group.monster,
+            runs = class_total.runs or 0,
+            runs_visible = group.runs_visible,
+            runs_killing = group.runs_killing,
+            xpaward = group.xpaward,
+            kills = group.kills,
+            visible_enemy_frames = group.visible_enemy_frames,
+            avg_kills_per_run = format_rate(group.kills / runs),
+            avg_visible_enemy_frames_per_run = format_rate(group.visible_enemy_frames / runs),
+            kill_share = format_rate(safe_div(group.kills, class_total.kills)),
+            visible_frame_share = format_rate(safe_div(group.visible_enemy_frames, class_total.visible_enemy_frames)),
+            xp_from_kills = group.xp_from_kills,
+            xp_share = format_rate(safe_div(group.xp_from_kills, class_total.xp_from_kills)),
+            kills_per_1000_visible_enemy_frames = format_rate(safe_div(group.kills * 1000, group.visible_enemy_frames)),
+            kills_per_1000_controlled_frames = format_rate(safe_div(group.kills * 1000, class_total.controlled_frames)),
+            kills_per_1000_combat_frames = format_rate(safe_div(group.kills * 1000, class_total.combat_frames)),
         }
     end
     return rows
@@ -824,6 +955,18 @@ local function game_init(run, telemetry, bot_options)
     GameState.frame = 0
 end
 
+local function should_count_monster_death(monster)
+    local entry = World.players[1]
+    local player = entry and entry.instance
+    if not player then
+        return true
+    end
+    if monster.is_enemy == false then
+        return false
+    end
+    return monster.team ~= player.team
+end
+
 local function install_run_hooks(events_module, base_player_death, base_monster_death, run_state, telemetry)
     load_core_modules()
     local Events = events_module
@@ -842,8 +985,10 @@ local function install_run_hooks(events_module, base_player_death, base_monster_
     end
 
     Events.events.MonsterDeath = function(monster)
-        telemetry.monster_kills = telemetry.monster_kills or {}
-        telemetry.monster_kills[monster.name] = (telemetry.monster_kills[monster.name] or 0) + 1
+        if should_count_monster_death(monster) then
+            telemetry.monster_kills = telemetry.monster_kills or {}
+            telemetry.monster_kills[monster.name] = (telemetry.monster_kills[monster.name] or 0) + 1
+        end
         if base_monster_death then
             return base_monster_death(monster)
         end
@@ -908,6 +1053,7 @@ local function run_balance(raw_args)
     parser:option("--spells_out", "Spell order CSV output.", "saves/balance_spells.csv")
     parser:option("--aggregate_out", "Class aggregate CSV output.", "saves/balance_classes.csv")
     parser:option("--spell_stats_out", "Spell aggregate CSV output.", "saves/balance_spell_stats.csv")
+    parser:option("--enemy_stats_out", "Enemy aggregate CSV output.", "saves/balance_enemy_stats.csv")
     parser:option("--report_out", "Balance report CSV output.", "saves/balance_report.csv")
     parser:option("--min_report_runs", "Minimum runs per class before balance flags are considered stable.", "3")
     parser:option("--report_delta_pct", "Relative delta threshold for class-balance report flags.", "0.25")
@@ -933,18 +1079,20 @@ local function run_balance(raw_args)
     local function finish_all()
         local class_rows = aggregate_summary_rows(summaries)
         local spell_stat_rows = aggregate_spell_rows(spell_rows, summaries)
+        local enemy_stat_rows = aggregate_enemy_rows(summaries)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
         write_csv(args.out, summaries, {
             "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "outcome", "frames", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
-            "deaths", "deepest_floor", "current_floor", "map_label",
+            "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
+            "monster_kills", "visible_enemy_frames",
         })
         write_csv(args.samples_out, samples, {
             "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "frame", "reason", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
-            "deaths", "deepest_floor", "current_floor", "map_label",
+            "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
         })
@@ -961,22 +1109,32 @@ local function run_balance(raw_args)
             "total_orders", "avg_orders_per_run", "avg_orders_per_using_run",
             "max_orders_in_run",
         })
+        write_csv(args.enemy_stats_out, enemy_stat_rows, {
+            "class", "start_level", "monster", "runs", "runs_visible", "runs_killing",
+            "xpaward", "kills", "visible_enemy_frames",
+            "avg_kills_per_run", "avg_visible_enemy_frames_per_run",
+            "kill_share", "visible_frame_share", "xp_from_kills", "xp_share",
+            "kills_per_1000_visible_enemy_frames",
+            "kills_per_1000_controlled_frames",
+            "kills_per_1000_combat_frames",
+        })
         write_csv(args.report_out, report_rows, {
             "severity", "category", "class", "metric", "value", "baseline",
             "delta", "delta_pct", "message",
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 2,
+                schema_version = 3,
                 seed_mode = seed_mode,
                 runs = json_runs,
                 class_stats = class_rows,
                 spell_stats = spell_stat_rows,
+                enemy_stats = enemy_stat_rows,
                 balance_report = report_rows,
             })
         end
         print(string.format(
-            "Balance run complete: %d runs, %d samples. Wrote %s, %s, %s, %s, %s, %s, %s.",
+            "Balance run complete: %d runs, %d samples. Wrote %s, %s, %s, %s, %s, %s, %s, %s.",
             #summaries,
             #samples,
             args.out,
@@ -984,6 +1142,7 @@ local function run_balance(raw_args)
             args.spells_out,
             args.aggregate_out,
             args.spell_stats_out,
+            args.enemy_stats_out,
             args.report_out,
             args.json_out
         ))
@@ -1009,6 +1168,7 @@ local function run_balance(raw_args)
             spell_slot_orders = {},
             item_orders = {},
             monster_kills = {},
+            visible_enemy_frames = {},
         }
         local run_state = {done = false, outcome = "step_limit"}
         local bot_options = {

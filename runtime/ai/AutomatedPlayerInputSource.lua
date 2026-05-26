@@ -193,6 +193,12 @@ function AutomatedPlayerInputSource:_record_scalar(key, amount)
     increment(self.telemetry, key, amount)
 end
 
+function AutomatedPlayerInputSource:_record_visible_enemies(enemies)
+    for _, enemy in ipairs(enemies or {}) do
+        self:_record_counter("visible_enemy_frames", enemy.name)
+    end
+end
+
 function AutomatedPlayerInputSource:_set_move(dir)
     if dir and (dir[1] ~= 0 or dir[2] ~= 0) then
         self:set("move_direction", dir)
@@ -554,6 +560,7 @@ function AutomatedPlayerInputSource:step()
 
     local enemies = visible_enemies(self.player)
     self.telemetry.max_visible_enemies = math.max(self.telemetry.max_visible_enemies or 0, #enemies)
+    self:_record_visible_enemies(enemies)
 
     if self:_combat_action(enemies) then
         self:_clear_stall_state()
