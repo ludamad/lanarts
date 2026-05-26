@@ -11,6 +11,29 @@ TypeEffectUtils = require "spells.TypeEffectUtils"
 BonusesUtils = require "items.BonusesUtils"
 
 DataW.effect_create {
+    name: "BalanceDamageTracker"
+    apply_func: (obj, args) =>
+        @telemetry = args and args.telemetry
+    on_receive_damage_func: (attacker, defender, damage) =>
+        telemetry = @telemetry
+        if not telemetry or not damage or damage <= 0
+            return damage
+        source = "Unattributed"
+        if attacker
+            if attacker == defender
+                source = "Self"
+            elseif attacker.name and attacker.name ~= ""
+                source = attacker.name
+        telemetry.damage_taken_by_source or= {}
+        telemetry.damage_events_by_source or= {}
+        telemetry.damage_taken_by_source[source] = (telemetry.damage_taken_by_source[source] or 0) + damage
+        telemetry.damage_events_by_source[source] = (telemetry.damage_events_by_source[source] or 0) + 1
+        telemetry.damage_taken_total = (telemetry.damage_taken_total or 0) + damage
+        telemetry.damage_event_total = (telemetry.damage_event_total or 0) + 1
+        return damage
+}
+
+DataW.effect_create {
     name: "Poison"
     effected_sprite: "spr_effects.poison"
     poison_rate: 35
