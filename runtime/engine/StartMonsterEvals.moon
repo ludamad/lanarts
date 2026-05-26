@@ -11,6 +11,35 @@ World = require "core.World"
 MAX_TIME = 10000000
 CONFIGS = nil
 DEFAULT_CONFIGS = "BaseFighter,BaseNecromancer,BaseStormcaller,BasePyrocaster"
+SPAWN_SOURCE_FILES = {
+    "map_descs/Crypt.moon"
+    "map_descs/GraghsLair.moon"
+    "map_descs/Hell.moon"
+    "map_descs/HiveDepths.moon"
+    "map_descs/HiveEntrance.json"
+    "map_descs/HiveEntrance.moon"
+    "map_descs/OgreLair.moon"
+    "map_descs/OutpostEntrance.moon"
+    "map_descs/OutpostStockroom.moon"
+    "map_descs/Overworld.moon"
+    "map_descs/PixullochiaDepths.moon"
+    "map_descs/PixullochiaEntrance.moon"
+    "map_descs/SnakePitDepths.moon"
+    "map_descs/SnakePitEntrance.moon"
+    "map_descs/TempleChamber.moon"
+    "map_descs/TempleEntrance.moon"
+    "map_descs/TempleSanctum.moon"
+    "map_descs/Underdungeon.moon"
+    "map_descs/World.moon"
+    "maps/NewDungeons.moon"
+    "maps/OldMaps.lua"
+    "maps/Places.moon"
+    "maps/Region1.lua"
+}
+SUMMON_SOURCE_FILES = {
+    "enemies/Enemies.moon"
+}
+SOURCE_CONTEXT_CACHE = {}
 
 split_csv = (value) ->
     result = {}
@@ -68,6 +97,78 @@ write_csv = (path, rows, preferred_keys) ->
         append lines, table.concat(values, ",")
     file_dump_string(path, table.concat(lines, "\n"))
 
+strip_line_comment = (line) ->
+    return "" unless line
+    line\gsub("%-%-.*$", "")
+
+line_has_quoted_name = (line, name) ->
+    return false unless line and name
+    return true if line\find('"' .. name .. '"', 1, true)
+    return true if line\find("'" .. name .. "'", 1, true)
+    false
+
+source_refs_for_name = (name, files, only_summoner_lines = false) ->
+    refs = {}
+    for file in *files
+        contents = file_as_string(file)
+        continue unless contents
+        line_no = 0
+        for line in (contents .. "\n")\gmatch("(.-)\n")
+            line_no += 1
+            active_line = strip_line_comment(line)
+            continue if active_line == ""
+            if only_summoner_lines and not active_line\find("summoner_base", 1, true)
+                continue
+            if line_has_quoted_name(active_line, name)
+                append refs, "#{file}:#{line_no}"
+    return refs
+
+monster_source_context = (name) ->
+    cached = SOURCE_CONTEXT_CACHE[name]
+    return cached if cached
+    map_refs = source_refs_for_name(name, SPAWN_SOURCE_FILES)
+    summon_refs = source_refs_for_name(name, SUMMON_SOURCE_FILES, true)
+    refs = {}
+    for ref in *map_refs
+        append refs, "map:#{ref}"
+    for ref in *summon_refs
+        append refs, "summon:#{ref}"
+    status = if #map_refs > 0
+        "map_spawned"
+    elseif #summon_refs > 0
+        "summoned_only"
+    else
+        "definition_only"
+    cached = {:status, :refs}
+    SOURCE_CONTEXT_CACHE[name] = cached
+    return cached
+
+encounter_source_context = (spawns) ->
+    has_map, has_summon, all_map = false, false, true
+    refs = {}
+    for monster in *spawns
+        context = monster_source_context(monster)
+        if context.status == "map_spawned"
+            has_map = true
+        else
+            all_map = false
+        if context.status == "summoned_only"
+            has_summon = true
+        for ref in *context.refs
+            append refs, "#{monster}@#{ref}" if #refs < 12
+    status = if all_map and #spawns > 0
+        "map_spawned"
+    elseif has_map
+        "mixed_map_spawned"
+    elseif has_summon
+        "summoned_only"
+    else
+        "definition_only"
+    return {
+        :status
+        refs: table.concat(refs, ";")
+    }
+
 monster_aliases = () ->
     aliases = {}
     for name in *table.sorted_key_list(enemies)
@@ -124,6 +225,7 @@ make_encounter = (name, spawns) ->
     for monster in *spawns
         entry = enemies and enemies[monster]
         xpaward += tonumber(entry and entry.xpaward) or 0
+    source_context = encounter_source_context(spawns)
     return {
         :name
         :spawns
@@ -131,6 +233,8 @@ make_encounter = (name, spawns) ->
         monster_spawns: table.concat(spawns, "|")
         :xpaward
         monster_types: encounter_types(spawns)
+        source_status: source_context.status
+        source_refs: source_context.refs
     }
 
 parse_pack_spawn = (part, aliases) ->
@@ -293,6 +397,8 @@ aggregate_stats = (stats) ->
                 spawn_count: tonumber(row.spawn_count) or 1
                 monster_spawns: row.monster_spawns or row.monster
                 xpaward: tonumber(row.xpaward) or 0
+                source_status: row.source_status or ""
+                source_refs: row.source_refs or ""
                 config_primary_type: row.config_primary_type or ""
                 monster_types: row.monster_types or ""
                 primary_resistance: tonumber(row.primary_resistance) or 0
@@ -350,6 +456,8 @@ aggregate_stats = (stats) ->
             spawn_count: aggregate.spawn_count
             monster_spawns: aggregate.monster_spawns
             xpaward: aggregate.xpaward
+            source_status: aggregate.source_status
+            source_refs: aggregate.source_refs
             config_primary_type: aggregate.config_primary_type
             monster_types: aggregate.monster_types
             primary_resistance: format_rate aggregate.primary_resistance
@@ -419,7 +527,29 @@ matchup_note = (row) ->
     return "" unless primary_type != "" and primary_resistance > 0
     " #{row.monster} resists #{primary_type} damage (resist #{row.primary_resistance}, multiplier #{row.primary_resistance_multiplier})."
 
+source_note = (row) ->
+    status = row.source_status or ""
+    if status == "definition_only"
+        return " Source context: no active map or summoner references found."
+    if status == "summoned_only"
+        return " Source context: summon-only encounter."
+    if status == "mixed_map_spawned"
+        return " Source context: mixed map-spawned encounter."
+    return ""
+
+normalize_inactive_warning_severity = (value) ->
+    value = string.lower(tostring(value or "info"))
+    return "warning" if value == "warning"
+    return "info"
+
+warning_severity_for = (row, inactive_warning_severity) ->
+    status = row.source_status or ""
+    return inactive_warning_severity if status == "definition_only" or status == "summoned_only"
+    "warning"
+
 with_matchup_context = (row, data) ->
+    data.source_status = row.source_status or ""
+    data.source_refs = row.source_refs or ""
     data.config_primary_type = row.config_primary_type or ""
     data.monster_types = row.monster_types or ""
     data.primary_resistance = row.primary_resistance or ""
@@ -428,9 +558,10 @@ with_matchup_context = (row, data) ->
     data.monster_spawns = row.monster_spawns or ""
     return data
 
-build_report = (aggregate_rows, delta_pct, min_report_runs) ->
+build_report = (aggregate_rows, delta_pct, min_report_runs, inactive_warning_severity) ->
     delta_pct = tonumber(delta_pct) or 0.5
     min_report_runs = tonumber(min_report_runs) or 1
+    inactive_warning_severity = normalize_inactive_warning_severity(inactive_warning_severity)
     reports = {}
     damage_per_xp_mean = mean_by_config_level(aggregate_rows, "contact_damage_per_xp")
     damage_rate_mean = mean_by_config_level(aggregate_rows, "contact_damage_per_1000_frames")
@@ -452,7 +583,7 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
 
         if step_limit_rate > 0
             append reports, with_matchup_context row, {
-                severity: "warning"
+                severity: warning_severity_for(row, inactive_warning_severity)
                 category: "toughness"
                 config_name: row.config_name
                 level: row.level
@@ -462,7 +593,7 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: "0.000"
                 delta: row.step_limit_rate
                 delta_pct: row.step_limit_rate
-                message: "#{row.monster} survives to the step limit in #{row.step_limit_rate} of #{row.config_name} L#{row.level} runs.#{matchup_note(row)}"
+                message: "#{row.monster} survives to the step limit in #{row.step_limit_rate} of #{row.config_name} L#{row.level} runs.#{matchup_note(row)}#{source_note(row)}"
             }
 
         if no_contact_step_limit_rate > 0
@@ -477,12 +608,12 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: "0.000"
                 delta: row.no_contact_step_limit_rate
                 delta_pct: row.no_contact_step_limit_rate
-                message: "#{row.monster} had no combat contact before the step limit in #{row.no_contact_step_limit_rate} of #{row.config_name} L#{row.level} runs.#{matchup_note(row)}"
+                message: "#{row.monster} had no combat contact before the step limit in #{row.no_contact_step_limit_rate} of #{row.config_name} L#{row.level} runs.#{matchup_note(row)}#{source_note(row)}"
             }
 
         if threat_baseline > 0 and damage_per_xp > threat_baseline * (1 + delta_pct)
             append reports, with_matchup_context row, {
-                severity: "warning"
+                severity: warning_severity_for(row, inactive_warning_severity)
                 category: "reward"
                 config_name: row.config_name
                 level: row.level
@@ -492,12 +623,12 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: format_rate threat_baseline
                 delta: format_rate(damage_per_xp - threat_baseline)
                 delta_pct: format_rate safe_div(damage_per_xp - threat_baseline, threat_baseline)
-                message: "#{row.monster} deals #{row.contact_damage_per_xp} contact damage per XP versus #{format_rate(threat_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}"
+                message: "#{row.monster} deals #{row.contact_damage_per_xp} contact damage per XP versus #{format_rate(threat_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}#{source_note(row)}"
             }
 
         if xpaward <= 0 and damage_rate > 0
             append reports, with_matchup_context row, {
-                severity: "warning"
+                severity: warning_severity_for(row, inactive_warning_severity)
                 category: "reward"
                 config_name: row.config_name
                 level: row.level
@@ -507,7 +638,7 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: ""
                 delta: ""
                 delta_pct: ""
-                message: "#{row.monster} deals damage but awards no XP in #{row.config_name} L#{row.level} evals.#{matchup_note(row)}"
+                message: "#{row.monster} deals damage but awards no XP in #{row.config_name} L#{row.level} evals.#{matchup_note(row)}#{source_note(row)}"
             }
 
         if damage_baseline > 0 and damage_rate > damage_baseline * (1 + delta_pct)
@@ -522,7 +653,7 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: format_rate damage_baseline
                 delta: format_rate(damage_rate - damage_baseline)
                 delta_pct: format_rate safe_div(damage_rate - damage_baseline, damage_baseline)
-                message: "#{row.monster} contact damage pace is #{row.contact_damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}"
+                message: "#{row.monster} contact damage pace is #{row.contact_damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}#{source_note(row)}"
             }
 
         if kill_rate == 1 and frame_baseline > 0 and avg_frames > frame_baseline * (1 + delta_pct)
@@ -537,7 +668,7 @@ build_report = (aggregate_rows, delta_pct, min_report_runs) ->
                 baseline: format_rate frame_baseline
                 delta: format_rate(avg_frames - frame_baseline)
                 delta_pct: format_rate safe_div(avg_frames - frame_baseline, frame_baseline)
-                message: "#{row.monster} takes #{row.contact_avg_frames} contact frames to kill versus #{format_rate(frame_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}"
+                message: "#{row.monster} takes #{row.contact_avg_frames} contact frames to kill versus #{format_rate(frame_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}#{source_note(row)}"
             }
 
     table.sort reports, (a, b) ->
@@ -738,6 +869,8 @@ dump_stats = (config, encounter, seed, run_index, outcome, run_state) ->
         spawn_count: encounter.spawn_count
         monster_spawns: encounter.monster_spawns
         xpaward: encounter.xpaward
+        source_status: encounter.source_status
+        source_refs: encounter.source_refs
         :config_primary_type
         monster_types: encounter.monster_types
         :primary_resistance
@@ -773,6 +906,7 @@ run_bot_tests = (raw_args) ->
     parser\option("--json_out", "JSON output containing raw, aggregate, and report rows.", "saves/monster_stats.json")
     parser\option("--report_delta_pct", "Relative deviation needed for report warnings.", 0.5)
     parser\option("--min_report_runs", "Minimum aggregate runs before report warnings are emitted.", 1)
+    parser\option("--inactive_warning_severity", "Severity for warning-class findings on definition-only or summon-only encounters: info or warning.", "info")
     parser\option("--comparison_event_log", "Event log to compare to.", nil)
     args = parser\parse(raw_args)
 
@@ -794,10 +928,10 @@ run_bot_tests = (raw_args) ->
             return _iterate selected_configs, monster_eval_step(level, stats, selected_encounters), next_level
         return _iterate selected_levels, level_eval_step, () ->
             aggregate_rows = aggregate_stats(stats)
-            report_rows = build_report(aggregate_rows, args.report_delta_pct, args.min_report_runs)
+            report_rows = build_report(aggregate_rows, args.report_delta_pct, args.min_report_runs, args.inactive_warning_severity)
             write_csv args.out, stats, {
                 "config_name", "run_index", "seed", "level", "monster", "spawn_count",
-                "monster_spawns", "xpaward",
+                "monster_spawns", "xpaward", "source_status", "source_refs",
                 "config_primary_type", "monster_types", "primary_resistance",
                 "primary_resistance_multiplier",
                 "outcome", "frames", "player_damage", "gross_player_damage",
@@ -808,7 +942,7 @@ run_bot_tests = (raw_args) ->
             }
             write_csv args.aggregate_out, aggregate_rows, {
                 "config_name", "level", "monster", "runs", "contact_runs", "contact_run_rate",
-                "spawn_count", "monster_spawns", "xpaward",
+                "spawn_count", "monster_spawns", "xpaward", "source_status", "source_refs",
                 "config_primary_type", "monster_types", "primary_resistance",
                 "primary_resistance_multiplier",
                 "enemy_kill_rate", "step_limit_rate", "no_contact_step_limit_rate", "player_death_rate",
@@ -828,14 +962,14 @@ run_bot_tests = (raw_args) ->
             }
             write_csv args.report_out, report_rows, {
                 "severity", "category", "config_name", "level", "monster",
-                "spawn_count", "monster_spawns",
+                "spawn_count", "monster_spawns", "source_status", "source_refs",
                 "config_primary_type", "monster_types", "primary_resistance",
                 "primary_resistance_multiplier",
                 "metric", "value", "baseline", "delta", "delta_pct", "message"
             }
             if args.json_out and args.json_out != ""
                 file_dump_json args.json_out, {
-                    schema_version: 4
+                    schema_version: 5
                     seed: tostring(args.seed)
                     runs_per_config_monster: tonumber(args.runs)
                     runs_per_config_encounter: tonumber(args.runs)

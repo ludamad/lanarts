@@ -85,3 +85,8 @@ Monster simulations:
     types, and the monster's resistance to that primary damage. Report messages
     call out resisted primary matchups so elemental-counter warnings can be
     separated from raw enemy overtuning.
+    Raw, aggregate, and report rows include source_status and source_refs
+    columns. Map-spawned enemies keep warning severity, while definition-only
+    or summon-only encounters are downgraded to info by default so --monster all
+    highlights live enemy balance first. Use --inactive_warning_severity warning
+    when intentionally tuning inactive definitions or summon-only monsters.
