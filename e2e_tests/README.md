@@ -19,7 +19,9 @@ Balance simulations:
     so low kill totals can be separated from low encounter contact.
     The report emits contact warnings when combat-frame exposure is far from
     baseline and suppresses raw-kill underperformance flags when combat-adjusted
-    kill rate is still in range.
+    kill rate is still in range. It also suppresses combat-efficiency
+    underperformance flags for high-contact runs when overall kill pacing is in
+    range.
     Ability-order totals are kept in the raw tables for behavior analysis, but
     are not used as cross-class balance report flags.
     Item-order totals are also raw telemetry; inventory access differs by class.

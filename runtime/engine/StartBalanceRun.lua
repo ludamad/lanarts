@@ -485,6 +485,10 @@ BASELINE_METRICS[#BASELINE_METRICS + 1] = {
     key = "combat_frame_rate",
     label = "combat contact rate",
 }
+BASELINE_METRICS[#BASELINE_METRICS + 1] = {
+    key = "kills_per_1000_controlled_frames",
+    label = "kills per 1000 controlled frames",
+}
 
 local function report_severity(metric, delta)
     if delta == 0 then
@@ -639,6 +643,8 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
             or 0
         local low_combat_contact = combat_rate_baseline > 0
             and combat_rate_delta_pct <= -relative_threshold
+        local high_combat_contact = combat_rate_baseline > 0
+            and combat_rate_delta_pct >= relative_threshold
         if combat_rate_baseline > 0 and math.abs(combat_rate_delta_pct) >= relative_threshold then
             local severity = low_combat_contact and "warning" or "info"
             add_report_row(
@@ -650,7 +656,7 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                 combat_rate,
                 combat_rate_baseline,
                 string.format(
-                    "%s combat contact rate is %.1f%% versus %.1f%% baseline; raw kill totals may reflect encounter exposure.",
+                    "%s combat contact rate is %.1f%% versus %.1f%% baseline; kill metrics may reflect encounter exposure.",
                     class_name,
                     combat_rate * 100,
                     combat_rate_baseline * 100
@@ -674,6 +680,16 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                 local combat_kill_baseline = baselines.kills_per_1000_combat_frames or 0
                 if combat_kill_baseline > 0
                     and combat_kill_rate >= combat_kill_baseline * (1 - relative_threshold)
+                then
+                    flagged = false
+                end
+            end
+            if flagged and metric.key == "kills_per_1000_combat_frames"
+                and delta < 0 and high_combat_contact then
+                local controlled_kill_rate = tonumber(row.kills_per_1000_controlled_frames) or 0
+                local controlled_kill_baseline = baselines.kills_per_1000_controlled_frames or 0
+                if controlled_kill_baseline > 0
+                    and controlled_kill_rate >= controlled_kill_baseline * (1 - relative_threshold)
                 then
                     flagged = false
                 end
