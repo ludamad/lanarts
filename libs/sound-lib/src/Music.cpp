@@ -28,6 +28,10 @@ namespace lsound {
 	}
 
 	void Music::init(const std::string& filename) {
+		if (lsound::muted()) {
+			clear();
+			return;
+		}
 //#ifdef EMSCRIPTEN
 //    Mix_Music* mm = NULL;
 //#else

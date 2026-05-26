@@ -795,6 +795,9 @@ LuaValue& GameState::lua_input() {
 static std::map<std::string, lsound::Sound> SOUND_MAP;
 
 void play(lsound::Sound& sound, const char* path) {
+        if (lsound::muted()) {
+            return;
+        }
         if (sound.empty()) {
             sound = lsound::load_sound(path);
         } 
@@ -806,6 +809,10 @@ void play(const char* sound_path) {
 }
 
 void GameState::loop(lsound::Sound& sound, const char* path) {
+        if (lsound::muted()) {
+            current_music_path.clear();
+            return;
+        }
         if (sound.empty()) {
             sound = lsound::load_music(path);
         }

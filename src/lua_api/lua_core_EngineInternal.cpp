@@ -44,7 +44,11 @@
 static int engine_initialize_subsystems(lua_State *L) {
     lanarts_net_init(true);
     lsound::init();
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) < 0) {
+    Uint32 sdl_flags = SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER;
+    if (!lsound::muted()) {
+        sdl_flags |= SDL_INIT_AUDIO;
+    }
+    if (SDL_Init(sdl_flags) < 0) {
         printf("SDL_Init failed: %s\n", SDL_GetError());
         exit(1);
     }

@@ -11,7 +11,12 @@
 #include <lcommon/sdl_headless_support.h>
 
 namespace lsound {
-	static double CURRENT_VOLUME = 1.0;
+	static double CURRENT_VOLUME = 0.0;
+
+	static bool env_mute_audio() {
+		const char* value = getenv("LANARTS_MUTE_AUDIO");
+		return value != NULL && value[0] != '\0' && value[0] != '0';
+	}
 
 	static double clamped_volume(double volume) {
 		if (volume < 0.0) {
@@ -28,6 +33,11 @@ namespace lsound {
 	}
 
 	int init(int nchannels) {
+		if (env_mute_audio()) {
+			CURRENT_VOLUME = 0.0;
+			return 0;
+		}
+
 		/* We're going to be requesting certain things from our audio
 		 device, so we set them up beforehand */
 		int audio_rate = 22050;
@@ -78,6 +88,10 @@ namespace lsound {
 	}
 
 	void set_volume(double volume) {
+		if (env_mute_audio()) {
+			CURRENT_VOLUME = 0.0;
+			return;
+		}
 		CURRENT_VOLUME = clamped_volume(volume);
 		int mix_volume = volume_to_mix(volume);
 		Mix_Volume(-1, mix_volume);
@@ -93,6 +107,6 @@ namespace lsound {
 	}
 
 	bool muted() {
-		return CURRENT_VOLUME <= 0.0;
+		return env_mute_audio() || CURRENT_VOLUME <= 0.0;
 	}
 }

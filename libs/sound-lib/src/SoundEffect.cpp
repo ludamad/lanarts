@@ -28,6 +28,10 @@ namespace lsound {
 	}
 
 	void SoundEffect::init(const std::string& filename) {
+		if (lsound::muted()) {
+			clear();
+			return;
+		}
 		Mix_Chunk* snd = Mix_LoadWAV(filename.c_str());
 		clear();
 		if (snd) {

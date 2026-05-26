@@ -84,6 +84,9 @@ fi
 if handle_flag "--small" || handle_flag "-s" ; then
     export LANARTS_SMALL=1
 fi
+if handle_flag "--audio" ; then
+    export LANARTS_ENABLE_AUDIO=1
+fi
 if handle_flag "--luajit" || handle_flag "-lj" ; then
     export BUILD_LUAJIT=1
 fi
@@ -194,6 +197,10 @@ fi
 function run_lanarts(){
     cd runtime
     export vblank_mode=0
+    if [ -z "$LANARTS_ENABLE_AUDIO" ] ; then
+        export LANARTS_MUTE_AUDIO=1
+        export SDL_AUDIODRIVER=dummy
+    fi
     if handle_flag "--gdb" || handle_flag "-g" ; then
         echo "Wrapping in GDB:" | colorify '1;35'
         gdb -silent -x ../debug.gdb --args ../build/src/lanarts "${args[@]}"

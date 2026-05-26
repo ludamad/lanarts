@@ -29,6 +29,9 @@ engine_init = (settings) ->
     if os.getenv("LANARTS_INVINCIBLE")
         settings.invincible = true
 
+    if os.getenv("LANARTS_MUTE_AUDIO")
+        settings.volume = 0
+
     log "Initializing GameState api..."
     with_mutable_globals () ->
         EngineInternal.init_gamestate_api(settings)
