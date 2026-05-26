@@ -619,9 +619,15 @@ DataW.enemy_create {
     xpaward: 250
     unique: true
     types: {"Red", "Bludgeon"}
+    resistances: {
+        Red: -2
+        White: -2
+        Black: 2
+        Bludgeon: 1
+    }
     stats: {
         attacks: {{weapon: "Basic Melee"}}
-        hp: 120
+        hp: 140
         hpregen: 0.02
         movespeed: 2.9
         strength: 28
