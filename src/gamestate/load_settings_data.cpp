@@ -28,6 +28,7 @@ void save_settings_data(GameSettings& settings, const char* filename) {
 		save_yaml_attr(file, "steps_per_draw", settings.steps_per_draw);
 		save_yaml_attr(file, "time_per_step", settings.time_per_step);
 		save_yaml_attr(file, "frame_action_repeat", settings.frame_action_repeat);
+		save_yaml_attr(file, "volume", settings.volume);
 
                 if (!settings.class_type.empty()) {
                     save_yaml_attr(file, "class", settings.class_type);
@@ -84,6 +85,11 @@ bool load_settings_data(GameSettings& settings, const char* filename) {
                             settings.invincible = true;
                         }
 			optional_set(root, "time_per_step", settings.time_per_step);
+			optional_set(root, "volume", settings.volume);
+			if (settings.volume < 0.0f)
+				settings.volume = 0.0f;
+			if (settings.volume > 1.0f)
+				settings.volume = 1.0f;
 			optional_set(root, "draw_diagnostics", settings.draw_diagnostics);
 			optional_set(root, "username", settings.username);
 			optional_set(root, "network_debug_mode",

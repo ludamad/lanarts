@@ -34,6 +34,7 @@ struct GameSettings {
 	float time_per_step;
 	int frame_action_repeat;
 	bool free_memory_while_idle;
+	float volume;
 
 	/*Debug options*/
 	bool draw_diagnostics, verbose_output;
@@ -65,6 +66,7 @@ struct GameSettings {
 		time_per_step = 16;
 		frame_action_repeat = 0;
 		free_memory_while_idle = false;
+		volume = 0.75f;
 
 		font = "fonts/Gudea-Regular.ttf";
 		menu_font = "fonts/Gudea-Regular.ttf";

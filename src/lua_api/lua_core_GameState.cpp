@@ -226,6 +226,7 @@ LuaValue luaapi_settings_proxy(lua_State* L) {
 	BIND(steps_per_draw);
 	BIND(frame_action_repeat);
 	BIND(free_memory_while_idle);
+	BIND(volume);
 	BIND(invincible);
 	BIND(time_per_step);
 	BIND(draw_diagnostics);

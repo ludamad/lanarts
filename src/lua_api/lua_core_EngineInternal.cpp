@@ -66,6 +66,7 @@ static void engine_init_gamestate_api(LuaValue lsettings) {
     lua_State* L = lsettings.luastate();
     GameSettings settings; // Initialized with defaults
     settings.parse(lsettings);
+    lsound::set_volume(settings.volume);
 
     ensure_fs_init();
     bool can_create_saves = ensure_directory("saves");

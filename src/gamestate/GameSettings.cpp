@@ -64,6 +64,11 @@ void GameSettings::parse(LuaValue& lsettings) {
         frame_action_repeat = 0;
     optional_fill(lsettings, "invincible", invincible);
     optional_fill(lsettings, "time_per_step", time_per_step);
+    optional_fill(lsettings, "volume", volume);
+    if (volume < 0.0f)
+        volume = 0.0f;
+    if (volume > 1.0f)
+        volume = 1.0f;
     optional_fill(lsettings, "draw_diagnostics", draw_diagnostics);
     optional_fill(lsettings, "username", username);
     optional_fill(lsettings, "network_debug_mode",

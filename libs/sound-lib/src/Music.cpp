@@ -30,23 +30,27 @@ namespace lsound {
 //#ifdef EMSCRIPTEN
 //    Mix_Music* mm = NULL;
 //#else
-    Mix_Music* mm = Mix_LoadMUS(filename.c_str());
+		Mix_Music* mm = Mix_LoadMUS(filename.c_str());
 //#endif
 		clear();
 		if (mm) {
 			_music = smartptr<Mix_Music>(mm, __freemusic_callback);
 		} else {
-                    //printf("Music Error %s\n",Mix_GetError());
-                }
+			printf("Music Error: Could not load '%s': %s\n",
+					filename.c_str(), Mix_GetError());
+		}
 	}
 
 	void Music::play() const {
 		if (_music) {
-			Mix_PlayMusic(_music.get(), 0);
+			if (Mix_PlayMusic(_music.get(), 0) == -1) {
+				printf("Music Error: Could not play music: %s\n", Mix_GetError());
+			}
 		} else {
-                    //printf("Music Error %s\n",Mix_GetError());
-                }
+			printf("Music Error: No music loaded to play: %s\n", Mix_GetError());
+		}
 	}
+
 	void Music::clear() {
 		_music = smartptr<Mix_Music>();
 	}
@@ -57,10 +61,12 @@ namespace lsound {
 
 	void Music::loop() const {
 		if (_music) {
-			Mix_PlayMusic(_music.get(), -1);
+			if (Mix_PlayMusic(_music.get(), -1) == -1) {
+				printf("Music Error: Could not loop music: %s\n", Mix_GetError());
+			}
 		} else {
-                        //printf("Music Error %s\n",Mix_GetError());
-                }
+			printf("Music Error: No music loaded to loop: %s\n", Mix_GetError());
+		}
 	}
 
 	Sound load_music(const std::string& filename) {

@@ -39,12 +39,12 @@ LuaValue lua_soundmetatable(lua_State* L) {
 	return meta;
 }
 
-static void set_volume(LuaStackValue table, LuaStackValue key, double volume) {
-	Mix_Volume(-1, volume * double(MIX_MAX_VOLUME));
+static void set_sound_volume(LuaStackValue table, LuaStackValue key, double volume) {
+	lsound::set_volume(volume);
 }
 
-static double get_volume(LuaStackValue table, LuaStackValue key) {
-	return Mix_Volume(-1, -1) / double(MIX_MAX_VOLUME);
+static double get_sound_volume(LuaStackValue table, LuaStackValue key) {
+	return lsound::get_volume();
 }
 
 void lua_register_lsound(lua_State* L, const LuaModule& module) {
@@ -52,6 +52,6 @@ void lua_register_lsound(lua_State* L, const LuaModule& module) {
 
 	module.values["music_load"].bind_function(load_music);
 	module.values["sound_load"].bind_function(load_sound);
-	module.setters["sound_volume"].bind_function(set_volume);
-	module.getters["sound_volume"].bind_function(get_volume);
+	module.setters["sound_volume"].bind_function(set_sound_volume);
+	module.getters["sound_volume"].bind_function(get_sound_volume);
 }

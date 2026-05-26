@@ -4,6 +4,7 @@
  */
 
 #include <SDL.h>
+#include <cstdlib>
 
 #undef GL_GLEXT_VERSION
 #ifndef __EMSCRIPTEN__
@@ -24,6 +25,21 @@
 static SDL_Window *MAIN_WINDOW = NULL;
 static SDL_GLContext MAIN_GL_CONTEXT = NULL;
 static Size RENDER_SIZE;
+
+static bool should_use_vsync() {
+    const char* value = getenv("LANARTS_VSYNC");
+    return value && value[0] != '\0' && value[0] != '0';
+}
+
+static void configure_swap_interval() {
+    if (should_use_vsync()) {
+        if (SDL_GL_SetSwapInterval(-1) != 0 && SDL_GL_SetSwapInterval(1) != 0) {
+            fprintf(stderr, "Couldn't enable vsync: %s\n", SDL_GetError());
+        }
+    } else if (SDL_GL_SetSwapInterval(0) != 0) {
+        fprintf(stderr, "Couldn't disable vsync: %s\n", SDL_GetError());
+    }
+}
 //
 //static
 //ImVec2          DisplayPos;             // Top-left position of the viewport to render (== top-left of the orthogonal projection matrix to use) (== GetMainViewport()->Pos for the main viewport, == (0.0) in most single-viewport applications)
@@ -99,12 +115,7 @@ static void gl_sdl_initialize(const char *window_name, int w, int h, bool fullsc
         // Create an OpenGL context associated with the window.
         MAIN_GL_CONTEXT = SDL_GL_CreateContext(MAIN_WINDOW);
         SDL_GL_MakeCurrent(MAIN_WINDOW, MAIN_GL_CONTEXT);
-        // Enable vsync with catchup
-        if (SDL_GL_SetSwapInterval(-1) != 0) {
-            // Enable vsync without catchup if not supported
-//            SDL_GL_SetSwapInterval(1);
-            SDL_GL_SetSwapInterval(0);
-        }
+        configure_swap_interval();
     }
     if (MAIN_WINDOW == NULL) {
         fprintf(stderr, "Couldn't set GL mode: %s\n", SDL_GetError());
