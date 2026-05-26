@@ -271,7 +271,7 @@ DataW.spell_create {
     cooldown: 45,
     can_cast_with_held_key: false,
     fallback_to_melee: false,
-    spell_cooldown: 200
+    spell_cooldown: 320
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) ->
         --if caster.stats.hp < 50 then
@@ -283,7 +283,8 @@ DataW.spell_create {
             if caster\is_local_player()
                 EventLog.add("You must be a necromancer to cast this spell!", {200,200,255})
             return false
-        amount = math.max 1, math.ceil((caster\effective_stats().willpower - 4) / 2)
+        amount = math.max 1, math.ceil((caster\effective_stats().willpower - 8) / 4)
+        amount = math.min amount, caster.stats.level
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons >= amount
             if caster\is_local_player()
@@ -302,12 +303,15 @@ DataW.spell_create {
                 --eff = obj\add_effect("DiesOutsideOfSummonerRange", INFINITE_DURATION)
                 -- eff.summoner = caster
                 -- Buff this monster based on caster's willpower:
-                obj.stats.hp += math.floor(caster\effective_stats().willpower * 5)
-                obj.stats.max_hp += math.floor(caster\effective_stats().willpower * 5)
-                obj.stats.strength += math.floor(caster\effective_stats().willpower / 2)
-                obj.stats.magic += math.floor(caster\effective_stats().willpower / 2)
-                obj.stats.defence += math.floor(caster\effective_stats().willpower / 2)
-                obj.stats.willpower += math.floor(caster\effective_stats().willpower / 2)
+                willpower = caster\effective_stats().willpower
+                hp_bonus = math.floor(willpower * 3)
+                stat_bonus = math.floor(willpower / 3)
+                obj.stats.hp += hp_bonus
+                obj.stats.max_hp += hp_bonus
+                obj.stats.strength += stat_bonus
+                obj.stats.magic += stat_bonus
+                obj.stats.defence += stat_bonus
+                obj.stats.willpower += stat_bonus
             eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
             eff.duration = 5
 }

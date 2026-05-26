@@ -62,7 +62,7 @@ DataW.spell_create {
     can_cast_with_cooldown: false
     mp_cost: 10
     cooldown: 25
-    spell_cooldown: 400
+    spell_cooldown: 550
     fallback_to_melee: false
     prereq_func: (obj) ->
         return true
@@ -72,7 +72,7 @@ DataW.spell_create {
         bpower = TypeEffectUtils.get_power(obj, "Black")
         ObjectUtils.nearby_square_iterate obj, (xy) ->
             mon = SummonUtils.summon_one_hit_monster(obj, xy, "SummonedSkeleton", 100 + bpower * 10)
-            mon.stats.strength = obj.stats.willpower / 3
+            mon.stats.strength = obj.stats.willpower / 4
             n_summoned += 1
             return n_summoned >= 10 + obj.stats.level * 3 + bpower * 2
 }
