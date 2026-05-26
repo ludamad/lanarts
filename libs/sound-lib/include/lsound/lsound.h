@@ -16,6 +16,7 @@ namespace lsound {
 	void stop_sounds();
 	void set_volume(double volume);
 	double get_volume();
+	bool muted();
 
 	Sound load_music(const std::string& filename);
 	Sound load_sound(const std::string& filename);

@@ -11,12 +11,19 @@
 #include <lcommon/sdl_headless_support.h>
 
 namespace lsound {
-	static int volume_to_mix(double volume) {
+	static double CURRENT_VOLUME = 1.0;
+
+	static double clamped_volume(double volume) {
 		if (volume < 0.0) {
-			volume = 0.0;
+			return 0.0;
 		} else if (volume > 1.0) {
-			volume = 1.0;
+			return 1.0;
 		}
+		return volume;
+	}
+
+	static int volume_to_mix(double volume) {
+		volume = clamped_volume(volume);
 		return int(volume * double(MIX_MAX_VOLUME) + 0.5);
 	}
 
@@ -66,13 +73,26 @@ namespace lsound {
 		Mix_HaltMusic();
 	}
 
+	void stop_sounds() {
+		Mix_HaltChannel(-1);
+	}
+
 	void set_volume(double volume) {
+		CURRENT_VOLUME = clamped_volume(volume);
 		int mix_volume = volume_to_mix(volume);
 		Mix_Volume(-1, mix_volume);
 		Mix_VolumeMusic(mix_volume);
+		if (mix_volume == 0) {
+			stop_sounds();
+			stop_music();
+		}
 	}
 
 	double get_volume() {
-		return Mix_VolumeMusic(-1) / double(MIX_MAX_VOLUME);
+		return CURRENT_VOLUME;
+	}
+
+	bool muted() {
+		return CURRENT_VOLUME <= 0.0;
 	}
 }
