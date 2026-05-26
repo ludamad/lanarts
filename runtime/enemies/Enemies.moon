@@ -1199,7 +1199,7 @@ DataW.enemy_create {
         hp: 80
         hpregen: 0.08
         movespeed: 4
-        strength: 45
+        strength: 40
         defence: 10
         willpower: 10
     }
