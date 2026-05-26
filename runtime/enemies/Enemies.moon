@@ -1724,12 +1724,12 @@ DataW.enemy_create {
     appear_message: "A golem eyes you with a cold gaze!"
     defeat_message: "The golem breaks apart."
     radius: 14
-    xpaward: 55
+    xpaward: 75
     stats: {
-        hp: 200
+        hp: 175
         hpregen: 0
         movespeed: 1
-        strength: 24
+        strength: 20
         defence: 10
         willpower: 10
     }
