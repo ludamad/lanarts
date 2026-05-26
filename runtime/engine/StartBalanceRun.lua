@@ -708,6 +708,31 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                     flagged = false
                 end
             end
+            if flagged and metric.key == "kills_per_1000_combat_frames"
+                and delta > 0 and low_combat_contact then
+                local controlled_kill_rate = tonumber(row.kills_per_1000_controlled_frames) or 0
+                local controlled_kill_baseline = baselines.kills_per_1000_controlled_frames or 0
+                if controlled_kill_baseline > 0
+                    and controlled_kill_rate <= controlled_kill_baseline * (1 + relative_threshold)
+                then
+                    flagged = false
+                    add_report_row(
+                        rows,
+                        class_name,
+                        "info",
+                        "pacing",
+                        metric.key,
+                        value,
+                        baseline,
+                        string.format(
+                            "%s combat kill rate is %.3f versus %.3f baseline under lower contact, but overall kill pacing is in range.",
+                            class_name,
+                            value,
+                            baseline
+                        )
+                    )
+                end
+            end
             if flagged and metric.key == "kills_per_1000_combat_frames" and delta < 0 then
                 local controlled_kill_rate = tonumber(row.kills_per_1000_controlled_frames) or 0
                 local controlled_kill_baseline = baselines.kills_per_1000_controlled_frames or 0
