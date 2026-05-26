@@ -416,6 +416,8 @@ aggregate_stats = (stats) ->
         contact = had_contact(row)
         aggregate.contact_runs += 1 if contact
         outcome = row.outcome or "unknown"
+        if outcome == "game_won"
+            outcome = "enemy_killed"
         if outcome == "step_limit" and not contact
             outcome = "no_contact_step_limit"
         aggregate.outcomes[outcome] = (aggregate.outcomes[outcome] or 0) + 1
@@ -573,6 +575,7 @@ build_report = (aggregate_rows, delta_pct, min_report_runs, inactive_warning_sev
         kill_rate = tonumber(row.enemy_kill_rate) or 0
         step_limit_rate = tonumber(row.step_limit_rate) or 0
         no_contact_step_limit_rate = tonumber(row.no_contact_step_limit_rate) or 0
+        contact_runs = tonumber(row.contact_runs) or 0
         damage_per_xp = tonumber(row.contact_damage_per_xp) or 0
         damage_rate = tonumber(row.contact_damage_per_1000_frames) or 0
         avg_frames = tonumber(row.contact_avg_frames) or 0
@@ -654,6 +657,21 @@ build_report = (aggregate_rows, delta_pct, min_report_runs, inactive_warning_sev
                 delta: format_rate(damage_rate - damage_baseline)
                 delta_pct: format_rate safe_div(damage_rate - damage_baseline, damage_baseline)
                 message: "#{row.monster} contact damage pace is #{row.contact_damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}#{source_note(row)}"
+            }
+
+        if contact_runs > 0 and damage_baseline > 0 and damage_rate < damage_baseline * (1 - delta_pct)
+            append reports, with_matchup_context row, {
+                severity: "info"
+                category: "underthreat"
+                config_name: row.config_name
+                level: row.level
+                monster: row.monster
+                metric: "contact_damage_per_1000_frames"
+                value: row.contact_damage_per_1000_frames
+                baseline: format_rate damage_baseline
+                delta: format_rate(damage_rate - damage_baseline)
+                delta_pct: format_rate safe_div(damage_rate - damage_baseline, damage_baseline)
+                message: "#{row.monster} contact damage pace is only #{row.contact_damage_per_1000_frames} per 1000 frames versus #{format_rate(damage_baseline)} baseline for #{row.config_name} L#{row.level}.#{matchup_note(row)}#{source_note(row)}"
             }
 
         if kill_rate == 1 and frame_baseline > 0 and avg_frames > frame_baseline * (1 + delta_pct)
