@@ -1702,18 +1702,18 @@ DataW.enemy_create {
     sprite: "jester"
     death_sprite: "green blood"
     radius: 12
-    xpaward: 35
+    xpaward: 55
     appear_message: "An odd and quick creature appears!"
     defeat_message: "The odd and quick creature has been destroyed."
     types: {"Black"}
     stats:
         attacks: { {weapon: "Basic Melee"} }
-        hp: 100
+        hp: 80
         hpregen: 0.06
         movespeed: 5
-        strength: 30
-        defence: 25
-        willpower: 25
+        strength: 25
+        defence: 20
+        willpower: 20
     }
 }
 
