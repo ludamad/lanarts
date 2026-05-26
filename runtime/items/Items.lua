@@ -170,7 +170,9 @@ local function scroll_of_exp_func(self, user)
     -- Collect ally players.
     local ally_players = {user}
     for _, ally in ipairs(Map.allies_list(user)) do
-        append(ally_players, ally)
+        if ally.gain_xp then
+            append(ally_players, ally)
+        end
     end
     -- Grant all of them an XP share.
     local xp_granted = 100 / #ally_players
