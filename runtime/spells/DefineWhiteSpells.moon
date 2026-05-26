@@ -11,16 +11,24 @@ M = nilprotect {
     _bolt: tosprite "spr_spells.spell_icon_lightning_bolt"
 }
 
+BOSS_STUN_CHANCE_MULTIPLIER = 0.35
+BOSS_STUN_DURATION_MULTIPLIER = 0.45
+BOSS_SPEAR_PUSH_CHANCE = 0.05
+
 -- A standardized stun for white mage:
 try_stun = (caster, mon, cooldown=nil) ->
     white_power = TypeEffectUtils.get_power(caster, "White")
     resist = math.min(1.25, TypeEffectUtils.get_resistance(mon, "White")) -- Max 25%+ on the spell
     if not mon.is_enemy
         resist = 0.5
-    if chance(resist)
-        if not mon.is_enemy
-            white_power = -5
-        mon\add_effect("Stunned", cooldown or (100 + white_power * 10) * resist)
+        white_power = -5
+    stun_chance = resist
+    stun_duration = cooldown or (100 + white_power * 10) * resist
+    if mon.unique
+        stun_chance = math.min(1, stun_chance) * BOSS_STUN_CHANCE_MULTIPLIER
+        stun_duration *= BOSS_STUN_DURATION_MULTIPLIER
+    if chance(stun_chance)
+        mon\add_effect("Stunned", math.max(1, math.floor(stun_duration)))
         if Map.object_visible(mon)
             play_sound "sound/ringfire-hit.ogg"
 
@@ -123,7 +131,8 @@ DataW.spell_create {
         on_map_init: () =>
             @bonus = 0.9
         on_hit_func: (target, atkstats) =>
-            if not target.destroyed and chance(.25)
+            push_chance = if target.unique then BOSS_SPEAR_PUSH_CHANCE else .25
+            if not target.destroyed and chance(push_chance)
                 target\go_towards_if_free {@vx * @speed / 4, @vy * @speed / 4}
             if @attacked_map[target] ~= nil
                 return nil
