@@ -1578,7 +1578,7 @@ DataW.enemy_create {
         movespeed: 4.0
         hp: 70
         hpregen: 0.15
-        strength: 16
+        strength: 24
         magic: 12
         defence: 10
         willpower: 10
