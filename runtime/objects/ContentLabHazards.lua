@@ -34,6 +34,27 @@ local function dist_to_segment_sqr(point, a, b)
     return dist_sqr(point, {a[1] + vx * t, a[2] + vy * t})
 end
 
+local function segment_point_at(a, b, pct)
+    pct = math.max(0, math.min(1, pct or 0))
+    return {
+        a[1] + (b[1] - a[1]) * pct,
+        a[2] + (b[2] - a[2]) * pct,
+    }
+end
+
+local function nearest_segment_point(point, a, b)
+    local vx = b[1] - a[1]
+    local vy = b[2] - a[2]
+    local len_sqr = vx * vx + vy * vy
+    if len_sqr <= 1 then
+        return {a[1], a[2]}, 0, dist_sqr(point, a)
+    end
+    local pct = ((point[1] - a[1]) * vx + (point[2] - a[2]) * vy) / len_sqr
+    pct = math.max(0, math.min(1, pct))
+    local xy = segment_point_at(a, b, pct)
+    return xy, pct, dist_sqr(point, xy)
+end
+
 local function xy_of(obj)
     return {obj.x, obj.y}
 end
@@ -612,6 +633,27 @@ local function rescue_blocker(strike)
     return best
 end
 
+local function rescue_intercept_hint(strike)
+    local target = strike.target
+    if not target or target.destroyed then
+        return nil
+    end
+    local from_xy = rescue_source_xy(strike)
+    local to_xy = xy_of(target)
+    local best_xy
+    local best_player
+    local best_dist
+    for _, player in ipairs(living_players()) do
+        local xy, _, dist = nearest_segment_point(xy_of(player), from_xy, to_xy)
+        if not best_dist or dist < best_dist then
+            best_xy = xy
+            best_player = player
+            best_dist = dist
+        end
+    end
+    return best_xy, best_player, best_dist
+end
+
 function M.create_pull_tether(args)
     return GameObject.object_create {
         map = args.map,
@@ -776,6 +818,20 @@ function M.create_rescue_strike(args)
                 or (self.current_blocker and COL_PALE_GREEN or (last_call and COL_PALE_YELLOW or COL_PALE_GREEN))
             local progress = self.resolved and 1 or math.max(0.2, math.min(1, self.elapsed / self.windup))
             draw_world_link(color, from_xy, to_xy, last_call and 4 or 3, last_call and 0.50 or 0.28)
+            if not self.resolved then
+                local threat_xy = segment_point_at(from_xy, to_xy, math.min(1, self.elapsed / math.max(1, self.windup)))
+                draw_world_circle(last_call and COL_PALE_YELLOW or COL_WHITE, threat_xy, last_call and 7 or 5, 0.10, last_call and 0.82 or 0.58)
+                local hint_xy, hint_player, hint_dist = rescue_intercept_hint(self)
+                if hint_xy and hint_player then
+                    local block_radius = self.block_radius or 30
+                    local player_radius = hint_player.target_radius or hint_player.radius or 12
+                    local in_block_zone = hint_dist <= sqr(block_radius + player_radius)
+                    local hint_color = in_block_zone and COL_PALE_GREEN or (last_call and COL_PALE_YELLOW or COL_LIGHT_GRAY)
+                    draw_world_circle(hint_color, hint_xy, block_radius, in_block_zone and 0.05 or 0.02, in_block_zone and 0.72 or 0.42)
+                    local hint_label_xy = Display.to_screen_xy({hint_xy[1], hint_xy[2] - block_radius - 10})
+                    draw_text(hint_color, Display.CENTER, hint_label_xy, in_block_zone and "HOLD" or "INTERCEPT")
+                end
+            end
             draw_world_circle(color, to_xy, self.strike_radius * progress, self.resolved and 0.14 or 0.07, self.resolved and 0.70 or 0.45)
             local label_xy = Display.to_screen_xy({to_xy[1], to_xy[2] - self.strike_radius - 14})
             local label
