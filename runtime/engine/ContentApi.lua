@@ -25,6 +25,7 @@ local function normalized_config(config)
         level = math.max(1, math.floor(tonumber(config.level) or 1)),
         seed = tostring(config.seed or "1"),
         preset = tostring(config.preset or config.loadout_preset or "none"),
+        intensity = tostring(config.intensity or config.packageIntensity or config.package_intensity or "standard"),
         customLoadout = tostring(config.customLoadout or config.loadout or ""),
         mapDesc = tostring(config.mapDesc or config.start_map_desc or ""),
         encounter = tostring(config.encounter or ""),
@@ -52,6 +53,8 @@ local function launch_args(config)
     if config.encounter ~= "" then
         args[#args + 1] = "--encounter"
         args[#args + 1] = config.encounter
+        args[#args + 1] = "--package_intensity"
+        args[#args + 1] = config.intensity
     end
     if config.monsters ~= "" then
         args[#args + 1] = "--monsters"

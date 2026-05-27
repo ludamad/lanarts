@@ -51,6 +51,7 @@ game_init = (args, load_file=nil) ->
                 ContentLaunch.generate_encounter_arena {
                     encounter: args.encounter
                     monsters: args.monsters
+                    package_intensity: args.package_intensity
                 }
         elseif args.start_map_desc and args.start_map_desc != ""
             EngineHooks.first_map_create = () ->
@@ -87,6 +88,7 @@ run_lanarts = (raw_args) ->
     parser\option "--loadout", "Comma-separated item specs to add to the first player, using Item or Item*COUNT.", ""
     parser\option "--encounter", "Content-lab encounter id to launch in a duel arena.", ""
     parser\option "--monsters", "Comma-separated monster names to launch in a content-lab arena.", ""
+    parser\option "--package_intensity", "Content-lab package pressure preset.", "standard"
     parser\option "--start_map_desc", "Start directly in a map desc module, such as map_descs.Overworld.", ""
     parser\option "--seed", "Seed for direct map launches.", false
     parser\option "--macro", "Script to run from debug_scripts/"

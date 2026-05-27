@@ -24,6 +24,36 @@ local function copy_xy(xy)
     return {xy[1], xy[2]}
 end
 
+local function normalize_intensity(intensity)
+    intensity = intensity or {}
+    return {
+        id = intensity.id or "standard",
+        label = intensity.label or "Standard",
+        tempo = math.max(0.25, tonumber(intensity.tempo) or 1),
+        damage = math.max(0.1, tonumber(intensity.damage) or 1),
+        summons = math.max(0.1, tonumber(intensity.summons) or 1),
+    }
+end
+
+local function scale_frames(value, fallback, intensity)
+    local frames = tonumber(value or fallback) or fallback
+    return math.max(1, math.floor(frames / intensity.tempo + 0.5))
+end
+
+local function scale_offset(value, fallback, interval, intensity)
+    local raw_offset = tonumber(value or fallback) or fallback
+    local offset = math.floor(raw_offset / intensity.tempo + 0.5)
+    return math.max(0, math.min(interval - 1, offset))
+end
+
+local function scale_damage(value, fallback, intensity)
+    return (tonumber(value or fallback) or fallback) * intensity.damage
+end
+
+local function scale_count(value, fallback, intensity)
+    return math.max(1, math.ceil((tonumber(value or fallback) or fallback) * intensity.summons))
+end
+
 local function living_players()
     local players = {}
     for _, player in ipairs(Map.players_list()) do
@@ -220,6 +250,7 @@ end
 
 local function spawn_orb_wave(director, package)
     local orbit = package.orbit or {}
+    local intensity = director.intensity
     local anchor = primary_monster(package.primary)
     local center = anchor and xy_of(anchor) or center_of_players() or director.xy
     local count = orbit.count or 4
@@ -233,9 +264,9 @@ local function spawn_orb_wave(director, package)
             angular_velocity = orbit.speed or 0.042,
             orbit_radius = orbit.radius or 118,
             hit_radius = orbit.hit_radius or 18,
-            duration = orbit.duration or 280,
-            damage = orbit.damage or 3,
-            power = orbit.power or 24,
+            duration = scale_frames(orbit.duration, 280, intensity),
+            damage = scale_damage(orbit.damage, 3, intensity),
+            power = scale_damage(orbit.power, 24, intensity),
             affects_escorts = orbit.affects_escorts,
             redamage_cooldown = orbit.redamage_cooldown or 20,
         }
@@ -244,18 +275,19 @@ end
 
 local function spawn_player_pulses(director, package)
     local pulse = package.pulse or {}
+    local intensity = director.intensity
     local source = primary_monster(package.primary)
     for _, player in ipairs(living_players()) do
         M.create_pulse {
             map = director.map,
             source = source,
             xy = xy_of(player),
-            windup = pulse.windup or 46,
-            active = pulse.active or 24,
+            windup = scale_frames(pulse.windup, 46, intensity),
+            active = scale_frames(pulse.active, 24, intensity),
             linger = pulse.linger or 16,
             radius = pulse.radius or 66,
-            damage = pulse.damage or 4,
-            power = pulse.power or 28,
+            damage = scale_damage(pulse.damage, 4, intensity),
+            power = scale_damage(pulse.power, 28, intensity),
             affects_escorts = pulse.affects_escorts,
             redamage_cooldown = pulse.redamage_cooldown or 18,
         }
@@ -304,7 +336,9 @@ end
 
 local function spawn_summons(director, package)
     local summon = package.summon or {}
-    if summon_count() >= (summon.max_alive or 4) then
+    local intensity = director.intensity
+    local max_alive = scale_count(summon.max_alive, 4, intensity)
+    if summon_count() >= max_alive then
         return
     end
     local anchor = primary_monster(package.primary)
@@ -313,10 +347,10 @@ local function spawn_summons(director, package)
     if #monsters == 0 then
         return
     end
-    local count = summon.count or 1
+    local count = scale_count(summon.count, 1, intensity)
     local radius = summon.radius or 150
     for idx = 1, count do
-        if summon_count() >= (summon.max_alive or 4) then
+        if summon_count() >= max_alive then
             return
         end
         local angle = (idx - 1) * (math.pi * 2 / count) + director.elapsed * 0.03
@@ -333,11 +367,12 @@ local function spawn_summons(director, package)
     end
 end
 
-function M.add_director(game_map, package)
+function M.add_director(game_map, package, intensity)
     package = package or {}
     if not (package.orbit or package.pulse or package.summon or package.escort) then
         return nil
     end
+    intensity = normalize_intensity(intensity)
     local center = center_of_players() or {320, 320}
     local director = GameObject.object_create {
         map = game_map,
@@ -347,6 +382,7 @@ function M.add_director(game_map, package)
         depth = DIRECTOR_DEPTH,
         elapsed = 0,
         package = package,
+        intensity = intensity,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
             if #living_monsters(false) == 0 then
@@ -354,16 +390,28 @@ function M.add_director(game_map, package)
                 return
             end
             local orbit = self.package.orbit
-            if orbit and self.elapsed % (orbit.interval or 300) == (orbit.offset or 40) then
-                spawn_orb_wave(self, self.package)
+            if orbit then
+                local interval = scale_frames(orbit.interval, 300, self.intensity)
+                local offset = scale_offset(orbit.offset, 40, interval, self.intensity)
+                if self.elapsed % interval == offset then
+                    spawn_orb_wave(self, self.package)
+                end
             end
             local pulse = self.package.pulse
-            if pulse and self.elapsed % (pulse.interval or 150) == (pulse.offset or 70) then
-                spawn_player_pulses(self, self.package)
+            if pulse then
+                local interval = scale_frames(pulse.interval, 150, self.intensity)
+                local offset = scale_offset(pulse.offset, 70, interval, self.intensity)
+                if self.elapsed % interval == offset then
+                    spawn_player_pulses(self, self.package)
+                end
             end
             local summon = self.package.summon
-            if summon and self.elapsed % (summon.interval or 360) == (summon.offset or 120) then
-                spawn_summons(self, self.package)
+            if summon then
+                local interval = scale_frames(summon.interval, 360, self.intensity)
+                local offset = scale_offset(summon.offset, 120, interval, self.intensity)
+                if self.elapsed % interval == offset then
+                    spawn_summons(self, self.package)
+                end
             end
         end,
     }

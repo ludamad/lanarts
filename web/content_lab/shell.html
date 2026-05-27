@@ -588,6 +588,15 @@
         </div>
         <div class="encounter-info" id="encounterInfo" hidden></div>
         <div class="field">
+          <label for="intensity">Pressure</label>
+          <select id="intensity">
+            <option value="learning">Learning</option>
+            <option value="standard" selected>Standard</option>
+            <option value="high">High</option>
+            <option value="brutal">Brutal</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="customMonsters">Custom monsters</label>
           <input id="customMonsters" spellcheck="false" placeholder="Mummoner, Executioner">
         </div>
@@ -644,6 +653,13 @@
         {id: 'gragh-rescue-package', label: 'Gragh rescue package', kind: 'rescue package', phase: 'late multiplayer', features: ['protect ally', 'pull/taunt window', 'rotating orbs', 'short AOE windows']},
         {id: 'executioner-duel', label: 'Executioner duel'},
         {id: 'hell-pressure-pair', label: 'Hell pressure pair', kind: 'package', phase: 'late enemy mix', features: ['support pressure', 'melee bodyguard', 'targeted pulse']},
+      ];
+
+      let intensities = [
+        {id: 'learning', label: 'Learning', tempo: 0.80, damage: 0.80, summons: 0.75},
+        {id: 'standard', label: 'Standard', tempo: 1.00, damage: 1.00, summons: 1.00},
+        {id: 'high', label: 'High', tempo: 1.18, damage: 1.12, summons: 1.20},
+        {id: 'brutal', label: 'Brutal', tempo: 1.35, damage: 1.25, summons: 1.50},
       ];
 
       let resources = [
@@ -767,8 +783,10 @@
         replaceOptions($('level'), catalog.levels || [], (entry) => String(entry.value), (entry) => entry.label || String(entry.value));
         replaceOptions($('mapDesc'), catalog.maps || [], (entry) => entry.id || '', (entry) => entry.label || entry.id || 'Campaign World');
         replaceOptions($('encounter'), catalog.encounters || [], (entry) => entry.id || '', (entry) => entry.label || entry.id || 'No forced encounter');
+        replaceOptions($('intensity'), catalog.intensities || intensities, (entry) => entry.id || 'standard', (entry) => entry.label || entry.id || 'Standard');
         rebuildLoadoutPresets(catalog.loadouts, catalog.loadout_names);
         encounters = catalog.encounters || encounters;
+        intensities = catalog.intensities || intensities;
         resources = (catalog.resources || []).map((resource) => ({
           name: resource.name,
           meta: resource.meta || resource.goal || '',
@@ -776,6 +794,7 @@
           className: resource.className,
           level: String(resource.level || 1),
           preset: resource.preset || 'none',
+          intensity: resource.intensity || 'standard',
           mapDesc: resource.mapDesc || '',
           encounter: resource.encounter || '',
           monsters: resource.monsters || '',
@@ -813,6 +832,7 @@
           level: $('level').value,
           seed: $('seed').value.trim() || '1',
           preset: state.preset,
+          intensity: $('intensity').value,
           customLoadout: $('customLoadout').value.trim(),
           mapDesc: $('mapDesc').value,
           encounter: $('encounter').value,
@@ -834,6 +854,7 @@
         $('customLoadout').value = config.customLoadout || '';
         $('mapDesc').value = config.mapDesc || '';
         $('encounter').value = config.encounter || '';
+        $('intensity').value = config.intensity || 'standard';
         $('customMonsters').value = config.monsters || '';
         setPreset(config.preset || 'none');
         drawPreviews();
@@ -844,28 +865,52 @@
         return encounters.find((entry) => (entry.id || '') === id) || null;
       }
 
+      function selectedIntensity() {
+        const id = $('intensity').value || 'standard';
+        return intensities.find((entry) => (entry.id || '') === id) || intensities.find((entry) => entry.id === 'standard') || {tempo: 1, damage: 1, summons: 1};
+      }
+
+      function scaledFrames(value, fallback, intensity) {
+        const raw = value === undefined || value === null ? fallback : value;
+        const frames = Number(raw === undefined || raw === null ? 1 : raw);
+        const tempo = Math.max(0.25, Number(intensity.tempo || 1));
+        return Math.max(0, Math.round(frames / tempo));
+      }
+
+      function scaledDamage(value, fallback, intensity) {
+        const raw = value === undefined || value === null ? fallback : value;
+        return Number(raw === undefined || raw === null ? 1 : raw) * Math.max(0.1, Number(intensity.damage || 1));
+      }
+
+      function scaledCount(value, fallback, intensity) {
+        const raw = value === undefined || value === null ? fallback : value;
+        return Math.max(1, Math.ceil(Number(raw === undefined || raw === null ? 1 : raw) * Math.max(0.1, Number(intensity.summons || 1))));
+      }
+
       function encounterRhythms(encounter) {
         const pkg = (encounter && encounter.package) || {};
+        const intensity = selectedIntensity();
         const rows = [];
         if (pkg.orbit) {
+          const duration = scaledFrames(pkg.orbit.duration, 1, intensity);
           rows.push({
             label: 'Orbs',
-            offset: Number(pkg.orbit.offset || 0),
-            interval: Number(pkg.orbit.interval || 1),
-            duration: Number(pkg.orbit.duration || 1),
-            meta: `${pkg.orbit.count || 4} orbiting hitboxes, radius ${pkg.orbit.radius || 118}${pkg.orbit.affects_escorts ? ', hits ally' : ''}`,
+            offset: scaledFrames(pkg.orbit.offset, 0, intensity),
+            interval: scaledFrames(pkg.orbit.interval, 1, intensity),
+            duration,
+            meta: `${pkg.orbit.count || 4} orbiting hitboxes, ${duration}f, damage ${scaledDamage(pkg.orbit.damage, 3, intensity).toFixed(1)}${pkg.orbit.affects_escorts ? ', hits ally' : ''}`,
           });
         }
         if (pkg.pulse) {
-          const windup = Number(pkg.pulse.windup || 0);
-          const active = Number(pkg.pulse.active || 1);
+          const windup = scaledFrames(pkg.pulse.windup, 0, intensity);
+          const active = scaledFrames(pkg.pulse.active, 1, intensity);
           rows.push({
             label: 'AOE',
-            offset: Number(pkg.pulse.offset || 0),
-            interval: Number(pkg.pulse.interval || 1),
+            offset: scaledFrames(pkg.pulse.offset, 0, intensity),
+            interval: scaledFrames(pkg.pulse.interval, 1, intensity),
             duration: windup + active,
             activeStart: windup,
-            meta: `player-targeted${pkg.pulse.affects_escorts ? ' plus ally' : ''}, ${windup}f warning, ${active}f active`,
+            meta: `player-targeted${pkg.pulse.affects_escorts ? ' plus ally' : ''}, ${windup}f warning, ${active}f active, damage ${scaledDamage(pkg.pulse.damage, 4, intensity).toFixed(1)}`,
           });
         }
         if (pkg.escort) {
@@ -880,10 +925,10 @@
         if (pkg.summon) {
           rows.push({
             label: 'Summons',
-            offset: Number(pkg.summon.offset || 0),
-            interval: Number(pkg.summon.interval || 1),
+            offset: scaledFrames(pkg.summon.offset, 0, intensity),
+            interval: scaledFrames(pkg.summon.interval, 1, intensity),
             duration: 20,
-            meta: `${pkg.summon.count || 1} ${((pkg.summon.monsters || [])[0]) || 'add'} per wave, cap ${pkg.summon.max_alive || 4}`,
+            meta: `${scaledCount(pkg.summon.count, 1, intensity)} ${((pkg.summon.monsters || [])[0]) || 'add'} per wave, cap ${scaledCount(pkg.summon.max_alive, 4, intensity)}`,
           });
         }
         return rows;
@@ -934,6 +979,10 @@
         body.textContent = encounter.description || encounter.label || encounter.id;
         info.appendChild(title);
         info.appendChild(body);
+        const intensity = selectedIntensity();
+        const pressure = document.createElement('div');
+        pressure.textContent = `Pressure: ${intensity.label || intensity.id || 'Standard'} - ${Number(intensity.tempo || 1).toFixed(2)}x tempo, ${Number(intensity.damage || 1).toFixed(2)}x damage`;
+        info.appendChild(pressure);
         const features = encounter.features || [];
         if (features.length) {
           const tags = document.createElement('div');
@@ -963,6 +1012,7 @@
         }
         if (config.encounter) {
           args.push('--encounter', config.encounter);
+          args.push('--package_intensity', config.intensity || 'standard');
         }
         if (config.monsters) {
           args.push('--monsters', config.monsters);
@@ -990,6 +1040,9 @@
         if (config.encounter) {
           query.set('encounter', config.encounter);
         }
+        if (config.intensity && config.intensity !== 'standard') {
+          query.set('pressure', config.intensity);
+        }
         if (config.monsters) {
           query.set('monsters', config.monsters);
         }
@@ -1009,6 +1062,7 @@
           customLoadout: query.get('items') || '',
           mapDesc: query.get('map') || '',
           encounter: query.get('encounter') || '',
+          intensity: query.get('pressure') || 'standard',
           monsters: query.get('monsters') || '',
           autorun: query.get('run') === '1',
         };
@@ -1128,7 +1182,8 @@
           button.type = 'button';
           button.className = 'resource';
           const goal = resource.goal ? `<span>${resource.goal}</span>` : '';
-          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${goal}</span><code>${resource.className} L${resource.level}</code>`;
+          const pressure = resource.intensity && resource.intensity !== 'standard' ? ` ${resource.intensity}` : '';
+          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${goal}</span><code>${resource.className} L${resource.level}${pressure}</code>`;
           button.addEventListener('click', () => {
             setConfig(resource);
           });
@@ -1144,7 +1199,7 @@
             setPreset(button.dataset.value);
           });
         });
-        ['className', 'level', 'seed', 'customLoadout', 'mapDesc', 'encounter', 'customMonsters'].forEach((id) => {
+        ['className', 'level', 'seed', 'customLoadout', 'mapDesc', 'encounter', 'intensity', 'customMonsters'].forEach((id) => {
           $(id).addEventListener('input', drawPreviews);
           $(id).addEventListener('change', drawPreviews);
         });

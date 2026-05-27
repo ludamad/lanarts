@@ -78,6 +78,26 @@ local function encounter_monsters(encounter_id, custom_monsters)
     return monsters
 end
 
+local function intensity_by_id(intensity_id)
+    for _, intensity in ipairs(Catalog.intensities or {}) do
+        if intensity.id == intensity_id then
+            return intensity
+        end
+    end
+    for _, intensity in ipairs(Catalog.intensities or {}) do
+        if intensity.id == "standard" then
+            return intensity
+        end
+    end
+    return {
+        id = "standard",
+        label = "Standard",
+        tempo = 1,
+        damage = 1,
+        summons = 1,
+    }
+end
+
 local function loadout_specs_for_class(preset_name, custom_specs, class_name)
     local specs = {}
     local preset = Catalog.loadout_presets[preset_name or "none"] or Catalog.loadout_presets.none
@@ -169,7 +189,7 @@ function M.generate_encounter_arena(options)
     local arena_options = encounter and encounter.arena or {}
     local game_map = require("map_descs.DebugArena"):generate_and_spawn(monsters, arena_options)
     if encounter and encounter.package then
-        require("objects.ContentLabHazards").add_director(game_map, encounter.package)
+        require("objects.ContentLabHazards").add_director(game_map, encounter.package, intensity_by_id(options.package_intensity))
     end
     return game_map
 end

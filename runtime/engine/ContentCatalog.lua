@@ -174,6 +174,41 @@ M.loadout_presets = {
 
 M.loadout_order = {"none", "gragh", "late"}
 
+M.intensities = {
+    {
+        id = "learning",
+        label = "Learning",
+        tempo = 0.80,
+        damage = 0.80,
+        summons = 0.75,
+        description = "Slower, lower-pressure package rhythms.",
+    },
+    {
+        id = "standard",
+        label = "Standard",
+        tempo = 1.00,
+        damage = 1.00,
+        summons = 1.00,
+        description = "Catalog baseline pressure.",
+    },
+    {
+        id = "high",
+        label = "High",
+        tempo = 1.18,
+        damage = 1.12,
+        summons = 1.20,
+        description = "Tighter windows for class imbalance checks.",
+    },
+    {
+        id = "brutal",
+        label = "Brutal",
+        tempo = 1.35,
+        damage = 1.25,
+        summons = 1.50,
+        description = "Stress test pressure, not a default tuning target.",
+    },
+}
+
 M.maps = {
     {
         id = "",
@@ -629,6 +664,7 @@ M.resources = {
         preset = "late",
         mapDesc = "",
         encounter = "gragh-rescue-package",
+        intensity = "high",
         seed = 22450,
         goal = "pull and body-block timing under boss pressure",
     },
@@ -641,6 +677,7 @@ M.resources = {
         preset = "late",
         mapDesc = "",
         encounter = "gragh-rescue-package",
+        intensity = "high",
         seed = 22450,
         goal = "regen abuse while protecting a fragile ally",
     },
@@ -711,6 +748,7 @@ function M.catalog()
         levels = M.levels,
         loadouts = M.loadout_presets,
         loadout_names = M.loadout_preset_names(),
+        intensities = M.intensities,
         maps = M.maps,
         encounters = M.encounters,
         resources = M.resources,
