@@ -6,6 +6,7 @@ StartEngine = require "engine.StartEngine"
 EngineHooks = require "engine.EngineBase"
 Settings = require "engine.Settings"
 EventLog = require "ui.EventLog"
+ContentLaunch = require "engine.ContentLaunch"
 
 load_location_is_valid = (load_file) ->
     if not load_file
@@ -39,10 +40,30 @@ game_init = (args, load_file=nil) ->
     EngineInternal.init_gamestate()
     GameState = require("core.GameState")
     load_file = load_file or os.getenv("MULTI_LOAD_FILE")
+    started_new_game = false
     if load_location_is_valid(load_file)
         GameState.load(load_file)
     else
+        if args.seed
+            random_seed tonumber(args.seed)
+        if (args.encounter and args.encounter != "") or (args.monsters and args.monsters != "")
+            EngineHooks.first_map_create = () ->
+                ContentLaunch.generate_encounter_arena {
+                    encounter: args.encounter
+                    monsters: args.monsters
+                }
+        elseif args.start_map_desc and args.start_map_desc != ""
+            EngineHooks.first_map_create = () ->
+                ContentLaunch.generate_start_map_desc args.start_map_desc
         EngineInternal.start_game()
+        started_new_game = true
+    if started_new_game
+        ContentLaunch.apply_player_setup {
+            level: args.level
+            loadout_preset: args.loadout_preset
+            loadout: args.loadout
+            class_name: settings.class_type
+        }
 
 dump_globals = () ->
     -- TODO make a file?
@@ -61,6 +82,13 @@ run_lanarts = (raw_args) ->
     parser\option "--class2", "Player 2's class.", false
     parser\option "--class3", "Player 3's class.", false
     parser\option "--class4", "Player 4's class.", false
+    parser\option "--level", "Level to grant the first player before play starts.", "1"
+    parser\option "--loadout_preset", "Equipment preset for the first player: none, gragh, or late.", "none"
+    parser\option "--loadout", "Comma-separated item specs to add to the first player, using Item or Item*COUNT.", ""
+    parser\option "--encounter", "Content-lab encounter id to launch in a duel arena.", ""
+    parser\option "--monsters", "Comma-separated monster names to launch in a content-lab arena.", ""
+    parser\option "--start_map_desc", "Start directly in a map desc module, such as map_descs.Overworld.", ""
+    parser\option "--seed", "Seed for direct map launches.", false
     parser\option "--macro", "Script to run from debug_scripts/"
     parser\option "-C --context", "Amount of lines of Lua error context.", "4"
     parser\option "--settings", "Settings YAML file to use.", "settings.yaml"
@@ -78,9 +106,10 @@ run_lanarts = (raw_args) ->
             return Engine.menu_start(pregame_start)
 
     pregame_start = (load_file=nil) ->
-        engine_init(args)
         if args.class
             settings.class_type = args.class
+        engine_init(args)
+        if args.class
             return game_start()
         elseif load_file or settings.connection_type ~= 2
             return game_start(load_file)

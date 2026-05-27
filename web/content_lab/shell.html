@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lanarts Content Lab</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101215;
+      --panel: #181c21;
+      --panel-2: #20262d;
+      --line: #303841;
+      --text: #eef1f4;
+      --muted: #a9b2bd;
+      --accent: #7cc7a2;
+      --accent-2: #d9b35f;
+      --danger: #e07969;
+      --canvas: #030405;
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    body {
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 58px;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #14171b;
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 19px;
+      line-height: 1.1;
+      font-weight: 760;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      min-width: 0;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      flex: 0 0 auto;
+    }
+
+    .shell {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
+    }
+
+    .controls {
+      min-height: 0;
+      overflow: auto;
+      padding: 16px;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .stage {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      background: var(--canvas);
+    }
+
+    .canvas-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    #canvas {
+      width: min(100%, 1280px);
+      height: min(100%, 800px);
+      max-height: calc(100vh - 112px);
+      background: #000;
+      image-rendering: pixelated;
+      outline: 1px solid #242a31;
+    }
+
+    .idle-panel {
+      position: absolute;
+      inset: 16px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 14px;
+      pointer-events: none;
+    }
+
+    .preview-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      padding: 0 2px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .preview-grid {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      align-content: stretch;
+    }
+
+    .preview {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      border: 1px solid #242b33;
+      border-radius: var(--radius);
+      background: #111418;
+      overflow: hidden;
+    }
+
+    .preview canvas {
+      width: 100%;
+      height: 100%;
+      min-height: 120px;
+      image-rendering: pixelated;
+      background: #070909;
+    }
+
+    .preview-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-top: 1px solid #242b33;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.2;
+      background: #151a1f;
+    }
+
+    .preview-label strong {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 680;
+    }
+
+    .console {
+      height: 54px;
+      overflow: auto;
+      padding: 8px 12px;
+      border-top: 1px solid var(--line);
+      background: #0c0e11;
+      color: #aeb8c4;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      line-height: 1.35;
+      white-space: pre-wrap;
+    }
+
+    .section {
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 720;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      color: #d5dbe2;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    select,
+    input,
+    textarea {
+      width: 100%;
+      min-height: 36px;
+      color: var(--text);
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 10px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .encounter-info {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      margin: -2px 0 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #14191e;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .encounter-info[hidden] {
+      display: none;
+    }
+
+    .encounter-info strong {
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .tag-list span {
+      padding: 3px 6px;
+      border: 1px solid #35404a;
+      border-radius: 999px;
+      color: #d4dde6;
+      background: #1b2229;
+      font-size: 11px;
+    }
+
+    select:focus,
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(124, 199, 162, 0.18);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--line);
+    }
+
+    .segmented button {
+      min-height: 34px;
+      border: 0;
+      color: var(--muted);
+      background: var(--panel-2);
+      cursor: pointer;
+    }
+
+    .segmented button.active {
+      color: #08110d;
+      background: var(--accent);
+      font-weight: 760;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .primary,
+    .secondary {
+      min-height: 40px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-weight: 760;
+    }
+
+    .primary:disabled,
+    .secondary:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .primary {
+      color: #07100c;
+      background: var(--accent);
+    }
+
+    .secondary {
+      color: var(--text);
+      background: var(--panel-2);
+      border-color: var(--line);
+    }
+
+    .resource-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .resource {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #151a1f;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .resource strong {
+      display: block;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .resource span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    .resource code {
+      color: var(--accent-2);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    body.running .idle-panel {
+      display: none;
+    }
+
+    body.running .status-dot {
+      background: var(--accent);
+    }
+
+    body.running .controls {
+      opacity: 0.92;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        overflow: auto;
+      }
+
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        max-height: none;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .stage {
+        min-height: 620px;
+      }
+
+      .preview-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>Lanarts Content Lab</h1>
+      <div class="status" id="status"><span class="status-dot"></span><span>Configure a run</span></div>
+    </div>
+    <button class="secondary" type="button" id="copyLink">Copy link</button>
+  </header>
+
+  <main class="shell">
+    <aside class="controls">
+      <section class="section">
+        <div class="section-title">Character</div>
+        <div class="field">
+          <label for="className">Class</label>
+          <select id="className">
+            <option>Fighter</option>
+            <option>Necromancer</option>
+            <option>Pyrocaster</option>
+            <option>Stormcaller</option>
+            <option>Templar</option>
+            <option>Rogue</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="level">Level</label>
+            <select id="level">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5 late</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8 high</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="seed">Seed</label>
+            <input id="seed" inputmode="numeric" value="17300">
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">Loadout</div>
+        <div class="field">
+          <div class="segmented" id="loadoutPreset">
+            <button type="button" data-value="none" class="active">None</button>
+            <button type="button" data-value="gragh">Gragh</button>
+            <button type="button" data-value="late">Late</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="customLoadout">Custom items</label>
+          <textarea id="customLoadout" spellcheck="false" placeholder="Health Potion*3, Ring of Vitality"></textarea>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">Map Generation</div>
+        <div class="field">
+          <label for="mapDesc">Generator</label>
+          <select id="mapDesc">
+            <option value="">Campaign World</option>
+            <option value="map_descs.Overworld">Overworld variety</option>
+            <option value="map_descs.GraghsLair">Gragh's Lair</option>
+            <option value="map_descs.Hell">Hell</option>
+            <option value="map_descs.HiveDepths">Hive Depths</option>
+            <option value="map_descs.PixullochiaDepths">Pixullochia Depths</option>
+            <option value="map_descs.Crypt">Crypt</option>
+            <option value="map_descs.Underdungeon">Underdungeon</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="encounter">Encounter</label>
+          <select id="encounter">
+            <option value="">No forced encounter</option>
+            <option value="giant-chicken-duel">Giant Chicken duel</option>
+            <option value="mummoner-duel">Mummoner duel</option>
+            <option value="purple-dragon-package">Purple Dragon package</option>
+            <option value="red-dragon-duel">Red Dragon duel</option>
+            <option value="gragh-duel">Gragh duel</option>
+            <option value="executioner-duel">Executioner duel</option>
+            <option value="hell-pressure-pair">Hell pressure pair</option>
+          </select>
+        </div>
+        <div class="encounter-info" id="encounterInfo" hidden></div>
+        <div class="field">
+          <label for="customMonsters">Custom monsters</label>
+          <input id="customMonsters" spellcheck="false" placeholder="Mummoner, Executioner">
+        </div>
+        <div class="button-row">
+          <button class="primary" type="button" id="launch">Launch in Emscripten</button>
+          <button class="secondary" type="button" id="reseed">Seed</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">Resources</div>
+        <div class="resource-list" id="resources"></div>
+      </section>
+    </aside>
+
+    <section class="stage">
+      <div class="canvas-wrap">
+        <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+        <div class="idle-panel" id="idlePanel">
+          <div class="preview-head">
+            <span>Map generation previews</span>
+            <span id="previewSeed"></span>
+          </div>
+          <div class="preview-grid" id="previewGrid"></div>
+        </div>
+      </div>
+      <pre class="console" id="output"></pre>
+    </section>
+  </main>
+
+  <script>
+    const contentLab = (() => {
+      const $ = (id) => document.getElementById(id);
+      const state = {
+        started: false,
+        runtimeReady: false,
+        preset: 'none',
+      };
+
+      let mapProfiles = [
+        {key: '', label: 'Campaign World', mode: 'world', density: 0.30},
+        {key: 'map_descs.Overworld', label: 'Overworld', mode: 'overworld', density: 0.22},
+        {key: 'map_descs.GraghsLair', label: "Gragh's Lair", mode: 'lair', density: 0.36},
+        {key: 'map_descs.Hell', label: 'Hell', mode: 'hell', density: 0.34},
+      ];
+
+      let encounters = [
+        {id: '', label: 'No forced encounter'},
+        {id: 'giant-chicken-duel', label: 'Giant Chicken duel'},
+        {id: 'mummoner-duel', label: 'Mummoner duel', kind: 'duel', phase: 'summon pressure', features: ['add timing', 'targeted pulse']},
+        {id: 'purple-dragon-package', label: 'Purple Dragon package', kind: 'boss package', phase: 'late micro', features: ['rotating orbs', 'targeted AOE rhythm', 'Fire Bat adds']},
+        {id: 'red-dragon-duel', label: 'Red Dragon duel', kind: 'boss duel', phase: 'late micro', features: ['projectile pressure', 'targeted AOE rhythm']},
+        {id: 'gragh-duel', label: 'Gragh duel', kind: 'boss duel', phase: 'late micro', features: ['melee pursuit', 'rotating orbs', 'short AOE windows']},
+        {id: 'executioner-duel', label: 'Executioner duel'},
+        {id: 'hell-pressure-pair', label: 'Hell pressure pair', kind: 'package', phase: 'late enemy mix', features: ['support pressure', 'melee bodyguard', 'targeted pulse']},
+      ];
+
+      let resources = [
+        {
+          name: 'Early overworld pressure',
+          meta: 'L1, no loadout, Overworld',
+          className: 'Necromancer',
+          level: '1',
+          preset: 'none',
+          mapDesc: 'map_descs.Overworld',
+          encounter: '',
+          monsters: '',
+          seed: '17300',
+        },
+        {
+          name: 'Necromancer regen abuse',
+          meta: 'L5, Gragh loadout, Gragh arena',
+          className: 'Necromancer',
+          level: '5',
+          preset: 'gragh',
+          mapDesc: 'map_descs.GraghsLair',
+          encounter: '',
+          monsters: '',
+          seed: '12345683',
+        },
+        {
+          name: 'Fighter late-game sanity',
+          meta: 'L5, late loadout, Gragh arena',
+          className: 'Fighter',
+          level: '5',
+          preset: 'late',
+          mapDesc: 'map_descs.GraghsLair',
+          encounter: '',
+          monsters: '',
+          seed: '12345685',
+        },
+        {
+          name: 'Pyro conversion check',
+          meta: 'L5, late loadout, Hell',
+          className: 'Pyrocaster',
+          level: '5',
+          preset: 'late',
+          mapDesc: 'map_descs.Hell',
+          encounter: '',
+          monsters: '',
+          seed: '9500',
+        },
+        {
+          name: 'Stormcaller comparison',
+          meta: 'L5, late loadout, Hell',
+          className: 'Stormcaller',
+          level: '5',
+          preset: 'late',
+          mapDesc: 'map_descs.Hell',
+          encounter: '',
+          monsters: '',
+          seed: '9500',
+        },
+      ];
+
+      function callContentApi(name, payload) {
+        if (!state.runtimeReady || !Module.ccall) {
+          return null;
+        }
+        const raw = payload === undefined
+          ? Module.ccall(name, 'string', [], [])
+          : Module.ccall(name, 'string', ['string'], [JSON.stringify(payload)]);
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.error) {
+          appendOutput(parsed.error);
+          return null;
+        }
+        return parsed;
+      }
+
+      function normalizePreviewProfile(map) {
+        return {
+          key: map.id || '',
+          label: map.label || map.id || 'Map',
+          mode: map.preview_mode || map.mode || 'world',
+          density: Number(map.density || 0.30),
+          palette: map.palette || null,
+        };
+      }
+
+      function replaceOptions(select, entries, valueFor, labelFor) {
+        const current = select.value;
+        select.innerHTML = '';
+        entries.forEach((entry) => {
+          const option = document.createElement('option');
+          option.value = valueFor(entry);
+          option.textContent = labelFor(entry);
+          select.appendChild(option);
+        });
+        if ([...select.options].some((option) => option.value === current)) {
+          select.value = current;
+        }
+      }
+
+      function rebuildLoadoutPresets(loadouts, names) {
+        const host = $('loadoutPreset');
+        host.innerHTML = '';
+        (names || Object.keys(loadouts || {})).forEach((name) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.dataset.value = name;
+          button.textContent = (loadouts[name] && loadouts[name].label) || name;
+          button.classList.toggle('active', name === state.preset);
+          button.addEventListener('click', () => {
+            setPreset(name);
+          });
+          host.appendChild(button);
+        });
+      }
+
+      function applyCatalog(catalog) {
+        if (!catalog) {
+          return;
+        }
+        replaceOptions($('className'), catalog.classes || [], (entry) => entry.id, (entry) => entry.label || entry.id);
+        replaceOptions($('level'), catalog.levels || [], (entry) => String(entry.value), (entry) => entry.label || String(entry.value));
+        replaceOptions($('mapDesc'), catalog.maps || [], (entry) => entry.id || '', (entry) => entry.label || entry.id || 'Campaign World');
+        replaceOptions($('encounter'), catalog.encounters || [], (entry) => entry.id || '', (entry) => entry.label || entry.id || 'No forced encounter');
+        rebuildLoadoutPresets(catalog.loadouts, catalog.loadout_names);
+        encounters = catalog.encounters || encounters;
+        resources = (catalog.resources || []).map((resource) => ({
+          name: resource.name,
+          meta: resource.meta || resource.goal || '',
+          className: resource.className,
+          level: String(resource.level || 1),
+          preset: resource.preset || 'none',
+          mapDesc: resource.mapDesc || '',
+          encounter: resource.encounter || '',
+          monsters: resource.monsters || '',
+          seed: String(resource.seed || 1),
+        }));
+        mapProfiles = (catalog.maps || []).slice(0, 4).map(normalizePreviewProfile);
+        wireResources();
+        setConfig(currentConfig());
+      }
+
+      function hashString(value) {
+        let hash = 2166136261;
+        const text = String(value || '');
+        for (let i = 0; i < text.length; i += 1) {
+          hash ^= text.charCodeAt(i);
+          hash = Math.imul(hash, 16777619);
+        }
+        return hash >>> 0;
+      }
+
+      function rng(seed) {
+        let value = seed >>> 0;
+        return () => {
+          value = Math.imul(value + 0x6D2B79F5, 1);
+          let t = value;
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      function currentConfig() {
+        return {
+          className: $('className').value,
+          level: $('level').value,
+          seed: $('seed').value.trim() || '1',
+          preset: state.preset,
+          customLoadout: $('customLoadout').value.trim(),
+          mapDesc: $('mapDesc').value,
+          encounter: $('encounter').value,
+          monsters: $('customMonsters').value.trim(),
+        };
+      }
+
+      function setPreset(value) {
+        state.preset = value;
+        document.querySelectorAll('#loadoutPreset button').forEach((button) => {
+          button.classList.toggle('active', button.dataset.value === value);
+        });
+      }
+
+      function setConfig(config) {
+        $('className').value = config.className || 'Fighter';
+        $('level').value = String(config.level || '1');
+        $('seed').value = String(config.seed || '1');
+        $('customLoadout').value = config.customLoadout || '';
+        $('mapDesc').value = config.mapDesc || '';
+        $('encounter').value = config.encounter || '';
+        $('customMonsters').value = config.monsters || '';
+        setPreset(config.preset || 'none');
+        drawPreviews();
+      }
+
+      function selectedEncounter() {
+        const id = $('encounter').value;
+        return encounters.find((entry) => (entry.id || '') === id) || null;
+      }
+
+      function renderEncounterInfo() {
+        const info = $('encounterInfo');
+        const encounter = selectedEncounter();
+        info.innerHTML = '';
+        if (!encounter || !encounter.id) {
+          info.hidden = true;
+          return;
+        }
+        info.hidden = false;
+        const title = document.createElement('strong');
+        const phase = encounter.phase ? ` - ${encounter.phase}` : '';
+        title.textContent = `${encounter.kind || 'encounter'}${phase}`;
+        const body = document.createElement('div');
+        body.textContent = encounter.description || encounter.label || encounter.id;
+        info.appendChild(title);
+        info.appendChild(body);
+        const features = encounter.features || [];
+        if (features.length) {
+          const tags = document.createElement('div');
+          tags.className = 'tag-list';
+          features.forEach((feature) => {
+            const tag = document.createElement('span');
+            tag.textContent = feature;
+            tags.appendChild(tag);
+          });
+          info.appendChild(tags);
+        }
+      }
+
+      function argsFor(config) {
+        const args = ['engine.StartLanarts', '--class', config.className, '--level', String(config.level), '--loadout_preset', config.preset, '--settings', 'settings.yaml'];
+        if (config.customLoadout) {
+          args.push('--loadout', config.customLoadout);
+        }
+        if (config.encounter) {
+          args.push('--encounter', config.encounter);
+        }
+        if (config.monsters) {
+          args.push('--monsters', config.monsters);
+        } else if (!config.encounter && config.mapDesc) {
+          args.push('--start_map_desc', config.mapDesc);
+        }
+        if (config.seed) {
+          args.push('--seed', String(config.seed));
+        }
+        return args;
+      }
+
+      function queryFor(config, autorun) {
+        const query = new URLSearchParams();
+        query.set('class', config.className);
+        query.set('level', config.level);
+        query.set('loadout', config.preset);
+        query.set('seed', config.seed);
+        if (config.customLoadout) {
+          query.set('items', config.customLoadout);
+        }
+        if (config.mapDesc) {
+          query.set('map', config.mapDesc);
+        }
+        if (config.encounter) {
+          query.set('encounter', config.encounter);
+        }
+        if (config.monsters) {
+          query.set('monsters', config.monsters);
+        }
+        if (autorun) {
+          query.set('run', '1');
+        }
+        return `${location.pathname}?${query.toString()}`;
+      }
+
+      function configFromQuery() {
+        const query = new URLSearchParams(location.search);
+        return {
+          className: query.get('class') || 'Fighter',
+          level: query.get('level') || '1',
+          preset: query.get('loadout') || 'none',
+          seed: query.get('seed') || '17300',
+          customLoadout: query.get('items') || '',
+          mapDesc: query.get('map') || '',
+          encounter: query.get('encounter') || '',
+          monsters: query.get('monsters') || '',
+          autorun: query.get('run') === '1',
+        };
+      }
+
+      function drawPreview(canvas, profile, seedText) {
+        const ctx = canvas.getContext('2d');
+        const width = 112;
+        const height = 72;
+        canvas.width = width;
+        canvas.height = height;
+        const mode = profile.mode || profile.preview_mode || 'world';
+        const palette = profile.palette || {};
+        const random = rng(hashString(`${seedText}:${profile.key || profile.id}:${mode}`));
+        const floor = palette.floor || (mode === 'hell' ? '#6d3130' : mode === 'lair' ? '#514235' : '#31553c');
+        const floor2 = palette.floor2 || (mode === 'hell' ? '#8c3e36' : mode === 'world' ? '#3a5f48' : '#416447');
+        const wall = palette.wall || (mode === 'hell' ? '#281a1a' : mode === 'lair' ? '#27231f' : '#1d2922');
+        const water = palette.accent || (mode === 'overworld' ? '#25465a' : '#253342');
+        ctx.fillStyle = wall;
+        ctx.fillRect(0, 0, width, height);
+
+        const rooms = 6 + Math.floor(random() * 8);
+        for (let i = 0; i < rooms; i += 1) {
+          const cx = Math.floor(random() * width);
+          const cy = Math.floor(random() * height);
+          const rx = 9 + Math.floor(random() * 20 * (1 - profile.density));
+          const ry = 6 + Math.floor(random() * 15 * (1 - profile.density));
+          ctx.fillStyle = random() > 0.45 ? floor : floor2;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx, ry, random() * Math.PI, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.strokeStyle = floor2;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        for (let i = 0; i < rooms - 1; i += 1) {
+          ctx.beginPath();
+          ctx.moveTo(Math.floor(random() * width), Math.floor(random() * height));
+          ctx.lineTo(Math.floor(random() * width), Math.floor(random() * height));
+          ctx.stroke();
+        }
+
+        if (mode === 'overworld' || mode === 'world') {
+          ctx.strokeStyle = water;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          let y = Math.floor(random() * height);
+          ctx.moveTo(0, y);
+          for (let x = 0; x < width; x += 9) {
+            y += Math.floor(random() * 11) - 5;
+            ctx.lineTo(x, Math.max(8, Math.min(height - 8, y)));
+          }
+          ctx.stroke();
+        }
+
+        for (let i = 0; i < 16; i += 1) {
+          ctx.fillStyle = random() > 0.5 ? '#d7c37a' : '#b6675a';
+          ctx.fillRect(Math.floor(random() * width), Math.floor(random() * height), 2, 2);
+        }
+      }
+
+      function drawPreviews() {
+        renderEncounterInfo();
+        const seed = currentConfig().seed || '1';
+        $('previewSeed').textContent = `seed ${seed}`;
+        const grid = $('previewGrid');
+        grid.innerHTML = '';
+        const previewResponse = callContentApi('lanarts_content_map_preview_json', currentConfig());
+        const profiles = previewResponse && previewResponse.previews
+          ? previewResponse.previews.map(normalizePreviewProfile)
+          : mapProfiles;
+        profiles.forEach((profile) => {
+          const node = document.createElement('article');
+          node.className = 'preview';
+          const canvas = document.createElement('canvas');
+          const label = document.createElement('div');
+          label.className = 'preview-label';
+          label.innerHTML = `<strong>${profile.label}</strong><span>${profile.key || 'world graph'}</span>`;
+          node.appendChild(canvas);
+          node.appendChild(label);
+          grid.appendChild(node);
+          drawPreview(canvas, profile, seed);
+        });
+      }
+
+      function appendOutput(text) {
+        const output = $('output');
+        output.textContent += `${text}\n`;
+        output.scrollTop = output.scrollHeight;
+      }
+
+      function launch(config) {
+        if (!state.runtimeReady) {
+          $('status').lastElementChild.textContent = 'Runtime loading';
+          appendOutput('runtime is still loading');
+          return;
+        }
+        if (state.started) {
+          location.href = queryFor(config, true);
+          return;
+        }
+        const launchResponse = callContentApi('lanarts_content_launch_args_json', config);
+        const args = launchResponse && launchResponse.args ? launchResponse.args : argsFor(config);
+        state.started = true;
+        document.body.classList.add('running');
+        $('status').lastElementChild.textContent = `${config.className} L${config.level} running`;
+        appendOutput(`launch ${args.join(' ')}`);
+        Module.callMain(args);
+      }
+
+      function wireResources() {
+        const list = $('resources');
+        list.innerHTML = '';
+        resources.forEach((resource) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'resource';
+          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span></span><code>${resource.className} L${resource.level}</code>`;
+          button.addEventListener('click', () => {
+            setConfig(resource);
+          });
+          list.appendChild(button);
+        });
+      }
+
+      function initShell() {
+        wireResources();
+        setConfig(configFromQuery());
+        document.querySelectorAll('#loadoutPreset button').forEach((button) => {
+          button.addEventListener('click', () => {
+            setPreset(button.dataset.value);
+          });
+        });
+        ['className', 'level', 'seed', 'customLoadout', 'mapDesc', 'encounter', 'customMonsters'].forEach((id) => {
+          $(id).addEventListener('input', drawPreviews);
+          $(id).addEventListener('change', drawPreviews);
+        });
+        $('launch').disabled = true;
+        $('launch').addEventListener('click', () => launch(currentConfig()));
+        $('reseed').addEventListener('click', () => {
+          $('seed').value = String(Math.floor(10000 + Math.random() * 900000));
+          drawPreviews();
+        });
+        $('copyLink').addEventListener('click', async () => {
+          const url = `${location.origin}${queryFor(currentConfig(), false)}`;
+          try {
+            await navigator.clipboard.writeText(url);
+            $('status').lastElementChild.textContent = 'Link copied';
+          } catch (err) {
+            appendOutput(url);
+          }
+        });
+      }
+
+      function runtimeReady() {
+        const queryConfig = configFromQuery();
+        state.runtimeReady = true;
+        $('launch').disabled = false;
+        $('status').lastElementChild.textContent = 'Runtime ready';
+        applyCatalog(callContentApi('lanarts_content_catalog_json'));
+        setConfig(queryConfig);
+        if (queryConfig.autorun) {
+          setTimeout(() => launch(currentConfig()), 0);
+        }
+      }
+
+      return {initShell, runtimeReady, appendOutput};
+    })();
+
+    var Module = {
+      noInitialRun: true,
+      canvas: document.getElementById('canvas'),
+      print: function(text) {
+        contentLab.appendOutput(text);
+      },
+      printErr: function(text) {
+        contentLab.appendOutput(text);
+      },
+      preRun: [function() {
+        if (typeof ENV !== 'undefined') {
+          ENV.LANARTS_MUTE_AUDIO = '1';
+          ENV.LANARTS_ENABLE_AUDIO = '0';
+          ENV.SDL_AUDIODRIVER = 'dummy';
+        }
+      }],
+      setStatus: function(text) {
+        if (text) {
+          document.getElementById('status').lastElementChild.textContent = text;
+        }
+      },
+      onAbort: function(reason) {
+        document.getElementById('status').lastElementChild.textContent = 'Runtime aborted';
+        contentLab.appendOutput(reason || 'abort');
+      },
+      onRuntimeInitialized: function() {
+        contentLab.runtimeReady();
+      },
+    };
+
+    contentLab.initShell();
+  </script>
+  {{{ SCRIPT }}}
+</body>
+</html>

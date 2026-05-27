@@ -58,7 +58,7 @@ node_place_easy_overworld_rooms = () =>
     event_log("(RNG #%d) generating %d rooms", @rng\amount_generated(), n_rooms)
     regions = {}
     for i=1,n_rooms
-        size = {10, 10}
+        size = @desc.room_size or {10, 10}
         result = find_bbox(@region_set, size)
         if not result
             return false
@@ -102,8 +102,9 @@ DebugArena = MapDesc.create {
 }
 
 MAX_MAP_TRIES = 100
-generate = (portal_spawns, monster_spawns) ->
+generate = (portal_spawns, monster_spawns, options={}) ->
     DebugArena.monster_spawns = monster_spawns
+    DebugArena.room_size = options.room_size or {10, 10}
     map = NewMaps.try_n_times MAX_MAP_TRIES, () -> DebugArena\compile(portal_spawns)
     game_map = NewMaps.generate_game_map(map)
     {x, y} = MapUtils.random_square(map, nil, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
@@ -113,8 +114,8 @@ generate = (portal_spawns, monster_spawns) ->
         post_poned(game_map)
     return game_map, player_spawn_points
 
-DebugArena.generate_and_spawn = (monster_spawns) =>
-    game_map, player_spawn_points = generate({}, monster_spawns)
+DebugArena.generate_and_spawn = (monster_spawns, options={}) =>
+    game_map, player_spawn_points = generate({}, monster_spawns, options)
     World.players_spawn(game_map, player_spawn_points)
     return game_map
 

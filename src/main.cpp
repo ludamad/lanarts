@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <ctime>
 #include <csignal>
+#include <string>
 
 #include <memory>
 
@@ -116,6 +117,113 @@ static void run_lua_value(void* arg) {
     }
 }
 
+#ifdef __EMSCRIPTEN__
+static std::string content_api_json_result;
+
+static std::string json_escape(const std::string& value) {
+    std::string escaped;
+    escaped.reserve(value.size() + 8);
+    for (char c : value) {
+        switch (c) {
+        case '\\':
+            escaped += "\\\\";
+            break;
+        case '"':
+            escaped += "\\\"";
+            break;
+        case '\n':
+            escaped += "\\n";
+            break;
+        case '\r':
+            escaped += "\\r";
+            break;
+        case '\t':
+            escaped += "\\t";
+            break;
+        default:
+            escaped += c;
+            break;
+        }
+    }
+    return escaped;
+}
+
+static const char* content_api_error(const std::string& message) {
+    content_api_json_result = "{\"schema\":1,\"error\":\"" + json_escape(message) + "\"}";
+    return content_api_json_result.c_str();
+}
+
+static lua_State* content_api_luastate() {
+    static lua_State* L = nullptr;
+    if (L == nullptr) {
+        L = init_luastate();
+        const char* setup =
+            "package.path = package.path .. ';dependencies/?.lua'\n"
+            "package.path = package.path .. ';dependencies/socket/?.lua'\n"
+            "require('Logging').set_log_level('ERROR')\n"
+            "require('GlobalVariableSetup')(true)\n"
+            "require('moonscript.base').insert_loader()\n";
+        if (luaL_dostring(L, setup) != 0) {
+            std::string err = lua_tostring(L, -1) ? lua_tostring(L, -1) : "unknown Lua setup error";
+            lua_settop(L, 0);
+            throw std::runtime_error(err);
+        }
+    }
+    return L;
+}
+
+static const char* content_api_call(const char* method_name, const char* raw_json) {
+    try {
+        lua_State* L = content_api_luastate();
+        lua_settop(L, 0);
+
+        lua_getglobal(L, "require");
+        lua_pushstring(L, "engine.ContentApi");
+        if (lua_pcall(L, 1, 1, 0) != 0) {
+            std::string err = lua_tostring(L, -1) ? lua_tostring(L, -1) : "could not require engine.ContentApi";
+            lua_settop(L, 0);
+            return content_api_error(err);
+        }
+
+        lua_getfield(L, -1, method_name);
+        if (!lua_isfunction(L, -1)) {
+            lua_settop(L, 0);
+            return content_api_error(std::string("Unknown content API method: ") + method_name);
+        }
+
+        int nargs = 0;
+        if (raw_json != nullptr) {
+            lua_pushstring(L, raw_json);
+            nargs = 1;
+        }
+        if (lua_pcall(L, nargs, 1, 0) != 0) {
+            std::string err = lua_tostring(L, -1) ? lua_tostring(L, -1) : "content API call failed";
+            lua_settop(L, 0);
+            return content_api_error(err);
+        }
+
+        const char* text = lua_tostring(L, -1);
+        content_api_json_result = text ? text : "{}";
+        lua_settop(L, 0);
+        return content_api_json_result.c_str();
+    } catch (const std::exception& err) {
+        return content_api_error(err.what());
+    }
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_catalog_json() {
+    return content_api_call("catalog_json", nullptr);
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_launch_args_json(const char* raw_json) {
+    return content_api_call("launch_args_json", raw_json);
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_map_preview_json(const char* raw_json) {
+    return content_api_call("map_preview_json", raw_json);
+}
+#endif
+
 
 static void run_engine_Main(int argc, const char **argv) { 
     lua_State* L = init_luastate();
@@ -166,8 +274,12 @@ int main(int argc, char** argv) {
 	try {
 #endif
 #ifdef __EMSCRIPTEN__
-    vector<const char*> args = {"./lanarts", "engine.StartLanarts"};
-    run_engine_Main(args.size(), &args[0]); // Remove 'bare' argument
+    if (argc <= 1) {
+        vector<const char*> args = {"./lanarts", "engine.StartLanarts"};
+        run_engine_Main(args.size(), &args[0]);
+    } else {
+        run_engine_Main(argc, (const char**)argv);
+    }
 #else
     run_engine_Main(argc, (const char**)argv); // Remove 'bare' argument
 #endif
