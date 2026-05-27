@@ -23,7 +23,14 @@ local function run_content_api_smoke()
     expect(catalog.schema == 1, "catalog schema mismatch")
     expect(#(catalog.classes or {}) >= 4, "catalog should expose classes")
     expect(#(catalog.maps or {}) >= 4, "catalog should expose map generators")
-    expect(#(catalog.encounters or {}) >= 4, "catalog should expose encounters")
+    expect(#(catalog.encounters or {}) >= 10, "catalog should expose packaged encounters")
+    local has_executioner_package = false
+    for _, encounter in ipairs(catalog.encounters or {}) do
+        if encounter.id == "executioner-blade-package" then
+            has_executioner_package = true
+        end
+    end
+    expect(has_executioner_package, "catalog should expose the Executioner blade package")
 
     local config = [[{
         "className": "Necromancer",
