@@ -45,6 +45,72 @@ M.classes = {
     },
 }
 
+M.class_builds = {
+    Fighter = {
+        starting_weapon = "Mace",
+        starting_items = {"Health Potion"},
+        base = {hp = 135, mp = 60, strength = 6, defence = 7, magic = 4, willpower = 4},
+        per_level = {hp = 20, mp = 15, strength = 2, defence = 2, magic = 1, willpower = 1},
+        spells = {
+            {name = "Berserk", level = 1, role = "burst"},
+            {name = "Dash Attack", level = 2, role = "gap close"},
+            {name = "Power Strike", level = 3, role = "melee control"},
+        },
+    },
+    Necromancer = {
+        starting_weapon = "Pain",
+        starting_items = {"Mana Potion"},
+        base = {hp = 115, mp = 50, strength = 0, defence = 4, magic = 7, willpower = 7},
+        per_level = {hp = 15, mp = 5, strength = 1, defence = 2, magic = 2, willpower = 1},
+        spells = {
+            {name = "Baleful Regeneration", level = 1, role = "regen"},
+            {name = "Summon Dark Aspect", level = 2, role = "summon"},
+            {name = "Skeleton Army", level = 3, role = "summon"},
+        },
+    },
+    Pyrocaster = {
+        starting_weapon = "Apprentice Staff",
+        starting_items = {"Mana Potion", "Health Potion"},
+        base = {hp = 100, mp = 120, strength = 4, defence = 4, magic = 7, willpower = 7},
+        per_level = {hp = 15, mp = 20, strength = 1, defence = 1, magic = 2, willpower = 2},
+        spells = {
+            {name = "Fire Bolt", level = 1, role = "ranged"},
+            {name = "Ring of Flames", level = 2, role = "zone"},
+            {name = "Dragonform", level = 3, role = "form"},
+        },
+    },
+    Stormcaller = {
+        starting_weapon = "Apprentice Staff",
+        starting_items = {"Mana Potion", "Health Potion"},
+        base = {hp = 130, mp = 120, strength = 4, defence = 6, magic = 7, willpower = 7},
+        per_level = {hp = 15, mp = 20, strength = 1, defence = 1, magic = 2, willpower = 2},
+        spells = {
+            {name = "Energy Spear", level = 1, role = "ranged"},
+            {name = "Chain Lightning", level = 2, role = "chain"},
+            {name = "Tornado Storm", level = 3, role = "zone"},
+        },
+    },
+    Templar = {
+        starting_weapon = "Short Sword",
+        starting_items = {"Health Potion"},
+        base = {hp = 135, mp = 60, strength = 7, defence = 7, magic = 4, willpower = 4},
+        per_level = {hp = 20, mp = 15, strength = 2, defence = 2, magic = 1, willpower = 1},
+        spells = {
+            {name = "Power Strike", level = 1, role = "melee control"},
+            {name = "Dash Attack", level = 2, role = "gap close"},
+        },
+    },
+    Rogue = {
+        starting_weapon = "Dagger",
+        starting_items = {"Health Potion"},
+        base = {hp = 100, mp = 60, strength = 7, defence = 7, magic = 4, willpower = 4},
+        per_level = {hp = 15, mp = 15, strength = 2, defence = 2, magic = 1, willpower = 1},
+        spells = {
+            {name = "Dash Attack", level = 1, role = "mobility"},
+        },
+    },
+}
+
 M.levels = {
     {value = 1, label = "1", phase = "opening"},
     {value = 2, label = "2", phase = "early"},
@@ -173,6 +239,91 @@ M.loadout_presets = {
 }
 
 M.loadout_order = {"none", "gragh", "late"}
+
+M.item_choices = {
+    {
+        id = "consumables",
+        label = "Consumables",
+        choices = {
+            {name = "Health Potion", amount = 3, tags = {"survival"}},
+            {name = "Mana Potion", amount = 2, tags = {"casting"}},
+            {name = "Red Mana Potion", amount = 2, classes = {"Pyrocaster"}, tags = {"red"}},
+        },
+    },
+    {
+        id = "weapons",
+        label = "Weapons",
+        choices = {
+            {name = "Iron Broadsword", classes = {"Fighter", "Templar"}, tags = {"melee"}},
+            {name = "Gragh's Club", classes = {"Fighter"}, tags = {"melee", "late"}},
+            {name = "Mace of Light", classes = {"Templar"}, tags = {"melee", "late"}},
+            {name = "Iron Scimitar", classes = {"Rogue"}, tags = {"melee", "late"}},
+            {name = "Apprentice Staff", classes = {"Necromancer", "Pyrocaster", "Stormcaller"}, tags = {"caster"}},
+            {name = "Wizard's Staff", classes = {"Stormcaller", "Pyrocaster"}, tags = {"caster"}},
+            {name = "Gallanthor's Crutch", classes = {"Pyrocaster", "Stormcaller"}, tags = {"caster", "late"}},
+        },
+    },
+    {
+        id = "armour",
+        label = "Armour",
+        choices = {
+            {name = "Leather Armour", classes = {"Rogue"}, tags = {"light"}},
+            {name = "Chainmail", classes = {"Fighter", "Templar"}, tags = {"medium"}},
+            {name = "Red Dragonplate", classes = {"Fighter"}, tags = {"late"}},
+            {name = "Crystalline Plate", classes = {"Templar"}, tags = {"late"}},
+            {name = "Robe", classes = {"Necromancer", "Pyrocaster", "Stormcaller"}, tags = {"caster"}},
+            {name = "Red Robe", classes = {"Pyrocaster"}, tags = {"red"}},
+            {name = "White Robe", classes = {"Stormcaller"}, tags = {"white"}},
+            {name = "Runed Robe", classes = {"Necromancer", "Pyrocaster", "Stormcaller"}, tags = {"late"}},
+            {name = "Robe of Vitality", classes = {"Stormcaller", "Necromancer"}, tags = {"survival"}},
+        },
+    },
+    {
+        id = "small_gear",
+        label = "Small gear",
+        choices = {
+            {name = "Leather Gloves", classes = {"Fighter", "Rogue", "Templar"}},
+            {name = "Steel Gloves", classes = {"Fighter", "Templar"}},
+            {name = "Runed Gloves", classes = {"Pyrocaster", "Stormcaller"}},
+            {name = "Iron Helmet", classes = {"Fighter", "Templar"}},
+            {name = "Wizard's Hat", classes = {"Pyrocaster", "Stormcaller"}},
+            {name = "Leather Boots", classes = {"Fighter", "Rogue", "Templar"}},
+            {name = "Jack Boots", classes = {"Fighter", "Templar"}},
+            {name = "Platelegs", classes = {"Fighter", "Templar"}},
+            {name = "Magic Skirt", classes = {"Pyrocaster", "Stormcaller"}},
+        },
+    },
+    {
+        id = "jewelry",
+        label = "Jewelry",
+        choices = {
+            {name = "Belt of Protection", classes = {"Fighter", "Templar"}},
+            {name = "Belt of Slaying", classes = {"Fighter"}},
+            {name = "Dank Belt", classes = {"Rogue"}},
+            {name = "Wishful Belt", classes = {"Necromancer", "Pyrocaster", "Stormcaller"}},
+            {name = "Ring of Vitality", tags = {"survival"}},
+            {name = "Ring of Vampirism", classes = {"Fighter", "Rogue"}},
+            {name = "Ring of Stone", classes = {"Templar"}},
+            {name = "Hydra Ring", classes = {"Necromancer", "Rogue"}},
+            {name = "Moonstone Ring", classes = {"Necromancer"}},
+            {name = "Wizard's Ring", classes = {"Necromancer", "Pyrocaster", "Stormcaller"}},
+            {name = "Magician's Ring", classes = {"Pyrocaster", "Stormcaller"}},
+            {name = "Ring of Spells", classes = {"Pyrocaster", "Stormcaller"}},
+        },
+    },
+    {
+        id = "amulets",
+        label = "Amulets",
+        choices = {
+            {name = "Amulet of Healing", classes = {"Fighter"}, tags = {"survival"}},
+            {name = "Amulet of Fortification", classes = {"Templar"}, tags = {"survival"}},
+            {name = "Amulet of Fear", classes = {"Rogue"}, tags = {"control"}},
+            {name = "Amulet of Great Pain", classes = {"Necromancer"}, tags = {"regen"}},
+            {name = "Amulet of Greater Fire", classes = {"Pyrocaster"}, tags = {"red"}},
+            {name = "Amulet of Light", classes = {"Stormcaller"}, tags = {"white"}},
+        },
+    },
+}
 
 M.intensities = {
     {
@@ -1034,6 +1185,8 @@ function M.catalog()
         levels = M.levels,
         loadouts = M.loadout_presets,
         loadout_names = M.loadout_preset_names(),
+        class_builds = M.class_builds,
+        item_choices = M.item_choices,
         intensities = M.intensities,
         maps = M.maps,
         map_algorithms = M.map_algorithms,

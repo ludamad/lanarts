@@ -22,6 +22,8 @@ local function run_content_api_smoke()
     local catalog = parse_response("catalog", ContentApi.catalog_json())
     expect(catalog.schema == 1, "catalog schema mismatch")
     expect(#(catalog.classes or {}) >= 4, "catalog should expose classes")
+    expect(catalog.class_builds and catalog.class_builds.Fighter, "catalog should expose class builds")
+    expect(#(catalog.item_choices or {}) >= 4, "catalog should expose curated item choices")
     expect(#(catalog.maps or {}) >= 4, "catalog should expose map generators")
     expect(#(catalog.map_algorithms or {}) >= 4, "catalog should expose map algorithms")
     expect(#(catalog.encounters or {}) >= 10, "catalog should expose packaged encounters")
@@ -65,6 +67,20 @@ local function run_content_api_smoke()
         end
     end
     expect(has_package_intensity, "balance args should preserve package intensity")
+
+    local loadout_options = parse_response("loadout options", ContentApi.loadout_options_json(config))
+    expect(loadout_options.classBuild and loadout_options.classBuild.spells, "loadout options should expose class build")
+    expect(#(loadout_options.knownSpells or {}) >= 1, "loadout options should expose known spells")
+    expect(#(loadout_options.itemChoices or {}) >= 3, "loadout options should expose item picker groups")
+    local has_necro_amulet = false
+    for _, group in ipairs(loadout_options.itemChoices or {}) do
+        for _, choice in ipairs(group.choices or {}) do
+            if choice.name == "Amulet of Great Pain" then
+                has_necro_amulet = true
+            end
+        end
+    end
+    expect(has_necro_amulet, "loadout options should expose class-relevant item choices")
 
     local map_config = [[{
         "className": "Fighter",

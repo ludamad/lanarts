@@ -223,6 +223,10 @@ extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_balance_args_json(co
     return content_api_call("balance_args_json", raw_json);
 }
 
+extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_loadout_options_json(const char* raw_json) {
+    return content_api_call("loadout_options_json", raw_json);
+}
+
 extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_map_preview_json(const char* raw_json) {
     return content_api_call("map_preview_json", raw_json);
 }

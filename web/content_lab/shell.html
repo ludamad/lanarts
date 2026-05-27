@@ -258,7 +258,8 @@
       resize: vertical;
     }
 
-    .encounter-info {
+    .encounter-info,
+    .build-info {
       display: grid;
       gap: 8px;
       padding: 10px;
@@ -278,6 +279,10 @@
     .encounter-info strong {
       color: var(--text);
       font-size: 13px;
+    }
+
+    .build-info:empty {
+      display: none;
     }
 
     .run-summary {
@@ -348,6 +353,47 @@
       color: #d4dde6;
       background: #1b2229;
       font-size: 11px;
+    }
+
+    .pick-list {
+      display: grid;
+      gap: 8px;
+      max-height: 260px;
+      overflow: auto;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #14191e;
+    }
+
+    .pick-group {
+      display: grid;
+      gap: 5px;
+    }
+
+    .pick-group strong {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .pick-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .pick-buttons button {
+      min-height: 28px;
+      border: 1px solid #35404a;
+      border-radius: 6px;
+      padding: 4px 7px;
+      color: #d4dde6;
+      background: #1b2229;
+      cursor: pointer;
+      font-size: 11px;
+      line-height: 1.2;
     }
 
     .rhythm-list {
@@ -606,6 +652,7 @@
             <input id="seed" inputmode="numeric" value="17300">
           </div>
         </div>
+        <div class="build-info" id="buildInfo"></div>
       </section>
 
       <section class="section">
@@ -620,6 +667,10 @@
         <div class="field">
           <label for="customLoadout">Custom items</label>
           <textarea id="customLoadout" spellcheck="false" placeholder="Health Potion*3, Ring of Vitality"></textarea>
+        </div>
+        <div class="field">
+          <label for="itemChoices">Items</label>
+          <div class="pick-list" id="itemChoices"></div>
         </div>
       </section>
 
@@ -825,6 +876,7 @@
 
       let generatedResources = [];
       let resolvedRun = null;
+      let loadoutOptions = null;
 
       function callContentApi(name, payload) {
         if (!state.runtimeReady || !Module.ccall) {
@@ -1076,6 +1128,86 @@
         appendSummaryLine(host, 'Balance', balanceArgs);
       }
 
+      function addChip(host, text) {
+        const chip = document.createElement('span');
+        chip.textContent = text;
+        host.appendChild(chip);
+      }
+
+      function renderBuildOptions(options) {
+        const buildHost = $('buildInfo');
+        const itemHost = $('itemChoices');
+        buildHost.innerHTML = '';
+        itemHost.innerHTML = '';
+        if (!options) {
+          return;
+        }
+
+        const build = options.classBuild || {};
+        const basics = document.createElement('div');
+        basics.className = 'item-chips';
+        if (build.starting_weapon) {
+          addChip(basics, build.starting_weapon);
+        }
+        ((build.starting_items || [])).forEach((item) => addChip(basics, item));
+        const base = build.base || {};
+        if (base.hp || base.mp) {
+          addChip(basics, `${base.hp || 0} HP`);
+          addChip(basics, `${base.mp || 0} MP`);
+        }
+        if (basics.childElementCount > 0) {
+          buildHost.appendChild(basics);
+        }
+
+        const known = options.knownSpells || [];
+        if (known.length) {
+          const spellRow = document.createElement('div');
+          spellRow.className = 'item-chips';
+          known.forEach((spell) => addChip(spellRow, spell.name));
+          buildHost.appendChild(spellRow);
+        }
+
+        (options.itemChoices || []).forEach((group) => {
+          const groupNode = document.createElement('div');
+          groupNode.className = 'pick-group';
+          const label = document.createElement('strong');
+          label.textContent = group.label || group.id || 'Items';
+          const buttons = document.createElement('div');
+          buttons.className = 'pick-buttons';
+          (group.choices || []).forEach((choice) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = choice.amount > 1 ? `${choice.name} x${choice.amount}` : choice.name;
+            button.addEventListener('click', () => {
+              addItemSpec(choice.spec || choice.name);
+            });
+            buttons.appendChild(button);
+          });
+          groupNode.appendChild(label);
+          groupNode.appendChild(buttons);
+          itemHost.appendChild(groupNode);
+        });
+      }
+
+      function addItemSpec(spec) {
+        const textarea = $('customLoadout');
+        const next = String(spec || '').trim();
+        if (!next) {
+          return;
+        }
+        const parts = textarea.value.split(',').map((part) => part.trim()).filter(Boolean);
+        if (!parts.includes(next)) {
+          parts.push(next);
+          textarea.value = parts.join(', ');
+        }
+        refreshLab();
+      }
+
+      function updateLoadoutOptions() {
+        loadoutOptions = callContentApi('lanarts_content_loadout_options_json', currentConfig());
+        renderBuildOptions(loadoutOptions);
+      }
+
       function updateRunSummary() {
         resolvedRun = callContentApi('lanarts_content_run_summary_json', currentConfig());
         renderRunSummary(resolvedRun);
@@ -1088,6 +1220,7 @@
       }
 
       function refreshLab() {
+        updateLoadoutOptions();
         updateRunSummary();
         drawPreviews();
         updateGeneratedResources();

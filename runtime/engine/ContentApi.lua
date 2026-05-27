@@ -193,6 +193,29 @@ local function class_lookup()
     return lookup
 end
 
+local function class_build_for(class_name)
+    return Catalog.class_builds[class_name or ""] or {}
+end
+
+local function spell_rows_for_level(class_name, level)
+    local known = {}
+    local upcoming = {}
+    local class_build = class_build_for(class_name)
+    for _, spell in ipairs(class_build.spells or {}) do
+        local row = {
+            name = spell.name,
+            level = spell.level,
+            role = spell.role,
+        }
+        if (tonumber(spell.level) or 1) <= level then
+            known[#known + 1] = row
+        else
+            upcoming[#upcoming + 1] = row
+        end
+    end
+    return known, upcoming
+end
+
 local function level_lookup()
     local lookup = {}
     for _, level in ipairs(Catalog.levels) do
@@ -284,6 +307,15 @@ local function parse_loadout_specs(value)
     return specs
 end
 
+local function has_value(values, needle)
+    for _, value in ipairs(values or {}) do
+        if value == needle then
+            return true
+        end
+    end
+    return false
+end
+
 local function loadout_for_config(config)
     local preset_name = config.preset or "none"
     local preset = Catalog.loadout_presets[preset_name] or Catalog.loadout_presets.none or {}
@@ -296,6 +328,62 @@ local function loadout_for_config(config)
         label = preset.label or preset_name,
         description = preset.description or "",
         items = specs,
+    }
+end
+
+local function item_spec_for_choice(choice)
+    local amount = math.max(1, tonumber(choice.amount) or 1)
+    if amount > 1 then
+        return string.format("%s*%d", choice.name, amount)
+    end
+    return choice.name
+end
+
+local function choice_relevant_to_class(choice, class_name)
+    if not choice.classes or #choice.classes == 0 then
+        return true
+    end
+    return has_value(choice.classes, class_name)
+end
+
+local function item_choices_for_config(config)
+    local groups = {}
+    for _, group in ipairs(Catalog.item_choices or {}) do
+        local choices = {}
+        for _, choice in ipairs(group.choices or {}) do
+            if choice_relevant_to_class(choice, config.className) then
+                choices[#choices + 1] = {
+                    name = choice.name,
+                    amount = math.max(1, tonumber(choice.amount) or 1),
+                    spec = item_spec_for_choice(choice),
+                    classes = copy_array(choice.classes or {}),
+                    tags = copy_array(choice.tags or {}),
+                }
+            end
+        end
+        if #choices > 0 then
+            groups[#groups + 1] = {
+                id = group.id,
+                label = group.label,
+                choices = choices,
+            }
+        end
+    end
+    return groups
+end
+
+local function build_options_payload(config)
+    local known_spells, upcoming_spells = spell_rows_for_level(config.className, config.level)
+    return {
+        schema = 1,
+        config = config,
+        classBuild = class_build_for(config.className),
+        knownSpells = known_spells,
+        upcomingSpells = upcoming_spells,
+        loadout = loadout_for_config(config),
+        itemChoices = item_choices_for_config(config),
+        args = launch_args(config),
+        balanceArgs = balance_args(config),
     }
 end
 
@@ -590,8 +678,13 @@ function M.balance_args_json(raw_json)
     })
 end
 
+function M.loadout_options_json(raw_json)
+    return encode(build_options_payload(normalized_config(parse_json_object(raw_json))))
+end
+
 function M.run_summary_json(raw_json)
     local config = normalized_config(parse_json_object(raw_json))
+    local known_spells, upcoming_spells = spell_rows_for_level(config.className, config.level)
     local selected = {
         class = class_lookup()[config.className],
         level = level_lookup()[config.level],
@@ -605,6 +698,9 @@ function M.run_summary_json(raw_json)
         config = config,
         class = selected.class,
         level = selected.level or {value = config.level, label = tostring(config.level)},
+        classBuild = class_build_for(config.className),
+        knownSpells = known_spells,
+        upcomingSpells = upcoming_spells,
         loadout = loadout_for_config(config),
         map = selected.map,
         mapAlgorithm = selected.mapAlgorithm,
