@@ -108,6 +108,21 @@ local function run_content_api_smoke()
     end
     expect(has_map_profile, "launch args should preserve map profile")
 
+    local red_dragon_config = [[{
+        "className": "Pyrocaster",
+        "level": 5,
+        "preset": "late",
+        "seed": "22480",
+        "encounter": "red-dragon-duel",
+        "intensity": "high"
+    }]]
+    local red_dragon_summary = parse_response("red dragon summary", ContentApi.run_summary_json(red_dragon_config))
+    local red_rhythms = {}
+    for _, rhythm in ipairs(red_dragon_summary.rhythms or {}) do
+        red_rhythms[rhythm.id] = true
+    end
+    expect(red_rhythms.orbit and red_rhythms.pulse and red_rhythms.summon, "red dragon should expose full package rhythms")
+
     local matrix = parse_response("resource matrix", ContentApi.resource_matrix_json(config))
     expect((matrix.count or 0) == #(matrix.resources or {}), "matrix count should match resources")
     expect((matrix.count or 0) >= 30, "matrix should expose orthogonal resources")
