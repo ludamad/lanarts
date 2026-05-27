@@ -8,10 +8,13 @@ Content lab APIs:
 
     Validates that the content-lab catalog, resolved run summary, and generated
     resource matrix return parseable JSON with the expected high-level shape.
+    Run summaries also expose StartBalanceRun args for the selected class,
+    level, loadout, map or encounter, and package pressure.
 
 Balance simulations:
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --classes Fighter,Necromancer,Pyrocaster,Stormcaller
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --levels 1,3
+    ./e2e_tests/test_content_package_balance_smoke.sh
 
     Outputs default to saves/balance_runs.csv, saves/balance_samples.csv,
     saves/balance_spells.csv, saves/balance_classes.csv,
@@ -59,6 +62,11 @@ Balance simulations:
     Use --start_map_desc to start every run in a specific map descriptor, for
     example map_descs.PixullochiaDepths, when testing late-game enemy pools
     without waiting for portal traversal.
+    Use --encounter and --package_intensity to run the same content-lab
+    packaged arenas used by the web shell, for example
+    --encounter gragh-rescue-package --package_intensity high. Packaged runs
+    emit package_outcome, escort HP, rescue saves, clutch saves, and misses in
+    run and sample rows; ally-down package failures end the run as ally_down.
     Use --loadout_preset late to give each class a representative equipped
     late-game kit without inflating the starting level. Use --loadout to append
     comma-separated item specs such as `Health Potion*3,Hydra Ring`, and

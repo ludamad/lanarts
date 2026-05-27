@@ -5,6 +5,8 @@ local StartEngine = require "engine.StartEngine"
 local EngineHooks = require "engine.EngineBase"
 
 local DEFAULT_CLASSES = "Fighter,Templar,Rogue,Necromancer,Pyrocaster,Stormcaller"
+local ContentLaunch
+local ContentLabHazards
 local GameState
 local Map
 local World
@@ -13,6 +15,16 @@ local function load_core_modules()
     GameState = GameState or require "core.GameState"
     Map = Map or require "core.Map"
     World = World or require "core.World"
+end
+
+local function load_content_launch()
+    ContentLaunch = ContentLaunch or require "engine.ContentLaunch"
+    return ContentLaunch
+end
+
+local function load_content_lab_hazards()
+    ContentLabHazards = ContentLabHazards or require "objects.ContentLabHazards"
+    return ContentLabHazards
 end
 
 local function split_csv(value)
@@ -24,6 +36,11 @@ local function split_csv(value)
         end
     end
     return result
+end
+
+local function content_lab_arena_requested(options)
+    return (options.encounter and options.encounter ~= "")
+        or (options.monsters and options.monsters ~= "")
 end
 
 local function parse_levels(value)
@@ -565,6 +582,59 @@ local function player_snapshot()
     }
 end
 
+local function content_lab_package_state(player)
+    if not player or not player.map then
+        return nil
+    end
+    if player.map.content_lab_package_result then
+        return player.map.content_lab_package_result
+    end
+    if not player.map.content_lab_director then
+        return nil
+    end
+    return load_content_lab_hazards().package_state(player.map)
+end
+
+local function package_state_fields(player)
+    local state = content_lab_package_state(player)
+    if not state then
+        return {
+            package_outcome = "",
+            package_frames = "",
+            package_escort_count = "",
+            package_escort_hp = "",
+            package_escort_max_hp = "",
+            package_escort_hp_pct = "",
+            package_rescue_saves = "",
+            package_rescue_clutch_saves = "",
+            package_rescue_misses = "",
+            package_rescue_best_margin = "",
+            package_rescue_last_margin = "",
+        }
+    end
+    local escort_hp = tonumber(state.escort_hp) or 0
+    local escort_max_hp = tonumber(state.escort_max_hp) or 0
+    return {
+        package_outcome = state.outcome or "",
+        package_frames = state.frames or 0,
+        package_escort_count = state.escort_count or 0,
+        package_escort_hp = format_rate(escort_hp),
+        package_escort_max_hp = format_rate(escort_max_hp),
+        package_escort_hp_pct = escort_max_hp > 0 and format_rate(escort_hp / escort_max_hp) or "",
+        package_rescue_saves = state.rescue_saves or 0,
+        package_rescue_clutch_saves = state.rescue_clutch_saves or 0,
+        package_rescue_misses = state.rescue_misses or 0,
+        package_rescue_best_margin = state.rescue_best_margin or "",
+        package_rescue_last_margin = state.rescue_last_margin or "",
+    }
+end
+
+local function copy_package_state_fields(row, player)
+    for key, value in pairs(package_state_fields(player)) do
+        row[key] = value
+    end
+end
+
 local function sample_run(run, telemetry, samples, reason)
     local snap = player_snapshot()
     if not snap then
@@ -575,7 +645,7 @@ local function sample_run(run, telemetry, samples, reason)
     local necromancer_pain_orders = telemetry.necromancer_pain_orders or 0
     local damage_taken_total = telemetry.damage_taken_total or 0
     local regen_recovered_total = telemetry.necromancer_regen_recovered_total or 0
-    samples[#samples + 1] = {
+    local row = {
         run_id = run.run_id,
         seed = tostring(run.seed),
         seed_group = run.seed_group,
@@ -585,6 +655,10 @@ local function sample_run(run, telemetry, samples, reason)
         loadout = run.loadout_name or "",
         bot_profile = run.bot_profile or telemetry.skill_profile or "",
         objective_enemy = run.objective_enemy or "",
+        start_map_desc = run.start_map_desc or "",
+        encounter = run.encounter or "",
+        monsters = run.monsters or "",
+        package_intensity = run.package_intensity or "",
         frame = GameState.frame,
         reason = reason or "interval",
         level = snap.level,
@@ -641,6 +715,8 @@ local function sample_run(run, telemetry, samples, reason)
         pyrocaster_ring_close_frames = telemetry.pyrocaster_ring_close_frames or 0,
         pyrocaster_ring_reposition_frames = telemetry.pyrocaster_ring_reposition_frames or 0,
     }
+    copy_package_state_fields(row, snap.player)
+    samples[#samples + 1] = row
 end
 
 local function summarize_run(run, telemetry, outcome)
@@ -650,7 +726,7 @@ local function summarize_run(run, telemetry, outcome)
     local necromancer_pain_orders = telemetry.necromancer_pain_orders or 0
     local damage_taken_total = telemetry.damage_taken_total or 0
     local regen_recovered_total = telemetry.necromancer_regen_recovered_total or 0
-    return {
+    local row = {
         run_id = run.run_id,
         seed = tostring(run.seed),
         seed_group = run.seed_group,
@@ -660,6 +736,10 @@ local function summarize_run(run, telemetry, outcome)
         loadout = run.loadout_name or "",
         bot_profile = run.bot_profile or telemetry.skill_profile or "",
         objective_enemy = run.objective_enemy or "",
+        start_map_desc = run.start_map_desc or "",
+        encounter = run.encounter or "",
+        monsters = run.monsters or "",
+        package_intensity = run.package_intensity or "",
         outcome = outcome,
         frames = GameState.frame,
         level = snap.level or 0,
@@ -739,6 +819,8 @@ local function summarize_run(run, telemetry, outcome)
         monster_kills = encode_counts(telemetry.monster_kills),
         visible_enemy_frames = encode_counts(telemetry.visible_enemy_frames),
     }
+    copy_package_state_fields(row, snap.player)
+    return row
 end
 
 local function flatten_spell_rows(run, telemetry)
@@ -821,6 +903,9 @@ local SUMMARY_METRICS = {
     "pyrocaster_ring_combat_frames", "pyrocaster_ring_close_frames",
     "pyrocaster_ring_reposition_frames",
     "max_same_square_frames", "max_visible_enemies",
+    "package_frames", "package_escort_count", "package_escort_hp", "package_escort_max_hp",
+    "package_escort_hp_pct", "package_rescue_saves", "package_rescue_clutch_saves",
+    "package_rescue_misses",
 }
 
 local function add_summary_metric(aggregate, row, key)
@@ -842,6 +927,10 @@ local function aggregate_summary_rows(summaries)
         local loadout = row.loadout or ""
         local bot_profile = row.bot_profile or ""
         local objective_enemy = row.objective_enemy or ""
+        local start_map_desc = row.start_map_desc or ""
+        local encounter = row.encounter or ""
+        local monsters = row.monsters or ""
+        local package_intensity = row.package_intensity or ""
         local key = group_key(class_name, start_level, loadout, bot_profile)
         local aggregate = groups[key]
         if not aggregate then
@@ -851,6 +940,10 @@ local function aggregate_summary_rows(summaries)
                 loadout = loadout,
                 bot_profile = bot_profile,
                 objective_enemy = objective_enemy,
+                start_map_desc = start_map_desc,
+                encounter = encounter,
+                monsters = monsters,
+                package_intensity = package_intensity,
                 runs = 0,
                 outcomes = {},
                 sums = {},
@@ -878,9 +971,15 @@ local function aggregate_summary_rows(summaries)
             loadout = aggregate.loadout,
             bot_profile = aggregate.bot_profile,
             objective_enemy = aggregate.objective_enemy,
+            start_map_desc = aggregate.start_map_desc,
+            encounter = aggregate.encounter,
+            monsters = aggregate.monsters,
+            package_intensity = aggregate.package_intensity,
             runs = aggregate.runs,
             wins = wins,
             clears = aggregate.outcomes.cleared or 0,
+            ally_downs = aggregate.outcomes.ally_down or 0,
+            package_failures = aggregate.outcomes.package_failed or 0,
             deaths = aggregate.outcomes.death or 0,
             step_limits = aggregate.outcomes.step_limit or 0,
             bot_stalls = aggregate.outcomes.bot_stalled or 0,
@@ -1704,7 +1803,15 @@ local function game_init(run, telemetry, bot_options)
 
     EngineInternal.init_gamestate()
     random_seed(run.seed)
-    if bot_options.start_map_desc and bot_options.start_map_desc ~= "" then
+    if content_lab_arena_requested(bot_options) then
+        EngineHooks.first_map_create = function()
+            return load_content_launch().generate_encounter_arena {
+                encounter = bot_options.encounter,
+                monsters = bot_options.monsters,
+                package_intensity = bot_options.package_intensity,
+            }
+        end
+    elseif bot_options.start_map_desc and bot_options.start_map_desc ~= "" then
         EngineHooks.first_map_create = function()
             return generate_start_map_desc(bot_options.start_map_desc)
         end
@@ -1780,6 +1887,19 @@ local function install_run_hooks(events_module, base_player_death, base_monster_
     end
 end
 
+local function package_outcome_to_run_outcome(outcome)
+    if outcome == "clear" then
+        return "cleared"
+    elseif outcome == "ally down" then
+        return "ally_down"
+    elseif outcome == "party down" then
+        return "death"
+    elseif outcome and outcome ~= "" then
+        return "package_failed"
+    end
+    return nil
+end
+
 local function add_run(runs, run_id, class_name, start_level, seed, seed_group, class_run_index, loadout, objective_enemy)
     runs[#runs + 1] = {
         run_id = run_id,
@@ -1830,6 +1950,9 @@ local function run_balance(raw_args)
     parser:option("--classes", "Comma-separated classes to run.", DEFAULT_CLASSES)
     parser:option("--levels", "Comma-separated starting levels to run.", "1")
     parser:option("--start_map_desc", "Optional map_desc module to start each run in, such as map_descs.PixullochiaDepths.", nil)
+    parser:option("--encounter", "Optional content-lab encounter id to start each run in an arena.", "")
+    parser:option("--monsters", "Comma-separated monster names to start each run in a content-lab arena.", "")
+    parser:option("--package_intensity", "Content-lab package pressure preset for arena encounters.", "standard")
     parser:option("--loadout_preset", "Equipment preset for each class: none or late.", "none")
     parser:option("--loadout", "Comma-separated item specs to add to every run, using Item or Item*COUNT.", "")
     parser:option("--loadout_label", "Optional label for this loadout in outputs.", "")
@@ -1875,6 +1998,10 @@ local function run_balance(raw_args)
     local runs = build_runs(classes, parse_levels(args.levels), tonumber(args.runs), tonumber(args.seed), seed_mode, loadout, args.objective_enemy)
     for _, run in ipairs(runs) do
         run.bot_profile = args.bot_profile
+        run.start_map_desc = args.start_map_desc or ""
+        run.encounter = args.encounter or ""
+        run.monsters = args.monsters or ""
+        run.package_intensity = args.package_intensity or ""
     end
     local summaries = {}
     local samples = {}
@@ -1899,10 +2026,16 @@ local function run_balance(raw_args)
         local enemy_stat_rows = aggregate_enemy_rows(summaries)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
         write_csv(args.out, summaries, {
-            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "objective_enemy", "outcome", "frames", "level", "xp",
+            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile",
+            "objective_enemy", "start_map_desc", "encounter", "monsters", "package_intensity",
+            "outcome", "frames", "level", "xp",
             "hp", "max_hp", "hp_pct", "min_hp", "min_hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
+            "package_outcome", "package_frames", "package_escort_count", "package_escort_hp",
+            "package_escort_max_hp", "package_escort_hp_pct", "package_rescue_saves",
+            "package_rescue_clutch_saves", "package_rescue_misses", "package_rescue_best_margin",
+            "package_rescue_last_margin",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "damage_taken_total", "regen_adjusted_damage_taken_total",
             "necromancer_regen_offset_pct", "damage_event_total", "damage_taken_by_source",
@@ -1920,11 +2053,17 @@ local function run_balance(raw_args)
             "alive_enemy_hp", "alive_enemy_max_hp",
         })
         write_csv(args.samples_out, samples, {
-            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "objective_enemy", "frame", "reason", "level", "xp",
+            "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile",
+            "objective_enemy", "start_map_desc", "encounter", "monsters", "package_intensity",
+            "frame", "reason", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "alive_enemy_counts",
             "alive_enemy_hp", "alive_enemy_max_hp", "spells_known",
+            "package_outcome", "package_frames", "package_escort_count", "package_escort_hp",
+            "package_escort_max_hp", "package_escort_hp_pct", "package_rescue_saves",
+            "package_rescue_clutch_saves", "package_rescue_misses", "package_rescue_best_margin",
+            "package_rescue_last_margin",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "damage_taken_total", "regen_adjusted_damage_taken_total",
             "necromancer_regen_offset_pct", "damage_event_total", "damage_taken_by_source",
@@ -1958,7 +2097,9 @@ local function run_balance(raw_args)
             "damage_share",
         })
         write_csv(args.aggregate_out, class_rows, {
-            "class", "start_level", "loadout", "bot_profile", "objective_enemy", "runs", "wins", "clears", "deaths", "step_limits", "bot_stalls",
+            "class", "start_level", "loadout", "bot_profile", "objective_enemy", "start_map_desc",
+            "encounter", "monsters", "package_intensity",
+            "runs", "wins", "clears", "ally_downs", "package_failures", "deaths", "step_limits", "bot_stalls",
             "game_loop_exits", "win_rate", "death_rate", "outcome_counts",
             "combat_frame_rate", "explore_frame_rate", "rest_frame_rate",
             "idle_frame_rate", "portal_stop_frame_rate",
@@ -1974,6 +2115,8 @@ local function run_balance(raw_args)
             "avg_ranged_keepaway_frames", "avg_ranged_close_enemy_frames",
             "avg_ranged_close_gragh_frames", "avg_necromancer_regen_frames",
             "avg_necromancer_regen_recovered_total",
+            "avg_package_frames", "avg_package_escort_hp_pct", "avg_package_rescue_saves",
+            "avg_package_rescue_clutch_saves", "avg_package_rescue_misses",
         })
         write_csv(args.spell_stats_out, spell_stat_rows, {
             "class", "start_level", "loadout", "bot_profile", "spell", "class_runs", "runs_using", "use_rate",
@@ -1997,9 +2140,12 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 14,
+                schema_version = 15,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
+                encounter = args.encounter,
+                monsters = args.monsters,
+                package_intensity = args.package_intensity,
                 bot_profile = args.bot_profile,
                 loadout_preset = loadout_preset,
                 loadout = loadout.name,
@@ -2068,6 +2214,9 @@ local function run_balance(raw_args)
             spell_policy = args.spell_policy,
             skill_profile = args.bot_profile,
             start_map_desc = args.start_map_desc,
+            encounter = args.encounter,
+            monsters = args.monsters,
+            package_intensity = args.package_intensity,
             objective_enemy = parse_bool(args.hunt_objective) and args.objective_enemy or "",
         }
 
@@ -2138,13 +2287,21 @@ local function run_balance(raw_args)
             local player = entry and entry.instance
             attach_objective_damage_tracker(player, args.objective_enemy, telemetry)
             attach_damage_dealt_trackers(player, telemetry)
+            local package_state = content_lab_package_state(player)
+            local package_run_outcome = package_state and package_outcome_to_run_outcome(package_state.outcome)
+            if not run_state.done and package_run_outcome then
+                run_state.outcome = package_run_outcome
+                run_state.done = true
+                return step
+            end
             if not run_state.done and args.objective_enemy and args.objective_enemy ~= ""
                 and player and hostile_alive_enemy_named_count(player, args.objective_enemy) == 0 then
                 run_state.outcome = "cleared"
                 run_state.done = true
                 return step
             end
-            if not run_state.done and args.start_map_desc and args.start_map_desc ~= ""
+            if not run_state.done and (args.start_map_desc and args.start_map_desc ~= ""
+                or content_lab_arena_requested(args) and not package_state)
                 and player and hostile_alive_enemy_count(player) == 0 then
                 run_state.outcome = "cleared"
                 run_state.done = true

@@ -116,6 +116,14 @@ generate = (portal_spawns, monster_spawns, options={}) ->
 
 DebugArena.generate_and_spawn = (monster_spawns, options={}) =>
     game_map, player_spawn_points = generate({}, monster_spawns, options)
+    if #player_spawn_points > 0
+        center = {0, 0}
+        for point in *player_spawn_points
+            center[1] += point[1]
+            center[2] += point[2]
+        center[1] /= #player_spawn_points
+        center[2] /= #player_spawn_points
+        game_map.content_lab_spawn_center = center
     World.players_spawn(game_map, player_spawn_points)
     return game_map
 

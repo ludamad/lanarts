@@ -1003,6 +1003,10 @@
         const args = document.createElement('code');
         args.textContent = (summary.args || []).join(' ');
         appendSummaryLine(host, 'Args', args);
+
+        const balanceArgs = document.createElement('code');
+        balanceArgs.textContent = (summary.balanceArgs || []).join(' ');
+        appendSummaryLine(host, 'Balance', balanceArgs);
       }
 
       function updateRunSummary() {

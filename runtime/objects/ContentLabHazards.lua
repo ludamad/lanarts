@@ -382,6 +382,37 @@ local function package_result(director, outcome)
         subtitle = package_title(director.package or {}, director.intensity or {}),
         detail = string.format("%.1fs, %s, %s", seconds, escort_text, rescue_text),
         color = result_color(outcome),
+        frames = frames,
+        seconds = seconds,
+        escort_count = count,
+        escort_hp = hp,
+        escort_max_hp = max_hp,
+        rescue_saves = saves,
+        rescue_clutch_saves = clutch,
+        rescue_misses = misses,
+        rescue_best_margin = best,
+        rescue_last_margin = director.rescue_last_margin,
+    }
+end
+
+local function package_state_from_director(director)
+    if not director or director.destroyed then
+        return nil
+    end
+    local count, hp, max_hp = escort_health()
+    return {
+        outcome = "",
+        title = package_title(director.package or {}, director.intensity or {}),
+        frames = director.elapsed or 0,
+        seconds = (director.elapsed or 0) / 60,
+        escort_count = count,
+        escort_hp = hp,
+        escort_max_hp = max_hp,
+        rescue_saves = director.rescue_saves or 0,
+        rescue_clutch_saves = director.rescue_clutch_saves or 0,
+        rescue_misses = director.rescue_misses or 0,
+        rescue_best_margin = director.rescue_best_margin,
+        rescue_last_margin = director.rescue_last_margin,
     }
 end
 
@@ -425,6 +456,10 @@ local function finish_package(director, outcome)
     end
     director.content_lab_finished = true
     local result = package_result(director, outcome)
+    if director.map then
+        director.map.content_lab_package_result = result
+        director.map.content_lab_director = nil
+    end
     EventLog.add(result.title .. ": " .. result.subtitle .. " (" .. result.detail .. ")", result.color)
     M.create_result_banner {
         map = director.map,
@@ -745,7 +780,7 @@ local function spawn_escorts(director, package)
     if not escort.monster then
         return
     end
-    local center = center_of_players() or director.xy
+    local center = director.xy
     local count = escort.count or 1
     local radius = escort.radius or 120
     local hp = escort.hp
@@ -798,6 +833,16 @@ function active_rescue_strikes()
     return count, blocked, best_remaining
 end
 
+function M.package_state(game_map)
+    if not game_map then
+        return nil
+    end
+    if game_map.content_lab_package_result then
+        return game_map.content_lab_package_result
+    end
+    return package_state_from_director(game_map.content_lab_director)
+end
+
 local function spawn_summons(director, package)
     local summon = package.summon or {}
     local intensity = director.intensity
@@ -837,7 +882,7 @@ function M.add_director(game_map, package, intensity)
         return nil
     end
     intensity = normalize_intensity(intensity)
-    local center = center_of_players() or {320, 320}
+    local center = game_map.content_lab_spawn_center or {320, 320}
     local director = GameObject.object_create {
         map = game_map,
         xy = center,
@@ -902,6 +947,7 @@ function M.add_director(game_map, package, intensity)
             draw_package_hud(self)
         end,
     }
+    game_map.content_lab_director = director
     spawn_escorts(director, package)
     return director
 end

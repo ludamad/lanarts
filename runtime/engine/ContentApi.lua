@@ -30,6 +30,9 @@ local function normalized_config(config)
         mapDesc = tostring(config.mapDesc or config.start_map_desc or ""),
         encounter = tostring(config.encounter or ""),
         monsters = tostring(config.monsters or ""),
+        botProfile = tostring(config.botProfile or config.bot_profile or "human"),
+        runs = math.max(1, math.floor(tonumber(config.runs) or 5)),
+        steps = math.max(1, math.floor(tonumber(config.steps) or 20000)),
     }
 end
 
@@ -66,6 +69,45 @@ local function launch_args(config)
     if config.seed ~= "" then
         args[#args + 1] = "--seed"
         args[#args + 1] = config.seed
+    end
+    return args
+end
+
+local function balance_args(config)
+    config = normalized_config(config)
+    local args = {
+        "engine.StartBalanceRun",
+        "--classes",
+        config.className,
+        "--levels",
+        tostring(config.level),
+        "--runs",
+        tostring(config.runs),
+        "--steps",
+        tostring(config.steps),
+        "--seed",
+        config.seed,
+        "--bot_profile",
+        config.botProfile,
+        "--loadout_preset",
+        config.preset,
+    }
+    if config.customLoadout ~= "" then
+        args[#args + 1] = "--loadout"
+        args[#args + 1] = config.customLoadout
+    end
+    if config.encounter ~= "" then
+        args[#args + 1] = "--encounter"
+        args[#args + 1] = config.encounter
+        args[#args + 1] = "--package_intensity"
+        args[#args + 1] = config.intensity
+    end
+    if config.monsters ~= "" then
+        args[#args + 1] = "--monsters"
+        args[#args + 1] = config.monsters
+    elseif config.encounter == "" and config.mapDesc ~= "" then
+        args[#args + 1] = "--start_map_desc"
+        args[#args + 1] = config.mapDesc
     end
     return args
 end
@@ -331,6 +373,8 @@ local function resource_entry(group, name, meta, goal, config, seed_offset)
         encounter = config.encounter,
         monsters = config.monsters,
         seed = tostring(seed + (seed_offset or 0)),
+        args = launch_args(config),
+        balanceArgs = balance_args(config),
     }
 end
 
@@ -367,6 +411,15 @@ function M.launch_args_json(raw_json)
     })
 end
 
+function M.balance_args_json(raw_json)
+    local config = normalized_config(parse_json_object(raw_json))
+    return encode({
+        schema = 1,
+        config = config,
+        args = balance_args(config),
+    })
+end
+
 function M.run_summary_json(raw_json)
     local config = normalized_config(parse_json_object(raw_json))
     local selected = {
@@ -388,6 +441,7 @@ function M.run_summary_json(raw_json)
         rhythms = encounter_rhythms(selected.encounter, selected.intensity),
         warnings = warnings_for(config, selected),
         args = launch_args(config),
+        balanceArgs = balance_args(config),
     })
 end
 

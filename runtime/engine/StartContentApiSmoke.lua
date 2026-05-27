@@ -52,6 +52,17 @@ local function run_content_api_smoke()
     end
     expect(has_rescue_rhythm, "summary should expose rescue rhythm metadata")
     expect(summary.args and #summary.args > 0, "summary should expose launch args")
+    expect(summary.balanceArgs and #summary.balanceArgs > 0, "summary should expose balance args")
+
+    local balance_args = parse_response("balance args", ContentApi.balance_args_json(config))
+    expect(balance_args.args and balance_args.args[1] == "engine.StartBalanceRun", "balance args should target StartBalanceRun")
+    local has_package_intensity = false
+    for _, arg in ipairs(balance_args.args or {}) do
+        if arg == "--package_intensity" then
+            has_package_intensity = true
+        end
+    end
+    expect(has_package_intensity, "balance args should preserve package intensity")
 
     local matrix = parse_response("resource matrix", ContentApi.resource_matrix_json(config))
     expect((matrix.count or 0) == #(matrix.resources or {}), "matrix count should match resources")
