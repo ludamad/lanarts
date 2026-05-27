@@ -33,22 +33,97 @@ create_overworld_scheme = (tileset) -> nilprotect {
 
 OVERWORLD_TILESET = create_overworld_scheme(Tilesets.grass)
 
-place_doors_and_statues = (region_set) ->
+OVERWORLD_AMBIENT_ENEMIES = table.tconcat OldMaps.medium_animals, {
+    {enemy: "Sheep", chance: 45, group_chance: 35, group_size: 2}
+    {enemy: "Black Mamba", chance: 20}
+    {enemy: "Skeleton", chance: 18}
+    {enemy: "Cloud Elemental", chance: 12, group_chance: 25, group_size: 2}
+    {enemy: "Mouther", chance: 10}
+}
+
+OVERWORLD_VAULT_ENEMIES = table.tconcat OldMaps.medium_enemies, {
+    {enemy: "Black Mamba", chance: 35}
+    {enemy: "Mouther", chance: 25}
+    {enemy: "Fire Bat", chance: 12}
+    {enemy: "Centaur Hunter", chance: 6}
+}
+
+OVERWORLD_PROFILES = {
+    {
+        name: "open_meadow"
+        region_base: 5
+        region_rolls: {2, 2}
+        connect_base: 3
+        connect_rolls: {4, 4, 3}
+        room_base: 8
+        room_rolls: {4, 4}
+        size_base: 84
+        shell: 25
+        ridges: {3, 5}
+        small_vaults: {1, 2}
+        mini_features: {Vaults.cavern, Vaults.stone_henge, Vaults.stone_henge}
+        ambient_enemies: 7
+        n_statues: 3
+    }
+    {
+        name: "broken_grove"
+        region_base: 7
+        region_rolls: {3, 3}
+        connect_base: 2
+        connect_rolls: {3, 3, 2}
+        room_base: 6
+        room_rolls: {4, 3, 2}
+        size_base: 88
+        shell: 22
+        ridges: {4, 6}
+        small_vaults: {2, 4}
+        mini_features: {Vaults.cavern, Vaults.cavern, Vaults.stone_henge, Vaults.stone_henge}
+        ambient_enemies: 8
+        n_statues: 4
+    }
+    {
+        name: "old_stones"
+        region_base: 8
+        region_rolls: {3, 3, 2}
+        connect_base: 1
+        connect_rolls: {3, 2, 2}
+        room_base: 5
+        room_rolls: {3, 3, 2}
+        size_base: 92
+        shell: 20
+        ridges: {2, 4}
+        small_vaults: {3, 5}
+        mini_features: {Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge, Vaults.cavern}
+        ambient_enemies: 9
+        n_statues: 6
+    }
+}
+
+roll_sum = (rng, base, rolls) ->
+    value = base
+    for roll in *(rolls or {})
+        value += rng\random(0, roll)
+    return value
+
+random_range = (rng, range) ->
+    return rng\random(range[1], range[2])
+
+place_doors_and_statues = (region_set, profile) ->
     {:map, :regions} = region_set
 
     for region in *regions
         area = region\bbox()
-        conf = region.conf
+        conf = rawget(region, "conf") or profile or {}
         for xy in *SourceMap.rectangle_match {:map, selector: {matches_none: {SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}, matches_all: {FLAG_DOOR_CANDIDATE}}}
             MapUtils.spawn_door(map, xy)
-        for i=1,conf.n_statues
+        for i=1,(conf.n_statues or 0)
             sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
             if not sqr
                 break
             map\square_apply(sqr, {add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT}, remove: SourceMap.FLAG_SEETHROUGH})
             MapUtils.spawn_decoration(map, OldMaps.statue, sqr, random(0,17))
 
-overworld_items_and_enemies = (region_set) ->
+overworld_items_and_enemies = (region_set, profile) ->
     {:map, :regions} = region_set
 
     for region in *regions
@@ -61,11 +136,11 @@ overworld_items_and_enemies = (region_set) ->
             item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, sqr)
 
-        OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 8, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        OldMaps.generate_from_enemy_entries(map, OVERWORLD_AMBIENT_ENEMIES, profile.ambient_enemies, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
     return true
 
 -----------------------------
-overworld_features = (region_set) ->
+overworld_features = (region_set, profile) ->
     -------------------------
     -- Place ridges: --
     place_outdoor_ridges = () ->
@@ -83,7 +158,7 @@ overworld_features = (region_set) ->
             return true -- Dont reject
         return true
 
-    for i=1,4
+    for i=1,random_range(region_set.map.rng, profile.ridges)
         if not place_outdoor_ridges()
             print "RETRY: place_outdoor_ridges()"
             return false
@@ -92,9 +167,9 @@ overworld_features = (region_set) ->
     -------------------------
     -- Place small_random_vaults:  --
     place_small_vaults = () ->
-        for i=1,region_set.map.rng\random(2,3)
+        for i=1,random_range(region_set.map.rng, profile.small_vaults)
             enemy_placer = (map, xy) ->
-                enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
+                enemy = OldMaps.enemy_generate(OVERWORLD_VAULT_ENEMIES)
                 MapUtils.spawn_enemy(map, enemy, xy)
             door_placer = (map, xy) ->
                 -- nil is passed for the default open sprite
@@ -179,10 +254,10 @@ overworld_features = (region_set) ->
 
     ---------------------------------
     place_mini_features = () ->
-        for i, template in ipairs {Vaults.cavern, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge}--, Vaults.stone_henge, Vaults.stone_henge}
+        for i, template in ipairs profile.mini_features
         --for template in *{Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge}
             enemy_placer = (map, xy) ->
-                enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
+                enemy = OldMaps.enemy_generate(OVERWORLD_VAULT_ENEMIES)
                 MapUtils.spawn_enemy(map, enemy, xy)
             local store_placer
             if i ~= 1 and i ~= 4
@@ -228,11 +303,12 @@ return MapDesc.create {
     children: {
         MapNode.create {
             place: () =>
-                number_regions = 5 + @rng\random(0, 3) + @rng\random(0, 3) + @rng\random(0, 3)
-                connect_line_width = () -> 1 + @rng\random(0, 4) + @rng\random(0, 4) + @rng\random(0, 4) + @rng\random(0, 4)
-                room_radius = () -> 5 + @rng\random(0,4) + @rng\random(0, 4) + @rng\random(0, 4)
+                profile = @rng\random_choice(OVERWORLD_PROFILES)
+                number_regions = roll_sum(@rng, profile.region_base, profile.region_rolls)
+                connect_line_width = () -> roll_sum(@rng, profile.connect_base, profile.connect_rolls)
+                room_radius = () -> roll_sum(@rng, profile.room_base, profile.room_rolls)
                 factor = math.sqrt(number_regions / 5)
-                size = {85 * factor, 85 * factor}
+                size = {profile.size_base * factor, profile.size_base * factor}
                 template = nilprotect {
                     default_wall: Tile.create(Tilesets.grass.wall, true, true, {FLAG_OVERWORLD})
                     subtemplates: {nilprotect {
@@ -250,24 +326,22 @@ return MapDesc.create {
                         :room_radius
                         region_delta_func: spread_region_delta_func
                         -- Dungeon objects/features
-                        n_statues: 4
+                        n_statues: profile.n_statues
                     }}
                     outer_conf: nilprotect {
                         floor1: OVERWORLD_TILESET.floor1
                         floor2: OVERWORLD_TILESET.floor2
                         :connect_line_width
                     }
-                    shell: 25
+                    shell: profile.shell
                 }
                 -- TODO, handle links to overworld...
                 if not NewMaps.map_try_create(@map, @map.rng, template)
                     return false
-                if not overworld_features(@region_set)
+                if not overworld_features(@region_set, profile)
                     return false
-                append @map.post_maps, () ->
-                    if not place_doors_and_statues(@region_set)
-                        return false
-                    if not overworld_items_and_enemies(@region_set)
+                append @map.post_map, () ->
+                    if not overworld_items_and_enemies(@region_set, profile)
                         return false
                     return true
                 return true
