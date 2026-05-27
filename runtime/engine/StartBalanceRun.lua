@@ -607,9 +607,11 @@ local function package_state_fields(player)
             package_escort_hp_pct = "",
             package_rescue_saves = "",
             package_rescue_clutch_saves = "",
+            package_rescue_pulls = "",
             package_rescue_misses = "",
             package_rescue_best_margin = "",
             package_rescue_last_margin = "",
+            package_rescue_last_pull_frames = "",
         }
     end
     local escort_hp = tonumber(state.escort_hp) or 0
@@ -623,9 +625,11 @@ local function package_state_fields(player)
         package_escort_hp_pct = escort_max_hp > 0 and format_rate(escort_hp / escort_max_hp) or "",
         package_rescue_saves = state.rescue_saves or 0,
         package_rescue_clutch_saves = state.rescue_clutch_saves or 0,
+        package_rescue_pulls = state.rescue_pulls or 0,
         package_rescue_misses = state.rescue_misses or 0,
         package_rescue_best_margin = state.rescue_best_margin or "",
         package_rescue_last_margin = state.rescue_last_margin or "",
+        package_rescue_last_pull_frames = state.rescue_last_pull_frames or "",
     }
 end
 
@@ -905,7 +909,7 @@ local SUMMARY_METRICS = {
     "max_same_square_frames", "max_visible_enemies",
     "package_frames", "package_escort_count", "package_escort_hp", "package_escort_max_hp",
     "package_escort_hp_pct", "package_rescue_saves", "package_rescue_clutch_saves",
-    "package_rescue_misses",
+    "package_rescue_pulls", "package_rescue_misses",
 }
 
 local function add_summary_metric(aggregate, row, key)
@@ -2034,8 +2038,8 @@ local function run_balance(raw_args)
             "enemies_alive", "visible_enemies", "spells_known",
             "package_outcome", "package_frames", "package_escort_count", "package_escort_hp",
             "package_escort_max_hp", "package_escort_hp_pct", "package_rescue_saves",
-            "package_rescue_clutch_saves", "package_rescue_misses", "package_rescue_best_margin",
-            "package_rescue_last_margin",
+            "package_rescue_clutch_saves", "package_rescue_pulls", "package_rescue_misses",
+            "package_rescue_best_margin", "package_rescue_last_margin", "package_rescue_last_pull_frames",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "damage_taken_total", "regen_adjusted_damage_taken_total",
             "necromancer_regen_offset_pct", "damage_event_total", "damage_taken_by_source",
@@ -2062,8 +2066,8 @@ local function run_balance(raw_args)
             "alive_enemy_hp", "alive_enemy_max_hp", "spells_known",
             "package_outcome", "package_frames", "package_escort_count", "package_escort_hp",
             "package_escort_max_hp", "package_escort_hp_pct", "package_rescue_saves",
-            "package_rescue_clutch_saves", "package_rescue_misses", "package_rescue_best_margin",
-            "package_rescue_last_margin",
+            "package_rescue_clutch_saves", "package_rescue_pulls", "package_rescue_misses",
+            "package_rescue_best_margin", "package_rescue_last_margin", "package_rescue_last_pull_frames",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "damage_taken_total", "regen_adjusted_damage_taken_total",
             "necromancer_regen_offset_pct", "damage_event_total", "damage_taken_by_source",
@@ -2116,7 +2120,7 @@ local function run_balance(raw_args)
             "avg_ranged_close_gragh_frames", "avg_necromancer_regen_frames",
             "avg_necromancer_regen_recovered_total",
             "avg_package_frames", "avg_package_escort_hp_pct", "avg_package_rescue_saves",
-            "avg_package_rescue_clutch_saves", "avg_package_rescue_misses",
+            "avg_package_rescue_clutch_saves", "avg_package_rescue_pulls", "avg_package_rescue_misses",
         })
         write_csv(args.spell_stats_out, spell_stat_rows, {
             "class", "start_level", "loadout", "bot_profile", "spell", "class_runs", "runs_using", "use_rate",

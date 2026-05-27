@@ -486,7 +486,7 @@ M.encounters = {
             escort = {
                 monster = "Spectral Beast",
                 count = 1,
-                hp = 28,
+                hp = 88,
                 radius = 122,
                 angle = 0,
             },
@@ -522,6 +522,7 @@ M.encounters = {
                 block_radius = 30,
                 ally_damage = 11.0,
                 block_damage = 4.0,
+                pull_frames = 96,
                 power = 24,
             },
         },

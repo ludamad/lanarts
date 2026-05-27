@@ -65,8 +65,9 @@ Balance simulations:
     Use --encounter and --package_intensity to run the same content-lab
     packaged arenas used by the web shell, for example
     --encounter gragh-rescue-package --package_intensity high. Packaged runs
-    emit package_outcome, escort HP, rescue saves, clutch saves, and misses in
-    run and sample rows; ally-down package failures end the run as ally_down.
+    emit package_outcome, escort HP, rescue saves, clutch saves, pull redirects,
+    and misses in run and sample rows; ally-down package failures end the run
+    as ally_down.
     Use --loadout_preset late to give each class a representative equipped
     late-game kit without inflating the starting level. Use --loadout to append
     comma-separated item specs such as `Health Potion*3,Hydra Ring`, and

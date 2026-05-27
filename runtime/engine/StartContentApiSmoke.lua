@@ -48,6 +48,7 @@ local function run_content_api_smoke()
     for _, rhythm in ipairs(summary.rhythms or {}) do
         if rhythm.id == "rescue" then
             has_rescue_rhythm = true
+            expect((rhythm.pullFrames or 0) > 0, "rescue rhythm should expose pull frames")
         end
     end
     expect(has_rescue_rhythm, "summary should expose rescue rhythm metadata")

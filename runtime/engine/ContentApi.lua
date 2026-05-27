@@ -320,6 +320,7 @@ local function encounter_rhythms(encounter, intensity)
             blockRadius = package.rescue.block_radius,
             allyDamage = scaled_damage(package.rescue.ally_damage, 10, intensity),
             blockDamage = scaled_damage(package.rescue.block_damage, 4, intensity),
+            pullFrames = scaled_frames(package.rescue.pull_frames, 90, intensity),
         }
     end
     if package.summon then

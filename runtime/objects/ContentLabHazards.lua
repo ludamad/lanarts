@@ -160,6 +160,14 @@ local function damage_player(hazard, player)
     end
 end
 
+local function force_chase(source, target, frames)
+    if not source or source.destroyed or not target or target.destroyed or not source.force_chase then
+        return false
+    end
+    source:force_chase(target, frames)
+    return true
+end
+
 local function damage_overlapping_players(hazard, xy, radius)
     step_cooldowns(hazard.hit_cooldowns)
     for _, player in ipairs(living_player_team_targets(hazard.affects_escorts)) do
@@ -325,13 +333,14 @@ local function draw_package_hud(director)
         local delta = next_delta(director.elapsed, interval, offset)
         local saves = director.rescue_saves or 0
         local clutch_saves = director.rescue_clutch_saves or 0
+        local pulls = director.rescue_pulls or 0
         local active, blocked, remaining = active_rescue_strikes()
         local value
         if active > 0 then
             value = blocked and ("hold " .. format_frames(remaining or 0)) or ("block " .. saves)
         else
             local margin = director.rescue_last_margin
-            value = saves .. " c" .. clutch_saves .. (margin and (" " .. margin .. "f") or "")
+            value = saves .. " c" .. clutch_saves .. " p" .. pulls .. (margin and (" " .. margin .. "f") or "")
         end
         draw_hud_row(y, "SAVE", value, COL_PALE_GREEN, active > 0 and 1 or 1 - delta / interval)
         y = y + HUD_ROW_H
@@ -371,10 +380,11 @@ local function package_result(director, outcome)
     local saves = director.rescue_saves or 0
     local clutch = director.rescue_clutch_saves or 0
     local misses = director.rescue_misses or 0
+    local pulls = director.rescue_pulls or 0
     local best = director.rescue_best_margin
     local escort_text = count > 0 and string.format("ally %d/%d", math.ceil(hp), math.ceil(max_hp)) or "ally down"
     local rescue_text = (saves > 0 or misses > 0)
-        and string.format("saves %d, clutch %d, misses %d%s", saves, clutch, misses, best and (", best " .. best .. "f") or "")
+        and string.format("saves %d, clutch %d, pulls %d, misses %d%s", saves, clutch, pulls, misses, best and (", best " .. best .. "f") or "")
         or "no rescue strikes"
     return {
         outcome = outcome,
@@ -389,9 +399,11 @@ local function package_result(director, outcome)
         escort_max_hp = max_hp,
         rescue_saves = saves,
         rescue_clutch_saves = clutch,
+        rescue_pulls = pulls,
         rescue_misses = misses,
         rescue_best_margin = best,
         rescue_last_margin = director.rescue_last_margin,
+        rescue_last_pull_frames = director.rescue_last_pull_frames,
     }
 end
 
@@ -410,9 +422,11 @@ local function package_state_from_director(director)
         escort_max_hp = max_hp,
         rescue_saves = director.rescue_saves or 0,
         rescue_clutch_saves = director.rescue_clutch_saves or 0,
+        rescue_pulls = director.rescue_pulls or 0,
         rescue_misses = director.rescue_misses or 0,
         rescue_best_margin = director.rescue_best_margin,
         rescue_last_margin = director.rescue_last_margin,
+        rescue_last_pull_frames = director.rescue_last_pull_frames,
     }
 end
 
@@ -616,10 +630,12 @@ function M.create_rescue_strike(args)
         block_radius = args.block_radius or 30,
         ally_damage = args.ally_damage or 10,
         block_damage = args.block_damage or 4,
+        pull_frames = args.pull_frames or 90,
         power = args.power or 24,
         magic_percentage = args.magic_percentage or 1,
         resolved = false,
         saved = false,
+        pulled = false,
         was_clutch = false,
         current_blocker = nil,
         block_started_elapsed = nil,
@@ -653,9 +669,14 @@ function M.create_rescue_strike(args)
                     self.saved = true
                     self.damage = self.block_damage
                     damage_player(self, blocker)
+                    self.pulled = force_chase(self.source, blocker, self.pull_frames)
                     if self.director and not self.director.destroyed then
                         self.director.rescue_saves = (self.director.rescue_saves or 0) + 1
                         self.director.rescue_last_margin = margin
+                        if self.pulled then
+                            self.director.rescue_pulls = (self.director.rescue_pulls or 0) + 1
+                            self.director.rescue_last_pull_frames = self.pull_frames
+                        end
                         if self.was_clutch then
                             self.director.rescue_clutch_saves = (self.director.rescue_clutch_saves or 0) + 1
                             self.director.rescue_best_margin = math.min(self.director.rescue_best_margin or margin, margin)
@@ -693,7 +714,9 @@ function M.create_rescue_strike(args)
             local label_xy = Display.to_screen_xy({to_xy[1], to_xy[2] - self.strike_radius - 14})
             local label
             if self.resolved then
-                label = self.saved and (self.was_clutch and ("CLUTCH " .. self.clutch_margin .. "f") or "SAVED") or "HIT"
+                label = self.saved
+                    and (self.was_clutch and ("CLUTCH " .. self.clutch_margin .. "f") or (self.pulled and "PULLED" or "SAVED"))
+                    or "HIT"
             elseif self.current_blocker then
                 label = "HOLD " .. remaining .. "f"
             else
@@ -771,6 +794,7 @@ local function spawn_rescue_strike(director, package)
         block_radius = rescue.block_radius or 30,
         ally_damage = scale_damage(rescue.ally_damage, 10, intensity),
         block_damage = scale_damage(rescue.block_damage, 4, intensity),
+        pull_frames = scale_frames(rescue.pull_frames, 90, intensity),
         power = scale_damage(rescue.power, 24, intensity),
     }
 end
@@ -800,6 +824,7 @@ local function spawn_escorts(director, package)
         ally.content_lab_ally = true
         ally.xpworth = 0
         if hp then
+            ally.stats.max_hp = hp
             ally.stats.hp = hp
             ally.content_lab_max_hp = hp
         end
@@ -895,6 +920,7 @@ function M.add_director(game_map, package, intensity)
         rescue_saves = 0,
         rescue_misses = 0,
         rescue_clutch_saves = 0,
+        rescue_pulls = 0,
         escort_required = package.escort ~= nil,
         on_step = function(self)
             self.elapsed = self.elapsed + 1

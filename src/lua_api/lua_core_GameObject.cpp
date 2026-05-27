@@ -4,6 +4,7 @@
  */
 
 #include <lua.hpp>
+#include <algorithm>
 #include <stdexcept>
 #include <typeinfo>
 
@@ -370,6 +371,18 @@ static LuaValue lua_projectileinst_metatable(lua_State* L) {
 }
 
 static int lua_enemyinst_metatable_clone(lua_State* L);
+static void lapi_enemyinst_force_chase(EnemyInst* enemy, CombatGameInst* target, int frames) {
+    if (!enemy || !target) {
+        return;
+    }
+    EnemyBehaviour& behaviour = enemy->behaviour();
+    behaviour.current_action = EnemyBehaviour::CHASING_PLAYER;
+    behaviour.chasing_actor = target->id;
+    behaviour.chase_timeout = std::max(1, frames);
+    behaviour.path.clear();
+    enemy->target() = target->id;
+}
+
 static LuaValue lua_enemyinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(EnemyInst*);
 
@@ -380,9 +393,10 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
     LUAWRAP_GETTER(getters, unique, OBJ->etype().unique);
 	LUAWRAP_GETTER(getters, def, OBJ->etype().raw_table);
     LUAWRAP_GETTER(getters, is_enemy, true);
-	LUAWRAP_GETTER(getters, kills, 0);
+    LUAWRAP_GETTER(getters, kills, 0);
     LUAWRAP_GETTER(getters, xpworth, OBJ->xpworth());
     LUAWRAP_SETTER(setters, xpworth, double, OBJ->xpworth() = VAL);
+    methods["force_chase"].bind_function(lapi_enemyinst_force_chase);
     meta["clone"].bind_function(lua_enemyinst_metatable_clone);
 	return meta;
 }
