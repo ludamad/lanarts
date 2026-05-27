@@ -760,6 +760,17 @@
 
       <section class="section">
         <div class="section-title">Resources</div>
+        <div class="field">
+          <label for="analysisGoal">Goal</label>
+          <select id="analysisGoal">
+            <option value="enemy-balance">Enemy balance</option>
+          </select>
+        </div>
+        <div class="run-summary" id="analysisPlan"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">Matrix</div>
         <div class="resource-list" id="resources"></div>
       </section>
     </aside>
@@ -842,6 +853,10 @@
         {id: '', label: 'None', monsters: []},
       ];
 
+      let analysisGoals = [
+        {id: 'enemy-balance', label: 'Enemy balance'},
+      ];
+
       let resources = [
         {
           name: 'Early overworld pressure',
@@ -916,6 +931,7 @@
       let resolvedRun = null;
       let loadoutOptions = null;
       let enemyOptions = null;
+      let analysisPlan = null;
 
       function callContentApi(name, payload) {
         if (!state.runtimeReady || !Module.ccall) {
@@ -1024,6 +1040,7 @@
           monsters: resource.monsters || '',
           enemyGroup: resource.enemyGroup || '',
           enemyPack: resource.enemyPack || '',
+          goal: resource.analysisGoal || resource.goalId || '',
           seed: String(resource.seed || 1),
         };
       }
@@ -1039,12 +1056,14 @@
         replaceOptions($('intensity'), catalog.intensities || intensities, (entry) => entry.id || 'standard', (entry) => entry.label || entry.id || 'Standard');
         replaceOptions($('enemyGroup'), catalog.enemy_groups || enemyGroups, (entry) => entry.id || '', (entry) => entry.label || entry.id || 'Enemies');
         replaceOptions($('enemyPack'), [{id: '', label: 'None'}].concat(catalog.enemy_packs || []), (entry) => entry.id || '', (entry) => entry.label || entry.id || 'None');
+        replaceOptions($('analysisGoal'), catalog.analysis_goals || analysisGoals, (entry) => entry.id || '', (entry) => entry.label || entry.id || 'Goal');
         rebuildLoadoutPresets(catalog.loadouts, catalog.loadout_names);
         mapAlgorithms = catalog.map_algorithms || mapAlgorithms;
         encounters = catalog.encounters || encounters;
         intensities = catalog.intensities || intensities;
         enemyGroups = catalog.enemy_groups || enemyGroups;
         enemyPacks = [{id: '', label: 'None', monsters: []}].concat(catalog.enemy_packs || []);
+        analysisGoals = catalog.analysis_goals || analysisGoals;
         resources = (catalog.resources || []).map(normalizeResource);
         mapProfiles = (catalog.map_algorithms || catalog.maps || []).slice(0, 4).map(normalizePreviewProfile);
         rebuildMapAlgorithms($('mapDesc').value, $('mapAlgorithm').value);
@@ -1089,6 +1108,7 @@
           monsters: $('customMonsters').value.trim(),
           enemyGroup: $('enemyGroup').value || '',
           enemyPack: $('enemyPack').value || '',
+          goal: $('analysisGoal').value || 'enemy-balance',
         };
       }
 
@@ -1270,6 +1290,39 @@
         host.appendChild(groupNode);
       }
 
+      function appendCommandLine(host, labelText, command) {
+        const code = document.createElement('code');
+        code.textContent = (command || []).join(' ');
+        appendSummaryLine(host, labelText, code);
+      }
+
+      function renderAnalysisPlan(plan) {
+        const host = $('analysisPlan');
+        host.innerHTML = '';
+        if (!plan) {
+          const pending = document.createElement('div');
+          pending.className = 'muted';
+          pending.textContent = state.runtimeReady ? 'No plan selected' : 'Runtime data pending';
+          host.appendChild(pending);
+          return;
+        }
+        const goal = document.createElement('div');
+        goal.textContent = plan.goal ? (plan.goal.label || plan.goal.id) : 'Enemy balance';
+        appendSummaryLine(host, 'Goal', goal);
+
+        const counts = document.createElement('div');
+        const enemyCount = plan.enemyMatrix ? Number(plan.enemyMatrix.count || 0) : 0;
+        const previewCount = plan.mapGeneration && plan.mapGeneration.previews ? plan.mapGeneration.previews.length : 0;
+        counts.textContent = `${enemyCount} enemy probes, ${previewCount} map previews`;
+        appendSummaryLine(host, 'Coverage', counts);
+
+        const commands = plan.commands || {};
+        appendCommandLine(host, 'Launch', commands.launch);
+        appendCommandLine(host, 'Balance', commands.balance);
+        appendCommandLine(host, 'Classes', commands.classSweep);
+        appendCommandLine(host, 'Monster', commands.monsterEval);
+      }
+
       function addItemSpec(spec) {
         const textarea = $('customLoadout');
         const next = String(spec || '').trim();
@@ -1299,6 +1352,11 @@
         renderEnemyOptions(enemyOptions);
       }
 
+      function updateAnalysisPlan() {
+        analysisPlan = callContentApi('lanarts_content_analysis_plan_json', currentConfig());
+        renderAnalysisPlan(analysisPlan);
+      }
+
       function updateGeneratedResources() {
         const response = callContentApi('lanarts_content_resource_matrix_json', currentConfig());
         generatedResources = response && response.resources ? response.resources.map(normalizeResource) : [];
@@ -1309,6 +1367,7 @@
         updateLoadoutOptions();
         updateRunSummary();
         updateEnemyOptions();
+        updateAnalysisPlan();
         drawPreviews();
         updateGeneratedResources();
       }
@@ -1326,6 +1385,7 @@
         $('customMonsters').value = config.monsters || '';
         $('enemyGroup').value = config.enemyGroup || $('enemyGroup').value || 'overworld-ambient';
         $('enemyPack').value = config.enemyPack || '';
+        $('analysisGoal').value = config.goal || config.analysisGoal || 'enemy-balance';
         setPreset(config.preset || 'none');
         refreshLab();
       }
@@ -1568,6 +1628,9 @@
         if (config.enemyPack) {
           query.set('enemyPack', config.enemyPack);
         }
+        if (config.goal && config.goal !== 'enemy-balance') {
+          query.set('goal', config.goal);
+        }
         if (autorun) {
           query.set('run', '1');
         }
@@ -1590,6 +1653,7 @@
           monsters: query.get('monsters') || '',
           enemyGroup: query.get('enemyGroup') || 'overworld-ambient',
           enemyPack: query.get('enemyPack') || '',
+          goal: query.get('goal') || 'enemy-balance',
           autorun: query.get('run') === '1',
         };
       }
@@ -1744,7 +1808,7 @@
             refreshLab();
           });
         });
-        ['className', 'level', 'seed', 'customLoadout', 'mapAlgorithm', 'encounter', 'intensity', 'customMonsters', 'enemyGroup'].forEach((id) => {
+        ['className', 'level', 'seed', 'customLoadout', 'mapAlgorithm', 'encounter', 'intensity', 'customMonsters', 'enemyGroup', 'analysisGoal'].forEach((id) => {
           $(id).addEventListener('input', refreshLab);
           $(id).addEventListener('change', refreshLab);
         });
