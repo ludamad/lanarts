@@ -318,8 +318,15 @@ local function draw_package_hud(director)
         local interval, offset = scaled_interval_and_offset(rescue, 205, 54, intensity)
         local delta = next_delta(director.elapsed, interval, offset)
         local saves = director.rescue_saves or 0
-        local active = active_rescue_strikes()
-        local value = active > 0 and "block " .. saves or format_frames(delta) .. " " .. saves
+        local clutch_saves = director.rescue_clutch_saves or 0
+        local active, blocked, remaining = active_rescue_strikes()
+        local value
+        if active > 0 then
+            value = blocked and ("hold " .. format_frames(remaining or 0)) or ("block " .. saves)
+        else
+            local margin = director.rescue_last_margin
+            value = saves .. " c" .. clutch_saves .. (margin and (" " .. margin .. "f") or "")
+        end
         draw_hud_row(y, "SAVE", value, COL_PALE_GREEN, active > 0 and 1 or 1 - delta / interval)
         y = y + HUD_ROW_H
     end
@@ -481,6 +488,10 @@ function M.create_rescue_strike(args)
         magic_percentage = args.magic_percentage or 1,
         resolved = false,
         saved = false,
+        was_clutch = false,
+        current_blocker = nil,
+        block_started_elapsed = nil,
+        clutch_margin = nil,
         result_elapsed = 0,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
@@ -489,14 +500,34 @@ function M.create_rescue_strike(args)
                 return
             end
             self.xy = xy_of(self.target)
-            if not self.resolved and self.elapsed >= self.windup then
+            if not self.resolved then
                 local blocker = rescue_blocker(self)
                 if blocker then
+                    if not self.current_blocker or self.current_blocker.id ~= blocker.id then
+                        self.block_started_elapsed = self.elapsed
+                    end
+                    self.current_blocker = blocker
+                else
+                    self.current_blocker = nil
+                    self.block_started_elapsed = nil
+                end
+            end
+            if not self.resolved and self.elapsed >= self.windup then
+                local blocker = self.current_blocker
+                if blocker then
+                    local margin = math.max(0, self.windup - (self.block_started_elapsed or self.elapsed))
+                    self.clutch_margin = margin
+                    self.was_clutch = margin <= self.late_window
                     self.saved = true
                     self.damage = self.block_damage
                     damage_player(self, blocker)
                     if self.director and not self.director.destroyed then
                         self.director.rescue_saves = (self.director.rescue_saves or 0) + 1
+                        self.director.rescue_last_margin = margin
+                        if self.was_clutch then
+                            self.director.rescue_clutch_saves = (self.director.rescue_clutch_saves or 0) + 1
+                            self.director.rescue_best_margin = math.min(self.director.rescue_best_margin or margin, margin)
+                        end
                     end
                 else
                     self.saved = false
@@ -523,12 +554,19 @@ function M.create_rescue_strike(args)
             local remaining = math.max(0, self.windup - self.elapsed)
             local last_call = remaining <= self.late_window
             local color = self.resolved and (self.saved and COL_PALE_GREEN or COL_PALE_RED)
-                or (last_call and COL_PALE_YELLOW or COL_PALE_GREEN)
+                or (self.current_blocker and COL_PALE_GREEN or (last_call and COL_PALE_YELLOW or COL_PALE_GREEN))
             local progress = self.resolved and 1 or math.max(0.2, math.min(1, self.elapsed / self.windup))
             draw_world_link(color, from_xy, to_xy, last_call and 4 or 3, last_call and 0.50 or 0.28)
             draw_world_circle(color, to_xy, self.strike_radius * progress, self.resolved and 0.14 or 0.07, self.resolved and 0.70 or 0.45)
             local label_xy = Display.to_screen_xy({to_xy[1], to_xy[2] - self.strike_radius - 14})
-            local label = self.resolved and (self.saved and "SAVED" or "HIT") or (last_call and "BLOCK" or "RESCUE")
+            local label
+            if self.resolved then
+                label = self.saved and (self.was_clutch and ("CLUTCH " .. self.clutch_margin .. "f") or "SAVED") or "HIT"
+            elseif self.current_blocker then
+                label = "HOLD " .. remaining .. "f"
+            else
+                label = last_call and "BLOCK" or "RESCUE"
+            end
             draw_text(color, Display.CENTER, label_xy, label)
         end,
     }
@@ -648,12 +686,19 @@ end
 
 function active_rescue_strikes()
     local count = 0
+    local blocked = false
+    local best_remaining
     for _, obj in ipairs(Map.objects_list()) do
         if obj and not obj.destroyed and obj.content_lab_rescue_strike then
             count = count + 1
+            if not obj.resolved and obj.current_blocker then
+                blocked = true
+                local remaining = math.max(0, obj.windup - obj.elapsed)
+                best_remaining = math.min(best_remaining or remaining, remaining)
+            end
         end
     end
-    return count
+    return count, blocked, best_remaining
 end
 
 local function spawn_summons(director, package)
@@ -707,6 +752,7 @@ function M.add_director(game_map, package, intensity)
         intensity = intensity,
         rescue_saves = 0,
         rescue_misses = 0,
+        rescue_clutch_saves = 0,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
             if #living_monsters(false) == 0 then

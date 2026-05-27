@@ -273,6 +273,7 @@ local function encounter_rhythms(encounter, intensity)
             activeStart = math.max(0, windup - late_window),
             windup = windup,
             lateWindow = late_window,
+            clutchWindow = late_window,
             radius = package.rescue.radius,
             blockRadius = package.rescue.block_radius,
             allyDamage = scaled_damage(package.rescue.ally_damage, 10, intensity),
