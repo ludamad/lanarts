@@ -487,6 +487,75 @@ function M.create_result_banner(args)
     }
 end
 
+function M.create_feedback_label(args)
+    return GameObject.object_create {
+        map = args.map,
+        xy = copy_xy(args.xy or {0, 0}),
+        radius = 1,
+        solid = false,
+        depth = RESULT_DEPTH - 1,
+        elapsed = 0,
+        duration = args.duration or 72,
+        drift = args.drift or 0.45,
+        text = args.text or "",
+        color = args.color or COL_WHITE,
+        on_step = function(self)
+            self.elapsed = self.elapsed + 1
+            if self.elapsed >= self.duration then
+                GameObject.destroy(self)
+            end
+        end,
+        on_draw = function(self)
+            local fade = math.min(1, self.elapsed / 8)
+            if self.elapsed > self.duration - 18 then
+                fade = math.min(fade, math.max(0, (self.duration - self.elapsed) / 18))
+            end
+            local screen_xy = Display.to_screen_xy({self.xy[1], self.xy[2] - self.elapsed * self.drift})
+            draw_text(with_alpha(self.color, fade), Display.CENTER, screen_xy, self.text)
+        end,
+    }
+end
+
+local function object_label(obj, fallback)
+    if obj and obj.name and obj.name ~= "" then
+        return obj.name
+    end
+    return fallback or "target"
+end
+
+local function rescue_feedback(strike, blocker)
+    local game_map = strike.strike_map or strike.map
+    if not game_map then
+        return
+    end
+    local color = strike.saved and COL_PALE_GREEN or COL_PALE_RED
+    local xy = strike.saved and xy_of(blocker) or xy_of(strike.target)
+    local text
+    if strike.saved then
+        text = strike.was_clutch and ("CLUTCH SAVE " .. strike.clutch_margin .. "f") or ("SAVE " .. strike.clutch_margin .. "f")
+        if strike.pulled then
+            text = text .. " PULL"
+        end
+    else
+        text = "ALLY HIT"
+    end
+    M.create_feedback_label {
+        map = game_map,
+        xy = xy,
+        text = text,
+        color = color,
+        duration = strike.saved and 86 or 72,
+        drift = strike.saved and 0.52 or 0.42,
+    }
+    if strike.saved then
+        local source_name = object_label(strike.source, "enemy")
+        local blocker_name = object_label(blocker, "rescuer")
+        EventLog.add(text .. ": " .. source_name .. " retargeted to " .. blocker_name .. ".", color)
+    else
+        EventLog.add("Rescue missed: " .. object_label(strike.target, "ally") .. " was hit.", color)
+    end
+end
+
 local function finish_package(director, outcome)
     if director.content_lab_finished then
         return
@@ -790,6 +859,7 @@ function M.create_rescue_strike(args)
                             self.director.rescue_best_margin = math.min(self.director.rescue_best_margin or margin, margin)
                         end
                     end
+                    rescue_feedback(self, blocker)
                 else
                     self.saved = false
                     self.damage = self.ally_damage
@@ -797,6 +867,7 @@ function M.create_rescue_strike(args)
                     if self.director and not self.director.destroyed then
                         self.director.rescue_misses = (self.director.rescue_misses or 0) + 1
                     end
+                    rescue_feedback(self)
                 end
                 self.resolved = true
             elseif self.resolved then
