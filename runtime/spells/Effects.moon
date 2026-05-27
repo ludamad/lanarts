@@ -1125,7 +1125,7 @@ DataW.effect_create {
 DataW.effect_create {
     name: "Charging"
     stat_func: (mon, old, new) =>
-        new.speed *= if mon.name == "Gragh" then 3 else 4
+        new.speed *= if mon.name == "Gragh" then 2.5 else 4
         if @n_steps > @n_ramp
             new.melee_cooldown_multiplier *= if mon.name == "Gragh" then 0.75 else 0.5
         if mon.name ~= "Gragh"
