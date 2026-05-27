@@ -167,6 +167,8 @@
       border-radius: var(--radius);
       background: #111418;
       overflow: hidden;
+      pointer-events: auto;
+      cursor: pointer;
     }
 
     .preview canvas {
@@ -637,6 +639,16 @@
           </select>
         </div>
         <div class="field">
+          <label for="mapAlgorithm">Algorithm</label>
+          <select id="mapAlgorithm">
+            <option value="">Default</option>
+            <option value="overworld-random">Overworld mix</option>
+            <option value="overworld-open-meadow">Open meadow</option>
+            <option value="overworld-broken-grove">Broken grove</option>
+            <option value="overworld-old-stones">Old stones</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="encounter">Encounter</label>
           <select id="encounter">
             <option value="">No forced encounter</option>
@@ -707,10 +719,18 @@
       };
 
       let mapProfiles = [
-        {key: '', label: 'Campaign World', mode: 'world', density: 0.30},
-        {key: 'map_descs.Overworld', label: 'Overworld', mode: 'overworld', density: 0.22},
-        {key: 'map_descs.GraghsLair', label: "Gragh's Lair", mode: 'lair', density: 0.36},
-        {key: 'map_descs.Hell', label: 'Hell', mode: 'hell', density: 0.34},
+        {key: '', label: 'Campaign World', mapDesc: '', mapAlgorithm: '', mapProfile: '', mode: 'world', density: 0.30},
+        {key: 'overworld-random', label: 'Overworld mix', mapDesc: 'map_descs.Overworld', mapAlgorithm: 'overworld-random', mapProfile: '', mode: 'overworld', density: 0.22},
+        {key: 'overworld-open-meadow', label: 'Open meadow', mapDesc: 'map_descs.Overworld', mapAlgorithm: 'overworld-open-meadow', mapProfile: 'open_meadow', mode: 'overworld-open', density: 0.18},
+        {key: 'overworld-broken-grove', label: 'Broken grove', mapDesc: 'map_descs.Overworld', mapAlgorithm: 'overworld-broken-grove', mapProfile: 'broken_grove', mode: 'overworld-grove', density: 0.26},
+      ];
+
+      let mapAlgorithms = [
+        {id: '', label: 'Campaign default', mapDesc: '', mapProfile: ''},
+        {id: 'overworld-random', label: 'Overworld mix', mapDesc: 'map_descs.Overworld', mapProfile: ''},
+        {id: 'overworld-open-meadow', label: 'Open meadow', mapDesc: 'map_descs.Overworld', mapProfile: 'open_meadow'},
+        {id: 'overworld-broken-grove', label: 'Broken grove', mapDesc: 'map_descs.Overworld', mapProfile: 'broken_grove'},
+        {id: 'overworld-old-stones', label: 'Old stones', mapDesc: 'map_descs.Overworld', mapProfile: 'old_stones'},
       ];
 
       let encounters = [
@@ -823,11 +843,15 @@
 
       function normalizePreviewProfile(map) {
         return {
-          key: map.id || '',
+          key: map.id || map.mapAlgorithm || '',
           label: map.label || map.id || 'Map',
+          mapDesc: map.mapDesc || map.map_desc || map.id || '',
+          mapProfile: map.mapProfile || map.map_profile || '',
+          mapAlgorithm: map.mapAlgorithm || map.map_algorithm || map.id || '',
           mode: map.preview_mode || map.mode || 'world',
           density: Number(map.density || 0.30),
           palette: map.palette || null,
+          runConfig: map.runConfig || null,
         };
       }
 
@@ -862,6 +886,35 @@
         });
       }
 
+      function mapAlgorithmsFor(mapDesc) {
+        const filtered = mapAlgorithms.filter((entry) => (entry.mapDesc || '') === (mapDesc || ''));
+        return filtered.length ? filtered : [{id: '', label: 'Default', mapDesc: mapDesc || '', mapProfile: ''}];
+      }
+
+      function mapAlgorithmIdFor(mapDesc, mapProfile) {
+        const exact = mapAlgorithms.find((entry) => (entry.mapDesc || '') === (mapDesc || '') && (entry.mapProfile || '') === (mapProfile || ''));
+        if (exact) {
+          return exact.id || '';
+        }
+        const fallback = mapAlgorithms.find((entry) => (entry.mapDesc || '') === (mapDesc || '') && !(entry.mapProfile || ''));
+        return fallback ? (fallback.id || '') : '';
+      }
+
+      function rebuildMapAlgorithms(mapDesc, selected) {
+        const select = $('mapAlgorithm');
+        const desired = selected !== undefined ? selected : select.value;
+        const entries = mapAlgorithmsFor(mapDesc);
+        replaceOptions(select, entries, (entry) => entry.id || '', (entry) => entry.label || entry.id || 'Default');
+        if ([...select.options].some((option) => option.value === desired)) {
+          select.value = desired || '';
+        }
+      }
+
+      function selectedMapAlgorithm() {
+        const id = $('mapAlgorithm').value || '';
+        return mapAlgorithms.find((entry) => (entry.id || '') === id) || null;
+      }
+
       function normalizeResource(resource) {
         return {
           name: resource.name,
@@ -874,6 +927,8 @@
           intensity: resource.intensity || 'standard',
           customLoadout: resource.customLoadout || resource.loadout || '',
           mapDesc: resource.mapDesc || '',
+          mapProfile: resource.mapProfile || '',
+          mapAlgorithm: resource.mapAlgorithm || mapAlgorithmIdFor(resource.mapDesc || '', resource.mapProfile || ''),
           encounter: resource.encounter || '',
           monsters: resource.monsters || '',
           seed: String(resource.seed || 1),
@@ -890,10 +945,12 @@
         replaceOptions($('encounter'), catalog.encounters || [], (entry) => entry.id || '', (entry) => entry.label || entry.id || 'No forced encounter');
         replaceOptions($('intensity'), catalog.intensities || intensities, (entry) => entry.id || 'standard', (entry) => entry.label || entry.id || 'Standard');
         rebuildLoadoutPresets(catalog.loadouts, catalog.loadout_names);
+        mapAlgorithms = catalog.map_algorithms || mapAlgorithms;
         encounters = catalog.encounters || encounters;
         intensities = catalog.intensities || intensities;
         resources = (catalog.resources || []).map(normalizeResource);
-        mapProfiles = (catalog.maps || []).slice(0, 4).map(normalizePreviewProfile);
+        mapProfiles = (catalog.map_algorithms || catalog.maps || []).slice(0, 4).map(normalizePreviewProfile);
+        rebuildMapAlgorithms($('mapDesc').value, $('mapAlgorithm').value);
         wireResources();
         setConfig(currentConfig());
       }
@@ -920,6 +977,7 @@
       }
 
       function currentConfig() {
+        const algorithm = selectedMapAlgorithm();
         return {
           className: $('className').value,
           level: $('level').value,
@@ -928,6 +986,8 @@
           intensity: $('intensity').value,
           customLoadout: $('customLoadout').value.trim(),
           mapDesc: $('mapDesc').value,
+          mapProfile: algorithm ? (algorithm.mapProfile || '') : '',
+          mapAlgorithm: $('mapAlgorithm').value || '',
           encounter: $('encounter').value,
           monsters: $('customMonsters').value.trim(),
         };
@@ -989,6 +1049,13 @@
         }
         appendSummaryLine(host, 'Loadout', loadout);
 
+        if (summary.mapAlgorithm && summary.mapAlgorithm.label) {
+          const algorithm = document.createElement('div');
+          const profile = summary.config.mapProfile ? ` (${summary.config.mapProfile})` : '';
+          algorithm.textContent = `${summary.mapAlgorithm.label}${profile}`;
+          appendSummaryLine(host, 'Map Algo', algorithm);
+        }
+
         if ((summary.warnings || []).length) {
           const warnings = document.createElement('div');
           warnings.className = 'warning-list';
@@ -1032,6 +1099,8 @@
         $('seed').value = String(config.seed || '1');
         $('customLoadout').value = config.customLoadout || '';
         $('mapDesc').value = config.mapDesc || '';
+        rebuildMapAlgorithms($('mapDesc').value, config.mapAlgorithm || mapAlgorithmIdFor(config.mapDesc || '', config.mapProfile || ''));
+        $('mapAlgorithm').value = config.mapAlgorithm || mapAlgorithmIdFor(config.mapDesc || '', config.mapProfile || '');
         $('encounter').value = config.encounter || '';
         $('intensity').value = config.intensity || 'standard';
         $('customMonsters').value = config.monsters || '';
@@ -1234,6 +1303,9 @@
           args.push('--monsters', config.monsters);
         } else if (!config.encounter && config.mapDesc) {
           args.push('--start_map_desc', config.mapDesc);
+          if (config.mapProfile) {
+            args.push('--map_profile', config.mapProfile);
+          }
         }
         if (config.seed) {
           args.push('--seed', String(config.seed));
@@ -1252,6 +1324,12 @@
         }
         if (config.mapDesc) {
           query.set('map', config.mapDesc);
+        }
+        if (config.mapAlgorithm) {
+          query.set('algo', config.mapAlgorithm);
+        }
+        if (config.mapProfile) {
+          query.set('profile', config.mapProfile);
         }
         if (config.encounter) {
           query.set('encounter', config.encounter);
@@ -1277,6 +1355,8 @@
           seed: query.get('seed') || '17300',
           customLoadout: query.get('items') || '',
           mapDesc: query.get('map') || '',
+          mapAlgorithm: query.get('algo') || '',
+          mapProfile: query.get('profile') || '',
           encounter: query.get('encounter') || '',
           intensity: query.get('pressure') || 'standard',
           monsters: query.get('monsters') || '',
@@ -1347,7 +1427,8 @@
         $('previewSeed').textContent = `seed ${seed}`;
         const grid = $('previewGrid');
         grid.innerHTML = '';
-        const previewResponse = callContentApi('lanarts_content_map_preview_json', currentConfig());
+        const previewResponse = callContentApi('lanarts_content_map_generation_json', currentConfig())
+          || callContentApi('lanarts_content_map_preview_json', currentConfig());
         const profiles = previewResponse && previewResponse.previews
           ? previewResponse.previews.map(normalizePreviewProfile)
           : mapProfiles;
@@ -1357,10 +1438,18 @@
           const canvas = document.createElement('canvas');
           const label = document.createElement('div');
           label.className = 'preview-label';
-          label.innerHTML = `<strong>${profile.label}</strong><span>${profile.key || 'world graph'}</span>`;
+          label.innerHTML = `<strong>${profile.label}</strong><span>${profile.mapProfile || profile.key || 'world graph'}</span>`;
           node.appendChild(canvas);
           node.appendChild(label);
           grid.appendChild(node);
+          node.addEventListener('click', () => {
+            setConfig({
+              ...currentConfig(),
+              mapDesc: profile.mapDesc || '',
+              mapProfile: profile.mapProfile || '',
+              mapAlgorithm: profile.mapAlgorithm || mapAlgorithmIdFor(profile.mapDesc || '', profile.mapProfile || ''),
+            });
+          });
           drawPreview(canvas, profile, seed);
         });
       }
@@ -1425,9 +1514,13 @@
             refreshLab();
           });
         });
-        ['className', 'level', 'seed', 'customLoadout', 'mapDesc', 'encounter', 'intensity', 'customMonsters'].forEach((id) => {
+        ['className', 'level', 'seed', 'customLoadout', 'mapAlgorithm', 'encounter', 'intensity', 'customMonsters'].forEach((id) => {
           $(id).addEventListener('input', refreshLab);
           $(id).addEventListener('change', refreshLab);
+        });
+        $('mapDesc').addEventListener('change', () => {
+          rebuildMapAlgorithms($('mapDesc').value, '');
+          refreshLab();
         });
         $('launch').disabled = true;
         $('launch').addEventListener('click', () => launch(currentConfig()));

@@ -660,6 +660,7 @@ local function sample_run(run, telemetry, samples, reason)
         bot_profile = run.bot_profile or telemetry.skill_profile or "",
         objective_enemy = run.objective_enemy or "",
         start_map_desc = run.start_map_desc or "",
+        map_profile = run.map_profile or "",
         encounter = run.encounter or "",
         monsters = run.monsters or "",
         package_intensity = run.package_intensity or "",
@@ -744,6 +745,7 @@ local function summarize_run(run, telemetry, outcome)
         bot_profile = run.bot_profile or telemetry.skill_profile or "",
         objective_enemy = run.objective_enemy or "",
         start_map_desc = run.start_map_desc or "",
+        map_profile = run.map_profile or "",
         encounter = run.encounter or "",
         monsters = run.monsters or "",
         package_intensity = run.package_intensity or "",
@@ -939,6 +941,7 @@ local function aggregate_summary_rows(summaries)
         local bot_profile = row.bot_profile or ""
         local objective_enemy = row.objective_enemy or ""
         local start_map_desc = row.start_map_desc or ""
+        local map_profile = row.map_profile or ""
         local encounter = row.encounter or ""
         local monsters = row.monsters or ""
         local package_intensity = row.package_intensity or ""
@@ -952,6 +955,7 @@ local function aggregate_summary_rows(summaries)
                 bot_profile = bot_profile,
                 objective_enemy = objective_enemy,
                 start_map_desc = start_map_desc,
+                map_profile = map_profile,
                 encounter = encounter,
                 monsters = monsters,
                 package_intensity = package_intensity,
@@ -983,6 +987,7 @@ local function aggregate_summary_rows(summaries)
             bot_profile = aggregate.bot_profile,
             objective_enemy = aggregate.objective_enemy,
             start_map_desc = aggregate.start_map_desc,
+            map_profile = aggregate.map_profile,
             encounter = aggregate.encounter,
             monsters = aggregate.monsters,
             package_intensity = aggregate.package_intensity,
@@ -1764,7 +1769,8 @@ local function pick_start_spawn_square(source_map, selector)
     return best_square
 end
 
-local function generate_start_map_desc(desc_name)
+local function generate_start_map_desc(desc_name, options)
+    options = options or {}
     load_core_modules()
     local NewMaps = require "maps.NewMaps"
     local MapUtils = require "maps.MapUtils"
@@ -1772,7 +1778,11 @@ local function generate_start_map_desc(desc_name)
     local Vaults = require "maps.Vaults"
 
     local desc = require(desc_name)
-    local source_map = desc:compile()
+    local generate_hooks = {}
+    if options.map_profile and options.map_profile ~= "" then
+        generate_hooks.overworld_profile = options.map_profile
+    end
+    local source_map = desc:compile({}, {}, generate_hooks)
     local spawn_selector = {
         matches_none = {
             SourceMap.FLAG_SOLID,
@@ -1824,7 +1834,9 @@ local function game_init(run, telemetry, bot_options)
         end
     elseif bot_options.start_map_desc and bot_options.start_map_desc ~= "" then
         EngineHooks.first_map_create = function()
-            return generate_start_map_desc(bot_options.start_map_desc)
+            return generate_start_map_desc(bot_options.start_map_desc, {
+                map_profile = bot_options.map_profile,
+            })
         end
     end
     EngineInternal.start_game()
@@ -1961,6 +1973,7 @@ local function run_balance(raw_args)
     parser:option("--classes", "Comma-separated classes to run.", DEFAULT_CLASSES)
     parser:option("--levels", "Comma-separated starting levels to run.", "1")
     parser:option("--start_map_desc", "Optional map_desc module to start each run in, such as map_descs.PixullochiaDepths.", nil)
+    parser:option("--map_profile", "Optional map-generation profile for --start_map_desc, such as open_meadow.", "")
     parser:option("--encounter", "Optional content-lab encounter id to start each run in an arena.", "")
     parser:option("--monsters", "Comma-separated monster names to start each run in a content-lab arena.", "")
     parser:option("--package_intensity", "Content-lab package pressure preset for arena encounters.", "standard")
@@ -2010,6 +2023,7 @@ local function run_balance(raw_args)
     for _, run in ipairs(runs) do
         run.bot_profile = args.bot_profile
         run.start_map_desc = args.start_map_desc or ""
+        run.map_profile = args.map_profile or ""
         run.encounter = args.encounter or ""
         run.monsters = args.monsters or ""
         run.package_intensity = args.package_intensity or ""
@@ -2038,7 +2052,7 @@ local function run_balance(raw_args)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
         write_csv(args.out, summaries, {
             "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile",
-            "objective_enemy", "start_map_desc", "encounter", "monsters", "package_intensity",
+            "objective_enemy", "start_map_desc", "map_profile", "encounter", "monsters", "package_intensity",
             "outcome", "frames", "level", "xp",
             "hp", "max_hp", "hp_pct", "min_hp", "min_hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
@@ -2066,7 +2080,7 @@ local function run_balance(raw_args)
         })
         write_csv(args.samples_out, samples, {
             "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile",
-            "objective_enemy", "start_map_desc", "encounter", "monsters", "package_intensity",
+            "objective_enemy", "start_map_desc", "map_profile", "encounter", "monsters", "package_intensity",
             "frame", "reason", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
@@ -2111,7 +2125,7 @@ local function run_balance(raw_args)
         })
         write_csv(args.aggregate_out, class_rows, {
             "class", "start_level", "loadout", "bot_profile", "objective_enemy", "start_map_desc",
-            "encounter", "monsters", "package_intensity",
+            "map_profile", "encounter", "monsters", "package_intensity",
             "runs", "wins", "clears", "ally_downs", "package_failures", "deaths", "step_limits", "bot_stalls",
             "game_loop_exits", "win_rate", "death_rate", "outcome_counts",
             "combat_frame_rate", "explore_frame_rate", "rest_frame_rate",
@@ -2154,9 +2168,10 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 15,
+                schema_version = 16,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
+                map_profile = args.map_profile,
                 encounter = args.encounter,
                 monsters = args.monsters,
                 package_intensity = args.package_intensity,
@@ -2228,6 +2243,7 @@ local function run_balance(raw_args)
             spell_policy = args.spell_policy,
             skill_profile = args.bot_profile,
             start_map_desc = args.start_map_desc,
+            map_profile = args.map_profile,
             encounter = args.encounter,
             monsters = args.monsters,
             package_intensity = args.package_intensity,

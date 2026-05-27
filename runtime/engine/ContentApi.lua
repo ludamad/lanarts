@@ -18,8 +18,63 @@ local function encode(value)
     return json.generate(value)
 end
 
+local function copy_object(value)
+    local result = {}
+    for key, entry in pairs(value or {}) do
+        result[key] = entry
+    end
+    return result
+end
+
+local function map_algorithm_by_id(algorithm_id)
+    for _, algorithm in ipairs(Catalog.map_algorithms or {}) do
+        if (algorithm.id or "") == (algorithm_id or "") then
+            return algorithm
+        end
+    end
+    return nil
+end
+
+local function map_algorithm_id_for(map_desc, map_profile)
+    local fallback
+    for _, algorithm in ipairs(Catalog.map_algorithms or {}) do
+        if (algorithm.mapDesc or "") == (map_desc or "") then
+            if (algorithm.mapProfile or "") == (map_profile or "") then
+                return algorithm.id or ""
+            end
+            if fallback == nil and (algorithm.mapProfile or "") == "" then
+                fallback = algorithm.id or ""
+            end
+        end
+    end
+    return fallback or ""
+end
+
+local function normalize_map_selection(map_desc, map_profile, map_algorithm)
+    map_desc = tostring(map_desc or "")
+    map_profile = tostring(map_profile or "")
+    map_algorithm = tostring(map_algorithm or "")
+    local algorithm = map_algorithm ~= "" and map_algorithm_by_id(map_algorithm) or nil
+    if algorithm then
+        map_desc = algorithm.mapDesc or map_desc
+        map_profile = algorithm.mapProfile or ""
+    end
+    if map_desc == "" and map_profile ~= "" then
+        map_desc = "map_descs.Overworld"
+    end
+    if map_algorithm == "" then
+        map_algorithm = map_algorithm_id_for(map_desc, map_profile)
+    end
+    return map_desc, map_profile, map_algorithm
+end
+
 local function normalized_config(config)
     config = config or {}
+    local map_desc, map_profile, map_algorithm = normalize_map_selection(
+        config.mapDesc or config.start_map_desc or "",
+        config.mapProfile or config.map_profile or "",
+        config.mapAlgorithm or config.map_algorithm or ""
+    )
     return {
         className = tostring(config.className or config.class or "Fighter"),
         level = math.max(1, math.floor(tonumber(config.level) or 1)),
@@ -27,7 +82,9 @@ local function normalized_config(config)
         preset = tostring(config.preset or config.loadout_preset or "none"),
         intensity = tostring(config.intensity or config.packageIntensity or config.package_intensity or "standard"),
         customLoadout = tostring(config.customLoadout or config.loadout or ""),
-        mapDesc = tostring(config.mapDesc or config.start_map_desc or ""),
+        mapDesc = map_desc,
+        mapProfile = map_profile,
+        mapAlgorithm = map_algorithm,
         encounter = tostring(config.encounter or ""),
         monsters = tostring(config.monsters or ""),
         botProfile = tostring(config.botProfile or config.bot_profile or "human"),
@@ -65,6 +122,10 @@ local function launch_args(config)
     elseif config.encounter == "" and config.mapDesc ~= "" then
         args[#args + 1] = "--start_map_desc"
         args[#args + 1] = config.mapDesc
+        if config.mapProfile ~= "" then
+            args[#args + 1] = "--map_profile"
+            args[#args + 1] = config.mapProfile
+        end
     end
     if config.seed ~= "" then
         args[#args + 1] = "--seed"
@@ -108,6 +169,10 @@ local function balance_args(config)
     elseif config.encounter == "" and config.mapDesc ~= "" then
         args[#args + 1] = "--start_map_desc"
         args[#args + 1] = config.mapDesc
+        if config.mapProfile ~= "" then
+            args[#args + 1] = "--map_profile"
+            args[#args + 1] = config.mapProfile
+        end
     end
     return args
 end
@@ -359,6 +424,8 @@ end
 
 local function resource_entry(group, name, meta, goal, config, seed_offset)
     local seed = tonumber(config.seed) or 1
+    local resource_config = copy_object(config)
+    resource_config.seed = tostring(seed + (seed_offset or 0))
     return {
         id = tostring(group):lower():gsub("[^a-z0-9]+", "-") .. "-" .. tostring(name):lower():gsub("[^a-z0-9]+", "-"),
         group = group,
@@ -371,11 +438,13 @@ local function resource_entry(group, name, meta, goal, config, seed_offset)
         intensity = config.intensity,
         customLoadout = config.customLoadout,
         mapDesc = config.mapDesc,
+        mapProfile = config.mapProfile,
+        mapAlgorithm = config.mapAlgorithm,
         encounter = config.encounter,
         monsters = config.monsters,
-        seed = tostring(seed + (seed_offset or 0)),
-        args = launch_args(config),
-        balanceArgs = balance_args(config),
+        seed = resource_config.seed,
+        args = launch_args(resource_config),
+        balanceArgs = balance_args(resource_config),
     }
 end
 
@@ -397,6 +466,106 @@ local function late_maps()
         end
     end
     return result
+end
+
+local function algorithms_for_map(map_desc)
+    local result = {}
+    for _, algorithm in ipairs(Catalog.map_algorithms or {}) do
+        if (algorithm.mapDesc or "") == (map_desc or "") then
+            result[#result + 1] = algorithm
+        end
+    end
+    return result
+end
+
+local function overworld_algorithms()
+    local result = {}
+    for _, algorithm in ipairs(Catalog.map_algorithms or {}) do
+        if (algorithm.mapDesc or "") == "map_descs.Overworld" then
+            result[#result + 1] = algorithm
+        end
+    end
+    return result
+end
+
+local function selected_map_algorithm(config)
+    local algorithm = map_algorithm_by_id(config.mapAlgorithm or "")
+    if algorithm then
+        return algorithm
+    end
+    return map_algorithm_by_id(map_algorithm_id_for(config.mapDesc, config.mapProfile))
+end
+
+local function map_preview_entry(algorithm, config, seed_offset)
+    local preview_config = copy_object(config)
+    preview_config.mapDesc = algorithm.mapDesc or ""
+    preview_config.mapProfile = algorithm.mapProfile or ""
+    preview_config.mapAlgorithm = algorithm.id or ""
+    preview_config.encounter = ""
+    preview_config.monsters = ""
+    local seed = tonumber(config.seed) or 1
+    preview_config.seed = tostring(seed + (seed_offset or 0))
+    return {
+        id = algorithm.id or "",
+        label = algorithm.label or algorithm.id or "Map",
+        mapDesc = preview_config.mapDesc,
+        mapProfile = preview_config.mapProfile,
+        mapAlgorithm = preview_config.mapAlgorithm,
+        preview_mode = algorithm.preview_mode or "world",
+        density = algorithm.density or 0.30,
+        phase = algorithm.phase or "",
+        description = algorithm.description or "",
+        tags = copy_array(algorithm.tags or {}),
+        palette = algorithm.palette,
+        signature = algorithm.signature,
+        runConfig = preview_config,
+        args = launch_args(preview_config),
+        balanceArgs = balance_args(preview_config),
+    }
+end
+
+local function map_generation_payload(config)
+    local selected_map = map_lookup()[config.mapDesc or ""]
+    local selected_algorithm = selected_map_algorithm(config)
+    local algorithms = algorithms_for_map(config.mapDesc or "")
+    if #algorithms == 0 and selected_map and selected_map.id and selected_map.id ~= "" then
+        algorithms[#algorithms + 1] = {
+            id = selected_map.id,
+            label = selected_map.label,
+            mapDesc = selected_map.id,
+            mapProfile = "",
+            preview_mode = selected_map.preview_mode,
+            density = selected_map.density,
+            phase = selected_map.phase,
+            palette = selected_map.palette,
+        }
+    end
+    if #algorithms == 0 then
+        algorithms = algorithms_for_map("")
+    end
+
+    local previews = {}
+    for idx, algorithm in ipairs(algorithms) do
+        previews[#previews + 1] = map_preview_entry(algorithm, config, idx - 1)
+    end
+    if config.mapDesc ~= "map_descs.Overworld" then
+        for idx, algorithm in ipairs(overworld_algorithms()) do
+            if #previews >= 4 then
+                break
+            end
+            previews[#previews + 1] = map_preview_entry(algorithm, config, 20 + idx)
+        end
+    end
+
+    return {
+        schema = 1,
+        seed = config.seed,
+        config = config,
+        selected = selected_map or Catalog.maps[1],
+        selectedAlgorithm = selected_algorithm,
+        algorithms = algorithms,
+        previews = previews,
+    }
 end
 
 function M.catalog_json()
@@ -427,6 +596,7 @@ function M.run_summary_json(raw_json)
         class = class_lookup()[config.className],
         level = level_lookup()[config.level],
         map = map_lookup()[config.mapDesc or ""],
+        mapAlgorithm = selected_map_algorithm(config),
         encounter = encounter_lookup()[config.encounter or ""],
         intensity = selected_intensity(config),
     }
@@ -437,6 +607,7 @@ function M.run_summary_json(raw_json)
         level = selected.level or {value = config.level, label = tostring(config.level)},
         loadout = loadout_for_config(config),
         map = selected.map,
+        mapAlgorithm = selected.mapAlgorithm,
         encounter = selected.encounter,
         intensity = selected.intensity,
         rhythms = encounter_rhythms(selected.encounter, selected.intensity),
@@ -448,21 +619,13 @@ end
 
 function M.map_preview_json(raw_json)
     local config = normalized_config(parse_json_object(raw_json))
-    local selected = map_lookup()[config.mapDesc or ""]
-    local encounter = encounter_lookup()[config.encounter or ""]
-    local previews = {}
-    for _, map in ipairs(Catalog.maps) do
-        if map.id == "" or map.id == config.mapDesc or #previews < 4 then
-            previews[#previews + 1] = map
-        end
-    end
-    return encode({
-        schema = 1,
-        seed = config.seed,
-        selected = selected or Catalog.maps[1],
-        encounter = encounter,
-        previews = previews,
-    })
+    local payload = map_generation_payload(config)
+    payload.encounter = encounter_lookup()[config.encounter or ""]
+    return encode(payload)
+end
+
+function M.map_generation_json(raw_json)
+    return encode(map_generation_payload(normalized_config(parse_json_object(raw_json))))
 end
 
 function M.resource_matrix_json(raw_json)
@@ -519,6 +682,8 @@ function M.resource_matrix_json(raw_json)
         next_config.level = 5
         next_config.preset = next_config.preset == "none" and "late" or next_config.preset
         next_config.mapDesc = map.id
+        next_config.mapProfile = ""
+        next_config.mapAlgorithm = map_algorithm_id_for(map.id, "")
         next_config.encounter = ""
         resources[#resources + 1] = resource_entry(
             "Map sweep",
@@ -530,6 +695,27 @@ function M.resource_matrix_json(raw_json)
         )
     end
 
+    for idx, algorithm in ipairs(overworld_algorithms()) do
+        local next_config = {}
+        for key, value in pairs(config) do
+            next_config[key] = value
+        end
+        next_config.level = math.min(5, math.max(1, next_config.level))
+        next_config.mapDesc = algorithm.mapDesc or "map_descs.Overworld"
+        next_config.mapProfile = algorithm.mapProfile or ""
+        next_config.mapAlgorithm = algorithm.id or ""
+        next_config.encounter = ""
+        next_config.monsters = ""
+        resources[#resources + 1] = resource_entry(
+            "Overworld algorithm sweep",
+            algorithm.label or algorithm.id,
+            string.format("L%d, %s", next_config.level, algorithm.phase or "opening"),
+            algorithm.description or "initial-map generation comparison",
+            next_config,
+            55 + idx
+        )
+    end
+
     for idx, encounter in ipairs(package_encounters()) do
         local next_config = {}
         for key, value in pairs(config) do
@@ -538,6 +724,8 @@ function M.resource_matrix_json(raw_json)
         next_config.level = 5
         next_config.preset = next_config.preset == "none" and "late" or next_config.preset
         next_config.mapDesc = ""
+        next_config.mapProfile = ""
+        next_config.mapAlgorithm = ""
         next_config.encounter = encounter.id
         next_config.intensity = base_intensity
         resources[#resources + 1] = resource_entry(

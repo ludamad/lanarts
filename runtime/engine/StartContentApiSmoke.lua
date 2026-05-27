@@ -23,6 +23,7 @@ local function run_content_api_smoke()
     expect(catalog.schema == 1, "catalog schema mismatch")
     expect(#(catalog.classes or {}) >= 4, "catalog should expose classes")
     expect(#(catalog.maps or {}) >= 4, "catalog should expose map generators")
+    expect(#(catalog.map_algorithms or {}) >= 4, "catalog should expose map algorithms")
     expect(#(catalog.encounters or {}) >= 10, "catalog should expose packaged encounters")
     local has_executioner_package = false
     for _, encounter in ipairs(catalog.encounters or {}) do
@@ -64,6 +65,25 @@ local function run_content_api_smoke()
         end
     end
     expect(has_package_intensity, "balance args should preserve package intensity")
+
+    local map_config = [[{
+        "className": "Fighter",
+        "level": 1,
+        "preset": "none",
+        "seed": "17300",
+        "mapAlgorithm": "overworld-broken-grove"
+    }]]
+    local map_generation = parse_response("map generation", ContentApi.map_generation_json(map_config))
+    expect(map_generation.selectedAlgorithm and map_generation.selectedAlgorithm.mapProfile == "broken_grove", "map generation should resolve overworld profile")
+    expect(#(map_generation.previews or {}) >= 3, "map generation should expose profile previews")
+    local launch_args = parse_response("launch args", ContentApi.launch_args_json(map_config))
+    local has_map_profile = false
+    for _, arg in ipairs(launch_args.args or {}) do
+        if arg == "--map_profile" then
+            has_map_profile = true
+        end
+    end
+    expect(has_map_profile, "launch args should preserve map profile")
 
     local matrix = parse_response("resource matrix", ContentApi.resource_matrix_json(config))
     expect((matrix.count or 0) == #(matrix.resources or {}), "matrix count should match resources")

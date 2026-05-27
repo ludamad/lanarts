@@ -99,6 +99,13 @@ OVERWORLD_PROFILES = {
     }
 }
 
+profile_by_name = (name) ->
+    return nil unless name and name != ""
+    for profile in *OVERWORLD_PROFILES
+        if profile.name == name
+            return profile
+    return nil
+
 roll_sum = (rng, base, rolls) ->
     value = base
     for roll in *(rolls or {})
@@ -303,7 +310,8 @@ return MapDesc.create {
     children: {
         MapNode.create {
             place: () =>
-                profile = @rng\random_choice(OVERWORLD_PROFILES)
+                requested_profile = @desc.generate_hooks and @desc.generate_hooks.overworld_profile
+                profile = profile_by_name(requested_profile) or @rng\random_choice(OVERWORLD_PROFILES)
                 number_regions = roll_sum(@rng, profile.region_base, profile.region_rolls)
                 connect_line_width = () -> roll_sum(@rng, profile.connect_base, profile.connect_rolls)
                 room_radius = () -> roll_sum(@rng, profile.room_base, profile.room_rolls)

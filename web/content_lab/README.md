@@ -10,13 +10,15 @@ Then serve `build/src/lanarts.html` with a local static server from the reposito
 
 The shell reads its runtime data from the exported content APIs:
 
-- `lanarts_content_catalog_json()` returns classes, level labels, loadout presets, map generators, encounters, and saved resource presets.
+- `lanarts_content_catalog_json()` returns classes, level labels, loadout presets, map generators, map algorithms, encounters, and saved resource presets.
 - `lanarts_content_launch_args_json(config)` normalizes a selected run and returns the `engine.StartLanarts` arguments.
-- `lanarts_content_map_preview_json(config)` returns generator metadata for the preview grid.
+- `lanarts_content_map_generation_json(config)` returns selectable map algorithms, preview metadata, and resolved run/balance args for each preview.
+- `lanarts_content_map_preview_json(config)` is kept as a compatible alias for the preview grid payload.
 - `lanarts_content_run_summary_json(config)` resolves a selection into launch args, loadout items, pressure-scaled encounter rhythms, and balance notes.
 - `lanarts_content_resource_matrix_json(config)` expands the current selection into class, pressure, map, and encounter sweeps for quick orthogonal comparisons.
 
 Encounter launches use `--encounter` for curated 1v1/package tests, or `--monsters` for a comma-separated custom arena.
+Direct map launches use `--start_map_desc`, and overworld profile selections add `--map_profile` so the same seed can compare `open_meadow`, `broken_grove`, and `old_stones`.
 Packaged encounters can also expose rhythm metadata for the shell's timeline view, so orbit, AOE, and summon loops are visible before launch.
 Rescue packages may spawn allied monsters on the player team, giving pull, taunt, and body-block tests a fragile target without requiring extra local controllers.
 Some rescue packages also add a timed rescue line; the ally takes the heavy hit unless a player intercepts the line during the windup.

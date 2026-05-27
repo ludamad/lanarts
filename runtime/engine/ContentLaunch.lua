@@ -194,7 +194,8 @@ function M.generate_encounter_arena(options)
     return game_map
 end
 
-function M.generate_start_map_desc(desc_name)
+function M.generate_start_map_desc(desc_name, options)
+    options = options or {}
     load_core_modules()
     local NewMaps = require "maps.NewMaps"
     local MapUtils = require "maps.MapUtils"
@@ -202,7 +203,11 @@ function M.generate_start_map_desc(desc_name)
     local Vaults = require "maps.Vaults"
 
     local desc = require(desc_name)
-    local source_map = desc:compile()
+    local generate_hooks = {}
+    if options.map_profile and options.map_profile ~= "" then
+        generate_hooks.overworld_profile = options.map_profile
+    end
+    local source_map = desc:compile({}, {}, generate_hooks)
     local spawn_selector = {
         matches_none = {
             SourceMap.FLAG_SOLID,

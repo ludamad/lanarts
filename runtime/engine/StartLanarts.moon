@@ -55,7 +55,9 @@ game_init = (args, load_file=nil) ->
                 }
         elseif args.start_map_desc and args.start_map_desc != ""
             EngineHooks.first_map_create = () ->
-                ContentLaunch.generate_start_map_desc args.start_map_desc
+                ContentLaunch.generate_start_map_desc args.start_map_desc, {
+                    map_profile: args.map_profile
+                }
         EngineInternal.start_game()
         started_new_game = true
     if started_new_game
@@ -90,6 +92,7 @@ run_lanarts = (raw_args) ->
     parser\option "--monsters", "Comma-separated monster names to launch in a content-lab arena.", ""
     parser\option "--package_intensity", "Content-lab package pressure preset.", "standard"
     parser\option "--start_map_desc", "Start directly in a map desc module, such as map_descs.Overworld.", ""
+    parser\option "--map_profile", "Optional map-generation profile for direct map launches.", ""
     parser\option "--seed", "Seed for direct map launches.", false
     parser\option "--macro", "Script to run from debug_scripts/"
     parser\option "-C --context", "Amount of lines of Lua error context.", "4"
