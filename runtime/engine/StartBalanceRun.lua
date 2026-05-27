@@ -514,6 +514,22 @@ local function attach_objective_damage_tracker(player, objective_enemy, telemetr
     end
 end
 
+local function attach_damage_dealt_trackers(player, telemetry)
+    load_core_modules()
+    if not player then
+        return
+    end
+    for _, enemy in ipairs(Map.enemies_list(player)) do
+        if hostile_alive_enemy(player, enemy) and not enemy:has_effect("BalanceDamageDealtTracker") then
+            enemy:add_effect("BalanceDamageDealtTracker", {
+                time_left = 10000000,
+                telemetry = telemetry,
+                attacker_team = player.team,
+            })
+        end
+    end
+end
+
 local function player_snapshot()
     load_core_modules()
     local entry = World.players[1]
@@ -601,6 +617,12 @@ local function sample_run(run, telemetry, samples, reason)
         damage_event_total = telemetry.damage_event_total or 0,
         damage_taken_by_source = encode_counts(telemetry.damage_taken_by_source),
         damage_events_by_source = encode_counts(telemetry.damage_events_by_source),
+        damage_dealt_total = format_rate(telemetry.damage_dealt_total or 0),
+        damage_dealt_event_total = telemetry.damage_dealt_event_total or 0,
+        damage_dealt_by_target = encode_counts(telemetry.damage_dealt_by_target),
+        damage_dealt_events_by_target = encode_counts(telemetry.damage_dealt_events_by_target),
+        damage_dealt_by_source = encode_counts(telemetry.damage_dealt_by_source),
+        damage_dealt_events_by_source = encode_counts(telemetry.damage_dealt_events_by_source),
         objective_damage_total = format_rate(telemetry.objective_damage_total or 0),
         objective_damage_event_total = telemetry.objective_damage_event_total or 0,
         objective_damage_by_source = encode_counts(telemetry.objective_damage_by_source),
@@ -672,6 +694,12 @@ local function summarize_run(run, telemetry, outcome)
         damage_event_total = telemetry.damage_event_total or 0,
         damage_taken_by_source = encode_counts(telemetry.damage_taken_by_source),
         damage_events_by_source = encode_counts(telemetry.damage_events_by_source),
+        damage_dealt_total = format_rate(telemetry.damage_dealt_total or 0),
+        damage_dealt_event_total = telemetry.damage_dealt_event_total or 0,
+        damage_dealt_by_target = encode_counts(telemetry.damage_dealt_by_target),
+        damage_dealt_events_by_target = encode_counts(telemetry.damage_dealt_events_by_target),
+        damage_dealt_by_source = encode_counts(telemetry.damage_dealt_by_source),
+        damage_dealt_events_by_source = encode_counts(telemetry.damage_dealt_events_by_source),
         objective_damage_total = format_rate(telemetry.objective_damage_total or 0),
         objective_damage_event_total = telemetry.objective_damage_event_total or 0,
         objective_damage_by_source = encode_counts(telemetry.objective_damage_by_source),
@@ -753,11 +781,33 @@ local function flatten_damage_rows(run, telemetry, damage_by_source_key, events_
     return rows
 end
 
+local function flatten_damage_dealt_target_rows(run, telemetry)
+    local rows = {}
+    local events = telemetry.damage_dealt_events_by_target or {}
+    for target, damage in pairs(telemetry.damage_dealt_by_target or {}) do
+        rows[#rows + 1] = {
+            run_id = run.run_id,
+            seed = tostring(run.seed),
+            seed_group = run.seed_group,
+            class_run_index = run.class_run_index,
+            class = run.class_name,
+            start_level = run.start_level or 1,
+            loadout = run.loadout_name or "",
+            bot_profile = run.bot_profile or telemetry.skill_profile or "",
+            target = target,
+            damage = format_rate(damage),
+            events = events[target] or 0,
+        }
+    end
+    return rows
+end
+
 local SUMMARY_METRICS = {
     "frames", "level", "xp", "hp_pct", "mp_pct", "kills", "player_kills", "deaths",
     "min_hp", "min_hp_pct", "deepest_floor", "current_floor", "spell_orders_total", "ability_orders_total", "weapon_orders",
     "item_orders_total", "damage_taken_total", "regen_adjusted_damage_taken_total",
     "necromancer_regen_offset_pct", "damage_event_total",
+    "damage_dealt_total", "damage_dealt_event_total",
     "objective_damage_total", "objective_damage_event_total",
     "reaction_hold_frames", "movement_noise_frames", "spell_skip_frames",
     "item_skip_frames", "weapon_skip_frames",
@@ -848,6 +898,7 @@ local function aggregate_summary_rows(summaries)
         local controlled_frames = math.max(1, aggregate.sums.controlled_frames or 0)
         local combat_frames = aggregate.sums.combat_frames or 0
         local kills = aggregate.sums.kills or 0
+        local damage_dealt = aggregate.sums.damage_dealt_total or 0
         row.combat_frame_rate = format_rate(combat_frames / controlled_frames)
         row.explore_frame_rate = format_rate((aggregate.sums.explore_frames or 0) / controlled_frames)
         row.rest_frame_rate = format_rate((aggregate.sums.rest_frames or 0) / controlled_frames)
@@ -855,6 +906,8 @@ local function aggregate_summary_rows(summaries)
         row.portal_stop_frame_rate = format_rate((aggregate.sums.portal_stop_frames or 0) / controlled_frames)
         row.kills_per_1000_controlled_frames = format_rate(kills / controlled_frames * 1000)
         row.kills_per_1000_combat_frames = format_rate(combat_frames > 0 and kills / combat_frames * 1000 or 0)
+        row.damage_dealt_per_1000_controlled_frames = format_rate(damage_dealt / controlled_frames * 1000)
+        row.damage_dealt_per_1000_combat_frames = format_rate(combat_frames > 0 and damage_dealt / combat_frames * 1000 or 0)
         rows[#rows + 1] = row
     end
     return rows
@@ -918,14 +971,17 @@ local function aggregate_spell_rows(spell_rows, summaries)
     return rows
 end
 
-local function aggregate_damage_rows(damage_rows, summaries)
+local function aggregate_damage_rows(damage_rows, summaries, group_field, output_field)
+    group_field = group_field or "source"
+    output_field = output_field or group_field
     local run_counts = class_run_counts(summaries)
     local class_damage = {}
     local groups = {}
     for _, row in ipairs(damage_rows) do
         local run_group = group_key(row.class, row.start_level, row.loadout, row.bot_profile)
         class_damage[run_group] = (class_damage[run_group] or 0) + (tonumber(row.damage) or 0)
-        local key = run_group .. "\n" .. tostring(row.source or "")
+        local group_value = row[group_field] or ""
+        local key = run_group .. "\n" .. tostring(group_value)
         local aggregate = groups[key]
         if not aggregate then
             aggregate = {
@@ -934,7 +990,7 @@ local function aggregate_damage_rows(damage_rows, summaries)
                 loadout = row.loadout or "",
                 bot_profile = row.bot_profile or "",
                 run_group = run_group,
-                source = row.source,
+                group_value = group_value,
                 runs_hit = 0,
                 total_damage = 0,
                 total_events = 0,
@@ -959,7 +1015,7 @@ local function aggregate_damage_rows(damage_rows, summaries)
             start_level = aggregate.start_level,
             loadout = aggregate.loadout,
             bot_profile = aggregate.bot_profile,
-            source = aggregate.source,
+            [output_field] = aggregate.group_value,
             class_runs = run_counts[aggregate.run_group] or 0,
             runs_hit = aggregate.runs_hit,
             hit_rate = format_rate(aggregate.runs_hit / class_runs),
@@ -1148,6 +1204,11 @@ local REPORT_METRICS = {
         label = "kills per 1000 combat frames",
         direction = "higher",
     },
+    {
+        key = "damage_dealt_per_1000_combat_frames",
+        label = "damage dealt per 1000 combat frames",
+        direction = "higher",
+    },
 }
 
 local BASELINE_METRICS = {}
@@ -1161,6 +1222,10 @@ BASELINE_METRICS[#BASELINE_METRICS + 1] = {
 BASELINE_METRICS[#BASELINE_METRICS + 1] = {
     key = "kills_per_1000_controlled_frames",
     label = "kills per 1000 controlled frames",
+}
+BASELINE_METRICS[#BASELINE_METRICS + 1] = {
+    key = "damage_dealt_per_1000_controlled_frames",
+    label = "damage dealt per 1000 controlled frames",
 }
 BASELINE_METRICS[#BASELINE_METRICS + 1] = {
     key = "avg_frames",
@@ -1659,6 +1724,7 @@ local function game_init(run, telemetry, bot_options)
         player.stats.mp = estats.max_mp
         player:add_effect("BalanceDamageTracker", {time_left = 10000000, telemetry = telemetry})
         attach_objective_damage_tracker(player, run.objective_enemy, telemetry)
+        attach_damage_dealt_trackers(player, telemetry)
     end
     GameState.input_capture()
     if not GameState.input_handle() then
@@ -1779,6 +1845,7 @@ local function run_balance(raw_args)
     parser:option("--aggregate_out", "Class aggregate CSV output.", "saves/balance_classes.csv")
     parser:option("--spell_stats_out", "Spell aggregate CSV output.", "saves/balance_spell_stats.csv")
     parser:option("--damage_stats_out", "Damage source aggregate CSV output.", "saves/balance_damage_stats.csv")
+    parser:option("--damage_dealt_stats_out", "Outgoing damage by target aggregate CSV output.", "saves/balance_damage_dealt_stats.csv")
     parser:option("--objective_damage_stats_out", "Objective damage source aggregate CSV output.", "saves/balance_objective_damage_stats.csv")
     parser:option("--enemy_stats_out", "Enemy aggregate CSV output.", "saves/balance_enemy_stats.csv")
     parser:option("--report_out", "Balance report CSV output.", "saves/balance_report.csv")
@@ -1813,6 +1880,7 @@ local function run_balance(raw_args)
     local samples = {}
     local spell_rows = {}
     local damage_rows = {}
+    local damage_dealt_target_rows = {}
     local objective_damage_rows = {}
     local json_runs = {}
     local Events
@@ -1826,6 +1894,7 @@ local function run_balance(raw_args)
         local class_rows = aggregate_summary_rows(summaries)
         local spell_stat_rows = aggregate_spell_rows(spell_rows, summaries)
         local damage_stat_rows = aggregate_damage_rows(damage_rows, summaries)
+        local damage_dealt_stat_rows = aggregate_damage_rows(damage_dealt_target_rows, summaries, "target", "target")
         local objective_damage_stat_rows = aggregate_damage_rows(objective_damage_rows, summaries)
         local enemy_stat_rows = aggregate_enemy_rows(summaries)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
@@ -1838,6 +1907,8 @@ local function run_balance(raw_args)
             "damage_taken_total", "regen_adjusted_damage_taken_total",
             "necromancer_regen_offset_pct", "damage_event_total", "damage_taken_by_source",
             "damage_events_by_source",
+            "damage_dealt_total", "damage_dealt_event_total", "damage_dealt_by_target",
+            "damage_dealt_events_by_target", "damage_dealt_by_source", "damage_dealt_events_by_source",
             "objective_damage_total", "objective_damage_event_total",
             "objective_damage_by_source", "objective_damage_events_by_source",
             "reaction_hold_frames", "movement_noise_frames", "spell_skip_frames",
@@ -1858,6 +1929,8 @@ local function run_balance(raw_args)
             "damage_taken_total", "regen_adjusted_damage_taken_total",
             "necromancer_regen_offset_pct", "damage_event_total", "damage_taken_by_source",
             "damage_events_by_source",
+            "damage_dealt_total", "damage_dealt_event_total", "damage_dealt_by_target",
+            "damage_dealt_events_by_target", "damage_dealt_by_source", "damage_dealt_events_by_source",
             "objective_damage_total", "objective_damage_event_total",
             "objective_damage_by_source", "objective_damage_events_by_source",
             "reaction_hold_frames", "movement_noise_frames", "spell_skip_frames",
@@ -1868,6 +1941,12 @@ local function run_balance(raw_args)
         write_csv(args.spells_out, spell_rows, {"run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "spell", "orders"})
         write_csv(args.damage_stats_out, damage_stat_rows, {
             "class", "start_level", "loadout", "bot_profile", "source", "class_runs", "runs_hit",
+            "hit_rate", "total_damage", "total_events", "avg_damage_per_run",
+            "avg_damage_per_hit_run", "avg_events_per_run", "max_damage_in_run",
+            "damage_share",
+        })
+        write_csv(args.damage_dealt_stats_out, damage_dealt_stat_rows, {
+            "class", "start_level", "loadout", "bot_profile", "target", "class_runs", "runs_hit",
             "hit_rate", "total_damage", "total_events", "avg_damage_per_run",
             "avg_damage_per_hit_run", "avg_events_per_run", "max_damage_in_run",
             "damage_share",
@@ -1884,8 +1963,10 @@ local function run_balance(raw_args)
             "combat_frame_rate", "explore_frame_rate", "rest_frame_rate",
             "idle_frame_rate", "portal_stop_frame_rate",
             "kills_per_1000_controlled_frames", "kills_per_1000_combat_frames",
+            "damage_dealt_per_1000_controlled_frames", "damage_dealt_per_1000_combat_frames",
             "avg_damage_taken_total", "avg_regen_adjusted_damage_taken_total",
             "avg_necromancer_regen_offset_pct", "avg_damage_event_total",
+            "avg_damage_dealt_total", "avg_damage_dealt_event_total",
             "avg_min_hp_pct", "min_min_hp_pct",
             "avg_objective_damage_total", "avg_objective_damage_event_total",
             "avg_reaction_hold_frames", "avg_movement_noise_frames",
@@ -1916,7 +1997,7 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 12,
+                schema_version = 14,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
                 bot_profile = args.bot_profile,
@@ -1927,19 +2008,21 @@ local function run_balance(raw_args)
                 class_stats = class_rows,
                 spell_stats = spell_stat_rows,
                 damage_stats = damage_stat_rows,
+                damage_dealt_stats = damage_dealt_stat_rows,
                 objective_damage_stats = objective_damage_stat_rows,
                 enemy_stats = enemy_stat_rows,
                 balance_report = report_rows,
             })
         end
         print(string.format(
-            "Balance run complete: %d runs, %d samples. Wrote %s, %s, %s, %s, %s, %s, %s, %s, %s, %s.",
+            "Balance run complete: %d runs, %d samples. Wrote %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s.",
             #summaries,
             #samples,
             args.out,
             args.samples_out,
             args.spells_out,
             args.damage_stats_out,
+            args.damage_dealt_stats_out,
             args.objective_damage_stats_out,
             args.aggregate_out,
             args.spell_stats_out,
@@ -1972,6 +2055,10 @@ local function run_balance(raw_args)
             visible_enemy_frames = {},
             damage_taken_by_source = {},
             damage_events_by_source = {},
+            damage_dealt_by_target = {},
+            damage_dealt_events_by_target = {},
+            damage_dealt_by_source = {},
+            damage_dealt_events_by_source = {},
             objective_damage_by_source = {},
             objective_damage_events_by_source = {},
         }
@@ -2006,6 +2093,9 @@ local function run_balance(raw_args)
                 end
                 for _, row in ipairs(flatten_damage_rows(run, telemetry)) do
                     damage_rows[#damage_rows + 1] = row
+                end
+                for _, row in ipairs(flatten_damage_dealt_target_rows(run, telemetry)) do
+                    damage_dealt_target_rows[#damage_dealt_target_rows + 1] = row
                 end
                 for _, row in ipairs(flatten_damage_rows(run, telemetry, "objective_damage_by_source", "objective_damage_events_by_source")) do
                     objective_damage_rows[#objective_damage_rows + 1] = row
@@ -2047,6 +2137,7 @@ local function run_balance(raw_args)
             local entry = World.players[1]
             local player = entry and entry.instance
             attach_objective_damage_tracker(player, args.objective_enemy, telemetry)
+            attach_damage_dealt_trackers(player, telemetry)
             if not run_state.done and args.objective_enemy and args.objective_enemy ~= ""
                 and player and hostile_alive_enemy_named_count(player, args.objective_enemy) == 0 then
                 run_state.outcome = "cleared"

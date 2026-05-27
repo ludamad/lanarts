@@ -44,6 +44,44 @@ DataW.effect_create {
 }
 
 DataW.effect_create {
+    name: "BalanceDamageDealtTracker"
+    apply_func: (obj, args) =>
+        @telemetry = args and args.telemetry
+        @attacker_team = args and args.attacker_team
+        @damage_by_target_key = (args and args.damage_by_target_key) or "damage_dealt_by_target"
+        @events_by_target_key = (args and args.events_by_target_key) or "damage_dealt_events_by_target"
+        @damage_by_source_key = (args and args.damage_by_source_key) or "damage_dealt_by_source"
+        @events_by_source_key = (args and args.events_by_source_key) or "damage_dealt_events_by_source"
+        @damage_total_key = (args and args.damage_total_key) or "damage_dealt_total"
+        @event_total_key = (args and args.event_total_key) or "damage_dealt_event_total"
+    on_receive_damage_func: (attacker, defender, damage) =>
+        telemetry = @telemetry
+        if not telemetry or not damage or damage <= 0
+            return damage
+        if @attacker_team ~= nil and (not attacker or attacker.team ~= @attacker_team)
+            return damage
+
+        source = damage_source_name(attacker, defender)
+        target = if defender and defender.name and defender.name ~= "" then defender.name else "Unattributed"
+        damage_by_target = telemetry[@damage_by_target_key] or {}
+        events_by_target = telemetry[@events_by_target_key] or {}
+        damage_by_source = telemetry[@damage_by_source_key] or {}
+        events_by_source = telemetry[@events_by_source_key] or {}
+        telemetry[@damage_by_target_key] = damage_by_target
+        telemetry[@events_by_target_key] = events_by_target
+        telemetry[@damage_by_source_key] = damage_by_source
+        telemetry[@events_by_source_key] = events_by_source
+
+        damage_by_target[target] = (damage_by_target[target] or 0) + damage
+        events_by_target[target] = (events_by_target[target] or 0) + 1
+        damage_by_source[source] = (damage_by_source[source] or 0) + damage
+        events_by_source[source] = (events_by_source[source] or 0) + 1
+        telemetry[@damage_total_key] = (telemetry[@damage_total_key] or 0) + damage
+        telemetry[@event_total_key] = (telemetry[@event_total_key] or 0) + 1
+        return damage
+}
+
+DataW.effect_create {
     name: "Poison"
     effected_sprite: "spr_effects.poison"
     poison_rate: 35
