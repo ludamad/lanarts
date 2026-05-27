@@ -3,6 +3,12 @@ e2e_tests:
 
     Note: Periodically run tests not on headless to ensure no graphical crashes / bugs.
 
+Content lab APIs:
+    ./run.sh --headless engine.StartContentApiSmoke
+
+    Validates that the content-lab catalog, resolved run summary, and generated
+    resource matrix return parseable JSON with the expected high-level shape.
+
 Balance simulations:
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --classes Fighter,Necromancer,Pyrocaster,Stormcaller
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --levels 1,3

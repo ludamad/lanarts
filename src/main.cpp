@@ -222,6 +222,14 @@ extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_launch_args_json(con
 extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_map_preview_json(const char* raw_json) {
     return content_api_call("map_preview_json", raw_json);
 }
+
+extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_run_summary_json(const char* raw_json) {
+    return content_api_call("run_summary_json", raw_json);
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_resource_matrix_json(const char* raw_json) {
+    return content_api_call("resource_matrix_json", raw_json);
+}
 #endif
 
 

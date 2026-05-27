@@ -278,6 +278,61 @@
       font-size: 13px;
     }
 
+    .run-summary {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #14191e;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .summary-line {
+      display: grid;
+      grid-template-columns: 78px minmax(0, 1fr);
+      gap: 8px;
+      align-items: start;
+    }
+
+    .summary-line strong {
+      color: #d4dde6;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .summary-line code {
+      color: var(--accent-2);
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .item-chips,
+    .warning-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .item-chips span,
+    .warning-list span {
+      padding: 3px 6px;
+      border-radius: 999px;
+      background: #1b2229;
+      border: 1px solid #35404a;
+      color: #d4dde6;
+      font-size: 11px;
+    }
+
+    .warning-list span {
+      color: #efd7a1;
+      border-color: #4d422c;
+      background: #241f16;
+    }
+
     .tag-list {
       display: flex;
       flex-wrap: wrap;
@@ -418,6 +473,15 @@
     .resource-list {
       display: grid;
       gap: 8px;
+    }
+
+    .resource-group {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 760;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .resource {
@@ -607,6 +671,11 @@
       </section>
 
       <section class="section">
+        <div class="section-title">Resolved Run</div>
+        <div class="run-summary" id="runSummary"></div>
+      </section>
+
+      <section class="section">
         <div class="section-title">Resources</div>
         <div class="resource-list" id="resources"></div>
       </section>
@@ -720,6 +789,9 @@
         },
       ];
 
+      let generatedResources = [];
+      let resolvedRun = null;
+
       function callContentApi(name, payload) {
         if (!state.runtimeReady || !Module.ccall) {
           return null;
@@ -770,9 +842,28 @@
           button.classList.toggle('active', name === state.preset);
           button.addEventListener('click', () => {
             setPreset(name);
+            refreshLab();
           });
           host.appendChild(button);
         });
+      }
+
+      function normalizeResource(resource) {
+        return {
+          name: resource.name,
+          group: resource.group || 'Curated',
+          meta: resource.meta || resource.goal || '',
+          goal: resource.goal || '',
+          className: resource.className,
+          level: String(resource.level || 1),
+          preset: resource.preset || 'none',
+          intensity: resource.intensity || 'standard',
+          customLoadout: resource.customLoadout || resource.loadout || '',
+          mapDesc: resource.mapDesc || '',
+          encounter: resource.encounter || '',
+          monsters: resource.monsters || '',
+          seed: String(resource.seed || 1),
+        };
       }
 
       function applyCatalog(catalog) {
@@ -787,19 +878,7 @@
         rebuildLoadoutPresets(catalog.loadouts, catalog.loadout_names);
         encounters = catalog.encounters || encounters;
         intensities = catalog.intensities || intensities;
-        resources = (catalog.resources || []).map((resource) => ({
-          name: resource.name,
-          meta: resource.meta || resource.goal || '',
-          goal: resource.goal || '',
-          className: resource.className,
-          level: String(resource.level || 1),
-          preset: resource.preset || 'none',
-          intensity: resource.intensity || 'standard',
-          mapDesc: resource.mapDesc || '',
-          encounter: resource.encounter || '',
-          monsters: resource.monsters || '',
-          seed: String(resource.seed || 1),
-        }));
+        resources = (catalog.resources || []).map(normalizeResource);
         mapProfiles = (catalog.maps || []).slice(0, 4).map(normalizePreviewProfile);
         wireResources();
         setConfig(currentConfig());
@@ -847,6 +926,88 @@
         });
       }
 
+      function appendSummaryLine(host, labelText, valueNode) {
+        const row = document.createElement('div');
+        row.className = 'summary-line';
+        const label = document.createElement('strong');
+        label.textContent = labelText;
+        row.appendChild(label);
+        row.appendChild(valueNode);
+        host.appendChild(row);
+      }
+
+      function renderRunSummary(summary) {
+        const host = $('runSummary');
+        host.innerHTML = '';
+        if (!summary) {
+          const pending = document.createElement('div');
+          pending.className = 'muted';
+          pending.textContent = state.runtimeReady ? 'No run selected' : 'Runtime data pending';
+          host.appendChild(pending);
+          return;
+        }
+
+        const target = document.createElement('div');
+        const targetLabel = summary.encounter && summary.encounter.id
+          ? summary.encounter.label || summary.encounter.id
+          : (summary.map && (summary.map.label || summary.map.id)) || 'Campaign World';
+        target.textContent = `${summary.config.className} L${summary.config.level}, ${targetLabel}`;
+        appendSummaryLine(host, 'Target', target);
+
+        const loadout = document.createElement('div');
+        loadout.className = 'item-chips';
+        const items = (summary.loadout && summary.loadout.items) || [];
+        if (items.length === 0) {
+          const empty = document.createElement('span');
+          empty.textContent = summary.loadout ? summary.loadout.label : 'No preset';
+          loadout.appendChild(empty);
+        } else {
+          items.slice(0, 8).forEach((item) => {
+            const chip = document.createElement('span');
+            chip.textContent = item.amount > 1 ? `${item.item} x${item.amount}` : item.item;
+            loadout.appendChild(chip);
+          });
+          if (items.length > 8) {
+            const more = document.createElement('span');
+            more.textContent = `+${items.length - 8}`;
+            loadout.appendChild(more);
+          }
+        }
+        appendSummaryLine(host, 'Loadout', loadout);
+
+        if ((summary.warnings || []).length) {
+          const warnings = document.createElement('div');
+          warnings.className = 'warning-list';
+          summary.warnings.forEach((warning) => {
+            const chip = document.createElement('span');
+            chip.textContent = warning;
+            warnings.appendChild(chip);
+          });
+          appendSummaryLine(host, 'Notes', warnings);
+        }
+
+        const args = document.createElement('code');
+        args.textContent = (summary.args || []).join(' ');
+        appendSummaryLine(host, 'Args', args);
+      }
+
+      function updateRunSummary() {
+        resolvedRun = callContentApi('lanarts_content_run_summary_json', currentConfig());
+        renderRunSummary(resolvedRun);
+      }
+
+      function updateGeneratedResources() {
+        const response = callContentApi('lanarts_content_resource_matrix_json', currentConfig());
+        generatedResources = response && response.resources ? response.resources.map(normalizeResource) : [];
+        wireResources();
+      }
+
+      function refreshLab() {
+        updateRunSummary();
+        drawPreviews();
+        updateGeneratedResources();
+      }
+
       function setConfig(config) {
         $('className').value = config.className || 'Fighter';
         $('level').value = String(config.level || '1');
@@ -857,7 +1018,7 @@
         $('intensity').value = config.intensity || 'standard';
         $('customMonsters').value = config.monsters || '';
         setPreset(config.preset || 'none');
-        drawPreviews();
+        refreshLab();
       }
 
       function selectedEncounter() {
@@ -934,6 +1095,26 @@
         return rows;
       }
 
+      function rhythmMeta(row) {
+        if (row.meta) {
+          return row.meta;
+        }
+        if (row.id === 'orbit') {
+          return `${row.count || 1} orbiting hitboxes, ${row.duration || 0}f, damage ${Number(row.damage || 0).toFixed(1)}${row.affectsEscorts ? ', hits ally' : ''}`;
+        }
+        if (row.id === 'pulse') {
+          return `player-targeted${row.affectsEscorts ? ' plus ally' : ''}, ${row.windup || 0}f warning, ${row.active || 0}f active, damage ${Number(row.damage || 0).toFixed(1)}`;
+        }
+        if (row.id === 'escort') {
+          return `protect ${row.monster || 'ally'}, ${row.hp || '?'} hp`;
+        }
+        if (row.id === 'summon') {
+          const monster = ((row.monsters || [])[0]) || 'add';
+          return `${row.count || 1} ${monster} per wave, cap ${row.maxAlive || 1}`;
+        }
+        return '';
+      }
+
       function renderRhythmTrack(row) {
         const item = document.createElement('div');
         item.className = 'rhythm-row';
@@ -958,7 +1139,7 @@
         item.appendChild(track);
         const meta = document.createElement('div');
         meta.className = 'rhythm-meta';
-        meta.textContent = `${row.interval}f loop - ${row.meta}`;
+        meta.textContent = `${row.interval}f loop - ${rhythmMeta(row)}`;
         item.appendChild(meta);
         return item;
       }
@@ -994,7 +1175,9 @@
           });
           info.appendChild(tags);
         }
-        const rhythms = encounterRhythms(encounter);
+        const rhythms = resolvedRun && resolvedRun.encounter && resolvedRun.encounter.id === encounter.id
+          ? (resolvedRun.rhythms || [])
+          : encounterRhythms(encounter);
         if (rhythms.length) {
           const rhythmList = document.createElement('div');
           rhythmList.className = 'rhythm-list';
@@ -1177,7 +1360,16 @@
       function wireResources() {
         const list = $('resources');
         list.innerHTML = '';
-        resources.forEach((resource) => {
+        let currentGroup = '';
+        resources.concat(generatedResources).forEach((resource) => {
+          const group = resource.group || 'Curated';
+          if (group !== currentGroup) {
+            currentGroup = group;
+            const groupNode = document.createElement('div');
+            groupNode.className = 'resource-group';
+            groupNode.textContent = group;
+            list.appendChild(groupNode);
+          }
           const button = document.createElement('button');
           button.type = 'button';
           button.className = 'resource';
@@ -1197,17 +1389,18 @@
         document.querySelectorAll('#loadoutPreset button').forEach((button) => {
           button.addEventListener('click', () => {
             setPreset(button.dataset.value);
+            refreshLab();
           });
         });
         ['className', 'level', 'seed', 'customLoadout', 'mapDesc', 'encounter', 'intensity', 'customMonsters'].forEach((id) => {
-          $(id).addEventListener('input', drawPreviews);
-          $(id).addEventListener('change', drawPreviews);
+          $(id).addEventListener('input', refreshLab);
+          $(id).addEventListener('change', refreshLab);
         });
         $('launch').disabled = true;
         $('launch').addEventListener('click', () => launch(currentConfig()));
         $('reseed').addEventListener('click', () => {
           $('seed').value = String(Math.floor(10000 + Math.random() * 900000));
-          drawPreviews();
+          refreshLab();
         });
         $('copyLink').addEventListener('click', async () => {
           const url = `${location.origin}${queryFor(currentConfig(), false)}`;
