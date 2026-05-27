@@ -37,6 +37,13 @@ local function run_content_api_smoke()
     expect(summary.config.className == "Necromancer", "summary should preserve class")
     expect(summary.loadout and #(summary.loadout.items or {}) > 0, "summary should resolve loadout")
     expect(summary.rhythms and #summary.rhythms >= 2, "summary should expose package rhythms")
+    local has_rescue_rhythm = false
+    for _, rhythm in ipairs(summary.rhythms or {}) do
+        if rhythm.id == "rescue" then
+            has_rescue_rhythm = true
+        end
+    end
+    expect(has_rescue_rhythm, "summary should expose rescue rhythm metadata")
     expect(summary.args and #summary.args > 0, "summary should expose launch args")
 
     local matrix = parse_response("resource matrix", ContentApi.resource_matrix_json(config))

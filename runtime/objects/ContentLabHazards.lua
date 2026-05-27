@@ -20,6 +20,18 @@ local function dist_sqr(a, b)
     return sqr(a[1] - b[1]) + sqr(a[2] - b[2])
 end
 
+local function dist_to_segment_sqr(point, a, b)
+    local vx = b[1] - a[1]
+    local vy = b[2] - a[2]
+    local len_sqr = vx * vx + vy * vy
+    if len_sqr <= 1 then
+        return dist_sqr(point, a)
+    end
+    local t = ((point[1] - a[1]) * vx + (point[2] - a[2]) * vy) / len_sqr
+    t = math.max(0, math.min(1, t))
+    return dist_sqr(point, {a[1] + vx * t, a[2] + vy * t})
+end
+
 local function xy_of(obj)
     return {obj.x, obj.y}
 end
@@ -163,6 +175,23 @@ local function draw_world_circle(color, xy, radius, fill_alpha, outline_alpha)
     Display.draw_circle_outline(with_alpha(color, outline_alpha), screen_xy, radius, 2)
 end
 
+local function draw_world_link(color, from_xy, to_xy, radius, alpha)
+    local dx = to_xy[1] - from_xy[1]
+    local dy = to_xy[2] - from_xy[2]
+    local distance = math.sqrt(dx * dx + dy * dy)
+    local steps = math.max(2, math.floor(distance / 18))
+    for idx = 0, steps do
+        if idx % 2 == 0 then
+            local pct = idx / steps
+            local xy = {
+                from_xy[1] + dx * pct,
+                from_xy[2] + dy * pct,
+            }
+            Display.draw_circle(with_alpha(color, alpha), Display.to_screen_xy(xy), radius)
+        end
+    end
+end
+
 local function next_delta(elapsed, interval, offset)
     local delta = offset - (elapsed % interval)
     if delta < 0 then
@@ -232,6 +261,7 @@ local function draw_escort_markers()
 end
 
 local summon_count
+local active_rescue_strikes
 
 local function draw_package_hud(director)
     local package = director.package or {}
@@ -244,6 +274,9 @@ local function draw_package_hud(director)
         row_count = row_count + 1
     end
     if package.summon then
+        row_count = row_count + 1
+    end
+    if package.rescue then
         row_count = row_count + 1
     end
     if package.escort then
@@ -278,6 +311,16 @@ local function draw_package_hud(director)
         local current = summon_count()
         local max_alive = scale_count(summon.max_alive, 4, intensity)
         draw_hud_row(y, "ADDS", format_frames(delta) .. " " .. current .. "/" .. max_alive, COL_PALE_YELLOW, 1 - delta / interval)
+        y = y + HUD_ROW_H
+    end
+    if package.rescue then
+        local rescue = package.rescue
+        local interval, offset = scaled_interval_and_offset(rescue, 205, 54, intensity)
+        local delta = next_delta(director.elapsed, interval, offset)
+        local saves = director.rescue_saves or 0
+        local active = active_rescue_strikes()
+        local value = active > 0 and "block " .. saves or format_frames(delta) .. " " .. saves
+        draw_hud_row(y, "SAVE", value, COL_PALE_GREEN, active > 0 and 1 or 1 - delta / interval)
         y = y + HUD_ROW_H
     end
     if package.escort then
@@ -379,6 +422,118 @@ function M.create_orb(args)
     }
 end
 
+local function rescue_target()
+    local escorts = living_escorts()
+    return escorts[1]
+end
+
+local function rescue_source_xy(strike)
+    if strike.source and not strike.source.destroyed then
+        return xy_of(strike.source)
+    end
+    return copy_xy(strike.source_xy)
+end
+
+local function rescue_blocker(strike)
+    local target = strike.target
+    if not target or target.destroyed then
+        return nil
+    end
+    local from_xy = rescue_source_xy(strike)
+    local to_xy = xy_of(target)
+    local best
+    local best_dist
+    for _, player in ipairs(living_players()) do
+        local player_xy = xy_of(player)
+        local radius = (strike.block_radius or 30) + (player.target_radius or player.radius or 12)
+        if dist_to_segment_sqr(player_xy, from_xy, to_xy) <= sqr(radius) then
+            local target_dist = dist_sqr(player_xy, to_xy)
+            if not best_dist or target_dist < best_dist then
+                best = player
+                best_dist = target_dist
+            end
+        end
+    end
+    return best
+end
+
+function M.create_rescue_strike(args)
+    return GameObject.object_create {
+        map = args.map,
+        xy = copy_xy(args.target and xy_of(args.target) or args.xy),
+        radius = 1,
+        solid = false,
+        depth = HAZARD_DEPTH + 1,
+        elapsed = 0,
+        content_lab_rescue_strike = true,
+        source = args.source,
+        source_xy = args.source and xy_of(args.source) or copy_xy(args.xy),
+        target = args.target,
+        director = args.director,
+        windup = args.windup or 68,
+        late_window = args.late_window or 22,
+        linger = args.linger or 18,
+        strike_radius = args.radius or 42,
+        block_radius = args.block_radius or 30,
+        ally_damage = args.ally_damage or 10,
+        block_damage = args.block_damage or 4,
+        power = args.power or 24,
+        magic_percentage = args.magic_percentage or 1,
+        resolved = false,
+        saved = false,
+        result_elapsed = 0,
+        on_step = function(self)
+            self.elapsed = self.elapsed + 1
+            if not self.target or self.target.destroyed then
+                GameObject.destroy(self)
+                return
+            end
+            self.xy = xy_of(self.target)
+            if not self.resolved and self.elapsed >= self.windup then
+                local blocker = rescue_blocker(self)
+                if blocker then
+                    self.saved = true
+                    self.damage = self.block_damage
+                    damage_player(self, blocker)
+                    if self.director and not self.director.destroyed then
+                        self.director.rescue_saves = (self.director.rescue_saves or 0) + 1
+                    end
+                else
+                    self.saved = false
+                    self.damage = self.ally_damage
+                    damage_player(self, self.target)
+                    if self.director and not self.director.destroyed then
+                        self.director.rescue_misses = (self.director.rescue_misses or 0) + 1
+                    end
+                end
+                self.resolved = true
+            elseif self.resolved then
+                self.result_elapsed = self.result_elapsed + 1
+                if self.result_elapsed >= self.linger then
+                    GameObject.destroy(self)
+                end
+            end
+        end,
+        on_draw = function(self)
+            if not self.target or self.target.destroyed then
+                return
+            end
+            local from_xy = rescue_source_xy(self)
+            local to_xy = xy_of(self.target)
+            local remaining = math.max(0, self.windup - self.elapsed)
+            local last_call = remaining <= self.late_window
+            local color = self.resolved and (self.saved and COL_PALE_GREEN or COL_PALE_RED)
+                or (last_call and COL_PALE_YELLOW or COL_PALE_GREEN)
+            local progress = self.resolved and 1 or math.max(0.2, math.min(1, self.elapsed / self.windup))
+            draw_world_link(color, from_xy, to_xy, last_call and 4 or 3, last_call and 0.50 or 0.28)
+            draw_world_circle(color, to_xy, self.strike_radius * progress, self.resolved and 0.14 or 0.07, self.resolved and 0.70 or 0.45)
+            local label_xy = Display.to_screen_xy({to_xy[1], to_xy[2] - self.strike_radius - 14})
+            local label = self.resolved and (self.saved and "SAVED" or "HIT") or (last_call and "BLOCK" or "RESCUE")
+            draw_text(color, Display.CENTER, label_xy, label)
+        end,
+    }
+end
+
 local function spawn_orb_wave(director, package)
     local orbit = package.orbit or {}
     local intensity = director.intensity
@@ -425,6 +580,31 @@ local function spawn_player_pulses(director, package)
     end
 end
 
+local function spawn_rescue_strike(director, package)
+    local rescue = package.rescue or {}
+    local target = rescue_target()
+    if not target then
+        return
+    end
+    local source = primary_monster(package.primary)
+    local intensity = director.intensity
+    M.create_rescue_strike {
+        map = director.map,
+        source = source,
+        target = target,
+        director = director,
+        xy = xy_of(target),
+        windup = scale_frames(rescue.windup, 68, intensity),
+        late_window = scale_frames(rescue.late_window, 22, intensity),
+        linger = rescue.linger or 18,
+        radius = rescue.radius or 42,
+        block_radius = rescue.block_radius or 30,
+        ally_damage = scale_damage(rescue.ally_damage, 10, intensity),
+        block_damage = scale_damage(rescue.block_damage, 4, intensity),
+        power = scale_damage(rescue.power, 24, intensity),
+    }
+end
+
 local function spawn_escorts(director, package)
     local escort = package.escort or {}
     if not escort.monster then
@@ -466,6 +646,16 @@ function summon_count()
     return count
 end
 
+function active_rescue_strikes()
+    local count = 0
+    for _, obj in ipairs(Map.objects_list()) do
+        if obj and not obj.destroyed and obj.content_lab_rescue_strike then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 local function spawn_summons(director, package)
     local summon = package.summon or {}
     local intensity = director.intensity
@@ -501,7 +691,7 @@ end
 
 function M.add_director(game_map, package, intensity)
     package = package or {}
-    if not (package.orbit or package.pulse or package.summon or package.escort) then
+    if not (package.orbit or package.pulse or package.summon or package.escort or package.rescue) then
         return nil
     end
     intensity = normalize_intensity(intensity)
@@ -515,6 +705,8 @@ function M.add_director(game_map, package, intensity)
         elapsed = 0,
         package = package,
         intensity = intensity,
+        rescue_saves = 0,
+        rescue_misses = 0,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
             if #living_monsters(false) == 0 then
@@ -543,6 +735,14 @@ function M.add_director(game_map, package, intensity)
                 local offset = scale_offset(summon.offset, 120, interval, self.intensity)
                 if self.elapsed % interval == offset then
                     spawn_summons(self, self.package)
+                end
+            end
+            local rescue = self.package.rescue
+            if rescue then
+                local interval = scale_frames(rescue.interval, 205, self.intensity)
+                local offset = scale_offset(rescue.offset, 54, interval, self.intensity)
+                if self.elapsed % interval == offset then
+                    spawn_rescue_strike(self, self.package)
                 end
             end
         end,

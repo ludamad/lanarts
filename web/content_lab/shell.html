@@ -719,7 +719,7 @@
         {id: 'purple-dragon-package', label: 'Purple Dragon package', kind: 'boss package', phase: 'late micro', features: ['rotating orbs', 'targeted AOE rhythm', 'Fire Bat adds']},
         {id: 'red-dragon-duel', label: 'Red Dragon duel', kind: 'boss duel', phase: 'late micro', features: ['projectile pressure', 'targeted AOE rhythm']},
         {id: 'gragh-duel', label: 'Gragh duel', kind: 'boss duel', phase: 'late micro', features: ['melee pursuit', 'rotating orbs', 'short AOE windows']},
-        {id: 'gragh-rescue-package', label: 'Gragh rescue package', kind: 'rescue package', phase: 'late multiplayer', features: ['protect ally', 'pull/taunt window', 'rotating orbs', 'short AOE windows']},
+        {id: 'gragh-rescue-package', label: 'Gragh rescue package', kind: 'rescue package', phase: 'late multiplayer', features: ['protect ally', 'body-block rescue', 'pull/taunt window', 'rotating orbs', 'short AOE windows']},
         {id: 'executioner-duel', label: 'Executioner duel'},
         {id: 'hell-pressure-pair', label: 'Hell pressure pair', kind: 'package', phase: 'late enemy mix', features: ['support pressure', 'melee bodyguard', 'targeted pulse']},
       ];
@@ -1083,6 +1083,18 @@
             meta: `protect ${pkg.escort.monster || 'ally'}, ${pkg.escort.hp || '?'} hp`,
           });
         }
+        if (pkg.rescue) {
+          const windup = scaledFrames(pkg.rescue.windup, 68, intensity);
+          const lateWindow = scaledFrames(pkg.rescue.late_window, 22, intensity);
+          rows.push({
+            label: 'Rescue',
+            offset: scaledFrames(pkg.rescue.offset, 54, intensity),
+            interval: scaledFrames(pkg.rescue.interval, 205, intensity),
+            duration: windup,
+            activeStart: Math.max(0, windup - lateWindow),
+            meta: `body-block line, ${lateWindow}f last-call, ally damage ${scaledDamage(pkg.rescue.ally_damage, 10, intensity).toFixed(1)}, block damage ${scaledDamage(pkg.rescue.block_damage, 4, intensity).toFixed(1)}`,
+          });
+        }
         if (pkg.summon) {
           rows.push({
             label: 'Summons',
@@ -1107,6 +1119,9 @@
         }
         if (row.id === 'escort') {
           return `protect ${row.monster || 'ally'}, ${row.hp || '?'} hp`;
+        }
+        if (row.id === 'rescue') {
+          return `body-block line, ${row.lateWindow || 0}f last-call, ally damage ${Number(row.allyDamage || 0).toFixed(1)}, block damage ${Number(row.blockDamage || 0).toFixed(1)}`;
         }
         if (row.id === 'summon') {
           const monster = ((row.monsters || [])[0]) || 'add';

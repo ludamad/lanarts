@@ -261,6 +261,24 @@ local function encounter_rhythms(encounter, intensity)
             hp = package.escort.hp,
         }
     end
+    if package.rescue then
+        local windup = scaled_frames(package.rescue.windup, 68, intensity)
+        local late_window = scaled_frames(package.rescue.late_window, 22, intensity)
+        rows[#rows + 1] = {
+            id = "rescue",
+            label = "Rescue",
+            offset = scaled_frames(package.rescue.offset, 54, intensity),
+            interval = scaled_frames(package.rescue.interval, 205, intensity),
+            duration = windup,
+            activeStart = math.max(0, windup - late_window),
+            windup = windup,
+            lateWindow = late_window,
+            radius = package.rescue.radius,
+            blockRadius = package.rescue.block_radius,
+            allyDamage = scaled_damage(package.rescue.ally_damage, 10, intensity),
+            blockDamage = scaled_damage(package.rescue.block_damage, 4, intensity),
+        }
+    end
     if package.summon then
         rows[#rows + 1] = {
             id = "summon",
