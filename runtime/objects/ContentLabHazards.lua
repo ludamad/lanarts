@@ -338,6 +338,8 @@ local function draw_package_hud(director)
         local value
         if active > 0 then
             value = blocked and ("hold " .. format_frames(remaining or 0)) or ("block " .. saves)
+        elseif (director.rescue_pull_active_frames or 0) > 0 then
+            value = "pull " .. format_frames(director.rescue_pull_active_frames)
         else
             local margin = director.rescue_last_margin
             value = saves .. " c" .. clutch_saves .. " p" .. pulls .. (margin and (" " .. margin .. "f") or "")
@@ -610,9 +612,63 @@ local function rescue_blocker(strike)
     return best
 end
 
+function M.create_pull_tether(args)
+    return GameObject.object_create {
+        map = args.map,
+        xy = copy_xy(args.xy or (args.source and xy_of(args.source)) or {0, 0}),
+        radius = 1,
+        solid = false,
+        depth = HAZARD_DEPTH + 2,
+        elapsed = 0,
+        duration = args.duration or 90,
+        source = args.source,
+        target = args.target,
+        director = args.director,
+        content_lab_pull_tether = true,
+        on_step = function(self)
+            self.elapsed = self.elapsed + 1
+            local remaining = math.max(0, self.duration - self.elapsed)
+            if not self.source or self.source.destroyed or not self.target or self.target.destroyed or self.elapsed >= self.duration then
+                if self.director and not self.director.destroyed then
+                    if not self.director.rescue_pull_active_id or self.director.rescue_pull_active_id == self.id then
+                        self.director.rescue_pull_active_frames = 0
+                        self.director.rescue_pull_active_id = nil
+                    end
+                end
+                GameObject.destroy(self)
+                return
+            end
+            self.xy = xy_of(self.source)
+            if self.director and not self.director.destroyed then
+                self.director.rescue_pull_active_frames = remaining
+                self.director.rescue_pull_active_id = self.id
+                self.director.rescue_pull_target = self.target.name
+            end
+        end,
+        on_draw = function(self)
+            if not self.source or self.source.destroyed or not self.target or self.target.destroyed then
+                return
+            end
+            local remaining = math.max(0, self.duration - self.elapsed)
+            local pct = remaining / math.max(1, self.duration)
+            local from_xy = xy_of(self.source)
+            local to_xy = xy_of(self.target)
+            local alpha = 0.18 + pct * 0.45
+            draw_world_link(COL_PALE_YELLOW, from_xy, to_xy, 4, alpha)
+            draw_world_circle(COL_PALE_YELLOW, from_xy, (self.source.radius or 14) + 7, 0.03, 0.48 + pct * 0.26)
+            draw_world_circle(COL_PALE_GREEN, to_xy, (self.target.radius or 12) + 6, 0.02, 0.40 + pct * 0.24)
+            local source_label = Display.to_screen_xy({from_xy[1], from_xy[2] - (self.source.radius or 14) - 20})
+            local target_label = Display.to_screen_xy({to_xy[1], to_xy[2] - (self.target.radius or 12) - 20})
+            draw_text(COL_PALE_YELLOW, Display.CENTER, source_label, "PULL " .. remaining .. "f")
+            draw_text(COL_PALE_GREEN, Display.CENTER, target_label, "TAUNTED")
+        end,
+    }
+end
+
 function M.create_rescue_strike(args)
     return GameObject.object_create {
         map = args.map,
+        strike_map = args.map,
         xy = copy_xy(args.target and xy_of(args.target) or args.xy),
         radius = 1,
         solid = false,
@@ -670,6 +726,16 @@ function M.create_rescue_strike(args)
                     self.damage = self.block_damage
                     damage_player(self, blocker)
                     self.pulled = force_chase(self.source, blocker, self.pull_frames)
+                    if self.pulled then
+                        M.create_pull_tether {
+                            map = self.strike_map or self.map,
+                            xy = xy_of(self.source),
+                            source = self.source,
+                            target = blocker,
+                            director = self.director,
+                            duration = self.pull_frames,
+                        }
+                    end
                     if self.director and not self.director.destroyed then
                         self.director.rescue_saves = (self.director.rescue_saves or 0) + 1
                         self.director.rescue_last_margin = margin
@@ -846,9 +912,9 @@ function active_rescue_strikes()
     local blocked = false
     local best_remaining
     for _, obj in ipairs(Map.objects_list()) do
-        if obj and not obj.destroyed and obj.content_lab_rescue_strike then
+        if obj and not obj.destroyed and obj.content_lab_rescue_strike and not obj.resolved then
             count = count + 1
-            if not obj.resolved and obj.current_blocker then
+            if obj.current_blocker then
                 blocked = true
                 local remaining = math.max(0, obj.windup - obj.elapsed)
                 best_remaining = math.min(best_remaining or remaining, remaining)
@@ -921,6 +987,7 @@ function M.add_director(game_map, package, intensity)
         rescue_misses = 0,
         rescue_clutch_saves = 0,
         rescue_pulls = 0,
+        rescue_pull_active_frames = 0,
         escort_required = package.escort ~= nil,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
