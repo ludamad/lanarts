@@ -1040,6 +1040,138 @@ M.encounters = {
     },
 }
 
+M.analysis_goals = {
+    {
+        id = "enemy-balance",
+        label = "Enemy balance",
+        description = "Compare enemy pressure, XP value, contact uptime, and class-specific counters.",
+        primary = true,
+    },
+    {
+        id = "class-buffer",
+        label = "Human-skill buffer",
+        description = "Check whether primitive automated play clears content too consistently.",
+    },
+    {
+        id = "map-variety",
+        label = "Map variety",
+        description = "Compare initial overworld topology, ambient density, and late-map enemy pools.",
+    },
+    {
+        id = "rescue-micro",
+        label = "Rescue micro",
+        description = "Exercise body-block, pull, taunt, and ally-protection windows.",
+    },
+    {
+        id = "caster-delta",
+        label = "Caster delta",
+        description = "Separate Pyrocaster conversion from Stormcaller overperformance and resist matchups.",
+    },
+    {
+        id = "necro-regen",
+        label = "Necro regen",
+        description = "Read Necromancer pressure through net damage, healing, and regen uptime.",
+    },
+}
+
+M.enemy_groups = {
+    {
+        id = "overworld-ambient",
+        label = "Overworld ambient",
+        phase = "opening",
+        description = "Initial-map enemies added to the overworld profiles.",
+        tags = {"initial map", "ambient", "enemy balance"},
+        choices = {
+            {name = "Sheep", role = "body-block ambient", suggestedLevel = 1, tags = {"ambient", "contact"}},
+            {name = "Black Mamba", role = "fast contact", suggestedLevel = 1, tags = {"ambient", "poison", "speed"}},
+            {name = "Skeleton", role = "basic undead contact", suggestedLevel = 1, tags = {"ambient", "undead"}},
+            {name = "Cloud Elemental", role = "opening caster pressure", suggestedLevel = 1, tags = {"ambient", "ranged", "white"}},
+            {name = "Mouther", role = "opening melee disruption", suggestedLevel = 2, tags = {"ambient", "melee"}},
+        },
+    },
+    {
+        id = "early-micro",
+        label = "Early micro",
+        phase = "early",
+        description = "Small-arena enemies for basic contact, projectile, and movement checks.",
+        tags = {"duel", "micro"},
+        choices = {
+            {name = "Giant Chicken", role = "dash and knockback", suggestedLevel = 2, tags = {"melee", "mobility"}},
+            {name = "Hound", role = "snap melee pressure", suggestedLevel = 3, tags = {"melee", "speed"}},
+            {name = "Fire Bat", role = "summoned add pressure", suggestedLevel = 3, tags = {"summon", "red"}},
+            {name = "Mummoner", role = "add timing", suggestedLevel = 3, tags = {"summoner", "black"}},
+        },
+    },
+    {
+        id = "late-melee",
+        label = "Late melee",
+        phase = "late",
+        description = "The enemies most likely to reveal melee survivability or contact damage problems.",
+        tags = {"late", "melee", "contact"},
+        choices = {
+            {name = "Gragh", role = "boss melee pressure", suggestedLevel = 5, tags = {"boss", "pull", "melee"}},
+            {name = "Executioner", role = "fast blade pressure", suggestedLevel = 5, tags = {"melee", "late"}},
+            {name = "Centaur Hunter", role = "late ranged pursuit", suggestedLevel = 5, tags = {"ranged", "late"}},
+            {name = "Mana Sapper", role = "support debuff pressure", suggestedLevel = 5, tags = {"support", "black", "sapped"}},
+        },
+    },
+    {
+        id = "late-bosses",
+        label = "Late bosses",
+        phase = "late",
+        description = "Boss-level comparisons for resistance, projectile, and summon pressure.",
+        tags = {"late", "boss", "package"},
+        choices = {
+            {name = "Red Dragon", role = "red/fire resistance check", suggestedLevel = 5, tags = {"boss", "red", "projectile"}},
+            {name = "Purple Dragon", role = "summon and projectile package", suggestedLevel = 5, tags = {"boss", "summon", "projectile"}},
+            {name = "Crypt Keeper", role = "black aura pressure", suggestedLevel = 5, tags = {"black", "aura"}},
+        },
+    },
+}
+
+M.enemy_packs = {
+    {
+        id = "overworld-ambient-pack",
+        label = "Overworld ambient pack",
+        phase = "opening",
+        monsters = {"Sheep", "Black Mamba", "Skeleton", "Cloud Elemental", "Mouther"},
+        pack = "OverworldAmbient=Sheep+Black Mamba+Skeleton+Cloud Elemental+Mouther",
+        goal = "opening enemy mix and ambient density",
+    },
+    {
+        id = "mummoner-add-pack",
+        label = "Mummoner add pack",
+        phase = "early",
+        monsters = {"Mummoner", "Mummy", "Flying Skull"},
+        pack = "MummonerAdds=Mummoner+Mummy*2+Flying Skull",
+        goal = "summon pacing and add cleanup",
+    },
+    {
+        id = "hell-support-pack",
+        label = "Hell support pair",
+        phase = "late",
+        monsters = {"Mana Sapper", "Executioner"},
+        pack = "HellSupport=Mana Sapper+Executioner",
+        goal = "support pressure with melee bodyguard",
+    },
+    {
+        id = "executioner-hound-pack",
+        label = "Executioner hounds",
+        phase = "late",
+        monsters = {"Executioner", "Hound", "Hound"},
+        pack = "ExecutionerHounds=Executioner+Hound*2",
+        goal = "fast melee stack and target swapping",
+    },
+    {
+        id = "dragon-add-pack",
+        label = "Dragon add pack",
+        phase = "late",
+        monsters = {"Purple Dragon", "Fire Bat", "Fire Bat"},
+        pack = "DragonAdds=Purple Dragon+Fire Bat*2",
+        goal = "boss projectile pressure plus summoned adds",
+    },
+}
+
 M.resources = {
     {
         id = "early-overworld-pressure",
@@ -1282,6 +1414,9 @@ function M.catalog()
         maps = M.maps,
         map_algorithms = M.map_algorithms,
         encounters = M.encounters,
+        analysis_goals = M.analysis_goals,
+        enemy_groups = M.enemy_groups,
+        enemy_packs = M.enemy_packs,
         resources = M.resources,
     }
 end

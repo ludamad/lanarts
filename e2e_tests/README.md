@@ -6,10 +6,14 @@ e2e_tests:
 Content lab APIs:
     ./run.sh --headless engine.StartContentApiSmoke
 
-    Validates that the content-lab catalog, resolved run summary, and generated
-    resource matrix return parseable JSON with the expected high-level shape.
+    Validates that the content-lab catalog, resolved run summary, enemy option
+    APIs, analysis plan, and generated resource matrix return parseable JSON
+    with the expected high-level shape.
     Run summaries also expose StartBalanceRun args for the selected class,
     level, loadout, map or encounter, and package pressure.
+    Enemy option APIs expose curated enemy groups, packs, arena launch args,
+    StartBalanceRun args, and StartMonsterEvals args so the web lab can build
+    enemy-balance probes without relying on free-text monster names.
 
 Balance simulations:
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --classes Fighter,Necromancer,Pyrocaster,Stormcaller

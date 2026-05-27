@@ -3,6 +3,17 @@ local Catalog = require "engine.ContentCatalog"
 
 local M = {}
 
+local MONSTER_EVAL_CONFIG_BY_CLASS = {
+    Fighter = "BaseFighter",
+    Necromancer = "BaseNecromancer",
+    Pyrocaster = "BasePyrocaster",
+    Stormcaller = "BaseStormcaller",
+    Templar = "BaseFighter",
+    Rogue = "BaseFighter",
+}
+
+local DEFAULT_MONSTER_EVAL_CONFIGS = "BaseFighter,BaseNecromancer,BaseStormcaller,BasePyrocaster"
+
 local function parse_json_object(raw_json)
     if not raw_json or raw_json == "" then
         return {}
@@ -87,6 +98,11 @@ local function normalized_config(config)
         mapAlgorithm = map_algorithm,
         encounter = tostring(config.encounter or ""),
         monsters = tostring(config.monsters or ""),
+        goal = tostring(config.goal or config.analysisGoal or config.analysis_goal or "enemy-balance"),
+        enemyGroup = tostring(config.enemyGroup or config.enemy_group or ""),
+        enemyPack = tostring(config.enemyPack or config.enemy_pack or ""),
+        monsterConfigs = tostring(config.monsterConfigs or config.monster_configs or ""),
+        monsterLevels = tostring(config.monsterLevels or config.monster_levels or config.levels or ""),
         botProfile = tostring(config.botProfile or config.bot_profile or "human"),
         runs = math.max(1, math.floor(tonumber(config.runs) or 5)),
         steps = math.max(1, math.floor(tonumber(config.steps) or 20000)),
@@ -271,6 +287,158 @@ local function split_csv(value)
         end
     end
     return result
+end
+
+local function join_names(values)
+    return table.concat(values or {}, ",")
+end
+
+local function enemy_group_lookup()
+    local lookup = {}
+    for _, group in ipairs(Catalog.enemy_groups or {}) do
+        lookup[group.id or ""] = group
+    end
+    return lookup
+end
+
+local function enemy_pack_lookup()
+    local lookup = {}
+    for _, pack in ipairs(Catalog.enemy_packs or {}) do
+        lookup[pack.id or ""] = pack
+    end
+    return lookup
+end
+
+local function analysis_goal_lookup()
+    local lookup = {}
+    for _, goal in ipairs(Catalog.analysis_goals or {}) do
+        lookup[goal.id or ""] = goal
+    end
+    return lookup
+end
+
+local function selected_enemy_group(config)
+    local lookup = enemy_group_lookup()
+    if lookup[config.enemyGroup or ""] then
+        return lookup[config.enemyGroup]
+    end
+    return Catalog.enemy_groups and Catalog.enemy_groups[1] or nil
+end
+
+local function selected_enemy_pack(config)
+    local lookup = enemy_pack_lookup()
+    if lookup[config.enemyPack or ""] then
+        return lookup[config.enemyPack]
+    end
+    return nil
+end
+
+local function monster_eval_configs_for(config)
+    if config.monsterConfigs ~= "" then
+        return config.monsterConfigs
+    end
+    if config.goal == "enemy-balance" or config.goal == "caster-delta" or config.goal == "class-buffer" then
+        return DEFAULT_MONSTER_EVAL_CONFIGS
+    end
+    return MONSTER_EVAL_CONFIG_BY_CLASS[config.className] or DEFAULT_MONSTER_EVAL_CONFIGS
+end
+
+local function monster_eval_levels_for(config, fallback_level)
+    if config.monsterLevels ~= "" then
+        return config.monsterLevels
+    end
+    return tostring(fallback_level or config.level or 1)
+end
+
+local function monster_eval_args(config, selection)
+    config = normalized_config(config)
+    selection = selection or {}
+    local args = {
+        "engine.StartMonsterEvals",
+        "--steps",
+        tostring(math.max(100, math.min(config.steps, 20000))),
+        "--runs",
+        tostring(config.runs),
+        "--seed",
+        config.seed,
+        "--levels",
+        monster_eval_levels_for(config, selection.level),
+        "--configs",
+        selection.configs or monster_eval_configs_for(config),
+    }
+    if selection.pack and selection.pack ~= "" then
+        args[#args + 1] = "--pack"
+        args[#args + 1] = selection.pack
+    else
+        local monsters = selection.monsters
+        if not monsters or monsters == "" then
+            monsters = config.monsters ~= "" and config.monsters or "all"
+        end
+        args[#args + 1] = "--monster"
+        args[#args + 1] = monsters
+    end
+    return args
+end
+
+local function enemy_choice_rows(group)
+    local rows = {}
+    for _, choice in ipairs(group and group.choices or {}) do
+        rows[#rows + 1] = {
+            name = choice.name,
+            role = choice.role or "",
+            suggestedLevel = choice.suggestedLevel or 1,
+            tags = copy_array(choice.tags or {}),
+        }
+    end
+    return rows
+end
+
+local function all_enemy_choices()
+    local rows = {}
+    local seen = {}
+    for _, group in ipairs(Catalog.enemy_groups or {}) do
+        for _, choice in ipairs(group.choices or {}) do
+            if choice.name and not seen[choice.name] then
+                local row = copy_object(choice)
+                row.group = group.id
+                row.groupLabel = group.label
+                rows[#rows + 1] = row
+                seen[choice.name] = true
+            end
+        end
+    end
+    return rows
+end
+
+local function enemy_options_payload(config)
+    local group = selected_enemy_group(config)
+    local pack = selected_enemy_pack(config)
+    local selected_monsters = config.monsters ~= "" and config.monsters
+        or pack and join_names(pack.monsters)
+        or group and join_names((function()
+            local names = {}
+            for _, choice in ipairs(group.choices or {}) do
+                names[#names + 1] = choice.name
+            end
+            return names
+        end)())
+        or "all"
+    return {
+        schema = 1,
+        config = config,
+        goals = Catalog.analysis_goals or {},
+        selectedGoal = analysis_goal_lookup()[config.goal] or (Catalog.analysis_goals and Catalog.analysis_goals[1]),
+        enemyGroups = Catalog.enemy_groups or {},
+        enemyPacks = Catalog.enemy_packs or {},
+        selectedGroup = group,
+        selectedPack = pack,
+        choices = enemy_choice_rows(group),
+        selectedMonsters = split_csv(selected_monsters),
+        monsterEvalArgs = monster_eval_args(config, {
+            monsters = pack and nil or selected_monsters,
+            pack = pack and pack.pack or nil,
+        }),
+    }
 end
 
 local function parse_item_spec(value)
@@ -510,11 +678,11 @@ local function warnings_for(config, selected)
     return warnings
 end
 
-local function resource_entry(group, name, meta, goal, config, seed_offset)
+local function resource_entry(group, name, meta, goal, config, seed_offset, extras)
     local seed = tonumber(config.seed) or 1
     local resource_config = copy_object(config)
     resource_config.seed = tostring(seed + (seed_offset or 0))
-    return {
+    local entry = {
         id = tostring(group):lower():gsub("[^a-z0-9]+", "-") .. "-" .. tostring(name):lower():gsub("[^a-z0-9]+", "-"),
         group = group,
         name = name,
@@ -530,10 +698,17 @@ local function resource_entry(group, name, meta, goal, config, seed_offset)
         mapAlgorithm = config.mapAlgorithm,
         encounter = config.encounter,
         monsters = config.monsters,
+        analysisGoal = config.goal,
+        enemyGroup = config.enemyGroup,
+        enemyPack = config.enemyPack,
         seed = resource_config.seed,
         args = launch_args(resource_config),
         balanceArgs = balance_args(resource_config),
     }
+    for key, value in pairs(extras or {}) do
+        entry[key] = value
+    end
+    return entry
 end
 
 local function package_encounters()
@@ -656,6 +831,110 @@ local function map_generation_payload(config)
     }
 end
 
+local function enemy_probe_resources(config, start_offset)
+    local resources = {}
+    local seed_offset = start_offset or 90
+    for idx, choice in ipairs(all_enemy_choices()) do
+        local next_config = copy_object(config)
+        next_config.level = math.min(5, math.max(1, tonumber(choice.suggestedLevel) or config.level))
+        if config.level >= 5 then
+            next_config.level = 5
+        end
+        next_config.preset = next_config.preset == "none" and (next_config.level >= 5 and "late" or "none") or next_config.preset
+        next_config.mapDesc = ""
+        next_config.mapProfile = ""
+        next_config.mapAlgorithm = ""
+        next_config.encounter = ""
+        next_config.enemyGroup = choice.group or ""
+        next_config.enemyPack = ""
+        next_config.monsters = choice.name or ""
+        local eval_config = copy_object(next_config)
+        eval_config.seed = tostring((tonumber(config.seed) or 1) + seed_offset + idx)
+        resources[#resources + 1] = resource_entry(
+            "Enemy probe",
+            choice.name or "Enemy",
+            string.format("L%d, %s arena", next_config.level, choice.role or "single enemy"),
+            "single-enemy balance and class-counter probe",
+            next_config,
+            seed_offset + idx,
+            {
+                enemy = choice,
+                monsterEvalArgs = monster_eval_args(eval_config, {
+                    monsters = choice.name or "",
+                    level = next_config.level,
+                }),
+            }
+        )
+    end
+    for idx, pack in ipairs(Catalog.enemy_packs or {}) do
+        local next_config = copy_object(config)
+        next_config.level = pack.phase == "opening" and math.min(3, next_config.level) or math.min(5, math.max(3, next_config.level))
+        next_config.preset = next_config.preset == "none" and (next_config.level >= 5 and "late" or "none") or next_config.preset
+        next_config.mapDesc = ""
+        next_config.mapProfile = ""
+        next_config.mapAlgorithm = ""
+        next_config.encounter = ""
+        next_config.monsters = join_names(pack.monsters or {})
+        next_config.enemyPack = pack.id or ""
+        local eval_config = copy_object(next_config)
+        eval_config.seed = tostring((tonumber(config.seed) or 1) + seed_offset + 40 + idx)
+        resources[#resources + 1] = resource_entry(
+            "Enemy pack",
+            pack.label or pack.id,
+            string.format("L%d, %s", next_config.level, pack.phase or "arena"),
+            pack.goal or "enemy-pack interaction probe",
+            next_config,
+            seed_offset + 40 + idx,
+            {
+                enemyPack = pack.id,
+                monsterEvalArgs = monster_eval_args(eval_config, {
+                    pack = pack.pack,
+                    level = next_config.level,
+                }),
+            }
+        )
+    end
+    return resources
+end
+
+local function append_resources(dest, rows)
+    for _, row in ipairs(rows or {}) do
+        dest[#dest + 1] = row
+    end
+end
+
+local function class_sweep_args(config)
+    local next_config = copy_object(config)
+    local names = {}
+    for _, class in ipairs(Catalog.classes or {}) do
+        names[#names + 1] = class.id
+    end
+    next_config.className = table.concat(names, ",")
+    return balance_args(next_config)
+end
+
+local function analysis_plan_payload(config)
+    local enemy_options = enemy_options_payload(config)
+    local enemy_matrix = enemy_probe_resources(config, 130)
+    return {
+        schema = 1,
+        config = config,
+        goal = analysis_goal_lookup()[config.goal] or (Catalog.analysis_goals and Catalog.analysis_goals[1]),
+        commands = {
+            launch = launch_args(config),
+            balance = balance_args(config),
+            classSweep = class_sweep_args(config),
+            monsterEval = enemy_options.monsterEvalArgs,
+        },
+        enemyOptions = enemy_options,
+        enemyMatrix = {
+            count = #enemy_matrix,
+            resources = enemy_matrix,
+        },
+        mapGeneration = map_generation_payload(config),
+    }
+end
+
 function M.catalog_json()
     return encode(Catalog.catalog())
 end
@@ -722,6 +1001,26 @@ end
 
 function M.map_generation_json(raw_json)
     return encode(map_generation_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.enemy_options_json(raw_json)
+    return encode(enemy_options_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.enemy_matrix_json(raw_json)
+    local config = normalized_config(parse_json_object(raw_json))
+    local resources = enemy_probe_resources(config, 90)
+    return encode({
+        schema = 1,
+        config = config,
+        count = #resources,
+        options = enemy_options_payload(config),
+        resources = resources,
+    })
+end
+
+function M.analysis_plan_json(raw_json)
+    return encode(analysis_plan_payload(normalized_config(parse_json_object(raw_json))))
 end
 
 function M.resource_matrix_json(raw_json)
@@ -833,6 +1132,8 @@ function M.resource_matrix_json(raw_json)
             70 + idx
         )
     end
+
+    append_resources(resources, enemy_probe_resources(config, 90))
 
     return encode({
         schema = 1,

@@ -729,6 +729,24 @@
           <label for="customMonsters">Custom monsters</label>
           <input id="customMonsters" spellcheck="false" placeholder="Mummoner, Executioner">
         </div>
+        <div class="row">
+          <div class="field">
+            <label for="enemyGroup">Enemy group</label>
+            <select id="enemyGroup">
+              <option value="overworld-ambient">Overworld ambient</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="enemyPack">Enemy pack</label>
+            <select id="enemyPack">
+              <option value="">None</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="enemyChoices">Enemy probes</label>
+          <div class="pick-list" id="enemyChoices"></div>
+        </div>
         <div class="button-row">
           <button class="primary" type="button" id="launch">Launch in Emscripten</button>
           <button class="secondary" type="button" id="reseed">Seed</button>
@@ -806,6 +824,24 @@
         {id: 'brutal', label: 'Brutal', tempo: 1.35, damage: 1.25, summons: 1.50},
       ];
 
+      let enemyGroups = [
+        {
+          id: 'overworld-ambient',
+          label: 'Overworld ambient',
+          choices: [
+            {name: 'Sheep', role: 'body-block ambient'},
+            {name: 'Black Mamba', role: 'fast contact'},
+            {name: 'Skeleton', role: 'basic undead contact'},
+            {name: 'Cloud Elemental', role: 'opening caster pressure'},
+            {name: 'Mouther', role: 'opening melee disruption'},
+          ],
+        },
+      ];
+
+      let enemyPacks = [
+        {id: '', label: 'None', monsters: []},
+      ];
+
       let resources = [
         {
           name: 'Early overworld pressure',
@@ -879,6 +915,7 @@
       let generatedResources = [];
       let resolvedRun = null;
       let loadoutOptions = null;
+      let enemyOptions = null;
 
       function callContentApi(name, payload) {
         if (!state.runtimeReady || !Module.ccall) {
@@ -985,6 +1022,8 @@
           mapAlgorithm: resource.mapAlgorithm || mapAlgorithmIdFor(resource.mapDesc || '', resource.mapProfile || ''),
           encounter: resource.encounter || '',
           monsters: resource.monsters || '',
+          enemyGroup: resource.enemyGroup || '',
+          enemyPack: resource.enemyPack || '',
           seed: String(resource.seed || 1),
         };
       }
@@ -998,10 +1037,14 @@
         replaceOptions($('mapDesc'), catalog.maps || [], (entry) => entry.id || '', (entry) => entry.label || entry.id || 'Campaign World');
         replaceOptions($('encounter'), catalog.encounters || [], (entry) => entry.id || '', (entry) => entry.label || entry.id || 'No forced encounter');
         replaceOptions($('intensity'), catalog.intensities || intensities, (entry) => entry.id || 'standard', (entry) => entry.label || entry.id || 'Standard');
+        replaceOptions($('enemyGroup'), catalog.enemy_groups || enemyGroups, (entry) => entry.id || '', (entry) => entry.label || entry.id || 'Enemies');
+        replaceOptions($('enemyPack'), [{id: '', label: 'None'}].concat(catalog.enemy_packs || []), (entry) => entry.id || '', (entry) => entry.label || entry.id || 'None');
         rebuildLoadoutPresets(catalog.loadouts, catalog.loadout_names);
         mapAlgorithms = catalog.map_algorithms || mapAlgorithms;
         encounters = catalog.encounters || encounters;
         intensities = catalog.intensities || intensities;
+        enemyGroups = catalog.enemy_groups || enemyGroups;
+        enemyPacks = [{id: '', label: 'None', monsters: []}].concat(catalog.enemy_packs || []);
         resources = (catalog.resources || []).map(normalizeResource);
         mapProfiles = (catalog.map_algorithms || catalog.maps || []).slice(0, 4).map(normalizePreviewProfile);
         rebuildMapAlgorithms($('mapDesc').value, $('mapAlgorithm').value);
@@ -1044,6 +1087,8 @@
           mapAlgorithm: $('mapAlgorithm').value || '',
           encounter: $('encounter').value,
           monsters: $('customMonsters').value.trim(),
+          enemyGroup: $('enemyGroup').value || '',
+          enemyPack: $('enemyPack').value || '',
         };
       }
 
@@ -1191,6 +1236,40 @@
         });
       }
 
+      function renderEnemyOptions(options) {
+        const host = $('enemyChoices');
+        host.innerHTML = '';
+        const choices = options && options.choices && options.choices.length
+          ? options.choices
+          : ((enemyGroups.find((group) => (group.id || '') === ($('enemyGroup').value || '')) || {}).choices || []);
+        if (!choices.length) {
+          const empty = document.createElement('div');
+          empty.className = 'muted';
+          empty.textContent = 'No enemy probes';
+          host.appendChild(empty);
+          return;
+        }
+        const groupNode = document.createElement('div');
+        groupNode.className = 'pick-group';
+        const buttons = document.createElement('div');
+        buttons.className = 'pick-buttons';
+        choices.forEach((choice) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = choice.name;
+          button.title = choice.role || '';
+          button.addEventListener('click', () => {
+            $('customMonsters').value = choice.name;
+            $('encounter').value = '';
+            $('enemyPack').value = '';
+            refreshLab();
+          });
+          buttons.appendChild(button);
+        });
+        groupNode.appendChild(buttons);
+        host.appendChild(groupNode);
+      }
+
       function addItemSpec(spec) {
         const textarea = $('customLoadout');
         const next = String(spec || '').trim();
@@ -1215,6 +1294,11 @@
         renderRunSummary(resolvedRun);
       }
 
+      function updateEnemyOptions() {
+        enemyOptions = callContentApi('lanarts_content_enemy_options_json', currentConfig());
+        renderEnemyOptions(enemyOptions);
+      }
+
       function updateGeneratedResources() {
         const response = callContentApi('lanarts_content_resource_matrix_json', currentConfig());
         generatedResources = response && response.resources ? response.resources.map(normalizeResource) : [];
@@ -1224,6 +1308,7 @@
       function refreshLab() {
         updateLoadoutOptions();
         updateRunSummary();
+        updateEnemyOptions();
         drawPreviews();
         updateGeneratedResources();
       }
@@ -1239,6 +1324,8 @@
         $('encounter').value = config.encounter || '';
         $('intensity').value = config.intensity || 'standard';
         $('customMonsters').value = config.monsters || '';
+        $('enemyGroup').value = config.enemyGroup || $('enemyGroup').value || 'overworld-ambient';
+        $('enemyPack').value = config.enemyPack || '';
         setPreset(config.preset || 'none');
         refreshLab();
       }
@@ -1475,6 +1562,12 @@
         if (config.monsters) {
           query.set('monsters', config.monsters);
         }
+        if (config.enemyGroup) {
+          query.set('enemyGroup', config.enemyGroup);
+        }
+        if (config.enemyPack) {
+          query.set('enemyPack', config.enemyPack);
+        }
         if (autorun) {
           query.set('run', '1');
         }
@@ -1495,6 +1588,8 @@
           encounter: query.get('encounter') || '',
           intensity: query.get('pressure') || 'standard',
           monsters: query.get('monsters') || '',
+          enemyGroup: query.get('enemyGroup') || 'overworld-ambient',
+          enemyPack: query.get('enemyPack') || '',
           autorun: query.get('run') === '1',
         };
       }
@@ -1649,9 +1744,17 @@
             refreshLab();
           });
         });
-        ['className', 'level', 'seed', 'customLoadout', 'mapAlgorithm', 'encounter', 'intensity', 'customMonsters'].forEach((id) => {
+        ['className', 'level', 'seed', 'customLoadout', 'mapAlgorithm', 'encounter', 'intensity', 'customMonsters', 'enemyGroup'].forEach((id) => {
           $(id).addEventListener('input', refreshLab);
           $(id).addEventListener('change', refreshLab);
+        });
+        $('enemyPack').addEventListener('change', () => {
+          const pack = enemyPacks.find((entry) => (entry.id || '') === ($('enemyPack').value || ''));
+          if (pack && (pack.monsters || []).length) {
+            $('customMonsters').value = pack.monsters.join(', ');
+            $('encounter').value = '';
+          }
+          refreshLab();
         });
         $('mapDesc').addEventListener('change', () => {
           rebuildMapAlgorithms($('mapDesc').value, '');

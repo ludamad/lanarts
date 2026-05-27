@@ -24,6 +24,9 @@ local function run_content_api_smoke()
     expect(#(catalog.classes or {}) >= 4, "catalog should expose classes")
     expect(catalog.class_builds and catalog.class_builds.Fighter, "catalog should expose class builds")
     expect(#(catalog.item_choices or {}) >= 4, "catalog should expose curated item choices")
+    expect(#(catalog.analysis_goals or {}) >= 3, "catalog should expose analysis goals")
+    expect(#(catalog.enemy_groups or {}) >= 3, "catalog should expose enemy groups")
+    expect(#(catalog.enemy_packs or {}) >= 3, "catalog should expose enemy packs")
     expect(#(catalog.maps or {}) >= 4, "catalog should expose map generators")
     expect(#(catalog.map_algorithms or {}) >= 4, "catalog should expose map algorithms")
     expect(#(catalog.encounters or {}) >= 10, "catalog should expose packaged encounters")
@@ -107,7 +110,26 @@ local function run_content_api_smoke()
 
     local matrix = parse_response("resource matrix", ContentApi.resource_matrix_json(config))
     expect((matrix.count or 0) == #(matrix.resources or {}), "matrix count should match resources")
-    expect((matrix.count or 0) >= 12, "matrix should expose orthogonal resources")
+    expect((matrix.count or 0) >= 30, "matrix should expose orthogonal resources")
+
+    local enemy_options = parse_response("enemy options", ContentApi.enemy_options_json(config))
+    expect(enemy_options.enemyGroups and #enemy_options.enemyGroups >= 3, "enemy options should expose enemy groups")
+    expect(enemy_options.monsterEvalArgs and enemy_options.monsterEvalArgs[1] == "engine.StartMonsterEvals", "enemy options should expose monster eval args")
+
+    local enemy_matrix = parse_response("enemy matrix", ContentApi.enemy_matrix_json(config))
+    expect((enemy_matrix.count or 0) == #(enemy_matrix.resources or {}), "enemy matrix count should match resources")
+    expect((enemy_matrix.count or 0) >= 12, "enemy matrix should expose enemy probes")
+    local has_gragh_probe = false
+    for _, resource in ipairs(enemy_matrix.resources or {}) do
+        if resource.monsters == "Gragh" and resource.monsterEvalArgs then
+            has_gragh_probe = true
+        end
+    end
+    expect(has_gragh_probe, "enemy matrix should include Gragh monster-eval coverage")
+
+    local analysis_plan = parse_response("analysis plan", ContentApi.analysis_plan_json(config))
+    expect(analysis_plan.commands and analysis_plan.commands.classSweep, "analysis plan should expose class sweep args")
+    expect(analysis_plan.enemyMatrix and (analysis_plan.enemyMatrix.count or 0) >= 12, "analysis plan should expose enemy resources")
 
     print(string.format(
         "Content API smoke complete: %d classes, %d maps, %d encounters, %d generated resources.",
