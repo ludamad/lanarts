@@ -704,7 +704,7 @@
           <select id="encounter">
             <option value="">No forced encounter</option>
             <option value="giant-chicken-duel">Giant Chicken package</option>
-            <option value="mummoner-duel">Mummoner duel</option>
+            <option value="mummoner-duel">Mummoner package</option>
             <option value="purple-dragon-package">Purple Dragon package</option>
             <option value="red-dragon-duel">Red Dragon package</option>
             <option value="gragh-duel">Gragh duel</option>
@@ -817,7 +817,7 @@
       let encounters = [
         {id: '', label: 'No forced encounter'},
         {id: 'giant-chicken-duel', label: 'Giant Chicken package', kind: 'micro package', phase: 'early micro', suggestedLevel: 2, suggestedPreset: 'none', features: ['dash pressure', 'rotating feathers', 'short AOE windows', 'Sheep adds']},
-        {id: 'mummoner-duel', label: 'Mummoner duel', kind: 'duel', phase: 'summon pressure', suggestedLevel: 3, suggestedPreset: 'none', features: ['add timing', 'targeted pulse']},
+        {id: 'mummoner-duel', label: 'Mummoner package', kind: 'summon package', phase: 'summon pressure', suggestedLevel: 3, suggestedPreset: 'none', features: ['native Mummy summons', 'bone orbit', 'targeted AOE rhythm', 'Flying Skull adds']},
         {id: 'purple-dragon-package', label: 'Purple Dragon package', kind: 'boss package', phase: 'late micro', features: ['rotating orbs', 'targeted AOE rhythm', 'Fire Bat adds']},
         {id: 'red-dragon-duel', label: 'Red Dragon package', kind: 'boss package', phase: 'late micro', features: ['projectile pressure', 'rotating embers', 'targeted AOE rhythm', 'Fire Bat adds']},
         {id: 'gragh-duel', label: 'Gragh duel', kind: 'boss duel', phase: 'late micro', features: ['melee pursuit', 'rotating orbs', 'short AOE windows']},
@@ -924,6 +924,18 @@
           intensity: 'standard',
           monsters: '',
           seed: '22405',
+        },
+        {
+          name: 'Mummoner package',
+          meta: 'L3, no loadout, summon package',
+          className: 'Fighter',
+          level: '3',
+          preset: 'none',
+          mapDesc: '',
+          encounter: 'mummoner-duel',
+          intensity: 'standard',
+          monsters: '',
+          seed: '22410',
         },
         {
           name: 'Rogue Executioner package',

@@ -31,11 +31,14 @@ local function run_content_api_smoke()
     expect(#(catalog.map_algorithms or {}) >= 4, "catalog should expose map algorithms")
     expect(#(catalog.encounters or {}) >= 10, "catalog should expose packaged encounters")
     local has_giant_chicken_package = false
+    local has_mummoner_package = false
     local has_executioner_package = false
     local has_executioner_rescue_package = false
     for _, encounter in ipairs(catalog.encounters or {}) do
         if encounter.id == "giant-chicken-duel" and encounter.package then
             has_giant_chicken_package = true
+        elseif encounter.id == "mummoner-duel" and encounter.package then
+            has_mummoner_package = true
         elseif encounter.id == "executioner-blade-package" then
             has_executioner_package = true
         elseif encounter.id == "executioner-rescue-package" then
@@ -43,6 +46,7 @@ local function run_content_api_smoke()
         end
     end
     expect(has_giant_chicken_package, "catalog should expose Giant Chicken as a package")
+    expect(has_mummoner_package, "catalog should expose Mummoner as a package")
     expect(has_executioner_package, "catalog should expose the Executioner blade package")
     expect(has_executioner_rescue_package, "catalog should expose the Executioner rescue package")
 
@@ -143,18 +147,40 @@ local function run_content_api_smoke()
     expect(chicken_rhythms.orbit and chicken_rhythms.pulse and chicken_rhythms.summon, "giant chicken should expose early package rhythms")
     expect(chicken_summary.encounter and chicken_summary.encounter.suggestedLevel == 2, "giant chicken should expose its suggested level")
 
+    local mummoner_config = [[{
+        "className": "Fighter",
+        "level": 3,
+        "preset": "none",
+        "seed": "22410",
+        "encounter": "mummoner-duel",
+        "intensity": "standard"
+    }]]
+    local mummoner_summary = parse_response("mummoner summary", ContentApi.run_summary_json(mummoner_config))
+    local mummoner_rhythms = {}
+    for _, rhythm in ipairs(mummoner_summary.rhythms or {}) do
+        mummoner_rhythms[rhythm.id] = true
+    end
+    expect(mummoner_rhythms.orbit and mummoner_rhythms.pulse and mummoner_rhythms.summon, "mummoner should expose full package rhythms")
+    expect(mummoner_summary.encounter and mummoner_summary.encounter.suggestedLevel == 3, "mummoner should expose its suggested level")
+
     local matrix = parse_response("resource matrix", ContentApi.resource_matrix_json(config))
     expect((matrix.count or 0) == #(matrix.resources or {}), "matrix count should match resources")
     expect((matrix.count or 0) >= 30, "matrix should expose orthogonal resources")
     local has_chicken_resource = false
+    local has_mummoner_resource = false
     for _, resource in ipairs(matrix.resources or {}) do
         if resource.group == "Encounter sweep" and resource.encounter == "giant-chicken-duel" then
             has_chicken_resource = true
             expect(resource.level == 2, "giant chicken resource should use its suggested level")
             expect(resource.preset == "none", "giant chicken resource should use its suggested loadout")
+        elseif resource.group == "Encounter sweep" and resource.encounter == "mummoner-duel" then
+            has_mummoner_resource = true
+            expect(resource.level == 3, "mummoner resource should use its suggested level")
+            expect(resource.preset == "none", "mummoner resource should use its suggested loadout")
         end
     end
     expect(has_chicken_resource, "matrix should include Giant Chicken package coverage")
+    expect(has_mummoner_resource, "matrix should include Mummoner package coverage")
 
     local enemy_options = parse_response("enemy options", ContentApi.enemy_options_json(config))
     expect(enemy_options.enemyGroups and #enemy_options.enemyGroups >= 3, "enemy options should expose enemy groups")
