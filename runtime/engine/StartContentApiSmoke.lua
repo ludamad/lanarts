@@ -163,6 +163,21 @@ local function run_content_api_smoke()
     expect(mummoner_rhythms.orbit and mummoner_rhythms.pulse and mummoner_rhythms.summon, "mummoner should expose full package rhythms")
     expect(mummoner_summary.encounter and mummoner_summary.encounter.suggestedLevel == 3, "mummoner should expose its suggested level")
 
+    local gragh_config = [[{
+        "className": "Fighter",
+        "level": 5,
+        "preset": "late",
+        "seed": "22420",
+        "encounter": "gragh-duel",
+        "intensity": "high"
+    }]]
+    local gragh_summary = parse_response("gragh summary", ContentApi.run_summary_json(gragh_config))
+    local gragh_rhythms = {}
+    for _, rhythm in ipairs(gragh_summary.rhythms or {}) do
+        gragh_rhythms[rhythm.id] = true
+    end
+    expect(gragh_rhythms.orbit and gragh_rhythms.pulse and gragh_rhythms.summon, "gragh should expose full package rhythms")
+
     local matrix = parse_response("resource matrix", ContentApi.resource_matrix_json(config))
     expect((matrix.count or 0) == #(matrix.resources or {}), "matrix count should match resources")
     expect((matrix.count or 0) >= 30, "matrix should expose orthogonal resources")
