@@ -63,6 +63,10 @@ local function copy_xy(xy)
     return {xy[1], xy[2]}
 end
 
+local function round_xy(xy)
+    return {math.floor(xy[1] + 0.5), math.floor(xy[2] + 0.5)}
+end
+
 local function normalize_intensity(intensity)
     intensity = intensity or {}
     return {
@@ -1061,6 +1065,58 @@ function M.package_state(game_map)
     return package_state_from_director(game_map.content_lab_director)
 end
 
+local function in_spawn_bounds(game_map, xy, radius)
+    local bounds = game_map and game_map.content_lab_spawn_bounds
+    if not bounds then
+        return xy[1] >= radius and xy[2] >= radius
+    end
+    return xy[1] >= bounds[1] + radius
+        and xy[2] >= bounds[2] + radius
+        and xy[1] <= bounds[3] - radius
+        and xy[2] <= bounds[4] - radius
+end
+
+local function free_spawn_xy(game_map, xy, radius)
+    local rounded = round_xy(xy)
+    radius = radius or 12
+    if not in_spawn_bounds(game_map, rounded, radius) then
+        return nil
+    end
+    if Map.radius_tile_check(game_map, rounded, radius) then
+        return nil
+    end
+    return rounded
+end
+
+local function summon_spawn_xy(director, center, base_radius, idx, count)
+    local base_angle = (idx - 1) * (math.pi * 2 / count) + director.elapsed * 0.03
+    local radii = {
+        base_radius,
+        base_radius * 0.75,
+        base_radius * 0.5,
+        48,
+        28,
+    }
+    for _, ring_radius in ipairs(radii) do
+        if ring_radius >= 10 then
+            for turn = 0, 7 do
+                local angle = base_angle + turn * (math.pi / 4)
+                local xy = {
+                    center[1] + math.cos(angle) * ring_radius,
+                    center[2] + math.sin(angle) * ring_radius,
+                }
+                local free_xy = free_spawn_xy(director.map, xy, 12)
+                if free_xy then
+                    return free_xy
+                end
+            end
+        end
+    end
+    return free_spawn_xy(director.map, center_of_players() or director.xy, 12)
+        or free_spawn_xy(director.map, director.xy, 12)
+        or round_xy(director.xy)
+end
+
 local function spawn_summons(director, package)
     local summon = package.summon or {}
     local intensity = director.intensity
@@ -1080,11 +1136,7 @@ local function spawn_summons(director, package)
         if summon_count() >= max_alive then
             return
         end
-        local angle = (idx - 1) * (math.pi * 2 / count) + director.elapsed * 0.03
-        local xy = {
-            center[1] + math.cos(angle) * radius,
-            center[2] + math.sin(angle) * radius,
-        }
+        local xy = summon_spawn_xy(director, center, radius, idx, count)
         GameObject.enemy_create {
             map = director.map,
             type = monsters[((idx - 1) % #monsters) + 1],

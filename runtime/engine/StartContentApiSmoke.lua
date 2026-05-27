@@ -30,15 +30,19 @@ local function run_content_api_smoke()
     expect(#(catalog.maps or {}) >= 4, "catalog should expose map generators")
     expect(#(catalog.map_algorithms or {}) >= 4, "catalog should expose map algorithms")
     expect(#(catalog.encounters or {}) >= 10, "catalog should expose packaged encounters")
+    local has_giant_chicken_package = false
     local has_executioner_package = false
     local has_executioner_rescue_package = false
     for _, encounter in ipairs(catalog.encounters or {}) do
-        if encounter.id == "executioner-blade-package" then
+        if encounter.id == "giant-chicken-duel" and encounter.package then
+            has_giant_chicken_package = true
+        elseif encounter.id == "executioner-blade-package" then
             has_executioner_package = true
         elseif encounter.id == "executioner-rescue-package" then
             has_executioner_rescue_package = true
         end
     end
+    expect(has_giant_chicken_package, "catalog should expose Giant Chicken as a package")
     expect(has_executioner_package, "catalog should expose the Executioner blade package")
     expect(has_executioner_rescue_package, "catalog should expose the Executioner rescue package")
 
@@ -123,9 +127,34 @@ local function run_content_api_smoke()
     end
     expect(red_rhythms.orbit and red_rhythms.pulse and red_rhythms.summon, "red dragon should expose full package rhythms")
 
+    local chicken_config = [[{
+        "className": "Fighter",
+        "level": 2,
+        "preset": "none",
+        "seed": "22405",
+        "encounter": "giant-chicken-duel",
+        "intensity": "standard"
+    }]]
+    local chicken_summary = parse_response("giant chicken summary", ContentApi.run_summary_json(chicken_config))
+    local chicken_rhythms = {}
+    for _, rhythm in ipairs(chicken_summary.rhythms or {}) do
+        chicken_rhythms[rhythm.id] = true
+    end
+    expect(chicken_rhythms.orbit and chicken_rhythms.pulse and chicken_rhythms.summon, "giant chicken should expose early package rhythms")
+    expect(chicken_summary.encounter and chicken_summary.encounter.suggestedLevel == 2, "giant chicken should expose its suggested level")
+
     local matrix = parse_response("resource matrix", ContentApi.resource_matrix_json(config))
     expect((matrix.count or 0) == #(matrix.resources or {}), "matrix count should match resources")
     expect((matrix.count or 0) >= 30, "matrix should expose orthogonal resources")
+    local has_chicken_resource = false
+    for _, resource in ipairs(matrix.resources or {}) do
+        if resource.group == "Encounter sweep" and resource.encounter == "giant-chicken-duel" then
+            has_chicken_resource = true
+            expect(resource.level == 2, "giant chicken resource should use its suggested level")
+            expect(resource.preset == "none", "giant chicken resource should use its suggested loadout")
+        end
+    end
+    expect(has_chicken_resource, "matrix should include Giant Chicken package coverage")
 
     local enemy_options = parse_response("enemy options", ContentApi.enemy_options_json(config))
     expect(enemy_options.enemyGroups and #enemy_options.enemyGroups >= 3, "enemy options should expose enemy groups")

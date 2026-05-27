@@ -107,6 +107,12 @@ generate = (portal_spawns, monster_spawns, options={}) ->
     DebugArena.room_size = options.room_size or {10, 10}
     map = NewMaps.try_n_times MAX_MAP_TRIES, () -> DebugArena\compile(portal_spawns)
     game_map = NewMaps.generate_game_map(map)
+    game_map.content_lab_spawn_bounds = {
+        Map.TILE_SIZE
+        Map.TILE_SIZE
+        map.size[1] * Map.TILE_SIZE - Map.TILE_SIZE
+        map.size[2] * Map.TILE_SIZE - Map.TILE_SIZE
+    }
     {x, y} = MapUtils.random_square(map, nil, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
     append map.player_candidate_squares, {x*32+16,y*32+16}
     player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)

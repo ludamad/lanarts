@@ -703,7 +703,7 @@
           <label for="encounter">Encounter</label>
           <select id="encounter">
             <option value="">No forced encounter</option>
-            <option value="giant-chicken-duel">Giant Chicken duel</option>
+            <option value="giant-chicken-duel">Giant Chicken package</option>
             <option value="mummoner-duel">Mummoner duel</option>
             <option value="purple-dragon-package">Purple Dragon package</option>
             <option value="red-dragon-duel">Red Dragon package</option>
@@ -816,8 +816,8 @@
 
       let encounters = [
         {id: '', label: 'No forced encounter'},
-        {id: 'giant-chicken-duel', label: 'Giant Chicken duel'},
-        {id: 'mummoner-duel', label: 'Mummoner duel', kind: 'duel', phase: 'summon pressure', features: ['add timing', 'targeted pulse']},
+        {id: 'giant-chicken-duel', label: 'Giant Chicken package', kind: 'micro package', phase: 'early micro', suggestedLevel: 2, suggestedPreset: 'none', features: ['dash pressure', 'rotating feathers', 'short AOE windows', 'Sheep adds']},
+        {id: 'mummoner-duel', label: 'Mummoner duel', kind: 'duel', phase: 'summon pressure', suggestedLevel: 3, suggestedPreset: 'none', features: ['add timing', 'targeted pulse']},
         {id: 'purple-dragon-package', label: 'Purple Dragon package', kind: 'boss package', phase: 'late micro', features: ['rotating orbs', 'targeted AOE rhythm', 'Fire Bat adds']},
         {id: 'red-dragon-duel', label: 'Red Dragon package', kind: 'boss package', phase: 'late micro', features: ['projectile pressure', 'rotating embers', 'targeted AOE rhythm', 'Fire Bat adds']},
         {id: 'gragh-duel', label: 'Gragh duel', kind: 'boss duel', phase: 'late micro', features: ['melee pursuit', 'rotating orbs', 'short AOE windows']},
@@ -912,6 +912,18 @@
           encounter: '',
           monsters: '',
           seed: '9500',
+        },
+        {
+          name: 'Fighter Giant Chicken package',
+          meta: 'L2, no loadout, micro package',
+          className: 'Fighter',
+          level: '2',
+          preset: 'none',
+          mapDesc: '',
+          encounter: 'giant-chicken-duel',
+          intensity: 'standard',
+          monsters: '',
+          seed: '22405',
         },
         {
           name: 'Rogue Executioner package',
@@ -1548,6 +1560,18 @@
         const pressure = document.createElement('div');
         pressure.textContent = `Pressure: ${intensity.label || intensity.id || 'Standard'} - ${Number(intensity.tempo || 1).toFixed(2)}x tempo, ${Number(intensity.damage || 1).toFixed(2)}x damage`;
         info.appendChild(pressure);
+        if (encounter.suggestedLevel || encounter.suggestedPreset) {
+          const baseline = document.createElement('div');
+          const parts = [];
+          if (encounter.suggestedLevel) {
+            parts.push(`L${encounter.suggestedLevel}`);
+          }
+          if (encounter.suggestedPreset) {
+            parts.push(`${encounter.suggestedPreset} loadout`);
+          }
+          baseline.textContent = `Model baseline: ${parts.join(', ')}`;
+          info.appendChild(baseline);
+        }
         const features = encounter.features || [];
         if (features.length) {
           const tags = document.createElement('div');

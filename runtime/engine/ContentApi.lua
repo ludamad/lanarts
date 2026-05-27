@@ -721,6 +721,24 @@ local function package_encounters()
     return result
 end
 
+local function encounter_resource_level(encounter)
+    local level = tonumber(encounter and (encounter.suggestedLevel or encounter.level))
+    if level == nil then
+        level = 5
+    end
+    return math.min(5, math.max(1, math.floor(level)))
+end
+
+local function encounter_resource_preset(encounter, current_preset, level)
+    if encounter and encounter.suggestedPreset ~= nil then
+        return tostring(encounter.suggestedPreset)
+    end
+    if (current_preset or "") == "none" and (level or 1) >= 5 then
+        return "late"
+    end
+    return current_preset
+end
+
 local function late_maps()
     local result = {}
     for _, map in ipairs(Catalog.maps) do
@@ -1116,8 +1134,8 @@ function M.resource_matrix_json(raw_json)
         for key, value in pairs(config) do
             next_config[key] = value
         end
-        next_config.level = 5
-        next_config.preset = next_config.preset == "none" and "late" or next_config.preset
+        next_config.level = encounter_resource_level(encounter)
+        next_config.preset = encounter_resource_preset(encounter, next_config.preset, next_config.level)
         next_config.mapDesc = ""
         next_config.mapProfile = ""
         next_config.mapAlgorithm = ""
