@@ -6,6 +6,7 @@ local M = {}
 
 local DIRECTOR_DEPTH = -200
 local HAZARD_DEPTH = 90
+local PLAYER_TEAM = 0
 
 local function sqr(value)
     return value * value
@@ -36,13 +37,33 @@ end
 local function living_monsters(include_summons)
     local monsters = {}
     for _, monster in ipairs(Map.monsters_list()) do
-        if monster and not monster.destroyed and monster.is_enemy then
+        if monster and not monster.destroyed and monster.is_enemy and monster.team ~= PLAYER_TEAM and not monster.content_lab_ally then
             if include_summons or not monster.content_lab_summon then
                 monsters[#monsters + 1] = monster
             end
         end
     end
     return monsters
+end
+
+local function living_escorts()
+    local escorts = {}
+    for _, monster in ipairs(Map.monsters_list()) do
+        if monster and not monster.destroyed and monster.content_lab_ally then
+            escorts[#escorts + 1] = monster
+        end
+    end
+    return escorts
+end
+
+local function living_player_team_targets(include_escorts)
+    local targets = living_players()
+    if include_escorts then
+        for _, escort in ipairs(living_escorts()) do
+            targets[#targets + 1] = escort
+        end
+    end
+    return targets
 end
 
 local function primary_monster(primary_name)
@@ -93,7 +114,7 @@ end
 
 local function damage_overlapping_players(hazard, xy, radius)
     step_cooldowns(hazard.hit_cooldowns)
-    for _, player in ipairs(living_players()) do
+    for _, player in ipairs(living_player_team_targets(hazard.affects_escorts)) do
         local player_radius = player.target_radius or player.radius or 12
         if dist_sqr(xy, xy_of(player)) <= sqr(radius + player_radius) and not hazard.hit_cooldowns[player.id] then
             hazard.hit_cooldowns[player.id] = hazard.redamage_cooldown
@@ -124,6 +145,7 @@ function M.create_pulse(args)
         damage = args.damage or 4,
         power = args.power or 22,
         magic_percentage = args.magic_percentage or 1,
+        affects_escorts = args.affects_escorts,
         redamage_cooldown = args.redamage_cooldown or 18,
         hit_cooldowns = {},
         on_step = function(self)
@@ -167,6 +189,7 @@ function M.create_orb(args)
         damage = args.damage or 3,
         power = args.power or 20,
         magic_percentage = args.magic_percentage or 1,
+        affects_escorts = args.affects_escorts,
         redamage_cooldown = args.redamage_cooldown or 20,
         hit_cooldowns = {},
         on_step = function(self)
@@ -213,6 +236,7 @@ local function spawn_orb_wave(director, package)
             duration = orbit.duration or 280,
             damage = orbit.damage or 3,
             power = orbit.power or 24,
+            affects_escorts = orbit.affects_escorts,
             redamage_cooldown = orbit.redamage_cooldown or 20,
         }
     end
@@ -232,8 +256,39 @@ local function spawn_player_pulses(director, package)
             radius = pulse.radius or 66,
             damage = pulse.damage or 4,
             power = pulse.power or 28,
+            affects_escorts = pulse.affects_escorts,
             redamage_cooldown = pulse.redamage_cooldown or 18,
         }
+    end
+end
+
+local function spawn_escorts(director, package)
+    local escort = package.escort or {}
+    if not escort.monster then
+        return
+    end
+    local center = center_of_players() or director.xy
+    local count = escort.count or 1
+    local radius = escort.radius or 120
+    local hp = escort.hp
+    for idx = 1, count do
+        local angle = escort.angle or ((idx - 1) * (math.pi * 2 / count))
+        local xy = {
+            center[1] + math.cos(angle) * radius,
+            center[2] + math.sin(angle) * radius,
+        }
+        local ally = GameObject.enemy_create {
+            map = director.map,
+            type = escort.monster,
+            xy = xy,
+            team = PLAYER_TEAM,
+            content_lab_ally = true,
+        }
+        ally.content_lab_ally = true
+        ally.xpworth = 0
+        if hp then
+            ally.stats.hp = hp
+        end
     end
 end
 
@@ -280,11 +335,11 @@ end
 
 function M.add_director(game_map, package)
     package = package or {}
-    if not (package.orbit or package.pulse or package.summon) then
+    if not (package.orbit or package.pulse or package.summon or package.escort) then
         return nil
     end
     local center = center_of_players() or {320, 320}
-    return GameObject.object_create {
+    local director = GameObject.object_create {
         map = game_map,
         xy = center,
         radius = 1,
@@ -312,6 +367,8 @@ function M.add_director(game_map, package)
             end
         end,
     }
+    spawn_escorts(director, package)
+    return director
 end
 
 return M

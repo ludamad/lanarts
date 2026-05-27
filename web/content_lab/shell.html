@@ -581,6 +581,7 @@
             <option value="purple-dragon-package">Purple Dragon package</option>
             <option value="red-dragon-duel">Red Dragon duel</option>
             <option value="gragh-duel">Gragh duel</option>
+            <option value="gragh-rescue-package">Gragh rescue package</option>
             <option value="executioner-duel">Executioner duel</option>
             <option value="hell-pressure-pair">Hell pressure pair</option>
           </select>
@@ -640,6 +641,7 @@
         {id: 'purple-dragon-package', label: 'Purple Dragon package', kind: 'boss package', phase: 'late micro', features: ['rotating orbs', 'targeted AOE rhythm', 'Fire Bat adds']},
         {id: 'red-dragon-duel', label: 'Red Dragon duel', kind: 'boss duel', phase: 'late micro', features: ['projectile pressure', 'targeted AOE rhythm']},
         {id: 'gragh-duel', label: 'Gragh duel', kind: 'boss duel', phase: 'late micro', features: ['melee pursuit', 'rotating orbs', 'short AOE windows']},
+        {id: 'gragh-rescue-package', label: 'Gragh rescue package', kind: 'rescue package', phase: 'late multiplayer', features: ['protect ally', 'pull/taunt window', 'rotating orbs', 'short AOE windows']},
         {id: 'executioner-duel', label: 'Executioner duel'},
         {id: 'hell-pressure-pair', label: 'Hell pressure pair', kind: 'package', phase: 'late enemy mix', features: ['support pressure', 'melee bodyguard', 'targeted pulse']},
       ];
@@ -851,7 +853,7 @@
             offset: Number(pkg.orbit.offset || 0),
             interval: Number(pkg.orbit.interval || 1),
             duration: Number(pkg.orbit.duration || 1),
-            meta: `${pkg.orbit.count || 4} orbiting hitboxes, radius ${pkg.orbit.radius || 118}`,
+            meta: `${pkg.orbit.count || 4} orbiting hitboxes, radius ${pkg.orbit.radius || 118}${pkg.orbit.affects_escorts ? ', hits ally' : ''}`,
           });
         }
         if (pkg.pulse) {
@@ -863,7 +865,16 @@
             interval: Number(pkg.pulse.interval || 1),
             duration: windup + active,
             activeStart: windup,
-            meta: `player-targeted, ${windup}f warning, ${active}f active`,
+            meta: `player-targeted${pkg.pulse.affects_escorts ? ' plus ally' : ''}, ${windup}f warning, ${active}f active`,
+          });
+        }
+        if (pkg.escort) {
+          rows.push({
+            label: 'Ally',
+            offset: 0,
+            interval: 600,
+            duration: 600,
+            meta: `protect ${pkg.escort.monster || 'ally'}, ${pkg.escort.hp || '?'} hp`,
           });
         }
         if (pkg.summon) {
