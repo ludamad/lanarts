@@ -1,4 +1,5 @@
 local Display = require "core.Display"
+local EventLog = require "ui.EventLog"
 local GameObject = require "core.GameObject"
 local Map = require "core.Map"
 
@@ -11,6 +12,7 @@ local HUD_X = 10
 local HUD_Y = 58
 local HUD_W = 190
 local HUD_ROW_H = 18
+local RESULT_DEPTH = DIRECTOR_DEPTH - 1
 
 local function sqr(value)
     return value * value
@@ -228,6 +230,10 @@ local function draw_hud_row(y, label, value, color, pct)
     draw_hud_bar(HUD_X + 70, y + 14, HUD_W - 82, 3, pct, color)
 end
 
+local function package_title(package, intensity)
+    return (package.primary or "Package") .. " " .. (intensity.label or intensity.id or "Standard")
+end
+
 local function scaled_interval_and_offset(entry, fallback_interval, fallback_offset, intensity)
     local interval = scale_frames(entry.interval, fallback_interval, intensity)
     local offset = scale_offset(entry.offset, fallback_offset, interval, intensity)
@@ -338,6 +344,97 @@ local function draw_package_hud(director)
     end
 
     draw_escort_markers()
+end
+
+local function result_color(outcome)
+    if outcome == "clear" then
+        return COL_PALE_GREEN
+    elseif outcome == "ally down" then
+        return COL_PALE_YELLOW
+    end
+    return COL_PALE_RED
+end
+
+local function result_label(outcome)
+    if outcome == "clear" then
+        return "PACKAGE CLEAR"
+    elseif outcome == "ally down" then
+        return "ALLY DOWN"
+    end
+    return "PACKAGE FAILED"
+end
+
+local function package_result(director, outcome)
+    local count, hp, max_hp = escort_health()
+    local frames = director.elapsed or 0
+    local seconds = frames / 60
+    local saves = director.rescue_saves or 0
+    local clutch = director.rescue_clutch_saves or 0
+    local misses = director.rescue_misses or 0
+    local best = director.rescue_best_margin
+    local escort_text = count > 0 and string.format("ally %d/%d", math.ceil(hp), math.ceil(max_hp)) or "ally down"
+    local rescue_text = (saves > 0 or misses > 0)
+        and string.format("saves %d, clutch %d, misses %d%s", saves, clutch, misses, best and (", best " .. best .. "f") or "")
+        or "no rescue strikes"
+    return {
+        outcome = outcome,
+        title = result_label(outcome),
+        subtitle = package_title(director.package or {}, director.intensity or {}),
+        detail = string.format("%.1fs, %s, %s", seconds, escort_text, rescue_text),
+        color = result_color(outcome),
+    }
+end
+
+function M.create_result_banner(args)
+    return GameObject.object_create {
+        map = args.map,
+        xy = copy_xy(args.xy or {0, 0}),
+        radius = 1,
+        solid = false,
+        depth = RESULT_DEPTH,
+        elapsed = 0,
+        title = args.title or "PACKAGE COMPLETE",
+        subtitle = args.subtitle or "",
+        detail = args.detail or "",
+        color = args.color or COL_PALE_GREEN,
+        on_step = function(self)
+            self.elapsed = self.elapsed + 1
+            if self.elapsed > 240 then
+                GameObject.destroy(self)
+            end
+        end,
+        on_draw = function(self)
+            local w = unpack(Display.display_size)
+            local x1 = math.floor(w / 2 - 150)
+            local x2 = math.floor(w / 2 + 150)
+            local y1 = 22
+            local y2 = 84
+            local alpha = math.min(1, self.elapsed / 12)
+            Display.draw_rectangle(with_alpha(COL_BLACK, 0.64 * alpha), {x1, y1, x2, y2})
+            Display.draw_rectangle_outline(with_alpha(self.color, 0.72 * alpha), {x1, y1, x2, y2}, 1)
+            draw_text(with_alpha(self.color, alpha), Display.CENTER_TOP, {math.floor(w / 2), y1 + 8}, self.title)
+            draw_text(with_alpha(COL_WHITE, alpha), Display.CENTER_TOP, {math.floor(w / 2), y1 + 26}, self.subtitle)
+            draw_text(with_alpha(COL_LIGHT_GRAY, alpha), Display.CENTER_TOP, {math.floor(w / 2), y1 + 43}, self.detail)
+        end,
+    }
+end
+
+local function finish_package(director, outcome)
+    if director.content_lab_finished then
+        return
+    end
+    director.content_lab_finished = true
+    local result = package_result(director, outcome)
+    EventLog.add(result.title .. ": " .. result.subtitle .. " (" .. result.detail .. ")", result.color)
+    M.create_result_banner {
+        map = director.map,
+        xy = director.xy,
+        title = result.title,
+        subtitle = result.subtitle,
+        detail = result.detail,
+        color = result.color,
+    }
+    GameObject.destroy(director)
 end
 
 function M.create_pulse(args)
@@ -753,10 +850,19 @@ function M.add_director(game_map, package, intensity)
         rescue_saves = 0,
         rescue_misses = 0,
         rescue_clutch_saves = 0,
+        escort_required = package.escort ~= nil,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
+            if #living_players() == 0 then
+                finish_package(self, "party down")
+                return
+            end
+            if self.escort_required and #living_escorts() == 0 then
+                finish_package(self, "ally down")
+                return
+            end
             if #living_monsters(false) == 0 then
-                GameObject.destroy(self)
+                finish_package(self, "clear")
                 return
             end
             local orbit = self.package.orbit

@@ -21,4 +21,5 @@ Packaged encounters can also expose rhythm metadata for the shell's timeline vie
 Rescue packages may spawn allied monsters on the player team, giving pull, taunt, and body-block tests a fragile target without requiring extra local controllers.
 Some rescue packages also add a timed rescue line; the ally takes the heavy hit unless a player intercepts the line during the windup.
 The in-game package HUD counts saves and marks blocks that start inside the final rescue window as clutch saves.
+When a package clears or fails, the game posts a compact result banner with elapsed time and rescue stats.
 `--package_intensity` scales package tempo, damage, and summon counts from the same encounter definition, which keeps pressure sweeps comparable.
