@@ -67,7 +67,9 @@ Balance simulations:
     --encounter gragh-rescue-package --package_intensity high. Packaged runs
     emit package_outcome, escort HP, rescue saves, clutch saves, pull redirects,
     and misses in run and sample rows; ally-down package failures end the run
-    as ally_down.
+    as ally_down. Automated players also emit rescue_intercept_frames,
+    rescue_hold_frames, and rescue_late_reaction_frames so package clears can
+    be separated from actual body-block micro.
     Use --loadout_preset late to give each class a representative equipped
     late-game kit without inflating the starting level. Use --loadout to append
     comma-separated item specs such as `Health Potion*3,Hydra Ring`, and

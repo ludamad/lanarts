@@ -142,6 +142,30 @@ local function distance_sqr(a, b)
     return dx * dx + dy * dy
 end
 
+local function xy_distance_sqr(a, b)
+    local dx, dy = a.x - b.x, a.y - b.y
+    return dx * dx + dy * dy
+end
+
+local function point_to_segment_sqr(point, a, b)
+    local vx, vy = b.x - a.x, b.y - a.y
+    local len_sqr = vx * vx + vy * vy
+    if len_sqr <= 1 then
+        return xy_distance_sqr(point, a)
+    end
+    local t = ((point.x - a.x) * vx + (point.y - a.y) * vy) / len_sqr
+    t = math.max(0, math.min(1, t))
+    local closest = {x = a.x + vx * t, y = a.y + vy * t}
+    return xy_distance_sqr(point, closest)
+end
+
+local function point_on_segment(a, b, t)
+    return {
+        x = a.x + (b.x - a.x) * t,
+        y = a.y + (b.y - a.y) * t,
+    }
+end
+
 local function direction_between(from_obj, to_obj, deadzone)
     local dx, dy = to_obj.x - from_obj.x, to_obj.y - from_obj.y
     deadzone = deadzone or 0
@@ -179,6 +203,65 @@ local function direction_from_vector(dx, dy, deadzone)
         dy = dy / math.abs(dy)
     end
     return {dx, dy}
+end
+
+local function source_xy(strike)
+    if strike.source and not strike.source.destroyed then
+        return {x = strike.source.x, y = strike.source.y}
+    end
+    if strike.source_xy then
+        return {x = strike.source_xy[1], y = strike.source_xy[2]}
+    end
+    return {x = strike.x, y = strike.y}
+end
+
+local function strike_target_xy(strike)
+    if strike.target and not strike.target.destroyed then
+        return {x = strike.target.x, y = strike.target.y}
+    end
+    return {x = strike.x, y = strike.y}
+end
+
+local function active_rescue_strikes()
+    local strikes = {}
+    for _, obj in ipairs(Map.objects_list()) do
+        if obj and not obj.destroyed and obj.content_lab_rescue_strike
+            and not obj.resolved and obj.target and not obj.target.destroyed then
+            strikes[#strikes + 1] = obj
+        end
+    end
+    table.sort(strikes, function(a, b)
+        local a_remaining = (a.windup or 0) - (a.elapsed or 0)
+        local b_remaining = (b.windup or 0) - (b.elapsed or 0)
+        return a_remaining < b_remaining
+    end)
+    return strikes
+end
+
+local function best_direction_towards_xy(player, xy)
+    local direct = direction_from_vector(xy.x - player.x, xy.y - player.y, 5)
+    if direct[1] == 0 and direct[2] == 0 then
+        return {0, 0}
+    end
+    local best_dir, best_score = direct, -math.huge
+    local current = {x = player.x, y = player.y}
+    local current_dist = math.sqrt(xy_distance_sqr(current, xy))
+    for _, dir in ipairs(MOVE_DIRECTIONS) do
+        local next_xy = {player.x + dir[1] * 16, player.y + dir[2] * 16}
+        if not Map.object_tile_check(player, next_xy) then
+            local next_point = {x = next_xy[1], y = next_xy[2]}
+            local next_dist = math.sqrt(xy_distance_sqr(next_point, xy))
+            local score = current_dist - next_dist
+            if dir[1] == direct[1] and dir[2] == direct[2] then
+                score = score + 2
+            end
+            if score > best_score then
+                best_score = score
+                best_dir = dir
+            end
+        end
+    end
+    return best_dir
 end
 
 local function hp_pct(player)
@@ -593,6 +676,44 @@ function AutomatedPlayerInputSource:_try_weapon(reason_key)
     return true
 end
 
+function AutomatedPlayerInputSource:_rescue_action()
+    local strike = active_rescue_strikes()[1]
+    if not strike then
+        return false
+    end
+
+    local player = self.player
+    local from_xy = source_xy(strike)
+    local to_xy = strike_target_xy(strike)
+    local player_xy = {x = player.x, y = player.y}
+    local block_radius = (strike.block_radius or 30) + (player.target_radius or player.radius or 12)
+    local remaining = math.max(0, (strike.windup or 0) - (strike.elapsed or 0))
+    local late_window = strike.late_window or 0
+    local blocking = point_to_segment_sqr(player_xy, from_xy, to_xy) <= block_radius * block_radius
+
+    if remaining <= late_window then
+        self:_record_scalar("rescue_late_reaction_frames")
+    end
+    if blocking then
+        self.queued_movements = {}
+        self:set("move_direction", {0, 0})
+        self:_record_scalar("rescue_hold_frames")
+        return true
+    end
+
+    local vx, vy = to_xy.x - from_xy.x, to_xy.y - from_xy.y
+    local len_sqr = vx * vx + vy * vy
+    local t = 0.78
+    if len_sqr > 1 then
+        t = ((player.x - from_xy.x) * vx + (player.y - from_xy.y) * vy) / len_sqr
+        t = math.max(0.18, math.min(0.92, t))
+    end
+    local block_xy = point_on_segment(from_xy, to_xy, t)
+    self.queued_movements = {}
+    self:_record_scalar("rescue_intercept_frames")
+    return self:_set_move(best_direction_towards_xy(player, block_xy)) or true
+end
+
 function AutomatedPlayerInputSource:_combat_move(enemies, ordered_spell)
     local closest = enemies[1]
     if not closest then
@@ -879,6 +1000,11 @@ function AutomatedPlayerInputSource:step()
     self.telemetry.max_visible_enemies = math.max(self.telemetry.max_visible_enemies or 0, #enemies)
     self:_record_visible_enemies(enemies)
 
+    if self:_rescue_action() then
+        self:_clear_stall_state()
+        self:_record_decision()
+        return
+    end
     if self:_combat_action(enemies) then
         self:_clear_stall_state()
         self:_record_decision()
