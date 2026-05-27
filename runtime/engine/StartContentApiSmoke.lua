@@ -178,6 +178,21 @@ local function run_content_api_smoke()
     end
     expect(gragh_rhythms.orbit and gragh_rhythms.pulse and gragh_rhythms.summon, "gragh should expose full package rhythms")
 
+    local hell_pair_config = [[{
+        "className": "Rogue",
+        "level": 5,
+        "preset": "late",
+        "seed": "22430",
+        "encounter": "hell-pressure-pair",
+        "intensity": "high"
+    }]]
+    local hell_pair_summary = parse_response("hell pressure pair summary", ContentApi.run_summary_json(hell_pair_config))
+    local hell_pair_rhythms = {}
+    for _, rhythm in ipairs(hell_pair_summary.rhythms or {}) do
+        hell_pair_rhythms[rhythm.id] = true
+    end
+    expect(hell_pair_rhythms.orbit and hell_pair_rhythms.pulse and hell_pair_rhythms.summon, "hell pressure pair should expose full package rhythms")
+
     local matrix = parse_response("resource matrix", ContentApi.resource_matrix_json(config))
     expect((matrix.count or 0) == #(matrix.resources or {}), "matrix count should match resources")
     expect((matrix.count or 0) >= 30, "matrix should expose orthogonal resources")
