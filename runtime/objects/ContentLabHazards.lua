@@ -7,6 +7,10 @@ local M = {}
 local DIRECTOR_DEPTH = -200
 local HAZARD_DEPTH = 90
 local PLAYER_TEAM = 0
+local HUD_X = 10
+local HUD_Y = 58
+local HUD_W = 190
+local HUD_ROW_H = 18
 
 local function sqr(value)
     return value * value
@@ -157,6 +161,133 @@ local function draw_world_circle(color, xy, radius, fill_alpha, outline_alpha)
     local screen_xy = Display.to_screen_xy(xy)
     Display.draw_circle(with_alpha(color, fill_alpha), screen_xy, radius)
     Display.draw_circle_outline(with_alpha(color, outline_alpha), screen_xy, radius, 2)
+end
+
+local function next_delta(elapsed, interval, offset)
+    local delta = offset - (elapsed % interval)
+    if delta < 0 then
+        delta = delta + interval
+    end
+    return delta
+end
+
+local function format_frames(frames)
+    if frames <= 0 then
+        return "now"
+    end
+    return tostring(frames) .. "f"
+end
+
+local function draw_text(color, origin, xy, text)
+    Fonts.small:draw({color = color, origin = origin}, xy, text)
+end
+
+local function draw_hud_bar(x, y, w, h, pct, color)
+    pct = math.max(0, math.min(1, pct or 0))
+    local fill_w = math.floor(w * pct + 0.5)
+    Display.draw_rectangle(with_alpha(COL_BLACK, 0.46), {x, y, x + w, y + h})
+    if fill_w > 0 then
+        Display.draw_rectangle(with_alpha(color, 0.52), {x, y, x + fill_w, y + h})
+    end
+    Display.draw_rectangle_outline(with_alpha(color, 0.62), {x, y, x + w, y + h}, 1)
+end
+
+local function draw_hud_row(y, label, value, color, pct)
+    local text_y = y + 2
+    draw_text(color, Display.LEFT_TOP, {HUD_X + 8, text_y}, label)
+    draw_text(COL_WHITE, Display.RIGHT_TOP, {HUD_X + HUD_W - 8, text_y}, value)
+    draw_hud_bar(HUD_X + 70, y + 14, HUD_W - 82, 3, pct, color)
+end
+
+local function scaled_interval_and_offset(entry, fallback_interval, fallback_offset, intensity)
+    local interval = scale_frames(entry.interval, fallback_interval, intensity)
+    local offset = scale_offset(entry.offset, fallback_offset, interval, intensity)
+    return interval, offset
+end
+
+local function escort_health()
+    local hp, max_hp = 0, 0
+    local count = 0
+    for _, escort in ipairs(living_escorts()) do
+        count = count + 1
+        hp = hp + math.max(0, escort.stats.hp or 0)
+        local estats = escort:effective_stats()
+        max_hp = max_hp + math.max(1, escort.content_lab_max_hp or estats.max_hp or escort.stats.hp or 1)
+    end
+    return count, hp, max_hp
+end
+
+local function draw_escort_markers()
+    for _, escort in ipairs(living_escorts()) do
+        local estats = escort:effective_stats()
+        local max_hp = math.max(1, escort.content_lab_max_hp or estats.max_hp or escort.stats.hp or 1)
+        local hp = math.max(0, escort.stats.hp or 0)
+        local pct = math.max(0, math.min(1, hp / max_hp))
+        local xy = Display.to_screen_xy({escort.x, escort.y - (escort.radius or 14) - 13})
+        local label = string.format("ALLY %d/%d", math.ceil(hp), math.ceil(max_hp))
+        local color = pct <= 0.35 and COL_PALE_RED or COL_PALE_GREEN
+        draw_world_circle(color, xy_of(escort), (escort.radius or 14) + 5, 0.02, 0.52)
+        draw_text(color, Display.CENTER, xy, label)
+    end
+end
+
+local summon_count
+
+local function draw_package_hud(director)
+    local package = director.package or {}
+    local intensity = director.intensity
+    local row_count = 1
+    if package.orbit then
+        row_count = row_count + 1
+    end
+    if package.pulse then
+        row_count = row_count + 1
+    end
+    if package.summon then
+        row_count = row_count + 1
+    end
+    if package.escort then
+        row_count = row_count + 1
+    end
+
+    local panel_h = 12 + row_count * HUD_ROW_H
+    Display.draw_rectangle(with_alpha(COL_BLACK, 0.56), {HUD_X, HUD_Y, HUD_X + HUD_W, HUD_Y + panel_h})
+    Display.draw_rectangle_outline(with_alpha(COL_PALE_BLUE, 0.34), {HUD_X, HUD_Y, HUD_X + HUD_W, HUD_Y + panel_h}, 1)
+    local title = "Package " .. (intensity.label or intensity.id or "Standard")
+    draw_text(COL_PALE_BLUE, Display.LEFT_TOP, {HUD_X + 8, HUD_Y + 5}, title)
+
+    local y = HUD_Y + 24
+    if package.orbit then
+        local orbit = package.orbit
+        local interval, offset = scaled_interval_and_offset(orbit, 300, 40, intensity)
+        local delta = next_delta(director.elapsed, interval, offset)
+        draw_hud_row(y, "ORBS", format_frames(delta), COL_PALE_BLUE, 1 - delta / interval)
+        y = y + HUD_ROW_H
+    end
+    if package.pulse then
+        local pulse = package.pulse
+        local interval, offset = scaled_interval_and_offset(pulse, 150, 70, intensity)
+        local delta = next_delta(director.elapsed, interval, offset)
+        draw_hud_row(y, "AOE", format_frames(delta), COL_PALE_RED, 1 - delta / interval)
+        y = y + HUD_ROW_H
+    end
+    if package.summon then
+        local summon = package.summon
+        local interval, offset = scaled_interval_and_offset(summon, 360, 120, intensity)
+        local delta = next_delta(director.elapsed, interval, offset)
+        local current = summon_count()
+        local max_alive = scale_count(summon.max_alive, 4, intensity)
+        draw_hud_row(y, "ADDS", format_frames(delta) .. " " .. current .. "/" .. max_alive, COL_PALE_YELLOW, 1 - delta / interval)
+        y = y + HUD_ROW_H
+    end
+    if package.escort then
+        local count, hp, max_hp = escort_health()
+        local pct = max_hp > 0 and hp / max_hp or 0
+        local value = count > 0 and string.format("%d/%d", math.ceil(hp), math.ceil(max_hp)) or "down"
+        draw_hud_row(y, "ALLY", value, pct <= 0.35 and COL_PALE_RED or COL_PALE_GREEN, pct)
+    end
+
+    draw_escort_markers()
 end
 
 function M.create_pulse(args)
@@ -320,11 +451,12 @@ local function spawn_escorts(director, package)
         ally.xpworth = 0
         if hp then
             ally.stats.hp = hp
+            ally.content_lab_max_hp = hp
         end
     end
 end
 
-local function summon_count()
+function summon_count()
     local count = 0
     for _, monster in ipairs(living_monsters(true)) do
         if monster.content_lab_summon then
@@ -413,6 +545,9 @@ function M.add_director(game_map, package, intensity)
                     spawn_summons(self, self.package)
                 end
             end
+        end,
+        on_draw = function(self)
+            draw_package_hud(self)
         end,
     }
     spawn_escorts(director, package)
