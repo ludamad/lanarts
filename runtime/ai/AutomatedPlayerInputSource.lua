@@ -18,7 +18,7 @@ local DEFAULTS = {
     emergency_mp_pct = 0.20,
     regen_hp_pct = 0.65,
     retreat_hp_pct = 0.28,
-    necromancer_regen_hp_pct = 0.60,
+    necromancer_regen_hp_pct = 0.85,
     necromancer_retreat_hp_pct = 0.22,
     necromancer_pain_range = 72,
     pyrocaster_ring_min_range = 30,
@@ -304,6 +304,7 @@ function AutomatedPlayerInputSource:init(player, telemetry, opts)
     self.last_decision_input = false
     self.last_x = player.x
     self.last_y = player.y
+    self.last_observed_hp = false
     self.same_square_frames = 0
     self.ticks = 0
 end
@@ -844,9 +845,30 @@ function AutomatedPlayerInputSource:_clear_stall_state()
     self.last_y = self.player.y
 end
 
+function AutomatedPlayerInputSource:_record_health_state()
+    local player = self.player
+    local max_hp = math.max(1, player:effective_stats().max_hp)
+    local hp = player.stats.hp
+    local pct = hp / max_hp
+    local previous_hp = self.last_observed_hp
+    if previous_hp and hp > previous_hp then
+        local recovered = hp - previous_hp
+        if player.class_name == "Necromancer" and player:has_effect("Baleful Regeneration") then
+            self:_record_scalar("necromancer_regen_recovered_total", recovered)
+        end
+    end
+    self.last_observed_hp = hp
+    self.telemetry.min_hp = math.min(self.telemetry.min_hp or hp, hp)
+    self.telemetry.min_hp_pct = math.min(self.telemetry.min_hp_pct or pct, pct)
+    if player.class_name == "Necromancer" and player:has_effect("Baleful Regeneration") then
+        self:_record_scalar("necromancer_regen_frames")
+    end
+end
+
 function AutomatedPlayerInputSource:step()
     self.ticks = self.ticks + 1
     self:_record_scalar("controlled_frames")
+    self:_record_health_state()
     if self:_repeat_previous_decision() then
         return
     end

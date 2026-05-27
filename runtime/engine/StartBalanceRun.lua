@@ -607,6 +607,7 @@ local function summarize_run(run, telemetry, outcome)
     local spell_orders_total = count_values(telemetry.spell_orders)
     local hostile_kills = count_values(telemetry.monster_kills)
     local necromancer_pain_orders = telemetry.necromancer_pain_orders or 0
+    local damage_taken_total = telemetry.damage_taken_total or 0
     return {
         run_id = run.run_id,
         seed = tostring(run.seed),
@@ -630,6 +631,8 @@ local function summarize_run(run, telemetry, outcome)
         kills = hostile_kills,
         player_kills = snap.kills or 0,
         deaths = snap.deaths or 0,
+        min_hp = telemetry.min_hp or snap.hp or 0,
+        min_hp_pct = format_rate(telemetry.min_hp_pct or tonumber(snap.hp_pct) or 0),
         deepest_floor = snap.deepest_floor or 0,
         current_floor = snap.current_floor or 0,
         map_label = snap.map_label or "",
@@ -643,7 +646,7 @@ local function summarize_run(run, telemetry, outcome)
         ability_orders_total = spell_orders_total + necromancer_pain_orders,
         weapon_orders = telemetry.weapon_orders or 0,
         item_orders_total = count_values(telemetry.item_orders),
-        damage_taken_total = format_rate(telemetry.damage_taken_total or 0),
+        damage_taken_total = format_rate(damage_taken_total),
         damage_event_total = telemetry.damage_event_total or 0,
         damage_taken_by_source = encode_counts(telemetry.damage_taken_by_source),
         damage_events_by_source = encode_counts(telemetry.damage_events_by_source),
@@ -672,6 +675,8 @@ local function summarize_run(run, telemetry, outcome)
         necromancer_close_frames = telemetry.necromancer_close_frames or 0,
         necromancer_pain_orders = necromancer_pain_orders,
         necromancer_pain_during_regen_orders = telemetry.necromancer_pain_during_regen_orders or 0,
+        necromancer_regen_frames = telemetry.necromancer_regen_frames or 0,
+        necromancer_regen_recovered_total = format_rate(telemetry.necromancer_regen_recovered_total or 0),
         necromancer_regen_combat_frames = telemetry.necromancer_regen_combat_frames or 0,
         necromancer_retreat_frames = telemetry.necromancer_retreat_frames or 0,
         pyrocaster_ring_combat_frames = telemetry.pyrocaster_ring_combat_frames or 0,
@@ -728,7 +733,7 @@ end
 
 local SUMMARY_METRICS = {
     "frames", "level", "xp", "hp_pct", "mp_pct", "kills", "player_kills", "deaths",
-    "deepest_floor", "current_floor", "spell_orders_total", "ability_orders_total", "weapon_orders",
+    "min_hp", "min_hp_pct", "deepest_floor", "current_floor", "spell_orders_total", "ability_orders_total", "weapon_orders",
     "item_orders_total", "damage_taken_total", "damage_event_total",
     "objective_damage_total", "objective_damage_event_total",
     "reaction_hold_frames", "movement_noise_frames", "spell_skip_frames",
@@ -738,6 +743,7 @@ local SUMMARY_METRICS = {
     "unstick_frames", "portal_stop_frames", "ranged_keepaway_frames",
     "ranged_close_enemy_frames", "ranged_close_gragh_frames", "objective_hunt_enemy_frames", "necromancer_close_frames",
     "necromancer_pain_orders", "necromancer_pain_during_regen_orders",
+    "necromancer_regen_frames", "necromancer_regen_recovered_total",
     "necromancer_regen_combat_frames", "necromancer_retreat_frames",
     "pyrocaster_ring_combat_frames", "pyrocaster_ring_close_frames",
     "pyrocaster_ring_reposition_frames",
@@ -1107,6 +1113,12 @@ local REPORT_METRICS = {
         key = "avg_kills",
         label = "kills",
         direction = "higher",
+    },
+    {
+        key = "avg_min_hp_pct",
+        label = "minimum HP pct",
+        direction = "higher",
+        absolute_delta_threshold = 0.15,
     },
     {
         key = "kills_per_1000_combat_frames",
@@ -1625,6 +1637,8 @@ local function install_run_hooks(events_module, base_player_death, base_monster_
     Events.events.PlayerDeath = function(player)
         local entry = World.players[1]
         if entry and player == entry.instance then
+            telemetry.min_hp = 0
+            telemetry.min_hp_pct = 0
             run_state.outcome = "death"
             run_state.done = true
             return false
@@ -1768,7 +1782,7 @@ local function run_balance(raw_args)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
         write_csv(args.out, summaries, {
             "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "objective_enemy", "outcome", "frames", "level", "xp",
-            "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
+            "hp", "max_hp", "hp_pct", "min_hp", "min_hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
             "enemies_alive", "visible_enemies", "spells_known",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
@@ -1780,6 +1794,7 @@ local function run_balance(raw_args)
             "item_skip_frames", "weapon_skip_frames",
             "hunt_enemy_frames", "ranged_keepaway_frames", "ranged_close_enemy_frames",
             "ranged_close_gragh_frames",
+            "necromancer_regen_frames", "necromancer_regen_recovered_total",
             "monster_kills", "visible_enemy_frames", "alive_enemy_counts",
             "alive_enemy_hp", "alive_enemy_max_hp",
         })
@@ -1819,11 +1834,13 @@ local function run_balance(raw_args)
             "idle_frame_rate", "portal_stop_frame_rate",
             "kills_per_1000_controlled_frames", "kills_per_1000_combat_frames",
             "avg_damage_taken_total", "avg_damage_event_total",
+            "avg_min_hp_pct", "min_min_hp_pct",
             "avg_objective_damage_total", "avg_objective_damage_event_total",
             "avg_reaction_hold_frames", "avg_movement_noise_frames",
             "avg_spell_skip_frames", "avg_item_skip_frames", "avg_weapon_skip_frames",
             "avg_ranged_keepaway_frames", "avg_ranged_close_enemy_frames",
-            "avg_ranged_close_gragh_frames",
+            "avg_ranged_close_gragh_frames", "avg_necromancer_regen_frames",
+            "avg_necromancer_regen_recovered_total",
         })
         write_csv(args.spell_stats_out, spell_stat_rows, {
             "class", "start_level", "loadout", "bot_profile", "spell", "class_runs", "runs_using", "use_rate",
@@ -1847,7 +1864,7 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 10,
+                schema_version = 11,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
                 bot_profile = args.bot_profile,
