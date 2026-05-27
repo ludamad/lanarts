@@ -293,6 +293,57 @@
       font-size: 11px;
     }
 
+    .rhythm-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .rhythm-row {
+      display: grid;
+      grid-template-columns: 84px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+
+    .rhythm-label {
+      color: #d4dde6;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .rhythm-track {
+      position: relative;
+      height: 10px;
+      overflow: hidden;
+      border: 1px solid #34404a;
+      border-radius: 999px;
+      background: #0f1317;
+    }
+
+    .rhythm-window,
+    .rhythm-hit {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+    }
+
+    .rhythm-window {
+      background: rgba(217, 179, 95, 0.22);
+    }
+
+    .rhythm-hit {
+      width: 2px;
+      background: var(--accent-2);
+    }
+
+    .rhythm-meta {
+      grid-column: 2;
+      margin-top: -4px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
     select:focus,
     input:focus,
     textarea:focus {
@@ -719,6 +770,7 @@
         resources = (catalog.resources || []).map((resource) => ({
           name: resource.name,
           meta: resource.meta || resource.goal || '',
+          goal: resource.goal || '',
           className: resource.className,
           level: String(resource.level || 1),
           preset: resource.preset || 'none',
@@ -790,6 +842,71 @@
         return encounters.find((entry) => (entry.id || '') === id) || null;
       }
 
+      function encounterRhythms(encounter) {
+        const pkg = (encounter && encounter.package) || {};
+        const rows = [];
+        if (pkg.orbit) {
+          rows.push({
+            label: 'Orbs',
+            offset: Number(pkg.orbit.offset || 0),
+            interval: Number(pkg.orbit.interval || 1),
+            duration: Number(pkg.orbit.duration || 1),
+            meta: `${pkg.orbit.count || 4} orbiting hitboxes, radius ${pkg.orbit.radius || 118}`,
+          });
+        }
+        if (pkg.pulse) {
+          const windup = Number(pkg.pulse.windup || 0);
+          const active = Number(pkg.pulse.active || 1);
+          rows.push({
+            label: 'AOE',
+            offset: Number(pkg.pulse.offset || 0),
+            interval: Number(pkg.pulse.interval || 1),
+            duration: windup + active,
+            activeStart: windup,
+            meta: `player-targeted, ${windup}f warning, ${active}f active`,
+          });
+        }
+        if (pkg.summon) {
+          rows.push({
+            label: 'Summons',
+            offset: Number(pkg.summon.offset || 0),
+            interval: Number(pkg.summon.interval || 1),
+            duration: 20,
+            meta: `${pkg.summon.count || 1} ${((pkg.summon.monsters || [])[0]) || 'add'} per wave, cap ${pkg.summon.max_alive || 4}`,
+          });
+        }
+        return rows;
+      }
+
+      function renderRhythmTrack(row) {
+        const item = document.createElement('div');
+        item.className = 'rhythm-row';
+        const label = document.createElement('div');
+        label.className = 'rhythm-label';
+        label.textContent = row.label;
+        const track = document.createElement('div');
+        track.className = 'rhythm-track';
+        const interval = Math.max(1, row.interval);
+        const offsetPct = Math.max(0, Math.min(100, (row.offset % interval) / interval * 100));
+        const durationPct = Math.max(2, Math.min(100 - offsetPct, row.duration / interval * 100));
+        const windowNode = document.createElement('span');
+        windowNode.className = 'rhythm-window';
+        windowNode.style.left = `${offsetPct}%`;
+        windowNode.style.width = `${durationPct}%`;
+        const hit = document.createElement('span');
+        hit.className = 'rhythm-hit';
+        hit.style.left = `${offsetPct}%`;
+        track.appendChild(windowNode);
+        track.appendChild(hit);
+        item.appendChild(label);
+        item.appendChild(track);
+        const meta = document.createElement('div');
+        meta.className = 'rhythm-meta';
+        meta.textContent = `${row.interval}f loop - ${row.meta}`;
+        item.appendChild(meta);
+        return item;
+      }
+
       function renderEncounterInfo() {
         const info = $('encounterInfo');
         const encounter = selectedEncounter();
@@ -816,6 +933,15 @@
             tags.appendChild(tag);
           });
           info.appendChild(tags);
+        }
+        const rhythms = encounterRhythms(encounter);
+        if (rhythms.length) {
+          const rhythmList = document.createElement('div');
+          rhythmList.className = 'rhythm-list';
+          rhythms.forEach((row) => {
+            rhythmList.appendChild(renderRhythmTrack(row));
+          });
+          info.appendChild(rhythmList);
         }
       }
 
@@ -990,7 +1116,8 @@
           const button = document.createElement('button');
           button.type = 'button';
           button.className = 'resource';
-          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span></span><code>${resource.className} L${resource.level}</code>`;
+          const goal = resource.goal ? `<span>${resource.goal}</span>` : '';
+          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${goal}</span><code>${resource.className} L${resource.level}</code>`;
           button.addEventListener('click', () => {
             setConfig(resource);
           });

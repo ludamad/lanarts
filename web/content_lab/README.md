@@ -15,3 +15,4 @@ The shell reads its runtime data from the exported content APIs:
 - `lanarts_content_map_preview_json(config)` returns generator metadata for the preview grid.
 
 Encounter launches use `--encounter` for curated 1v1/package tests, or `--monsters` for a comma-separated custom arena.
+Packaged encounters can also expose rhythm metadata for the shell's timeline view, so orbit, AOE, and summon loops are visible before launch.
