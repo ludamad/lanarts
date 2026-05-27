@@ -359,17 +359,18 @@ local function draw_package_hud(director)
         local saves = director.rescue_saves or 0
         local clutch_saves = director.rescue_clutch_saves or 0
         local pulls = director.rescue_pulls or 0
-        local active, blocked, remaining = active_rescue_strikes()
+        local active, blocked, remaining, late = active_rescue_strikes()
         local value
         if active > 0 then
-            value = blocked and ("hold " .. format_frames(remaining or 0)) or ("block " .. saves)
+            local prefix = late and "clutch " or (blocked and "hold " or "block ")
+            value = prefix .. format_frames(remaining or 0)
         elseif (director.rescue_pull_active_frames or 0) > 0 then
             value = "pull " .. format_frames(director.rescue_pull_active_frames)
         else
             local margin = director.rescue_last_margin
             value = saves .. " c" .. clutch_saves .. " p" .. pulls .. (margin and (" " .. margin .. "f") or "")
         end
-        draw_hud_row(y, "SAVE", value, COL_PALE_GREEN, active > 0 and 1 or 1 - delta / interval)
+        draw_hud_row(y, "SAVE", value, late and COL_PALE_YELLOW or COL_PALE_GREEN, active > 0 and 1 or 1 - delta / interval)
         y = y + HUD_ROW_H
     end
     if package.escort then
@@ -889,10 +890,11 @@ function M.create_rescue_strike(args)
             local to_xy = xy_of(self.target)
             local remaining = math.max(0, self.windup - self.elapsed)
             local last_call = remaining <= self.late_window
+            local clutch_pct = last_call and (1 - remaining / math.max(1, self.late_window)) or 0
             local color = self.resolved and (self.saved and COL_PALE_GREEN or COL_PALE_RED)
                 or (self.current_blocker and COL_PALE_GREEN or (last_call and COL_PALE_YELLOW or COL_PALE_GREEN))
             local progress = self.resolved and 1 or math.max(0.2, math.min(1, self.elapsed / self.windup))
-            draw_world_link(color, from_xy, to_xy, last_call and 4 or 3, last_call and 0.50 or 0.28)
+            draw_world_link(color, from_xy, to_xy, last_call and 5 or 3, last_call and 0.58 or 0.28)
             if not self.resolved then
                 local threat_xy = segment_point_at(from_xy, to_xy, math.min(1, self.elapsed / math.max(1, self.windup)))
                 draw_world_circle(last_call and COL_PALE_YELLOW or COL_WHITE, threat_xy, last_call and 7 or 5, 0.10, last_call and 0.82 or 0.58)
@@ -904,10 +906,15 @@ function M.create_rescue_strike(args)
                     local hint_color = in_block_zone and COL_PALE_GREEN or (last_call and COL_PALE_YELLOW or COL_LIGHT_GRAY)
                     draw_world_circle(hint_color, hint_xy, block_radius, in_block_zone and 0.05 or 0.02, in_block_zone and 0.72 or 0.42)
                     local hint_label_xy = Display.to_screen_xy({hint_xy[1], hint_xy[2] - block_radius - 10})
-                    draw_text(hint_color, Display.CENTER, hint_label_xy, in_block_zone and "HOLD" or "INTERCEPT")
+                    local hint_label = in_block_zone and (last_call and "CLUTCH HOLD" or "HOLD") or (last_call and "BLOCK NOW" or "INTERCEPT")
+                    draw_text(hint_color, Display.CENTER, hint_label_xy, hint_label)
                 end
             end
             draw_world_circle(color, to_xy, self.strike_radius * progress, self.resolved and 0.14 or 0.07, self.resolved and 0.70 or 0.45)
+            if last_call and not self.resolved then
+                local pulse = 1 + math.sin(self.elapsed * 0.55) * 0.08
+                draw_world_circle(COL_PALE_YELLOW, to_xy, (self.strike_radius + 9 + clutch_pct * 12) * pulse, 0.02, 0.58 + clutch_pct * 0.24)
+            end
             local label_xy = Display.to_screen_xy({to_xy[1], to_xy[2] - self.strike_radius - 14})
             local label
             if self.resolved then
@@ -915,9 +922,9 @@ function M.create_rescue_strike(args)
                     and (self.was_clutch and ("CLUTCH " .. self.clutch_margin .. "f") or (self.pulled and "PULLED" or "SAVED"))
                     or "HIT"
             elseif self.current_blocker then
-                label = "HOLD " .. remaining .. "f"
+                label = last_call and ("CLUTCH HOLD " .. remaining .. "f") or ("HOLD " .. remaining .. "f")
             else
-                label = last_call and "BLOCK" or "RESCUE"
+                label = last_call and ("BLOCK NOW " .. remaining .. "f") or ("RESCUE " .. remaining .. "f")
             end
             draw_text(color, Display.CENTER, label_xy, label)
         end,
@@ -1041,18 +1048,22 @@ end
 function active_rescue_strikes()
     local count = 0
     local blocked = false
+    local late = false
     local best_remaining
     for _, obj in ipairs(Map.objects_list()) do
         if obj and not obj.destroyed and obj.content_lab_rescue_strike and not obj.resolved then
             count = count + 1
+            local remaining = math.max(0, obj.windup - obj.elapsed)
+            best_remaining = math.min(best_remaining or remaining, remaining)
+            if remaining <= (obj.late_window or 0) then
+                late = true
+            end
             if obj.current_blocker then
                 blocked = true
-                local remaining = math.max(0, obj.windup - obj.elapsed)
-                best_remaining = math.min(best_remaining or remaining, remaining)
             end
         end
     end
-    return count, blocked, best_remaining
+    return count, blocked, best_remaining, late
 end
 
 function M.package_state(game_map)
