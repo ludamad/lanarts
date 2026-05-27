@@ -396,6 +396,52 @@
       line-height: 1.2;
     }
 
+    .pick-buttons button.active {
+      border-color: #6b8fbd;
+      color: #ffffff;
+      background: #223247;
+    }
+
+    .loadout-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-height: 28px;
+    }
+
+    .loadout-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      max-width: 100%;
+      border: 1px solid #35404a;
+      border-radius: 6px;
+      background: #1b2229;
+      color: #d4dde6;
+      font-size: 11px;
+      line-height: 1.2;
+      overflow: hidden;
+    }
+
+    .loadout-chip span {
+      padding: 4px 7px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .loadout-chip button {
+      align-self: stretch;
+      width: 24px;
+      border: 0;
+      border-left: 1px solid #35404a;
+      background: #14191e;
+      color: #d4dde6;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+    }
+
     .rhythm-list {
       display: grid;
       gap: 7px;
@@ -667,6 +713,7 @@
         <div class="field">
           <label for="customLoadout">Custom items</label>
           <textarea id="customLoadout" spellcheck="false" placeholder="Health Potion*3, Ring of Vitality"></textarea>
+          <div class="loadout-chips" id="activeLoadout"></div>
         </div>
         <div class="field">
           <label for="itemChoices">Items</label>
@@ -1258,6 +1305,7 @@
           buildHost.appendChild(spellRow);
         }
 
+        const selectedItems = new Set(customLoadoutParts());
         (options.itemChoices || []).forEach((group) => {
           const groupNode = document.createElement('div');
           groupNode.className = 'pick-group';
@@ -1268,9 +1316,11 @@
           (group.choices || []).forEach((choice) => {
             const button = document.createElement('button');
             button.type = 'button';
+            const spec = choice.spec || choice.name;
             button.textContent = choice.amount > 1 ? `${choice.name} x${choice.amount}` : choice.name;
+            button.classList.toggle('active', selectedItems.has(spec));
             button.addEventListener('click', () => {
-              addItemSpec(choice.spec || choice.name);
+              addItemSpec(spec);
             });
             buttons.appendChild(button);
           });
@@ -1347,16 +1397,47 @@
         appendCommandLine(host, 'Monster', commands.monsterEval);
       }
 
+      function customLoadoutParts() {
+        return $('customLoadout').value.split(',').map((part) => part.trim()).filter(Boolean);
+      }
+
+      function setCustomLoadoutParts(parts) {
+        $('customLoadout').value = parts.map((part) => String(part || '').trim()).filter(Boolean).join(', ');
+      }
+
+      function renderCustomLoadout() {
+        const host = $('activeLoadout');
+        host.innerHTML = '';
+        customLoadoutParts().forEach((part, index) => {
+          const chip = document.createElement('div');
+          chip.className = 'loadout-chip';
+          const label = document.createElement('span');
+          label.textContent = part;
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.textContent = 'x';
+          remove.title = `Remove ${part}`;
+          remove.addEventListener('click', () => {
+            const next = customLoadoutParts();
+            next.splice(index, 1);
+            setCustomLoadoutParts(next);
+            refreshLab();
+          });
+          chip.appendChild(label);
+          chip.appendChild(remove);
+          host.appendChild(chip);
+        });
+      }
+
       function addItemSpec(spec) {
-        const textarea = $('customLoadout');
         const next = String(spec || '').trim();
         if (!next) {
           return;
         }
-        const parts = textarea.value.split(',').map((part) => part.trim()).filter(Boolean);
+        const parts = customLoadoutParts();
         if (!parts.includes(next)) {
           parts.push(next);
-          textarea.value = parts.join(', ');
+          setCustomLoadoutParts(parts);
         }
         refreshLab();
       }
@@ -1388,6 +1469,7 @@
       }
 
       function refreshLab() {
+        renderCustomLoadout();
         updateLoadoutOptions();
         updateRunSummary();
         updateEnemyOptions();
