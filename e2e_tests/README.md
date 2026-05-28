@@ -146,9 +146,9 @@ Balance simulations:
     mechanic hits, plus package_micro_punish_break_total when clutch/perfect
     rescue saves break that Fury back off.
     Dicebinder runs also emit dice_rolls_total, per-face roll counts,
-    roll buildup FX, reveal cues, high-roll streaks, repeat rolls, effective
-    Dash/Power refreshes, jackpot rolls, and buff active frames so skill-dice
-    RNG can be modeled separately from package execution.
+    roll buildup FX, lock cues, suspense pips, reveal cues, high-roll streaks,
+    repeat rolls, effective Dash/Power refreshes, jackpot rolls, and buff
+    active frames so skill-dice RNG can be modeled separately from package execution.
     Use --package_components orbit,pulse,sweep,summon,escort,rescue to isolate
     package parts while keeping the same encounter arena, monsters, and
     pressure preset. A rescue component automatically keeps its escort target.
@@ -175,9 +175,10 @@ Balance simulations:
     to also exercise the normal native draw path for procedural FX without
     entering the slower Emscripten loop.
     Dicebinder reports include fair-bag roll counts, animation frames, staged
-    buildup FX, reveal cues, high-roll streaks, repeat rolls, bag refills,
-    dash-window frames, and effective cooldown refreshes so exciting D6 windows
-    can be checked without hiding class power inside RNG streaks.
+    buildup FX, lock cues, suspense pips, reveal cues, high-roll streaks,
+    repeat rolls, bag refills, dash-window frames, and effective cooldown
+    refreshes so exciting D6 windows can be checked without hiding class power
+    inside RNG streaks.
     The content API smoke also honors LANARTS_SKIP_BUILD=1, so Lua/catalog
     changes can be checked against the existing native binary without a rebuild.
     For ad hoc tuning, use ./e2e_tests/run_content_lab_native.sh with the same

@@ -31,8 +31,11 @@ grep -q "avg_package_aggro_switches" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_rolls_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_animation_frames" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_buildup_fx" runtime/engine/StartBalanceRun.lua
+grep -q "avg_dice_roll_lock_cues" runtime/engine/StartBalanceRun.lua
+grep -q "avg_dice_roll_suspense_pips" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_longest_high_streak" runtime/engine/StartBalanceRun.lua
 grep -q "DICE_FULL_BAG_MASK" runtime/spells/Effects.moon
+grep -q "DICE_ROLL_LOCK_STAGE_FRAMES" runtime/spells/Effects.moon
 grep -q "dicebinder_emit_roll_fx" runtime/spells/Effects.moon
 grep -q "dicebinder_emit_roll_tick_fx" runtime/spells/Effects.moon
 grep -q "draw_die_face" runtime/ui/ProceduralEffects.lua

@@ -309,6 +309,8 @@ function M.draw_die_badge(obj, args)
     local rolling_remaining = math.max(0, args.rolling_remaining or 0)
     local rolling_total = math.max(1, args.rolling_total or 1)
     local rolling_pct = clamp(1 - rolling_remaining / rolling_total, 0, 1)
+    local lock_total = math.max(1, args.lock_total or 3)
+    local lock_stage = math.max(0, math.min(lock_total, args.lock_stage or 0))
     local label = args.label or ""
     local buff_remaining = math.max(0, args.buff_remaining or 0)
     local buff_duration = math.max(1, args.buff_duration or 1)
@@ -369,6 +371,27 @@ function M.draw_die_badge(obj, args)
                 alpha(idx <= math.max(1, roll) and color or COL_WHITE, 0.20 + pulse * 0.22),
                 pip_xy,
                 idx <= math.max(1, roll) and 2.2 or 1.4
+            )
+        end
+        if lock_stage > 0 then
+            local locked_pips = math.min(6, lock_stage * 2)
+            local lock_radius = outer_radius - 13
+            for idx = 1, locked_pips do
+                local angle = -math.pi / 2 + idx * TWO_PI / 6 + spin * 0.28
+                Display.draw_circle(
+                    alpha(color, 0.42 + pulse * 0.28),
+                    {xy[1] + math.cos(angle) * lock_radius, xy[2] + math.sin(angle) * lock_radius},
+                    2.4 + lock_stage * 0.25
+                )
+            end
+            Display.draw_arc(
+                alpha(color, 0.35 + lock_stage / lock_total * 0.38),
+                xy,
+                outer_radius - 13,
+                -math.pi / 2,
+                -math.pi / 2 + TWO_PI * (lock_stage / lock_total),
+                2,
+                12
             )
         end
     end
