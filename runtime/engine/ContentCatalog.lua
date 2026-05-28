@@ -1511,7 +1511,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Purple Dragon"},
         arena = {
-            room_size = {27, 27},
+            room_size = {31, 31},
         },
         package = {
             primary = "Purple Dragon",
@@ -1556,7 +1556,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Red Dragon"},
         arena = {
-            room_size = {27, 27},
+            room_size = {31, 31},
         },
         package = {
             primary = "Red Dragon",
@@ -1615,7 +1615,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Gragh"},
         arena = {
-            room_size = {26, 26},
+            room_size = {30, 30},
         },
         package = {
             primary = "Gragh",
@@ -1681,7 +1681,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Gragh"},
         arena = {
-            room_size = {28, 28},
+            room_size = {32, 32},
         },
         package = {
             primary = "Gragh",
@@ -1771,7 +1771,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Executioner"},
         arena = {
-            room_size = {24, 24},
+            room_size = {28, 28},
         },
     },
     {
@@ -1785,7 +1785,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Executioner"},
         arena = {
-            room_size = {25, 25},
+            room_size = {30, 30},
         },
         package = {
             primary = "Executioner",
@@ -1844,7 +1844,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Executioner"},
         arena = {
-            room_size = {27, 27},
+            room_size = {32, 32},
         },
         package = {
             primary = "Executioner",
@@ -1927,7 +1927,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Mana Sapper", "Executioner"},
         arena = {
-            room_size = {26, 26},
+            room_size = {32, 32},
         },
         package = {
             primary = "Executioner",
@@ -1972,7 +1972,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Centaur Hunter"},
         arena = {
-            room_size = {27, 27},
+            room_size = {32, 32},
         },
         package = {
             primary = "Centaur Hunter",
@@ -2017,7 +2017,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Crypt Keeper"},
         arena = {
-            room_size = {26, 26},
+            room_size = {30, 30},
         },
         package = {
             primary = "Crypt Keeper",

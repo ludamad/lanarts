@@ -45,6 +45,7 @@ Run and fight payloads include matchup reads for red/fire, white, and black resi
 Encounter launches use `--encounter` for curated 1v1/package tests, or `--monsters` for a comma-separated custom arena.
 Direct map launches use `--start_map_desc`, and overworld profile selections add `--map_profile` so the same seed can compare profiles such as `open_meadow`, `broken_grove`, `river_road`, `predator_thicket`, and `ruin_crossroads`.
 Packaged encounters can also expose rhythm metadata for the shell's timeline view, so orbit, AOE, sweep, and summon loops are visible before launch.
+Level-5 package arenas use larger 30-32 tile rooms so stacked orb, sweep, rescue, and add pressure has room to read without turning the fight into corridor pinball.
 Rescue packages may spawn allied monsters on the player team, giving pull, taunt, and body-block tests a fragile target without requiring extra local controllers.
 Some rescue packages also add a timed rescue line; the ally takes the heavy hit unless a player intercepts the line during the windup.
 The in-game package HUD counts saves and marks blocks that start inside the final rescue window as clutch saves, with a tighter perfect-save band for few-frame body-blocks. Live rescue cues now call out that perfect band before the strike resolves.
