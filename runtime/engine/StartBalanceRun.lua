@@ -2298,8 +2298,12 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local step_limits = tonumber(row.step_limits) or 0
     local step_limit_rate = runs > 0 and step_limits / runs or 0
     local boss_hp_left = tonumber(row.avg_package_primary_hp_pct) or 0
+    -- Almost-won: a clean profile (no deaths, non-negative micro) that is steadily winning the
+    -- damage race but ran out of budget reads as "raise the step budget" even with more boss HP
+    -- left, so it is not mistaken for a fight that is genuinely too hard.
+    local clean_stall = death_rate <= 0.05 and micro_score >= 0
     if runs >= min_runs and win_rate <= 0.05 and death_rate <= 0.05 and step_limit_rate >= 0.75 then
-        if boss_hp_left > 0 and boss_hp_left <= 0.25 then
+        if boss_hp_left > 0 and (boss_hp_left <= 0.25 or (clean_stall and boss_hp_left <= 0.40)) then
             add_report_row(
                 rows,
                 class_name,
