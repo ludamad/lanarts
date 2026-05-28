@@ -134,9 +134,12 @@ Balance simulations:
     Use --min_report_runs and --report_delta_pct to tune report sensitivity.
     For content-lab iteration, prefer ./e2e_tests/test_content_lab_native_fast.sh
     before rebuilding Emscripten. It runs the same packaged Gragh/Dicebinder
-    and rescue-package content through the native build with audio muted. Set
-    LANARTS_DRAW_SMOKE=1 to also exercise the normal native draw path for
-    procedural FX without entering the slower Emscripten loop.
+    and rescue-package content through native binaries with audio muted. The
+    script builds each needed native binary once, then runs scenarios directly
+    from build_debug_headless/src/lanarts or build_debug/src/lanarts. Set
+    LANARTS_SKIP_BUILD=1 to reuse existing binaries, or LANARTS_DRAW_SMOKE=1
+    to also exercise the normal native draw path for procedural FX without
+    entering the slower Emscripten loop.
 
 Monster simulations:
     ./run.sh --headless engine.StartMonsterEvals --steps 1000 --runs 3 --level 1 --monster GiantRat,Hound,CloudElemental

@@ -6,11 +6,26 @@ cd "$(dirname "$0")/.."
 temp_dir=$(mktemp -d)
 trap 'rm -rf "$temp_dir"' EXIT
 
+repo_dir=$(pwd)
+headless_exe="${LANARTS_HEADLESS_EXE:-$repo_dir/build_debug_headless/src/lanarts}"
+native_exe="${LANARTS_NATIVE_EXE:-$repo_dir/build_debug/src/lanarts}"
+
+build_env=(SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1)
+
+if [[ "${LANARTS_SKIP_BUILD:-0}" == "0" ]]; then
+    env "${build_env[@]}" ./run.sh --headless --build >/dev/null
+    if [[ "${LANARTS_DRAW_SMOKE:-0}" != "0" ]]; then
+        env "${build_env[@]}" ./run.sh --build >/dev/null
+    fi
+fi
+
 run_balance() {
-    local name="$1"
-    shift
-    env SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1 \
-        ./run.sh "$@" \
+    local exe="$1"
+    local name="$2"
+    shift 2
+    (
+        cd runtime
+        env "${build_env[@]}" "$exe" "$@" \
         --out="$temp_dir/${name}_runs.csv" \
         --samples_out="$temp_dir/${name}_samples.csv" \
         --spells_out="$temp_dir/${name}_spells.csv" \
@@ -22,10 +37,11 @@ run_balance() {
         --enemy_stats_out="$temp_dir/${name}_enemy_stats.csv" \
         --report_out="$temp_dir/${name}_report.csv" \
         --json_out="$temp_dir/${name}_runs.json"
+    )
 }
 
-run_balance dicebinder \
-    --headless engine.StartBalanceRun \
+run_balance "$headless_exe" dicebinder \
+    engine.StartBalanceRun \
     --steps 700 \
     --runs 1 \
     --classes Dicebinder \
@@ -35,8 +51,8 @@ run_balance dicebinder \
     --encounter gragh-duel \
     --package_intensity high
 
-run_balance rescue \
-    --headless engine.StartBalanceRun \
+run_balance "$headless_exe" rescue \
+    engine.StartBalanceRun \
     --steps 700 \
     --runs 1 \
     --classes Rogue \
@@ -57,7 +73,7 @@ grep -q "package_rescue_save_rate" "$temp_dir/rescue_runs.csv"
 grep -q "package_rescue_pull_uptime_rate" "$temp_dir/rescue_runs.csv"
 
 if [[ "${LANARTS_DRAW_SMOKE:-0}" != "0" ]]; then
-    run_balance dicebinder_draw \
+    run_balance "$native_exe" dicebinder_draw \
         engine.StartBalanceRun \
         --steps 180 \
         --runs 1 \
@@ -69,7 +85,7 @@ if [[ "${LANARTS_DRAW_SMOKE:-0}" != "0" ]]; then
         --package_intensity high \
         --draw_interval 60
 
-    run_balance rescue_draw \
+    run_balance "$native_exe" rescue_draw \
         engine.StartBalanceRun \
         --steps 500 \
         --runs 1 \
