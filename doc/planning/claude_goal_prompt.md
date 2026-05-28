@@ -61,6 +61,20 @@ Highest-signal balance finding (do not lose this): a fixed-seed `gragh-duel` lev
 
 Possible next slices: reduce gragh-duel pressure dominance/overlap for legibility (variety, not damage); add a non-Gragh full package (Workstream 2); or improve the bot's hazard-avoidance so late packages become measurable.
 
+Session 2 update (Claude, 2026-05-28) — the instrument-limited finding above is now RESOLVED. Nine further commits (`1a39b5a0`..`4f9372e5` plus fixes):
+
+- `1a39b5a0` Bot now actively dodges package orb/pulse/sweep hazards (was rescue-only), skill-gated by profile (perfect reacts early/wide, sloppy late/narrow, with a skip chance). `hazard_dodge_frames`/`_skip_frames` telemetry. Pulse `threat_radius` exposed. Effect: perfect/Fighter micro -48->-7, perfect/Stormcaller -21->+20.
+- `803663e2` Stall flag now reads boss HP at the stall; `2ca9afe7` ranged dodge folds in keep-away so dodging never pulls a kiter into the boss (red-dragon close-frames 256->182, deaths 2->1); `4f9372e5` clean budget-limited stalls (no deaths, >=0 micro, boss <=40%) read as almost-won/raise-budget.
+- `880839e7` Fixed a regression the dodge introduced: rescue pull-timing report row now emits on any rescue opportunity, not only when a pull happened (package balance smoke).
+- `d3120529` Red Dragon gained a DRAGONFIRE micro_punish (in-fight cost + EMBER BREAK streak counterplay), matching Gragh/Crypt Keeper depth.
+- `1d24b204` Brute-force detector: a class clearing >=50% with <=-40 micro and >=10 avoidable hits/run is flagged as a face-tank clear (Fighter trips it on gragh-duel; clean classes do not).
+
+Verdict with the fixed instrument (gragh-duel, perfect, 1800 steps): the fight is winnable and healthy -- Necromancer 4/4 (regen, fast), Pyrocaster/Stormcaller clear with positive micro, Fighter worst (-99 micro, face-tanks, feeds 140 FURY). The 900-step budget in the prompt's example commands is simply too short for level-5 boss duels; use >=1500. A roster triage (perfect Stormcaller, 1500 steps) found executioner/stara/crypt-keeper/waxanarian/mana-sapper all clear cleanly; pixulloch is clean-but-budget-limited (now flagged almost-won).
+
+Remaining known limits (do NOT tune enemies off these): (1) the bot still cannot dodge native MONSTER projectiles -- only package hazards -- so arrow/projectile bosses like nesso-arrow-storm read as lethal-at-range (perfect Stormcaller kites perfectly, close-frames ~1, yet takes ~300 arrow damage); closing this needs engine-level projectile introspection. (2) human-profile Necromancer dies to gragh-duel because raw damage outpaces regen volume, not because the bot misplays -- judge with regen context; perfect Necro is fine.
+
+Good next slices: native-projectile dodging for the bot (large, engine-level); a class-posture/distance-discipline HUD cue (Workstream 3); or another full-package upgrade (Workstream 2).
+
 ## User Goal
 
 The broad goal is to make late-game Lanarts content more fun, legible, difficult in the right ways, and measurable.
