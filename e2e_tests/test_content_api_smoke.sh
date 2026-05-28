@@ -19,6 +19,8 @@ grep -q "lanarts_content_presentation_json" web/content_lab/shell.html
 grep -q "Sweeps only" web/content_lab/shell.html
 grep -q "avg_package_sweep_active_count" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_score" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_micro_thread_cues" runtime/engine/StartBalanceRun.lua
+grep -q "MICRO x" runtime/objects/ContentLabHazards.lua
 grep -q "avg_package_micro_punish_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_punish_break_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_rolls_total" runtime/engine/StartBalanceRun.lua

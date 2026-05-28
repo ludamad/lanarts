@@ -429,6 +429,30 @@ local function add_micro_event(director, args)
             drift = args.drift or 0.42,
         }
     end
+    if args.kind == "dodge" and points > 0 then
+        local streak = director.micro_streak or 0
+        local is_milestone = streak == 3 or streak == 5 or (streak > 5 and streak % 5 == 0)
+        if is_milestone and args.xy then
+            director.micro_streak_bursts = (director.micro_streak_bursts or 0) + 1
+            ImpactFX.world_burst {
+                map = director.map,
+                xy = args.xy,
+                color = director.micro_last_color or COL_PALE_BLUE,
+                label = "MICRO x" .. tostring(streak),
+                radius = math.min(82, 40 + streak * 4),
+                duration = 32,
+                drift = 0.34,
+            }
+            if streak >= 5 then
+                ImpactFX.screen_flash {
+                    map = director.map,
+                    color = director.micro_last_color or COL_PALE_BLUE,
+                    alpha = 0.045,
+                    duration = 8,
+                }
+            end
+        end
+    end
 end
 
 local function record_hazard_hit(hazard, target, xy)
@@ -474,6 +498,19 @@ local function mark_hazard_dodge_eligible(hazard, xy, label)
     hazard.micro_dodge_xy = xy and copy_xy(xy) or hazard.xy
     if label then
         hazard.micro_dodge_label = label
+    end
+    if not hazard.micro_thread_cued then
+        hazard.micro_thread_cued = true
+        hazard.director.micro_thread_cues = (hazard.director.micro_thread_cues or 0) + 1
+        ImpactFX.world_burst {
+            map = hazard.director.map,
+            xy = hazard.micro_dodge_xy or hazard.xy,
+            color = hazard.micro_color or COL_PALE_BLUE,
+            label = label or hazard.micro_thread_label or "THREAD",
+            radius = 36,
+            duration = 22,
+            drift = 0.20,
+        }
     end
 end
 
@@ -1248,6 +1285,8 @@ local function package_result(director, outcome)
         micro_hits = director.micro_hits or 0,
         micro_dodges = director.micro_dodges or 0,
         micro_events = director.micro_events or 0,
+        micro_thread_cues = director.micro_thread_cues or 0,
+        micro_streak_bursts = director.micro_streak_bursts or 0,
         micro_punish_total = director.micro_punish_total or 0,
         micro_punish_events = director.micro_punish_events or 0,
         micro_punish_break_total = director.micro_punish_break_total or 0,
@@ -1367,6 +1406,8 @@ local function package_state_from_director(director)
         micro_hits = director.micro_hits or 0,
         micro_dodges = director.micro_dodges or 0,
         micro_events = director.micro_events or 0,
+        micro_thread_cues = director.micro_thread_cues or 0,
+        micro_streak_bursts = director.micro_streak_bursts or 0,
         micro_punish_total = director.micro_punish_total or 0,
         micro_punish_events = director.micro_punish_events or 0,
         micro_punish_break_total = director.micro_punish_break_total or 0,
@@ -1547,6 +1588,7 @@ function M.create_pulse(args)
         redamage_cooldown = args.redamage_cooldown or 18,
         micro_label = "AOE",
         micro_color = COL_PALE_RED,
+        micro_thread_label = "AOE THREAD",
         micro_dodge_eligible = true,
         micro_dodge_xy = copy_xy(args.xy),
         micro_dodge_label = "AOE EVADE",
@@ -2838,6 +2880,8 @@ function M.add_director(game_map, package, intensity)
         micro_hits = 0,
         micro_dodges = 0,
         micro_events = 0,
+        micro_thread_cues = 0,
+        micro_streak_bursts = 0,
         micro_punish_total = 0,
         micro_punish_events = 0,
         micro_punish_break_total = 0,

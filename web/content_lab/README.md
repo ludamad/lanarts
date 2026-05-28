@@ -56,7 +56,7 @@ Package HUDs include NEXT and BEAT rows that summarize the active or nearest pac
 Package HUDs also include a STACK row, and balance rows expose peak stack plus overlap rate so full-package fights can be checked for actual simultaneous micro pressure.
 Boss package draws now use a reusable procedural pressure-field aura that grows and spins harder when overlapping package beats stack up.
 Dicebinder's live D6 badge animates through a short rolling anticipation window, then shows the resolved roll role and remaining buff arc so cooldown-refresh windows are readable during boss-package drills. Rolls use a fair six-face bag before refilling, keeping the class varied without letting jackpot streaks dominate balance reads.
-Package HUDs include a MICRO row that scores clean hazard dodges, rescue saves, streaks, and avoidable hits while the fight is happening.
+Package HUDs include a MICRO row that scores clean hazard dodges, rescue saves, streaks, and avoidable hits while the fight is happening. Near-miss lane reads now throw immediate THREAD bursts, and clean dodge streaks add small MICRO xN bursts so package footwork feels like active execution rather than delayed accounting.
 Rescue HUDs include TAUNT uptime, and balance rows expose pull/taunt total frames plus uptime rate so rescue-package clears can be separated from forced-target-control cheese.
 Balance rows also expose clutch/perfect pull counts and timed-pull rates, so a few-frame snap-pull save can be modeled separately from broad taunt uptime.
 Balance rows also expose perfect-save counts/rates to distinguish ordinary clutch blocks from the last-few-frame saves that make rescue packages feel sharp.

@@ -127,7 +127,8 @@ Balance simulations:
     Orb, sweep, summon, and AOE package rows likewise expose active/warning counts and
     remaining frames so timeline samples can be matched against the in-game HUD.
     Package runs also emit package_micro_score, package_micro_best_streak,
-    package_micro_dodges, and package_micro_hits so clean execution can be
+    package_micro_dodges, package_micro_thread_cues,
+    package_micro_streak_bursts, and package_micro_hits so clean execution can be
     separated from clears that brute-force avoidable mechanics. Package reports
     summarize those micro rows and warn when a class clears while averaging
     negative micro score. The package_micro_dodges field tracks targeted or
