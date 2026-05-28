@@ -109,9 +109,10 @@ Balance simulations:
     be separated from actual body-block micro. Package rows also derive rescue
     opportunities plus save, clutch, perfect, early, timing-score, pull,
     timed-pull, perfect-pull, clutch/perfect/timed-pull margin, late/perfect
-    cover, uncovered danger-window, and counter-opening rates
-    so rescue packages can be compared without hand-calculating rates from raw
-    counts. Package rows also expose threaded dodge openings plus opening
+    cover, uncovered danger-window, near-line commit rate/distance, and
+    counter-opening rates so rescue packages can be compared without
+    hand-calculating rates from raw counts. Package rows also expose threaded
+    dodge openings plus opening
     damage/stagger totals so clean footwork can be separated from brute-force
     clears. Package rows expose primary target HP, current package aggro
     target, primary aggro player/ally/other/none rates, inferred-target rate,

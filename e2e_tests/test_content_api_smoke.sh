@@ -80,6 +80,10 @@ grep -q "avg_package_rescue_avg_clutch_margin" runtime/engine/StartBalanceRun.lu
 grep -q "avg_package_rescue_avg_timed_pull_margin" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_window_cues" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_late_cover_rate" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_rescue_late_commit_rate" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_rescue_perfect_commit_rate" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_rescue_avg_commit_distance" runtime/engine/StartBalanceRun.lua
+grep -q "rescue-commit" runtime/engine/ContentApi.lua
 grep -q "CUT PERFECT" runtime/objects/ContentLabHazards.lua
 grep -q "avg_package_rescue_counter_windows" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_fatal_misses" runtime/engine/StartBalanceRun.lua

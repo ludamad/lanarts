@@ -1248,7 +1248,9 @@ local active_orbs
 local active_pulses
 local active_sweeps
 local active_rescue_strikes
+local active_rescue_commit_state
 local rescue_intercept_hint
+local rescue_commit_hint
 local rescue_window_state
 local rescue_danger_cover_fields
 local next_threat_state
@@ -1589,6 +1591,17 @@ local function draw_package_hud(director)
                 read_value = state.perfect and "hold perfect" or state.late and "hold clutch" or "hold line"
                 read_color = state.perfect and COL_WHITE or COL_PALE_GREEN
                 read_pct = 1
+            elseif state.commit_distance then
+                local cut_text = tostring(state.commit_distance) .. "px"
+                read_value = state.perfect and ("perfect cut " .. cut_text)
+                    or state.late and ("cut now " .. cut_text)
+                    or ("cut " .. cut_text)
+                read_color = state.perfect and COL_WHITE
+                    or state.commit_ready and COL_PALE_GREEN
+                    or state.late and COL_PALE_YELLOW
+                    or COL_LIGHT_GRAY
+                local scale = state.late and 42 or 84
+                read_pct = 1 - math.min(scale, state.commit_distance) / math.max(1, scale)
             elseif state.perfect then
                 read_value = "perfect now"
                 read_color = COL_WHITE
@@ -1809,9 +1822,16 @@ local function package_result(director, outcome)
         rescue_late_window_frames = rescue_danger.rescue_late_window_frames,
         rescue_late_uncovered_frames = rescue_danger.rescue_late_uncovered_frames,
         rescue_late_cover_rate = rescue_danger.rescue_late_cover_rate,
+        rescue_late_commit_frames = rescue_danger.rescue_late_commit_frames,
+        rescue_late_commit_rate = rescue_danger.rescue_late_commit_rate,
         rescue_perfect_window_frames = rescue_danger.rescue_perfect_window_frames,
         rescue_perfect_uncovered_frames = rescue_danger.rescue_perfect_uncovered_frames,
         rescue_perfect_cover_rate = rescue_danger.rescue_perfect_cover_rate,
+        rescue_perfect_commit_frames = rescue_danger.rescue_perfect_commit_frames,
+        rescue_perfect_commit_rate = rescue_danger.rescue_perfect_commit_rate,
+        rescue_avg_commit_distance = rescue_danger.rescue_avg_commit_distance,
+        rescue_best_commit_distance = rescue_danger.rescue_best_commit_distance,
+        rescue_last_commit_distance = rescue_danger.rescue_last_commit_distance,
         rescue_perfect_window = director.rescue_perfect_window,
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
         rescue_margin_total = director.rescue_margin_total or 0,
@@ -1980,9 +2000,16 @@ local function package_state_from_director(director)
         rescue_late_window_frames = rescue_danger.rescue_late_window_frames,
         rescue_late_uncovered_frames = rescue_danger.rescue_late_uncovered_frames,
         rescue_late_cover_rate = rescue_danger.rescue_late_cover_rate,
+        rescue_late_commit_frames = rescue_danger.rescue_late_commit_frames,
+        rescue_late_commit_rate = rescue_danger.rescue_late_commit_rate,
         rescue_perfect_window_frames = rescue_danger.rescue_perfect_window_frames,
         rescue_perfect_uncovered_frames = rescue_danger.rescue_perfect_uncovered_frames,
         rescue_perfect_cover_rate = rescue_danger.rescue_perfect_cover_rate,
+        rescue_perfect_commit_frames = rescue_danger.rescue_perfect_commit_frames,
+        rescue_perfect_commit_rate = rescue_danger.rescue_perfect_commit_rate,
+        rescue_avg_commit_distance = rescue_danger.rescue_avg_commit_distance,
+        rescue_best_commit_distance = rescue_danger.rescue_best_commit_distance,
+        rescue_last_commit_distance = rescue_danger.rescue_last_commit_distance,
         rescue_perfect_window = director.rescue_perfect_window,
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
         rescue_margin_total = director.rescue_margin_total or 0,
@@ -2028,6 +2055,8 @@ local function package_state_from_director(director)
         rescue_active_blocked = rescue_state and rescue_state.blocked or false,
         rescue_active_late = rescue_state and rescue_state.late or false,
         rescue_active_perfect = rescue_state and rescue_state.perfect or false,
+        rescue_active_commit_distance = rescue_state and rescue_state.commit_distance or nil,
+        rescue_active_commit_ready = rescue_state and rescue_state.commit_ready or false,
         rescue_pull_active_frames = director.rescue_pull_active_frames or 0,
         rescue_pull_target = director.rescue_pull_target,
         pressure_active_count = pressure.active_count or 0,
@@ -2231,12 +2260,35 @@ local function record_rescue_danger_frame(strike, remaining, blocked)
         return
     end
     remaining = tonumber(remaining) or 0
+    local commit = (not blocked and rescue_commit_hint) and rescue_commit_hint(strike) or nil
+    local committed = commit and commit.in_commit_zone
+    local commit_distance = commit and commit.distance_to_block
+    local commit_distance_recorded = false
+    local function record_commit_frame(perfect)
+        if not committed then
+            return
+        end
+        if perfect then
+            director.rescue_perfect_commit_frames = (director.rescue_perfect_commit_frames or 0) + 1
+        else
+            director.rescue_late_commit_frames = (director.rescue_late_commit_frames or 0) + 1
+        end
+        if commit_distance and not commit_distance_recorded then
+            commit_distance_recorded = true
+            local rounded = math.floor(commit_distance + 0.5)
+            director.rescue_last_commit_distance = rounded
+            director.rescue_best_commit_distance = math.min(director.rescue_best_commit_distance or rounded, rounded)
+            director.rescue_commit_distance_total = (director.rescue_commit_distance_total or 0) + commit_distance
+            director.rescue_commit_distance_samples = (director.rescue_commit_distance_samples or 0) + 1
+        end
+    end
     if remaining <= (strike.late_window or 0) then
         director.rescue_late_window_frames = (director.rescue_late_window_frames or 0) + 1
         if blocked then
             director.rescue_blocked_late_frames = (director.rescue_blocked_late_frames or 0) + 1
         else
             director.rescue_late_uncovered_frames = (director.rescue_late_uncovered_frames or 0) + 1
+            record_commit_frame(false)
         end
     end
     if remaining <= (strike.perfect_window or 0) then
@@ -2245,6 +2297,7 @@ local function record_rescue_danger_frame(strike, remaining, blocked)
             director.rescue_blocked_perfect_frames = (director.rescue_blocked_perfect_frames or 0) + 1
         else
             director.rescue_perfect_uncovered_frames = (director.rescue_perfect_uncovered_frames or 0) + 1
+            record_commit_frame(true)
         end
     end
 end
@@ -2254,6 +2307,9 @@ rescue_danger_cover_fields = function(director)
     local perfect_frames = director.rescue_perfect_window_frames or 0
     local late_uncovered = director.rescue_late_uncovered_frames or 0
     local perfect_uncovered = director.rescue_perfect_uncovered_frames or 0
+    local late_commit = director.rescue_late_commit_frames or 0
+    local perfect_commit = director.rescue_perfect_commit_frames or 0
+    local commit_samples = director.rescue_commit_distance_samples or 0
     return {
         rescue_late_window_frames = late_frames,
         rescue_perfect_window_frames = perfect_frames,
@@ -2261,6 +2317,13 @@ rescue_danger_cover_fields = function(director)
         rescue_perfect_uncovered_frames = perfect_uncovered,
         rescue_late_cover_rate = safe_rate(late_frames - late_uncovered, late_frames),
         rescue_perfect_cover_rate = safe_rate(perfect_frames - perfect_uncovered, perfect_frames),
+        rescue_late_commit_frames = late_commit,
+        rescue_late_commit_rate = safe_rate(late_commit, late_uncovered),
+        rescue_perfect_commit_frames = perfect_commit,
+        rescue_perfect_commit_rate = safe_rate(perfect_commit, perfect_uncovered),
+        rescue_avg_commit_distance = safe_rate(director.rescue_commit_distance_total or 0, commit_samples),
+        rescue_best_commit_distance = director.rescue_best_commit_distance,
+        rescue_last_commit_distance = director.rescue_last_commit_distance,
     }
 end
 
@@ -2801,6 +2864,26 @@ rescue_intercept_hint = function(strike)
     return best_xy, best_player, best_dist
 end
 
+rescue_commit_hint = function(strike)
+    local hint_xy, hint_player, hint_dist = rescue_intercept_hint(strike)
+    if not hint_xy or not hint_player then
+        return nil
+    end
+    local block_radius = (strike.block_radius or 30) + (hint_player.target_radius or hint_player.radius or 12)
+    local distance = math.sqrt(math.max(0, hint_dist or 0))
+    local commit_radius = block_radius + (strike.commit_slop or 42)
+    return {
+        xy = hint_xy,
+        player = hint_player,
+        distance = distance,
+        distance_to_block = math.max(0, distance - block_radius),
+        block_radius = block_radius,
+        commit_radius = commit_radius,
+        in_block_zone = distance <= block_radius,
+        in_commit_zone = distance <= commit_radius,
+    }
+end
+
 local function rescue_pull_color(was_perfect, was_clutch)
     if was_perfect then
         return COL_WHITE
@@ -3143,19 +3226,25 @@ function M.create_rescue_strike(args)
             if not self.resolved then
                 local threat_xy = segment_point_at(from_xy, to_xy, math.min(1, self.elapsed / math.max(1, self.windup)))
                 draw_world_circle(perfect_call and COL_WHITE or last_call and COL_PALE_YELLOW or COL_WHITE, threat_xy, perfect_call and 9 or last_call and 7 or 5, 0.10, perfect_call and 0.94 or last_call and 0.82 or 0.58)
-                local hint_xy, hint_player, hint_dist = rescue_intercept_hint(self)
-                if hint_xy and hint_player then
+                local commit = rescue_commit_hint(self)
+                if commit and commit.xy and commit.player then
+                    local hint_xy = commit.xy
                     local block_radius = self.block_radius or 30
-                    local player_radius = hint_player.target_radius or hint_player.radius or 12
-                    local in_block_zone = hint_dist <= sqr(block_radius + player_radius)
+                    local in_block_zone = commit.in_block_zone
+                    local in_commit_zone = commit.in_commit_zone
                     local hint_color = perfect_call and COL_WHITE
                         or in_block_zone and COL_PALE_GREEN
+                        or in_commit_zone and COL_PALE_YELLOW
                         or (last_call and COL_PALE_YELLOW or COL_LIGHT_GRAY)
                     draw_world_circle(hint_color, hint_xy, block_radius, in_block_zone and 0.05 or 0.02, in_block_zone and 0.72 or 0.42)
+                    if not in_block_zone and in_commit_zone then
+                        draw_world_circle(COL_PALE_YELLOW, hint_xy, block_radius + 12, 0.01, 0.32)
+                    end
                     local hint_label_xy = Display.to_screen_xy({hint_xy[1], hint_xy[2] - block_radius - 10})
+                    local distance_text = in_block_zone and "" or (" " .. tostring(math.floor((commit.distance_to_block or 0) + 0.5)) .. "px")
                     local hint_label = in_block_zone
                         and (perfect_call and "PERFECT HOLD" or last_call and "CLUTCH HOLD" or "HOLD")
-                        or (perfect_call and "PERFECT NOW" or last_call and "BLOCK NOW" or "INTERCEPT")
+                        or (perfect_call and ("PERFECT CUT" .. distance_text) or last_call and ("CUT NOW" .. distance_text) or ("INTERCEPT" .. distance_text))
                     draw_text(hint_color, Display.CENTER, hint_label_xy, hint_label)
                 end
             end
@@ -3439,10 +3528,34 @@ function active_rescue_strikes()
     return count, blocked, best_remaining, late, perfect
 end
 
+function active_rescue_commit_state()
+    local best
+    local best_score
+    for _, obj in ipairs(Map.objects_list()) do
+        if obj and not obj.destroyed and obj.content_lab_rescue_strike and not obj.resolved then
+            local commit = rescue_commit_hint and rescue_commit_hint(obj)
+            if commit then
+                local remaining = math.max(0, obj.windup - obj.elapsed)
+                local score = remaining * 1000 + (commit.distance_to_block or 999)
+                if not best_score or score < best_score then
+                    best_score = score
+                    best = commit
+                    best.remaining = remaining
+                    best.late = remaining <= (obj.late_window or 0)
+                    best.perfect = remaining <= (obj.perfect_window or 0)
+                    best.blocked = obj.current_blocker ~= nil
+                end
+            end
+        end
+    end
+    return best
+end
+
 function rescue_window_state(director, rescue)
     local intensity = director and director.intensity or normalize_intensity(nil)
     local interval, offset = scaled_interval_and_offset(rescue or {}, 205, 54, intensity)
     local active_count, blocked, remaining, late, perfect = active_rescue_strikes()
+    local commit = active_rescue_commit_state()
     local windup = scale_frames((rescue or {}).windup, 68, intensity)
     local late_window = scale_frames((rescue or {}).late_window, 22, intensity)
     local perfect_window = scale_frames((rescue or {}).perfect_window, 6, intensity)
@@ -3458,6 +3571,10 @@ function rescue_window_state(director, rescue)
         remaining = remaining,
         late = late,
         perfect = perfect,
+        commit_distance = commit and math.floor((commit.distance_to_block or 0) + 0.5) or nil,
+        commit_ready = commit and commit.in_commit_zone or false,
+        commit_player = commit and commit.player and commit.player.name or nil,
+        commit_remaining = commit and commit.remaining or nil,
     }
 end
 

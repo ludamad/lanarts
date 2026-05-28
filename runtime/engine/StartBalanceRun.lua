@@ -694,9 +694,16 @@ local function package_state_fields(player)
             package_rescue_late_window_frames = "",
             package_rescue_late_uncovered_frames = "",
             package_rescue_late_cover_rate = "",
+            package_rescue_late_commit_frames = "",
+            package_rescue_late_commit_rate = "",
             package_rescue_perfect_window_frames = "",
             package_rescue_perfect_uncovered_frames = "",
             package_rescue_perfect_cover_rate = "",
+            package_rescue_perfect_commit_frames = "",
+            package_rescue_perfect_commit_rate = "",
+            package_rescue_avg_commit_distance = "",
+            package_rescue_best_commit_distance = "",
+            package_rescue_last_commit_distance = "",
             package_rescue_perfect_window = "",
             package_rescue_best_perfect_margin = "",
             package_rescue_margin_total = "",
@@ -742,6 +749,8 @@ local function package_state_fields(player)
             package_rescue_active_blocked = "",
             package_rescue_active_late = "",
             package_rescue_active_perfect = "",
+            package_rescue_active_commit_distance = "",
+            package_rescue_active_commit_ready = "",
             package_rescue_pull_active_frames = "",
             package_rescue_pull_target = "",
         }
@@ -839,9 +848,16 @@ local function package_state_fields(player)
         package_rescue_late_window_frames = state.rescue_late_window_frames or 0,
         package_rescue_late_uncovered_frames = state.rescue_late_uncovered_frames or 0,
         package_rescue_late_cover_rate = format_rate(state.rescue_late_cover_rate or 0),
+        package_rescue_late_commit_frames = state.rescue_late_commit_frames or 0,
+        package_rescue_late_commit_rate = format_rate(state.rescue_late_commit_rate or 0),
         package_rescue_perfect_window_frames = state.rescue_perfect_window_frames or 0,
         package_rescue_perfect_uncovered_frames = state.rescue_perfect_uncovered_frames or 0,
         package_rescue_perfect_cover_rate = format_rate(state.rescue_perfect_cover_rate or 0),
+        package_rescue_perfect_commit_frames = state.rescue_perfect_commit_frames or 0,
+        package_rescue_perfect_commit_rate = format_rate(state.rescue_perfect_commit_rate or 0),
+        package_rescue_avg_commit_distance = format_rate(state.rescue_avg_commit_distance or 0),
+        package_rescue_best_commit_distance = state.rescue_best_commit_distance or "",
+        package_rescue_last_commit_distance = state.rescue_last_commit_distance or "",
         package_rescue_perfect_window = state.rescue_perfect_window or "",
         package_rescue_best_perfect_margin = state.rescue_best_perfect_margin or "",
         package_rescue_margin_total = format_rate(state.rescue_margin_total or 0),
@@ -887,6 +903,8 @@ local function package_state_fields(player)
         package_rescue_active_blocked = state.rescue_active_blocked and "true" or "false",
         package_rescue_active_late = state.rescue_active_late and "true" or "false",
         package_rescue_active_perfect = state.rescue_active_perfect and "true" or "false",
+        package_rescue_active_commit_distance = state.rescue_active_commit_distance or "",
+        package_rescue_active_commit_ready = state.rescue_active_commit_ready and "true" or "false",
         package_rescue_pull_active_frames = state.rescue_pull_active_frames or 0,
         package_rescue_pull_target = state.rescue_pull_target or "",
     }
@@ -1318,8 +1336,12 @@ local SUMMARY_METRICS = {
     "package_rescue_perfect_rate", "package_rescue_early_saves", "package_rescue_early_rate",
     "package_rescue_timing_score", "package_rescue_window_cues", "package_rescue_perfect_window_cues",
     "package_rescue_late_window_frames", "package_rescue_late_uncovered_frames",
-    "package_rescue_late_cover_rate", "package_rescue_perfect_window_frames",
+    "package_rescue_late_cover_rate", "package_rescue_late_commit_frames",
+    "package_rescue_late_commit_rate", "package_rescue_perfect_window_frames",
     "package_rescue_perfect_uncovered_frames", "package_rescue_perfect_cover_rate",
+    "package_rescue_perfect_commit_frames", "package_rescue_perfect_commit_rate",
+    "package_rescue_avg_commit_distance", "package_rescue_best_commit_distance",
+    "package_rescue_last_commit_distance",
     "package_rescue_margin_total", "package_rescue_clutch_margin_total",
     "package_rescue_perfect_margin_total", "package_rescue_avg_clutch_margin",
     "package_rescue_avg_perfect_margin",
@@ -2302,9 +2324,15 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local late_window_frames = tonumber(row.avg_package_rescue_late_window_frames) or 0
     local late_uncovered_frames = tonumber(row.avg_package_rescue_late_uncovered_frames) or 0
     local late_cover_rate = tonumber(row.avg_package_rescue_late_cover_rate) or 0
+    local late_commit_frames = tonumber(row.avg_package_rescue_late_commit_frames) or 0
+    local late_commit_rate = tonumber(row.avg_package_rescue_late_commit_rate) or 0
     local perfect_window_frames = tonumber(row.avg_package_rescue_perfect_window_frames) or 0
     local perfect_uncovered_frames = tonumber(row.avg_package_rescue_perfect_uncovered_frames) or 0
     local perfect_cover_rate = tonumber(row.avg_package_rescue_perfect_cover_rate) or 0
+    local perfect_commit_frames = tonumber(row.avg_package_rescue_perfect_commit_frames) or 0
+    local perfect_commit_rate = tonumber(row.avg_package_rescue_perfect_commit_rate) or 0
+    local avg_commit_distance = tonumber(row.avg_package_rescue_avg_commit_distance) or 0
+    local best_commit_distance = tonumber(row.avg_package_rescue_best_commit_distance) or 0
     local avg_clutch_margin = tonumber(row.avg_package_rescue_avg_clutch_margin) or 0
     local avg_perfect_margin = tonumber(row.avg_package_rescue_avg_perfect_margin) or 0
     local avg_timed_pull_margin = tonumber(row.avg_package_rescue_avg_timed_pull_margin) or 0
@@ -2374,15 +2402,21 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         late_window_frames,
         0,
         string.format(
-            "%s rescue danger clock in %s averaged %.1f late-window frames/run (%.1f uncovered, %.1f%% covered) and %.1f perfect-window frames/run (%.1f uncovered, %.1f%% covered).",
+            "%s rescue danger clock in %s averaged %.1f late-window frames/run (%.1f uncovered, %.1f%% covered, %.1f commit, %.1f%% commit rate) and %.1f perfect-window frames/run (%.1f uncovered, %.1f%% covered, %.1f commit, %.1f%% commit rate); commit distance averaged %.1fpx, best %.1fpx.",
             class_name,
             encounter,
             late_window_frames,
             late_uncovered_frames,
             late_cover_rate * 100,
+            late_commit_frames,
+            late_commit_rate * 100,
             perfect_window_frames,
             perfect_uncovered_frames,
-            perfect_cover_rate * 100
+            perfect_cover_rate * 100,
+            perfect_commit_frames,
+            perfect_commit_rate * 100,
+            avg_commit_distance,
+            best_commit_distance
         )
     )
 
@@ -3396,8 +3430,12 @@ local function run_balance(raw_args)
             "package_rescue_timing_score",
             "package_rescue_window_cues", "package_rescue_perfect_window_cues",
             "package_rescue_late_window_frames", "package_rescue_late_uncovered_frames",
-            "package_rescue_late_cover_rate", "package_rescue_perfect_window_frames",
+            "package_rescue_late_cover_rate", "package_rescue_late_commit_frames",
+            "package_rescue_late_commit_rate", "package_rescue_perfect_window_frames",
             "package_rescue_perfect_uncovered_frames", "package_rescue_perfect_cover_rate",
+            "package_rescue_perfect_commit_frames", "package_rescue_perfect_commit_rate",
+            "package_rescue_avg_commit_distance", "package_rescue_best_commit_distance",
+            "package_rescue_last_commit_distance",
             "package_rescue_perfect_window", "package_rescue_best_perfect_margin",
             "package_rescue_margin_total", "package_rescue_clutch_margin_total",
             "package_rescue_perfect_margin_total", "package_rescue_avg_clutch_margin",
@@ -3421,6 +3459,7 @@ local function run_balance(raw_args)
             "package_rescue_last_margin", "package_rescue_last_pull_frames", "package_rescue_last_pull_margin",
             "package_rescue_next_frames", "package_rescue_active_count", "package_rescue_active_remaining",
             "package_rescue_active_blocked", "package_rescue_active_late", "package_rescue_active_perfect",
+            "package_rescue_active_commit_distance", "package_rescue_active_commit_ready",
             "package_rescue_pull_active_frames", "package_rescue_pull_target",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "dice_rolls_total", "dice_last_roll", "dice_next_roll_frames",
@@ -3505,8 +3544,12 @@ local function run_balance(raw_args)
             "package_rescue_timing_score",
             "package_rescue_window_cues", "package_rescue_perfect_window_cues",
             "package_rescue_late_window_frames", "package_rescue_late_uncovered_frames",
-            "package_rescue_late_cover_rate", "package_rescue_perfect_window_frames",
+            "package_rescue_late_cover_rate", "package_rescue_late_commit_frames",
+            "package_rescue_late_commit_rate", "package_rescue_perfect_window_frames",
             "package_rescue_perfect_uncovered_frames", "package_rescue_perfect_cover_rate",
+            "package_rescue_perfect_commit_frames", "package_rescue_perfect_commit_rate",
+            "package_rescue_avg_commit_distance", "package_rescue_best_commit_distance",
+            "package_rescue_last_commit_distance",
             "package_rescue_perfect_window", "package_rescue_best_perfect_margin",
             "package_rescue_margin_total", "package_rescue_clutch_margin_total",
             "package_rescue_perfect_margin_total", "package_rescue_avg_clutch_margin",
@@ -3530,6 +3573,7 @@ local function run_balance(raw_args)
             "package_rescue_last_margin", "package_rescue_last_pull_frames", "package_rescue_last_pull_margin",
             "package_rescue_next_frames", "package_rescue_active_count", "package_rescue_active_remaining",
             "package_rescue_active_blocked", "package_rescue_active_late", "package_rescue_active_perfect",
+            "package_rescue_active_commit_distance", "package_rescue_active_commit_ready",
             "package_rescue_pull_active_frames", "package_rescue_pull_target",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "dice_rolls_total", "dice_last_roll", "dice_next_roll_frames",
@@ -3629,8 +3673,12 @@ local function run_balance(raw_args)
             "avg_package_rescue_timing_score",
             "avg_package_rescue_window_cues", "avg_package_rescue_perfect_window_cues",
             "avg_package_rescue_late_window_frames", "avg_package_rescue_late_uncovered_frames",
-            "avg_package_rescue_late_cover_rate", "avg_package_rescue_perfect_window_frames",
+            "avg_package_rescue_late_cover_rate", "avg_package_rescue_late_commit_frames",
+            "avg_package_rescue_late_commit_rate", "avg_package_rescue_perfect_window_frames",
             "avg_package_rescue_perfect_uncovered_frames", "avg_package_rescue_perfect_cover_rate",
+            "avg_package_rescue_perfect_commit_frames", "avg_package_rescue_perfect_commit_rate",
+            "avg_package_rescue_avg_commit_distance", "avg_package_rescue_best_commit_distance",
+            "avg_package_rescue_last_commit_distance",
             "avg_package_rescue_margin_total", "avg_package_rescue_clutch_margin_total",
             "avg_package_rescue_perfect_margin_total", "avg_package_rescue_avg_clutch_margin",
             "avg_package_rescue_avg_perfect_margin",

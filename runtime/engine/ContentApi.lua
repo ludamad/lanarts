@@ -2896,9 +2896,12 @@ telemetry_watch_for = function(config, package_summary)
             append_metric(rows, "avg_package_rescue_late_window_frames", "Late frames", "active clutch-window pressure frames")
             append_metric(rows, "avg_package_rescue_late_uncovered_frames", "Late open", "clutch-window frames with no body block")
             append_metric(rows, "avg_package_rescue_late_cover_rate", "Late cover", "share of clutch-window frames covered")
+            append_metric(rows, "avg_package_rescue_late_commit_rate", "Late commit", "uncovered clutch-window frames with a player near the cut line")
             append_metric(rows, "avg_package_rescue_perfect_window_frames", "Perfect frames", "active few-frame pressure frames")
             append_metric(rows, "avg_package_rescue_perfect_uncovered_frames", "Perfect open", "perfect-window frames with no body block")
             append_metric(rows, "avg_package_rescue_perfect_cover_rate", "Perfect cover", "share of perfect-window frames covered")
+            append_metric(rows, "avg_package_rescue_perfect_commit_rate", "Perfect commit", "uncovered perfect-window frames with a near-line save attempt")
+            append_metric(rows, "avg_package_rescue_avg_commit_distance", "Commit px", "average pixels from the body-block radius during near-line attempts")
             append_metric(rows, "avg_package_rescue_avg_clutch_margin", "Clutch margin", "average frames from block start to strike inside clutch saves")
             append_metric(rows, "avg_package_rescue_avg_perfect_margin", "Perfect margin", "average frames from block start to strike inside perfect saves")
             append_metric(rows, "avg_package_rescue_pull_rate", "Pull rate", "taunt/body-block interaction")
@@ -3188,6 +3191,15 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
             threshold = list_has(drill.tags, "perfect") and 0.35 or 0.20,
             target = list_has(drill.tags, "perfect") and ">=0.35 timing score" or ">=0.20 timing score",
             reason = "Clutch and perfect saves should appear often enough to prove few-frame micro.",
+        })
+        add({
+            id = "rescue-commit",
+            label = "Near-line commits",
+            metric = "avg_package_rescue_late_commit_rate",
+            comparator = ">=",
+            threshold = 0.20,
+            target = ">=20% uncovered late frames committed",
+            reason = "Missed rescues should still show whether the player was cutting into the line rather than ignoring the read.",
         })
         add({
             id = "taunt-cheese",
