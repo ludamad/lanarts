@@ -37,6 +37,8 @@ Content lab APIs:
 Balance simulations:
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --classes Fighter,Necromancer,Pyrocaster,Stormcaller
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --levels 1,3
+    ./e2e_tests/run_content_lab_native.sh --class Dicebinder --encounter gragh-duel
+    ./e2e_tests/run_content_lab_native.sh --draw --class Rogue --encounter executioner-rescue-package --package_components escort,orbit,pulse,sweep,rescue
     ./e2e_tests/test_content_lab_native_fast.sh
     ./e2e_tests/test_content_package_balance_smoke.sh
 
@@ -144,6 +146,11 @@ Balance simulations:
     LANARTS_SKIP_BUILD=1 to reuse existing binaries, or LANARTS_DRAW_SMOKE=1
     to also exercise the normal native draw path for procedural FX without
     entering the slower Emscripten loop.
+    For ad hoc tuning, use ./e2e_tests/run_content_lab_native.sh with the same
+    class, encounter, package component, bot profile, seed, and draw options
+    surfaced by the web lab. It writes persistent CSV/JSON outputs under the
+    ignored saves/content_lab_native directory and can reuse existing binaries
+    with LANARTS_SKIP_BUILD=1 or --no-build.
 
 Monster simulations:
     ./run.sh --headless engine.StartMonsterEvals --steps 1000 --runs 3 --level 1 --monster GiantRat,Hound,CloudElemental

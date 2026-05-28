@@ -8,6 +8,15 @@ The Emscripten build uses `web/content_lab/shell.html` as its shell. Build it wi
 
 Then serve `build/src/lanarts.html` with a local static server from the repository root or build directory. The page exposes class, level, loadout, map generator, bot skill, and seed as URL parameters, then launches the same Lua entry point used by desktop play.
 
+For fast boss/package iteration, use the native runner before rebuilding Emscripten:
+
+```sh
+LANARTS_SKIP_BUILD=1 ./e2e_tests/run_content_lab_native.sh --class Dicebinder --encounter gragh-duel
+LANARTS_SKIP_BUILD=1 ./e2e_tests/run_content_lab_native.sh --draw --class Rogue --encounter executioner-rescue-package --package_components escort,orbit,pulse,sweep,rescue
+```
+
+The runner accepts the same class, level, loadout, bot profile, encounter, package intensity, package component, seed, and draw options surfaced by the web lab. It mutes audio and writes persistent CSV/JSON outputs under `saves/content_lab_native/`.
+
 The shell reads its runtime data from the exported content APIs:
 
 - `lanarts_content_catalog_json()` returns classes, class control metadata, bot skill profiles, level labels, loadout presets, build archetypes, micro drills, map generators, map algorithms, encounters, and saved resource presets.
