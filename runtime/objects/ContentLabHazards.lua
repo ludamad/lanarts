@@ -202,11 +202,7 @@ local function damage_player(hazard, player)
     if source and source.destroyed then
         source = nil
     end
-    if source then
-        player:damage(hazard.damage, hazard.power, hazard.magic_percentage, source)
-    else
-        player:damage(hazard.damage, hazard.power, hazard.magic_percentage)
-    end
+    player:damage(hazard.damage, hazard.power, hazard.magic_percentage, source or player)
 end
 
 local function force_chase(source, target, frames)

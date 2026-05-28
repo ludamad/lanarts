@@ -574,12 +574,13 @@ DataW.effect_create {
                 new.defence += 2
                 @active_bonuses[k] -= 1
     on_receive_damage_func: (attacker, defender, damage) =>
-        if not @active_bonuses[attacker.id]
+        attacker_key = if attacker and attacker.id then attacker.id else "environment"
+        if not @active_bonuses[attacker_key]
             for _ in screens()
                 EventLog.add("Your defence rises due to getting hit!", COL_PALE_BLUE)
-            @active_bonuses[attacker.id] = @duration
-        elseif @active_bonuses[attacker.id] < @duration
-            @active_bonuses[attacker.id] = @duration
+            @active_bonuses[attacker_key] = @duration
+        elseif @active_bonuses[attacker_key] < @duration
+            @active_bonuses[attacker_key] = @duration
         return damage
 
 }

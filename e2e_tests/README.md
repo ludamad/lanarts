@@ -92,7 +92,9 @@ Balance simulations:
     packaged arenas used by the web shell, for example
     --encounter gragh-rescue-package --package_intensity high. Packaged runs
     include solo 1v1 full-package cases such as mana-sapper-ritual-package,
-    where a support enemy is tested with orbit, AOE, sweep, and add rhythms.
+    where a support enemy is tested with orbit, AOE, sweep, and add rhythms,
+    plus hell-warrior-flame-package for fast red contact pressure with capped
+    extra Imp portals and readable flame lanes.
     emit package_outcome, escort HP, rescue saves, clutch/perfect saves, pull
     redirects, and misses in run and sample rows; ally-down package failures end the run
     as ally_down. Automated players also emit rescue_intercept_frames,

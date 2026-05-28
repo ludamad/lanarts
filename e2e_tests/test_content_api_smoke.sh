@@ -31,6 +31,9 @@ grep -q "avg_package_rescue_fatal_misses" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timed_pull_rate" runtime/engine/StartBalanceRun.lua
 grep -q "mana-sapper-ritual-package" runtime/engine/ContentCatalog.lua
 grep -q "mana-sapper-ritual-package" web/content_lab/shell.html
+grep -q "hell-warrior-flame-package" runtime/engine/ContentCatalog.lua
+grep -q "hell-warrior-flame-package" web/content_lab/shell.html
+grep -q "source or player" runtime/objects/ContentLabHazards.lua
 grep -q "MICRO" runtime/objects/ContentLabHazards.lua
 grep -q "BEAT" runtime/objects/ContentLabHazards.lua
 grep -q "FURY" runtime/objects/ContentLabHazards.lua

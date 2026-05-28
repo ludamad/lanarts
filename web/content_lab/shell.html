@@ -1009,6 +1009,7 @@
             <option value="executioner-blade-package">Executioner blade package</option>
             <option value="executioner-rescue-package">Executioner rescue package</option>
             <option value="hell-pressure-pair">Hell pressure pair</option>
+            <option value="hell-warrior-flame-package">Hell Warrior flame package</option>
             <option value="mana-sapper-ritual-package">Mana Sapper ritual package</option>
             <option value="centaur-volley-package">Centaur Hunter volley package</option>
             <option value="crypt-keeper-aura-package">Crypt Keeper aura package</option>
@@ -1184,6 +1185,7 @@
         {id: 'executioner-blade-package', label: 'Executioner blade package', kind: 'melee package', phase: 'late melee micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['melee pursuit', 'rotating blades', 'crossing sweeps', 'Hound adds', 'short AOE windows']},
         {id: 'executioner-rescue-package', label: 'Executioner rescue package', kind: 'rescue package', phase: 'late multiplayer', suggestedLevel: 5, suggestedPreset: 'late', features: ['protect ally', 'body-block rescue', 'pull/taunt window', 'rotating blades', 'crossing sweeps', 'Hound adds', 'short AOE windows']},
         {id: 'hell-pressure-pair', label: 'Hell pressure pair', kind: 'enemy mix package', phase: 'late enemy mix', suggestedLevel: 5, suggestedPreset: 'late', features: ['support pressure', 'melee bodyguard', 'ember orbit', 'targeted pulse', 'Imp adds']},
+        {id: 'hell-warrior-flame-package', label: 'Hell Warrior flame package', kind: 'red melee package', phase: 'late melee micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['fast melee pursuit', 'ember rings', 'crossing flame lanes', 'brand pulse rhythm', 'capped Imp portal']},
         {id: 'mana-sapper-ritual-package', label: 'Mana Sapper ritual package', kind: 'black package', phase: 'late black micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['mana-sap aura', 'rotating sigils', 'crossing shadow lanes', 'sap nova rhythm', 'Imp adds']},
         {id: 'centaur-volley-package', label: 'Centaur Hunter volley package', kind: 'ranged package', phase: 'late ranged micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['ranged pursuit', 'rotating arrow lanes', 'volley AOE rhythm', 'Hound adds']},
         {id: 'crypt-keeper-aura-package', label: 'Crypt Keeper aura package', kind: 'boss package', phase: 'late black micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['black aura pressure', 'bone orbit', 'pain nova rhythm', 'Skeleton adds']},
@@ -1395,6 +1397,31 @@
           intensity: 'high',
           monsters: '',
           seed: '22508',
+        },
+        {
+          name: 'Templar Hell Warrior package',
+          meta: 'L5, late loadout, red melee package',
+          className: 'Templar',
+          level: '5',
+          preset: 'late',
+          mapDesc: '',
+          encounter: 'hell-warrior-flame-package',
+          intensity: 'high',
+          monsters: '',
+          seed: '22512',
+        },
+        {
+          name: 'Templar Hell Warrior flame read',
+          meta: 'L5, late loadout, flame lanes only',
+          className: 'Templar',
+          level: '5',
+          preset: 'late',
+          mapDesc: '',
+          encounter: 'hell-warrior-flame-package',
+          intensity: 'high',
+          packageComponents: 'orbit,pulse,sweep',
+          monsters: '',
+          seed: '22516',
         },
         {
           name: 'Rogue Centaur package',
