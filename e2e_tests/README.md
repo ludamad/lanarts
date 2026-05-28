@@ -122,7 +122,9 @@ Balance simulations:
     package_micro_dodges, and package_micro_hits so clean execution can be
     separated from clears that brute-force avoidable mechanics. Package reports
     summarize those micro rows and warn when a class clears while averaging
-    negative micro score.
+    negative micro score. The package_micro_dodges field tracks targeted or
+    near-miss threaded avoids; hazards that expire without threatening a player
+    no longer inflate the count.
     Use --package_components orbit,pulse,sweep,summon,escort,rescue to isolate
     package parts while keeping the same encounter arena, monsters, and
     pressure preset. A rescue component automatically keeps its escort target.

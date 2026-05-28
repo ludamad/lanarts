@@ -264,15 +264,63 @@ local function record_hazard_dodge(hazard)
     if not hazard or hazard.micro_dodge_recorded or hazard.micro_hit_recorded or not hazard.director then
         return
     end
+    if not hazard.micro_dodge_eligible then
+        return
+    end
     hazard.micro_dodge_recorded = true
     add_micro_event(hazard.director, {
         kind = "dodge",
         points = hazard.micro_dodge_points or 6,
-        label = (hazard.micro_label or "LANE") .. " DODGE",
+        label = hazard.micro_dodge_label or ((hazard.micro_label or "LANE") .. " DODGE"),
         color = hazard.micro_color or COL_PALE_BLUE,
-        xy = hazard.xy,
+        xy = hazard.micro_dodge_xy or hazard.xy,
         duration = 48,
     })
+end
+
+local function mark_hazard_dodge_eligible(hazard, xy, label)
+    if not hazard or hazard.micro_hit_recorded or hazard.micro_dodge_recorded or not hazard.director then
+        return
+    end
+    hazard.micro_dodge_eligible = true
+    hazard.micro_dodge_xy = xy and copy_xy(xy) or hazard.xy
+    if label then
+        hazard.micro_dodge_label = label
+    end
+end
+
+local function mark_circle_threat(hazard, xy, radius, margin, include_hit_zone)
+    if not hazard or hazard.micro_hit_recorded then
+        return
+    end
+    local near_margin = margin or hazard.micro_thread_margin or 22
+    for _, player in ipairs(living_player_team_targets(hazard.affects_escorts)) do
+        local player_radius = player.target_radius or player.radius or 12
+        local hit_radius = radius + player_radius
+        local threat_radius = hit_radius + near_margin
+        local d = dist_sqr(xy, xy_of(player))
+        if d <= sqr(threat_radius) and (include_hit_zone or d > sqr(hit_radius)) then
+            mark_hazard_dodge_eligible(hazard, xy_of(player), hazard.micro_thread_label)
+            return
+        end
+    end
+end
+
+local function mark_segment_threat(hazard, from_xy, to_xy, radius, margin, include_hit_zone)
+    if not hazard or hazard.micro_hit_recorded then
+        return
+    end
+    local near_margin = margin or hazard.micro_thread_margin or 22
+    for _, player in ipairs(living_player_team_targets(hazard.affects_escorts)) do
+        local player_radius = player.target_radius or player.radius or 12
+        local hit_radius = radius + player_radius
+        local threat_radius = hit_radius + near_margin
+        local nearest_xy, _, d = nearest_segment_point(xy_of(player), from_xy, to_xy)
+        if d <= sqr(threat_radius) and (include_hit_zone or d > sqr(hit_radius)) then
+            mark_hazard_dodge_eligible(hazard, nearest_xy, hazard.micro_thread_label)
+            return
+        end
+    end
 end
 
 local function damage_overlapping_players(hazard, xy, radius)
@@ -1137,6 +1185,9 @@ function M.create_pulse(args)
         redamage_cooldown = args.redamage_cooldown or 18,
         micro_label = "AOE",
         micro_color = COL_PALE_RED,
+        micro_dodge_eligible = true,
+        micro_dodge_xy = copy_xy(args.xy),
+        micro_dodge_label = "AOE EVADE",
         micro_hit_points = args.micro_hit_points or -10,
         micro_dodge_points = args.micro_dodge_points or 8,
         hit_cooldowns = {},
@@ -1144,6 +1195,7 @@ function M.create_pulse(args)
             self.elapsed = self.elapsed + 1
             if self.elapsed > windup and self.elapsed <= windup + active then
                 damage_overlapping_players(self, self.xy, radius)
+                mark_circle_threat(self, self.xy, radius, self.micro_thread_margin, false)
             elseif self.elapsed > windup + active + linger then
                 record_hazard_dodge(self)
                 GameObject.destroy(self)
@@ -1248,16 +1300,21 @@ function M.create_sweep(args)
         redamage_cooldown = args.redamage_cooldown or 18,
         micro_label = "SWEEP",
         micro_color = COL_PALE_RED,
+        micro_thread_label = "SWEEP THREAD",
         micro_hit_points = args.micro_hit_points or -12,
         micro_dodge_points = args.micro_dodge_points or 10,
+        micro_thread_margin = args.micro_thread_margin or 22,
         hit_cooldowns = {},
         on_step = function(self)
             self.elapsed = self.elapsed + 1
             local center = sweep_center_at(self, self.elapsed)
             self.xy = center
+            local from_xy, to_xy = segment_endpoints(center, self.angle, self.length)
             if self.elapsed > windup and self.elapsed <= windup + active then
-                local from_xy, to_xy = segment_endpoints(center, self.angle, self.length)
                 damage_segment_overlapping_players(self, from_xy, to_xy, self.lane_radius)
+                mark_segment_threat(self, from_xy, to_xy, self.lane_radius, self.micro_thread_margin, false)
+            elseif self.elapsed <= windup then
+                mark_segment_threat(self, from_xy, to_xy, self.lane_radius, self.micro_thread_margin, true)
             elseif self.elapsed > windup + active + linger then
                 record_hazard_dodge(self)
                 GameObject.destroy(self)
@@ -1343,8 +1400,10 @@ function M.create_orb(args)
         redamage_cooldown = args.redamage_cooldown or 20,
         micro_label = "ORB",
         micro_color = COL_PALE_BLUE,
+        micro_thread_label = "ORB THREAD",
         micro_hit_points = args.micro_hit_points or -8,
         micro_dodge_points = args.micro_dodge_points or 4,
+        micro_thread_margin = args.micro_thread_margin or 18,
         hit_cooldowns = {},
         on_step = function(self)
             self.elapsed = self.elapsed + 1
@@ -1359,6 +1418,7 @@ function M.create_orb(args)
                 center[2] + math.sin(self.angle) * self.orbit_radius,
             }
             damage_overlapping_players(self, self.xy, self.hit_radius)
+            mark_circle_threat(self, self.xy, self.hit_radius, self.micro_thread_margin, false)
             if self.elapsed >= self.duration then
                 record_hazard_dodge(self)
                 GameObject.destroy(self)

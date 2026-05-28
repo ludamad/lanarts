@@ -1764,7 +1764,7 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         micro_score,
         0,
         string.format(
-            "%s package execution in %s averaged %.1f micro score, %.1f dodges, %.1f mechanic hits, and %.1f best streak.",
+            "%s package execution in %s averaged %.1f micro score, %.1f threaded avoids, %.1f mechanic hits, and %.1f best streak.",
             class_name,
             encounter,
             micro_score,
