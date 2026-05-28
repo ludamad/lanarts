@@ -34,6 +34,7 @@ grep -q "FURY" runtime/objects/ContentLabHazards.lua
 grep -q "THREAD" runtime/objects/ContentLabHazards.lua
 grep -q "COUNTER" runtime/objects/ContentLabHazards.lua
 grep -q "draw_boss_pressure_aura" runtime/ui/ProceduralEffects.lua
+grep -q "buff_remaining" runtime/ui/ProceduralEffects.lua
 
 run_args=(--headless)
 if [[ "${LANARTS_SKIP_BUILD:-0}" != "0" ]]; then

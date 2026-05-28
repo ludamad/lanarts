@@ -1535,31 +1535,37 @@ local DICE_ROLLS = {
   [1] = {
     kind = "fleet",
     label = "Fleet step",
+    short = "SPD",
     color = COL_PALE_GREEN
   },
   [2] = {
     kind = "guard",
     label = "Guard stance",
+    short = "GRD",
     color = COL_PALE_BLUE
   },
   [3] = {
     kind = "edge",
     label = "Killing edge",
+    short = "DMG",
     color = COL_PALE_RED
   },
   [4] = {
     kind = "focus",
     label = "Flow state",
+    short = "CDR",
     color = COL_PALE_YELLOW
   },
   [5] = {
     kind = "dash",
     label = "Dash ready",
+    short = "DASH",
     color = COL_WHITE
   },
   [6] = {
     kind = "jackpot",
     label = "Power ready",
+    short = "PWR",
     color = COL_PALE_YELLOW
   }
 }
@@ -1700,11 +1706,15 @@ DataW.effect_create({
     end
   end,
   draw_func = function(self, caster)
+    local entry = DICE_ROLLS[self.last_roll or 0]
     return ProceduralEffects.draw_die_badge(caster, {
       roll = self.last_roll or 0,
       remaining = self.next_roll or 0,
       interval = self.roll_interval or DICE_ROLL_INTERVAL,
-      color = self.roll_color or COL_PALE_BLUE
+      color = self.roll_color or COL_PALE_BLUE,
+      label = (entry and entry.short) or "",
+      buff_remaining = self.buff_time or 0,
+      buff_duration = DICE_BUFF_DURATION
     })
   end
 })

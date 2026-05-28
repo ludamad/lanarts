@@ -268,16 +268,28 @@ function M.draw_die_badge(obj, args)
     local remaining = math.max(0, args.remaining or 0)
     local interval = math.max(1, args.interval or 1)
     local pct = remaining / interval
+    local label = args.label or ""
+    local buff_remaining = math.max(0, args.buff_remaining or 0)
+    local buff_duration = math.max(1, args.buff_duration or 1)
+    local buff_pct = clamp(buff_remaining / buff_duration, 0, 1)
     local color = args.color or COL_PALE_BLUE
     local xy = screen_xy({obj.x, obj.y - (obj.radius or 14) - 30})
-    local w = 48
-    local h = 20
+    local w = label ~= "" and 64 or 48
+    local h = label ~= "" and 28 or 20
     local box = {xy[1] - w / 2, xy[2] - h / 2, xy[1] + w / 2, xy[2] + h / 2}
-    Display.draw_radial_gradient({120, 170, 255, 35}, {20, 30, 70, 0}, xy, 34, 5)
+    Display.draw_radial_gradient({120, 170, 255, 35}, {20, 30, 70, 0}, xy, label ~= "" and 39 or 34, 5)
     Display.draw_rectangle(alpha(COL_BLACK, 0.48), box)
     Display.draw_rectangle_outline(alpha(color, 0.78), box, 1)
-    Fonts.small:draw({color = alpha(COL_WHITE, 0.95), origin = Display.CENTER}, {xy[1], xy[2] - 1}, "D6 " .. tostring(roll))
-    Display.draw_arc(alpha(color, 0.88), xy, 31, -math.pi / 2, -math.pi / 2 + TWO_PI * (1 - pct), 2, 18)
+    if label ~= "" then
+        Fonts.small:draw({color = alpha(COL_WHITE, 0.95), origin = Display.CENTER}, {xy[1], xy[2] - 7}, "D6 " .. tostring(roll))
+        Fonts.small:draw({color = alpha(color, 0.95), origin = Display.CENTER}, {xy[1], xy[2] + 7}, label)
+    else
+        Fonts.small:draw({color = alpha(COL_WHITE, 0.95), origin = Display.CENTER}, {xy[1], xy[2] - 1}, "D6 " .. tostring(roll))
+    end
+    Display.draw_arc(alpha(color, 0.88), xy, label ~= "" and 36 or 31, -math.pi / 2, -math.pi / 2 + TWO_PI * (1 - pct), 2, 18)
+    if buff_pct > 0 then
+        Display.draw_arc(alpha(COL_WHITE, 0.70), xy, label ~= "" and 26 or 23, -math.pi / 2, -math.pi / 2 + TWO_PI * buff_pct, 2, 16)
+    end
 end
 
 return M

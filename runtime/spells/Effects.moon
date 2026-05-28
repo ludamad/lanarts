@@ -1074,12 +1074,12 @@ for name in *{"Ranger", "Fighter", "Templar", "Rogue", "Green Mage", "Black Mage
 DICE_ROLL_INTERVAL = 240
 DICE_BUFF_DURATION = 150
 DICE_ROLLS = {
-    [1]: {kind: "fleet", label: "Fleet step", color: COL_PALE_GREEN}
-    [2]: {kind: "guard", label: "Guard stance", color: COL_PALE_BLUE}
-    [3]: {kind: "edge", label: "Killing edge", color: COL_PALE_RED}
-    [4]: {kind: "focus", label: "Flow state", color: COL_PALE_YELLOW}
-    [5]: {kind: "dash", label: "Dash ready", color: COL_WHITE}
-    [6]: {kind: "jackpot", label: "Power ready", color: COL_PALE_YELLOW}
+    [1]: {kind: "fleet", label: "Fleet step", short: "SPD", color: COL_PALE_GREEN}
+    [2]: {kind: "guard", label: "Guard stance", short: "GRD", color: COL_PALE_BLUE}
+    [3]: {kind: "edge", label: "Killing edge", short: "DMG", color: COL_PALE_RED}
+    [4]: {kind: "focus", label: "Flow state", short: "CDR", color: COL_PALE_YELLOW}
+    [5]: {kind: "dash", label: "Dash ready", short: "DASH", color: COL_WHITE}
+    [6]: {kind: "jackpot", label: "Power ready", short: "PWR", color: COL_PALE_YELLOW}
 }
 
 dicebinder_increment = (effect, key, amount=1) ->
@@ -1181,11 +1181,15 @@ DataW.effect_create {
         if @next_roll <= 0
             dicebinder_roll(@, caster)
     draw_func: (caster) =>
+        entry = DICE_ROLLS[@last_roll or 0]
         ProceduralEffects.draw_die_badge caster, {
             roll: @last_roll or 0
             remaining: @next_roll or 0
             interval: @roll_interval or DICE_ROLL_INTERVAL
             color: @roll_color or COL_PALE_BLUE
+            label: (entry and entry.short) or ""
+            buff_remaining: @buff_time or 0
+            buff_duration: DICE_BUFF_DURATION
         }
 }
 
