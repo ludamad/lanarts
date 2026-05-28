@@ -73,7 +73,9 @@ Balance simulations:
     and misses in run and sample rows; ally-down package failures end the run
     as ally_down. Automated players also emit rescue_intercept_frames,
     rescue_hold_frames, and rescue_late_reaction_frames so package clears can
-    be separated from actual body-block micro.
+    be separated from actual body-block micro. Package rows also derive rescue
+    opportunities plus save, clutch, and pull rates so rescue packages can be
+    compared without hand-calculating rates from raw counts.
     Use --loadout_preset late to give each class a representative equipped
     late-game kit without inflating the starting level. Use --loadout to append
     comma-separated item specs such as `Health Potion*3,Hydra Ring`, and

@@ -242,6 +242,18 @@ local function format_frames(frames)
     return tostring(frames) .. "f"
 end
 
+local function safe_rate(num, denom)
+    denom = tonumber(denom) or 0
+    if denom <= 0 then
+        return 0
+    end
+    return (tonumber(num) or 0) / denom
+end
+
+local function format_pct(value)
+    return tostring(math.floor((value or 0) * 100 + 0.5)) .. "%"
+end
+
 local function draw_text(color, origin, xy, text)
     Fonts.small:draw({color = color, origin = origin}, xy, text)
 end
@@ -368,7 +380,8 @@ local function draw_package_hud(director)
             value = "pull " .. format_frames(director.rescue_pull_active_frames)
         else
             local margin = director.rescue_last_margin
-            value = saves .. " c" .. clutch_saves .. " p" .. pulls .. (margin and (" " .. margin .. "f") or "")
+            local attempts = saves + (director.rescue_misses or 0)
+            value = saves .. "/" .. attempts .. " c" .. clutch_saves .. " p" .. pulls .. (margin and (" " .. margin .. "f") or "")
         end
         draw_hud_row(y, "SAVE", value, late and COL_PALE_YELLOW or COL_PALE_GREEN, active > 0 and 1 or 1 - delta / interval)
         y = y + HUD_ROW_H
@@ -409,10 +422,14 @@ local function package_result(director, outcome)
     local clutch = director.rescue_clutch_saves or 0
     local misses = director.rescue_misses or 0
     local pulls = director.rescue_pulls or 0
+    local opportunities = saves + misses
+    local save_rate = safe_rate(saves, opportunities)
+    local clutch_rate = safe_rate(clutch, saves)
+    local pull_rate = safe_rate(pulls, saves)
     local best = director.rescue_best_margin
     local escort_text = count > 0 and string.format("ally %d/%d", math.ceil(hp), math.ceil(max_hp)) or "ally down"
     local rescue_text = (saves > 0 or misses > 0)
-        and string.format("saves %d, clutch %d, pulls %d, misses %d%s", saves, clutch, pulls, misses, best and (", best " .. best .. "f") or "")
+        and string.format("saves %d/%d (%s), clutch %d (%s), pulls %d%s", saves, opportunities, format_pct(save_rate), clutch, format_pct(clutch_rate), pulls, best and (", best " .. best .. "f") or "")
         or "no rescue strikes"
     return {
         outcome = outcome,
@@ -426,8 +443,12 @@ local function package_result(director, outcome)
         escort_hp = hp,
         escort_max_hp = max_hp,
         rescue_saves = saves,
+        rescue_opportunities = opportunities,
+        rescue_save_rate = save_rate,
         rescue_clutch_saves = clutch,
+        rescue_clutch_rate = clutch_rate,
         rescue_pulls = pulls,
+        rescue_pull_rate = pull_rate,
         rescue_misses = misses,
         rescue_best_margin = best,
         rescue_last_margin = director.rescue_last_margin,
@@ -440,6 +461,11 @@ local function package_state_from_director(director)
         return nil
     end
     local count, hp, max_hp = escort_health()
+    local saves = director.rescue_saves or 0
+    local misses = director.rescue_misses or 0
+    local clutch = director.rescue_clutch_saves or 0
+    local pulls = director.rescue_pulls or 0
+    local opportunities = saves + misses
     return {
         outcome = "",
         title = package_title(director.package or {}, director.intensity or {}),
@@ -448,10 +474,14 @@ local function package_state_from_director(director)
         escort_count = count,
         escort_hp = hp,
         escort_max_hp = max_hp,
-        rescue_saves = director.rescue_saves or 0,
-        rescue_clutch_saves = director.rescue_clutch_saves or 0,
-        rescue_pulls = director.rescue_pulls or 0,
-        rescue_misses = director.rescue_misses or 0,
+        rescue_saves = saves,
+        rescue_opportunities = opportunities,
+        rescue_save_rate = safe_rate(saves, opportunities),
+        rescue_clutch_saves = clutch,
+        rescue_clutch_rate = safe_rate(clutch, saves),
+        rescue_pulls = pulls,
+        rescue_pull_rate = safe_rate(pulls, saves),
+        rescue_misses = misses,
         rescue_best_margin = director.rescue_best_margin,
         rescue_last_margin = director.rescue_last_margin,
         rescue_last_pull_frames = director.rescue_last_pull_frames,
