@@ -1538,8 +1538,11 @@ end
 local DICE_ROLL_INTERVAL = 240
 local DICE_BUFF_DURATION = 150
 local DICE_ROLL_ANIMATION = 48
+local DICE_ROLL_REVEAL_FRAMES = 9
+local DICE_ROLL_TICK_PERIOD = 6
 local DICE_INITIAL_ROLL_DELAY = DICE_ROLL_INTERVAL - DICE_BUFF_DURATION - DICE_ROLL_ANIMATION
 local DICE_FULL_BAG_MASK = 63
+local DICE_TWO_PI = math.pi * 2
 local DICE_FACE_BITS = {
   1,
   2,
@@ -1647,9 +1650,24 @@ dicebinder_record_refresh = function(effect, caster, spell_name, total_key, effe
   end
 end
 local dicebinder_record_roll
-dicebinder_record_roll = function(effect, caster, roll, entry)
+dicebinder_record_roll = function(effect, caster, roll, entry, previous_roll)
   dicebinder_increment(effect, "rolls_total")
   dicebinder_increment(effect, "roll_" .. tostring(roll) .. "_count")
+  if roll >= 5 then
+    dicebinder_increment(effect, "high_rolls")
+    effect.current_high_streak = (effect.current_high_streak or 0) + 1
+    effect.longest_high_streak = math.max(effect.longest_high_streak or 0, effect.current_high_streak)
+  else
+    dicebinder_increment(effect, "utility_rolls")
+    effect.current_high_streak = 0
+  end
+  if previous_roll and previous_roll > 0 then
+    if previous_roll == roll then
+      dicebinder_increment(effect, "repeat_rolls")
+    else
+      dicebinder_increment(effect, "roll_variety_switches")
+    end
+  end
   if roll == 5 then
     return dicebinder_record_refresh(effect, caster, "Dash Attack", "dash_refreshes", "dash_effective_refreshes")
   elseif roll == 6 then
@@ -1726,6 +1744,56 @@ dicebinder_emit_roll_fx = function(caster, roll, entry)
     })
   end
 end
+local dicebinder_emit_roll_tick_fx
+dicebinder_emit_roll_tick_fx = function(effect, caster, elapsed)
+  if not (elapsed > 0 and elapsed % DICE_ROLL_TICK_PERIOD == 0) then
+    return
+  end
+  local total = math.max(1, effect.rolling_total or DICE_ROLL_ANIMATION)
+  local pct = math.max(0, math.min(1, elapsed / total))
+  local roll = effect.preview_roll or 1
+  if (effect.rolling_time or 0) <= DICE_ROLL_REVEAL_FRAMES and effect.pending_roll and effect.pending_roll > 0 then
+    roll = effect.pending_roll
+  end
+  local entry = DICE_ROLLS[roll] or DICE_ROLLS[1]
+  local pip_count = math.max(2, math.min(6, roll))
+  local radius = 24 + pct * 44
+  local burst_radius = 10 + pct * 12
+  local frame = GameState.frame or 0
+  dicebinder_increment(effect, "roll_buildup_fx")
+  for idx = 1, pip_count do
+    local angle = frame * (0.10 + pct * 0.05) + idx * DICE_TWO_PI / pip_count + pct * 1.4
+    ImpactFX.world_burst({
+      map = caster.map,
+      xy = {
+        caster.x + math.cos(angle) * radius,
+        caster.y + math.sin(angle) * radius
+      },
+      color = entry.color,
+      radius = burst_radius,
+      duration = 10 + math.floor(pct * 9),
+      drift = 0.10
+    })
+  end
+  if (effect.rolling_time or 0) <= DICE_ROLL_REVEAL_FRAMES and not effect.roll_reveal_fx_emitted then
+    effect.roll_reveal_fx_emitted = true
+    if roll >= 5 then
+      dicebinder_increment(effect, "roll_reveal_cues")
+      return ImpactFX.screen_flash({
+        map = caster.map,
+        color = entry.color,
+        alpha = (function()
+          if roll == 6 then
+            return 0.12
+          else
+            return 0.08
+          end
+        end)(),
+        duration = 8
+      })
+    end
+  end
+end
 local dicebinder_resolve_roll
 dicebinder_resolve_roll = function(effect, caster)
   local roll
@@ -1735,6 +1803,7 @@ dicebinder_resolve_roll = function(effect, caster)
     roll = dicebinder_next_fair_roll(effect)
   end
   local entry = DICE_ROLLS[roll]
+  local previous_roll = effect.last_roll or 0
   effect.last_roll = roll
   effect.roll_color = entry.color
   effect.buff_kind = entry.kind
@@ -1743,7 +1812,7 @@ dicebinder_resolve_roll = function(effect, caster)
   effect.preview_roll = roll
   effect.rolling_time = 0
   effect.next_roll = math.max(1, (effect.roll_interval or DICE_ROLL_INTERVAL) - DICE_ROLL_ANIMATION)
-  dicebinder_record_roll(effect, caster, roll, entry)
+  dicebinder_record_roll(effect, caster, roll, entry, previous_roll)
   if roll == 5 then
     caster:set_spell_cooldown("Dash Attack", 0)
   elseif roll == 6 then
@@ -1765,6 +1834,7 @@ dicebinder_start_roll = function(effect, caster)
   effect.preview_roll = math.random(1, 6)
   effect.rolling_time = DICE_ROLL_ANIMATION
   effect.rolling_total = DICE_ROLL_ANIMATION
+  effect.roll_reveal_fx_emitted = false
   effect.roll_color = COL_WHITE
   dicebinder_increment(effect, "roll_animations_total")
   return ImpactFX.world_burst({
@@ -1782,7 +1852,7 @@ dicebinder_step_roll_animation = function(effect, caster)
   effect.rolling_time = math.max(0, (effect.rolling_time or 0) - 1)
   local elapsed = (effect.rolling_total or DICE_ROLL_ANIMATION) - effect.rolling_time
   local period = math.max(2, math.floor(2 + elapsed / 12))
-  if effect.rolling_time <= 7 then
+  if effect.rolling_time <= DICE_ROLL_REVEAL_FRAMES then
     if effect.pending_roll and effect.pending_roll > 0 then
       effect.preview_roll = effect.pending_roll
     else
@@ -1791,6 +1861,7 @@ dicebinder_step_roll_animation = function(effect, caster)
   elseif elapsed % period == 0 then
     effect.preview_roll = (effect.preview_roll or 0) % 6 + 1
   end
+  dicebinder_emit_roll_tick_fx(effect, caster, elapsed)
   if effect.rolling_time <= 0 then
     return dicebinder_resolve_roll(effect, caster)
   end
@@ -1830,11 +1901,20 @@ DataW.effect_create({
     self.preview_roll = 0
     self.rolling_time = 0
     self.rolling_total = DICE_ROLL_ANIMATION
+    self.roll_reveal_fx_emitted = false
     self.bag_mask = DICE_FULL_BAG_MASK
     self.bag_refills = 0
     self.roll_animations_total = 0
     self.roll_animation_frames = 0
+    self.roll_buildup_fx = 0
+    self.roll_reveal_cues = 0
     self.rolls_total = 0
+    self.high_rolls = 0
+    self.utility_rolls = 0
+    self.current_high_streak = 0
+    self.longest_high_streak = 0
+    self.repeat_rolls = 0
+    self.roll_variety_switches = 0
     self.dash_refreshes = 0
     self.dash_effective_refreshes = 0
     self.power_refreshes = 0
@@ -1866,7 +1946,7 @@ DataW.effect_create({
     local rolling = self.rolling_time and self.rolling_time > 0
     local shown_roll
     if rolling then
-      if self.rolling_time <= 7 and self.pending_roll and self.pending_roll > 0 then
+      if self.rolling_time <= DICE_ROLL_REVEAL_FRAMES and self.pending_roll and self.pending_roll > 0 then
         shown_roll = self.pending_roll
       elseif self.preview_roll and self.preview_roll > 0 then
         shown_roll = self.preview_roll
@@ -1882,7 +1962,7 @@ DataW.effect_create({
       remaining = self.next_roll or 0,
       interval = self.roll_interval or DICE_ROLL_INTERVAL,
       color = (rolling and entry and entry.color) or self.roll_color or COL_PALE_BLUE,
-      label = (rolling and ((self.rolling_time or 0) <= 7 and entry and entry.short or "ROLL")) or (entry and entry.short) or "",
+      label = (rolling and ((self.rolling_time or 0) <= DICE_ROLL_REVEAL_FRAMES and entry and entry.short or "ROLL")) or (entry and entry.short) or "",
       buff_remaining = self.buff_time or 0,
       buff_duration = DICE_BUFF_DURATION,
       rolling = rolling,
