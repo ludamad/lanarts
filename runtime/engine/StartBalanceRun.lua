@@ -2594,7 +2594,7 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         )
     )
 
-    if pull_rate > 0 then
+    if rescue_opportunities > 0 or pull_rate > 0 then
         add_report_row(
             rows,
             class_name,
