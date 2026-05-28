@@ -10,9 +10,10 @@ Then serve `build/src/lanarts.html` with a local static server from the reposito
 
 The shell reads its runtime data from the exported content APIs:
 
-- `lanarts_content_catalog_json()` returns classes, class control metadata, bot skill profiles, level labels, loadout presets, map generators, map algorithms, encounters, and saved resource presets.
+- `lanarts_content_catalog_json()` returns classes, class control metadata, bot skill profiles, level labels, loadout presets, build archetypes, map generators, map algorithms, encounters, and saved resource presets.
 - `lanarts_content_launch_args_json(config)` normalizes a selected run and returns the `engine.StartLanarts` arguments.
-- `lanarts_content_loadout_options_json(config)` resolves class build metadata, known spells, preset items, class-relevant curated item choices, and a loadout-readiness read for the selected fight.
+- `lanarts_content_loadout_options_json(config)` resolves class build metadata, known spells, preset items, class-relevant curated item choices, build archetypes, and a loadout-readiness read for the selected fight.
+- `lanarts_content_build_matrix_json(config)` expands the selected class into curated build archetypes with resolved loadouts, readiness scores, launch args, and balance args.
 - `lanarts_content_map_generation_json(config)` returns selectable map algorithms, deterministic preview geometry with enemy pins, map threat profiles, and resolved run/balance args for each preview.
 - `lanarts_content_map_preview_json(config)` is kept as a compatible alias for the preview grid payload.
 - `lanarts_content_map_matrix_json(config)` expands selected-seed, overworld-algorithm, and late-map probes for map-generation balance runs, including preview-derived threat profiles for quick comparison.
@@ -22,11 +23,12 @@ The shell reads its runtime data from the exported content APIs:
 - `lanarts_content_run_summary_json(config)` resolves a selection into launch args, loadout items, loadout readiness, class/enemy matchup read, class control model, bot skill profile, pressure-scaled encounter rhythms, predicted pressure density/diagnosis, and balance notes.
 - `lanarts_content_fight_setup_json(config)` resolves the selected fight objective, class posture, loadout readiness, class/enemy matchup read, package timing windows, predicted pressure density/diagnosis, per-class micro plan, and telemetry fields worth watching for that setup.
 - `lanarts_content_package_matrix_json(config)` expands package baselines plus selected-package class, pressure, skill-buffer, and rescue sweeps with rhythm summaries.
-- `lanarts_content_resource_matrix_json(config)` expands the current selection into class, pressure, loadout, bot-skill, caster-matchup, map, enemy, and encounter sweeps for quick orthogonal comparisons.
+- `lanarts_content_resource_matrix_json(config)` expands the current selection into class, pressure, loadout, build-archetype, bot-skill, caster-matchup, map, enemy, and encounter sweeps for quick orthogonal comparisons.
 - `lanarts_content_workspace_json(config)` composes the current selection into one UI payload: loadout options, run summary, fight setup, enemy options, map previews, map matrix, analysis plan, package matrix, generated resources, bot profiles, and control model.
 - `lanarts_content_presentation_json(config)` returns presentation-ready controls, command previews, map preview cards, matchup read, telemetry rows, threat windows, and grouped resource cards for the web lab.
 
 The shell renders a content board from `lanarts_content_presentation_json(config)` so the selected objective, commands, telemetry, threat windows, pressure density preview, class-specific micro plan, map-preview threat cards, enemy probes, package probes, and orthogonal resources are visible together.
+Build templates apply concrete loadout strings from the API, then immediately recompute the selected fight readiness and commands.
 Run and fight payloads include matchup reads for red/fire, white, and black resistance checks so Pyrocaster, Stormcaller, and Necromancer comparisons can be selected before running sweeps.
 Encounter launches use `--encounter` for curated 1v1/package tests, or `--monsters` for a comma-separated custom arena.
 Direct map launches use `--start_map_desc`, and overworld profile selections add `--map_profile` so the same seed can compare profiles such as `open_meadow`, `broken_grove`, `river_road`, `predator_thicket`, and `ruin_crossroads`.

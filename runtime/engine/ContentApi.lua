@@ -893,6 +893,45 @@ local function loadout_readiness_for_config(config, loadout, known_spells)
     }
 end
 
+local function build_archetype_rows(config)
+    local rows = {}
+    for _, archetype in ipairs((Catalog.build_archetypes or {})[config.className] or {}) do
+        local next_config = copy_object(config)
+        next_config.className = config.className
+        next_config.preset = archetype.preset or "none"
+        next_config.customLoadout = join_names(archetype.items or {})
+        local known_spells, upcoming_spells = spell_rows_for_level(next_config.className, next_config.level)
+        local loadout = loadout_for_config(next_config)
+        local readiness = loadout_readiness_for_config(next_config, loadout, known_spells)
+        rows[#rows + 1] = {
+            id = archetype.id or tostring(config.className):lower(),
+            label = archetype.label or archetype.id or config.className,
+            role = archetype.role or "",
+            preset = next_config.preset,
+            customLoadout = next_config.customLoadout,
+            tags = copy_array(archetype.tags or {}),
+            config = copy_object(next_config),
+            loadout = loadout,
+            loadoutReadiness = readiness,
+            knownSpells = known_spells,
+            upcomingSpells = upcoming_spells,
+            args = launch_args(next_config),
+            balanceArgs = balance_args(next_config),
+        }
+    end
+    return rows
+end
+
+local function build_matrix_payload(config)
+    local rows = build_archetype_rows(config)
+    return {
+        schema = 1,
+        config = config,
+        count = #rows,
+        builds = rows,
+    }
+end
+
 local function build_options_payload(config)
     local known_spells, upcoming_spells = spell_rows_for_level(config.className, config.level)
     local loadout = loadout_for_config(config)
@@ -906,6 +945,7 @@ local function build_options_payload(config)
         upcomingSpells = upcoming_spells,
         loadout = loadout,
         loadoutReadiness = loadout_readiness_for_config(config, loadout, known_spells),
+        buildArchetypes = build_archetype_rows(config),
         itemChoices = item_choices_for_config(config),
         args = launch_args(config),
         balanceArgs = balance_args(config),
@@ -1132,6 +1172,34 @@ local function resource_entry(group, name, meta, goal, config, seed_offset, extr
         entry[key] = value
     end
     return entry
+end
+
+local function append_build_archetype_resources(resources, config, start_offset)
+    for idx, build in ipairs(build_archetype_rows(config)) do
+        resources[#resources + 1] = resource_entry(
+            "Build archetype sweep",
+            build.label,
+            string.format("L%d, %s", build.config.level or config.level, build.role or "build"),
+            "spec comparison against the selected fight",
+            build.config,
+            (start_offset or 10) + idx,
+            {
+                buildArchetype = {
+                    id = build.id,
+                    label = build.label,
+                    role = build.role,
+                    tags = copy_array(build.tags or {}),
+                },
+                loadoutReadiness = build.loadoutReadiness,
+            }
+        )
+    end
+end
+
+local function build_archetype_resources(config, start_offset)
+    local resources = {}
+    append_build_archetype_resources(resources, config, start_offset)
+    return resources
 end
 
 local function package_encounters()
@@ -2968,6 +3036,8 @@ local function resource_matrix_payload(config)
         )
     end
 
+    append_build_archetype_resources(resources, config, 36)
+
     append_caster_matchup_resources(resources, config, 110)
 
     append_resources(resources, map_probe_resources(config, 40))
@@ -3206,6 +3276,12 @@ local function resource_summary_chips(resource)
             add(tostring(resource.mapThreat.clusteredPairs) .. " clusters")
         end
     end
+    if resource.loadoutReadiness then
+        add("fit " .. tostring(resource.loadoutReadiness.label or "read"))
+        if resource.loadoutReadiness.score then
+            add(tostring(resource.loadoutReadiness.score) .. " build")
+        end
+    end
     if resource.matchup then
         add(resource.matchup.label)
         if resource.matchup.severity and resource.matchup.severity ~= "neutral" then
@@ -3244,6 +3320,8 @@ local function resource_card(resource)
         command = command_preview(resource.args),
         balance = command_preview(resource.balanceArgs),
         packageSummary = resource.packageSummary,
+        buildArchetype = resource.buildArchetype,
+        loadoutReadiness = resource.loadoutReadiness,
         previewMode = resource.previewMode,
         signature = resource.signature,
         mapThreat = resource.mapThreat,
@@ -3356,6 +3434,7 @@ local function presentation_payload(config)
     local resource_matrix = resource_matrix_payload(config)
     local enemy_matrix = enemy_matrix_payload(config, 90)
     local analysis_plan = analysis_plan_payload(config)
+    local build_matrix = build_matrix_payload(config)
 
     return {
         schema = 1,
@@ -3368,8 +3447,15 @@ local function presentation_payload(config)
             classSweep = command_preview(analysis_plan.commands and analysis_plan.commands.classSweep),
             monsterEval = command_preview(analysis_plan.commands and analysis_plan.commands.monsterEval),
         },
+        buildArchetypes = build_matrix.builds or {},
         mapPreviews = preview_cards(map_generation),
         resourceGroups = {
+            {
+                id = "build",
+                label = "Build archetypes",
+                count = build_matrix.count or 0,
+                cards = resource_cards(build_archetype_resources(config, 0)),
+            },
             {
                 id = "map",
                 label = "Map matrix",
@@ -3410,6 +3496,7 @@ local function workspace_payload(config)
         schema = 1,
         config = config,
         loadoutOptions = build_options_payload(config),
+        buildMatrix = build_matrix_payload(config),
         runSummary = run_summary_payload(config),
         enemyOptions = enemy_options_payload(config),
         mapGeneration = map_generation_payload(config),
@@ -3448,6 +3535,10 @@ end
 
 function M.loadout_options_json(raw_json)
     return encode(build_options_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.build_matrix_json(raw_json)
+    return encode(build_matrix_payload(normalized_config(parse_json_object(raw_json))))
 end
 
 function M.run_summary_json(raw_json)

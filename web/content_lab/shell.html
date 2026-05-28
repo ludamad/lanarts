@@ -958,6 +958,10 @@
           <div class="loadout-chips" id="activeLoadout"></div>
         </div>
         <div class="field">
+          <label for="buildTemplates">Build templates</label>
+          <div class="pick-list" id="buildTemplates"></div>
+        </div>
+        <div class="field">
           <label for="itemChoices">Items</label>
           <div class="pick-list" id="itemChoices"></div>
         </div>
@@ -1528,6 +1532,8 @@
           analysisGoal: resource.analysisGoal || resource.goalId || '',
           botProfile: resource.botProfile || 'human',
           packageSummary: resource.packageSummary || null,
+          buildArchetype: resource.buildArchetype || null,
+          loadoutReadiness: resource.loadoutReadiness || null,
           previewMode: resource.previewMode || resource.preview_mode || '',
           density: resource.density === undefined ? null : Number(resource.density),
           phase: resource.phase || '',
@@ -2033,8 +2039,10 @@
 
       function renderBuildOptions(options) {
         const buildHost = $('buildInfo');
+        const templateHost = $('buildTemplates');
         const itemHost = $('itemChoices');
         buildHost.innerHTML = '';
+        templateHost.innerHTML = '';
         itemHost.innerHTML = '';
         if (!options) {
           return;
@@ -2086,6 +2094,45 @@
           known.forEach((spell) => addChip(spellRow, spellChipText(spell)));
           upcoming.forEach((spell) => addChip(spellRow, spellChipText(spell), 'locked'));
           buildHost.appendChild(spellRow);
+        }
+
+        const buildTemplates = options.buildArchetypes || [];
+        if (buildTemplates.length) {
+          buildTemplates.forEach((build) => {
+            const groupNode = document.createElement('div');
+            groupNode.className = 'pick-group';
+            const label = document.createElement('strong');
+            const readiness = build.loadoutReadiness || {};
+            label.textContent = build.label || build.id || 'Build';
+            const buttons = document.createElement('div');
+            buttons.className = 'pick-buttons';
+            const button = document.createElement('button');
+            button.type = 'button';
+            const score = readiness.score === undefined ? '' : ` ${readiness.score}`;
+            button.textContent = `${readiness.label || 'fit'}${score}`;
+            button.title = [build.role, (build.tags || []).join(', ')].filter(Boolean).join(' | ');
+            button.addEventListener('click', () => {
+              const next = {
+                ...currentConfig(),
+                ...(build.config || {}),
+              };
+              setConfig(next);
+            });
+            buttons.appendChild(button);
+            if ((readiness.strengths || []).length || (readiness.gaps || []).length) {
+              const chips = document.createElement('div');
+              chips.className = 'item-chips';
+              (readiness.strengths || []).slice(0, 2).forEach((text) => addChip(chips, text));
+              (readiness.gaps || []).slice(0, 2).forEach((text) => addChip(chips, text, 'locked'));
+              groupNode.appendChild(label);
+              groupNode.appendChild(buttons);
+              groupNode.appendChild(chips);
+            } else {
+              groupNode.appendChild(label);
+              groupNode.appendChild(buttons);
+            }
+            templateHost.appendChild(groupNode);
+          });
         }
 
         const selectedItems = new Set(customLoadoutParts());
@@ -2299,6 +2346,33 @@
         appendCommandPreview(commandSection, 'Monster', commands.monsterEval);
         if (commandSection.childElementCount > 1) {
           host.appendChild(commandSection);
+        }
+
+        const buildArchetypes = payload.buildArchetypes || [];
+        if (buildArchetypes.length) {
+          const buildSection = document.createElement('div');
+          buildSection.className = 'presentation-section';
+          appendBoardTitle(buildSection, 'Builds');
+          const list = document.createElement('div');
+          list.className = 'board-card-list';
+          buildArchetypes.slice(0, 3).forEach((build) => {
+            const readiness = build.loadoutReadiness || {};
+            list.appendChild(boardCard({
+              title: build.label,
+              subtitle: build.role,
+              chips: [
+                readiness.label,
+                readiness.score !== undefined ? `${readiness.score} fit` : '',
+                ...((build.tags || []).slice(0, 3)),
+              ],
+              config: build.config,
+              balance: {args: build.balanceArgs || []},
+            }, () => {
+              setConfig(build.config || currentConfig());
+            }));
+          });
+          buildSection.appendChild(list);
+          host.appendChild(buildSection);
         }
 
         const watch = document.createElement('div');
@@ -3251,6 +3325,25 @@
         return parts.join(' | ');
       }
 
+      function readinessSummaryText(readiness) {
+        if (!readiness) {
+          return '';
+        }
+        const parts = [];
+        if (readiness.label) {
+          parts.push(`${readiness.label}${readiness.score === undefined ? '' : ` ${readiness.score}`}`);
+        }
+        const strength = readiness.strengths && readiness.strengths.length ? readiness.strengths[0] : '';
+        const gap = readiness.gaps && readiness.gaps.length ? readiness.gaps[0] : '';
+        if (strength) {
+          parts.push(strength);
+        }
+        if (gap) {
+          parts.push(gap);
+        }
+        return parts.join(' | ');
+      }
+
       function mapThreatText(threat) {
         if (!threat) {
           return '';
@@ -3293,10 +3386,12 @@
           const summary = packageSummaryText(resource.packageSummary);
           const mapSummary = mapSummaryText(resource);
           const matchupSummary = matchupSummaryText(resource.matchup);
+          const readinessSummary = readinessSummaryText(resource.loadoutReadiness);
           const summaryNode = summary ? `<span>${summary}</span>` : '';
           const mapSummaryNode = mapSummary ? `<span>${mapSummary}</span>` : '';
           const matchupNode = matchupSummary ? `<span>${matchupSummary}</span>` : '';
-          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${mapSummaryNode}${matchupNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${parts}${skill}</code>`;
+          const readinessNode = readinessSummary ? `<span>${readinessSummary}</span>` : '';
+          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${mapSummaryNode}${matchupNode}${readinessNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${parts}${skill}</code>`;
           button.addEventListener('click', () => {
             setConfig(resource);
           });

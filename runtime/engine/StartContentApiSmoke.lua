@@ -24,6 +24,7 @@ local function run_content_api_smoke()
     expect(#(catalog.classes or {}) >= 4, "catalog should expose classes")
     expect(catalog.class_builds and catalog.class_builds.Fighter, "catalog should expose class builds")
     expect(#(catalog.item_choices or {}) >= 4, "catalog should expose curated item choices")
+    expect(catalog.build_archetypes and catalog.build_archetypes.Fighter and #(catalog.build_archetypes.Fighter or {}) >= 2, "catalog should expose build archetypes")
     expect(#(catalog.bot_profiles or {}) >= 4, "catalog should expose bot skill profiles")
     expect(#(catalog.package_component_sets or {}) >= 5, "catalog should expose package component sets")
     expect(#(catalog.analysis_goals or {}) >= 3, "catalog should expose analysis goals")
@@ -260,8 +261,16 @@ local function run_content_api_smoke()
     expect(loadout_options.resolvedStats and #(loadout_options.resolvedStats.rows or {}) >= 6, "loadout options should expose selected-level stat rows")
     expect(#(loadout_options.knownSpells or {}) >= 1, "loadout options should expose known spells")
     expect(#(loadout_options.itemChoices or {}) >= 3, "loadout options should expose item picker groups")
+    expect(#(loadout_options.buildArchetypes or {}) >= 2, "loadout options should expose build archetypes")
     expect(loadout_options.loadoutReadiness and tostring(loadout_options.loadoutReadiness.label or "") ~= "", "loadout options should expose build readiness label")
     expect(loadout_options.loadoutReadiness and #(loadout_options.loadoutReadiness.notes or {}) >= 1, "loadout options should expose build readiness notes")
+    local has_necro_regen_build = false
+    for _, build in ipairs(loadout_options.buildArchetypes or {}) do
+        if build.id == "necro-regen-anchor" then
+            has_necro_regen_build = build.loadoutReadiness and (build.loadoutReadiness.score or 0) > 0 and tostring(build.customLoadout or ""):find("Amulet of Great Pain") ~= nil
+        end
+    end
+    expect(has_necro_regen_build, "loadout options should expose selectable necromancer regen build")
     local has_necro_amulet = false
     for _, group in ipairs(loadout_options.itemChoices or {}) do
         for _, choice in ipairs(group.choices or {}) do
@@ -271,6 +280,17 @@ local function run_content_api_smoke()
         end
     end
     expect(has_necro_amulet, "loadout options should expose class-relevant item choices")
+
+    local build_matrix = parse_response("build matrix", ContentApi.build_matrix_json(config))
+    expect((build_matrix.count or 0) == #(build_matrix.builds or {}), "build matrix count should match builds")
+    expect((build_matrix.count or 0) >= 2, "build matrix should expose class build probes")
+    local has_build_command = false
+    for _, build in ipairs(build_matrix.builds or {}) do
+        if build.id == "necro-regen-anchor" and build.args and build.balanceArgs and build.loadoutReadiness then
+            has_build_command = true
+        end
+    end
+    expect(has_build_command, "build matrix should expose commands and readiness for archetypes")
 
     local map_config = [[{
         "className": "Fighter",
@@ -486,6 +506,7 @@ local function run_content_api_smoke()
     local has_none_loadout = false
     local has_gragh_loadout = false
     local has_late_loadout = false
+    local has_build_archetype_resource = false
     local has_perfect_skill_buffer = false
     local has_sloppy_skill_buffer = false
     local has_pyro_red_resource = false
@@ -505,6 +526,8 @@ local function run_content_api_smoke()
             has_none_loadout = has_none_loadout or resource.preset == "none"
             has_gragh_loadout = has_gragh_loadout or resource.preset == "gragh"
             has_late_loadout = has_late_loadout or resource.preset == "late"
+        elseif resource.group == "Build archetype sweep" and resource.buildArchetype and resource.loadoutReadiness then
+            has_build_archetype_resource = true
         elseif resource.group == "Skill buffer sweep" and resource.encounter == "gragh-rescue-package" then
             has_perfect_skill_buffer = has_perfect_skill_buffer or resource.botProfile == "perfect"
             has_sloppy_skill_buffer = has_sloppy_skill_buffer or resource.botProfile == "sloppy"
@@ -521,6 +544,7 @@ local function run_content_api_smoke()
     expect(has_chicken_resource, "matrix should include Giant Chicken package coverage")
     expect(has_mummoner_resource, "matrix should include Mummoner package coverage")
     expect(has_none_loadout and has_gragh_loadout and has_late_loadout, "matrix should include loadout sweep coverage")
+    expect(has_build_archetype_resource, "matrix should include build archetype resources")
     expect(has_perfect_skill_buffer and has_sloppy_skill_buffer, "matrix should include skill-buffer sweep coverage")
     expect(has_pyro_red_resource and has_storm_red_resource and has_storm_white_resource and has_necro_black_resource, "matrix should include caster-delta matchup resources")
 
@@ -579,6 +603,7 @@ local function run_content_api_smoke()
     expect(workspace.runSummary and workspace.runSummary.config.className == "Necromancer", "workspace should expose run summary")
     expect(workspace.fightSetup and workspace.fightSetup.objective and workspace.fightSetup.objective.primary == "Gragh", "workspace should expose fight setup")
     expect(workspace.loadoutOptions and #(workspace.loadoutOptions.knownSpells or {}) >= 1, "workspace should expose loadout options")
+    expect(workspace.buildMatrix and (workspace.buildMatrix.count or 0) >= 2, "workspace should expose build matrix")
     expect(workspace.enemyOptions and workspace.enemyOptions.monsterEvalArgs, "workspace should expose enemy options")
     expect(workspace.mapGeneration and #(workspace.mapGeneration.previews or {}) >= 3, "workspace should expose map previews")
     expect(workspace.mapMatrix and (workspace.mapMatrix.count or 0) >= 12, "workspace should expose map matrix resources")
@@ -644,6 +669,7 @@ local function run_content_api_smoke()
         end
     end
     expect(groups.map and (groups.map.count or 0) >= 12, "presentation should expose map resource group")
+    expect(groups.build and (groups.build.count or 0) >= 2, "presentation should expose build resource group")
     expect(groups.package and (groups.package.count or 0) >= 20, "presentation should expose package resource group")
     expect(groups.enemy and (groups.enemy.count or 0) >= 12, "presentation should expose enemy resource group")
     expect(groups.orthogonal and (groups.orthogonal.count or 0) >= 30, "presentation should expose orthogonal resource group")
@@ -651,6 +677,7 @@ local function run_content_api_smoke()
     expect(has_map_threat_card, "presentation map cards should expose map threat profiles")
     expect(has_enemy_card, "presentation enemy cards should expose monster-eval commands")
     expect(presentation.telemetry and #presentation.telemetry >= 10, "presentation should expose telemetry watch rows")
+    expect(presentation.buildArchetypes and #(presentation.buildArchetypes or {}) >= 2, "presentation should expose build archetypes")
     expect(presentation.threats and #presentation.threats >= 2, "presentation should expose threat timing rows")
     expect(presentation.microPlan and #presentation.microPlan >= 3, "presentation should expose micro plan rows")
     expect(presentation.matchup and tostring(presentation.matchup.label or "") ~= "", "presentation should expose matchup read")

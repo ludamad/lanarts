@@ -347,6 +347,149 @@ M.loadout_presets = {
 
 M.loadout_order = {"none", "gragh", "late"}
 
+M.build_archetypes = {
+    Fighter = {
+        {
+            id = "fighter-block-anchor",
+            label = "Block Anchor",
+            role = "rescue body-block survival",
+            preset = "none",
+            items = {"Health Potion*3", "Iron Broadsword", "Chainmail", "Leather Gloves", "Iron Helmet", "Leather Boots", "Belt of Protection", "Ring of Vitality", "Amulet of Healing"},
+            tags = {"survival", "rescue", "melee"},
+        },
+        {
+            id = "fighter-slayer",
+            label = "Slayer",
+            role = "close-range boss damage",
+            preset = "none",
+            items = {"Health Potion*2", "Gragh's Club", "Red Dragonplate", "Steel Gloves", "Belt of Slaying", "Ring of Vampirism", "Ring of Vitality"},
+            tags = {"melee", "damage", "survival"},
+        },
+        {
+            id = "fighter-add-cleanup",
+            label = "Add Cleanup",
+            role = "melee control with sustain",
+            preset = "none",
+            items = {"Health Potion*3", "Iron Broadsword", "Chainmail", "Jack Boots", "Belt of Slaying", "Ring of Vampirism", "Ring of Vitality"},
+            tags = {"melee", "summon", "mobility"},
+        },
+    },
+    Necromancer = {
+        {
+            id = "necro-regen-anchor",
+            label = "Regen Anchor",
+            role = "regen trades under contact",
+            preset = "none",
+            items = {"Mana Potion*3", "Runed Robe", "Hydra Ring", "Moonstone Ring", "Wishful Belt", "Amulet of Great Pain"},
+            tags = {"regen", "casting", "survival"},
+        },
+        {
+            id = "necro-summon-cleanup",
+            label = "Summon Cleanup",
+            role = "adds and attrition",
+            preset = "none",
+            items = {"Mana Potion*3", "Apprentice Staff", "Runed Robe", "Wizard's Ring", "Hydra Ring", "Wishful Belt"},
+            tags = {"summon", "casting", "control"},
+        },
+        {
+            id = "necro-safe-caster",
+            label = "Safe Caster",
+            role = "survival margin for black fights",
+            preset = "none",
+            items = {"Health Potion*2", "Mana Potion*2", "Robe of Vitality", "Moonstone Ring", "Ring of Vitality", "Amulet of Great Pain"},
+            tags = {"survival", "regen", "casting"},
+        },
+    },
+    Pyrocaster = {
+        {
+            id = "pyro-fire-conversion",
+            label = "Fire Conversion",
+            role = "red damage throughput",
+            preset = "none",
+            items = {"Mana Potion*3", "Red Mana Potion*2", "Gallanthor's Crutch", "Red Robe", "Runed Gloves", "Ring of Spells", "Amulet of Greater Fire"},
+            tags = {"red", "casting", "damage"},
+        },
+        {
+            id = "pyro-ring-dive",
+            label = "Ring Dive",
+            role = "step-in zone timing",
+            preset = "none",
+            items = {"Health Potion*2", "Mana Potion*2", "Gallanthor's Crutch", "Red Robe", "Magic Skirt", "Ring of Spells", "Ring of Vitality"},
+            tags = {"red", "survival", "zone"},
+        },
+        {
+            id = "pyro-safe-caster",
+            label = "Safe Caster",
+            role = "keep-away with survival margin",
+            preset = "none",
+            items = {"Health Potion*2", "Mana Potion*2", "Wizard's Staff", "Runed Robe", "Wizard's Hat", "Ring of Spells", "Ring of Vitality"},
+            tags = {"casting", "survival", "ranged"},
+        },
+    },
+    Stormcaller = {
+        {
+            id = "storm-white-burst",
+            label = "White Burst",
+            role = "white damage throughput",
+            preset = "none",
+            items = {"Mana Potion*3", "Wizard's Staff", "White Robe", "Runed Gloves", "Ring of Spells", "Amulet of Light"},
+            tags = {"white", "casting", "damage"},
+        },
+        {
+            id = "storm-safe-white",
+            label = "Safe White",
+            role = "ranged pressure with HP buffer",
+            preset = "none",
+            items = {"Health Potion*2", "Mana Potion*2", "Robe of Vitality", "Runed Gloves", "Ring of Vitality", "Amulet of Light"},
+            tags = {"white", "survival", "ranged"},
+        },
+        {
+            id = "storm-zone-control",
+            label = "Zone Control",
+            role = "AOE and add cleanup",
+            preset = "none",
+            items = {"Mana Potion*3", "Gallanthor's Crutch", "Magic Skirt", "Magician's Ring", "Ring of Spells", "Amulet of Light"},
+            tags = {"white", "zone", "summon"},
+        },
+    },
+    Templar = {
+        {
+            id = "templar-hold-line",
+            label = "Hold Line",
+            role = "defensive melee rescue",
+            preset = "none",
+            items = {"Health Potion*3", "Mace of Light", "Crystalline Plate", "Steel Gloves", "Jack Boots", "Belt of Protection", "Ring of Stone", "Amulet of Fortification"},
+            tags = {"survival", "rescue", "melee"},
+        },
+        {
+            id = "templar-light-control",
+            label = "Light Control",
+            role = "melee control and white damage",
+            preset = "none",
+            items = {"Health Potion*2", "Mana Potion*2", "Mace of Light", "Crystalline Plate", "Ring of Vitality", "Amulet of Fortification"},
+            tags = {"control", "white", "melee"},
+        },
+    },
+    Rogue = {
+        {
+            id = "rogue-mobile-rescue",
+            label = "Mobile Rescue",
+            role = "dash saves and repositioning",
+            preset = "none",
+            items = {"Health Potion*3", "Iron Scimitar", "Leather Armour", "Leather Boots", "Dank Belt", "Ring of Vampirism", "Hydra Ring", "Amulet of Fear"},
+            tags = {"mobility", "rescue", "melee"},
+        },
+        {
+            id = "rogue-bleed-burst",
+            label = "Close Burst",
+            role = "low-margin melee damage",
+            preset = "none",
+            items = {"Health Potion*2", "Iron Scimitar", "Leather Armour", "Leather Gloves", "Dank Belt", "Ring of Vampirism", "Amulet of Fear"},
+            tags = {"melee", "damage", "control"},
+        },
+    },
+}
+
 M.item_choices = {
     {
         id = "consumables",
@@ -1912,6 +2055,7 @@ function M.catalog()
         levels = M.levels,
         loadouts = M.loadout_presets,
         loadout_names = M.loadout_preset_names(),
+        build_archetypes = M.build_archetypes,
         class_builds = M.class_builds,
         item_choices = M.item_choices,
         intensities = M.intensities,

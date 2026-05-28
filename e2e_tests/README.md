@@ -20,6 +20,9 @@ Content lab APIs:
     Loadout payloads include a readiness read that maps selected gear and known
     spells to the active package demands, such as rescue blocks, add cleanup,
     AOE movement, and orb spacing.
+    Build-matrix payloads expose curated class archetypes as concrete loadout
+    strings with readiness scores and launch/balance commands, so the web lab
+    can spec a hero before entering a package fight.
     Run summaries and fight setup payloads also include class/enemy matchup
     reads for red/fire, white, and black resistance checks, with telemetry keys
     that explain whether the pairing is suppressing damage conversion.
