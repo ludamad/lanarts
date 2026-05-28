@@ -770,6 +770,66 @@ local function copy_package_state_fields(row, player)
     end
 end
 
+local DICEBINDER_METRICS = {
+    "dice_rolls_total",
+    "dice_roll_1_count",
+    "dice_roll_2_count",
+    "dice_roll_3_count",
+    "dice_roll_4_count",
+    "dice_roll_5_count",
+    "dice_roll_6_count",
+    "dice_dash_refreshes",
+    "dice_dash_effective_refreshes",
+    "dice_power_refreshes",
+    "dice_power_effective_refreshes",
+    "dice_jackpot_rolls",
+    "dice_buff_active_frames",
+    "dice_fleet_frames",
+    "dice_guard_frames",
+    "dice_edge_frames",
+    "dice_focus_frames",
+    "dice_jackpot_frames",
+}
+
+local function dicebinder_state_fields(player)
+    local fields = {
+        dice_last_roll = "",
+        dice_next_roll_frames = "",
+    }
+    for _, key in ipairs(DICEBINDER_METRICS) do
+        fields[key] = 0
+    end
+    if not player or player.class_name ~= "Dicebinder" or not player:has_effect("Dicebinder") then
+        return fields
+    end
+    local effect = player:get_effect("Dicebinder") or {}
+    fields.dice_last_roll = effect.last_roll or 0
+    fields.dice_next_roll_frames = effect.next_roll or 0
+    fields.dice_rolls_total = effect.rolls_total or 0
+    for roll = 1, 6 do
+        local key = "dice_roll_" .. tostring(roll) .. "_count"
+        fields[key] = effect["roll_" .. tostring(roll) .. "_count"] or 0
+    end
+    fields.dice_dash_refreshes = effect.dash_refreshes or 0
+    fields.dice_dash_effective_refreshes = effect.dash_effective_refreshes or 0
+    fields.dice_power_refreshes = effect.power_refreshes or 0
+    fields.dice_power_effective_refreshes = effect.power_effective_refreshes or 0
+    fields.dice_jackpot_rolls = effect.jackpot_rolls or 0
+    fields.dice_buff_active_frames = effect.buff_active_frames or 0
+    fields.dice_fleet_frames = effect.fleet_frames or 0
+    fields.dice_guard_frames = effect.guard_frames or 0
+    fields.dice_edge_frames = effect.edge_frames or 0
+    fields.dice_focus_frames = effect.focus_frames or 0
+    fields.dice_jackpot_frames = effect.jackpot_frames or 0
+    return fields
+end
+
+local function copy_dicebinder_state_fields(row, player)
+    for key, value in pairs(dicebinder_state_fields(player)) do
+        row[key] = value
+    end
+end
+
 local function sample_run(run, telemetry, samples, reason)
     local snap = player_snapshot()
     if not snap then
@@ -856,6 +916,7 @@ local function sample_run(run, telemetry, samples, reason)
         pyrocaster_ring_reposition_frames = telemetry.pyrocaster_ring_reposition_frames or 0,
     }
     copy_package_state_fields(row, snap.player)
+    copy_dicebinder_state_fields(row, snap.player)
     samples[#samples + 1] = row
 end
 
@@ -965,6 +1026,7 @@ local function summarize_run(run, telemetry, outcome)
         visible_enemy_frames = encode_counts(telemetry.visible_enemy_frames),
     }
     copy_package_state_fields(row, snap.player)
+    copy_dicebinder_state_fields(row, snap.player)
     return row
 end
 
@@ -1049,6 +1111,12 @@ local SUMMARY_METRICS = {
     "pyrocaster_ring_combat_frames", "pyrocaster_ring_close_frames",
     "pyrocaster_ring_reposition_frames",
     "max_same_square_frames", "max_visible_enemies",
+    "dice_rolls_total", "dice_roll_1_count", "dice_roll_2_count",
+    "dice_roll_3_count", "dice_roll_4_count", "dice_roll_5_count",
+    "dice_roll_6_count", "dice_dash_refreshes", "dice_dash_effective_refreshes",
+    "dice_power_refreshes", "dice_power_effective_refreshes", "dice_jackpot_rolls",
+    "dice_buff_active_frames", "dice_fleet_frames", "dice_guard_frames",
+    "dice_edge_frames", "dice_focus_frames", "dice_jackpot_frames",
     "package_frames", "package_escort_count", "package_escort_hp", "package_escort_max_hp",
     "package_escort_hp_pct", "package_rescue_saves", "package_rescue_clutch_saves",
     "package_rescue_perfect_saves", "package_rescue_pulls", "package_rescue_misses",
@@ -2079,6 +2147,35 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
             end
         end
 
+        if row.class == "Dicebinder" then
+            local rolls = tonumber(row.avg_dice_rolls_total) or 0
+            if rolls > 0 then
+                local frames = math.max(1, tonumber(row.avg_frames) or 1)
+                local buff_frames = tonumber(row.avg_dice_buff_active_frames) or 0
+                local dash_refreshes = tonumber(row.avg_dice_dash_effective_refreshes) or 0
+                local power_refreshes = tonumber(row.avg_dice_power_effective_refreshes) or 0
+                local jackpots = tonumber(row.avg_dice_jackpot_rolls) or 0
+                add_report_row(
+                    rows,
+                    class_name,
+                    "info",
+                    "dicebinder",
+                    "avg_dice_rolls_total",
+                    rolls,
+                    0,
+                    string.format(
+                        "%s skill dice averaged %.1f rolls/run, %.1f effective Dash refreshes, %.1f effective Power refreshes, %.1f jackpots, and %.1f%% buff uptime.",
+                        class_name,
+                        rolls,
+                        dash_refreshes,
+                        power_refreshes,
+                        jackpots,
+                        buff_frames / frames * 100
+                    )
+                )
+            end
+        end
+
         add_package_report_rows(rows, row, class_name, runs, min_runs)
         add_drill_scorecard_report_rows(rows, row, class_name, runs, min_runs)
 
@@ -2632,6 +2729,14 @@ local function run_balance(raw_args)
             "package_rescue_active_blocked", "package_rescue_active_late", "package_rescue_active_perfect",
             "package_rescue_pull_active_frames", "package_rescue_pull_target",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
+            "dice_rolls_total", "dice_last_roll", "dice_next_roll_frames",
+            "dice_roll_1_count", "dice_roll_2_count", "dice_roll_3_count",
+            "dice_roll_4_count", "dice_roll_5_count", "dice_roll_6_count",
+            "dice_dash_refreshes", "dice_dash_effective_refreshes",
+            "dice_power_refreshes", "dice_power_effective_refreshes",
+            "dice_jackpot_rolls", "dice_buff_active_frames",
+            "dice_fleet_frames", "dice_guard_frames", "dice_edge_frames",
+            "dice_focus_frames", "dice_jackpot_frames",
             "damage_taken_total", "regen_adjusted_damage_taken_total",
             "necromancer_regen_offset_pct", "damage_event_total", "damage_taken_by_source",
             "damage_events_by_source",
@@ -2691,6 +2796,14 @@ local function run_balance(raw_args)
             "package_rescue_active_blocked", "package_rescue_active_late", "package_rescue_active_perfect",
             "package_rescue_pull_active_frames", "package_rescue_pull_target",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
+            "dice_rolls_total", "dice_last_roll", "dice_next_roll_frames",
+            "dice_roll_1_count", "dice_roll_2_count", "dice_roll_3_count",
+            "dice_roll_4_count", "dice_roll_5_count", "dice_roll_6_count",
+            "dice_dash_refreshes", "dice_dash_effective_refreshes",
+            "dice_power_refreshes", "dice_power_effective_refreshes",
+            "dice_jackpot_rolls", "dice_buff_active_frames",
+            "dice_fleet_frames", "dice_guard_frames", "dice_edge_frames",
+            "dice_focus_frames", "dice_jackpot_frames",
             "damage_taken_total", "regen_adjusted_damage_taken_total",
             "necromancer_regen_offset_pct", "damage_event_total", "damage_taken_by_source",
             "damage_events_by_source",
@@ -2739,6 +2852,12 @@ local function run_balance(raw_args)
             "avg_objective_damage_total", "avg_objective_damage_event_total",
             "avg_reaction_hold_frames", "avg_movement_noise_frames",
             "avg_spell_skip_frames", "avg_item_skip_frames", "avg_weapon_skip_frames",
+            "avg_dice_rolls_total", "avg_dice_roll_1_count", "avg_dice_roll_2_count",
+            "avg_dice_roll_3_count", "avg_dice_roll_4_count", "avg_dice_roll_5_count",
+            "avg_dice_roll_6_count", "avg_dice_dash_refreshes", "avg_dice_dash_effective_refreshes",
+            "avg_dice_power_refreshes", "avg_dice_power_effective_refreshes", "avg_dice_jackpot_rolls",
+            "avg_dice_buff_active_frames", "avg_dice_fleet_frames", "avg_dice_guard_frames",
+            "avg_dice_edge_frames", "avg_dice_focus_frames", "avg_dice_jackpot_frames",
             "avg_ranged_keepaway_frames", "avg_ranged_close_enemy_frames",
             "avg_ranged_close_gragh_frames", "avg_rescue_intercept_frames",
             "avg_rescue_hold_frames", "avg_rescue_late_reaction_frames", "avg_necromancer_regen_frames",

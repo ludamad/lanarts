@@ -1082,6 +1082,24 @@ DICE_ROLLS = {
     [6]: {kind: "jackpot", label: "Power ready", color: COL_PALE_YELLOW}
 }
 
+dicebinder_increment = (effect, key, amount=1) ->
+    effect[key] = (effect[key] or 0) + amount
+
+dicebinder_record_refresh = (effect, caster, spell_name, total_key, effective_key) ->
+    dicebinder_increment(effect, total_key)
+    if caster\spell_cooldown(spell_name) > 0
+        dicebinder_increment(effect, effective_key)
+
+dicebinder_record_roll = (effect, caster, roll, entry) ->
+    dicebinder_increment(effect, "rolls_total")
+    dicebinder_increment(effect, "roll_#{roll}_count")
+    if roll == 5
+        dicebinder_record_refresh(effect, caster, "Dash Attack", "dash_refreshes", "dash_effective_refreshes")
+    elseif roll == 6
+        dicebinder_increment(effect, "jackpot_rolls")
+        dicebinder_record_refresh(effect, caster, "Dash Attack", "dash_refreshes", "dash_effective_refreshes")
+        dicebinder_record_refresh(effect, caster, "Power Strike", "power_refreshes", "power_effective_refreshes")
+
 dicebinder_roll = (effect, caster) ->
     roll = math.random(1, 6)
     entry = DICE_ROLLS[roll]
@@ -1090,6 +1108,7 @@ dicebinder_roll = (effect, caster) ->
     effect.buff_kind = entry.kind
     effect.buff_time = DICE_BUFF_DURATION
     effect.next_roll = effect.roll_interval or DICE_ROLL_INTERVAL
+    dicebinder_record_roll(effect, caster, roll, entry)
 
     if roll == 5
         caster\set_spell_cooldown("Dash Attack", 0)
@@ -1144,9 +1163,20 @@ DataW.effect_create {
         @roll_color = COL_PALE_BLUE
         @buff_kind = "none"
         @buff_time = 0
+        @rolls_total = 0
+        @dash_refreshes = 0
+        @dash_effective_refreshes = 0
+        @power_refreshes = 0
+        @power_effective_refreshes = 0
+        @jackpot_rolls = 0
+        @buff_active_frames = 0
+        for roll=1,6
+            @["roll_#{roll}_count"] = 0
     step_func: (caster) =>
         @next_roll -= 1
         if @buff_time and @buff_time > 0
+            dicebinder_increment(@, "buff_active_frames")
+            dicebinder_increment(@, "#{@buff_kind}_frames") if @buff_kind and @buff_kind ~= "none"
             @buff_time -= 1
         if @next_roll <= 0
             dicebinder_roll(@, caster)

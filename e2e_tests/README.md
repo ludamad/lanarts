@@ -128,6 +128,9 @@ Balance simulations:
     package_micro_punish_total for Gragh Fury healing caused by avoidable
     mechanic hits, plus package_micro_punish_break_total when clutch/perfect
     rescue saves break that Fury back off.
+    Dicebinder runs also emit dice_rolls_total, per-face roll counts,
+    effective Dash/Power refreshes, jackpot rolls, and buff active frames so
+    skill-dice RNG can be modeled separately from package execution.
     Use --package_components orbit,pulse,sweep,summon,escort,rescue to isolate
     package parts while keeping the same encounter arena, monsters, and
     pressure preset. A rescue component automatically keeps its escort target.

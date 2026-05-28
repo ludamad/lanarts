@@ -2883,6 +2883,12 @@ telemetry_watch_for = function(config, package_summary)
         append_metric(rows, "avg_necromancer_regen_recovered_total", "Regen total", "sustain volume")
         append_metric(rows, "avg_necromancer_regen_frames", "Regen frames", "regen uptime")
         append_metric(rows, "avg_necromancer_close_frames", "Close frames", "Pain-range commitment")
+    elseif config.className == "Dicebinder" then
+        append_metric(rows, "avg_dice_rolls_total", "D6 rolls", "skill dice windows per run")
+        append_metric(rows, "avg_dice_dash_effective_refreshes", "Dash refresh", "cooldown refunds that mattered")
+        append_metric(rows, "avg_dice_power_effective_refreshes", "Power refresh", "Power Strike refunds that mattered")
+        append_metric(rows, "avg_dice_jackpot_rolls", "Jackpots", "roll-six swing windows")
+        append_metric(rows, "avg_dice_buff_active_frames", "Buff frames", "skill dice uptime")
     end
     return rows
 end

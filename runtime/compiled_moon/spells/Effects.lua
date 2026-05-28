@@ -1563,6 +1563,32 @@ local DICE_ROLLS = {
     color = COL_PALE_YELLOW
   }
 }
+local dicebinder_increment
+dicebinder_increment = function(effect, key, amount)
+  if amount == nil then
+    amount = 1
+  end
+  effect[key] = (effect[key] or 0) + amount
+end
+local dicebinder_record_refresh
+dicebinder_record_refresh = function(effect, caster, spell_name, total_key, effective_key)
+  dicebinder_increment(effect, total_key)
+  if caster:spell_cooldown(spell_name) > 0 then
+    return dicebinder_increment(effect, effective_key)
+  end
+end
+local dicebinder_record_roll
+dicebinder_record_roll = function(effect, caster, roll, entry)
+  dicebinder_increment(effect, "rolls_total")
+  dicebinder_increment(effect, "roll_" .. tostring(roll) .. "_count")
+  if roll == 5 then
+    return dicebinder_record_refresh(effect, caster, "Dash Attack", "dash_refreshes", "dash_effective_refreshes")
+  elseif roll == 6 then
+    dicebinder_increment(effect, "jackpot_rolls")
+    dicebinder_record_refresh(effect, caster, "Dash Attack", "dash_refreshes", "dash_effective_refreshes")
+    return dicebinder_record_refresh(effect, caster, "Power Strike", "power_refreshes", "power_effective_refreshes")
+  end
+end
 local dicebinder_roll
 dicebinder_roll = function(effect, caster)
   local roll = math.random(1, 6)
@@ -1572,6 +1598,7 @@ dicebinder_roll = function(effect, caster)
   effect.buff_kind = entry.kind
   effect.buff_time = DICE_BUFF_DURATION
   effect.next_roll = effect.roll_interval or DICE_ROLL_INTERVAL
+  dicebinder_record_roll(effect, caster, roll, entry)
   if roll == 5 then
     caster:set_spell_cooldown("Dash Attack", 0)
   elseif roll == 6 then
@@ -1648,10 +1675,24 @@ DataW.effect_create({
     self.roll_color = COL_PALE_BLUE
     self.buff_kind = "none"
     self.buff_time = 0
+    self.rolls_total = 0
+    self.dash_refreshes = 0
+    self.dash_effective_refreshes = 0
+    self.power_refreshes = 0
+    self.power_effective_refreshes = 0
+    self.jackpot_rolls = 0
+    self.buff_active_frames = 0
+    for roll = 1, 6 do
+      self["roll_" .. tostring(roll) .. "_count"] = 0
+    end
   end,
   step_func = function(self, caster)
     self.next_roll = self.next_roll - 1
     if self.buff_time and self.buff_time > 0 then
+      dicebinder_increment(self, "buff_active_frames")
+      if self.buff_kind and self.buff_kind ~= "none" then
+        dicebinder_increment(self, tostring(self.buff_kind) .. "_frames")
+      end
       self.buff_time = self.buff_time - 1
     end
     if self.next_roll <= 0 then
