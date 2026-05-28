@@ -94,6 +94,8 @@ Balance simulations:
     Content API fight setup rows also expose a per-rhythm micro plan with
     class posture, effective reaction windows, and telemetry for separating
     real micro from forgiving enemy pressure.
+    Run summaries and fight setup payloads include a predicted first-720-frame
+    pressure preview so package stack timing can be inspected before launching.
     Use --loadout_preset late to give each class a representative equipped
     late-game kit without inflating the starting level. Use --loadout to append
     comma-separated item specs such as `Health Potion*3,Hydra Ring`, and

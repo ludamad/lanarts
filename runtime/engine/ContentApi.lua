@@ -728,6 +728,14 @@ local function scaled_count(value, fallback, intensity)
     return math.max(1, math.ceil((tonumber(count) or 1) * math.max(0.1, tonumber(intensity.summons) or 1)))
 end
 
+local function safe_rate(num, denom)
+    denom = tonumber(denom) or 0
+    if denom <= 0 then
+        return 0
+    end
+    return (tonumber(num) or 0) / denom
+end
+
 local function encounter_rhythms(encounter, intensity)
     local package = encounter and encounter.package or {}
     local rows = {}
@@ -1470,10 +1478,95 @@ local function analysis_plan_payload(config)
     }
 end
 
+local function pressure_labels_for_frame(rhythms, frame)
+    local labels = {}
+    for _, rhythm in ipairs(rhythms or {}) do
+        if rhythm.id ~= "escort" then
+            local interval = math.max(1, tonumber(rhythm.interval) or 1)
+            local offset = tonumber(rhythm.offset) or 0
+            local duration = math.max(0, tonumber(rhythm.duration) or 0)
+            if duration > 0 and frame >= offset then
+                local phase = (frame - offset) % interval
+                if phase < duration then
+                    labels[#labels + 1] = rhythm.label or rhythm.id
+                end
+            end
+        end
+    end
+    return labels
+end
+
+local function pressure_preview_for(rhythms, horizon_frames)
+    rhythms = rhythms or {}
+    local horizon = math.max(120, math.floor(tonumber(horizon_frames) or 720))
+    local peak_stack = 0
+    local first_overlap
+    local first_peak
+    local overlap_frames = 0
+    local windows = {}
+    local active_window
+
+    for frame = 0, horizon - 1 do
+        local labels = pressure_labels_for_frame(rhythms, frame)
+        local stack = #labels
+        if stack > peak_stack then
+            peak_stack = stack
+            first_peak = frame
+        end
+        if stack >= 2 then
+            overlap_frames = overlap_frames + 1
+            if not first_overlap then
+                first_overlap = frame
+            end
+            if not active_window then
+                active_window = {
+                    startFrame = frame,
+                    endFrame = frame + 1,
+                    peakStack = stack,
+                    labels = table.concat(labels, "+"),
+                }
+            else
+                active_window.endFrame = frame + 1
+                if stack > (active_window.peakStack or 0) then
+                    active_window.peakStack = stack
+                    active_window.labels = table.concat(labels, "+")
+                end
+            end
+        elseif active_window then
+            active_window.durationFrames = (active_window.endFrame or frame) - (active_window.startFrame or frame)
+            windows[#windows + 1] = active_window
+            active_window = nil
+        end
+    end
+    if active_window then
+        active_window.durationFrames = (active_window.endFrame or horizon) - (active_window.startFrame or horizon)
+        windows[#windows + 1] = active_window
+    end
+
+    local limited_windows = {}
+    for idx, window in ipairs(windows) do
+        if idx > 8 then
+            break
+        end
+        limited_windows[#limited_windows + 1] = window
+    end
+
+    return {
+        horizonFrames = horizon,
+        peakStack = peak_stack,
+        firstPeakFrame = first_peak,
+        overlapFrames = overlap_frames,
+        overlapRate = safe_rate(overlap_frames, horizon),
+        firstOverlapFrame = first_overlap,
+        windows = limited_windows,
+    }
+end
+
 local function package_summary_from_rhythms(rhythms)
     if #(rhythms or {}) == 0 then
         return nil
     end
+    local pressure = pressure_preview_for(rhythms)
     local rhythm_ids = {}
     local first_threat
     local fastest_loop
@@ -1516,6 +1609,10 @@ local function package_summary_from_rhythms(rhythms)
         hasSummons = has_summons,
         summonCap = summon_cap,
         hitsEscorts = hits_escorts,
+        predictedPeakStack = pressure.peakStack,
+        predictedOverlapFrames = pressure.overlapFrames,
+        predictedOverlapRate = pressure.overlapRate,
+        predictedFirstOverlapFrame = pressure.firstOverlapFrame,
     }
 end
 
@@ -1864,6 +1961,7 @@ local function fight_setup_payload(config)
     local package_summary = package_summary_from_rhythms(rhythms)
     local control_model = control_model_for(config)
     local micro_plan = micro_plan_for(rhythms, control_model)
+    local pressure_preview = pressure_preview_for(rhythms)
     return {
         schema = 1,
         config = config,
@@ -1880,6 +1978,7 @@ local function fight_setup_payload(config)
         loadout = loadout_for_config(config),
         threats = threat_windows_for(rhythms),
         microPlan = micro_plan,
+        pressurePreview = pressure_preview,
         packageSummary = package_summary,
         telemetry = telemetry_watch_for(config, package_summary),
         warnings = warnings_for(config, selected),
@@ -1902,6 +2001,7 @@ local function run_summary_payload(config)
     }
     local encounter = encounter_with_components(selected.encounter, config.packageComponents)
     local rhythms = encounter_rhythms(encounter, selected.intensity)
+    local pressure_preview = pressure_preview_for(rhythms)
     return {
         schema = 1,
         config = config,
@@ -1918,6 +2018,7 @@ local function run_summary_payload(config)
         encounter = encounter,
         intensity = selected.intensity,
         rhythms = rhythms,
+        pressurePreview = pressure_preview,
         packageSummary = package_summary_from_rhythms(rhythms),
         botProfile = selected_bot_profile(config),
         warnings = warnings_for(config, selected),
@@ -2421,6 +2522,12 @@ local function resource_summary_chips(resource)
         if summary.fastestLoopFrames and summary.fastestLoopFrames > 0 then
             add(tostring(summary.fastestLoopFrames) .. "f loop")
         end
+        if summary.predictedPeakStack and summary.predictedPeakStack > 0 then
+            add("stack " .. tostring(summary.predictedPeakStack))
+        end
+        if summary.predictedOverlapRate and summary.predictedOverlapRate > 0 then
+            add("overlap " .. tostring(math.floor(summary.predictedOverlapRate * 100 + 0.5)) .. "%")
+        end
         if summary.hasRescue then
             add("rescue")
         end
@@ -2604,6 +2711,7 @@ local function presentation_payload(config)
         telemetry = fight_setup.telemetry or {},
         threats = fight_setup.threats or {},
         microPlan = fight_setup.microPlan or {},
+        pressurePreview = fight_setup.pressurePreview or {},
         warnings = run_summary.warnings or {},
     }
 end

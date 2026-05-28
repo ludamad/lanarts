@@ -1598,6 +1598,45 @@
         host.appendChild(row);
       }
 
+      function pctText(value) {
+        return `${Math.round(Number(value || 0) * 100)}%`;
+      }
+
+      function pressureChips(preview) {
+        const row = document.createElement('div');
+        row.className = 'item-chips';
+        if (!preview) {
+          return row;
+        }
+        addChip(row, `peak ${preview.peakStack || 0}`);
+        addChip(row, `overlap ${pctText(preview.overlapRate)}`);
+        addChip(row, `${preview.overlapFrames || 0}/${preview.horizonFrames || 0}f`);
+        if (preview.firstOverlapFrame !== undefined && preview.firstOverlapFrame !== null) {
+          addChip(row, `first ${preview.firstOverlapFrame}f`);
+        }
+        return row;
+      }
+
+      function renderPressureWindows(preview, limit) {
+        const grid = document.createElement('div');
+        grid.className = 'threat-grid';
+        ((preview && preview.windows) || []).slice(0, limit || 4).forEach((window) => {
+          const card = document.createElement('div');
+          card.className = 'threat-card';
+          const label = document.createElement('strong');
+          label.textContent = `Stack ${window.peakStack || 0}`;
+          const timing = document.createElement('code');
+          timing.textContent = `${window.startFrame || 0}-${window.endFrame || 0}f`;
+          const detail = document.createElement('span');
+          detail.textContent = `${window.durationFrames || 0}f | ${window.labels || 'package pressure'}`;
+          card.appendChild(label);
+          card.appendChild(timing);
+          card.appendChild(detail);
+          grid.appendChild(card);
+        });
+        return grid;
+      }
+
       function microPlanCard(row) {
         const card = document.createElement('div');
         card.className = 'micro-card';
@@ -1702,6 +1741,12 @@
           addChip(packageInfo, `${summary.packageSummary.rhythmCount} rhythms`);
           addChip(packageInfo, `first ${summary.packageSummary.firstThreatFrame || 0}f`);
           addChip(packageInfo, `fastest ${summary.packageSummary.fastestLoopFrames || 0}f`);
+          if (summary.packageSummary.predictedPeakStack) {
+            addChip(packageInfo, `stack ${summary.packageSummary.predictedPeakStack}`);
+          }
+          if (summary.packageSummary.predictedOverlapRate) {
+            addChip(packageInfo, `overlap ${pctText(summary.packageSummary.predictedOverlapRate)}`);
+          }
           if (summary.packageSummary.hasRescue) {
             addChip(packageInfo, `${summary.packageSummary.rescueClutchWindow || 0}f clutch`);
             if (summary.packageSummary.rescuePullFrames) {
@@ -1797,6 +1842,13 @@
           const profile = setup.role.botProfile || {};
           addChip(role, profile.label || profile.id || 'Human');
           appendSummaryLine(host, 'Role', role);
+        }
+
+        if (setup.pressurePreview && (setup.pressurePreview.peakStack || setup.pressurePreview.overlapFrames)) {
+          appendSummaryLine(host, 'Density', pressureChips(setup.pressurePreview));
+          if ((setup.pressurePreview.windows || []).length) {
+            appendSummaryLine(host, 'Stacks', renderPressureWindows(setup.pressurePreview, 5));
+          }
         }
 
         const microPlan = setup.microPlan || [];
@@ -2151,6 +2203,18 @@
         }
         if (watch.childElementCount > 1) {
           host.appendChild(watch);
+        }
+
+        if (payload.pressurePreview && (payload.pressurePreview.peakStack || payload.pressurePreview.overlapFrames)) {
+          const pressureSection = document.createElement('div');
+          pressureSection.className = 'presentation-section';
+          appendBoardTitle(pressureSection, 'Pressure Density');
+          pressureSection.appendChild(pressureChips(payload.pressurePreview));
+          const windows = renderPressureWindows(payload.pressurePreview, 4);
+          if (windows.childElementCount) {
+            pressureSection.appendChild(windows);
+          }
+          host.appendChild(pressureSection);
         }
 
         const microPlan = payload.microPlan || [];

@@ -127,6 +127,8 @@ local function run_content_api_smoke()
     expect(summary.packageSummary and summary.packageSummary.hasRescue, "summary should expose package rescue summary")
     expect(summary.packageSummary and summary.packageSummary.hasSummons, "summary should expose package summon summary")
     expect(summary.packageSummary and summary.packageSummary.hitsEscorts, "summary should expose ally-risk package summary")
+    expect(summary.packageSummary and (summary.packageSummary.predictedPeakStack or 0) >= 2, "summary should expose predicted pressure stack")
+    expect(summary.pressurePreview and (summary.pressurePreview.overlapFrames or 0) > 0, "summary should expose pressure overlap preview")
     expect(summary.controlModel and summary.controlModel.botProfile and summary.controlModel.botProfile.id == "human", "summary should expose selected human control model")
     expect(summary.controlModel and summary.controlModel.classRange == "close", "summary should expose class positioning model")
 
@@ -137,6 +139,8 @@ local function run_content_api_smoke()
     expect(fight_setup.packageSummary and fight_setup.packageSummary.hasRescue, "fight setup should expose rescue package summary")
     expect(#(fight_setup.telemetry or {}) >= 10, "fight setup should expose telemetry watch fields")
     expect(#(fight_setup.microPlan or {}) >= 3, "fight setup should expose per-rhythm micro plan rows")
+    expect(fight_setup.pressurePreview and (fight_setup.pressurePreview.peakStack or 0) >= 2, "fight setup should expose pressure density preview")
+    expect(fight_setup.pressurePreview and #(fight_setup.pressurePreview.windows or {}) >= 1, "fight setup should expose stacked pressure windows")
     local has_fight_rescue_window = false
     local has_pressure_peak_metric = false
     local has_pressure_overlap_metric = false
@@ -571,6 +575,7 @@ local function run_content_api_smoke()
     expect(presentation.telemetry and #presentation.telemetry >= 10, "presentation should expose telemetry watch rows")
     expect(presentation.threats and #presentation.threats >= 2, "presentation should expose threat timing rows")
     expect(presentation.microPlan and #presentation.microPlan >= 3, "presentation should expose micro plan rows")
+    expect(presentation.pressurePreview and (presentation.pressurePreview.peakStack or 0) >= 2, "presentation should expose pressure density preview")
 
     print(string.format(
         "Content API smoke complete: %d classes, %d maps, %d encounters, %d generated resources.",
