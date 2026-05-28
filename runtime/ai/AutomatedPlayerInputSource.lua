@@ -735,7 +735,8 @@ function AutomatedPlayerInputSource:_combat_move(enemies, ordered_spell)
             return self:_set_move(avoid)
         end
     end
-    if not ordered_spell and CLOSE_RANGE_CLASSES[player.class_name] and dist > self.options.melee_close then
+    local should_close_for_spell = player.class_name == "Dicebinder"
+    if (not ordered_spell or should_close_for_spell) and CLOSE_RANGE_CLASSES[player.class_name] and dist > self.options.melee_close then
         return self:_set_move(toward)
     end
     return false

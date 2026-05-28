@@ -259,6 +259,43 @@ function M.draw_screen_edges(args)
     end
 end
 
+local function draw_die_face(center, roll, size, color, opacity)
+    roll = math.floor(tonumber(roll) or 0)
+    if roll <= 0 then
+        return
+    end
+    opacity = clamp(opacity or 1, 0, 1)
+    local half = size / 2
+    local box = {center[1] - half, center[2] - half, center[1] + half, center[2] + half}
+    Display.draw_rectangle(alpha(COL_BLACK, 0.44 * opacity), box)
+    Display.draw_rectangle_outline(alpha(color, 0.92 * opacity), box, 1)
+
+    local off = size * 0.25
+    local pips = {}
+    if roll == 1 then
+        pips = {{0, 0}}
+    elseif roll == 2 then
+        pips = {{-off, -off}, {off, off}}
+    elseif roll == 3 then
+        pips = {{-off, -off}, {0, 0}, {off, off}}
+    elseif roll == 4 then
+        pips = {{-off, -off}, {off, -off}, {-off, off}, {off, off}}
+    elseif roll == 5 then
+        pips = {{-off, -off}, {off, -off}, {0, 0}, {-off, off}, {off, off}}
+    else
+        pips = {{-off, -off}, {off, -off}, {-off, 0}, {off, 0}, {-off, off}, {off, off}}
+    end
+
+    local pip_radius = math.max(1.6, size * 0.075)
+    for _, pip in ipairs(pips) do
+        Display.draw_circle(
+            alpha(COL_WHITE, 0.88 * opacity),
+            {center[1] + pip[1], center[2] + pip[2]},
+            pip_radius
+        )
+    end
+end
+
 function M.draw_die_badge(obj, args)
     if not obj or obj.destroyed or not Map.object_visible(obj) then
         return
@@ -277,10 +314,16 @@ function M.draw_die_badge(obj, args)
     local buff_duration = math.max(1, args.buff_duration or 1)
     local buff_pct = clamp(buff_remaining / buff_duration, 0, 1)
     local color = args.color or COL_PALE_BLUE
-    local xy = screen_xy({obj.x, obj.y - (obj.radius or 14) - 30})
-    local pulse = 0.5 + 0.5 * math.sin((GameState.frame or 0) * 0.32)
-    local w = rolling and 72 or label ~= "" and 64 or 48
-    local h = rolling and 32 or label ~= "" and 28 or 20
+    local frame = GameState.frame or 0
+    local base_xy = screen_xy({obj.x, obj.y - (obj.radius or 14) - 30})
+    local shake = rolling and (0.8 + rolling_pct * 2.0) or 0
+    local xy = {
+        base_xy[1] + math.sin(frame * 0.73) * shake,
+        base_xy[2] + math.cos(frame * 0.61) * shake * 0.45,
+    }
+    local pulse = 0.5 + 0.5 * math.sin(frame * 0.32)
+    local w = rolling and 82 or label ~= "" and 72 or 48
+    local h = rolling and 34 or label ~= "" and 30 or 20
     local box = {xy[1] - w / 2, xy[2] - h / 2, xy[1] + w / 2, xy[2] + h / 2}
     Display.draw_radial_gradient(
         rolling and alpha(color, 0.20 + pulse * 0.12) or {120, 170, 255, 35},
@@ -291,9 +334,16 @@ function M.draw_die_badge(obj, args)
     )
     Display.draw_rectangle(alpha(COL_BLACK, rolling and 0.58 or 0.48), box)
     Display.draw_rectangle_outline(alpha(color, rolling and (0.82 + pulse * 0.16) or 0.78), box, rolling and 2 or 1)
+    local has_die = roll > 0 and label ~= ""
+    local text_x = xy[1]
+    if has_die then
+        local die_size = rolling and 21 or 18
+        draw_die_face({box[1] + 17, xy[2]}, roll, die_size, color, rolling and 1 or 0.88)
+        text_x = xy[1] + 11
+    end
     if label ~= "" then
-        Fonts.small:draw({color = alpha(COL_WHITE, 0.95), origin = Display.CENTER}, {xy[1], xy[2] - 7}, "D6 " .. tostring(roll))
-        Fonts.small:draw({color = alpha(color, 0.95), origin = Display.CENTER}, {xy[1], xy[2] + 7}, label)
+        Fonts.small:draw({color = alpha(COL_WHITE, 0.95), origin = Display.CENTER}, {text_x, xy[2] - 7}, "D6 " .. tostring(roll))
+        Fonts.small:draw({color = alpha(color, 0.95), origin = Display.CENTER}, {text_x, xy[2] + 7}, label)
     else
         Fonts.small:draw({color = alpha(COL_WHITE, 0.95), origin = Display.CENTER}, {xy[1], xy[2] - 1}, "D6 " .. tostring(roll))
     end
@@ -308,11 +358,17 @@ function M.draw_die_badge(obj, args)
             local angle = spin + idx * TWO_PI / 6
             local inner = outer_radius - 3
             local outer = outer_radius + 3 + pulse * 2
+            local pip_xy = {xy[1] + math.cos(angle) * (outer_radius + 4), xy[2] + math.sin(angle) * (outer_radius + 4)}
             Display.draw_line(
                 alpha(color, 0.18 + pulse * 0.18),
                 {xy[1] + math.cos(angle) * inner, xy[2] + math.sin(angle) * inner},
                 {xy[1] + math.cos(angle) * outer, xy[2] + math.sin(angle) * outer},
                 1
+            )
+            Display.draw_circle(
+                alpha(idx <= math.max(1, roll) and color or COL_WHITE, 0.20 + pulse * 0.22),
+                pip_xy,
+                idx <= math.max(1, roll) and 2.2 or 1.4
             )
         end
     end

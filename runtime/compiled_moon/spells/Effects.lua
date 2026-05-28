@@ -802,13 +802,19 @@ DataW.effect_create({
     end
   end,
   on_receive_damage_func = function(self, attacker, defender, damage)
-    if not self.active_bonuses[attacker.id] then
+    local attacker_key
+    if attacker and attacker.id then
+      attacker_key = attacker.id
+    else
+      attacker_key = "environment"
+    end
+    if not self.active_bonuses[attacker_key] then
       for _ in screens() do
         EventLog.add("Your defence rises due to getting hit!", COL_PALE_BLUE)
       end
-      self.active_bonuses[attacker.id] = self.duration
-    elseif self.active_bonuses[attacker.id] < self.duration then
-      self.active_bonuses[attacker.id] = self.duration
+      self.active_bonuses[attacker_key] = self.duration
+    elseif self.active_bonuses[attacker_key] < self.duration then
+      self.active_bonuses[attacker_key] = self.duration
     end
     return damage
   end
@@ -1531,7 +1537,7 @@ for _index_0 = 1, #_list_2 do
 end
 local DICE_ROLL_INTERVAL = 240
 local DICE_BUFF_DURATION = 150
-local DICE_ROLL_ANIMATION = 36
+local DICE_ROLL_ANIMATION = 48
 local DICE_INITIAL_ROLL_DELAY = DICE_ROLL_INTERVAL - DICE_BUFF_DURATION - DICE_ROLL_ANIMATION
 local DICE_FULL_BAG_MASK = 63
 local DICE_FACE_BITS = {
@@ -1652,6 +1658,74 @@ dicebinder_record_roll = function(effect, caster, roll, entry)
     return dicebinder_record_refresh(effect, caster, "Power Strike", "power_refreshes", "power_effective_refreshes")
   end
 end
+local dicebinder_emit_roll_fx
+dicebinder_emit_roll_fx = function(caster, roll, entry)
+  local major = roll >= 5
+  ImpactFX.world_burst({
+    map = caster.map,
+    xy = caster.xy,
+    color = entry.color,
+    label = "D6 " .. tostring(roll),
+    radius = ((function()
+      if major then
+        return 82
+      else
+        return 58 + roll * 4
+      end
+    end)()),
+    duration = ((function()
+      if major then
+        return 46
+      else
+        return 30 + roll * 2
+      end
+    end)())
+  })
+  local pip_count = math.max(2, math.min(6, roll))
+  local spread = 26 + roll * 5
+  for idx = 1, pip_count do
+    local angle = (GameState.frame or 0) * 0.037 + idx * math.pi * 2 / pip_count
+    ImpactFX.world_burst({
+      map = caster.map,
+      xy = {
+        caster.x + math.cos(angle) * spread,
+        caster.y + math.sin(angle) * spread
+      },
+      color = entry.color,
+      radius = ((function()
+        if major then
+          return 28
+        else
+          return 18
+        end
+      end)()),
+      duration = 18 + roll * 3,
+      drift = 0.18
+    })
+  end
+  if roll >= 4 then
+    return ImpactFX.screen_flash({
+      map = caster.map,
+      color = entry.color,
+      alpha = ((function()
+        if roll == 6 then
+          return 0.24
+        elseif roll == 5 then
+          return 0.16
+        else
+          return 0.10
+        end
+      end)()),
+      duration = ((function()
+        if roll == 6 then
+          return 16
+        else
+          return 12
+        end
+      end)())
+    })
+  end
+end
 local dicebinder_resolve_roll
 dicebinder_resolve_roll = function(effect, caster)
   local roll
@@ -1678,40 +1752,7 @@ dicebinder_resolve_roll = function(effect, caster)
     caster:heal_hp(6 + caster.stats.level * 2)
     caster:heal_mp(8 + caster.stats.level)
   end
-  ImpactFX.world_burst({
-    map = caster.map,
-    xy = caster.xy,
-    color = entry.color,
-    label = "D6 " .. tostring(roll),
-    radius = ((function()
-      if roll >= 5 then
-        return 78
-      else
-        return 56
-      end
-    end)()),
-    duration = ((function()
-      if roll >= 5 then
-        return 42
-      else
-        return 30
-      end
-    end)())
-  })
-  if roll >= 5 then
-    ImpactFX.screen_flash({
-      map = caster.map,
-      color = entry.color,
-      alpha = ((function()
-        if roll == 6 then
-          return 0.24
-        else
-          return 0.16
-        end
-      end)()),
-      duration = 14
-    })
-  end
+  dicebinder_emit_roll_fx(caster, roll, entry)
   for _ in screens() do
     if caster:is_local_player() then
       EventLog.add("Skill die " .. tostring(roll) .. ": " .. tostring(entry.label) .. ".", entry.color)
@@ -1731,7 +1772,7 @@ dicebinder_start_roll = function(effect, caster)
     xy = caster.xy,
     color = COL_WHITE,
     label = "D6",
-    radius = 58,
+    radius = 62,
     duration = DICE_ROLL_ANIMATION
   })
 end
@@ -1769,6 +1810,9 @@ DataW.effect_create({
         new.strength = new.strength + 3
       elseif "focus" == _exp_0 then
         new.spell_cooldown_multiplier = new.spell_cooldown_multiplier * 0.72
+      elseif "dash" == _exp_0 then
+        new.speed = new.speed + 1.25
+        new.melee_cooldown_multiplier = new.melee_cooldown_multiplier * 0.94
       elseif "jackpot" == _exp_0 then
         new.melee_cooldown_multiplier = new.melee_cooldown_multiplier * 0.82
         new.spell_cooldown_multiplier = new.spell_cooldown_multiplier * 0.82
@@ -1838,7 +1882,7 @@ DataW.effect_create({
       remaining = self.next_roll or 0,
       interval = self.roll_interval or DICE_ROLL_INTERVAL,
       color = (rolling and entry and entry.color) or self.roll_color or COL_PALE_BLUE,
-      label = (rolling and (((self.rolling_time or 0) <= 7 and entry and entry.short) or "ROLL")) or (entry and entry.short) or "",
+      label = (rolling and ((self.rolling_time or 0) <= 7 and entry and entry.short or "ROLL")) or (entry and entry.short) or "",
       buff_remaining = self.buff_time or 0,
       buff_duration = DICE_BUFF_DURATION,
       rolling = rolling,

@@ -1074,7 +1074,7 @@ for name in *{"Ranger", "Fighter", "Templar", "Rogue", "Green Mage", "Black Mage
 
 DICE_ROLL_INTERVAL = 240
 DICE_BUFF_DURATION = 150
-DICE_ROLL_ANIMATION = 36
+DICE_ROLL_ANIMATION = 48
 DICE_INITIAL_ROLL_DELAY = DICE_ROLL_INTERVAL - DICE_BUFF_DURATION - DICE_ROLL_ANIMATION
 DICE_FULL_BAG_MASK = 63
 DICE_FACE_BITS = {1, 2, 4, 8, 16, 32}
@@ -1139,6 +1139,41 @@ dicebinder_record_roll = (effect, caster, roll, entry) ->
         dicebinder_record_refresh(effect, caster, "Dash Attack", "dash_refreshes", "dash_effective_refreshes")
         dicebinder_record_refresh(effect, caster, "Power Strike", "power_refreshes", "power_effective_refreshes")
 
+dicebinder_emit_roll_fx = (caster, roll, entry) ->
+    major = roll >= 5
+    ImpactFX.world_burst {
+        map: caster.map
+        xy: caster.xy
+        color: entry.color
+        label: "D6 #{roll}"
+        radius: (if major then 82 else 58 + roll * 4)
+        duration: (if major then 46 else 30 + roll * 2)
+    }
+
+    pip_count = math.max(2, math.min(6, roll))
+    spread = 26 + roll * 5
+    for idx=1,pip_count
+        angle = (GameState.frame or 0) * 0.037 + idx * math.pi * 2 / pip_count
+        ImpactFX.world_burst {
+            map: caster.map
+            xy: {
+                caster.x + math.cos(angle) * spread
+                caster.y + math.sin(angle) * spread
+            }
+            color: entry.color
+            radius: (if major then 28 else 18)
+            duration: 18 + roll * 3
+            drift: 0.18
+        }
+
+    if roll >= 4
+        ImpactFX.screen_flash {
+            map: caster.map
+            color: entry.color
+            alpha: (if roll == 6 then 0.24 elseif roll == 5 then 0.16 else 0.10)
+            duration: (if roll == 6 then 16 else 12)
+        }
+
 dicebinder_resolve_roll = (effect, caster) ->
     roll = if effect.pending_roll and effect.pending_roll > 0 then effect.pending_roll else dicebinder_next_fair_roll(effect)
     entry = DICE_ROLLS[roll]
@@ -1160,21 +1195,7 @@ dicebinder_resolve_roll = (effect, caster) ->
         caster\heal_hp(6 + caster.stats.level * 2)
         caster\heal_mp(8 + caster.stats.level)
 
-    ImpactFX.world_burst {
-        map: caster.map
-        xy: caster.xy
-        color: entry.color
-        label: "D6 #{roll}"
-        radius: (if roll >= 5 then 78 else 56)
-        duration: (if roll >= 5 then 42 else 30)
-    }
-    if roll >= 5
-        ImpactFX.screen_flash {
-            map: caster.map
-            color: entry.color
-            alpha: (if roll == 6 then 0.24 else 0.16)
-            duration: 14
-        }
+    dicebinder_emit_roll_fx(caster, roll, entry)
 
     for _ in screens()
         if caster\is_local_player()
@@ -1192,7 +1213,7 @@ dicebinder_start_roll = (effect, caster) ->
         xy: caster.xy
         color: COL_WHITE
         label: "D6"
-        radius: 58
+        radius: 62
         duration: DICE_ROLL_ANIMATION
     }
 
@@ -1223,6 +1244,9 @@ DataW.effect_create {
                     new.strength += 3
                 when "focus"
                     new.spell_cooldown_multiplier *= 0.72
+                when "dash"
+                    new.speed += 1.25
+                    new.melee_cooldown_multiplier *= 0.94
                 when "jackpot"
                     new.melee_cooldown_multiplier *= 0.82
                     new.spell_cooldown_multiplier *= 0.82

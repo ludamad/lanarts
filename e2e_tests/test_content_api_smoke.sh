@@ -26,6 +26,8 @@ grep -q "avg_package_micro_punish_break_total" runtime/engine/StartBalanceRun.lu
 grep -q "avg_dice_rolls_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_animation_frames" runtime/engine/StartBalanceRun.lua
 grep -q "DICE_FULL_BAG_MASK" runtime/spells/Effects.moon
+grep -q "dicebinder_emit_roll_fx" runtime/spells/Effects.moon
+grep -q "draw_die_face" runtime/ui/ProceduralEffects.lua
 grep -q "avg_package_rescue_early_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timing_score" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_counter_windows" runtime/engine/StartBalanceRun.lua
