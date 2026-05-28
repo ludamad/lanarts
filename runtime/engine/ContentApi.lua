@@ -2935,12 +2935,15 @@ telemetry_watch_for = function(config, package_summary)
         append_metric(rows, "avg_dice_roll_animation_frames", "Roll anim", "animated anticipation frames")
         append_metric(rows, "avg_dice_roll_buildup_fx", "Roll FX", "pip bursts during anticipation")
         append_metric(rows, "avg_dice_roll_face_swaps", "Face swaps", "visible tumbling face changes during roll animation")
+        append_metric(rows, "avg_dice_roll_surge_cues", "Surge cues", "staged roll-up beats before lock-in")
         append_metric(rows, "avg_dice_roll_lock_cues", "Lock cues", "staged dice lock-in beats")
         append_metric(rows, "avg_dice_roll_suspense_pips", "Suspense pips", "extra lock-in pips during roll animation")
-        append_metric(rows, "avg_dice_roll_reveal_cues", "Reveal cues", "late high-roll flashes")
+        append_metric(rows, "avg_dice_roll_reveal_cues", "Reveal cues", "late final-face flashes")
+        append_metric(rows, "avg_dice_roll_finale_fx", "Finale FX", "resolved payoff bursts")
         append_metric(rows, "avg_dice_cooldown_trim_frames", "Trim frames", "bounded roll-four partial cooldown refund")
         append_metric(rows, "avg_dice_longest_high_streak", "High streak", "high-roll clump check")
         append_metric(rows, "avg_dice_repeat_rolls", "Repeats", "same face after a bag refill")
+        append_metric(rows, "avg_dice_anti_repeat_rerolls", "Anti-repeat", "refill repeats actively avoided")
         append_metric(rows, "avg_dice_bag_refills", "D6 bag", "fair-bag cycle refills")
         append_metric(rows, "avg_dice_buff_active_frames", "Buff frames", "skill dice uptime")
         append_metric(rows, "avg_dice_dash_frames", "Dash window", "roll-five window uptime")
@@ -3319,6 +3322,24 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
             reason = "The roll should have visible staged anticipation before the face resolves.",
         })
         add({
+            id = "dice-surge",
+            label = "Surge cues",
+            metric = "avg_dice_roll_surge_cues",
+            comparator = ">=",
+            threshold = 8,
+            target = ">=8 surge cues/run",
+            reason = "Rolls should build through multiple visible beats before the final face lands.",
+        })
+        add({
+            id = "dice-finale",
+            label = "Finale FX",
+            metric = "avg_dice_roll_finale_fx",
+            comparator = ">=",
+            threshold = 2,
+            target = ">=2 finale FX/run",
+            reason = "Each resolved die should have a readable payoff burst.",
+        })
+        add({
             id = "dice-motion",
             label = "Face motion",
             metric = "avg_dice_roll_face_swaps",
@@ -3344,6 +3365,15 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
             threshold = 1,
             target = "<=1 repeat/run",
             reason = "Repeated faces should stay rare enough that jackpot streaks do not dominate balance reads.",
+        })
+        add({
+            id = "dice-anti-repeat",
+            label = "Anti-repeat guard",
+            metric = "avg_dice_anti_repeat_rerolls",
+            comparator = ">=",
+            threshold = 0,
+            target = "tracked anti-repeat rerolls",
+            reason = "Bag refills should expose when immediate repeats were actively avoided.",
         })
         add({
             id = "dice-buff-uptime",

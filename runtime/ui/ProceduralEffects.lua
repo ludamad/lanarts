@@ -311,6 +311,8 @@ function M.draw_die_badge(obj, args)
     local rolling_pct = clamp(1 - rolling_remaining / rolling_total, 0, 1)
     local lock_total = math.max(1, args.lock_total or 3)
     local lock_stage = math.max(0, math.min(lock_total, args.lock_stage or 0))
+    local surge_total = math.max(1, args.surge_total or 5)
+    local surge_stage = math.max(0, math.min(surge_total, args.surge_stage or 0))
     local label = args.label or ""
     local buff_remaining = math.max(0, args.buff_remaining or 0)
     local buff_duration = math.max(1, args.buff_duration or 1)
@@ -318,14 +320,14 @@ function M.draw_die_badge(obj, args)
     local color = args.color or COL_PALE_BLUE
     local frame = GameState.frame or 0
     local base_xy = screen_xy({obj.x, obj.y - (obj.radius or 14) - 30})
-    local shake = rolling and (0.8 + rolling_pct * 2.0) or 0
+    local shake = rolling and (0.8 + rolling_pct * 2.0 + surge_stage * 0.18) or 0
     local xy = {
         base_xy[1] + math.sin(frame * 0.73) * shake,
         base_xy[2] + math.cos(frame * 0.61) * shake * 0.45,
     }
     local pulse = 0.5 + 0.5 * math.sin(frame * 0.32)
-    local w = rolling and 82 or label ~= "" and 72 or 48
-    local h = rolling and 34 or label ~= "" and 30 or 20
+    local w = rolling and 92 or label ~= "" and 72 or 48
+    local h = rolling and 38 or label ~= "" and 30 or 20
     local box = {xy[1] - w / 2, xy[2] - h / 2, xy[1] + w / 2, xy[2] + h / 2}
     Display.draw_radial_gradient(
         rolling and alpha(color, 0.20 + pulse * 0.12) or {120, 170, 255, 35},
@@ -336,10 +338,11 @@ function M.draw_die_badge(obj, args)
     )
     if rolling then
         local trail_spin = frame * 0.16
-        for idx = 1, 5 do
-            local trail_pct = (rolling_pct + idx * 0.17) % 1
-            local angle = trail_spin + idx * TWO_PI / 5 + rolling_pct * 2.2
-            local dist = 29 + trail_pct * 18
+        for idx = 1, 6 do
+            local trail_pct = (rolling_pct + idx * 0.15) % 1
+            local direction = idx % 2 == 0 and -0.72 or 1
+            local angle = trail_spin * direction + idx * TWO_PI / 6 + rolling_pct * 2.7
+            local dist = 31 + trail_pct * 20 + surge_stage * 1.3
             local trail_roll = ((roll + idx - 2) % 6) + 1
             local trail_xy = {xy[1] + math.cos(angle) * dist, xy[2] + math.sin(angle) * dist * 0.58}
             draw_die_face(trail_xy, trail_roll, 9 + trail_pct * 5, color, 0.14 + trail_pct * 0.24)
@@ -359,6 +362,16 @@ function M.draw_die_badge(obj, args)
                 active and 8.5 or 6.5,
                 active and color or COL_WHITE,
                 active and 0.58 or locked and 0.34 or 0.18
+            )
+        end
+        local surge_y = box[2] - 8
+        for stage = 1, surge_total do
+            local stage_x = xy[1] - (surge_total - 1) * 4.5 + (stage - 1) * 9
+            local active = stage <= surge_stage
+            Display.draw_circle(
+                alpha(active and color or COL_WHITE, active and 0.58 or 0.18),
+                {stage_x, surge_y},
+                active and 2.6 or 1.7
             )
         end
     end
@@ -382,6 +395,11 @@ function M.draw_die_badge(obj, args)
         local spin = (GameState.frame or 0) * 0.19
         Display.draw_arc(alpha(COL_WHITE, 0.26 + pulse * 0.28), xy, outer_radius + 5, spin, spin + math.pi * 0.74, 2, 18)
         Display.draw_arc(alpha(color, 0.20 + pulse * 0.24), xy, outer_radius - 8, -spin * 0.7, -spin * 0.7 + math.pi * 1.18, 2, 18)
+        if surge_stage > 0 then
+            local surge_pct = surge_stage / surge_total
+            Display.draw_arc(alpha(color, 0.26 + surge_pct * 0.44), xy, outer_radius + 10, -math.pi / 2, -math.pi / 2 + TWO_PI * surge_pct, 2, 20)
+            Display.draw_arc(alpha(COL_WHITE, 0.16 + surge_pct * 0.20), xy, outer_radius + 14, spin * -0.42, spin * -0.42 + math.pi * (0.38 + surge_pct), 1, 18)
+        end
         for idx = 1, 6 do
             local angle = spin + idx * TWO_PI / 6
             local inner = outer_radius - 3

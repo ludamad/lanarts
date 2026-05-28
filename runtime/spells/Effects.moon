@@ -1074,12 +1074,17 @@ for name in *{"Ranger", "Fighter", "Templar", "Rogue", "Green Mage", "Black Mage
 
 DICE_ROLL_INTERVAL = 240
 DICE_BUFF_DURATION = 150
-DICE_ROLL_ANIMATION = 60
-DICE_ROLL_REVEAL_FRAMES = 10
-DICE_ROLL_TICK_PERIOD = 5
+DICE_ROLL_ANIMATION = 72
+DICE_ROLL_REVEAL_FRAMES = 14
+DICE_ROLL_FINAL_REVEAL_FRAMES = 6
+DICE_ROLL_TICK_PERIOD = 4
 DICE_MINOR_COOLDOWN_TRIM = 45
-DICE_ROLL_LOCK_STAGE_FRAMES = {12, 30, DICE_ROLL_ANIMATION - DICE_ROLL_REVEAL_FRAMES}
-DICE_ROLL_LOCK_LABELS = {"PIPS", "TUMBLE", "FACE"}
+DICE_ROLL_LOCK_STAGE_FRAMES = {12, 30, 50, DICE_ROLL_ANIMATION - DICE_ROLL_FINAL_REVEAL_FRAMES}
+DICE_ROLL_LOCK_LABELS = {"PIPS", "TUMBLE", "BANK", "FACE"}
+DICE_ROLL_SURGE_STAGE_FRAMES = {8, 20, 34, 48, 60}
+DICE_ROLL_SURGE_LABELS = {"SHAKE", "RATTLE", "SPIN", "DROP", "LOCK"}
+DICE_ROLL_LOCK_TOTAL = 4
+DICE_ROLL_SURGE_TOTAL = 5
 DICE_INITIAL_ROLL_DELAY = DICE_ROLL_INTERVAL - DICE_BUFF_DURATION - DICE_ROLL_ANIMATION
 DICE_FULL_BAG_MASK = 63
 DICE_TWO_PI = math.pi * 2
@@ -1119,22 +1124,55 @@ dicebinder_roll_lock_stage = (elapsed) ->
             stage = idx
     stage
 
-dicebinder_next_fair_roll = (effect) ->
+dicebinder_roll_surge_stage = (elapsed) ->
+    stage = 0
+    for idx, frame in ipairs DICE_ROLL_SURGE_STAGE_FRAMES
+        if elapsed >= frame
+            stage = idx
+    stage
+
+dicebinder_next_fair_roll = (effect, avoid_face=0) ->
     mask = effect.bag_mask or DICE_FULL_BAG_MASK
     remaining = dicebinder_bag_count(mask)
+    refilled = false
     if remaining <= 0
         mask = DICE_FULL_BAG_MASK
         remaining = 6
+        refilled = true
         dicebinder_increment(effect, "bag_refills")
-    pick = math.random(1, remaining)
+    pick_mask = mask
+    pick_remaining = remaining
+    if refilled and avoid_face and avoid_face > 0 and remaining > 1 and dicebinder_face_available(mask, avoid_face)
+        pick_mask = dicebinder_remove_from_bag(mask, avoid_face)
+        pick_remaining = remaining - 1
+        dicebinder_increment(effect, "anti_repeat_rerolls")
+    pick = math.random(1, pick_remaining)
     seen = 0
     for face=1,6
-        if dicebinder_face_available(mask, face)
+        if dicebinder_face_available(pick_mask, face)
             seen += 1
             if seen == pick
                 effect.bag_mask = dicebinder_remove_from_bag(mask, face)
                 return face
     effect.bag_mask = DICE_FULL_BAG_MASK - 1
+    1
+
+dicebinder_near_miss_roll = (roll) ->
+    direction = if math.random(1, 2) == 1 then -1 else 1
+    near = roll + direction
+    if near < 1
+        near = 2
+    elseif near > 6
+        near = 5
+    near
+
+dicebinder_visible_roll = (effect) ->
+    if (effect.rolling_time or 0) <= DICE_ROLL_FINAL_REVEAL_FRAMES and effect.pending_roll and effect.pending_roll > 0
+        return effect.pending_roll
+    if (effect.rolling_time or 0) <= DICE_ROLL_REVEAL_FRAMES and effect.near_miss_roll and effect.near_miss_roll > 0
+        return effect.near_miss_roll
+    if effect.preview_roll and effect.preview_roll > 0
+        return effect.preview_roll
     1
 
 dicebinder_record_refresh = (effect, caster, spell_name, total_key, effective_key) ->
@@ -1246,27 +1284,71 @@ dicebinder_emit_roll_lock_fx = (effect, caster, stage, roll, entry) ->
             duration: 7
         }
 
+dicebinder_emit_roll_surge_fx = (effect, caster, stage, roll, entry) ->
+    dicebinder_increment(effect, "roll_surge_cues")
+    color = if stage >= 4 then entry.color else COL_WHITE
+    label = DICE_ROLL_SURGE_LABELS[stage] or "ROLL"
+    radius = 30 + stage * 12
+    ImpactFX.world_burst {
+        map: caster.map
+        xy: caster.xy
+        color: color
+        label: label
+        radius: radius
+        duration: 14 + stage * 4
+        drift: 0.10
+    }
+    frame = GameState.frame or 0
+    pip_count = math.min(6, 2 + stage)
+    for idx=1,pip_count
+        angle = frame * (0.09 + stage * 0.010) + idx * DICE_TWO_PI / pip_count
+        ImpactFX.world_burst {
+            map: caster.map
+            xy: {
+                caster.x + math.cos(angle) * (radius * 0.62)
+                caster.y + math.sin(angle) * (radius * 0.62)
+            }
+            color: color
+            radius: 9 + stage * 2
+            duration: 11 + stage * 3
+            drift: 0.06
+        }
+    if stage >= 5
+        ImpactFX.screen_flash {
+            map: caster.map
+            color: entry.color
+            alpha: if roll >= 5 then 0.12 else 0.06
+            duration: 8
+        }
+
 dicebinder_update_roll_lock = (effect, caster, elapsed) ->
     stage = dicebinder_roll_lock_stage(elapsed)
     previous = effect.roll_lock_stage or 0
     return unless stage > previous
-    roll = effect.preview_roll or 1
-    if (effect.rolling_time or 0) <= DICE_ROLL_REVEAL_FRAMES and effect.pending_roll and effect.pending_roll > 0
-        roll = effect.pending_roll
+    roll = dicebinder_visible_roll(effect)
     entry = DICE_ROLLS[roll] or DICE_ROLLS[1]
     for lock_stage=previous + 1, stage
         dicebinder_emit_roll_lock_fx(effect, caster, lock_stage, roll, entry)
     effect.roll_lock_stage = stage
 
+dicebinder_update_roll_surge = (effect, caster, elapsed) ->
+    stage = dicebinder_roll_surge_stage(elapsed)
+    previous = effect.roll_surge_stage or 0
+    return unless stage > previous
+    roll = dicebinder_visible_roll(effect)
+    entry = DICE_ROLLS[roll] or DICE_ROLLS[1]
+    for surge_stage=previous + 1, stage
+        dicebinder_emit_roll_surge_fx(effect, caster, surge_stage, roll, entry)
+    effect.roll_surge_stage = stage
+
 dicebinder_emit_roll_tick_fx = (effect, caster, elapsed) ->
     return unless elapsed > 0 and elapsed % DICE_ROLL_TICK_PERIOD == 0
     total = math.max(1, effect.rolling_total or DICE_ROLL_ANIMATION)
     pct = math.max(0, math.min(1, elapsed / total))
-    roll = effect.preview_roll or 1
-    if (effect.rolling_time or 0) <= DICE_ROLL_REVEAL_FRAMES and effect.pending_roll and effect.pending_roll > 0
-        roll = effect.pending_roll
+    roll = dicebinder_visible_roll(effect)
     entry = DICE_ROLLS[roll] or DICE_ROLLS[1]
-    pip_count = math.max(2, math.min(6, roll))
+    pip_bonus = if pct > 0.65 then 1 else 0
+    pip_count = math.max(3, math.min(6, roll + pip_bonus))
     radius = 24 + pct * 44
     burst_radius = 10 + pct * 12
     frame = GameState.frame or 0
@@ -1284,26 +1366,39 @@ dicebinder_emit_roll_tick_fx = (effect, caster, elapsed) ->
             duration: 10 + math.floor(pct * 9)
             drift: 0.10
         }
-    if (effect.rolling_time or 0) <= DICE_ROLL_REVEAL_FRAMES and not effect.roll_reveal_fx_emitted
-        effect.roll_reveal_fx_emitted = true
-        if roll >= 5
-            dicebinder_increment(effect, "roll_reveal_cues")
-            ImpactFX.screen_flash {
+        if pct > 0.52 and idx % 2 == 0
+            counter_angle = -angle + pct * 2.1
+            ImpactFX.world_burst {
                 map: caster.map
+                xy: {
+                    caster.x + math.cos(counter_angle) * (radius * 0.58)
+                    caster.y + math.sin(counter_angle) * (radius * 0.58)
+                }
                 color: entry.color
-                alpha: if roll == 6 then 0.12 else 0.08
-                duration: 8
+                radius: burst_radius * 0.72
+                duration: 8 + math.floor(pct * 8)
+                drift: 0.06
             }
+    if (effect.rolling_time or 0) <= DICE_ROLL_FINAL_REVEAL_FRAMES and not effect.roll_reveal_fx_emitted
+        effect.roll_reveal_fx_emitted = true
+        dicebinder_increment(effect, "roll_reveal_cues")
+        ImpactFX.screen_flash {
+            map: caster.map
+            color: entry.color
+            alpha: if roll == 6 then 0.14 elseif roll == 5 then 0.10 else 0.05
+            duration: 8
+        }
 
 dicebinder_resolve_roll = (effect, caster) ->
-    roll = if effect.pending_roll and effect.pending_roll > 0 then effect.pending_roll else dicebinder_next_fair_roll(effect)
-    entry = DICE_ROLLS[roll]
     previous_roll = effect.last_roll or 0
+    roll = if effect.pending_roll and effect.pending_roll > 0 then effect.pending_roll else dicebinder_next_fair_roll(effect, previous_roll)
+    entry = DICE_ROLLS[roll]
     effect.last_roll = roll
     effect.roll_color = entry.color
     effect.buff_kind = entry.kind
     effect.buff_time = DICE_BUFF_DURATION
     effect.pending_roll = 0
+    effect.near_miss_roll = 0
     effect.preview_roll = roll
     effect.rolling_time = 0
     effect.next_roll = math.max(1, (effect.roll_interval or DICE_ROLL_INTERVAL) - DICE_ROLL_ANIMATION)
@@ -1320,6 +1415,7 @@ dicebinder_resolve_roll = (effect, caster) ->
         caster\heal_hp(4 + caster.stats.level)
         caster\heal_mp(8 + caster.stats.level)
 
+    dicebinder_increment(effect, "roll_finale_fx")
     dicebinder_emit_roll_fx(caster, roll, entry)
 
     for _ in screens()
@@ -1327,12 +1423,15 @@ dicebinder_resolve_roll = (effect, caster) ->
             EventLog.add("Skill die #{roll}: #{entry.label}.", entry.color)
 
 dicebinder_start_roll = (effect, caster) ->
-    effect.pending_roll = dicebinder_next_fair_roll(effect)
+    effect.pending_roll = dicebinder_next_fair_roll(effect, effect.last_roll or 0)
+    effect.near_miss_roll = dicebinder_near_miss_roll(effect.pending_roll)
     effect.preview_roll = math.random(1, 6)
     effect.rolling_time = DICE_ROLL_ANIMATION
     effect.rolling_total = DICE_ROLL_ANIMATION
     effect.roll_reveal_fx_emitted = false
     effect.roll_lock_stage = 0
+    effect.roll_surge_stage = 0
+    effect.roll_spin_seed = math.random(1, 360)
     effect.roll_color = COL_WHITE
     dicebinder_increment(effect, "roll_animations_total")
     ImpactFX.world_burst {
@@ -1340,22 +1439,27 @@ dicebinder_start_roll = (effect, caster) ->
         xy: caster.xy
         color: COL_WHITE
         label: "D6"
-        radius: 62
+        radius: 72
         duration: DICE_ROLL_ANIMATION
     }
 
 dicebinder_step_roll_animation = (effect, caster) ->
     dicebinder_increment(effect, "roll_animation_frames")
+    previous_shown = dicebinder_visible_roll(effect)
     effect.rolling_time = math.max(0, (effect.rolling_time or 0) - 1)
     elapsed = (effect.rolling_total or DICE_ROLL_ANIMATION) - effect.rolling_time
-    period = math.max(2, math.floor(2 + elapsed / 12))
-    previous_preview = effect.preview_roll or 0
-    if effect.rolling_time <= DICE_ROLL_REVEAL_FRAMES
+    period = if elapsed < 24 then 2 elseif elapsed < 48 then 3 else 5
+    if effect.rolling_time <= DICE_ROLL_FINAL_REVEAL_FRAMES
         effect.preview_roll = if effect.pending_roll and effect.pending_roll > 0 then effect.pending_roll else effect.preview_roll or 1
+    elseif effect.rolling_time <= DICE_ROLL_REVEAL_FRAMES
+        effect.preview_roll = if effect.near_miss_roll and effect.near_miss_roll > 0 then effect.near_miss_roll else effect.preview_roll or 1
     elseif elapsed % period == 0
-        effect.preview_roll = (effect.preview_roll or 0) % 6 + 1
-    if effect.preview_roll ~= previous_preview
+        spin_seed = effect.roll_spin_seed or 1
+        jump = 1 + ((spin_seed + elapsed) % 5)
+        effect.preview_roll = ((effect.preview_roll or 0) + jump - 1) % 6 + 1
+    if dicebinder_visible_roll(effect) ~= previous_shown
         dicebinder_increment(effect, "roll_face_swaps")
+    dicebinder_update_roll_surge(effect, caster, elapsed)
     dicebinder_update_roll_lock(effect, caster, elapsed)
     dicebinder_emit_roll_tick_fx(effect, caster, elapsed)
     if effect.rolling_time <= 0
@@ -1392,19 +1496,25 @@ DataW.effect_create {
         @buff_kind = "none"
         @buff_time = 0
         @pending_roll = 0
+        @near_miss_roll = 0
         @preview_roll = 0
         @rolling_time = 0
         @rolling_total = DICE_ROLL_ANIMATION
         @roll_reveal_fx_emitted = false
         @roll_lock_stage = 0
+        @roll_surge_stage = 0
+        @roll_spin_seed = 1
         @bag_mask = DICE_FULL_BAG_MASK
         @bag_refills = 0
+        @anti_repeat_rerolls = 0
         @roll_animations_total = 0
         @roll_animation_frames = 0
         @roll_buildup_fx = 0
         @roll_face_swaps = 0
         @roll_reveal_cues = 0
         @roll_lock_cues = 0
+        @roll_surge_cues = 0
+        @roll_finale_fx = 0
         @roll_suspense_pips = 0
         @cooldown_trim_frames = 0
         @dash_trim_effective = 0
@@ -1438,24 +1548,29 @@ DataW.effect_create {
     draw_func: (caster) =>
         rolling = @rolling_time and @rolling_time > 0
         shown_roll = if rolling
-            if @rolling_time <= DICE_ROLL_REVEAL_FRAMES and @pending_roll and @pending_roll > 0 then @pending_roll
-            elseif @preview_roll and @preview_roll > 0 then @preview_roll
-            else 1
+            dicebinder_visible_roll(@)
         else @last_roll or 0
         entry = DICE_ROLLS[shown_roll]
+        rolling_label = if rolling
+            if (@rolling_time or 0) <= DICE_ROLL_FINAL_REVEAL_FRAMES and entry then entry.short
+            elseif (@rolling_time or 0) <= DICE_ROLL_REVEAL_FRAMES then "DROP"
+            else "ROLL"
+        else nil
         ProceduralEffects.draw_die_badge caster, {
             roll: shown_roll
             remaining: @next_roll or 0
             interval: @roll_interval or DICE_ROLL_INTERVAL
             color: (rolling and entry and entry.color) or @roll_color or COL_PALE_BLUE
-            label: (rolling and ((@rolling_time or 0) <= DICE_ROLL_REVEAL_FRAMES and entry and entry.short or "ROLL")) or (entry and entry.short) or ""
+            label: rolling_label or (entry and entry.short) or ""
             buff_remaining: @buff_time or 0
             buff_duration: DICE_BUFF_DURATION
             rolling: rolling
             rolling_remaining: @rolling_time or 0
             rolling_total: @rolling_total or DICE_ROLL_ANIMATION
             lock_stage: @roll_lock_stage or 0
-            lock_total: 3
+            lock_total: DICE_ROLL_LOCK_TOTAL
+            surge_stage: @roll_surge_stage or 0
+            surge_total: DICE_ROLL_SURGE_TOTAL
         }
 }
 

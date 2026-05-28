@@ -33,19 +33,27 @@ grep -q "avg_dice_roll_animation_frames" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_buildup_fx" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_face_swaps" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_lock_cues" runtime/engine/StartBalanceRun.lua
+grep -q "avg_dice_roll_surge_cues" runtime/engine/StartBalanceRun.lua
+grep -q "avg_dice_roll_finale_fx" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_suspense_pips" runtime/engine/StartBalanceRun.lua
+grep -q "avg_dice_anti_repeat_rerolls" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_cooldown_trim_frames" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_longest_high_streak" runtime/engine/StartBalanceRun.lua
 grep -q "dice-animation" runtime/engine/ContentApi.lua
 grep -q "dice-motion" runtime/engine/ContentApi.lua
+grep -q "dice-surge" runtime/engine/ContentApi.lua
+grep -q "dice-finale" runtime/engine/ContentApi.lua
 grep -q "skill-buffer" runtime/engine/ContentApi.lua
 grep -q "DICE_MINOR_COOLDOWN_TRIM" runtime/spells/Effects.moon
 grep -q "DICE_FULL_BAG_MASK" runtime/spells/Effects.moon
 grep -q "DICE_ROLL_LOCK_STAGE_FRAMES" runtime/spells/Effects.moon
+grep -q "DICE_ROLL_SURGE_STAGE_FRAMES" runtime/spells/Effects.moon
 grep -q "dicebinder_emit_roll_fx" runtime/spells/Effects.moon
 grep -q "dicebinder_emit_roll_tick_fx" runtime/spells/Effects.moon
+grep -q "dicebinder_update_roll_surge" runtime/spells/Effects.moon
 grep -q "draw_die_face" runtime/ui/ProceduralEffects.lua
 grep -q "trail_roll" runtime/ui/ProceduralEffects.lua
+grep -q "surge_stage" runtime/ui/ProceduralEffects.lua
 grep -q "orbiting die ghosts" web/content_lab/README.md
 grep -q "avg_package_rescue_early_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timing_score" runtime/engine/StartBalanceRun.lua
