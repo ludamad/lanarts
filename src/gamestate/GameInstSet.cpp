@@ -405,7 +405,11 @@ int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 
 			while (ptr) {
 				GameInst* inst = ptr->inst;
-				if (obj != inst && inst != NULL) {
+				// Skip empty/tombstoned grid nodes: a removed instance can still be
+				// referenced from a collision bucket under heavy object churn, and a
+				// tombstone is the sentinel (GameInst*)1, not a real object. valid_inst
+				// excludes both NULL and the tombstone (matches every other traversal here).
+				if (obj != inst && valid_inst(inst)) {
 					int radsqr = (inst->target_radius + rad)
 							* (inst->target_radius + rad);
 					int dx = inst->x - x, dy = inst->y - y;
@@ -448,7 +452,7 @@ std::vector<GameInst*> GameInstSet::object_rectangle_test(BBox rect, GameInst* t
 
 			while (ptr) {
 				GameInst* inst = ptr->inst;
-				if (tester != inst) {
+				if (tester != inst && valid_inst(inst)) {
 					if (circle_rectangle_test(inst->ipos(), inst->target_radius, rect)) {
 						instances.push_back(inst);
 					}

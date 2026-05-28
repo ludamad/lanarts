@@ -74,13 +74,28 @@ add it here in the same change.
   they are fixed up in `reallocate_internal_data()`. Suspected
   dangling-pointer bug here under heavy object churn (see KNOWN ISSUES).
 
-## Known issues / in-progress
+## AddressSanitizer / UBSan
 
-- **Collision-grid dangling pointer (in progress):** jamming a melee bot into a
-  dense object cluster on gragh-duel crashes in
-  `GameInstSet::object_radius_test` (GameInstSet.cpp:409) dereferencing a stale
-  `inst` from `unit_grid`, via `PlayerInst::_use_move`. Repro:
-  `./run.sh --headless engine.StartBalanceRun --steps 700 --runs 1 --classes
-  Dicebinder --levels 5 --loadout_preset late --bot_profile human --encounter
-  gragh-duel --package_intensity high`. The melee-weave bot change that exposed
-  it was reverted to keep the suite green; re-land weaving after this is fixed.
+- Build: `./run.sh --headless --sanitize --build` → `build_debug_headless_asan/src/lanarts`
+  (`-fsanitize=address -fsanitize=undefined`).
+- Run a repro: `(cd runtime && ASAN_OPTIONS=detect_leaks=0:abort_on_error=0 \
+  SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1 \
+  ../build_debug_headless_asan/src/lanarts engine.StartBalanceRun <args>)`
+- Known **benign, pre-existing** UBSan findings (do NOT "fix" — they are
+  functionally fine and the RNG one is determinism-critical):
+  - `GameState.cpp:64` left-shift overflow in a hash.
+  - `lcommon/mtwist.h:86` signed integer overflow in the Mersenne-Twister RNG;
+    changing it would alter the seeded RNG sequence and break every fixed-seed
+    test. Leave it.
+
+## Fixed-bug postmortems
+
+- **Collision-grid tombstone deref (FIXED):** `GameInstSet::object_radius_test`
+  (and `object_rectangle_test`) guarded grid-bucket nodes with only
+  `inst != NULL`, but a removed instance is marked with the sentinel
+  `GAMEINST_TOMBSTONE = (GameInst*)1` and can still be referenced from a
+  collision bucket under heavy object churn. Dereferencing the tombstone's
+  `target_radius` crashed at ~0x25 (offset from address 1). Fix: guard both
+  grid traversals with `valid_inst(inst)` (`inst > GAMEINST_TOMBSTONE`,
+  excludes NULL and tombstone) — the invariant every other traversal here
+  already uses. ASan/UBSan confirmed the tombstone deref and confirmed the fix.
