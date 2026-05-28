@@ -1089,6 +1089,164 @@ local function preview_enemy_names(signature, mode)
     return names
 end
 
+local MAP_ENEMY_THREAT = {
+    ["Sheep"] = {weight = 0.25, contact = 0, role = "ambient"},
+    ["Black Mamba"] = {weight = 1.10, contact = 1, predator = 1, role = "fast contact"},
+    ["Skeleton"] = {weight = 0.70, contact = 1, role = "contact"},
+    ["Cloud Elemental"] = {weight = 1.30, ranged = 1, caster = 1, role = "caster"},
+    ["Mouther"] = {weight = 1.00, contact = 1, disruptor = 1, role = "disruptor"},
+    ["Hound"] = {weight = 1.20, contact = 1, predator = 1, role = "predator"},
+    ambient = {weight = 0.75, contact = 1, role = "ambient"},
+}
+
+local function round_to(value, scale)
+    scale = scale or 1
+    return math.floor((tonumber(value) or 0) * scale + 0.5) / scale
+end
+
+local function map_enemy_threat(monster)
+    return MAP_ENEMY_THREAT[tostring(monster or "")] or MAP_ENEMY_THREAT.ambient
+end
+
+local function pressure_label(score)
+    score = tonumber(score) or 0
+    if score >= 78 then
+        return "overloaded"
+    elseif score >= 58 then
+        return "dangerous"
+    elseif score >= 38 then
+        return "active"
+    elseif score >= 18 then
+        return "readable"
+    end
+    return "sparse"
+end
+
+local function map_threat_profile_for_plan(plan, algorithm)
+    local pins = plan.enemyPins or {}
+    local stats = plan.stats or {}
+    local density = tonumber(plan.density or (algorithm and algorithm.density)) or 0.30
+    local counts = {}
+    local weighted = 0
+    local contact = 0
+    local ranged = 0
+    local caster = 0
+    local predator = 0
+    local disruptor = 0
+
+    for _, pin in ipairs(pins) do
+        local monster = tostring(pin.monster or "ambient")
+        local threat = map_enemy_threat(monster)
+        counts[monster] = (counts[monster] or 0) + 1
+        weighted = weighted + (threat.weight or 0.75)
+        contact = contact + (threat.contact or 0)
+        ranged = ranged + (threat.ranged or 0)
+        caster = caster + (threat.caster or 0)
+        predator = predator + (threat.predator or 0)
+        disruptor = disruptor + (threat.disruptor or 0)
+    end
+
+    local clustered_pairs = 0
+    local stack_pairs = 0
+    local tightest
+    local nearest_total = 0
+    local nearest_count = 0
+    for idx, pin in ipairs(pins) do
+        local nearest
+        for other_idx, other in ipairs(pins) do
+            if other_idx ~= idx then
+                local dx = (pin.x or 0) - (other.x or 0)
+                local dy = (pin.y or 0) - (other.y or 0)
+                local dist = math.sqrt(dx * dx + dy * dy)
+                if not nearest or dist < nearest then
+                    nearest = dist
+                end
+                if other_idx > idx then
+                    if dist <= 18 then
+                        clustered_pairs = clustered_pairs + 1
+                    end
+                    if dist <= 10 then
+                        stack_pairs = stack_pairs + 1
+                    end
+                    if not tightest or dist < tightest then
+                        tightest = dist
+                    end
+                end
+            end
+        end
+        if nearest then
+            nearest_total = nearest_total + nearest
+            nearest_count = nearest_count + 1
+        end
+    end
+
+    local avg_nearest = nearest_count > 0 and nearest_total / nearest_count or 0
+    local cluster_pressure = clustered_pairs * 3.5 + stack_pairs * 4.5
+    if avg_nearest > 0 and avg_nearest < 22 then
+        cluster_pressure = cluster_pressure + (22 - avg_nearest) * 0.55
+    end
+    local score = math.min(100, math.max(0, math.floor(
+        weighted * 8
+        + density * 18
+        + cluster_pressure
+        + ranged * 2.5
+        + caster * 2.5
+        + predator * 2.0
+        + disruptor * 1.5
+        + 0.5
+    )))
+
+    local mix = {}
+    for monster, count in pairs(counts) do
+        mix[#mix + 1] = {monster = monster, count = count, role = map_enemy_threat(monster).role}
+    end
+    table.sort(mix, function(a, b)
+        if a.count == b.count then
+            return a.monster < b.monster
+        end
+        return a.count > b.count
+    end)
+
+    local notes = {}
+    if #pins == 0 then
+        notes[#notes + 1] = "No ambient enemy pins in this preview."
+    elseif #pins >= 9 then
+        notes[#notes + 1] = "High ambient count; compare early contact and potion burn."
+    end
+    if caster > 0 then
+        notes[#notes + 1] = "Caster pins can punish slow or cornered classes."
+    end
+    if predator > 0 then
+        notes[#notes + 1] = "Fast predator/contact pins can collapse ranged spacing."
+    end
+    if clustered_pairs > 0 then
+        notes[#notes + 1] = "Enemy pins cluster close enough to create package-like pressure."
+    end
+    if tostring(stats.enemyMix or "") == "" and #pins > 0 then
+        notes[#notes + 1] = "Using default ambient mix for this map family."
+    end
+
+    return {
+        schema = 1,
+        label = pressure_label(score),
+        score = score,
+        enemyCount = #pins,
+        weightedThreat = round_to(weighted, 10),
+        density = round_to(density, 100),
+        contactCount = contact,
+        rangedCount = ranged,
+        casterCount = caster,
+        predatorCount = predator,
+        disruptorCount = disruptor,
+        clusteredPairs = clustered_pairs,
+        stackPairs = stack_pairs,
+        avgNearestDistance = round_to(avg_nearest, 10),
+        tightestPairDistance = round_to(tightest or 0, 10),
+        mix = mix,
+        notes = notes,
+    }
+end
+
 local function preview_plan_for_algorithm(algorithm, config, seed_offset)
     local width = 112
     local height = 72
@@ -1180,7 +1338,7 @@ local function preview_plan_for_algorithm(algorithm, config, seed_offset)
         }
     end
 
-    return {
+    local plan = {
         schema = 1,
         width = width,
         height = height,
@@ -1202,6 +1360,8 @@ local function preview_plan_for_algorithm(algorithm, config, seed_offset)
             statues = statue_count,
         },
     }
+    plan.threatProfile = map_threat_profile_for_plan(plan, algorithm)
+    return plan
 end
 
 local function map_preview_entry(algorithm, config, seed_offset)
@@ -1213,6 +1373,7 @@ local function map_preview_entry(algorithm, config, seed_offset)
     preview_config.monsters = ""
     local seed = tonumber(config.seed) or 1
     preview_config.seed = tostring(seed + (seed_offset or 0))
+    local preview_plan = preview_plan_for_algorithm(algorithm, config, seed_offset or 0)
     return {
         id = algorithm.id or "",
         label = algorithm.label or algorithm.id or "Map",
@@ -1226,10 +1387,35 @@ local function map_preview_entry(algorithm, config, seed_offset)
         tags = copy_array(algorithm.tags or {}),
         palette = algorithm.palette,
         signature = algorithm.signature,
-        previewPlan = preview_plan_for_algorithm(algorithm, config, seed_offset or 0),
+        previewPlan = preview_plan,
+        threatProfile = preview_plan.threatProfile,
         runConfig = preview_config,
         args = launch_args(preview_config),
         balanceArgs = balance_args(preview_config),
+    }
+end
+
+local function map_threat_summary(previews)
+    local total = 0
+    local highest
+    for _, preview in ipairs(previews or {}) do
+        local threat = preview.threatProfile or (preview.previewPlan and preview.previewPlan.threatProfile)
+        local score = tonumber(threat and threat.score) or 0
+        total = total + score
+        if not highest or score > (highest.score or 0) then
+            highest = {
+                id = preview.id,
+                label = preview.label,
+                mapProfile = preview.mapProfile,
+                score = score,
+                threatLabel = threat and threat.label or pressure_label(score),
+            }
+        end
+    end
+    return {
+        previewCount = #(previews or {}),
+        averageScore = #(previews or {}) > 0 and round_to(total / #previews, 10) or 0,
+        highest = highest,
     }
 end
 
@@ -1273,12 +1459,13 @@ local function map_generation_payload(config)
         selected = selected_map or Catalog.maps[1],
         selectedAlgorithm = selected_algorithm,
         algorithms = algorithms,
+        threatSummary = map_threat_summary(previews),
         previews = previews,
     }
 end
 
-local function map_resource_extras(algorithm)
-    return {
+local function map_resource_extras(algorithm, config, seed_offset)
+    local extras = {
         previewMode = algorithm.preview_mode or "world",
         density = algorithm.density or 0.30,
         phase = algorithm.phase or "",
@@ -1286,6 +1473,14 @@ local function map_resource_extras(algorithm)
         signature = copy_object(algorithm.signature or {}),
         palette = algorithm.palette,
     }
+    if config then
+        local preview_config = copy_object(config)
+        preview_config.seed = tostring((tonumber(config.seed) or 1) + (seed_offset or 0))
+        local plan = preview_plan_for_algorithm(algorithm, preview_config, 0)
+        extras.previewStats = copy_object(plan.stats or {})
+        extras.mapThreat = plan.threatProfile
+    end
+    return extras
 end
 
 local function config_for_map_algorithm(config, algorithm)
@@ -1315,7 +1510,7 @@ local function map_probe_resources(config, start_offset)
                 "same map algorithm across nearby seeds",
                 next_config,
                 idx - 1,
-                map_resource_extras(selected_algorithm)
+                map_resource_extras(selected_algorithm, next_config, idx - 1)
             )
         end
     end
@@ -1329,7 +1524,7 @@ local function map_probe_resources(config, start_offset)
             algorithm.description or "initial-map generation comparison",
             next_config,
             offset + idx,
-            map_resource_extras(algorithm)
+            map_resource_extras(algorithm, next_config, offset + idx)
         )
     end
 
@@ -1358,7 +1553,7 @@ local function map_probe_resources(config, start_offset)
             "late-map enemy pool and routing comparison",
             next_config,
             offset + 30 + idx,
-            map_resource_extras(algorithm)
+            map_resource_extras(algorithm, next_config, offset + 30 + idx)
         )
     end
 
@@ -2607,6 +2802,12 @@ local function resource_summary_chips(resource)
     elseif resource.signature and resource.signature.ambientEnemies then
         add(tostring(resource.signature.ambientEnemies) .. " ambient")
     end
+    if resource.mapThreat then
+        add(tostring(resource.mapThreat.label or "threat") .. " " .. tostring(resource.mapThreat.score or 0))
+        if (resource.mapThreat.clusteredPairs or 0) > 0 then
+            add(tostring(resource.mapThreat.clusteredPairs) .. " clusters")
+        end
+    end
     return chips
 end
 
@@ -2641,6 +2842,8 @@ local function resource_card(resource)
         packageSummary = resource.packageSummary,
         previewMode = resource.previewMode,
         signature = resource.signature,
+        mapThreat = resource.mapThreat,
+        previewStats = resource.previewStats,
         monsterEval = resource.monsterEvalArgs and command_preview(resource.monsterEvalArgs) or nil,
     }
 end
@@ -2672,6 +2875,16 @@ local function preview_card(preview)
     if stats.enemyMix and stats.enemyMix ~= "" then
         add(stats.enemyMix)
     end
+    local threat = preview.threatProfile or (preview.previewPlan and preview.previewPlan.threatProfile)
+    if threat then
+        add(tostring(threat.label or "threat") .. " " .. tostring(threat.score or 0))
+        if (threat.clusteredPairs or 0) > 0 then
+            add(tostring(threat.clusteredPairs) .. " clusters")
+        end
+        if (threat.casterCount or 0) > 0 then
+            add(tostring(threat.casterCount) .. " caster")
+        end
+    end
     return {
         id = preview.id,
         title = preview.label or preview.id,
@@ -2682,6 +2895,7 @@ local function preview_card(preview)
         mapAlgorithm = preview.mapAlgorithm,
         previewMode = preview.preview_mode,
         previewPlan = preview.previewPlan,
+        threatProfile = threat,
         command = command_preview(preview.args),
         balance = command_preview(preview.balanceArgs),
     }

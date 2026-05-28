@@ -282,6 +282,8 @@ local function run_content_api_smoke()
     local has_ruin_preview = false
     local has_preview_geometry = false
     local has_preview_enemy_pins = false
+    local has_preview_threat_profile = false
+    local has_preview_threat_notes = false
     for _, preview in ipairs(map_generation.previews or {}) do
         if preview.mapProfile == "river_road" then
             has_river_preview = true
@@ -296,10 +298,19 @@ local function run_content_api_smoke()
         if preview.previewPlan and #(preview.previewPlan.enemyPins or {}) >= 1 then
             has_preview_enemy_pins = true
         end
+        local threat = preview.threatProfile or (preview.previewPlan and preview.previewPlan.threatProfile)
+        if threat and (threat.enemyCount or 0) >= 1 and tostring(threat.label or "") ~= "" and (threat.score or 0) > 0 then
+            has_preview_threat_profile = true
+            has_preview_threat_notes = #(threat.notes or {}) >= 1
+        end
     end
     expect(has_river_preview and has_predator_preview and has_ruin_preview, "map generation should expose new overworld profile previews")
     expect(has_preview_geometry, "map generation should expose deterministic preview geometry")
     expect(has_preview_enemy_pins, "map generation should expose preview enemy pins")
+    expect(has_preview_threat_profile, "map generation should expose deterministic enemy threat profiles")
+    expect(has_preview_threat_notes, "map generation threat profiles should include balance notes")
+    expect(map_generation.threatSummary and (map_generation.threatSummary.averageScore or 0) > 0, "map generation should summarize preview threat")
+    expect(map_generation.threatSummary and map_generation.threatSummary.highest and tostring(map_generation.threatSummary.highest.threatLabel or "") ~= "", "map generation should identify the highest-threat preview")
     local launch_args = parse_response("launch args", ContentApi.launch_args_json(map_config))
     local has_map_profile = false
     for _, arg in ipairs(launch_args.args or {}) do
@@ -315,6 +326,7 @@ local function run_content_api_smoke()
     local has_selected_seed = false
     local has_overworld_algorithm = false
     local has_late_map = false
+    local has_map_resource_threat = false
     for _, resource in ipairs(map_matrix.resources or {}) do
         if resource.group == "Selected map seed sweep" and resource.mapProfile == "broken_grove" and resource.previewMode then
             has_selected_seed = true
@@ -323,10 +335,14 @@ local function run_content_api_smoke()
         elseif resource.group == "Late map sweep" and resource.mapDesc == "map_descs.Hell" then
             has_late_map = true
         end
+        if resource.mapThreat and (resource.mapThreat.score or 0) > 0 and tostring(resource.mapThreat.label or "") ~= "" then
+            has_map_resource_threat = true
+        end
     end
     expect(has_selected_seed, "map matrix should include selected algorithm seed sweep")
     expect(has_overworld_algorithm, "map matrix should include overworld algorithm sweep")
     expect(has_late_map, "map matrix should include late-map sweep")
+    expect(has_map_resource_threat, "map matrix resources should expose map threat profiles")
 
     local red_dragon_config = [[{
         "className": "Pyrocaster",
@@ -547,6 +563,13 @@ local function run_content_api_smoke()
     expect(presentation.commandPreviews and presentation.commandPreviews.launch and presentation.commandPreviews.launch.text:find("engine.StartLanarts"), "presentation should expose launch command text")
     expect(presentation.commandPreviews and presentation.commandPreviews.balance and presentation.commandPreviews.balance.text:find("engine.StartBalanceRun"), "presentation should expose balance command text")
     expect(presentation.mapPreviews and #presentation.mapPreviews >= 3, "presentation should expose map preview cards")
+    local has_map_preview_threat_card = false
+    for _, card in ipairs(presentation.mapPreviews or {}) do
+        if card.threatProfile and (card.threatProfile.score or 0) > 0 then
+            has_map_preview_threat_card = true
+        end
+    end
+    expect(has_map_preview_threat_card, "presentation map preview cards should expose threat profiles")
     local has_class_control = false
     local has_level_control = false
     local has_map_algorithm_control = false
@@ -565,12 +588,19 @@ local function run_content_api_smoke()
     local groups = {}
     local has_rescue_card = false
     local has_enemy_card = false
+    local has_map_threat_card = false
     for _, group in ipairs(presentation.resourceGroups or {}) do
         groups[group.id or ""] = group
         if group.id == "package" then
             for _, card in ipairs(group.cards or {}) do
                 if card.packageSummary and card.packageSummary.hasRescue then
                     has_rescue_card = true
+                end
+            end
+        elseif group.id == "map" then
+            for _, card in ipairs(group.cards or {}) do
+                if card.mapThreat and (card.mapThreat.score or 0) > 0 then
+                    has_map_threat_card = true
                 end
             end
         elseif group.id == "enemy" then
@@ -586,6 +616,7 @@ local function run_content_api_smoke()
     expect(groups.enemy and (groups.enemy.count or 0) >= 12, "presentation should expose enemy resource group")
     expect(groups.orthogonal and (groups.orthogonal.count or 0) >= 30, "presentation should expose orthogonal resource group")
     expect(has_rescue_card, "presentation package cards should preserve rescue summaries")
+    expect(has_map_threat_card, "presentation map cards should expose map threat profiles")
     expect(has_enemy_card, "presentation enemy cards should expose monster-eval commands")
     expect(presentation.telemetry and #presentation.telemetry >= 10, "presentation should expose telemetry watch rows")
     expect(presentation.threats and #presentation.threats >= 2, "presentation should expose threat timing rows")

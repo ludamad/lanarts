@@ -1411,6 +1411,7 @@
           density: Number(map.density || 0.30),
           palette: map.palette || null,
           previewPlan: map.previewPlan || map.preview_plan || null,
+          threatProfile: map.threatProfile || map.threat_profile || (map.previewPlan && map.previewPlan.threatProfile) || null,
           runConfig: map.runConfig || null,
         };
       }
@@ -1502,6 +1503,8 @@
           phase: resource.phase || '',
           tags: resource.tags || [],
           signature: resource.signature || null,
+          mapThreat: resource.mapThreat || resource.map_threat || null,
+          previewStats: resource.previewStats || resource.preview_stats || null,
           seed: String(resource.seed || 1),
         };
       }
@@ -3034,7 +3037,9 @@
           const canvas = document.createElement('canvas');
           const label = document.createElement('div');
           label.className = 'preview-label';
-          label.innerHTML = `<strong>${profile.label}</strong><span>${profile.mapProfile || profile.key || 'world graph'}</span>`;
+          const threat = profile.threatProfile || (profile.previewPlan && profile.previewPlan.threatProfile);
+          const threatLine = threat ? mapThreatText(threat) : `${Math.round((profile.density || 0) * 100)}% density`;
+          label.innerHTML = `<strong>${profile.label}</strong><span>${profile.mapProfile || profile.key || 'world graph'}</span><span>${threatLine}</span>`;
           node.appendChild(canvas);
           node.appendChild(label);
           grid.appendChild(node);
@@ -3114,7 +3119,30 @@
         } else if (resource.signature && resource.signature.ambientEnemies) {
           parts.push(`${resource.signature.ambientEnemies} ambient`);
         }
+        if (resource.mapThreat) {
+          parts.push(mapThreatText(resource.mapThreat));
+        }
         return parts.join(' | ');
+      }
+
+      function mapThreatText(threat) {
+        if (!threat) {
+          return '';
+        }
+        const parts = [`${threat.label || 'threat'} ${threat.score || 0}`];
+        if (threat.enemyCount !== undefined) {
+          parts.push(`${threat.enemyCount} enemies`);
+        }
+        if (threat.clusteredPairs) {
+          parts.push(`${threat.clusteredPairs} clusters`);
+        }
+        if (threat.casterCount || threat.rangedCount) {
+          parts.push(`${threat.casterCount || threat.rangedCount} caster`);
+        }
+        if (threat.predatorCount) {
+          parts.push(`${threat.predatorCount} predator`);
+        }
+        return parts.join(' ');
       }
 
       function wireResourceList(list, entries) {

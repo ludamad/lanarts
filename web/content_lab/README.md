@@ -13,9 +13,9 @@ The shell reads its runtime data from the exported content APIs:
 - `lanarts_content_catalog_json()` returns classes, class control metadata, bot skill profiles, level labels, loadout presets, map generators, map algorithms, encounters, and saved resource presets.
 - `lanarts_content_launch_args_json(config)` normalizes a selected run and returns the `engine.StartLanarts` arguments.
 - `lanarts_content_loadout_options_json(config)` resolves class build metadata, known spells, preset items, and class-relevant curated item choices.
-- `lanarts_content_map_generation_json(config)` returns selectable map algorithms, deterministic preview geometry with enemy pins, and resolved run/balance args for each preview.
+- `lanarts_content_map_generation_json(config)` returns selectable map algorithms, deterministic preview geometry with enemy pins, map threat profiles, and resolved run/balance args for each preview.
 - `lanarts_content_map_preview_json(config)` is kept as a compatible alias for the preview grid payload.
-- `lanarts_content_map_matrix_json(config)` expands selected-seed, overworld-algorithm, and late-map probes for map-generation balance runs.
+- `lanarts_content_map_matrix_json(config)` expands selected-seed, overworld-algorithm, and late-map probes for map-generation balance runs, including preview-derived threat profiles for quick comparison.
 - `lanarts_content_enemy_options_json(config)` returns curated enemy groups, packs, selected monster lists, and `StartMonsterEvals` args.
 - `lanarts_content_enemy_matrix_json(config)` expands single-enemy and enemy-pack probes for arena play, balance runs, and monster-eval sweeps.
 - `lanarts_content_analysis_plan_json(config)` returns the selected launch, balance, class-sweep, monster-eval, enemy, and map-generation plan.
@@ -26,7 +26,7 @@ The shell reads its runtime data from the exported content APIs:
 - `lanarts_content_workspace_json(config)` composes the current selection into one UI payload: loadout options, run summary, fight setup, enemy options, map previews, map matrix, analysis plan, package matrix, generated resources, bot profiles, and control model.
 - `lanarts_content_presentation_json(config)` returns presentation-ready controls, command previews, map preview cards, telemetry rows, threat windows, and grouped resource cards for the web lab.
 
-The shell renders a content board from `lanarts_content_presentation_json(config)` so the selected objective, commands, telemetry, threat windows, pressure density preview, class-specific micro plan, map-preview cards, enemy probes, package probes, and orthogonal resources are visible together.
+The shell renders a content board from `lanarts_content_presentation_json(config)` so the selected objective, commands, telemetry, threat windows, pressure density preview, class-specific micro plan, map-preview threat cards, enemy probes, package probes, and orthogonal resources are visible together.
 Encounter launches use `--encounter` for curated 1v1/package tests, or `--monsters` for a comma-separated custom arena.
 Direct map launches use `--start_map_desc`, and overworld profile selections add `--map_profile` so the same seed can compare profiles such as `open_meadow`, `broken_grove`, `river_road`, `predator_thicket`, and `ruin_crossroads`.
 Packaged encounters can also expose rhythm metadata for the shell's timeline view, so orbit, AOE, and summon loops are visible before launch.
