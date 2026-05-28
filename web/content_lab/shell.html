@@ -694,6 +694,7 @@
     .rhythm-window,
     .rhythm-active,
     .rhythm-clutch,
+    .rhythm-perfect,
     .rhythm-hit {
       position: absolute;
       top: 0;
@@ -715,10 +716,15 @@
       z-index: 2;
     }
 
+    .rhythm-perfect {
+      background: rgba(245, 246, 238, 0.78);
+      z-index: 3;
+    }
+
     .rhythm-hit {
       width: 2px;
       background: var(--accent-2);
-      z-index: 3;
+      z-index: 4;
     }
 
     .rhythm-meta {
@@ -2589,6 +2595,7 @@
         if (pkg.rescue) {
           const windup = scaledFrames(pkg.rescue.windup, 68, intensity);
           const lateWindow = scaledFrames(pkg.rescue.late_window, 22, intensity);
+          const perfectWindow = scaledFrames(pkg.rescue.perfect_window, 6, intensity);
           const pullFrames = scaledFrames(pkg.rescue.pull_frames, 90, intensity);
           rows.push({
             id: 'rescue',
@@ -2598,8 +2605,9 @@
             duration: windup,
             activeStart: Math.max(0, windup - lateWindow),
             clutchWindow: lateWindow,
+            perfectWindow,
             pullFrames,
-            meta: `body-block line, ${lateWindow}f clutch window, ${pullFrames}f pull, ally damage ${scaledDamage(pkg.rescue.ally_damage, 10, intensity).toFixed(1)}, block damage ${scaledDamage(pkg.rescue.block_damage, 4, intensity).toFixed(1)}`,
+            meta: `body-block line, ${lateWindow}f clutch window, ${perfectWindow}f perfect, ${pullFrames}f pull, ally damage ${scaledDamage(pkg.rescue.ally_damage, 10, intensity).toFixed(1)}, block damage ${scaledDamage(pkg.rescue.block_damage, 4, intensity).toFixed(1)}`,
           });
         }
         if (pkg.summon) {
@@ -2632,7 +2640,8 @@
         }
         if (row.id === 'rescue') {
           const pull = row.pullFrames ? `, ${row.pullFrames}f pull` : '';
-          return `body-block line, ${row.clutchWindow || row.lateWindow || 0}f clutch window${pull}, ally damage ${Number(row.allyDamage || 0).toFixed(1)}, block damage ${Number(row.blockDamage || 0).toFixed(1)}`;
+          const perfect = row.perfectWindow ? `, ${row.perfectWindow}f perfect` : '';
+          return `body-block line, ${row.clutchWindow || row.lateWindow || 0}f clutch window${perfect}${pull}, ally damage ${Number(row.allyDamage || 0).toFixed(1)}, block damage ${Number(row.blockDamage || 0).toFixed(1)}`;
         }
         if (row.id === 'summon') {
           const monster = ((row.monsters || [])[0]) || 'add';
@@ -2674,6 +2683,17 @@
         track.appendChild(windowNode);
         if (activeNode) {
           track.appendChild(activeNode);
+        }
+        if (row.id === 'rescue' && row.perfectWindow) {
+          const perfectDuration = Math.max(1, Number(row.perfectWindow || 0));
+          const perfectStart = Math.max(0, Number(row.duration || 0) - perfectDuration);
+          const perfectLeft = Math.max(0, Math.min(100, (((row.offset % interval) + perfectStart) % interval) / interval * 100));
+          const perfectWidth = Math.max(2, Math.min(100 - perfectLeft, perfectDuration / interval * 100));
+          const perfectNode = document.createElement('span');
+          perfectNode.className = 'rhythm-perfect';
+          perfectNode.style.left = `${perfectLeft}%`;
+          perfectNode.style.width = `${perfectWidth}%`;
+          track.appendChild(perfectNode);
         }
         track.appendChild(hit);
         item.appendChild(label);

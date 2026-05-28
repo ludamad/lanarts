@@ -519,9 +519,13 @@ local function draw_package_hud(director)
         local color = delta <= 60 and COL_PALE_YELLOW or COL_PALE_GREEN
         local pct = 1 - delta / math.max(1, state.interval)
         if state.active_count > 0 then
-            local prefix = state.late and "clutch " or (state.blocked and "hold " or "block ")
+            local prefix = state.perfect and "perfect "
+                or state.late and "clutch "
+                or (state.blocked and "hold " or "block ")
             value = prefix .. format_frames(state.remaining or 0)
-            color = state.late and COL_PALE_YELLOW or COL_PALE_GREEN
+            color = state.perfect and COL_WHITE
+                or state.late and COL_PALE_YELLOW
+                or COL_PALE_GREEN
             pct = 1
         elseif (director.rescue_pull_active_frames or 0) > 0 then
             value = "pull " .. format_frames(director.rescue_pull_active_frames)
@@ -542,11 +546,15 @@ local function draw_package_hud(director)
             read_pct = 1
         elseif state.active_count > 0 then
             if state.blocked then
-                read_value = state.late and "hold clutch" or "hold line"
-                read_color = COL_PALE_GREEN
+                read_value = state.perfect and "hold perfect" or state.late and "hold clutch" or "hold line"
+                read_color = state.perfect and COL_WHITE or COL_PALE_GREEN
+                read_pct = 1
+            elseif state.perfect then
+                read_value = "perfect now"
+                read_color = COL_WHITE
                 read_pct = 1
             elseif state.late then
-                read_value = "block now"
+                read_value = "perfect in " .. format_frames(math.max(0, (state.remaining or 0) - (state.perfect_window or 0)))
                 read_color = COL_PALE_YELLOW
                 read_pct = 1
             else
@@ -762,6 +770,7 @@ local function package_state_from_director(director)
         rescue_active_remaining = rescue_state and rescue_state.remaining or nil,
         rescue_active_blocked = rescue_state and rescue_state.blocked or false,
         rescue_active_late = rescue_state and rescue_state.late or false,
+        rescue_active_perfect = rescue_state and rescue_state.perfect or false,
         rescue_pull_active_frames = director.rescue_pull_active_frames or 0,
         rescue_pull_target = director.rescue_pull_target,
         pressure_active_count = pressure.active_count or 0,
@@ -1267,23 +1276,28 @@ function M.create_rescue_strike(args)
             local to_xy = xy_of(self.target)
             local remaining = math.max(0, self.windup - self.elapsed)
             local last_call = remaining <= self.late_window
+            local perfect_call = remaining <= self.perfect_window
             local clutch_pct = last_call and (1 - remaining / math.max(1, self.late_window)) or 0
             local color = self.resolved and (self.saved and COL_PALE_GREEN or COL_PALE_RED)
-                or (self.current_blocker and COL_PALE_GREEN or (last_call and COL_PALE_YELLOW or COL_PALE_GREEN))
+                or (perfect_call and COL_WHITE or self.current_blocker and COL_PALE_GREEN or (last_call and COL_PALE_YELLOW or COL_PALE_GREEN))
             local progress = self.resolved and 1 or math.max(0.2, math.min(1, self.elapsed / self.windup))
             draw_world_link(color, from_xy, to_xy, last_call and 5 or 3, last_call and 0.58 or 0.28)
             if not self.resolved then
                 local threat_xy = segment_point_at(from_xy, to_xy, math.min(1, self.elapsed / math.max(1, self.windup)))
-                draw_world_circle(last_call and COL_PALE_YELLOW or COL_WHITE, threat_xy, last_call and 7 or 5, 0.10, last_call and 0.82 or 0.58)
+                draw_world_circle(perfect_call and COL_WHITE or last_call and COL_PALE_YELLOW or COL_WHITE, threat_xy, perfect_call and 9 or last_call and 7 or 5, 0.10, perfect_call and 0.94 or last_call and 0.82 or 0.58)
                 local hint_xy, hint_player, hint_dist = rescue_intercept_hint(self)
                 if hint_xy and hint_player then
                     local block_radius = self.block_radius or 30
                     local player_radius = hint_player.target_radius or hint_player.radius or 12
                     local in_block_zone = hint_dist <= sqr(block_radius + player_radius)
-                    local hint_color = in_block_zone and COL_PALE_GREEN or (last_call and COL_PALE_YELLOW or COL_LIGHT_GRAY)
+                    local hint_color = perfect_call and COL_WHITE
+                        or in_block_zone and COL_PALE_GREEN
+                        or (last_call and COL_PALE_YELLOW or COL_LIGHT_GRAY)
                     draw_world_circle(hint_color, hint_xy, block_radius, in_block_zone and 0.05 or 0.02, in_block_zone and 0.72 or 0.42)
                     local hint_label_xy = Display.to_screen_xy({hint_xy[1], hint_xy[2] - block_radius - 10})
-                    local hint_label = in_block_zone and (last_call and "CLUTCH HOLD" or "HOLD") or (last_call and "BLOCK NOW" or "INTERCEPT")
+                    local hint_label = in_block_zone
+                        and (perfect_call and "PERFECT HOLD" or last_call and "CLUTCH HOLD" or "HOLD")
+                        or (perfect_call and "PERFECT NOW" or last_call and "BLOCK NOW" or "INTERCEPT")
                     draw_text(hint_color, Display.CENTER, hint_label_xy, hint_label)
                 end
             end
@@ -1291,6 +1305,9 @@ function M.create_rescue_strike(args)
             if last_call and not self.resolved then
                 local pulse = 1 + math.sin(self.elapsed * 0.55) * 0.08
                 draw_world_circle(COL_PALE_YELLOW, to_xy, (self.strike_radius + 9 + clutch_pct * 12) * pulse, 0.02, 0.58 + clutch_pct * 0.24)
+                if perfect_call then
+                    draw_world_circle(COL_WHITE, to_xy, (self.strike_radius + 23) * pulse, 0.01, 0.80)
+                end
             end
             local label_xy = Display.to_screen_xy({to_xy[1], to_xy[2] - self.strike_radius - 14})
             local label
@@ -1299,9 +1316,9 @@ function M.create_rescue_strike(args)
                     and (self.was_perfect and ("PERFECT " .. self.clutch_margin .. "f") or self.was_clutch and ("CLUTCH " .. self.clutch_margin .. "f") or (self.pulled and "PULLED" or "SAVED"))
                     or "HIT"
             elseif self.current_blocker then
-                label = last_call and ("CLUTCH HOLD " .. remaining .. "f") or ("HOLD " .. remaining .. "f")
+                label = perfect_call and ("PERFECT HOLD " .. remaining .. "f") or last_call and ("CLUTCH HOLD " .. remaining .. "f") or ("HOLD " .. remaining .. "f")
             else
-                label = last_call and ("BLOCK NOW " .. remaining .. "f") or ("RESCUE " .. remaining .. "f")
+                label = perfect_call and ("PERFECT NOW " .. remaining .. "f") or last_call and ("BLOCK NOW " .. remaining .. "f") or ("RESCUE " .. remaining .. "f")
             end
             draw_text(color, Display.CENTER, label_xy, label)
         end,
@@ -1477,6 +1494,7 @@ function active_rescue_strikes()
     local count = 0
     local blocked = false
     local late = false
+    local perfect = false
     local best_remaining
     for _, obj in ipairs(Map.objects_list()) do
         if obj and not obj.destroyed and obj.content_lab_rescue_strike and not obj.resolved then
@@ -1486,30 +1504,36 @@ function active_rescue_strikes()
             if remaining <= (obj.late_window or 0) then
                 late = true
             end
+            if remaining <= (obj.perfect_window or 0) then
+                perfect = true
+            end
             if obj.current_blocker then
                 blocked = true
             end
         end
     end
-    return count, blocked, best_remaining, late
+    return count, blocked, best_remaining, late, perfect
 end
 
 function rescue_window_state(director, rescue)
     local intensity = director and director.intensity or normalize_intensity(nil)
     local interval, offset = scaled_interval_and_offset(rescue or {}, 205, 54, intensity)
-    local active_count, blocked, remaining, late = active_rescue_strikes()
+    local active_count, blocked, remaining, late, perfect = active_rescue_strikes()
     local windup = scale_frames((rescue or {}).windup, 68, intensity)
     local late_window = scale_frames((rescue or {}).late_window, 22, intensity)
+    local perfect_window = scale_frames((rescue or {}).perfect_window, 6, intensity)
     return {
         interval = interval,
         offset = offset,
         next_frames = next_delta(director and director.elapsed or 0, interval, offset),
         windup = windup,
         late_window = late_window,
+        perfect_window = perfect_window,
         active_count = active_count,
         blocked = blocked,
         remaining = remaining,
         late = late,
+        perfect = perfect,
     }
 end
 
@@ -1604,11 +1628,17 @@ function next_threat_state(director, package)
     elseif rescue and rescue.active_count and rescue.active_count > 0 then
         return {
             id = "rescue",
-            label = rescue.late and "SAVE" or "LINE",
-            state = rescue.blocked and "hold" or rescue.late and "clutch" or "block",
+            label = rescue.perfect and "SAVE" or rescue.late and "SAVE" or "LINE",
+            state = rescue.blocked and (rescue.perfect and "perfect hold" or "hold")
+                or rescue.perfect and "perfect"
+                or rescue.late and "clutch"
+                or "block",
             frames = rescue.remaining or 0,
             pct = 1,
-            color = rescue.blocked and COL_PALE_GREEN or rescue.late and COL_PALE_YELLOW or COL_PALE_GREEN,
+            color = rescue.perfect and COL_WHITE
+                or rescue.blocked and COL_PALE_GREEN
+                or rescue.late and COL_PALE_YELLOW
+                or COL_PALE_GREEN,
         }
     end
 

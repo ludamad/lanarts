@@ -32,7 +32,7 @@ Direct map launches use `--start_map_desc`, and overworld profile selections add
 Packaged encounters can also expose rhythm metadata for the shell's timeline view, so orbit, AOE, and summon loops are visible before launch.
 Rescue packages may spawn allied monsters on the player team, giving pull, taunt, and body-block tests a fragile target without requiring extra local controllers.
 Some rescue packages also add a timed rescue line; the ally takes the heavy hit unless a player intercepts the line during the windup.
-The in-game package HUD counts saves and marks blocks that start inside the final rescue window as clutch saves, with a tighter perfect-save band for few-frame body-blocks.
+The in-game package HUD counts saves and marks blocks that start inside the final rescue window as clutch saves, with a tighter perfect-save band for few-frame body-blocks. Live rescue cues now call out that perfect band before the strike resolves.
 Package HUDs show primary target HP so threat timing can be read against actual clear progress.
 Package HUDs also show current aggro, with a world link from the primary enemy to its target so taunt/pull state is readable during rescue windows.
 Package HUDs include a NEXT row that summarizes the active or nearest package beat, keeping AOE, orbs, summons, and rescue-line timing readable during heavy micro.

@@ -81,7 +81,7 @@ Balance simulations:
     compared without hand-calculating rates from raw counts. Package rows expose
     primary target HP, current package aggro target, the current/next package
     threat, and live rescue-window fields such as next strike, active count,
-    blocked/late state, and active pull target for HUD and replay checks.
+    blocked/late/perfect state, and active pull target for HUD and replay checks.
     Package pressure rows track active/warning component stacks, peak stack,
     and overlap rate, which helps distinguish true full-package micro from
     isolated single-beat pressure. The report also emits package_pressure and
