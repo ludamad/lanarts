@@ -4,4 +4,5 @@ grep -q "_lanarts_content_package_matrix_json" CMakeLists.txt
 grep -q "_lanarts_content_map_matrix_json" CMakeLists.txt
 grep -q "_lanarts_content_fight_setup_json" CMakeLists.txt
 grep -q "_lanarts_content_presentation_json" CMakeLists.txt
+grep -q "lanarts_content_presentation_json" web/content_lab/shell.html
 ./run.sh --headless engine.StartContentApiSmoke "$@"

@@ -322,6 +322,130 @@
       line-height: 1.35;
     }
 
+    .presentation-board {
+      display: grid;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .presentation-hero {
+      display: grid;
+      gap: 6px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .presentation-hero strong {
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .presentation-section {
+      display: grid;
+      gap: 8px;
+    }
+
+    .presentation-section-title {
+      color: #d4dde6;
+      font-size: 11px;
+      font-weight: 760;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .command-grid {
+      display: grid;
+      gap: 7px;
+    }
+
+    .command-row {
+      display: grid;
+      gap: 3px;
+    }
+
+    .command-row span {
+      color: #d4dde6;
+      font-size: 11px;
+      font-weight: 720;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .command-row code {
+      color: var(--accent-2);
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .board-resource-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    .board-resource-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: #d4dde6;
+      font-size: 11px;
+      font-weight: 760;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .board-resource-head span:last-child {
+      color: var(--muted);
+      font-weight: 650;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .board-card-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .board-card {
+      display: grid;
+      gap: 5px;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 8px;
+      color: var(--muted);
+      background: #151a1f;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .board-card strong {
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    .board-card span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
+    .board-card .item-chips span {
+      font-size: 10px;
+    }
+
+    .board-card code {
+      color: var(--accent-2);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+      white-space: normal;
+      word-break: break-word;
+    }
+
     .threat-grid {
       display: grid;
       gap: 6px;
@@ -933,6 +1057,11 @@
       </section>
 
       <section class="section">
+        <div class="section-title">Content Board</div>
+        <div class="presentation-board" id="presentationBoard"></div>
+      </section>
+
+      <section class="section">
         <div class="section-title">Map Matrix</div>
         <div class="resource-list" id="mapResources"></div>
       </section>
@@ -1220,6 +1349,7 @@
       let enemyOptions = null;
       let analysisPlan = null;
       let workspace = null;
+      let presentation = null;
 
       function callContentApi(name, payload) {
         if (!state.runtimeReady || !Module.ccall) {
@@ -1805,6 +1935,189 @@
         appendCommandLine(host, 'Monster', commands.monsterEval);
       }
 
+      function commandPreviewText(command) {
+        if (!command) {
+          return '';
+        }
+        if (command.text) {
+          return command.text;
+        }
+        if (Array.isArray(command.args)) {
+          return commandText(command.args);
+        }
+        if (Array.isArray(command)) {
+          return commandText(command);
+        }
+        return '';
+      }
+
+      function appendBoardTitle(host, text) {
+        const title = document.createElement('div');
+        title.className = 'presentation-section-title';
+        title.textContent = text;
+        host.appendChild(title);
+      }
+
+      function appendCommandPreview(host, labelText, command) {
+        const text = commandPreviewText(command);
+        if (!text) {
+          return;
+        }
+        const row = document.createElement('div');
+        row.className = 'command-row';
+        const label = document.createElement('span');
+        label.textContent = labelText;
+        const code = document.createElement('code');
+        code.textContent = text;
+        row.appendChild(label);
+        row.appendChild(code);
+        host.appendChild(row);
+      }
+
+      function chipRow(values) {
+        const row = document.createElement('div');
+        row.className = 'item-chips';
+        (values || []).forEach((value) => {
+          if (value !== undefined && value !== null && String(value) !== '') {
+            addChip(row, value);
+          }
+        });
+        return row;
+      }
+
+      function boardCard(card, onClick) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'board-card';
+        const title = document.createElement('strong');
+        title.textContent = card.title || card.label || card.id || 'Resource';
+        button.appendChild(title);
+        if (card.subtitle || card.goal) {
+          const subtitle = document.createElement('span');
+          subtitle.textContent = card.subtitle || card.goal;
+          button.appendChild(subtitle);
+        }
+        const chips = chipRow(card.chips || []);
+        if (chips.childElementCount) {
+          button.appendChild(chips);
+        }
+        const command = card.balance || card.command;
+        const commandTextValue = commandPreviewText(command);
+        if (commandTextValue) {
+          const code = document.createElement('code');
+          code.textContent = commandTextValue;
+          button.appendChild(code);
+        }
+        button.addEventListener('click', onClick);
+        return button;
+      }
+
+      function renderPresentationBoard(payload) {
+        const host = $('presentationBoard');
+        host.innerHTML = '';
+        if (!payload) {
+          const pending = document.createElement('div');
+          pending.className = 'muted';
+          pending.textContent = state.runtimeReady ? 'No presentation payload' : 'Runtime data pending';
+          host.appendChild(pending);
+          return;
+        }
+
+        const selected = payload.selected || {};
+        const hero = document.createElement('div');
+        hero.className = 'presentation-hero';
+        const title = document.createElement('strong');
+        title.textContent = selected.title || 'Selected content';
+        const subtitle = document.createElement('span');
+        subtitle.textContent = selected.subtitle || '';
+        hero.appendChild(title);
+        if (subtitle.textContent) {
+          hero.appendChild(subtitle);
+        }
+        const warningChips = chipRow(payload.warnings || []);
+        if (warningChips.childElementCount) {
+          hero.appendChild(warningChips);
+        }
+        host.appendChild(hero);
+
+        const commands = payload.commandPreviews || {};
+        const commandSection = document.createElement('div');
+        commandSection.className = 'presentation-section command-grid';
+        appendBoardTitle(commandSection, 'Commands');
+        appendCommandPreview(commandSection, 'Launch', commands.launch);
+        appendCommandPreview(commandSection, 'Balance', commands.balance);
+        appendCommandPreview(commandSection, 'Classes', commands.classSweep);
+        appendCommandPreview(commandSection, 'Monster', commands.monsterEval);
+        if (commandSection.childElementCount > 1) {
+          host.appendChild(commandSection);
+        }
+
+        const watch = document.createElement('div');
+        watch.className = 'presentation-section';
+        appendBoardTitle(watch, 'Watch');
+        const watchChips = chipRow((payload.telemetry || []).slice(0, 16).map((metric) => metric.label || metric.key));
+        if ((payload.telemetry || []).length > 16) {
+          addChip(watchChips, `+${payload.telemetry.length - 16}`);
+        }
+        const threatChips = chipRow((payload.threats || []).map((threat) => {
+          const loop = threat.loopFrames || 0;
+          return `${threat.label || threat.id} ${loop}f`;
+        }));
+        if (watchChips.childElementCount) {
+          watch.appendChild(watchChips);
+        }
+        if (threatChips.childElementCount) {
+          watch.appendChild(threatChips);
+        }
+        if (watch.childElementCount > 1) {
+          host.appendChild(watch);
+        }
+
+        const previews = payload.mapPreviews || [];
+        if (previews.length) {
+          const previewSection = document.createElement('div');
+          previewSection.className = 'presentation-section';
+          appendBoardTitle(previewSection, 'Preview Cards');
+          const list = document.createElement('div');
+          list.className = 'board-card-list';
+          previews.slice(0, 4).forEach((card) => {
+            list.appendChild(boardCard(card, () => {
+              setConfig({
+                ...currentConfig(),
+                mapDesc: card.mapDesc || '',
+                mapProfile: card.mapProfile || '',
+                mapAlgorithm: card.mapAlgorithm || mapAlgorithmIdFor(card.mapDesc || '', card.mapProfile || ''),
+              });
+            }));
+          });
+          previewSection.appendChild(list);
+          host.appendChild(previewSection);
+        }
+
+        (payload.resourceGroups || []).forEach((group) => {
+          const section = document.createElement('div');
+          section.className = 'board-resource-group';
+          const head = document.createElement('div');
+          head.className = 'board-resource-head';
+          const label = document.createElement('span');
+          label.textContent = group.label || group.id || 'Resources';
+          const count = document.createElement('span');
+          count.textContent = `${group.count || (group.cards || []).length} resources`;
+          head.appendChild(label);
+          head.appendChild(count);
+          section.appendChild(head);
+          const list = document.createElement('div');
+          list.className = 'board-card-list';
+          (group.cards || []).slice(0, 4).forEach((card) => {
+            list.appendChild(boardCard(card, () => {
+              setConfig(card.config || currentConfig());
+            }));
+          });
+          section.appendChild(list);
+          host.appendChild(section);
+        });
+      }
+
       function customLoadoutParts() {
         return $('customLoadout').value.split(',').map((part) => part.trim()).filter(Boolean);
       }
@@ -1896,6 +2209,11 @@
         renderAnalysisPlan(analysisPlan);
       }
 
+      function updatePresentation() {
+        presentation = callContentApi('lanarts_content_presentation_json', currentConfig());
+        renderPresentationBoard(presentation);
+      }
+
       function updateGeneratedResources() {
         const response = callContentApi('lanarts_content_resource_matrix_json', currentConfig());
         generatedResources = response && response.resources ? response.resources.map(normalizeResource) : [];
@@ -1924,6 +2242,7 @@
         fightSetup = workspace.fightSetup || null;
         enemyOptions = workspace.enemyOptions || null;
         analysisPlan = workspace.analysisPlan || null;
+        presentation = callContentApi('lanarts_content_presentation_json', currentConfig());
         mapResources = workspace.mapMatrix && workspace.mapMatrix.resources
           ? workspace.mapMatrix.resources.map(normalizeResource)
           : [];
@@ -1938,6 +2257,7 @@
         renderFightSetup(fightSetup);
         renderEnemyOptions(enemyOptions);
         renderAnalysisPlan(analysisPlan);
+        renderPresentationBoard(presentation);
         drawPreviews(workspace.mapGeneration);
         wireMapResources();
         wirePackageResources();
@@ -1955,6 +2275,7 @@
         updateFightSetup();
         updateEnemyOptions();
         updateAnalysisPlan();
+        updatePresentation();
         drawPreviews();
         updateMapResources();
         updatePackageResources();
