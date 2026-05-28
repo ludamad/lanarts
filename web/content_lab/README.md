@@ -52,7 +52,7 @@ Some rescue packages also add a timed rescue line; the ally takes the heavy hit 
 The in-game package HUD counts saves and marks blocks that start inside the final rescue window as clutch saves, with a tighter perfect-save band for few-frame body-blocks. Live rescue cues now call out that perfect band before the strike resolves, and clutch/perfect saves can open a short boss counter window.
 Package HUDs show primary target HP so threat timing can be read against actual clear progress.
 Package HUDs also show current aggro, with a world link from the primary enemy to its target so taunt/pull state is readable during rescue windows.
-Package HUDs include a NEXT row that summarizes the active or nearest package beat, keeping AOE, orbs, sweeps, summons, and rescue-line timing readable during heavy micro.
+Package HUDs include NEXT and BEAT rows that summarize the active or nearest package beat, keeping AOE, orbs, sweeps, summons, portals, and rescue-line timing readable during heavy micro.
 Package HUDs also include a STACK row, and balance rows expose peak stack plus overlap rate so full-package fights can be checked for actual simultaneous micro pressure.
 Package HUDs include a MICRO row that scores clean hazard dodges, rescue saves, streaks, and avoidable hits while the fight is happening.
 Rescue HUDs include TAUNT uptime, and balance rows expose pull/taunt total frames plus uptime rate so rescue-package clears can be separated from forced-target-control cheese.

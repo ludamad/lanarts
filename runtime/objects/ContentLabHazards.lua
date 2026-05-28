@@ -633,6 +633,43 @@ local function draw_hud_row(y, label, value, color, pct)
     draw_hud_bar(HUD_X + 70, y + 14, HUD_W - 82, 3, pct, color)
 end
 
+local PRESSURE_LABEL_ABBREVIATIONS = {
+    orbs = "ORB",
+    aoe = "AOE",
+    sweep = "SWP",
+    adds = "ADD",
+    portal = "PORT",
+    rescue = "SAVE",
+    pull = "PULL",
+}
+
+local function format_pressure_labels(labels)
+    if not labels or labels == "" then
+        return "quiet"
+    end
+    local parts = {}
+    local extra = 0
+    for raw_label in string.gmatch(labels, "[^+]+") do
+        local label = string.match(raw_label, "^%s*(.-)%s*$")
+        if label and label ~= "" then
+            local abbrev = PRESSURE_LABEL_ABBREVIATIONS[label] or string.upper(string.sub(label, 1, 4))
+            if #parts < 3 then
+                parts[#parts + 1] = abbrev
+            else
+                extra = extra + 1
+            end
+        end
+    end
+    if #parts == 0 then
+        return "quiet"
+    end
+    local value = table.concat(parts, "+")
+    if extra > 0 then
+        value = value .. "+" .. tostring(extra)
+    end
+    return value
+end
+
 local function package_title(package, intensity)
     return (package.primary or "Package") .. " " .. (intensity.label or intensity.id or "Standard")
 end
@@ -857,7 +894,7 @@ local function draw_package_hud(director)
     local row_count = 1
     local has_threat_rows = package.orbit or package.pulse or package.sweep or package.summon or package.rescue
     if has_threat_rows then
-        row_count = row_count + 3
+        row_count = row_count + 4
     end
     if package.micro_punish then
         row_count = row_count + 1
@@ -906,6 +943,13 @@ local function draw_package_hud(director)
             or (pressure.total_count or 0) >= 2 and COL_PALE_YELLOW
             or COL_LIGHT_GRAY
         draw_hud_row(y, "STACK", stack_value, stack_color, math.min(1, (pressure.total_count or 0) / 4))
+        y = y + HUD_ROW_H
+
+        local beat_value = format_pressure_labels(pressure.labels)
+        local beat_color = (pressure.active_count or 0) > 0 and stack_color
+            or (pressure.warning_count or 0) > 0 and COL_PALE_YELLOW
+            or COL_LIGHT_GRAY
+        draw_hud_row(y, "BEAT", beat_value, beat_color, math.min(1, (pressure.total_count or 0) / 4))
         y = y + HUD_ROW_H
 
         local score = math.floor(director.micro_score or 0)
@@ -982,7 +1026,7 @@ local function draw_package_hud(director)
         local delta = next_delta(director.elapsed, interval, offset)
         local current = summon_count()
         local warning_count, warning_remaining = active_summon_portals()
-        local max_alive = scale_count(summon.max_alive, 4, intensity)
+        local max_alive = scale_summon_count(summon, "max_alive", 4, intensity)
         if warning_count > 0 then
             draw_hud_row(y, "ADDS", "warn " .. format_frames(warning_remaining or 0) .. " " .. current .. "/" .. max_alive, COL_PALE_YELLOW, 1)
         else
