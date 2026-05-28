@@ -123,16 +123,16 @@ Balance simulations:
     isolated single-beat pressure. The report also emits package_pressure and
     package_difficulty rows when package overlap is only serial pressure or
     the selected automation profile is clearing too comfortably.
-    Rescue package rows also track pull/taunt total frames, uptime rate, and
-    late-window pull rates, plus pull-snap burst counts, so clears can be
-    flagged when forced target control is carrying the fight instead of
-    few-frame snap-pull saves.
+    Rescue package rows also track pull/taunt total frames, uptime rate,
+    pull-discipline rate, and late-window pull rates, plus pull-snap burst
+    counts, so clears can be flagged when forced target control is carrying
+    the fight instead of few-frame snap-pull saves.
     Rescue-package report rows summarize save, clutch, perfect, early,
-    timing-score, pull, timed-pull, perfect-pull, taunt-uptime, late-cover,
-    perfect-cover, uncovered danger-window, counter-window, counter-damage,
-    counter-stagger, fatal-miss, and buffered-miss rates, then warn when
-    pull/taunt control or early parking is replacing the intended few-frame
-    body-block micro.
+    timing-score, pull, timed-pull, pull-discipline, perfect-pull,
+    taunt-uptime, late-cover, perfect-cover, uncovered danger-window,
+    counter-window, counter-damage, counter-stagger, fatal-miss, and
+    buffered-miss rates, then warn when pull/taunt control or early parking
+    is replacing the intended few-frame body-block micro.
     When a balance run matches a content-lab micro drill, the report also emits
     drill_scorecard rows for that drill's pass/fail targets, including rescue
     saves, perfect saves, taunt reliance, add cleanup, stack overlap, spacing,

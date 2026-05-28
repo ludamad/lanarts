@@ -51,6 +51,8 @@ grep -q "CUT PERFECT" runtime/objects/ContentLabHazards.lua
 grep -q "avg_package_rescue_counter_windows" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_fatal_misses" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timed_pull_rate" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_rescue_pull_discipline_rate" runtime/engine/StartBalanceRun.lua
+grep -q "pull-discipline" runtime/engine/ContentApi.lua
 grep -q "avg_package_rescue_pull_snap_bursts" runtime/engine/StartBalanceRun.lua
 grep -q "PERFECT SNAP" runtime/objects/ContentLabHazards.lua
 grep -q "mana-sapper-ritual-package" runtime/engine/ContentCatalog.lua

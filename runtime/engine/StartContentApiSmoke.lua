@@ -168,6 +168,7 @@ local function run_content_api_smoke()
     local has_pressure_overlap_metric = false
     local has_fight_regen_metric = false
     local has_taunt_uptime_metric = false
+    local has_pull_discipline_metric = false
     local has_perfect_metric = false
     local has_sweep_metric = false
     local has_micro_score_metric = false
@@ -193,6 +194,8 @@ local function run_content_api_smoke()
             has_fight_regen_metric = true
         elseif metric.key == "avg_package_rescue_pull_uptime_rate" then
             has_taunt_uptime_metric = true
+        elseif metric.key == "avg_package_rescue_pull_discipline_rate" then
+            has_pull_discipline_metric = true
         elseif metric.key == "avg_package_rescue_perfect_rate" then
             has_perfect_metric = true
         elseif metric.key == "avg_package_rescue_early_rate" then
@@ -223,6 +226,7 @@ local function run_content_api_smoke()
     expect(has_pressure_overlap_metric, "fight setup should expose package overlap telemetry")
     expect(has_fight_regen_metric, "fight setup should expose necromancer regen telemetry")
     expect(has_taunt_uptime_metric, "fight setup should expose taunt uptime telemetry")
+    expect(has_pull_discipline_metric, "fight setup should expose pull discipline telemetry")
     expect(has_perfect_metric, "fight setup should expose perfect-save telemetry")
     expect(has_early_save_metric, "fight setup should expose early-save telemetry")
     expect(has_timing_score_metric, "fight setup should expose rescue timing quality telemetry")
@@ -367,6 +371,7 @@ local function run_content_api_smoke()
                 and #(drill.microPlan or {}) >= 1
             local has_perfect_metric = false
             local has_taunt_metric = false
+            local has_pull_discipline_metric = false
             local has_early_metric = false
             local has_timing_metric = false
             for _, row in ipairs(drill.scorecard and drill.scorecard.rows or {}) do
@@ -374,6 +379,8 @@ local function run_content_api_smoke()
                     has_perfect_metric = true
                 elseif row.metric == "avg_package_rescue_pull_uptime_rate" then
                     has_taunt_metric = true
+                elseif row.metric == "avg_package_rescue_pull_discipline_rate" then
+                    has_pull_discipline_metric = true
                 elseif row.metric == "avg_package_rescue_early_rate" then
                     has_early_metric = true
                 elseif row.metric == "avg_package_rescue_timing_score" then
@@ -381,7 +388,7 @@ local function run_content_api_smoke()
                 end
             end
             has_gragh_rescue_scorecard = drill.scorecard and #(drill.scorecard.rows or {}) >= 8
-                and has_perfect_metric and has_taunt_metric and has_early_metric and has_timing_metric
+                and has_perfect_metric and has_taunt_metric and has_pull_discipline_metric and has_early_metric and has_timing_metric
         end
     end
     expect(has_gragh_rescue_drill, "micro drills should expose launchable Gragh rescue timing practice")

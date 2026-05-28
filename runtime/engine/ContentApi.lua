@@ -2896,6 +2896,7 @@ telemetry_watch_for = function(config, package_summary)
             append_metric(rows, "avg_package_rescue_perfect_cover_rate", "Perfect cover", "share of perfect-window frames covered")
             append_metric(rows, "avg_package_rescue_pull_rate", "Pull rate", "taunt/body-block interaction")
             append_metric(rows, "avg_package_rescue_timed_pull_rate", "Late pulls", "pulls started inside clutch window")
+            append_metric(rows, "avg_package_rescue_pull_discipline_rate", "Pull discipline", "no-pull or clutch-window pull share")
             append_metric(rows, "avg_package_rescue_perfect_pull_rate", "Perfect pulls", "pulls started inside perfect window")
             append_metric(rows, "avg_package_rescue_pull_snap_bursts", "Pull snaps", "visible clutch/perfect pull snap payoffs")
             append_metric(rows, "avg_package_rescue_perfect_pull_snap_bursts", "Perfect snaps", "visible perfect-pull snap payoffs")
@@ -3177,6 +3178,15 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
             threshold = 0.35,
             target = "<=35% pull uptime",
             reason = "High forced-target uptime means taunt is carrying the rescue lane.",
+        })
+        add({
+            id = "pull-discipline",
+            label = "Pull discipline",
+            metric = "avg_package_rescue_pull_discipline_rate",
+            comparator = ">=",
+            threshold = list_has(drill.tags, "taunt") and 0.45 or 0.35,
+            target = list_has(drill.tags, "taunt") and ">=45% disciplined pulls" or ">=35% disciplined pulls",
+            reason = "No-pull body blocks are neutral, but pull-heavy rescues should be late-window snap saves rather than broad target-control uptime.",
         })
         add({
             id = "ally-margin",

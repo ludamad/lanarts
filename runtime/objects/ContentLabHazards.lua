@@ -708,6 +708,14 @@ local function safe_rate(num, denom)
     return (tonumber(num) or 0) / denom
 end
 
+local function pull_discipline_rate(pulls, clutch_pulls)
+    pulls = tonumber(pulls) or 0
+    if pulls <= 0 then
+        return 1
+    end
+    return safe_rate(clutch_pulls, pulls)
+end
+
 local function format_pct(value)
     return tostring(math.floor((value or 0) * 100 + 0.5)) .. "%"
 end
@@ -1401,6 +1409,7 @@ local function package_result(director, outcome)
     local timing_score = safe_rate(clutch + perfect, saves)
     local pull_rate = safe_rate(pulls, saves)
     local timed_pull_rate = safe_rate(clutch_pulls, pulls)
+    local pull_discipline = pull_discipline_rate(pulls, clutch_pulls)
     local perfect_pull_rate = safe_rate(perfect_pulls, pulls)
     local pull_total_frames = director.rescue_pull_total_frames or 0
     local pull_uptime_rate = safe_rate(pull_total_frames, math.max(1, frames))
@@ -1412,7 +1421,7 @@ local function package_result(director, outcome)
     local best_pull = director.rescue_best_pull_margin
     local escort_text = count > 0 and string.format("ally %d/%d", math.ceil(hp), math.ceil(max_hp)) or "ally down"
     local rescue_text = (saves > 0 or misses > 0)
-        and string.format("saves %d/%d (%s), clutch %d (%s), perfect %d (%s), early %d (%s), pulls %d (%s timed), taunt %s%s%s", saves, opportunities, format_pct(save_rate), clutch, format_pct(clutch_rate), perfect, format_pct(perfect_rate), early, format_pct(early_rate), pulls, format_pct(timed_pull_rate), format_pct(pull_uptime_rate), best and (", best " .. best .. "f") or "", best_pull and (", pull " .. best_pull .. "f") or "")
+        and string.format("saves %d/%d (%s), clutch %d (%s), perfect %d (%s), early %d (%s), pulls %d (%s disciplined), taunt %s%s%s", saves, opportunities, format_pct(save_rate), clutch, format_pct(clutch_rate), perfect, format_pct(perfect_rate), early, format_pct(early_rate), pulls, format_pct(pull_discipline), format_pct(pull_uptime_rate), best and (", best " .. best .. "f") or "", best_pull and (", pull " .. best_pull .. "f") or "")
         or "no rescue strikes"
     return {
         outcome = outcome,
@@ -1468,6 +1477,7 @@ local function package_result(director, outcome)
         rescue_clutch_pulls = clutch_pulls,
         rescue_perfect_pulls = perfect_pulls,
         rescue_timed_pull_rate = timed_pull_rate,
+        rescue_pull_discipline_rate = pull_discipline,
         rescue_perfect_pull_rate = perfect_pull_rate,
         rescue_pull_snap_bursts = director.rescue_pull_snap_bursts or 0,
         rescue_perfect_pull_snap_bursts = director.rescue_perfect_pull_snap_bursts or 0,
@@ -1608,6 +1618,7 @@ local function package_state_from_director(director)
         rescue_clutch_pulls = clutch_pulls,
         rescue_perfect_pulls = perfect_pulls,
         rescue_timed_pull_rate = safe_rate(clutch_pulls, pulls),
+        rescue_pull_discipline_rate = pull_discipline_rate(pulls, clutch_pulls),
         rescue_perfect_pull_rate = safe_rate(perfect_pulls, pulls),
         rescue_pull_snap_bursts = director.rescue_pull_snap_bursts or 0,
         rescue_perfect_pull_snap_bursts = director.rescue_perfect_pull_snap_bursts or 0,
