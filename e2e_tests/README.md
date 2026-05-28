@@ -98,7 +98,9 @@ Balance simulations:
     for black aura/projectile pressure with skull lanes and Skeleton cleanup.
     pixulloch-web-package adds a larger final-boss arena with native black
     summons, rotating web knots, crossing venom lanes, a web nova beat, and
-    Giant Spider cleanup.
+    Giant Spider cleanup. waxanarian-venom-package adds fast green boss
+    pursuit with stinger knots, venom lanes, poison bloom timing, and Poison
+    Bee cleanup.
     emit package_outcome, escort HP, rescue saves, clutch/perfect saves,
     clutch/perfect rescue window cues, danger-clock coverage, pull redirects,
     and misses in run and sample rows; ally-down package failures end the run
@@ -152,6 +154,11 @@ Balance simulations:
     roll buildup FX, lock cues, suspense pips, reveal cues, high-roll streaks,
     repeat rolls, effective Dash/Power refreshes, jackpot rolls, and buff
     active frames so skill-dice RNG can be modeled separately from package execution.
+    Dicebinder drill scorecards also watch roll cadence, animation frames,
+    lock-in cues, variety switches, repeat caps, and buff uptime directly.
+    Drills tagged `stress` replace the practice clear-floor check with a
+    skill-buffer ceiling, which models late-game content that a primitive
+    human-profile bot should not clear reliably.
     Use --package_components orbit,pulse,sweep,summon,escort,rescue to isolate
     package parts while keeping the same encounter arena, monsters, and
     pressure preset. A rescue component automatically keeps its escort target.

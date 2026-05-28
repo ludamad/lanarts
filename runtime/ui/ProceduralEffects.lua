@@ -334,6 +334,17 @@ function M.draw_die_badge(obj, args)
         rolling and (43 + pulse * 5) or label ~= "" and 39 or 34,
         5
     )
+    if rolling then
+        local trail_spin = frame * 0.16
+        for idx = 1, 3 do
+            local trail_pct = (rolling_pct + idx * 0.23) % 1
+            local angle = trail_spin + idx * TWO_PI / 3 + rolling_pct * 2.2
+            local dist = 31 + trail_pct * 15
+            local trail_roll = ((roll + idx - 2) % 6) + 1
+            local trail_xy = {xy[1] + math.cos(angle) * dist, xy[2] + math.sin(angle) * dist * 0.58}
+            draw_die_face(trail_xy, trail_roll, 10 + trail_pct * 5, color, 0.18 + trail_pct * 0.26)
+        end
+    end
     Display.draw_rectangle(alpha(COL_BLACK, rolling and 0.58 or 0.48), box)
     Display.draw_rectangle_outline(alpha(color, rolling and (0.82 + pulse * 0.16) or 0.78), box, rolling and 2 or 1)
     local has_die = roll > 0 and label ~= ""

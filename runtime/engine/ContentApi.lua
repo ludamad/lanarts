@@ -3068,6 +3068,7 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
     local telemetry = {}
     local notes = {}
     local seen = {}
+    local stress_drill = list_has(drill.tags, "stress")
     local function watch(metric)
         if metric and metric ~= "" and not seen[metric] then
             telemetry[#telemetry + 1] = metric
@@ -3079,24 +3080,37 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
         watch(row.metric)
     end
 
-    add({
-        id = "clear-floor",
-        label = "Clear floor",
-        metric = "win_rate",
-        comparator = ">=",
-        threshold = 0.35,
-        target = ">=35% human clears",
-        reason = "Practice drills should be learnable without perfect automation.",
-    })
-    add({
-        id = "clear-ceiling",
-        label = "Ceiling check",
-        metric = "win_rate",
-        comparator = "<=",
-        threshold = 0.90,
-        target = "<=90% human clears",
-        reason = "A primitive human-profile bot clearing every run means the drill is too forgiving.",
-    })
+    if stress_drill then
+        add({
+            id = "skill-buffer",
+            label = "Skill buffer",
+            metric = "win_rate",
+            comparator = "<=",
+            threshold = 0.65,
+            target = "<=65% primitive human clears",
+            reason = "Stress drills model late-game execution where a primitive bot should not reliably clear.",
+        })
+        notes[#notes + 1] = "Stress drill: the scorecard checks that primitive automation is not clearing reliably instead of requiring a clear floor."
+    else
+        add({
+            id = "clear-floor",
+            label = "Clear floor",
+            metric = "win_rate",
+            comparator = ">=",
+            threshold = 0.35,
+            target = ">=35% human clears",
+            reason = "Practice drills should be learnable without perfect automation.",
+        })
+        add({
+            id = "clear-ceiling",
+            label = "Ceiling check",
+            metric = "win_rate",
+            comparator = "<=",
+            threshold = 0.90,
+            target = "<=90% human clears",
+            reason = "A primitive human-profile bot clearing every run means the drill is too forgiving.",
+        })
+    end
     add({
         id = "near-death",
         label = "Pressure floor",
@@ -3250,6 +3264,63 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
             threshold = 0,
             target = ">0 regen offset",
             reason = "Necromancer pressure must be read after regen correction.",
+        })
+    end
+
+    if drill_config.className == "Dicebinder" then
+        add({
+            id = "dice-cadence",
+            label = "Dice cadence",
+            metric = "avg_dice_rolls_total",
+            comparator = ">=",
+            threshold = 2,
+            target = ">=2 rolls/run",
+            reason = "The class should expose multiple decision windows during a boss drill.",
+        })
+        add({
+            id = "dice-animation",
+            label = "Roll animation",
+            metric = "avg_dice_roll_animation_frames",
+            comparator = ">=",
+            threshold = 96,
+            target = ">=96 animation frames/run",
+            reason = "Dice rolls should unfold over time instead of resolving as an instant stat tick.",
+        })
+        add({
+            id = "dice-lock-read",
+            label = "Lock-in cues",
+            metric = "avg_dice_roll_lock_cues",
+            comparator = ">=",
+            threshold = 6,
+            target = ">=6 lock cues/run",
+            reason = "The roll should have visible staged anticipation before the face resolves.",
+        })
+        add({
+            id = "dice-variety",
+            label = "Roll variety",
+            metric = "avg_dice_roll_variety_switches",
+            comparator = ">=",
+            threshold = 1,
+            target = ">=1 face switch/run",
+            reason = "The fair-bag dice should produce varied outcomes instead of repeating one result.",
+        })
+        add({
+            id = "dice-repeat-cap",
+            label = "Repeat cap",
+            metric = "avg_dice_repeat_rolls",
+            comparator = "<=",
+            threshold = 1,
+            target = "<=1 repeat/run",
+            reason = "Repeated faces should stay rare enough that jackpot streaks do not dominate balance reads.",
+        })
+        add({
+            id = "dice-buff-uptime",
+            label = "Buff uptime",
+            metric = "avg_dice_buff_active_frames",
+            comparator = ">=",
+            threshold = 120,
+            target = ">=120 buff frames/run",
+            reason = "Roll outcomes should create real temporary bonuses that can be modeled in telemetry.",
         })
     end
 

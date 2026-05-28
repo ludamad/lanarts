@@ -34,11 +34,15 @@ grep -q "avg_dice_roll_buildup_fx" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_lock_cues" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_suspense_pips" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_longest_high_streak" runtime/engine/StartBalanceRun.lua
+grep -q "dice-animation" runtime/engine/ContentApi.lua
+grep -q "skill-buffer" runtime/engine/ContentApi.lua
 grep -q "DICE_FULL_BAG_MASK" runtime/spells/Effects.moon
 grep -q "DICE_ROLL_LOCK_STAGE_FRAMES" runtime/spells/Effects.moon
 grep -q "dicebinder_emit_roll_fx" runtime/spells/Effects.moon
 grep -q "dicebinder_emit_roll_tick_fx" runtime/spells/Effects.moon
 grep -q "draw_die_face" runtime/ui/ProceduralEffects.lua
+grep -q "trail_roll" runtime/ui/ProceduralEffects.lua
+grep -q "orbiting die ghosts" web/content_lab/README.md
 grep -q "avg_package_rescue_early_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timing_score" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_window_cues" runtime/engine/StartBalanceRun.lua
@@ -57,6 +61,8 @@ grep -q "stara-pain-star-package" runtime/engine/ContentCatalog.lua
 grep -q "stara-pain-star-package" web/content_lab/shell.html
 grep -q "pixulloch-web-package" runtime/engine/ContentCatalog.lua
 grep -q "pixulloch-web-package" web/content_lab/shell.html
+grep -q "waxanarian-venom-package" runtime/engine/ContentCatalog.lua
+grep -q "waxanarian-venom-package" web/content_lab/shell.html
 grep -q "source or player" runtime/objects/ContentLabHazards.lua
 grep -q "MICRO" runtime/objects/ContentLabHazards.lua
 grep -q "BEAT" runtime/objects/ContentLabHazards.lua
