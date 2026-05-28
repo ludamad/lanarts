@@ -2858,6 +2858,9 @@ telemetry_watch_for = function(config, package_summary)
         append_metric(rows, "avg_package_pressure_overlap_rate", "Overlap rate", "share of frames with stacked pressure")
         append_metric(rows, "avg_package_pressure_sync_rate", "Sync rate", "share of frames with 3+ simultaneous package demands")
         append_metric(rows, "avg_package_pressure_sync_bursts", "Sync bursts", "visible stacked-rhythm callouts")
+        append_metric(rows, "avg_package_pressure_unique_components", "Beat mix", "unique mechanic types seen during package pressure")
+        append_metric(rows, "avg_package_pressure_signature_switches", "Beat swaps", "pressure signature changes across the drill")
+        append_metric(rows, "avg_package_pressure_dominance_rate", "Dominance", "share of pressure frames owned by the most frequent mechanic")
         append_metric(rows, "avg_package_micro_score", "Micro score", "live drill score from dodges, saves, and hits")
         append_metric(rows, "avg_package_micro_best_streak", "Best streak", "longest clean micro streak")
         append_metric(rows, "avg_package_micro_dodges", "Threaded avoids", "targeted or near-miss hazard avoids")
@@ -3273,6 +3276,27 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
                 reason = "Full-package 1v1 fights should call out stacked rhythm moments, not hide them as unrelated hazard clutter.",
             })
         end
+    end
+
+    if package_summary and (package_summary.rhythmCount or 0) >= 3 then
+        add({
+            id = "beat-variety",
+            label = "Beat variety",
+            metric = "avg_package_pressure_unique_components",
+            comparator = ">=",
+            threshold = math.min(3, package_summary.rhythmCount or 3),
+            target = ">=3 mechanic types seen",
+            reason = "A full package should rotate through different reads, not just stack one dominant action.",
+        })
+        add({
+            id = "beat-rotation",
+            label = "Beat rotation",
+            metric = "avg_package_pressure_signature_switches",
+            comparator = ">=",
+            threshold = 2,
+            target = ">=2 pressure signature switches",
+            reason = "The encounter should change what the player is reading over time instead of holding one static pressure state.",
+        })
     end
 
     local class = class_lookup()[drill_config.className] or {}

@@ -53,7 +53,7 @@ The in-game package HUD counts saves and marks blocks that start inside the fina
 Package HUDs show primary target HP so threat timing can be read against actual clear progress.
 Package HUDs also show current aggro plus the current target-role uptime, with a world link from the primary enemy to its target so taunt/pull state is readable during rescue windows.
 Package HUDs include NEXT and BEAT rows that summarize the active or nearest package beat, keeping AOE, orbs, sweeps, summons, portals, and rescue-line timing readable during heavy micro.
-Package HUDs also include STACK and SYNC rows, and balance rows expose peak stack, overlap rate, sync-beat frames, sync bursts, and sync peak so full-package fights can be checked for actual simultaneous micro pressure.
+Package HUDs also include STACK, SYNC, and MIX rows, and balance rows expose peak stack, overlap rate, sync-beat frames, sync bursts, sync peak, unique mechanic types, pressure signature switches, and dominant-mechanic share so full-package fights can be checked for simultaneous pressure and beat variety.
 Package HUDs include a compact beat wheel in the title band; its orbit, AOE, sweep, add, and rescue pips fill toward the next rhythm and flare when a beat is warning or active.
 Boss package draws now use a reusable procedural pressure-field aura that grows and spins harder when overlapping package beats stack up.
 Nesso now has a late green ranged full-package fight with arrow wheels, tight volley pulses, crossing trample lanes, and bounded Centaur/Hound flank adds, giving the lab a unique poison-arrow boss benchmark beyond the lighter Centaur Hunter package.

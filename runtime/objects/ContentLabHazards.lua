@@ -963,6 +963,66 @@ local function pressure_sync_color(count)
     return COL_LIGHT_GRAY
 end
 
+local function split_pressure_labels(labels)
+    local result = {}
+    for label in tostring(labels or ""):gmatch("[^+]+") do
+        if label ~= "" then
+            result[#result + 1] = label
+        end
+    end
+    return result
+end
+
+local function pressure_variety_summary(director)
+    director = director or {}
+    local seen = director.pressure_component_seen or {}
+    local frames_by_component = director.pressure_component_frames or {}
+    local unique = 0
+    local dominant_component = ""
+    local dominant_frames = 0
+    for label, _ in pairs(seen) do
+        unique = unique + 1
+        local frames = frames_by_component[label] or 0
+        if frames > dominant_frames then
+            dominant_component = label
+            dominant_frames = frames
+        end
+    end
+    local variety_frames = director.pressure_variety_frames or 0
+    return {
+        unique_components = unique,
+        signature_switches = director.pressure_signature_switches or 0,
+        variety_frames = variety_frames,
+        dominant_component = dominant_component,
+        dominant_component_frames = dominant_frames,
+        dominance_rate = safe_rate(dominant_frames, math.max(1, variety_frames)),
+    }
+end
+
+local function record_pressure_variety(director, pressure)
+    if not director or director.destroyed or not pressure then
+        return
+    end
+    local labels = split_pressure_labels(pressure.labels)
+    if #labels <= 0 then
+        director.pressure_last_signature = ""
+        return
+    end
+    director.pressure_variety_frames = (director.pressure_variety_frames or 0) + 1
+    director.pressure_component_seen = director.pressure_component_seen or {}
+    director.pressure_component_frames = director.pressure_component_frames or {}
+    for _, label in ipairs(labels) do
+        director.pressure_component_seen[label] = true
+        director.pressure_component_frames[label] = (director.pressure_component_frames[label] or 0) + 1
+    end
+    local signature = table.concat(labels, "+")
+    local previous = director.pressure_last_signature or ""
+    if previous ~= "" and previous ~= signature then
+        director.pressure_signature_switches = (director.pressure_signature_switches or 0) + 1
+    end
+    director.pressure_last_signature = signature
+end
+
 local function record_aggro_state(director)
     if not director then
         return
@@ -1325,7 +1385,7 @@ local function draw_package_hud(director)
     local row_count = 1
     local has_threat_rows = package.orbit or package.pulse or package.sweep or package.summon or package.rescue
     if has_threat_rows then
-        row_count = row_count + 5
+        row_count = row_count + 6
     end
     if package.micro_punish then
         row_count = row_count + 1
@@ -1396,6 +1456,16 @@ local function draw_package_hud(director)
             or ("ready b" .. tostring(sync_bursts))
         local sync_color = pressure_sync_color(sync_count)
         draw_hud_row(y, "SYNC", sync_value, sync_color, math.min(1, sync_count / 4))
+        y = y + HUD_ROW_H
+
+        local variety = pressure_variety_summary(director)
+        local mix_value = tostring(variety.unique_components or 0)
+            .. "x sw" .. tostring(variety.signature_switches or 0)
+            .. " dom" .. tostring(math.floor((variety.dominance_rate or 0) * 100 + 0.5)) .. "%"
+        local mix_color = (variety.unique_components or 0) >= 4 and COL_PALE_GREEN
+            or (variety.unique_components or 0) >= 3 and COL_PALE_YELLOW
+            or COL_LIGHT_GRAY
+        draw_hud_row(y, "MIX", mix_value, mix_color, math.min(1, (variety.unique_components or 0) / 5))
         y = y + HUD_ROW_H
 
         local score = math.floor(director.micro_score or 0)
@@ -1685,6 +1755,7 @@ local function package_result(director, outcome)
     local avg_pull_margin = safe_rate(director.rescue_pull_margin_total or 0, pulls)
     local avg_timed_pull_margin = safe_rate(director.rescue_timed_pull_margin_total or 0, clutch_pulls)
     local pressure = package_pressure_state(director, director.package or {})
+    local pressure_variety = pressure_variety_summary(director)
     local aggro_tracking = aggro_tracking_fields(director)
     local rescue_danger = rescue_danger_cover_fields(director)
     local sweep_warning_count, sweep_active_count, sweep_warning_remaining, sweep_active_remaining = active_sweeps()
@@ -1790,6 +1861,12 @@ local function package_result(director, outcome)
         pressure_sync_rate = safe_rate(director.pressure_sync_frames or 0, math.max(1, frames)),
         pressure_sync_bursts = director.pressure_sync_bursts or 0,
         pressure_sync_peak = math.max(director.pressure_sync_peak or 0, pressure.total_count or 0),
+        pressure_unique_components = pressure_variety.unique_components or 0,
+        pressure_signature_switches = pressure_variety.signature_switches or 0,
+        pressure_variety_frames = pressure_variety.variety_frames or 0,
+        pressure_dominant_component = pressure_variety.dominant_component or "",
+        pressure_dominant_component_frames = pressure_variety.dominant_component_frames or 0,
+        pressure_dominance_rate = pressure_variety.dominance_rate or 0,
         pressure_labels = pressure.labels or "",
         micro_score = director.micro_score or 0,
         micro_streak = director.micro_streak or 0,
@@ -1836,6 +1913,7 @@ local function package_state_from_director(director)
     local aggro_tracking = aggro_tracking_fields(director)
     local next_threat = next_threat_state(director, director.package or {})
     local pressure = package_pressure_state(director, director.package or {})
+    local pressure_variety = pressure_variety_summary(director)
     local rescue_danger = rescue_danger_cover_fields(director)
     local avg_clutch_margin = safe_rate(director.rescue_clutch_margin_total or 0, clutch)
     local avg_perfect_margin = safe_rate(director.rescue_perfect_margin_total or 0, perfect)
@@ -1962,6 +2040,12 @@ local function package_state_from_director(director)
         pressure_sync_rate = safe_rate(director.pressure_sync_frames or 0, math.max(1, director.elapsed or 0)),
         pressure_sync_bursts = director.pressure_sync_bursts or 0,
         pressure_sync_peak = math.max(director.pressure_sync_peak or 0, pressure.total_count or 0),
+        pressure_unique_components = pressure_variety.unique_components or 0,
+        pressure_signature_switches = pressure_variety.signature_switches or 0,
+        pressure_variety_frames = pressure_variety.variety_frames or 0,
+        pressure_dominant_component = pressure_variety.dominant_component or "",
+        pressure_dominant_component_frames = pressure_variety.dominant_component_frames or 0,
+        pressure_dominance_rate = pressure_variety.dominance_rate or 0,
         pressure_labels = pressure.labels or "",
         micro_score = director.micro_score or 0,
         micro_streak = director.micro_streak or 0,
@@ -3767,6 +3851,11 @@ function M.add_director(game_map, package, intensity)
         pressure_sync_last_timer = 0,
         pressure_sync_last_count = 0,
         pressure_sync_last_labels = "",
+        pressure_component_seen = {},
+        pressure_component_frames = {},
+        pressure_signature_switches = 0,
+        pressure_last_signature = "",
+        pressure_variety_frames = 0,
         micro_score = 0,
         micro_streak = 0,
         micro_best_streak = 0,
@@ -3890,6 +3979,7 @@ function M.add_director(game_map, package, intensity)
                 end
             end
             local pressure = package_pressure_state(self, self.package)
+            record_pressure_variety(self, pressure)
             self.pressure_max_count = math.max(self.pressure_max_count or 0, pressure.total_count or 0)
             if (pressure.total_count or 0) >= 2 then
                 self.pressure_overlap_frames = (self.pressure_overlap_frames or 0) + 1

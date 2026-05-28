@@ -645,6 +645,12 @@ local function package_state_fields(player)
             package_pressure_sync_rate = "",
             package_pressure_sync_bursts = "",
             package_pressure_sync_peak = "",
+            package_pressure_unique_components = "",
+            package_pressure_signature_switches = "",
+            package_pressure_variety_frames = "",
+            package_pressure_dominant_component = "",
+            package_pressure_dominant_component_frames = "",
+            package_pressure_dominance_rate = "",
             package_pressure_labels = "",
             package_micro_score = "",
             package_micro_streak = "",
@@ -784,6 +790,12 @@ local function package_state_fields(player)
         package_pressure_sync_rate = format_rate(state.pressure_sync_rate or 0),
         package_pressure_sync_bursts = state.pressure_sync_bursts or 0,
         package_pressure_sync_peak = state.pressure_sync_peak or 0,
+        package_pressure_unique_components = state.pressure_unique_components or 0,
+        package_pressure_signature_switches = state.pressure_signature_switches or 0,
+        package_pressure_variety_frames = state.pressure_variety_frames or 0,
+        package_pressure_dominant_component = state.pressure_dominant_component or "",
+        package_pressure_dominant_component_frames = state.pressure_dominant_component_frames or 0,
+        package_pressure_dominance_rate = format_rate(state.pressure_dominance_rate or 0),
         package_pressure_labels = state.pressure_labels or "",
         package_micro_score = state.micro_score or 0,
         package_micro_streak = state.micro_streak or 0,
@@ -1316,7 +1328,9 @@ local SUMMARY_METRICS = {
     "package_pressure_active_count", "package_pressure_warning_count", "package_pressure_total_count",
     "package_pressure_max_count", "package_pressure_overlap_frames", "package_pressure_overlap_rate",
     "package_pressure_sync_frames", "package_pressure_sync_rate", "package_pressure_sync_bursts",
-    "package_pressure_sync_peak",
+    "package_pressure_sync_peak", "package_pressure_unique_components", "package_pressure_signature_switches",
+    "package_pressure_variety_frames", "package_pressure_dominant_component_frames",
+    "package_pressure_dominance_rate",
     "package_micro_score", "package_micro_streak", "package_micro_best_streak",
     "package_micro_hits", "package_micro_dodges", "package_micro_events",
     "package_micro_thread_cues", "package_micro_streak_bursts",
@@ -2006,6 +2020,10 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local pressure_sync_rate = tonumber(row.avg_package_pressure_sync_rate) or 0
     local pressure_sync_bursts = tonumber(row.avg_package_pressure_sync_bursts) or 0
     local pressure_sync_peak = tonumber(row.avg_package_pressure_sync_peak) or 0
+    local pressure_unique_components = tonumber(row.avg_package_pressure_unique_components) or 0
+    local pressure_signature_switches = tonumber(row.avg_package_pressure_signature_switches) or 0
+    local pressure_variety_frames = tonumber(row.avg_package_pressure_variety_frames) or 0
+    local pressure_dominance_rate = tonumber(row.avg_package_pressure_dominance_rate) or 0
     local package_frames = tonumber(row.avg_package_frames) or 0
     local micro_score = tonumber(row.avg_package_micro_score) or 0
     local micro_hits = tonumber(row.avg_package_micro_hits) or 0
@@ -2060,6 +2078,25 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
             encounter,
             pressure_sync_bursts,
             pressure_sync_rate * 100
+        )
+    )
+
+    add_report_row(
+        rows,
+        class_name,
+        "info",
+        "package_variety",
+        "avg_package_pressure_unique_components",
+        pressure_unique_components,
+        0,
+        string.format(
+            "%s beat variety in %s averaged %.1f unique mechanic types, %.1f signature switches, %.0f pressure frames, and %.1f%% dominant-mechanic share.",
+            class_name,
+            encounter,
+            pressure_unique_components,
+            pressure_signature_switches,
+            pressure_variety_frames,
+            pressure_dominance_rate * 100
         )
     )
 
@@ -2198,6 +2235,43 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
                 class_name,
                 pressure_peak,
                 encounter
+            )
+        )
+    end
+
+    if pressure_peak >= 3 and pressure_unique_components < 3 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_variety",
+            "avg_package_pressure_unique_components",
+            pressure_unique_components,
+            3,
+            string.format(
+                "%s reached %.1f peak pressure in %s but only exposed %.1f mechanic types; the package may be busy without feeling varied.",
+                class_name,
+                pressure_peak,
+                encounter,
+                pressure_unique_components
+            )
+        )
+    end
+
+    if pressure_peak >= 3 and pressure_dominance_rate >= 0.88 then
+        add_report_row(
+            rows,
+            class_name,
+            "info",
+            "package_variety",
+            "avg_package_pressure_dominance_rate",
+            pressure_dominance_rate,
+            0.88,
+            string.format(
+                "%s pressure in %s was %.1f%% dominated by one mechanic; check whether the full package reads as one repeated action.",
+                class_name,
+                encounter,
+                pressure_dominance_rate * 100
             )
         )
     end
@@ -3279,6 +3353,9 @@ local function run_balance(raw_args)
             "package_pressure_overlap_frames", "package_pressure_overlap_rate",
             "package_pressure_sync_frames", "package_pressure_sync_rate",
             "package_pressure_sync_bursts", "package_pressure_sync_peak",
+            "package_pressure_unique_components", "package_pressure_signature_switches",
+            "package_pressure_variety_frames", "package_pressure_dominant_component",
+            "package_pressure_dominant_component_frames", "package_pressure_dominance_rate",
             "package_pressure_labels",
             "package_micro_score", "package_micro_streak", "package_micro_best_streak",
             "package_micro_hits", "package_micro_dodges", "package_micro_events",
@@ -3383,6 +3460,9 @@ local function run_balance(raw_args)
             "package_pressure_overlap_frames", "package_pressure_overlap_rate",
             "package_pressure_sync_frames", "package_pressure_sync_rate",
             "package_pressure_sync_bursts", "package_pressure_sync_peak",
+            "package_pressure_unique_components", "package_pressure_signature_switches",
+            "package_pressure_variety_frames", "package_pressure_dominant_component",
+            "package_pressure_dominant_component_frames", "package_pressure_dominance_rate",
             "package_pressure_labels",
             "package_micro_score", "package_micro_streak", "package_micro_best_streak",
             "package_micro_hits", "package_micro_dodges", "package_micro_events",
@@ -3548,6 +3628,9 @@ local function run_balance(raw_args)
             "avg_package_pressure_max_count", "avg_package_pressure_overlap_rate",
             "avg_package_pressure_sync_frames", "avg_package_pressure_sync_rate",
             "avg_package_pressure_sync_bursts", "avg_package_pressure_sync_peak",
+            "avg_package_pressure_unique_components", "avg_package_pressure_signature_switches",
+            "avg_package_pressure_variety_frames", "avg_package_pressure_dominant_component_frames",
+            "avg_package_pressure_dominance_rate",
             "avg_package_micro_score", "avg_package_micro_best_streak",
             "avg_package_micro_hits", "avg_package_micro_dodges",
             "avg_package_micro_thread_cues", "avg_package_micro_streak_bursts",
@@ -3580,7 +3663,7 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 20,
+                schema_version = 21,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
                 map_profile = args.map_profile,

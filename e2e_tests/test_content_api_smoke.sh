@@ -27,6 +27,8 @@ grep -q "avg_package_micro_punish_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_punish_break_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_pressure_sync_bursts" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_pressure_sync_rate" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_pressure_unique_components" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_pressure_dominance_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_aggro_ally_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_aggro_inferred_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_aggro_switches" runtime/engine/StartBalanceRun.lua
@@ -47,6 +49,8 @@ grep -q "dice-surge" runtime/engine/ContentApi.lua
 grep -q "dice-finale" runtime/engine/ContentApi.lua
 grep -q "avg_package_rescue_avg_clutch_margin" runtime/engine/ContentApi.lua
 grep -q "sync-beats" runtime/engine/ContentApi.lua
+grep -q "beat-variety" runtime/engine/ContentApi.lua
+grep -q "Beat mix" runtime/engine/ContentApi.lua
 grep -q "skill-buffer" runtime/engine/ContentApi.lua
 grep -q "DICE_MINOR_COOLDOWN_TRIM" runtime/spells/Effects.moon
 grep -q "DICE_FULL_BAG_MASK" runtime/spells/Effects.moon
@@ -62,6 +66,7 @@ grep -q "safe_xy_for_map" runtime/ui/ImpactFX.lua
 grep -q "fx_bounds" runtime/maps/NewMaps.moon
 grep -q "\"MARGIN\"" runtime/objects/ContentLabHazards.lua
 grep -q "\"SYNC\"" runtime/objects/ContentLabHazards.lua
+grep -q "\"MIX\"" runtime/objects/ContentLabHazards.lua
 grep -q "orbiting die ghosts" web/content_lab/README.md
 grep -q "avg_package_rescue_early_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timing_score" runtime/engine/StartBalanceRun.lua
