@@ -2302,7 +2302,7 @@ local function micro_action_for(rhythm, control_model)
                 action = "Hold Pain range until the line warns, then body-block late and let regen offset the block hit.",
                 posture = "regen attrition",
                 failure = "ally hit before regen-adjusted damage says the trade was worth it",
-                telemetry = {"avg_package_rescue_clutch_rate", "avg_package_rescue_pull_rate", "avg_necromancer_regen_offset_pct"},
+                telemetry = {"avg_package_rescue_clutch_rate", "avg_package_rescue_broad_pull_index", "avg_necromancer_regen_offset_pct"},
             }
         elseif close_class then
             return {
@@ -2310,7 +2310,7 @@ local function micro_action_for(rhythm, control_model)
                 action = "Stay close enough to threaten the primary, then cut into the rescue line during the clutch window.",
                 posture = "close intercept",
                 failure = "primary dies but ally saves collapse under real reaction delay",
-                telemetry = {"avg_package_rescue_save_rate", "avg_package_rescue_clutch_rate", "avg_rescue_intercept_frames"},
+                telemetry = {"avg_package_rescue_save_rate", "avg_package_rescue_snap_ready_rate", "avg_rescue_intercept_frames"},
             }
         end
         return {
