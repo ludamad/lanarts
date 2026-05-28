@@ -953,6 +953,16 @@ local function aggro_tracking_fields(director)
     }
 end
 
+local function pressure_sync_color(count)
+    count = tonumber(count) or 0
+    if count >= 4 then
+        return COL_PALE_RED
+    elseif count >= 3 then
+        return COL_PALE_YELLOW
+    end
+    return COL_LIGHT_GRAY
+end
+
 local function record_aggro_state(director)
     if not director then
         return
@@ -1039,6 +1049,31 @@ local function draw_micro_punish_marker(director, package)
         or (director.micro_punish_last_label or "FURY")
     local label_xy = Display.to_screen_xy({primary.x, primary.y - (primary.radius or 16) - 44})
     draw_text(color, Display.CENTER, label_xy, label .. (breaking and " -" or " +") .. tostring(math.ceil(amount)))
+end
+
+local function draw_pressure_sync_marker(director, package)
+    if not director or not package or (director.pressure_sync_last_timer or 0) <= 0 then
+        return
+    end
+    local primary = primary_monster(package.primary)
+    if not primary then
+        return
+    end
+    local timer = director.pressure_sync_last_timer or 0
+    local intensity = math.min(1, timer / 60)
+    local count = director.pressure_sync_last_count or director.pressure_sync_peak or 0
+    local color = pressure_sync_color(count)
+    ProceduralEffects.draw_boss_pressure_aura(primary, {
+        palette = palette_for_primary(package.primary),
+        radius = (primary.radius or 16) + 88 + math.min(30, count * 8),
+        pressure = math.max(3, count),
+        active = count,
+        intensity = 0.42 + 0.34 * intensity,
+        rotation_speed = 0.040,
+        spoke_speed = -0.030,
+    })
+    local label_xy = Display.to_screen_xy({primary.x, primary.y - (primary.radius or 16) - 78})
+    draw_text(color, Display.CENTER, label_xy, "SYNC x" .. tostring(count))
 end
 
 local function draw_rescue_counter_marker(director, package)
@@ -1290,7 +1325,7 @@ local function draw_package_hud(director)
     local row_count = 1
     local has_threat_rows = package.orbit or package.pulse or package.sweep or package.summon or package.rescue
     if has_threat_rows then
-        row_count = row_count + 4
+        row_count = row_count + 5
     end
     if package.micro_punish then
         row_count = row_count + 1
@@ -1347,6 +1382,20 @@ local function draw_package_hud(director)
             or (pressure.warning_count or 0) > 0 and COL_PALE_YELLOW
             or COL_LIGHT_GRAY
         draw_hud_row(y, "BEAT", beat_value, beat_color, math.min(1, (pressure.total_count or 0) / 4))
+        y = y + HUD_ROW_H
+
+        local sync_count = (director.pressure_sync_last_timer or 0) > 0
+            and (director.pressure_sync_last_count or 0)
+            or ((pressure.total_count or 0) >= 3 and pressure.total_count or 0)
+        local sync_bursts = director.pressure_sync_bursts or 0
+        local sync_labels = ((director.pressure_sync_last_timer or 0) > 0 and (director.pressure_sync_last_labels or "") ~= "")
+            and director.pressure_sync_last_labels
+            or pressure.labels
+        local sync_value = sync_count > 0
+            and ("x" .. tostring(sync_count) .. " " .. format_pressure_labels(sync_labels) .. " b" .. tostring(sync_bursts))
+            or ("ready b" .. tostring(sync_bursts))
+        local sync_color = pressure_sync_color(sync_count)
+        draw_hud_row(y, "SYNC", sync_value, sync_color, math.min(1, sync_count / 4))
         y = y + HUD_ROW_H
 
         local score = math.floor(director.micro_score or 0)
@@ -1578,6 +1627,7 @@ local function draw_package_hud(director)
     draw_escort_markers()
     draw_aggro_marker(director, package)
     draw_micro_punish_marker(director, package)
+    draw_pressure_sync_marker(director, package)
     draw_micro_counter_marker(director, package)
     draw_rescue_counter_marker(director, package)
     draw_micro_streak_marker(director)
@@ -1736,6 +1786,10 @@ local function package_result(director, outcome)
         pressure_max_count = math.max(director.pressure_max_count or 0, pressure.total_count or 0),
         pressure_overlap_frames = director.pressure_overlap_frames or 0,
         pressure_overlap_rate = safe_rate(director.pressure_overlap_frames or 0, math.max(1, frames)),
+        pressure_sync_frames = director.pressure_sync_frames or 0,
+        pressure_sync_rate = safe_rate(director.pressure_sync_frames or 0, math.max(1, frames)),
+        pressure_sync_bursts = director.pressure_sync_bursts or 0,
+        pressure_sync_peak = math.max(director.pressure_sync_peak or 0, pressure.total_count or 0),
         pressure_labels = pressure.labels or "",
         micro_score = director.micro_score or 0,
         micro_streak = director.micro_streak or 0,
@@ -1904,6 +1958,10 @@ local function package_state_from_director(director)
         pressure_max_count = math.max(director.pressure_max_count or 0, pressure.total_count or 0),
         pressure_overlap_frames = director.pressure_overlap_frames or 0,
         pressure_overlap_rate = safe_rate(director.pressure_overlap_frames or 0, math.max(1, director.elapsed or 0)),
+        pressure_sync_frames = director.pressure_sync_frames or 0,
+        pressure_sync_rate = safe_rate(director.pressure_sync_frames or 0, math.max(1, director.elapsed or 0)),
+        pressure_sync_bursts = director.pressure_sync_bursts or 0,
+        pressure_sync_peak = math.max(director.pressure_sync_peak or 0, pressure.total_count or 0),
         pressure_labels = pressure.labels or "",
         micro_score = director.micro_score or 0,
         micro_streak = director.micro_streak or 0,
@@ -3381,6 +3439,21 @@ function package_pressure_state(director, package)
     }
 end
 
+local function trigger_pressure_sync(director, pressure)
+    if not director or director.destroyed or not pressure then
+        return
+    end
+    local count = pressure.total_count or 0
+    if count < 3 then
+        return
+    end
+    director.pressure_sync_bursts = (director.pressure_sync_bursts or 0) + 1
+    director.pressure_sync_last_timer = 60
+    director.pressure_sync_last_count = count
+    director.pressure_sync_last_labels = pressure.labels or ""
+    director.pressure_sync_cooldown = 58
+end
+
 local function upcoming_candidate(package, intensity, elapsed, id, label, entry, fallback_interval, fallback_offset)
     if not entry then
         return nil
@@ -3687,6 +3760,13 @@ function M.add_director(game_map, package, intensity)
         rescue_survived_misses = 0,
         pressure_max_count = 0,
         pressure_overlap_frames = 0,
+        pressure_sync_frames = 0,
+        pressure_sync_bursts = 0,
+        pressure_sync_peak = 0,
+        pressure_sync_cooldown = 0,
+        pressure_sync_last_timer = 0,
+        pressure_sync_last_count = 0,
+        pressure_sync_last_labels = "",
         micro_score = 0,
         micro_streak = 0,
         micro_best_streak = 0,
@@ -3727,6 +3807,12 @@ function M.add_director(game_map, package, intensity)
             end
             if (self.micro_counter_last_timer or 0) > 0 then
                 self.micro_counter_last_timer = self.micro_counter_last_timer - 1
+            end
+            if (self.pressure_sync_last_timer or 0) > 0 then
+                self.pressure_sync_last_timer = self.pressure_sync_last_timer - 1
+            end
+            if (self.pressure_sync_cooldown or 0) > 0 then
+                self.pressure_sync_cooldown = self.pressure_sync_cooldown - 1
             end
             if (self.rescue_pull_active_frames or 0) > 0 then
                 self.rescue_pull_total_frames = (self.rescue_pull_total_frames or 0) + 1
@@ -3808,6 +3894,13 @@ function M.add_director(game_map, package, intensity)
             if (pressure.total_count or 0) >= 2 then
                 self.pressure_overlap_frames = (self.pressure_overlap_frames or 0) + 1
             end
+            if (pressure.total_count or 0) >= 3 then
+                self.pressure_sync_frames = (self.pressure_sync_frames or 0) + 1
+                self.pressure_sync_peak = math.max(self.pressure_sync_peak or 0, pressure.total_count or 0)
+                if (self.pressure_sync_cooldown or 0) <= 0 then
+                    trigger_pressure_sync(self, pressure)
+                end
+            end
         end,
         on_draw = function(self)
             local pressure = package_pressure_state(self, self.package)
@@ -3838,6 +3931,15 @@ function M.add_director(game_map, package, intensity)
                     alpha = math.min(0.22, 0.045 + total * 0.028),
                     thickness = 18 + total * 3,
                     passes = 3,
+                }
+            end
+            if (self.pressure_sync_last_timer or 0) > 0 then
+                local sync_count = self.pressure_sync_last_count or self.pressure_sync_peak or total
+                ProceduralEffects.draw_screen_edges {
+                    color = pressure_sync_color(sync_count),
+                    alpha = math.min(0.18, 0.045 + sync_count * 0.018) * math.min(1, (self.pressure_sync_last_timer or 0) / 18),
+                    thickness = 24 + sync_count * 4,
+                    passes = 4,
                 }
             end
             draw_package_hud(self)

@@ -2856,6 +2856,8 @@ telemetry_watch_for = function(config, package_summary)
         append_metric(rows, "avg_package_frames", "Package time", "package clear pacing")
         append_metric(rows, "avg_package_pressure_max_count", "Peak stack", "simultaneous package demands")
         append_metric(rows, "avg_package_pressure_overlap_rate", "Overlap rate", "share of frames with stacked pressure")
+        append_metric(rows, "avg_package_pressure_sync_rate", "Sync rate", "share of frames with 3+ simultaneous package demands")
+        append_metric(rows, "avg_package_pressure_sync_bursts", "Sync bursts", "visible stacked-rhythm callouts")
         append_metric(rows, "avg_package_micro_score", "Micro score", "live drill score from dodges, saves, and hits")
         append_metric(rows, "avg_package_micro_best_streak", "Best streak", "longest clean micro streak")
         append_metric(rows, "avg_package_micro_dodges", "Threaded avoids", "targeted or near-miss hazard avoids")
@@ -3260,6 +3262,17 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
             target = "overlap visible in samples",
             reason = "Without overlap this becomes serial pressure rather than micro layering.",
         })
+        if (pressure_preview.peakStack or 0) >= 3 then
+            add({
+                id = "sync-beats",
+                label = "Sync beats",
+                metric = "avg_package_pressure_sync_bursts",
+                comparator = ">=",
+                threshold = 1,
+                target = ">=1 visible sync beat",
+                reason = "Full-package 1v1 fights should call out stacked rhythm moments, not hide them as unrelated hazard clutter.",
+            })
+        end
     end
 
     local class = class_lookup()[drill_config.className] or {}

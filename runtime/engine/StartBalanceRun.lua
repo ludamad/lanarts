@@ -641,6 +641,10 @@ local function package_state_fields(player)
             package_pressure_max_count = "",
             package_pressure_overlap_frames = "",
             package_pressure_overlap_rate = "",
+            package_pressure_sync_frames = "",
+            package_pressure_sync_rate = "",
+            package_pressure_sync_bursts = "",
+            package_pressure_sync_peak = "",
             package_pressure_labels = "",
             package_micro_score = "",
             package_micro_streak = "",
@@ -776,6 +780,10 @@ local function package_state_fields(player)
         package_pressure_max_count = state.pressure_max_count or 0,
         package_pressure_overlap_frames = state.pressure_overlap_frames or 0,
         package_pressure_overlap_rate = format_rate(state.pressure_overlap_rate or 0),
+        package_pressure_sync_frames = state.pressure_sync_frames or 0,
+        package_pressure_sync_rate = format_rate(state.pressure_sync_rate or 0),
+        package_pressure_sync_bursts = state.pressure_sync_bursts or 0,
+        package_pressure_sync_peak = state.pressure_sync_peak or 0,
         package_pressure_labels = state.pressure_labels or "",
         package_micro_score = state.micro_score or 0,
         package_micro_streak = state.micro_streak or 0,
@@ -1307,6 +1315,8 @@ local SUMMARY_METRICS = {
     "package_rescue_counter_stagger_frames",
     "package_pressure_active_count", "package_pressure_warning_count", "package_pressure_total_count",
     "package_pressure_max_count", "package_pressure_overlap_frames", "package_pressure_overlap_rate",
+    "package_pressure_sync_frames", "package_pressure_sync_rate", "package_pressure_sync_bursts",
+    "package_pressure_sync_peak",
     "package_micro_score", "package_micro_streak", "package_micro_best_streak",
     "package_micro_hits", "package_micro_dodges", "package_micro_events",
     "package_micro_thread_cues", "package_micro_streak_bursts",
@@ -1993,6 +2003,9 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local min_hp_pct = tonumber(row.avg_min_hp_pct) or 0
     local pressure_peak = tonumber(row.avg_package_pressure_max_count) or 0
     local pressure_overlap = tonumber(row.avg_package_pressure_overlap_rate) or 0
+    local pressure_sync_rate = tonumber(row.avg_package_pressure_sync_rate) or 0
+    local pressure_sync_bursts = tonumber(row.avg_package_pressure_sync_bursts) or 0
+    local pressure_sync_peak = tonumber(row.avg_package_pressure_sync_peak) or 0
     local package_frames = tonumber(row.avg_package_frames) or 0
     local micro_score = tonumber(row.avg_package_micro_score) or 0
     local micro_hits = tonumber(row.avg_package_micro_hits) or 0
@@ -2021,12 +2034,32 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         pressure_overlap,
         0,
         string.format(
-            "%s package pressure in %s averaged %.1f peak stack and %.1f%% overlap over %.0f package frames.",
+            "%s package pressure in %s averaged %.1f peak stack, %.1f%% overlap, %.1f%% sync-beat frames, %.1f sync bursts, and %.1f sync peak over %.0f package frames.",
             class_name,
             encounter,
             pressure_peak,
             pressure_overlap * 100,
+            pressure_sync_rate * 100,
+            pressure_sync_bursts,
+            pressure_sync_peak,
             package_frames
+        )
+    )
+
+    add_report_row(
+        rows,
+        class_name,
+        "info",
+        "package_sync",
+        "avg_package_pressure_sync_bursts",
+        pressure_sync_bursts,
+        0,
+        string.format(
+            "%s sync beats in %s fired %.1f times/run on %.1f%% of package frames, highlighting 3+ simultaneous package demands.",
+            class_name,
+            encounter,
+            pressure_sync_bursts,
+            pressure_sync_rate * 100
         )
     )
 
@@ -2147,6 +2180,24 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
                 class_name,
                 encounter,
                 pressure_overlap * 100
+            )
+        )
+    end
+
+    if pressure_peak >= 3 and pressure_sync_bursts <= 0 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_sync",
+            "avg_package_pressure_sync_bursts",
+            pressure_sync_bursts,
+            1,
+            string.format(
+                "%s reached %.1f peak pressure in %s but emitted no sync beats; stacked rhythm may not be readable enough in play.",
+                class_name,
+                pressure_peak,
+                encounter
             )
         )
     end
@@ -3226,6 +3277,8 @@ local function run_balance(raw_args)
             "package_pressure_active_count", "package_pressure_warning_count",
             "package_pressure_total_count", "package_pressure_max_count",
             "package_pressure_overlap_frames", "package_pressure_overlap_rate",
+            "package_pressure_sync_frames", "package_pressure_sync_rate",
+            "package_pressure_sync_bursts", "package_pressure_sync_peak",
             "package_pressure_labels",
             "package_micro_score", "package_micro_streak", "package_micro_best_streak",
             "package_micro_hits", "package_micro_dodges", "package_micro_events",
@@ -3328,6 +3381,8 @@ local function run_balance(raw_args)
             "package_pressure_active_count", "package_pressure_warning_count",
             "package_pressure_total_count", "package_pressure_max_count",
             "package_pressure_overlap_frames", "package_pressure_overlap_rate",
+            "package_pressure_sync_frames", "package_pressure_sync_rate",
+            "package_pressure_sync_bursts", "package_pressure_sync_peak",
             "package_pressure_labels",
             "package_micro_score", "package_micro_streak", "package_micro_best_streak",
             "package_micro_hits", "package_micro_dodges", "package_micro_events",
@@ -3491,6 +3546,8 @@ local function run_balance(raw_args)
             "avg_package_rescue_misses",
             "avg_package_rescue_fatal_misses", "avg_package_rescue_survived_misses",
             "avg_package_pressure_max_count", "avg_package_pressure_overlap_rate",
+            "avg_package_pressure_sync_frames", "avg_package_pressure_sync_rate",
+            "avg_package_pressure_sync_bursts", "avg_package_pressure_sync_peak",
             "avg_package_micro_score", "avg_package_micro_best_streak",
             "avg_package_micro_hits", "avg_package_micro_dodges",
             "avg_package_micro_thread_cues", "avg_package_micro_streak_bursts",
@@ -3523,7 +3580,7 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 19,
+                schema_version = 20,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
                 map_profile = args.map_profile,

@@ -119,10 +119,11 @@ Balance simulations:
     fields such as next strike, active count, blocked/late/perfect state, and
     active pull target for HUD and replay checks.
     Package pressure rows track active/warning component stacks, peak stack,
-    and overlap rate, which helps distinguish true full-package micro from
-    isolated single-beat pressure. The report also emits package_pressure and
-    package_difficulty rows when package overlap is only serial pressure or
-    the selected automation profile is clearing too comfortably.
+    overlap rate, sync-beat frames, sync bursts, and sync peak, which helps
+    distinguish true full-package micro from isolated single-beat pressure. The
+    report also emits package_pressure, package_sync, and package_difficulty
+    rows when package overlap is only serial pressure, sync beats are missing,
+    or the selected automation profile is clearing too comfortably.
     Rescue package rows also track pull/taunt total frames, uptime rate,
     pull-discipline rate, taunt-strain rate, late-window pull rates, and
     average timed-pull margins, plus pull-snap burst and strain-pulse counts,
