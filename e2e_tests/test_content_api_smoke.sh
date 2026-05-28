@@ -34,6 +34,7 @@ grep -q "avg_package_primary_hp_pct" runtime/engine/ContentApi.lua
 grep -q "DRAGONFIRE on mechanic hits" runtime/engine/ContentCatalog.lua
 grep -q "brute-force/face-tank clear" runtime/engine/StartBalanceRun.lua
 grep -q "survivability is regen-masked" runtime/engine/StartBalanceRun.lua
+grep -q "draw_boss_beat_tells" runtime/objects/ContentLabHazards.lua
 grep -q "gmap_projectile_data" src/lua_api/lua_core_Map.cpp
 grep -q "hostile_projectiles" runtime/ai/AutomatedPlayerInputSource.lua
 grep -q "streak_break" runtime/engine/ContentCatalog.lua

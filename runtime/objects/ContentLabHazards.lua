@@ -4042,6 +4042,69 @@ local function spawn_summons(director, package)
     end
 end
 
+local BEAT_TELLS = {
+    {key = "orbit", interval = 300, offset = 40, color = COL_PALE_BLUE, label = "ORBS"},
+    {key = "pulse", interval = 150, offset = 70, color = COL_PALE_RED, label = "AOE"},
+    {key = "sweep", interval = 180, offset = 52, color = COL_PALE_YELLOW, label = "SWEEP"},
+    {key = "summon", interval = 360, offset = 120, color = COL_PALE_GREEN, label = "ADDS"},
+}
+
+-- In-world boss "tell": before each package beat fires, a colored ring charges on the primary
+-- (red=AOE, yellow=sweep, blue=orbs, green=adds) with a release flash when it fires, so the
+-- player reads overlapping pressure by watching the boss instead of memorizing timers. Honest:
+-- simultaneous beats draw simultaneous rings. Timing mirrors the director on_step exactly.
+local function draw_boss_beat_tells(director, package, intensity)
+    local primary = primary_monster(package.primary)
+    if not primary or primary.destroyed then
+        return
+    end
+    local elapsed = director.elapsed or 0
+    local xy = {primary.x, primary.y}
+    local base = primary.radius or 16
+    local palette = palette_for_primary(package.primary)
+    local tell_window = 44
+    local soonest, soonest_label, soonest_color
+    for _, b in ipairs(BEAT_TELLS) do
+        local cfg = package[b.key]
+        if cfg then
+            local interval = scale_frames(cfg.interval, b.interval, intensity)
+            local offset = scale_offset(cfg.offset, b.offset, interval, intensity)
+            local m = elapsed % interval
+            local nextin = (offset - m) % interval
+            local since = (m - offset) % interval
+            if nextin <= tell_window then
+                local charge = 1 - nextin / tell_window
+                local ring_r = base + 12 + charge * 30
+                draw_world_circle(b.color, xy, ring_r, 0.015 + charge * 0.04, 0.22 + charge * 0.5)
+                if charge > 0.6 then
+                    ProceduralEffects.draw_world_rune {
+                        xy = xy,
+                        radius = ring_r,
+                        palette = palette,
+                        intensity = 0.35 + charge * 0.5,
+                        arcs = 3,
+                        spokes = 6,
+                        rotation_speed = 0.05,
+                        spoke_speed = -0.03,
+                        gradient_steps = 4,
+                    }
+                end
+                if not soonest or nextin < soonest then
+                    soonest, soonest_label, soonest_color = nextin, b.label, b.color
+                end
+            end
+            if since <= 8 then
+                local f = 1 - since / 8
+                draw_world_circle(b.color, xy, base + 22, 0.07 * f, 0.65 * f)
+            end
+        end
+    end
+    if soonest_label then
+        local label_xy = Display.to_screen_xy({xy[1], xy[2] - base - 34})
+        draw_text(soonest_color or COL_WHITE, Display.CENTER, label_xy, soonest_label .. " " .. format_frames(soonest))
+    end
+end
+
 function M.add_director(game_map, package, intensity)
     package = package or {}
     if not (package.orbit or package.pulse or package.sweep or package.summon or package.escort or package.rescue) then
@@ -4288,6 +4351,7 @@ function M.add_director(game_map, package, intensity)
                     passes = 4,
                 }
             end
+            draw_boss_beat_tells(self, self.package, self.intensity)
             draw_package_hud(self)
         end,
     }
