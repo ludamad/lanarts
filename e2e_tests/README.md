@@ -77,7 +77,9 @@ Balance simulations:
     rescue_hold_frames, and rescue_late_reaction_frames so package clears can
     be separated from actual body-block micro. Package rows also derive rescue
     opportunities plus save, clutch, and pull rates so rescue packages can be
-    compared without hand-calculating rates from raw counts.
+    compared without hand-calculating rates from raw counts. Raw run and sample
+    rows also expose live rescue-window fields such as next strike, active
+    count, blocked/late state, and active pull target for HUD and replay checks.
     Use --package_components orbit,pulse,summon,escort,rescue to isolate
     package parts while keeping the same encounter arena, monsters, and
     pressure preset. A rescue component automatically keeps its escort target.

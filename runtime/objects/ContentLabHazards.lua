@@ -313,6 +313,7 @@ end
 
 local summon_count
 local active_rescue_strikes
+local rescue_window_state
 
 local function draw_package_hud(director)
     local package = director.package or {}
@@ -328,7 +329,7 @@ local function draw_package_hud(director)
         row_count = row_count + 1
     end
     if package.rescue then
-        row_count = row_count + 2
+        row_count = row_count + 3
     end
     if package.escort then
         row_count = row_count + 1
@@ -366,19 +367,15 @@ local function draw_package_hud(director)
     end
     if package.rescue then
         local rescue = package.rescue
-        local interval, offset = scaled_interval_and_offset(rescue, 205, 54, intensity)
-        local delta = next_delta(director.elapsed, interval, offset)
-        local saves = director.rescue_saves or 0
-        local clutch_saves = director.rescue_clutch_saves or 0
-        local pulls = director.rescue_pulls or 0
-        local active, blocked, remaining, late = active_rescue_strikes()
+        local state = rescue_window_state(director, rescue)
+        local delta = state.next_frames
         local value
         local color = delta <= 60 and COL_PALE_YELLOW or COL_PALE_GREEN
-        local pct = 1 - delta / interval
-        if active > 0 then
-            local prefix = late and "clutch " or (blocked and "hold " or "block ")
-            value = prefix .. format_frames(remaining or 0)
-            color = late and COL_PALE_YELLOW or COL_PALE_GREEN
+        local pct = 1 - delta / math.max(1, state.interval)
+        if state.active_count > 0 then
+            local prefix = state.late and "clutch " or (state.blocked and "hold " or "block ")
+            value = prefix .. format_frames(state.remaining or 0)
+            color = state.late and COL_PALE_YELLOW or COL_PALE_GREEN
             pct = 1
         elseif (director.rescue_pull_active_frames or 0) > 0 then
             value = "pull " .. format_frames(director.rescue_pull_active_frames)
@@ -390,6 +387,38 @@ local function draw_package_hud(director)
         draw_hud_row(y, "SAVE", value, color, pct)
         y = y + HUD_ROW_H
 
+        local read_value
+        local read_color = COL_LIGHT_GRAY
+        local read_pct = 0
+        if (director.rescue_pull_active_frames or 0) > 0 then
+            read_value = "taunt " .. (director.rescue_pull_target or "target")
+            read_color = COL_PALE_YELLOW
+            read_pct = 1
+        elseif state.active_count > 0 then
+            if state.blocked then
+                read_value = state.late and "hold clutch" or "hold line"
+                read_color = COL_PALE_GREEN
+                read_pct = 1
+            elseif state.late then
+                read_value = "block now"
+                read_color = COL_PALE_YELLOW
+                read_pct = 1
+            else
+                read_value = "clutch in " .. format_frames(math.max(0, (state.remaining or 0) - (state.late_window or 0)))
+                read_color = COL_LIGHT_GRAY
+                read_pct = 1 - math.max(0, ((state.remaining or 0) - (state.late_window or 0))) / math.max(1, state.windup or 1)
+            end
+        else
+            read_value = "next line"
+            read_color = delta <= 60 and COL_PALE_YELLOW or COL_LIGHT_GRAY
+            read_pct = pct
+        end
+        draw_hud_row(y, "READ", read_value, read_color, read_pct)
+        y = y + HUD_ROW_H
+
+        local saves = director.rescue_saves or 0
+        local clutch_saves = director.rescue_clutch_saves or 0
+        local pulls = director.rescue_pulls or 0
         local margin = director.rescue_last_margin
         local attempts = saves + (director.rescue_misses or 0)
         local stats_value = saves .. "/" .. attempts .. " c" .. clutch_saves .. " p" .. pulls .. (margin and (" " .. margin .. "f") or "")
@@ -476,6 +505,10 @@ local function package_state_from_director(director)
     local clutch = director.rescue_clutch_saves or 0
     local pulls = director.rescue_pulls or 0
     local opportunities = saves + misses
+    local rescue_state
+    if director.package and director.package.rescue then
+        rescue_state = rescue_window_state(director, director.package.rescue)
+    end
     return {
         outcome = "",
         title = package_title(director.package or {}, director.intensity or {}),
@@ -495,6 +528,13 @@ local function package_state_from_director(director)
         rescue_best_margin = director.rescue_best_margin,
         rescue_last_margin = director.rescue_last_margin,
         rescue_last_pull_frames = director.rescue_last_pull_frames,
+        rescue_next_frames = rescue_state and rescue_state.next_frames or nil,
+        rescue_active_count = rescue_state and rescue_state.active_count or 0,
+        rescue_active_remaining = rescue_state and rescue_state.remaining or nil,
+        rescue_active_blocked = rescue_state and rescue_state.blocked or false,
+        rescue_active_late = rescue_state and rescue_state.late or false,
+        rescue_pull_active_frames = director.rescue_pull_active_frames or 0,
+        rescue_pull_target = director.rescue_pull_target,
     }
 end
 
@@ -1104,6 +1144,25 @@ function active_rescue_strikes()
         end
     end
     return count, blocked, best_remaining, late
+end
+
+function rescue_window_state(director, rescue)
+    local intensity = director and director.intensity or normalize_intensity(nil)
+    local interval, offset = scaled_interval_and_offset(rescue or {}, 205, 54, intensity)
+    local active_count, blocked, remaining, late = active_rescue_strikes()
+    local windup = scale_frames((rescue or {}).windup, 68, intensity)
+    local late_window = scale_frames((rescue or {}).late_window, 22, intensity)
+    return {
+        interval = interval,
+        offset = offset,
+        next_frames = next_delta(director and director.elapsed or 0, interval, offset),
+        windup = windup,
+        late_window = late_window,
+        active_count = active_count,
+        blocked = blocked,
+        remaining = remaining,
+        late = late,
+    }
 end
 
 function M.package_state(game_map)

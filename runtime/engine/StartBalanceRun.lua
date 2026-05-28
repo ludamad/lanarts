@@ -616,6 +616,13 @@ local function package_state_fields(player)
             package_rescue_best_margin = "",
             package_rescue_last_margin = "",
             package_rescue_last_pull_frames = "",
+            package_rescue_next_frames = "",
+            package_rescue_active_count = "",
+            package_rescue_active_remaining = "",
+            package_rescue_active_blocked = "",
+            package_rescue_active_late = "",
+            package_rescue_pull_active_frames = "",
+            package_rescue_pull_target = "",
         }
     end
     local escort_hp = tonumber(state.escort_hp) or 0
@@ -638,6 +645,13 @@ local function package_state_fields(player)
         package_rescue_best_margin = state.rescue_best_margin or "",
         package_rescue_last_margin = state.rescue_last_margin or "",
         package_rescue_last_pull_frames = state.rescue_last_pull_frames or "",
+        package_rescue_next_frames = state.rescue_next_frames or "",
+        package_rescue_active_count = state.rescue_active_count or 0,
+        package_rescue_active_remaining = state.rescue_active_remaining or "",
+        package_rescue_active_blocked = state.rescue_active_blocked and "true" or "false",
+        package_rescue_active_late = state.rescue_active_late and "true" or "false",
+        package_rescue_pull_active_frames = state.rescue_pull_active_frames or 0,
+        package_rescue_pull_target = state.rescue_pull_target or "",
     }
 end
 
@@ -2080,6 +2094,9 @@ local function run_balance(raw_args)
             "package_rescue_clutch_saves", "package_rescue_clutch_rate",
             "package_rescue_pulls", "package_rescue_pull_rate", "package_rescue_misses",
             "package_rescue_best_margin", "package_rescue_last_margin", "package_rescue_last_pull_frames",
+            "package_rescue_next_frames", "package_rescue_active_count", "package_rescue_active_remaining",
+            "package_rescue_active_blocked", "package_rescue_active_late",
+            "package_rescue_pull_active_frames", "package_rescue_pull_target",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "damage_taken_total", "regen_adjusted_damage_taken_total",
             "necromancer_regen_offset_pct", "damage_event_total", "damage_taken_by_source",
@@ -2111,6 +2128,9 @@ local function run_balance(raw_args)
             "package_rescue_clutch_saves", "package_rescue_clutch_rate",
             "package_rescue_pulls", "package_rescue_pull_rate", "package_rescue_misses",
             "package_rescue_best_margin", "package_rescue_last_margin", "package_rescue_last_pull_frames",
+            "package_rescue_next_frames", "package_rescue_active_count", "package_rescue_active_remaining",
+            "package_rescue_active_blocked", "package_rescue_active_late",
+            "package_rescue_pull_active_frames", "package_rescue_pull_target",
             "spell_orders_total", "ability_orders_total", "weapon_orders", "item_orders_total",
             "damage_taken_total", "regen_adjusted_damage_taken_total",
             "necromancer_regen_offset_pct", "damage_event_total", "damage_taken_by_source",
