@@ -1039,6 +1039,27 @@ local function resource_matrix_payload(config)
         end
     end
 
+    for idx, preset_name in ipairs(Catalog.loadout_order or {}) do
+        local preset = Catalog.loadout_presets and Catalog.loadout_presets[preset_name]
+        if preset then
+            local next_config = {}
+            for key, value in pairs(config) do
+                next_config[key] = value
+            end
+            next_config.preset = preset_name
+            local label = preset.label or preset_name
+            local custom = next_config.customLoadout ~= "" and " + custom" or ""
+            resources[#resources + 1] = resource_entry(
+                "Loadout sweep",
+                label,
+                string.format("L%d, %s%s, %s", next_config.level, label, custom, selected_target_label),
+                preset.description or "loadout comparison",
+                next_config,
+                12 + idx
+            )
+        end
+    end
+
     for idx, map in ipairs(late_maps()) do
         local next_config = {}
         for key, value in pairs(config) do

@@ -230,6 +230,9 @@ local function run_content_api_smoke()
     expect((matrix.count or 0) >= 30, "matrix should expose orthogonal resources")
     local has_chicken_resource = false
     local has_mummoner_resource = false
+    local has_none_loadout = false
+    local has_gragh_loadout = false
+    local has_late_loadout = false
     for _, resource in ipairs(matrix.resources or {}) do
         if resource.group == "Encounter sweep" and resource.encounter == "giant-chicken-duel" then
             has_chicken_resource = true
@@ -239,10 +242,15 @@ local function run_content_api_smoke()
             has_mummoner_resource = true
             expect(resource.level == 3, "mummoner resource should use its suggested level")
             expect(resource.preset == "none", "mummoner resource should use its suggested loadout")
+        elseif resource.group == "Loadout sweep" and resource.encounter == "gragh-rescue-package" then
+            has_none_loadout = has_none_loadout or resource.preset == "none"
+            has_gragh_loadout = has_gragh_loadout or resource.preset == "gragh"
+            has_late_loadout = has_late_loadout or resource.preset == "late"
         end
     end
     expect(has_chicken_resource, "matrix should include Giant Chicken package coverage")
     expect(has_mummoner_resource, "matrix should include Mummoner package coverage")
+    expect(has_none_loadout and has_gragh_loadout and has_late_loadout, "matrix should include loadout sweep coverage")
 
     local enemy_options = parse_response("enemy options", ContentApi.enemy_options_json(config))
     expect(enemy_options.enemyGroups and #enemy_options.enemyGroups >= 3, "enemy options should expose enemy groups")
