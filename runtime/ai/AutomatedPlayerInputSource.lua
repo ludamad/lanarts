@@ -27,6 +27,7 @@ local DEFAULTS = {
     gragh_keepaway_bonus = 28,
     charging_keepaway_bonus = 24,
     melee_close = 46,
+    melee_engage_range = 64,
     stuck_end_frames = 720,
     hazard_dodge_skip_chance = 0,
     hazard_react_margin = 16,
@@ -876,21 +877,27 @@ function AutomatedPlayerInputSource:_hazard_dodge_action()
         self:_record_scalar("hazard_dodge_skip_frames")
         return false
     end
-    -- Ranged classes must keep dodging away from the boss, not into it: fold a keep-away
-    -- penalty into the tile score so dodging an anchored hazard never pulls a kiter into melee.
-    local keepaway, nearest_enemy = 0, nil
-    if RANGED_CLASSES[player.class_name] then
-        nearest_enemy = visible_enemies(player)[1]
-        if nearest_enemy then
-            keepaway = self:_keepaway_for(nearest_enemy)
-        end
-    end
+    -- Shape the dodge around the class's intended range so it weaves rather than flees:
+    -- ranged classes penalize tiles inside their keep-away band (never dodge into the boss),
+    -- melee classes penalize tiles beyond their engage range (sidestep the hazard but stay in
+    -- striking distance so they can re-enter the moment the window passes).
+    local nearest_enemy = visible_enemies(player)[1]
+    local ranged = RANGED_CLASSES[player.class_name]
+    local melee = CLOSE_RANGE_CLASSES[player.class_name]
+    local keepaway = (ranged and nearest_enemy) and self:_keepaway_for(nearest_enemy) or 0
+    local engage = (melee and nearest_enemy) and (self.options.melee_engage_range or 64) or 0
     local function tile_cost(x, y)
         local cost = hazard_danger_at(hazards, x, y, lookahead, margin, pr)
             + projectile_danger_at(projectiles, x, y, lookahead, margin, pr)
         if nearest_enemy and not nearest_enemy.destroyed then
             local dx, dy = x - nearest_enemy.x, y - nearest_enemy.y
-            cost = cost + math.max(0, keepaway - math.sqrt(dx * dx + dy * dy)) * 0.6
+            local d = math.sqrt(dx * dx + dy * dy)
+            if keepaway > 0 then
+                cost = cost + math.max(0, keepaway - d) * 0.6
+            end
+            if engage > 0 then
+                cost = cost + math.max(0, d - engage) * 0.5
+            end
         end
         return cost
     end
