@@ -155,13 +155,14 @@ Balance simulations:
     mechanic hits, plus package_micro_punish_break_total when clutch/perfect
     rescue saves break that Fury back off.
     Dicebinder runs also emit dice_rolls_total, per-face roll counts,
-    face swaps, roll buildup FX, surge cues, lock cues, suspense pips, reveal
-    cues, finale FX, cooldown-trim frames, high-roll streaks, repeat rolls,
-    anti-repeat rerolls, effective Dash/Power refreshes, jackpot rolls, and
-    buff active frames so skill-dice RNG can be modeled separately from package
-    execution. Dicebinder drill scorecards also watch roll cadence, animation
-    frames, face motion, surge/lock-in cues, variety switches, repeat caps, and
-    buff uptime directly.
+    face swaps, roll buildup FX, surge cues, lock cues, suspense pips, guard
+    cues, reveal cues, finale FX, cooldown-trim frames, high-roll streaks,
+    repeat rolls, dry-roll streaks, streak-guard breaks, anti-repeat rerolls,
+    effective Dash/Power refreshes, jackpot rolls, and buff active frames so
+    skill-dice RNG can be modeled separately from package execution.
+    Dicebinder drill scorecards also watch roll cadence, animation frames, face motion,
+    surge/lock-in cues, variety switches, repeat caps, streak caps, and buff
+    uptime directly.
     Drills tagged `stress` replace the practice clear-floor check with a
     skill-buffer ceiling, which models late-game content that a primitive
     human-profile bot should not clear reliably.
@@ -191,11 +192,12 @@ Balance simulations:
     to also exercise the normal native draw path for procedural FX without
     entering the slower Emscripten loop.
     Dicebinder reports include fair-bag roll counts, animation frames, face
-    swaps, staged buildup FX, surge cues, lock cues, suspense pips, reveal
-    cues, finale FX, cooldown trims, high-roll streaks, repeat rolls, bag
-    refills, anti-repeat rerolls, dash-window frames, and effective cooldown
-    refreshes so exciting D6 windows can be checked without hiding class power
-    inside RNG streaks.
+    swaps, staged buildup FX, surge cues, lock cues, suspense pips, guard cues,
+    reveal cues, finale FX, cooldown trims, high-roll streaks, dry-roll
+    streaks, high/dry streak guards, repeat rolls, bag refills,
+    anti-repeat rerolls, dash-window frames, and effective cooldown refreshes
+    so exciting D6 windows can be checked without hiding class power inside
+    RNG streaks.
     The fast native smoke also includes a fixed-seed three-run Dicebinder
     package batch that previously pushed procedural dice FX outside arena
     bounds; map-generated fx_bounds keep those animated bursts visible without

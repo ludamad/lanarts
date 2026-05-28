@@ -1649,6 +1649,26 @@ dicebinder_remove_from_bag = function(mask, face)
   end
   return mask
 end
+local dicebinder_mask_without_faces
+dicebinder_mask_without_faces = function(mask, faces)
+  local reduced = mask
+  for _index_0 = 1, #faces do
+    local face = faces[_index_0]
+    reduced = dicebinder_remove_from_bag(reduced, face)
+  end
+  return reduced
+end
+local dicebinder_mask_only_faces
+dicebinder_mask_only_faces = function(mask, faces)
+  local filtered = 0
+  for _index_0 = 1, #faces do
+    local face = faces[_index_0]
+    if dicebinder_face_available(mask, face) then
+      filtered = filtered + (DICE_FACE_BITS[face] or 0)
+    end
+  end
+  return filtered
+end
 local dicebinder_roll_lock_stage
 dicebinder_roll_lock_stage = function(elapsed)
   local stage = 0
@@ -1674,6 +1694,7 @@ dicebinder_next_fair_roll = function(effect, avoid_face)
   if avoid_face == nil then
     avoid_face = 0
   end
+  effect.pending_guard_kind = "none"
   local mask = effect.bag_mask or DICE_FULL_BAG_MASK
   local remaining = dicebinder_bag_count(mask)
   local refilled = false
@@ -1689,6 +1710,31 @@ dicebinder_next_fair_roll = function(effect, avoid_face)
     pick_mask = dicebinder_remove_from_bag(mask, avoid_face)
     pick_remaining = remaining - 1
     dicebinder_increment(effect, "anti_repeat_rerolls")
+  end
+  if (effect.current_high_streak or 0) >= 2 then
+    local guarded_mask = dicebinder_mask_without_faces(pick_mask, {
+      5,
+      6
+    })
+    local guarded_remaining = dicebinder_bag_count(guarded_mask)
+    if guarded_remaining > 0 then
+      pick_mask = guarded_mask
+      pick_remaining = guarded_remaining
+      effect.pending_guard_kind = "bank"
+      dicebinder_increment(effect, "high_streak_breaks")
+    end
+  elseif (effect.current_utility_streak or 0) >= 3 then
+    local guarded_mask = dicebinder_mask_only_faces(pick_mask, {
+      5,
+      6
+    })
+    local guarded_remaining = dicebinder_bag_count(guarded_mask)
+    if guarded_remaining > 0 then
+      pick_mask = guarded_mask
+      pick_remaining = guarded_remaining
+      effect.pending_guard_kind = "surge"
+      dicebinder_increment(effect, "low_streak_breaks")
+    end
   end
   local pick = math.random(1, pick_remaining)
   local seen = 0
@@ -1760,9 +1806,12 @@ dicebinder_record_roll = function(effect, caster, roll, entry, previous_roll)
     dicebinder_increment(effect, "high_rolls")
     effect.current_high_streak = (effect.current_high_streak or 0) + 1
     effect.longest_high_streak = math.max(effect.longest_high_streak or 0, effect.current_high_streak)
+    effect.current_utility_streak = 0
   else
     dicebinder_increment(effect, "utility_rolls")
     effect.current_high_streak = 0
+    effect.current_utility_streak = (effect.current_utility_streak or 0) + 1
+    effect.longest_utility_streak = math.max(effect.longest_utility_streak or 0, effect.current_utility_streak)
   end
   if previous_roll and previous_roll > 0 then
     if previous_roll == roll then
@@ -1950,6 +1999,53 @@ dicebinder_emit_roll_surge_fx = function(effect, caster, stage, roll, entry)
     })
   end
 end
+local dicebinder_emit_roll_guard_fx
+dicebinder_emit_roll_guard_fx = function(effect, caster)
+  local guard = effect.roll_guard_kind or "none"
+  if guard == "none" then
+    return
+  end
+  dicebinder_increment(effect, "roll_guard_cues")
+  local label
+  if guard == "surge" then
+    label = "SURGE"
+  else
+    label = "BANK"
+  end
+  local color
+  if guard == "surge" then
+    color = COL_PALE_YELLOW
+  else
+    color = COL_PALE_BLUE
+  end
+  ImpactFX.world_burst({
+    map = caster.map,
+    xy = caster.xy,
+    color = color,
+    label = label,
+    radius = (function()
+      if guard == "surge" then
+        return 84
+      else
+        return 66
+      end
+    end)(),
+    duration = 34,
+    drift = 0.12
+  })
+  return ImpactFX.screen_flash({
+    map = caster.map,
+    color = color,
+    alpha = (function()
+      if guard == "surge" then
+        return 0.08
+      else
+        return 0.045
+      end
+    end)(),
+    duration = 8
+  })
+end
 local dicebinder_update_roll_lock
 dicebinder_update_roll_lock = function(effect, caster, elapsed)
   local stage = dicebinder_roll_lock_stage(elapsed)
@@ -2061,6 +2157,7 @@ dicebinder_resolve_roll = function(effect, caster)
   effect.buff_time = DICE_BUFF_DURATION
   effect.pending_roll = 0
   effect.near_miss_roll = 0
+  effect.roll_guard_kind = "none"
   effect.preview_roll = roll
   effect.rolling_time = 0
   effect.next_roll = math.max(1, (effect.roll_interval or DICE_ROLL_INTERVAL) - DICE_ROLL_ANIMATION)
@@ -2087,6 +2184,7 @@ end
 local dicebinder_start_roll
 dicebinder_start_roll = function(effect, caster)
   effect.pending_roll = dicebinder_next_fair_roll(effect, effect.last_roll or 0)
+  effect.roll_guard_kind = effect.pending_guard_kind or "none"
   effect.near_miss_roll = dicebinder_near_miss_roll(effect.pending_roll)
   effect.preview_roll = math.random(1, 6)
   effect.rolling_time = DICE_ROLL_ANIMATION
@@ -2097,7 +2195,7 @@ dicebinder_start_roll = function(effect, caster)
   effect.roll_spin_seed = math.random(1, 360)
   effect.roll_color = COL_WHITE
   dicebinder_increment(effect, "roll_animations_total")
-  return ImpactFX.world_burst({
+  ImpactFX.world_burst({
     map = caster.map,
     xy = caster.xy,
     color = COL_WHITE,
@@ -2105,6 +2203,7 @@ dicebinder_start_roll = function(effect, caster)
     radius = 72,
     duration = DICE_ROLL_ANIMATION
   })
+  return dicebinder_emit_roll_guard_fx(effect, caster)
 end
 local dicebinder_step_roll_animation
 dicebinder_step_roll_animation = function(effect, caster)
@@ -2181,6 +2280,8 @@ DataW.effect_create({
     self.buff_kind = "none"
     self.buff_time = 0
     self.pending_roll = 0
+    self.pending_guard_kind = "none"
+    self.roll_guard_kind = "none"
     self.near_miss_roll = 0
     self.preview_roll = 0
     self.rolling_time = 0
@@ -2201,6 +2302,7 @@ DataW.effect_create({
     self.roll_surge_cues = 0
     self.roll_finale_fx = 0
     self.roll_suspense_pips = 0
+    self.roll_guard_cues = 0
     self.cooldown_trim_frames = 0
     self.dash_trim_effective = 0
     self.power_trim_effective = 0
@@ -2209,6 +2311,10 @@ DataW.effect_create({
     self.utility_rolls = 0
     self.current_high_streak = 0
     self.longest_high_streak = 0
+    self.current_utility_streak = 0
+    self.longest_utility_streak = 0
+    self.high_streak_breaks = 0
+    self.low_streak_breaks = 0
     self.repeat_rolls = 0
     self.roll_variety_switches = 0
     self.dash_refreshes = 0
@@ -2249,7 +2355,13 @@ DataW.effect_create({
     local entry = DICE_ROLLS[shown_roll]
     local rolling_label
     if rolling then
-      if (self.rolling_time or 0) <= DICE_ROLL_FINAL_REVEAL_FRAMES and entry then
+      local guard = self.roll_guard_kind or "none"
+      local elapsed = (self.rolling_total or DICE_ROLL_ANIMATION) - (self.rolling_time or 0)
+      if guard == "surge" and elapsed <= 22 then
+        rolling_label = "SURGE"
+      elseif guard == "bank" and elapsed <= 22 then
+        rolling_label = "BANK"
+      elseif (self.rolling_time or 0) <= DICE_ROLL_FINAL_REVEAL_FRAMES and entry then
         rolling_label = entry.short
       elseif (self.rolling_time or 0) <= DICE_ROLL_REVEAL_FRAMES then
         rolling_label = "DROP"

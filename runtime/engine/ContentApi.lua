@@ -2946,10 +2946,14 @@ telemetry_watch_for = function(config, package_summary)
         append_metric(rows, "avg_dice_roll_surge_cues", "Surge cues", "staged roll-up beats before lock-in")
         append_metric(rows, "avg_dice_roll_lock_cues", "Lock cues", "staged dice lock-in beats")
         append_metric(rows, "avg_dice_roll_suspense_pips", "Suspense pips", "extra lock-in pips during roll animation")
+        append_metric(rows, "avg_dice_roll_guard_cues", "Pace cues", "visible bank/surge cues from streak guards")
         append_metric(rows, "avg_dice_roll_reveal_cues", "Reveal cues", "late final-face flashes")
         append_metric(rows, "avg_dice_roll_finale_fx", "Finale FX", "resolved payoff bursts")
         append_metric(rows, "avg_dice_cooldown_trim_frames", "Trim frames", "bounded roll-four partial cooldown refund")
         append_metric(rows, "avg_dice_longest_high_streak", "High streak", "high-roll clump check")
+        append_metric(rows, "avg_dice_longest_utility_streak", "Dry streak", "low-roll dry spell check")
+        append_metric(rows, "avg_dice_high_streak_breaks", "High guard", "high-roll clumps actively delayed")
+        append_metric(rows, "avg_dice_low_streak_breaks", "Dry guard", "dry streaks actively brought forward a high roll")
         append_metric(rows, "avg_dice_repeat_rolls", "Repeats", "same face after a bag refill")
         append_metric(rows, "avg_dice_anti_repeat_rerolls", "Anti-repeat", "refill repeats actively avoided")
         append_metric(rows, "avg_dice_bag_refills", "D6 bag", "fair-bag cycle refills")
@@ -3405,6 +3409,24 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
             threshold = 1,
             target = "<=1 repeat/run",
             reason = "Repeated faces should stay rare enough that jackpot streaks do not dominate balance reads.",
+        })
+        add({
+            id = "dice-high-streak-cap",
+            label = "High streak cap",
+            metric = "avg_dice_longest_high_streak",
+            comparator = "<=",
+            threshold = 3,
+            target = "<=3 high rolls/run",
+            reason = "High-roll swings should stay exciting without becoming the whole balance profile.",
+        })
+        add({
+            id = "dice-dry-streak-cap",
+            label = "Dry streak cap",
+            metric = "avg_dice_longest_utility_streak",
+            comparator = "<=",
+            threshold = 4,
+            target = "<=4 low rolls/run",
+            reason = "The fair bag should not leave long stretches without a power-window promise.",
         })
         add({
             id = "dice-anti-repeat",

@@ -1117,6 +1117,19 @@ dicebinder_remove_from_bag = (mask, face) ->
         return mask - bit
     mask
 
+dicebinder_mask_without_faces = (mask, faces) ->
+    reduced = mask
+    for face in *faces
+        reduced = dicebinder_remove_from_bag(reduced, face)
+    reduced
+
+dicebinder_mask_only_faces = (mask, faces) ->
+    filtered = 0
+    for face in *faces
+        if dicebinder_face_available(mask, face)
+            filtered += DICE_FACE_BITS[face] or 0
+    filtered
+
 dicebinder_roll_lock_stage = (elapsed) ->
     stage = 0
     for idx, frame in ipairs DICE_ROLL_LOCK_STAGE_FRAMES
@@ -1132,6 +1145,7 @@ dicebinder_roll_surge_stage = (elapsed) ->
     stage
 
 dicebinder_next_fair_roll = (effect, avoid_face=0) ->
+    effect.pending_guard_kind = "none"
     mask = effect.bag_mask or DICE_FULL_BAG_MASK
     remaining = dicebinder_bag_count(mask)
     refilled = false
@@ -1146,6 +1160,22 @@ dicebinder_next_fair_roll = (effect, avoid_face=0) ->
         pick_mask = dicebinder_remove_from_bag(mask, avoid_face)
         pick_remaining = remaining - 1
         dicebinder_increment(effect, "anti_repeat_rerolls")
+    if (effect.current_high_streak or 0) >= 2
+        guarded_mask = dicebinder_mask_without_faces(pick_mask, {5, 6})
+        guarded_remaining = dicebinder_bag_count(guarded_mask)
+        if guarded_remaining > 0
+            pick_mask = guarded_mask
+            pick_remaining = guarded_remaining
+            effect.pending_guard_kind = "bank"
+            dicebinder_increment(effect, "high_streak_breaks")
+    elseif (effect.current_utility_streak or 0) >= 3
+        guarded_mask = dicebinder_mask_only_faces(pick_mask, {5, 6})
+        guarded_remaining = dicebinder_bag_count(guarded_mask)
+        if guarded_remaining > 0
+            pick_mask = guarded_mask
+            pick_remaining = guarded_remaining
+            effect.pending_guard_kind = "surge"
+            dicebinder_increment(effect, "low_streak_breaks")
     pick = math.random(1, pick_remaining)
     seen = 0
     for face=1,6
@@ -1196,9 +1226,12 @@ dicebinder_record_roll = (effect, caster, roll, entry, previous_roll) ->
         dicebinder_increment(effect, "high_rolls")
         effect.current_high_streak = (effect.current_high_streak or 0) + 1
         effect.longest_high_streak = math.max(effect.longest_high_streak or 0, effect.current_high_streak)
+        effect.current_utility_streak = 0
     else
         dicebinder_increment(effect, "utility_rolls")
         effect.current_high_streak = 0
+        effect.current_utility_streak = (effect.current_utility_streak or 0) + 1
+        effect.longest_utility_streak = math.max(effect.longest_utility_streak or 0, effect.current_utility_streak)
     if previous_roll and previous_roll > 0
         if previous_roll == roll
             dicebinder_increment(effect, "repeat_rolls")
@@ -1321,6 +1354,28 @@ dicebinder_emit_roll_surge_fx = (effect, caster, stage, roll, entry) ->
             duration: 8
         }
 
+dicebinder_emit_roll_guard_fx = (effect, caster) ->
+    guard = effect.roll_guard_kind or "none"
+    return if guard == "none"
+    dicebinder_increment(effect, "roll_guard_cues")
+    label = if guard == "surge" then "SURGE" else "BANK"
+    color = if guard == "surge" then COL_PALE_YELLOW else COL_PALE_BLUE
+    ImpactFX.world_burst {
+        map: caster.map
+        xy: caster.xy
+        color: color
+        label: label
+        radius: if guard == "surge" then 84 else 66
+        duration: 34
+        drift: 0.12
+    }
+    ImpactFX.screen_flash {
+        map: caster.map
+        color: color
+        alpha: if guard == "surge" then 0.08 else 0.045
+        duration: 8
+    }
+
 dicebinder_update_roll_lock = (effect, caster, elapsed) ->
     stage = dicebinder_roll_lock_stage(elapsed)
     previous = effect.roll_lock_stage or 0
@@ -1399,6 +1454,7 @@ dicebinder_resolve_roll = (effect, caster) ->
     effect.buff_time = DICE_BUFF_DURATION
     effect.pending_roll = 0
     effect.near_miss_roll = 0
+    effect.roll_guard_kind = "none"
     effect.preview_roll = roll
     effect.rolling_time = 0
     effect.next_roll = math.max(1, (effect.roll_interval or DICE_ROLL_INTERVAL) - DICE_ROLL_ANIMATION)
@@ -1424,6 +1480,7 @@ dicebinder_resolve_roll = (effect, caster) ->
 
 dicebinder_start_roll = (effect, caster) ->
     effect.pending_roll = dicebinder_next_fair_roll(effect, effect.last_roll or 0)
+    effect.roll_guard_kind = effect.pending_guard_kind or "none"
     effect.near_miss_roll = dicebinder_near_miss_roll(effect.pending_roll)
     effect.preview_roll = math.random(1, 6)
     effect.rolling_time = DICE_ROLL_ANIMATION
@@ -1442,6 +1499,7 @@ dicebinder_start_roll = (effect, caster) ->
         radius: 72
         duration: DICE_ROLL_ANIMATION
     }
+    dicebinder_emit_roll_guard_fx(effect, caster)
 
 dicebinder_step_roll_animation = (effect, caster) ->
     dicebinder_increment(effect, "roll_animation_frames")
@@ -1496,6 +1554,8 @@ DataW.effect_create {
         @buff_kind = "none"
         @buff_time = 0
         @pending_roll = 0
+        @pending_guard_kind = "none"
+        @roll_guard_kind = "none"
         @near_miss_roll = 0
         @preview_roll = 0
         @rolling_time = 0
@@ -1516,6 +1576,7 @@ DataW.effect_create {
         @roll_surge_cues = 0
         @roll_finale_fx = 0
         @roll_suspense_pips = 0
+        @roll_guard_cues = 0
         @cooldown_trim_frames = 0
         @dash_trim_effective = 0
         @power_trim_effective = 0
@@ -1524,6 +1585,10 @@ DataW.effect_create {
         @utility_rolls = 0
         @current_high_streak = 0
         @longest_high_streak = 0
+        @current_utility_streak = 0
+        @longest_utility_streak = 0
+        @high_streak_breaks = 0
+        @low_streak_breaks = 0
         @repeat_rolls = 0
         @roll_variety_switches = 0
         @dash_refreshes = 0
@@ -1552,7 +1617,11 @@ DataW.effect_create {
         else @last_roll or 0
         entry = DICE_ROLLS[shown_roll]
         rolling_label = if rolling
-            if (@rolling_time or 0) <= DICE_ROLL_FINAL_REVEAL_FRAMES and entry then entry.short
+            guard = @roll_guard_kind or "none"
+            elapsed = (@rolling_total or DICE_ROLL_ANIMATION) - (@rolling_time or 0)
+            if guard == "surge" and elapsed <= 22 then "SURGE"
+            elseif guard == "bank" and elapsed <= 22 then "BANK"
+            elseif (@rolling_time or 0) <= DICE_ROLL_FINAL_REVEAL_FRAMES and entry then entry.short
             elseif (@rolling_time or 0) <= DICE_ROLL_REVEAL_FRAMES then "DROP"
             else "ROLL"
         else nil
