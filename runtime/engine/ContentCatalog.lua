@@ -1609,8 +1609,8 @@ M.encounters = {
         label = "Gragh package",
         kind = "boss package",
         phase = "late micro",
-        description = "Gragh's melee pursuit wrapped in rotating orbs, crossing cleave sweeps, short AOE windows, and light Hound flank pressure.",
-        features = {"melee pursuit", "rotating orbs", "crossing sweeps", "short AOE windows", "Hound adds"},
+        description = "Gragh's melee pursuit wrapped in rotating orbs, crossing cleave sweeps, short AOE windows, light Hound flank pressure, and fury recovery when players eat avoidable mechanics.",
+        features = {"melee pursuit", "rotating orbs", "crossing sweeps", "short AOE windows", "fury on mechanic hits", "Hound adds"},
         suggestedLevel = 5,
         suggestedPreset = "late",
         monsters = {"Gragh"},
@@ -1619,6 +1619,11 @@ M.encounters = {
         },
         package = {
             primary = "Gragh",
+            micro_punish = {
+                label = "GRAGH FURY",
+                heal_primary = 8,
+                overheal_cap_pct = 0.35,
+            },
             orbit = {
                 interval = 260,
                 offset = 35,
@@ -1668,8 +1673,8 @@ M.encounters = {
         label = "Gragh rescue package",
         kind = "rescue package",
         phase = "late multiplayer",
-        description = "A fragile ally starts in the arena so Gragh's pressure creates pull, taunt, body-block rescue windows, crossing sweeps, and Hound target swaps.",
-        features = {"protect ally", "body-block rescue", "pull/taunt window", "rotating orbs", "crossing sweeps", "short AOE windows", "Hound adds"},
+        description = "A fragile ally starts in the arena so Gragh's pressure creates pull, taunt, body-block rescue windows, crossing sweeps, Hound target swaps, and fury recovery when avoidable mechanics are eaten.",
+        features = {"protect ally", "body-block rescue", "pull/taunt window", "rotating orbs", "crossing sweeps", "short AOE windows", "fury on mechanic hits", "Hound adds"},
         suggestedLevel = 5,
         suggestedPreset = "late",
         monsters = {"Gragh"},
@@ -1678,6 +1683,11 @@ M.encounters = {
         },
         package = {
             primary = "Gragh",
+            micro_punish = {
+                label = "GRAGH FURY",
+                heal_primary = 8,
+                overheal_cap_pct = 0.35,
+            },
             escort = {
                 monster = "Spectral Beast",
                 count = 1,

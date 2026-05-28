@@ -2833,6 +2833,7 @@ telemetry_watch_for = function(config, package_summary)
         append_metric(rows, "avg_package_micro_best_streak", "Best streak", "longest clean micro streak")
         append_metric(rows, "avg_package_micro_dodges", "Threaded avoids", "targeted or near-miss hazard avoids")
         append_metric(rows, "avg_package_micro_hits", "Mechanic hits", "avoidable hazard failures")
+        append_metric(rows, "avg_package_micro_punish_total", "Punish", "boss recovery from avoidable failures")
         if package_summary.hasSweep then
             append_metric(rows, "avg_package_sweep_active_count", "Sweep active", "crossing-lane pressure uptime")
             append_metric(rows, "avg_package_sweep_warning_count", "Sweep warns", "crossing-lane read windows")

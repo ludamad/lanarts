@@ -124,7 +124,9 @@ Balance simulations:
     summarize those micro rows and warn when a class clears while averaging
     negative micro score. The package_micro_dodges field tracks targeted or
     near-miss threaded avoids; hazards that expire without threatening a player
-    no longer inflate the count.
+    no longer inflate the count. Gragh packages also emit
+    package_micro_punish_total for Gragh Fury healing caused by avoidable
+    mechanic hits.
     Use --package_components orbit,pulse,sweep,summon,escort,rescue to isolate
     package parts while keeping the same encounter arena, monsters, and
     pressure preset. A rescue component automatically keeps its escort target.

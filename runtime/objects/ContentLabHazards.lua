@@ -206,6 +206,49 @@ local function force_chase(source, target, frames)
     return true
 end
 
+local function apply_micro_punish(hazard)
+    local director = hazard and hazard.director
+    local package = director and director.package
+    local punish = package and package.micro_punish
+    if not punish then
+        return
+    end
+    local primary = primary_monster(package.primary)
+    if not primary or primary.destroyed then
+        return
+    end
+    local heal = tonumber(punish.heal_primary or punish.heal) or 0
+    if heal <= 0 then
+        return
+    end
+    local intensity = director.intensity or normalize_intensity(nil)
+    heal = heal * (intensity.damage or 1)
+    local estats = primary:effective_stats()
+    local max_hp = math.max(1, estats.max_hp or primary.stats.max_hp or primary.stats.hp or 1)
+    local cap_pct = tonumber(punish.overheal_cap_pct) or 0.25
+    local cap = max_hp * (1 + math.max(0, cap_pct))
+    local before = primary.stats.hp or max_hp
+    local after = math.min(cap, before + heal)
+    local applied = math.max(0, after - before)
+    if applied <= 0 then
+        return
+    end
+    primary.stats.hp = after
+    director.micro_punish_total = (director.micro_punish_total or 0) + applied
+    director.micro_punish_events = (director.micro_punish_events or 0) + 1
+    director.micro_punish_last_label = punish.label or "FURY"
+    if M.create_feedback_label then
+        M.create_feedback_label {
+            map = director.map,
+            xy = xy_of(primary),
+            text = (punish.label or "FURY") .. " +" .. tostring(math.ceil(applied)),
+            color = COL_PALE_RED,
+            duration = 52,
+            drift = 0.40,
+        }
+    end
+end
+
 local function add_micro_event(director, args)
     if not director or director.destroyed then
         return
@@ -258,6 +301,7 @@ local function record_hazard_hit(hazard, target, xy)
         color = COL_PALE_RED,
         xy = xy or (target and xy_of(target)) or hazard.xy,
     })
+    apply_micro_punish(hazard)
 end
 
 local function record_hazard_dodge(hazard)
@@ -907,6 +951,8 @@ local function package_result(director, outcome)
         micro_hits = director.micro_hits or 0,
         micro_dodges = director.micro_dodges or 0,
         micro_events = director.micro_events or 0,
+        micro_punish_total = director.micro_punish_total or 0,
+        micro_punish_events = director.micro_punish_events or 0,
         sweep_warning_count = sweep_warning_count,
         sweep_warning_remaining = sweep_warning_remaining,
         sweep_active_count = sweep_active_count,
@@ -1009,6 +1055,8 @@ local function package_state_from_director(director)
         micro_hits = director.micro_hits or 0,
         micro_dodges = director.micro_dodges or 0,
         micro_events = director.micro_events or 0,
+        micro_punish_total = director.micro_punish_total or 0,
+        micro_punish_events = director.micro_punish_events or 0,
     }
 end
 
@@ -2423,6 +2471,8 @@ function M.add_director(game_map, package, intensity)
         micro_hits = 0,
         micro_dodges = 0,
         micro_events = 0,
+        micro_punish_total = 0,
+        micro_punish_events = 0,
         micro_last_timer = 0,
         escort_required = package.escort ~= nil,
         on_step = function(self)
