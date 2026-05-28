@@ -2270,6 +2270,45 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         )
     end
 
+    local step_limits = tonumber(row.step_limits) or 0
+    local step_limit_rate = runs > 0 and step_limits / runs or 0
+    if runs >= min_runs and win_rate <= 0.05 and death_rate <= 0.05 and step_limit_rate >= 0.75 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_difficulty",
+            "win_rate",
+            win_rate,
+            0.05,
+            string.format(
+                "%s neither cleared nor died in %s (%.1f%% step-limit stalls); the package is not resolving inside the step budget. Verify damage output, killability, and readability before tuning enemy damage -- a 0%% clear here is likely instrument-limited, not proof the fight is too hard.",
+                class_name,
+                encounter,
+                step_limit_rate * 100
+            )
+        )
+    end
+
+    if runs >= min_runs and micro_score <= -20 and micro_hits >= 5 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_micro",
+            "avg_package_micro_score",
+            micro_score,
+            -20,
+            string.format(
+                "%s averaged %.1f micro score and %.1f avoidable mechanic hits/run in %s; if this holds across automation profiles, improve mechanic readability before tuning numbers rather than reading the loss as intended difficulty.",
+                class_name,
+                micro_score,
+                micro_hits,
+                encounter
+            )
+        )
+    end
+
     if pressure_peak >= 2 and pressure_overlap < 0.05 then
         add_report_row(
             rows,
