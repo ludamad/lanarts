@@ -1532,6 +1532,8 @@
           analysisGoal: resource.analysisGoal || resource.goalId || '',
           botProfile: resource.botProfile || 'human',
           packageSummary: resource.packageSummary || null,
+          pressurePreview: resource.pressurePreview || null,
+          microDrill: resource.microDrill || null,
           buildArchetype: resource.buildArchetype || null,
           loadoutReadiness: resource.loadoutReadiness || null,
           previewMode: resource.previewMode || resource.preview_mode || '',
@@ -2373,6 +2375,37 @@
           });
           buildSection.appendChild(list);
           host.appendChild(buildSection);
+        }
+
+        const microDrills = payload.microDrills || [];
+        if (microDrills.length) {
+          const drillSection = document.createElement('div');
+          drillSection.className = 'presentation-section';
+          appendBoardTitle(drillSection, 'Drills');
+          const list = document.createElement('div');
+          list.className = 'board-card-list';
+          microDrills.slice(0, 4).forEach((drill) => {
+            const summary = drill.packageSummary || {};
+            const preview = drill.pressurePreview || {};
+            list.appendChild(boardCard({
+              title: drill.label,
+              subtitle: drill.focus || drill.role,
+              chips: [
+                drill.role,
+                drill.config && drill.config.packageComponents ? drill.config.packageComponents : 'full',
+                drill.config && drill.config.intensity,
+                summary.fastestLoopFrames ? `${summary.fastestLoopFrames}f loop` : '',
+                preview.peakStack ? `stack ${preview.peakStack}` : '',
+                ...((drill.tags || []).slice(0, 2)),
+              ],
+              config: drill.config,
+              balance: {args: drill.balanceArgs || []},
+            }, () => {
+              setConfig(drill.config || currentConfig());
+            }));
+          });
+          drillSection.appendChild(list);
+          host.appendChild(drillSection);
         }
 
         const watch = document.createElement('div');
@@ -3282,6 +3315,18 @@
         return parts.join(' | ');
       }
 
+      function microDrillSummaryText(drill) {
+        if (!drill) {
+          return '';
+        }
+        const parts = [];
+        if (drill.role) {
+          parts.push(drill.role);
+        }
+        (drill.tags || []).slice(0, 3).forEach((tag) => parts.push(tag));
+        return parts.join(' | ');
+      }
+
       function mapSummaryText(resource) {
         if (!resource || !resource.previewMode) {
           return '';
@@ -3384,14 +3429,16 @@
           const parts = resource.packageComponents ? ` ${resource.packageComponents}` : '';
           const skill = resource.botProfile && resource.botProfile !== 'human' ? ` ${resource.botProfile}` : '';
           const summary = packageSummaryText(resource.packageSummary);
+          const drillSummary = microDrillSummaryText(resource.microDrill);
           const mapSummary = mapSummaryText(resource);
           const matchupSummary = matchupSummaryText(resource.matchup);
           const readinessSummary = readinessSummaryText(resource.loadoutReadiness);
           const summaryNode = summary ? `<span>${summary}</span>` : '';
+          const drillSummaryNode = drillSummary ? `<span>${drillSummary}</span>` : '';
           const mapSummaryNode = mapSummary ? `<span>${mapSummary}</span>` : '';
           const matchupNode = matchupSummary ? `<span>${matchupSummary}</span>` : '';
           const readinessNode = readinessSummary ? `<span>${readinessSummary}</span>` : '';
-          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${mapSummaryNode}${matchupNode}${readinessNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${parts}${skill}</code>`;
+          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${drillSummaryNode}${mapSummaryNode}${matchupNode}${readinessNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${parts}${skill}</code>`;
           button.addEventListener('click', () => {
             setConfig(resource);
           });

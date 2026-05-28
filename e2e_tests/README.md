@@ -23,6 +23,8 @@ Content lab APIs:
     Build-matrix payloads expose curated class archetypes as concrete loadout
     strings with readiness scores and launch/balance commands, so the web lab
     can spec a hero before entering a package fight.
+    Micro-drill payloads expose launchable rescue, orb/AOE, add-cleanup, and
+    stacked-package practice setups with isolated components and micro plans.
     Run summaries and fight setup payloads also include class/enemy matchup
     reads for red/fire, white, and black resistance checks, with telemetry keys
     that explain whether the pairing is suppressing damage conversion.

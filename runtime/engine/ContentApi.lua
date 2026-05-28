@@ -893,13 +893,30 @@ local function loadout_readiness_for_config(config, loadout, known_spells)
     }
 end
 
+local function build_archetype_by_id(class_name, build_id)
+    for _, archetype in ipairs((Catalog.build_archetypes or {})[class_name] or {}) do
+        if (archetype.id or "") == (build_id or "") then
+            return archetype
+        end
+    end
+    return nil
+end
+
+local function apply_build_archetype(config, build_id)
+    local next_config = copy_object(config)
+    local archetype = build_archetype_by_id(next_config.className, build_id)
+    if archetype then
+        next_config.preset = archetype.preset or "none"
+        next_config.customLoadout = join_names(archetype.items or {})
+    end
+    return next_config, archetype
+end
+
 local function build_archetype_rows(config)
     local rows = {}
     for _, archetype in ipairs((Catalog.build_archetypes or {})[config.className] or {}) do
-        local next_config = copy_object(config)
+        local next_config = apply_build_archetype(config, archetype.id)
         next_config.className = config.className
-        next_config.preset = archetype.preset or "none"
-        next_config.customLoadout = join_names(archetype.items or {})
         local known_spells, upcoming_spells = spell_rows_for_level(next_config.className, next_config.level)
         local loadout = loadout_for_config(next_config)
         local readiness = loadout_readiness_for_config(next_config, loadout, known_spells)
@@ -2680,6 +2697,109 @@ local function run_summary_payload(config)
     }
 end
 
+local function micro_drill_config(config, drill)
+    local next_config = copy_object(config)
+    next_config.className = drill.className or config.className
+    next_config.level = tonumber(drill.level) or config.level
+    next_config.seed = tostring(drill.seed or config.seed)
+    next_config.preset = drill.preset or config.preset
+    next_config.customLoadout = drill.customLoadout or ""
+    next_config.mapDesc = ""
+    next_config.mapProfile = ""
+    next_config.mapAlgorithm = ""
+    next_config.encounter = drill.encounter or ""
+    next_config.monsters = ""
+    next_config.intensity = drill.intensity or config.intensity
+    next_config.packageComponents = normalize_package_components(drill.packageComponents or "")
+    next_config.botProfile = drill.botProfile or config.botProfile
+    if drill.buildId and drill.buildId ~= "" then
+        next_config = apply_build_archetype(next_config, drill.buildId)
+    end
+    return normalized_config(next_config)
+end
+
+local function micro_drill_rows(config)
+    local rows = {}
+    local encounters = encounter_lookup()
+    for _, drill in ipairs(Catalog.micro_drills or {}) do
+        local drill_config = micro_drill_config(config, drill)
+        local encounter = encounter_with_components(encounters[drill_config.encounter or ""], drill_config.packageComponents)
+        local rhythms = encounter_rhythms(encounter, selected_intensity(drill_config))
+        local package_summary = package_summary_from_rhythms(rhythms)
+        local known_spells, upcoming_spells = spell_rows_for_level(drill_config.className, drill_config.level)
+        local loadout = loadout_for_config(drill_config)
+        local build = build_archetype_by_id(drill_config.className, drill.buildId)
+        local control_model = control_model_for(drill_config)
+        rows[#rows + 1] = {
+            id = drill.id or "",
+            label = drill.label or drill.id or "",
+            role = drill.role or "",
+            focus = drill.focus or "",
+            tags = copy_array(drill.tags or {}),
+            config = drill_config,
+            buildArchetype = build and {
+                id = build.id,
+                label = build.label,
+                role = build.role,
+                tags = copy_array(build.tags or {}),
+            } or nil,
+            loadout = loadout,
+            loadoutReadiness = loadout_readiness_for_config(drill_config, loadout, known_spells),
+            matchup = matchup_read_for(drill_config, encounter),
+            knownSpells = known_spells,
+            upcomingSpells = upcoming_spells,
+            encounter = encounter,
+            rhythms = rhythms,
+            packageSummary = package_summary,
+            pressurePreview = pressure_preview_for(rhythms),
+            microPlan = micro_plan_for(rhythms, control_model),
+            telemetry = telemetry_watch_for(drill_config, package_summary),
+            args = launch_args(drill_config),
+            balanceArgs = balance_args(drill_config),
+        }
+    end
+    return rows
+end
+
+local function micro_drills_payload(config)
+    local rows = micro_drill_rows(config)
+    return {
+        schema = 1,
+        config = config,
+        count = #rows,
+        drills = rows,
+    }
+end
+
+local function micro_drill_resources(config, start_offset)
+    local resources = {}
+    for idx, drill in ipairs(micro_drill_rows(config)) do
+        resources[#resources + 1] = resource_entry(
+            "Micro drill sweep",
+            drill.label,
+            string.format("%s, %s", drill.config.className, drill.role or "micro"),
+            drill.focus or "micro drill",
+            drill.config,
+            (start_offset or 120) + idx,
+            {
+                microDrill = {
+                    id = drill.id,
+                    label = drill.label,
+                    role = drill.role,
+                    focus = drill.focus,
+                    tags = copy_array(drill.tags or {}),
+                },
+                buildArchetype = drill.buildArchetype,
+                loadoutReadiness = drill.loadoutReadiness,
+                matchup = drill.matchup,
+                packageSummary = drill.packageSummary,
+                pressurePreview = drill.pressurePreview,
+            }
+        )
+    end
+    return resources
+end
+
 local function selected_package_encounter(config)
     local selected_encounter = encounter_lookup()[config.encounter or ""]
     if selected_encounter and selected_encounter.package then
@@ -3040,6 +3160,8 @@ local function resource_matrix_payload(config)
 
     append_caster_matchup_resources(resources, config, 110)
 
+    append_resources(resources, micro_drill_resources(config, 120))
+
     append_resources(resources, map_probe_resources(config, 40))
 
     for idx, encounter in ipairs(package_encounters()) do
@@ -3238,6 +3360,12 @@ local function resource_summary_chips(resource)
     if resource.packageComponents and resource.packageComponents ~= "" then
         add(resource.packageComponents)
     end
+    if resource.microDrill then
+        add(resource.microDrill.role)
+        for _, tag in ipairs(resource.microDrill.tags or {}) do
+            add(tag)
+        end
+    end
     if resource.mapProfile and resource.mapProfile ~= "" then
         add(resource.mapProfile)
     end
@@ -3320,6 +3448,8 @@ local function resource_card(resource)
         command = command_preview(resource.args),
         balance = command_preview(resource.balanceArgs),
         packageSummary = resource.packageSummary,
+        pressurePreview = resource.pressurePreview,
+        microDrill = resource.microDrill,
         buildArchetype = resource.buildArchetype,
         loadoutReadiness = resource.loadoutReadiness,
         previewMode = resource.previewMode,
@@ -3435,6 +3565,7 @@ local function presentation_payload(config)
     local enemy_matrix = enemy_matrix_payload(config, 90)
     local analysis_plan = analysis_plan_payload(config)
     local build_matrix = build_matrix_payload(config)
+    local micro_drills = micro_drills_payload(config)
 
     return {
         schema = 1,
@@ -3448,6 +3579,7 @@ local function presentation_payload(config)
             monsterEval = command_preview(analysis_plan.commands and analysis_plan.commands.monsterEval),
         },
         buildArchetypes = build_matrix.builds or {},
+        microDrills = micro_drills.drills or {},
         mapPreviews = preview_cards(map_generation),
         resourceGroups = {
             {
@@ -3455,6 +3587,12 @@ local function presentation_payload(config)
                 label = "Build archetypes",
                 count = build_matrix.count or 0,
                 cards = resource_cards(build_archetype_resources(config, 0)),
+            },
+            {
+                id = "drill",
+                label = "Micro drills",
+                count = micro_drills.count or 0,
+                cards = resource_cards(micro_drill_resources(config, 0)),
             },
             {
                 id = "map",
@@ -3497,6 +3635,7 @@ local function workspace_payload(config)
         config = config,
         loadoutOptions = build_options_payload(config),
         buildMatrix = build_matrix_payload(config),
+        microDrills = micro_drills_payload(config),
         runSummary = run_summary_payload(config),
         enemyOptions = enemy_options_payload(config),
         mapGeneration = map_generation_payload(config),
@@ -3539,6 +3678,10 @@ end
 
 function M.build_matrix_json(raw_json)
     return encode(build_matrix_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.micro_drills_json(raw_json)
+    return encode(micro_drills_payload(normalized_config(parse_json_object(raw_json))))
 end
 
 function M.run_summary_json(raw_json)
