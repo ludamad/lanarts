@@ -533,3 +533,12 @@ When you finish a slice, report:
 - any remaining risk or next best slice
 
 Keep the user-facing summary short and concrete.
+
+Session 3 update (Claude, 2026-05-28) — projectile instrument + definitive audit + Gragh tuning:
+
+- `f7250ab9` Bot now dodges native enemy projectiles via a new `Map.projectile_data` engine binding (C++ does the dynamic_cast filtering and returns plain {x,y,vx,vy,radius,team} tables, so Lua never reads a type-specific getter that raises an uncatchable C++ error). This closed the last instrument gap: nesso damage-taken 300->97, deaths 2->0; at 2800 steps nesso is confirmed HEALTHY (perfect Stormcaller 67% clear, +84 micro). Requires a native rebuild.
+- `dfdd1248` Raised GRAGH FURY (heal 8->9, overheal cap 35%->40%) to tax face-tanking. A definitive 4-class human audit (now trustworthy) showed Fighter brute-forcing gragh-duel (75% clear, -107 micro, 15+ hits, boss 9%) while clean ranged respected mechanics. Since FURY heals per avoidable hit, the tax scales with sloppiness: human Fighter 75%->25%, perfect Fighter still ~50%, clean Stormcaller unchanged.
+
+Audit verdict (human profile, 1500 steps, fixed instrument): no class trivializes the roster. Ranged (Pyro/Storm) play clean but win modestly; Fighter face-tanks (now taxed); Necromancer is fragile for a human (regen-masked, dies often) -- judge with regen context, perfect Necro is fine. Pyrocaster vs Red Dragon is a real fire-resist matchup (boss 81% HP), as designed.
+
+OPEN DESIGN QUESTION for the user (needs your call, not autonomous): the bot's melee Fighter eats ~18 avoidable hits on gragh-duel even at the "perfect" profile, because Gragh's orbit+pulse+sweep are densely overlapped and anchored on Gragh (pressure dominance ~0.85, overlap ~0.8), so a melee class cannot both stay in attack range and dodge. FURY now correctly punishes the resulting face-tank, but the deeper "is Gragh meleeable with skill?" question is a readability/spacing design decision: spreading Gragh's beat offsets so melee can weave between hazards would let skilled melee win cleanly (the prompt-preferred "improve readability before tuning numbers" path). Deferred because it changes Gragh's intended overlap/sync feel and should be your design call.
