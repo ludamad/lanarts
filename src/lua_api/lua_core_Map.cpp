@@ -15,6 +15,8 @@
 #include "gamestate/GameState.h"
 #include "objects/EnemyInst.h"
 #include "objects/PlayerInst.h"
+#include "objects/ProjectileInst.h"
+#include "objects/CombatGameInst.h"
 #include "gamestate/GameMapState.h"
 #include "gamestate/GameSettings.h"
 #include "gamestate/TeamIter.h"
@@ -176,6 +178,42 @@ static int gmap_objects_list(lua_State* L) {
     auto* level = gs->game_world().get_level(id);
     GameInstSet& insts = level->game_inst_set();
     luawrap::push(L, insts.to_vector());
+    return 1;
+}
+
+// Return hostile-or-any projectiles as plain data tables so Lua can read trajectories without
+// reading type-specific gameinst getters (which raise an uncatchable C++ error on other types).
+static int gmap_projectile_data(lua_State* L) {
+    GameState* gs = lua_api::gamestate(L);
+    level_id id = -1;
+    if (lua_gettop(L) == 0) {
+        id = gs->get_level_id();
+    } else {
+        id = LuaStackValue(L, 1)["_id"].to_int();
+    }
+    auto* level = gs->game_world().get_level(id);
+    GameInstSet& insts = level->game_inst_set();
+    lua_newtable(L);
+    int j = 1;
+    for (GameInst* inst : insts.to_vector()) {
+        ProjectileInst* proj = dynamic_cast<ProjectileInst*>(inst);
+        if (!proj) {
+            continue;
+        }
+        int team = -1;
+        CombatGameInst* corigin = dynamic_cast<CombatGameInst*>(proj->origin(gs));
+        if (corigin) {
+            team = corigin->team;
+        }
+        lua_newtable(L);
+        lua_pushnumber(L, proj->x); lua_setfield(L, -2, "x");
+        lua_pushnumber(L, proj->y); lua_setfield(L, -2, "y");
+        lua_pushnumber(L, proj->vx); lua_setfield(L, -2, "vx");
+        lua_pushnumber(L, proj->vy); lua_setfield(L, -2, "vy");
+        lua_pushnumber(L, proj->radius); lua_setfield(L, -2, "radius");
+        lua_pushinteger(L, team); lua_setfield(L, -2, "team");
+        lua_rawseti(L, -2, j++);
+    }
     return 1;
 }
 
@@ -529,6 +567,7 @@ namespace lua_api {
         gmap["lookup"].bind_function(gmap_lookup);
 
         gmap["objects_list"].bind_function(gmap_objects_list);
+        gmap["projectile_data"].bind_function(gmap_projectile_data);
 
         gmap["tile_is_solid"].bind_function(gmap_tile_is_solid);
         gmap["tile_is_seethrough"].bind_function(gmap_tile_is_seethrough);

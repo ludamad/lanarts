@@ -188,9 +188,10 @@ Balance simulations:
     skill-buffer ceiling, which models late-game content that a primitive
     human-profile bot should not clear reliably.
     The automated player now actively dodges content-lab orb, pulse, and
-    sweep hazards (not just rescue lines), moving to the least-dangerous
-    adjacent tile when it stands inside or just ahead of an active/imminent
-    danger zone. Dodging is skill-gated: perfect reacts early with a wide
+    sweep hazards (not just rescue lines), AND native enemy projectiles
+    (arrows/bolts, via the Map.projectile_data engine binding), moving to
+    the least-dangerous adjacent tile when it stands inside or just ahead
+    of an active/imminent danger zone. Dodging is skill-gated: perfect reacts early with a wide
     margin, while skilled/human/sloppy react later, with a smaller margin,
     and sometimes skip the read (hazard_dodge_skip_chance). hazard_dodge_frames
     and hazard_dodge_skip_frames are emitted per run so package micro is now a

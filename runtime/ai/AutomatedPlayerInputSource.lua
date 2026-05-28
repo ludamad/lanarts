@@ -345,6 +345,41 @@ local function hazard_danger_at(hazards, x, y, lookahead, margin, player_radius)
     return danger
 end
 
+-- Map.projectile_data() is a C++ binding that returns hostile/native projectiles as plain data
+-- tables {x,y,vx,vy,radius,team}, so the bot can dodge arrows/bolts without reading type-specific
+-- gameinst getters from Lua (which raise an uncatchable C++ error on the wrong instance type).
+local function hostile_projectiles(player)
+    if not Map.projectile_data then
+        return {}
+    end
+    local result = {}
+    local team = player.team
+    for _, p in ipairs(Map.projectile_data()) do
+        if p.team ~= team then
+            result[#result + 1] = p
+        end
+    end
+    return result
+end
+
+local function projectile_danger_at(projectiles, x, y, lookahead, margin, player_radius)
+    local danger = 0
+    for _, p in ipairs(projectiles) do
+        local reach = (p.radius or 5) + player_radius + margin
+        local best = 0
+        for _, t in ipairs({0, lookahead * 0.5, lookahead}) do
+            local px = p.x + p.vx * t
+            local py = p.y + p.vy * t
+            local pen = reach - math.sqrt((x - px) * (x - px) + (y - py) * (y - py))
+            if pen > best then
+                best = pen
+            end
+        end
+        danger = danger + best
+    end
+    return danger
+end
+
 local function best_direction_towards_xy(player, xy)
     local direct = direction_from_vector(xy.x - player.x, xy.y - player.y, 5)
     if direct[1] == 0 and direct[2] == 0 then
@@ -822,15 +857,17 @@ function AutomatedPlayerInputSource:_rescue_action()
 end
 
 function AutomatedPlayerInputSource:_hazard_dodge_action()
+    local player = self.player
     local hazards = active_hazards()
-    if #hazards == 0 then
+    local projectiles = hostile_projectiles(player)
+    if #hazards == 0 and #projectiles == 0 then
         return false
     end
-    local player = self.player
     local margin = self.options.hazard_react_margin or 12
     local lookahead = self.options.hazard_lookahead_frames or 8
     local pr = player.target_radius or player.radius or 12
     local here = hazard_danger_at(hazards, player.x, player.y, lookahead, margin, pr)
+        + projectile_danger_at(projectiles, player.x, player.y, lookahead, margin, pr)
     if here <= 0 then
         return false
     end
@@ -850,6 +887,7 @@ function AutomatedPlayerInputSource:_hazard_dodge_action()
     end
     local function tile_cost(x, y)
         local cost = hazard_danger_at(hazards, x, y, lookahead, margin, pr)
+            + projectile_danger_at(projectiles, x, y, lookahead, margin, pr)
         if nearest_enemy and not nearest_enemy.destroyed then
             local dx, dy = x - nearest_enemy.x, y - nearest_enemy.y
             cost = cost + math.max(0, keepaway - math.sqrt(dx * dx + dy * dy)) * 0.6
