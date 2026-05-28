@@ -1308,7 +1308,7 @@ local function draw_package_hud(director)
         row_count = row_count + 1
     end
     if package.rescue then
-        row_count = row_count + 4
+        row_count = row_count + 6
     end
     if package.escort then
         row_count = row_count + 1
@@ -1502,6 +1502,26 @@ local function draw_package_hud(director)
         draw_hud_row(y, "RATE", stats_value, COL_PALE_GREEN, safe_rate(saves, math.max(1, attempts)))
         y = y + HUD_ROW_H
 
+        local best_margin = director.rescue_best_margin
+        local perfect_margin = director.rescue_best_perfect_margin
+        local best_pull = director.rescue_best_pull_margin
+        local margin_value
+        local margin_color = COL_LIGHT_GRAY
+        local margin_pct = 0
+        if saves > 0 then
+            local last_text = margin and ("last " .. tostring(margin) .. "f") or "last --"
+            local best_text = best_margin and ("best " .. tostring(best_margin) .. "f") or "best --"
+            local pull_text = best_pull and (" pull " .. tostring(best_pull) .. "f") or ""
+            margin_value = last_text .. " " .. best_text .. pull_text
+            margin_color = perfect_margin and COL_WHITE or best_margin and COL_PALE_YELLOW or COL_PALE_GREEN
+            local target_margin = perfect_margin or best_margin or margin
+            margin_pct = 1 - math.min(tonumber(target_margin) or state.late_window or 1, state.late_window or 1) / math.max(1, state.late_window or 1)
+        else
+            margin_value = "no save yet"
+        end
+        draw_hud_row(y, "MARGIN", margin_value, margin_color, margin_pct)
+        y = y + HUD_ROW_H
+
         local pull_frames = director.rescue_pull_total_frames or 0
         local pull_uptime = safe_rate(pull_frames, math.max(1, director.elapsed or 0))
         local pull_active = director.rescue_pull_active_frames or 0
@@ -1610,6 +1630,10 @@ local function package_result(director, outcome)
     local taunt_safe_frames = director.rescue_taunt_safe_frames or 0
     local taunt_strain_frames = director.rescue_taunt_strain_frames or 0
     local taunt_strain_rate = safe_rate(taunt_strain_frames, math.max(1, pull_total_frames))
+    local avg_clutch_margin = safe_rate(director.rescue_clutch_margin_total or 0, clutch)
+    local avg_perfect_margin = safe_rate(director.rescue_perfect_margin_total or 0, perfect)
+    local avg_pull_margin = safe_rate(director.rescue_pull_margin_total or 0, pulls)
+    local avg_timed_pull_margin = safe_rate(director.rescue_timed_pull_margin_total or 0, clutch_pulls)
     local pressure = package_pressure_state(director, director.package or {})
     local aggro_tracking = aggro_tracking_fields(director)
     local rescue_danger = rescue_danger_cover_fields(director)
@@ -1669,6 +1693,11 @@ local function package_result(director, outcome)
         rescue_perfect_cover_rate = rescue_danger.rescue_perfect_cover_rate,
         rescue_perfect_window = director.rescue_perfect_window,
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
+        rescue_margin_total = director.rescue_margin_total or 0,
+        rescue_clutch_margin_total = director.rescue_clutch_margin_total or 0,
+        rescue_perfect_margin_total = director.rescue_perfect_margin_total or 0,
+        rescue_avg_clutch_margin = avg_clutch_margin,
+        rescue_avg_perfect_margin = avg_perfect_margin,
         rescue_pulls = pulls,
         rescue_pull_rate = pull_rate,
         rescue_clutch_pulls = clutch_pulls,
@@ -1676,6 +1705,11 @@ local function package_result(director, outcome)
         rescue_timed_pull_rate = timed_pull_rate,
         rescue_pull_discipline_rate = pull_discipline,
         rescue_perfect_pull_rate = perfect_pull_rate,
+        rescue_pull_margin_total = director.rescue_pull_margin_total or 0,
+        rescue_timed_pull_margin_total = director.rescue_timed_pull_margin_total or 0,
+        rescue_perfect_pull_margin_total = director.rescue_perfect_pull_margin_total or 0,
+        rescue_avg_pull_margin = avg_pull_margin,
+        rescue_avg_timed_pull_margin = avg_timed_pull_margin,
         rescue_pull_snap_bursts = director.rescue_pull_snap_bursts or 0,
         rescue_perfect_pull_snap_bursts = director.rescue_perfect_pull_snap_bursts or 0,
         rescue_pull_total_frames = pull_total_frames,
@@ -1749,6 +1783,10 @@ local function package_state_from_director(director)
     local next_threat = next_threat_state(director, director.package or {})
     local pressure = package_pressure_state(director, director.package or {})
     local rescue_danger = rescue_danger_cover_fields(director)
+    local avg_clutch_margin = safe_rate(director.rescue_clutch_margin_total or 0, clutch)
+    local avg_perfect_margin = safe_rate(director.rescue_perfect_margin_total or 0, perfect)
+    local avg_pull_margin = safe_rate(director.rescue_pull_margin_total or 0, pulls)
+    local avg_timed_pull_margin = safe_rate(director.rescue_timed_pull_margin_total or 0, clutch_pulls)
     local rescue_state
     if director.package and director.package.rescue then
         rescue_state = rescue_window_state(director, director.package.rescue)
@@ -1815,6 +1853,11 @@ local function package_state_from_director(director)
         rescue_perfect_cover_rate = rescue_danger.rescue_perfect_cover_rate,
         rescue_perfect_window = director.rescue_perfect_window,
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
+        rescue_margin_total = director.rescue_margin_total or 0,
+        rescue_clutch_margin_total = director.rescue_clutch_margin_total or 0,
+        rescue_perfect_margin_total = director.rescue_perfect_margin_total or 0,
+        rescue_avg_clutch_margin = avg_clutch_margin,
+        rescue_avg_perfect_margin = avg_perfect_margin,
         rescue_pulls = pulls,
         rescue_pull_rate = safe_rate(pulls, saves),
         rescue_clutch_pulls = clutch_pulls,
@@ -1822,6 +1865,11 @@ local function package_state_from_director(director)
         rescue_timed_pull_rate = safe_rate(clutch_pulls, pulls),
         rescue_pull_discipline_rate = pull_discipline_rate(pulls, clutch_pulls),
         rescue_perfect_pull_rate = safe_rate(perfect_pulls, pulls),
+        rescue_pull_margin_total = director.rescue_pull_margin_total or 0,
+        rescue_timed_pull_margin_total = director.rescue_timed_pull_margin_total or 0,
+        rescue_perfect_pull_margin_total = director.rescue_perfect_pull_margin_total or 0,
+        rescue_avg_pull_margin = avg_pull_margin,
+        rescue_avg_timed_pull_margin = avg_timed_pull_margin,
         rescue_pull_snap_bursts = director.rescue_pull_snap_bursts or 0,
         rescue_perfect_pull_snap_bursts = director.rescue_perfect_pull_snap_bursts or 0,
         rescue_pull_total_frames = director.rescue_pull_total_frames or 0,
@@ -2832,25 +2880,31 @@ function M.create_rescue_strike(args)
                     if self.director and not self.director.destroyed then
                         self.director.rescue_saves = (self.director.rescue_saves or 0) + 1
                         self.director.rescue_last_margin = margin
+                        self.director.rescue_margin_total = (self.director.rescue_margin_total or 0) + margin
                         if self.pulled then
                             self.director.rescue_pulls = (self.director.rescue_pulls or 0) + 1
                             self.director.rescue_last_pull_frames = self.pull_frames
                             self.director.rescue_last_pull_margin = margin
                             self.director.rescue_best_pull_margin = math.min(self.director.rescue_best_pull_margin or margin, margin)
+                            self.director.rescue_pull_margin_total = (self.director.rescue_pull_margin_total or 0) + margin
                             if self.was_clutch then
                                 self.director.rescue_clutch_pulls = (self.director.rescue_clutch_pulls or 0) + 1
+                                self.director.rescue_timed_pull_margin_total = (self.director.rescue_timed_pull_margin_total or 0) + margin
                             end
                             if self.was_perfect then
                                 self.director.rescue_perfect_pulls = (self.director.rescue_perfect_pulls or 0) + 1
+                                self.director.rescue_perfect_pull_margin_total = (self.director.rescue_perfect_pull_margin_total or 0) + margin
                             end
                         end
                         if self.was_clutch then
                             self.director.rescue_clutch_saves = (self.director.rescue_clutch_saves or 0) + 1
                             self.director.rescue_best_margin = math.min(self.director.rescue_best_margin or margin, margin)
+                            self.director.rescue_clutch_margin_total = (self.director.rescue_clutch_margin_total or 0) + margin
                         end
                         if self.was_perfect then
                             self.director.rescue_perfect_saves = (self.director.rescue_perfect_saves or 0) + 1
                             self.director.rescue_best_perfect_margin = math.min(self.director.rescue_best_perfect_margin or margin, margin)
+                            self.director.rescue_perfect_margin_total = (self.director.rescue_perfect_margin_total or 0) + margin
                         end
                         local punish = self.director.package and self.director.package.micro_punish
                         if punish and self.was_clutch then
@@ -3607,9 +3661,15 @@ function M.add_director(game_map, package, intensity)
         rescue_perfect_uncovered_frames = 0,
         rescue_blocked_perfect_frames = 0,
         rescue_perfect_window = scale_frames((package.rescue or {}).perfect_window, 6, intensity),
+        rescue_margin_total = 0,
+        rescue_clutch_margin_total = 0,
+        rescue_perfect_margin_total = 0,
         rescue_pulls = 0,
         rescue_clutch_pulls = 0,
         rescue_perfect_pulls = 0,
+        rescue_pull_margin_total = 0,
+        rescue_timed_pull_margin_total = 0,
+        rescue_perfect_pull_margin_total = 0,
         rescue_pull_snap_bursts = 0,
         rescue_perfect_pull_snap_bursts = 0,
         rescue_pull_active_frames = 0,

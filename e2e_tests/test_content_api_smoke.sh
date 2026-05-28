@@ -43,6 +43,7 @@ grep -q "dice-animation" runtime/engine/ContentApi.lua
 grep -q "dice-motion" runtime/engine/ContentApi.lua
 grep -q "dice-surge" runtime/engine/ContentApi.lua
 grep -q "dice-finale" runtime/engine/ContentApi.lua
+grep -q "avg_package_rescue_avg_clutch_margin" runtime/engine/ContentApi.lua
 grep -q "skill-buffer" runtime/engine/ContentApi.lua
 grep -q "DICE_MINOR_COOLDOWN_TRIM" runtime/spells/Effects.moon
 grep -q "DICE_FULL_BAG_MASK" runtime/spells/Effects.moon
@@ -54,9 +55,12 @@ grep -q "dicebinder_update_roll_surge" runtime/spells/Effects.moon
 grep -q "draw_die_face" runtime/ui/ProceduralEffects.lua
 grep -q "trail_roll" runtime/ui/ProceduralEffects.lua
 grep -q "surge_stage" runtime/ui/ProceduralEffects.lua
+grep -q "\"MARGIN\"" runtime/objects/ContentLabHazards.lua
 grep -q "orbiting die ghosts" web/content_lab/README.md
 grep -q "avg_package_rescue_early_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timing_score" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_rescue_avg_clutch_margin" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_rescue_avg_timed_pull_margin" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_window_cues" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_late_cover_rate" runtime/engine/StartBalanceRun.lua
 grep -q "CUT PERFECT" runtime/objects/ContentLabHazards.lua

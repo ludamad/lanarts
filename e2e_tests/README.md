@@ -108,8 +108,8 @@ Balance simulations:
     rescue_hold_frames, and rescue_late_reaction_frames so package clears can
     be separated from actual body-block micro. Package rows also derive rescue
     opportunities plus save, clutch, perfect, early, timing-score, pull,
-    timed-pull, perfect-pull, late/perfect cover, uncovered danger-window,
-    and counter-opening rates
+    timed-pull, perfect-pull, clutch/perfect/timed-pull margin, late/perfect
+    cover, uncovered danger-window, and counter-opening rates
     so rescue packages can be compared without hand-calculating rates from raw
     counts. Package rows also expose threaded dodge openings plus opening
     damage/stagger totals so clean footwork can be separated from brute-force
@@ -124,10 +124,10 @@ Balance simulations:
     package_difficulty rows when package overlap is only serial pressure or
     the selected automation profile is clearing too comfortably.
     Rescue package rows also track pull/taunt total frames, uptime rate,
-    pull-discipline rate, taunt-strain rate, and late-window pull rates, plus
-    pull-snap burst and strain-pulse counts, so clears can be flagged when
-    forced target control is carrying the fight instead of few-frame snap-pull
-    saves.
+    pull-discipline rate, taunt-strain rate, late-window pull rates, and
+    average timed-pull margins, plus pull-snap burst and strain-pulse counts,
+    so clears can be flagged when forced target control is carrying the fight
+    instead of few-frame snap-pull saves.
     Rescue-package report rows summarize save, clutch, perfect, early,
     timing-score, pull, timed-pull, pull-discipline, perfect-pull,
     taunt-uptime, taunt-strain, late-cover, perfect-cover, uncovered
