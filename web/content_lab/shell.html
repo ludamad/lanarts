@@ -823,11 +823,22 @@
 
       <section class="section">
         <div class="section-title">Resources</div>
-        <div class="field">
-          <label for="analysisGoal">Goal</label>
-          <select id="analysisGoal">
-            <option value="enemy-balance">Enemy balance</option>
-          </select>
+        <div class="row">
+          <div class="field">
+            <label for="analysisGoal">Goal</label>
+            <select id="analysisGoal">
+              <option value="enemy-balance">Enemy balance</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="botProfile">Bot skill</label>
+            <select id="botProfile">
+              <option value="perfect">Perfect</option>
+              <option value="skilled">Skilled</option>
+              <option value="human" selected>Human</option>
+              <option value="sloppy">Sloppy</option>
+            </select>
+          </div>
         </div>
         <div class="run-summary" id="analysisPlan"></div>
       </section>
@@ -928,6 +939,13 @@
 
       let analysisGoals = [
         {id: 'enemy-balance', label: 'Enemy balance'},
+      ];
+
+      let botProfiles = [
+        {id: 'perfect', label: 'Perfect', decisionInterval: 1, spellSkipChance: 0, itemSkipChance: 0, weaponSkipChance: 0, movementNoiseChance: 0},
+        {id: 'skilled', label: 'Skilled', decisionInterval: 2, spellSkipChance: 0.04, itemSkipChance: 0.04, weaponSkipChance: 0.02, movementNoiseChance: 0.02},
+        {id: 'human', label: 'Human', decisionInterval: 4, spellSkipChance: 0.12, itemSkipChance: 0.14, weaponSkipChance: 0.06, movementNoiseChance: 0.07},
+        {id: 'sloppy', label: 'Sloppy', decisionInterval: 7, spellSkipChance: 0.25, itemSkipChance: 0.28, weaponSkipChance: 0.14, movementNoiseChance: 0.14},
       ];
 
       let resources = [
@@ -1184,6 +1202,7 @@
           enemyGroup: resource.enemyGroup || '',
           enemyPack: resource.enemyPack || '',
           analysisGoal: resource.analysisGoal || resource.goalId || '',
+          botProfile: resource.botProfile || 'human',
           packageSummary: resource.packageSummary || null,
           seed: String(resource.seed || 1),
         };
@@ -1201,6 +1220,7 @@
         replaceOptions($('enemyGroup'), catalog.enemy_groups || enemyGroups, (entry) => entry.id || '', (entry) => entry.label || entry.id || 'Enemies');
         replaceOptions($('enemyPack'), [{id: '', label: 'None'}].concat(catalog.enemy_packs || []), (entry) => entry.id || '', (entry) => entry.label || entry.id || 'None');
         replaceOptions($('analysisGoal'), catalog.analysis_goals || analysisGoals, (entry) => entry.id || '', (entry) => entry.label || entry.id || 'Goal');
+        replaceOptions($('botProfile'), catalog.bot_profiles || botProfiles, (entry) => entry.id || 'human', (entry) => entry.label || entry.id || 'Human');
         rebuildLoadoutPresets(catalog.loadouts, catalog.loadout_names);
         mapAlgorithms = catalog.map_algorithms || mapAlgorithms;
         encounters = catalog.encounters || encounters;
@@ -1208,6 +1228,7 @@
         enemyGroups = catalog.enemy_groups || enemyGroups;
         enemyPacks = [{id: '', label: 'None', monsters: []}].concat(catalog.enemy_packs || []);
         analysisGoals = catalog.analysis_goals || analysisGoals;
+        botProfiles = catalog.bot_profiles || botProfiles;
         resources = (catalog.resources || []).map(normalizeResource);
         mapProfiles = (catalog.map_algorithms || catalog.maps || []).slice(0, 4).map(normalizePreviewProfile);
         rebuildMapAlgorithms($('mapDesc').value, $('mapAlgorithm').value);
@@ -1254,6 +1275,7 @@
           enemyGroup: $('enemyGroup').value || '',
           enemyPack: $('enemyPack').value || '',
           goal: $('analysisGoal').value || 'enemy-balance',
+          botProfile: $('botProfile').value || 'human',
         };
       }
 
@@ -1338,6 +1360,18 @@
           appendSummaryLine(host, 'Map Algo', algorithm);
         }
 
+        if (summary.controlModel) {
+          const control = document.createElement('div');
+          control.className = 'item-chips';
+          const model = summary.controlModel;
+          const profile = model.botProfile || summary.botProfile || {};
+          addChip(control, profile.label || profile.id || model.botProfile || 'Human');
+          addChip(control, model.positioning || model.classRange || 'positioning');
+          addChip(control, `${model.targetDistance || 0}px target`);
+          addChip(control, `${model.decisionInterval || 1}f decisions`);
+          appendSummaryLine(host, 'Control', control);
+        }
+
         if ((summary.warnings || []).length) {
           const warnings = document.createElement('div');
           warnings.className = 'warning-list';
@@ -1387,6 +1421,20 @@
         }
         if (basics.childElementCount > 0) {
           buildHost.appendChild(basics);
+        }
+
+        if (options.controlModel) {
+          const control = document.createElement('div');
+          control.className = 'item-chips';
+          const model = options.controlModel;
+          const profile = model.botProfile || {};
+          addChip(control, profile.label || profile.id || 'Human');
+          addChip(control, model.positioning || model.classRange || 'positioning');
+          addChip(control, `${model.targetDistance || 0}px target`);
+          if (model.notes) {
+            addChip(control, model.notes);
+          }
+          buildHost.appendChild(control);
         }
 
         const known = options.knownSpells || [];
@@ -1479,7 +1527,8 @@
         const counts = document.createElement('div');
         const enemyCount = plan.enemyMatrix ? Number(plan.enemyMatrix.count || 0) : 0;
         const previewCount = plan.mapGeneration && plan.mapGeneration.previews ? plan.mapGeneration.previews.length : 0;
-        counts.textContent = `${enemyCount} enemy probes, ${previewCount} map previews`;
+        const profileCount = botProfiles.length || 0;
+        counts.textContent = `${enemyCount} enemy probes, ${previewCount} map previews, ${profileCount} skill profiles`;
         appendSummaryLine(host, 'Coverage', counts);
 
         const commands = plan.commands || {};
@@ -1620,6 +1669,7 @@
         $('enemyPack').value = config.enemyPack || '';
         const goalId = config.analysisGoal || config.goalId || (analysisGoals.some((entry) => entry.id === config.goal) ? config.goal : '');
         $('analysisGoal').value = goalId || 'enemy-balance';
+        $('botProfile').value = config.botProfile || 'human';
         setPreset(config.preset || 'none');
         refreshLab();
       }
@@ -1898,6 +1948,9 @@
         if (config.goal && config.goal !== 'enemy-balance') {
           query.set('goal', config.goal);
         }
+        if (config.botProfile && config.botProfile !== 'human') {
+          query.set('bot', config.botProfile);
+        }
         if (autorun) {
           query.set('run', '1');
         }
@@ -1921,6 +1974,7 @@
           enemyGroup: query.get('enemyGroup') || 'overworld-ambient',
           enemyPack: query.get('enemyPack') || '',
           goal: query.get('goal') || 'enemy-balance',
+          botProfile: query.get('bot') || 'human',
           autorun: query.get('run') === '1',
         };
       }
@@ -2081,9 +2135,10 @@
           button.className = 'resource';
           const goal = resource.goal ? `<span>${resource.goal}</span>` : '';
           const pressure = resource.intensity && resource.intensity !== 'standard' ? ` ${resource.intensity}` : '';
+          const skill = resource.botProfile && resource.botProfile !== 'human' ? ` ${resource.botProfile}` : '';
           const summary = packageSummaryText(resource.packageSummary);
           const summaryNode = summary ? `<span>${summary}</span>` : '';
-          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}</code>`;
+          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${skill}</code>`;
           button.addEventListener('click', () => {
             setConfig(resource);
           });
@@ -2109,7 +2164,7 @@
             refreshLab();
           });
         });
-        ['className', 'level', 'seed', 'customLoadout', 'mapAlgorithm', 'encounter', 'intensity', 'customMonsters', 'enemyGroup', 'analysisGoal'].forEach((id) => {
+        ['className', 'level', 'seed', 'customLoadout', 'mapAlgorithm', 'encounter', 'intensity', 'customMonsters', 'enemyGroup', 'analysisGoal', 'botProfile'].forEach((id) => {
           $(id).addEventListener('input', refreshLab);
           $(id).addEventListener('change', refreshLab);
         });

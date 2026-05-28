@@ -79,6 +79,19 @@ local function normalize_map_selection(map_desc, map_profile, map_algorithm)
     return map_desc, map_profile, map_algorithm
 end
 
+local function normalize_bot_profile_name(value)
+    local profile_name = tostring(value or "human")
+    if profile_name == "" then
+        profile_name = "human"
+    end
+    for _, profile in ipairs(Catalog.bot_profiles or {}) do
+        if (profile.id or "") == profile_name then
+            return profile_name
+        end
+    end
+    return "human"
+end
+
 local function normalized_config(config)
     config = config or {}
     local map_desc, map_profile, map_algorithm = normalize_map_selection(
@@ -103,7 +116,7 @@ local function normalized_config(config)
         enemyPack = tostring(config.enemyPack or config.enemy_pack or ""),
         monsterConfigs = tostring(config.monsterConfigs or config.monster_configs or ""),
         monsterLevels = tostring(config.monsterLevels or config.monster_levels or config.levels or ""),
-        botProfile = tostring(config.botProfile or config.bot_profile or "human"),
+        botProfile = normalize_bot_profile_name(config.botProfile or config.bot_profile or "human"),
         runs = math.max(1, math.floor(tonumber(config.runs) or 5)),
         steps = math.max(1, math.floor(tonumber(config.steps) or 20000)),
     }
@@ -264,6 +277,14 @@ local function intensity_lookup()
     return lookup
 end
 
+local function bot_profile_lookup()
+    local lookup = {}
+    for _, profile in ipairs(Catalog.bot_profiles or {}) do
+        lookup[profile.id or ""] = profile
+    end
+    return lookup
+end
+
 local function selected_intensity(config)
     local intensity = intensity_lookup()[config.intensity or ""]
     if intensity then
@@ -275,6 +296,40 @@ local function selected_intensity(config)
         tempo = 1,
         damage = 1,
         summons = 1,
+    }
+end
+
+local function selected_bot_profile(config)
+    local lookup = bot_profile_lookup()
+    return lookup[config.botProfile or ""]
+        or lookup.human
+        or {
+            id = "human",
+            label = "Human",
+            decisionInterval = 4,
+            spellSkipChance = 0.12,
+            itemSkipChance = 0.14,
+            weaponSkipChance = 0.06,
+            movementNoiseChance = 0.07,
+        }
+end
+
+local function control_model_for(config)
+    local class = class_lookup()[config.className] or {}
+    local profile = selected_bot_profile(config)
+    return {
+        className = config.className,
+        classRole = class.role or "",
+        classRange = class.range or "",
+        positioning = class.positioning or "",
+        targetDistance = class.targetDistance or (class.range == "far" and 120 or 46),
+        notes = class.control_notes or class.balance_focus or "",
+        botProfile = profile,
+        decisionInterval = profile.decisionInterval or 1,
+        spellSkipChance = profile.spellSkipChance or 0,
+        itemSkipChance = profile.itemSkipChance or 0,
+        weaponSkipChance = profile.weaponSkipChance or 0,
+        movementNoiseChance = profile.movementNoiseChance or 0,
     }
 end
 
@@ -546,6 +601,7 @@ local function build_options_payload(config)
         schema = 1,
         config = config,
         classBuild = class_build_for(config.className),
+        controlModel = control_model_for(config),
         knownSpells = known_spells,
         upcomingSpells = upcoming_spells,
         loadout = loadout_for_config(config),
@@ -672,6 +728,11 @@ local function warnings_for(config, selected)
     if selected.encounter and selected.encounter.kind and selected.encounter.kind:find("baseline") then
         warnings[#warnings + 1] = "Baseline duels are control cases; use package variants for encounter tuning."
     end
+    if config.botProfile == "perfect" then
+        warnings[#warnings + 1] = "Perfect automation is a ceiling profile; use human/sloppy sweeps for fairness checks."
+    elseif config.botProfile == "sloppy" then
+        warnings[#warnings + 1] = "Sloppy automation is a lower-bound stress profile for dropped actions."
+    end
     if config.className == "Necromancer" then
         warnings[#warnings + 1] = "Necromancer damage taken must be read with regen-adjusted pressure."
     end
@@ -696,6 +757,7 @@ local function resource_entry(group, name, meta, goal, config, seed_offset, extr
         preset = config.preset,
         intensity = config.intensity,
         customLoadout = config.customLoadout,
+        botProfile = config.botProfile,
         mapDesc = config.mapDesc,
         mapProfile = config.mapProfile,
         mapAlgorithm = config.mapAlgorithm,
@@ -1019,6 +1081,7 @@ local function run_summary_payload(config)
         class = selected.class,
         level = selected.level or {value = config.level, label = tostring(config.level)},
         classBuild = class_build_for(config.className),
+        controlModel = control_model_for(config),
         knownSpells = known_spells,
         upcomingSpells = upcoming_spells,
         loadout = loadout_for_config(config),
@@ -1028,6 +1091,7 @@ local function run_summary_payload(config)
         intensity = selected.intensity,
         rhythms = rhythms,
         packageSummary = package_summary_from_rhythms(rhythms),
+        botProfile = selected_bot_profile(config),
         warnings = warnings_for(config, selected),
         args = launch_args(config),
         balanceArgs = balance_args(config),
@@ -1127,6 +1191,24 @@ local function package_matrix_payload(config)
                 50 + idx,
                 {
                     packageRole = "pressure-sweep",
+                }
+            )
+        end
+
+        for idx, profile in ipairs(Catalog.bot_profiles or {}) do
+            local next_config = package_base_config(config, selected_package)
+            next_config.botProfile = profile.id or "human"
+            resources[#resources + 1] = package_resource_entry(
+                "Selected package skill buffer",
+                profile.label or profile.id,
+                string.format("%s, %s automation", selected_package.label or selected_package.id, profile.id or "human"),
+                profile.description or "automated-player skill buffer comparison",
+                next_config,
+                selected_package,
+                60 + idx,
+                {
+                    packageRole = "skill-buffer",
+                    controlModel = control_model_for(next_config),
                 }
             )
         end
@@ -1245,6 +1327,25 @@ local function resource_matrix_payload(config)
         end
     end
 
+    for idx, profile in ipairs(Catalog.bot_profiles or {}) do
+        local next_config = {}
+        for key, value in pairs(config) do
+            next_config[key] = value
+        end
+        next_config.botProfile = profile.id or "human"
+        resources[#resources + 1] = resource_entry(
+            "Skill buffer sweep",
+            profile.label or profile.id,
+            string.format("%s automation, %s", profile.id or "human", selected_target_label),
+            profile.description or "automated-player skill buffer comparison",
+            next_config,
+            30 + idx,
+            {
+                controlModel = control_model_for(next_config),
+            }
+        )
+    end
+
     for idx, map in ipairs(late_maps()) do
         local next_config = {}
         for key, value in pairs(config) do
@@ -1331,6 +1432,8 @@ local function workspace_payload(config)
         analysisPlan = analysis_plan,
         packageMatrix = package_matrix_payload(config),
         resourceMatrix = resource_matrix_payload(config),
+        botProfiles = Catalog.bot_profiles or {},
+        controlModel = control_model_for(config),
         commands = analysis_plan.commands,
     }
 end

@@ -24,6 +24,7 @@ local function run_content_api_smoke()
     expect(#(catalog.classes or {}) >= 4, "catalog should expose classes")
     expect(catalog.class_builds and catalog.class_builds.Fighter, "catalog should expose class builds")
     expect(#(catalog.item_choices or {}) >= 4, "catalog should expose curated item choices")
+    expect(#(catalog.bot_profiles or {}) >= 4, "catalog should expose bot skill profiles")
     expect(#(catalog.analysis_goals or {}) >= 3, "catalog should expose analysis goals")
     expect(#(catalog.enemy_groups or {}) >= 3, "catalog should expose enemy groups")
     expect(#(catalog.enemy_packs or {}) >= 3, "catalog should expose enemy packs")
@@ -34,6 +35,8 @@ local function run_content_api_smoke()
     local has_mummoner_package = false
     local has_executioner_package = false
     local has_executioner_rescue_package = false
+    local has_human_bot_profile = false
+    local has_pyro_keepaway_model = false
     local has_executioner_baseline = false
     local has_predator_thicket = false
     local has_ruin_crossroads = false
@@ -42,6 +45,16 @@ local function run_content_api_smoke()
             has_predator_thicket = true
         elseif algorithm.id == "overworld-ruin-crossroads" then
             has_ruin_crossroads = true
+        end
+    end
+    for _, profile in ipairs(catalog.bot_profiles or {}) do
+        if profile.id == "human" and (profile.decisionInterval or 0) > 1 then
+            has_human_bot_profile = true
+        end
+    end
+    for _, class in ipairs(catalog.classes or {}) do
+        if class.id == "Pyrocaster" and class.range == "far" and (class.targetDistance or 0) >= 120 then
+            has_pyro_keepaway_model = true
         end
     end
     for _, encounter in ipairs(catalog.encounters or {}) do
@@ -62,6 +75,8 @@ local function run_content_api_smoke()
     expect(has_executioner_baseline, "catalog should mark the plain Executioner duel as a baseline")
     expect(has_executioner_package, "catalog should expose the Executioner blade package")
     expect(has_executioner_rescue_package, "catalog should expose the Executioner rescue package")
+    expect(has_human_bot_profile, "catalog should expose the human bot profile")
+    expect(has_pyro_keepaway_model, "catalog should expose ranged class control metadata")
     expect(has_predator_thicket, "catalog should expose the predator thicket overworld profile")
     expect(has_ruin_crossroads, "catalog should expose the ruin crossroads overworld profile")
 
@@ -92,6 +107,8 @@ local function run_content_api_smoke()
     expect(summary.packageSummary and summary.packageSummary.hasRescue, "summary should expose package rescue summary")
     expect(summary.packageSummary and summary.packageSummary.hasSummons, "summary should expose package summon summary")
     expect(summary.packageSummary and summary.packageSummary.hitsEscorts, "summary should expose ally-risk package summary")
+    expect(summary.controlModel and summary.controlModel.botProfile and summary.controlModel.botProfile.id == "human", "summary should expose selected human control model")
+    expect(summary.controlModel and summary.controlModel.classRange == "close", "summary should expose class positioning model")
 
     local executioner_baseline_config = [[{
         "className": "Templar",
@@ -116,12 +133,16 @@ local function run_content_api_smoke()
     local balance_args = parse_response("balance args", ContentApi.balance_args_json(config))
     expect(balance_args.args and balance_args.args[1] == "engine.StartBalanceRun", "balance args should target StartBalanceRun")
     local has_package_intensity = false
+    local has_bot_profile_arg = false
     for _, arg in ipairs(balance_args.args or {}) do
         if arg == "--package_intensity" then
             has_package_intensity = true
+        elseif arg == "--bot_profile" then
+            has_bot_profile_arg = true
         end
     end
     expect(has_package_intensity, "balance args should preserve package intensity")
+    expect(has_bot_profile_arg, "balance args should preserve bot profile")
 
     local loadout_options = parse_response("loadout options", ContentApi.loadout_options_json(config))
     expect(loadout_options.classBuild and loadout_options.classBuild.spells, "loadout options should expose class build")
@@ -258,6 +279,8 @@ local function run_content_api_smoke()
     local has_none_loadout = false
     local has_gragh_loadout = false
     local has_late_loadout = false
+    local has_perfect_skill_buffer = false
+    local has_sloppy_skill_buffer = false
     for _, resource in ipairs(matrix.resources or {}) do
         if resource.group == "Encounter sweep" and resource.encounter == "giant-chicken-duel" then
             has_chicken_resource = true
@@ -271,11 +294,15 @@ local function run_content_api_smoke()
             has_none_loadout = has_none_loadout or resource.preset == "none"
             has_gragh_loadout = has_gragh_loadout or resource.preset == "gragh"
             has_late_loadout = has_late_loadout or resource.preset == "late"
+        elseif resource.group == "Skill buffer sweep" and resource.encounter == "gragh-rescue-package" then
+            has_perfect_skill_buffer = has_perfect_skill_buffer or resource.botProfile == "perfect"
+            has_sloppy_skill_buffer = has_sloppy_skill_buffer or resource.botProfile == "sloppy"
         end
     end
     expect(has_chicken_resource, "matrix should include Giant Chicken package coverage")
     expect(has_mummoner_resource, "matrix should include Mummoner package coverage")
     expect(has_none_loadout and has_gragh_loadout and has_late_loadout, "matrix should include loadout sweep coverage")
+    expect(has_perfect_skill_buffer and has_sloppy_skill_buffer, "matrix should include skill-buffer sweep coverage")
 
     local package_matrix = parse_response("package matrix", ContentApi.package_matrix_json(config))
     expect((package_matrix.count or 0) == #(package_matrix.resources or {}), "package matrix count should match resources")
@@ -284,6 +311,7 @@ local function run_content_api_smoke()
     local has_package_baseline = false
     local has_package_class_sweep = false
     local has_package_pressure_sweep = false
+    local has_package_skill_buffer = false
     local has_rescue_check = false
     for _, resource in ipairs(package_matrix.resources or {}) do
         if resource.group == "Package baselines" and resource.encounter == "gragh-rescue-package" then
@@ -292,6 +320,8 @@ local function run_content_api_smoke()
             has_package_class_sweep = resource.packageSummary and resource.packageSummary.hasSummons
         elseif resource.group == "Selected package pressure sweep" and resource.intensity == "brutal" then
             has_package_pressure_sweep = resource.packageSummary and resource.packageSummary.fastestLoopFrames > 0
+        elseif resource.group == "Selected package skill buffer" and resource.botProfile == "sloppy" then
+            has_package_skill_buffer = resource.controlModel and resource.controlModel.botProfile and resource.controlModel.botProfile.id == "sloppy"
         elseif resource.group == "Rescue package checks" and resource.className == "Necromancer" then
             has_rescue_check = resource.packageSummary and resource.packageSummary.hitsEscorts
         end
@@ -299,6 +329,7 @@ local function run_content_api_smoke()
     expect(has_package_baseline, "package matrix should include package baselines with summaries")
     expect(has_package_class_sweep, "package matrix should include selected-package class sweeps")
     expect(has_package_pressure_sweep, "package matrix should include selected-package pressure sweeps")
+    expect(has_package_skill_buffer, "package matrix should include selected-package skill-buffer sweeps")
     expect(has_rescue_check, "package matrix should include rescue package checks")
 
     local enemy_options = parse_response("enemy options", ContentApi.enemy_options_json(config))
@@ -327,6 +358,8 @@ local function run_content_api_smoke()
     expect(workspace.mapGeneration and #(workspace.mapGeneration.previews or {}) >= 3, "workspace should expose map previews")
     expect(workspace.analysisPlan and workspace.analysisPlan.commands and workspace.analysisPlan.commands.classSweep, "workspace should expose analysis commands")
     expect(workspace.commands and workspace.commands.monsterEval, "workspace should expose top-level commands")
+    expect(workspace.botProfiles and #(workspace.botProfiles or {}) >= 4, "workspace should expose bot profiles")
+    expect(workspace.controlModel and workspace.controlModel.botProfile and workspace.controlModel.botProfile.id == "human", "workspace should expose selected control model")
     expect(workspace.packageMatrix and (workspace.packageMatrix.count or 0) >= 20, "workspace should expose package matrix resources")
     expect(workspace.resourceMatrix and (workspace.resourceMatrix.count or 0) == #(workspace.resourceMatrix.resources or {}), "workspace should expose generated resources")
 
