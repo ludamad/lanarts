@@ -194,6 +194,10 @@ Balance simulations:
     refills, anti-repeat rerolls, dash-window frames, and effective cooldown
     refreshes so exciting D6 windows can be checked without hiding class power
     inside RNG streaks.
+    The fast native smoke also includes a fixed-seed three-run Dicebinder
+    package batch that previously pushed procedural dice FX outside arena
+    bounds; map-generated fx_bounds keep those animated bursts visible without
+    tripping native instance-bound assertions.
     The content API smoke also honors LANARTS_SKIP_BUILD=1, so Lua/catalog
     changes can be checked against the existing native binary without a rebuild.
     For ad hoc tuning, use ./e2e_tests/run_content_lab_native.sh with the same

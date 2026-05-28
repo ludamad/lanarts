@@ -58,6 +58,8 @@ grep -q "dicebinder_update_roll_surge" runtime/spells/Effects.moon
 grep -q "draw_die_face" runtime/ui/ProceduralEffects.lua
 grep -q "trail_roll" runtime/ui/ProceduralEffects.lua
 grep -q "surge_stage" runtime/ui/ProceduralEffects.lua
+grep -q "safe_xy_for_map" runtime/ui/ImpactFX.lua
+grep -q "fx_bounds" runtime/maps/NewMaps.moon
 grep -q "\"MARGIN\"" runtime/objects/ContentLabHazards.lua
 grep -q "\"SYNC\"" runtime/objects/ContentLabHazards.lua
 grep -q "orbiting die ghosts" web/content_lab/README.md

@@ -64,6 +64,18 @@ run_balance "$headless_exe" dicebinder \
     --encounter gragh-duel \
     --package_intensity high
 
+run_balance "$headless_exe" dicebinder_fx_bounds \
+    engine.StartBalanceRun \
+    --steps 720 \
+    --runs 3 \
+    --seed 22680 \
+    --classes Dicebinder \
+    --levels 5 \
+    --loadout_preset late \
+    --bot_profile human \
+    --encounter gragh-duel \
+    --package_intensity high
+
 run_balance "$headless_exe" rescue \
     engine.StartBalanceRun \
     --steps 700 \
@@ -77,9 +89,12 @@ run_balance "$headless_exe" rescue \
     --package_components escort,orbit,pulse,sweep,rescue
 
 test -s "$temp_dir/dicebinder_runs.csv"
+test -s "$temp_dir/dicebinder_fx_bounds_runs.csv"
 test -s "$temp_dir/rescue_runs.csv"
 grep -q "Dicebinder" "$temp_dir/dicebinder_runs.csv"
 grep -q "gragh-duel" "$temp_dir/dicebinder_runs.json"
+grep -q "22682" "$temp_dir/dicebinder_fx_bounds_runs.csv"
+grep -q "avg_dice_roll_animation_frames" "$temp_dir/dicebinder_fx_bounds_classes.csv"
 grep -q "package_pressure_max_count" "$temp_dir/dicebinder_runs.csv"
 grep -q "package_micro_score" "$temp_dir/dicebinder_runs.csv"
 grep -q "package_micro_counter_windows" "$temp_dir/dicebinder_runs.csv"

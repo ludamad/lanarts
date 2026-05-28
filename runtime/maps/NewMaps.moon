@@ -52,6 +52,13 @@ generate_game_map = (map, place_object, place_monsters) ->
         instances: map.instances
         wandering_enabled: map.wandering_enabled
     }
+    if map.size
+        M.fx_bounds = {
+            1
+            1
+            map.size[1] * Map.TILE_SIZE - 2
+            map.size[2] * Map.TILE_SIZE - 2
+        }
     return M
 
 connect_edges = (map, rng, conf, area, edges) ->

@@ -11,8 +11,50 @@ local function copy_xy(xy)
     return {xy[1], xy[2]}
 end
 
+local function clamp(value, lo, hi)
+    if hi and hi < lo then
+        hi = lo
+    end
+    if value < lo then
+        return lo
+    elseif hi and value > hi then
+        return hi
+    end
+    return value
+end
+
 local function object_map(args)
     return args and (args.map or (args.obj and args.obj.map))
+end
+
+local function fx_bounds(map)
+    if not map then
+        return nil
+    end
+    if map.fx_bounds then
+        return map.fx_bounds
+    end
+    if map.content_lab_spawn_bounds then
+        return map.content_lab_spawn_bounds
+    end
+    if map._width and map._height then
+        return {1, 1, map._width - 2, map._height - 2}
+    end
+    return nil
+end
+
+local function safe_xy_for_map(map, xy)
+    if not xy then
+        return nil
+    end
+    local bounds = fx_bounds(map)
+    if bounds then
+        return {
+            clamp(xy[1], bounds[1], bounds[3]),
+            clamp(xy[2], bounds[2], bounds[4]),
+        }
+    end
+    return {math.max(1, xy[1]), math.max(1, xy[2])}
 end
 
 function M.world_burst(args)
@@ -21,9 +63,10 @@ function M.world_burst(args)
     if not map or not args.xy then
         return nil
     end
+    local xy = safe_xy_for_map(map, args.xy)
     return GameObject.object_create {
         map = map,
-        xy = copy_xy(args.xy),
+        xy = xy,
         radius = 1,
         solid = false,
         depth = args.depth or WORLD_DEPTH,

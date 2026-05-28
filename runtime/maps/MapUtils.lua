@@ -217,6 +217,14 @@ end
 function M.game_map_create(map, wandering_enabled)
     if wandering_enabled == nil then wandering_enabled = false end
     local game_map = Map.create { map = map, label = map.label, instances = map.instances, wandering_enabled = wandering_enabled }
+    if map.size then
+        game_map.fx_bounds = {
+            1,
+            1,
+            map.size[1] * Map.TILE_SIZE - 2,
+            map.size[2] * Map.TILE_SIZE - 2,
+        }
+    end
     for _, post_game_map in ipairs(map.post_game_map) do
         post_game_map(game_map)
     end
