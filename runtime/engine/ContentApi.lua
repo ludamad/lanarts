@@ -1562,6 +1562,157 @@ local function threat_read_for(rhythm)
     return "fight rhythm"
 end
 
+local function micro_skill_buffer(control_model, rhythm)
+    local reaction_tax = math.max(0, (tonumber(control_model.decisionInterval) or 1) - 1)
+    local error_chance = math.max(
+        tonumber(control_model.spellSkipChance) or 0,
+        tonumber(control_model.itemSkipChance) or 0,
+        tonumber(control_model.weaponSkipChance) or 0,
+        tonumber(control_model.movementNoiseChance) or 0
+    )
+    local window = rhythm.clutchWindow or rhythm.lateWindow or rhythm.active or rhythm.duration or 0
+    return {
+        reactionTaxFrames = reaction_tax,
+        dropRiskPct = math.floor(error_chance * 100 + 0.5),
+        windowFrames = window,
+        effectiveWindowFrames = math.max(0, (tonumber(window) or 0) - reaction_tax),
+    }
+end
+
+local function micro_action_for(rhythm, control_model)
+    local class_name = control_model.className or ""
+    local class_range = control_model.classRange or ""
+    local target_distance = tonumber(control_model.targetDistance) or 0
+    local close_class = class_range ~= "far"
+
+    if rhythm.id == "rescue" then
+        if class_name == "Necromancer" then
+            return {
+                priority = 1,
+                action = "Hold Pain range until the line warns, then body-block late and let regen offset the block hit.",
+                posture = "regen attrition",
+                failure = "ally hit before regen-adjusted damage says the trade was worth it",
+                telemetry = {"avg_package_rescue_clutch_rate", "avg_package_rescue_pull_rate", "avg_necromancer_regen_offset_pct"},
+            }
+        elseif close_class then
+            return {
+                priority = 1,
+                action = "Stay close enough to threaten the primary, then cut into the rescue line during the clutch window.",
+                posture = "close intercept",
+                failure = "primary dies but ally saves collapse under real reaction delay",
+                telemetry = {"avg_package_rescue_save_rate", "avg_package_rescue_clutch_rate", "avg_rescue_intercept_frames"},
+            }
+        end
+        return {
+            priority = 1,
+            action = "Hold keep-away range, then deliberately break spacing to body-block the line before returning to range.",
+            posture = "ranged rescue commit",
+            failure = "caster wins only when the rescue lane is ignored or the enemy cannot punish the commit",
+            telemetry = {"avg_package_rescue_save_rate", "avg_ranged_keepaway_frames", "avg_ranged_close_enemy_frames"},
+        }
+    elseif rhythm.id == "summon" then
+        if close_class then
+            return {
+                priority = 2,
+                action = "Swap off the primary during the portal warning, clear the add before the cap fills, then re-enter contact.",
+                posture = "target swap",
+                failure = "primary uptime stays perfect while add cap is saturated",
+                telemetry = {"avg_max_visible_enemies", "kills_per_1000_combat_frames"},
+            }
+        end
+        return {
+            priority = 2,
+            action = "Kite the primary around the portal, tag the spawn early, and reset to keep-away range before the next beat.",
+            posture = "kite cleanup",
+            failure = "adds never force lost casting distance",
+            telemetry = {"avg_max_visible_enemies", "kills_per_1000_combat_frames", "avg_ranged_keepaway_frames"},
+        }
+    elseif rhythm.id == "pulse" then
+        if close_class then
+            return {
+                priority = 3,
+                action = "Drop contact during windup, drag the circle away from ally lanes, then re-engage after active frames.",
+                posture = "melee reset",
+                failure = "melee can facetank the pulse without giving up pressure",
+                telemetry = {"avg_min_hp_pct", "combat_frame_rate"},
+            }
+        end
+        return {
+            priority = 3,
+            action = "Keep casting until windup starts, sidestep out, and preserve roughly " .. tostring(target_distance) .. "px spacing.",
+            posture = "caster sidestep",
+            failure = "AOE never collapses keep-away uptime",
+            telemetry = {"avg_ranged_keepaway_frames", "avg_ranged_close_enemy_frames"},
+        }
+    elseif rhythm.id == "orbit" then
+        if close_class then
+            return {
+                priority = 4,
+                action = "Fight inside the orbit lanes only when the primary is vulnerable; otherwise stutter-step around the rotating path.",
+                posture = "close lane read",
+                failure = "orb damage is ignorable contact tax",
+                telemetry = {"avg_min_hp_pct", "combat_frame_rate"},
+            }
+        end
+        return {
+            priority = 4,
+            action = "Use the orbit lane as the spacing boundary and punish when the lane rotates off the casting angle.",
+            posture = "ranged lane read",
+            failure = "orbs do not constrain caster angle or distance",
+            telemetry = {"avg_ranged_keepaway_frames", "avg_min_hp_pct"},
+        }
+    elseif rhythm.id == "escort" then
+        return {
+            priority = 5,
+            action = "Keep the ally inside reachable space without letting it become the primary damage sponge.",
+            posture = "ally tether",
+            failure = "package clears while ally HP is irrelevant",
+            telemetry = {"avg_package_escort_hp_pct"},
+        }
+    end
+
+    return {
+        priority = 9,
+        action = "Read the package beat, trade only inside the class posture, and check whether the bot profile is carrying the clear.",
+        posture = control_model.positioning or class_range or "class posture",
+        failure = "clear rate hides the actual micro requirement",
+        telemetry = {"win_rate", "avg_min_hp_pct"},
+    }
+end
+
+local function micro_plan_for(rhythms, control_model)
+    local rows = {}
+    for index, rhythm in ipairs(rhythms or {}) do
+        local action = micro_action_for(rhythm, control_model or {})
+        local buffer = micro_skill_buffer(control_model or {}, rhythm)
+        rows[#rows + 1] = {
+            id = rhythm.id,
+            label = rhythm.label or rhythm.id,
+            priority = action.priority or 9,
+            order = index,
+            firstFrame = rhythm.offset or 0,
+            loopFrames = rhythm.interval or 0,
+            read = threat_read_for(rhythm),
+            target = threat_target_for(rhythm),
+            action = action.action,
+            posture = action.posture,
+            failure = action.failure,
+            telemetry = action.telemetry or {},
+            reactionTaxFrames = buffer.reactionTaxFrames,
+            dropRiskPct = buffer.dropRiskPct,
+            windowFrames = buffer.windowFrames,
+            effectiveWindowFrames = buffer.effectiveWindowFrames,
+        }
+    end
+    table.sort(rows, function(a, b)
+        if a.priority == b.priority then
+            return (a.order or 0) < (b.order or 0)
+        end
+        return (a.priority or 9) < (b.priority or 9)
+    end)
+    return rows
+end
+
 local function threat_windows_for(rhythms)
     local rows = {}
     for _, rhythm in ipairs(rhythms or {}) do
@@ -1709,6 +1860,7 @@ local function fight_setup_payload(config)
     local rhythms = encounter_rhythms(encounter, selected.intensity)
     local package_summary = package_summary_from_rhythms(rhythms)
     local control_model = control_model_for(config)
+    local micro_plan = micro_plan_for(rhythms, control_model)
     return {
         schema = 1,
         config = config,
@@ -1724,6 +1876,7 @@ local function fight_setup_payload(config)
         },
         loadout = loadout_for_config(config),
         threats = threat_windows_for(rhythms),
+        microPlan = micro_plan,
         packageSummary = package_summary,
         telemetry = telemetry_watch_for(config, package_summary),
         warnings = warnings_for(config, selected),
@@ -2447,6 +2600,7 @@ local function presentation_payload(config)
         },
         telemetry = fight_setup.telemetry or {},
         threats = fight_setup.threats or {},
+        microPlan = fight_setup.microPlan or {},
         warnings = run_summary.warnings or {},
     }
 end

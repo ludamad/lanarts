@@ -136,8 +136,12 @@ local function run_content_api_smoke()
     expect(fight_setup.role and fight_setup.role.positioning == "regen attrition", "fight setup should expose class posture")
     expect(fight_setup.packageSummary and fight_setup.packageSummary.hasRescue, "fight setup should expose rescue package summary")
     expect(#(fight_setup.telemetry or {}) >= 10, "fight setup should expose telemetry watch fields")
+    expect(#(fight_setup.microPlan or {}) >= 3, "fight setup should expose per-rhythm micro plan rows")
     local has_fight_rescue_window = false
     local has_fight_regen_metric = false
+    local has_rescue_micro = false
+    local has_necro_regen_micro = false
+    local has_effective_window = false
     for _, threat in ipairs(fight_setup.threats or {}) do
         if threat.id == "rescue" and (threat.pullFrames or 0) > 0 then
             has_fight_rescue_window = true
@@ -148,8 +152,18 @@ local function run_content_api_smoke()
             has_fight_regen_metric = true
         end
     end
+    for _, row in ipairs(fight_setup.microPlan or {}) do
+        if row.id == "rescue" then
+            has_rescue_micro = tostring(row.action or ""):find("body%-block") ~= nil
+            has_necro_regen_micro = tostring(row.action or ""):find("regen") ~= nil
+            has_effective_window = (row.effectiveWindowFrames or 0) > 0 and (row.reactionTaxFrames or 0) > 0
+        end
+    end
     expect(has_fight_rescue_window, "fight setup should expose rescue timing windows")
     expect(has_fight_regen_metric, "fight setup should expose necromancer regen telemetry")
+    expect(has_rescue_micro, "fight setup should explain the rescue body-block action")
+    expect(has_necro_regen_micro, "fight setup should preserve necromancer regen-specific micro")
+    expect(has_effective_window, "fight setup should include human-skill effective windows")
 
     local component_config = [[{
         "className": "Fighter",
@@ -544,6 +558,7 @@ local function run_content_api_smoke()
     expect(has_enemy_card, "presentation enemy cards should expose monster-eval commands")
     expect(presentation.telemetry and #presentation.telemetry >= 10, "presentation should expose telemetry watch rows")
     expect(presentation.threats and #presentation.threats >= 2, "presentation should expose threat timing rows")
+    expect(presentation.microPlan and #presentation.microPlan >= 3, "presentation should expose micro plan rows")
 
     print(string.format(
         "Content API smoke complete: %d classes, %d maps, %d encounters, %d generated resources.",

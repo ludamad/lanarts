@@ -478,6 +478,35 @@
       font-size: 11px;
     }
 
+    .micro-card {
+      display: grid;
+      gap: 5px;
+      padding: 7px;
+      border: 1px solid #303841;
+      border-radius: 6px;
+      background: #11161b;
+    }
+
+    .micro-card strong {
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    .micro-card code {
+      color: var(--accent-2);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .micro-card span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
     .summary-line {
       display: grid;
       grid-template-columns: 78px minmax(0, 1fr);
@@ -1569,6 +1598,52 @@
         host.appendChild(row);
       }
 
+      function microPlanCard(row) {
+        const card = document.createElement('div');
+        card.className = 'micro-card';
+        const title = document.createElement('strong');
+        title.textContent = `${row.label || row.id || 'Beat'} - ${row.posture || row.read || 'micro'}`;
+        const timing = document.createElement('code');
+        const window = row.effectiveWindowFrames !== undefined
+          ? `${row.effectiveWindowFrames}f effective`
+          : `${row.windowFrames || 0}f window`;
+        timing.textContent = `${row.firstFrame || 0}f first / ${row.loopFrames || 0}f loop / ${window}`;
+        const action = document.createElement('span');
+        action.textContent = row.action || row.read || '';
+        card.appendChild(title);
+        card.appendChild(timing);
+        if (action.textContent) {
+          card.appendChild(action);
+        }
+        const telemetry = (row.telemetry || []).slice(0, 3);
+        const chips = chipRow([
+          row.target,
+          row.read,
+          row.reactionTaxFrames ? `${row.reactionTaxFrames}f reaction tax` : '',
+          row.dropRiskPct ? `${row.dropRiskPct}% drop risk` : '',
+          ...telemetry,
+        ]);
+        if (chips.childElementCount) {
+          card.appendChild(chips);
+        }
+        if (row.failure) {
+          const failure = document.createElement('span');
+          failure.textContent = row.failure;
+          card.appendChild(failure);
+        }
+        return card;
+      }
+
+      function renderMicroPlanGrid(rows, limit) {
+        const grid = document.createElement('div');
+        grid.className = 'threat-grid';
+        const list = rows || [];
+        list.slice(0, limit || list.length).forEach((row) => {
+          grid.appendChild(microPlanCard(row));
+        });
+        return grid;
+      }
+
       function commandText(command) {
         return (command || []).map((arg) => {
           const text = String(arg === undefined || arg === null ? '' : arg);
@@ -1722,6 +1797,11 @@
           const profile = setup.role.botProfile || {};
           addChip(role, profile.label || profile.id || 'Human');
           appendSummaryLine(host, 'Role', role);
+        }
+
+        const microPlan = setup.microPlan || [];
+        if (microPlan.length) {
+          appendSummaryLine(host, 'Micro', renderMicroPlanGrid(microPlan, 6));
         }
 
         const threats = setup.threats || [];
@@ -2071,6 +2151,15 @@
         }
         if (watch.childElementCount > 1) {
           host.appendChild(watch);
+        }
+
+        const microPlan = payload.microPlan || [];
+        if (microPlan.length) {
+          const microSection = document.createElement('div');
+          microSection.className = 'presentation-section';
+          appendBoardTitle(microSection, 'Micro Plan');
+          microSection.appendChild(renderMicroPlanGrid(microPlan, 4));
+          host.appendChild(microSection);
         }
 
         const previews = payload.mapPreviews || [];
