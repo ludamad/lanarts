@@ -1611,10 +1611,27 @@
         addChip(row, `peak ${preview.peakStack || 0}`);
         addChip(row, `overlap ${pctText(preview.overlapRate)}`);
         addChip(row, `${preview.overlapFrames || 0}/${preview.horizonFrames || 0}f`);
+        if (preview.diagnosis && preview.diagnosis.label) {
+          addChip(row, preview.diagnosis.label);
+        }
         if (preview.firstOverlapFrame !== undefined && preview.firstOverlapFrame !== null) {
           addChip(row, `first ${preview.firstOverlapFrame}f`);
         }
         return row;
+      }
+
+      function pressureDiagnosisNotes(preview) {
+        const notes = preview && preview.diagnosis && Array.isArray(preview.diagnosis.notes)
+          ? preview.diagnosis.notes
+          : [];
+        const list = document.createElement('div');
+        list.className = 'warning-list';
+        notes.slice(0, 4).forEach((note) => {
+          const chip = document.createElement('span');
+          chip.textContent = note;
+          list.appendChild(chip);
+        });
+        return list;
       }
 
       function renderPressureWindows(preview, limit) {
@@ -1747,6 +1764,9 @@
           if (summary.packageSummary.predictedOverlapRate) {
             addChip(packageInfo, `overlap ${pctText(summary.packageSummary.predictedOverlapRate)}`);
           }
+          if (summary.packageSummary.predictedPressureLabel) {
+            addChip(packageInfo, summary.packageSummary.predictedPressureLabel);
+          }
           if (summary.packageSummary.hasRescue) {
             addChip(packageInfo, `${summary.packageSummary.rescueClutchWindow || 0}f clutch`);
             if (summary.packageSummary.rescuePullFrames) {
@@ -1846,6 +1866,10 @@
 
         if (setup.pressurePreview && (setup.pressurePreview.peakStack || setup.pressurePreview.overlapFrames)) {
           appendSummaryLine(host, 'Density', pressureChips(setup.pressurePreview));
+          const diagnosis = pressureDiagnosisNotes(setup.pressurePreview);
+          if (diagnosis.childElementCount) {
+            appendSummaryLine(host, 'Pressure', diagnosis);
+          }
           if ((setup.pressurePreview.windows || []).length) {
             appendSummaryLine(host, 'Stacks', renderPressureWindows(setup.pressurePreview, 5));
           }
@@ -2210,6 +2234,10 @@
           pressureSection.className = 'presentation-section';
           appendBoardTitle(pressureSection, 'Pressure Density');
           pressureSection.appendChild(pressureChips(payload.pressurePreview));
+          const diagnosis = pressureDiagnosisNotes(payload.pressurePreview);
+          if (diagnosis.childElementCount) {
+            pressureSection.appendChild(diagnosis);
+          }
           const windows = renderPressureWindows(payload.pressurePreview, 4);
           if (windows.childElementCount) {
             pressureSection.appendChild(windows);

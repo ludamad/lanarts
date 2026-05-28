@@ -1496,6 +1496,58 @@ local function pressure_labels_for_frame(rhythms, frame)
     return labels
 end
 
+local function pressure_diagnosis_for(rhythms, preview)
+    local ids = {}
+    for _, rhythm in ipairs(rhythms or {}) do
+        ids[rhythm.id or ""] = true
+    end
+
+    local peak = tonumber(preview.peakStack) or 0
+    local overlap_rate = tonumber(preview.overlapRate) or 0
+    local rhythm_count = #(rhythms or {})
+    local label
+    local severity
+    local notes = {}
+
+    if rhythm_count == 0 then
+        label = "No package pressure"
+        severity = "none"
+        notes[#notes + 1] = "No package rhythms are selected."
+    elseif peak >= 4 or overlap_rate >= 0.45 then
+        label = "Overloaded"
+        severity = "danger"
+        notes[#notes + 1] = "Many windows overlap; use this as a stress target, not a default baseline."
+    elseif peak >= 3 or overlap_rate >= 0.18 then
+        label = "Stacked micro"
+        severity = "strong"
+        notes[#notes + 1] = "Multiple package decisions overlap often enough to test real micro."
+    elseif peak >= 2 and overlap_rate >= 0.06 then
+        label = "Readable overlap"
+        severity = "ok"
+        notes[#notes + 1] = "Package has overlap, but the stack should remain readable."
+    else
+        label = "Serial beats"
+        severity = "light"
+        notes[#notes + 1] = "Rhythms rarely overlap; the fight may feel like isolated mechanics."
+    end
+
+    if not ids.rescue then
+        notes[#notes + 1] = "No rescue lane; this will not test pull/body-block saves."
+    end
+    if not ids.summon then
+        notes[#notes + 1] = "No add wave; this will not test target-swap cleanup pressure."
+    end
+    if ids.rescue and ids.summon and peak < 2 then
+        notes[#notes + 1] = "Rescue and add pressure do not overlap in the preview horizon."
+    end
+
+    return {
+        label = label,
+        severity = severity,
+        notes = notes,
+    }
+end
+
 local function pressure_preview_for(rhythms, horizon_frames)
     rhythms = rhythms or {}
     local horizon = math.max(120, math.floor(tonumber(horizon_frames) or 720))
@@ -1551,7 +1603,7 @@ local function pressure_preview_for(rhythms, horizon_frames)
         limited_windows[#limited_windows + 1] = window
     end
 
-    return {
+    local preview = {
         horizonFrames = horizon,
         peakStack = peak_stack,
         firstPeakFrame = first_peak,
@@ -1560,6 +1612,8 @@ local function pressure_preview_for(rhythms, horizon_frames)
         firstOverlapFrame = first_overlap,
         windows = limited_windows,
     }
+    preview.diagnosis = pressure_diagnosis_for(rhythms, preview)
+    return preview
 end
 
 local function package_summary_from_rhythms(rhythms)
@@ -1613,6 +1667,8 @@ local function package_summary_from_rhythms(rhythms)
         predictedOverlapFrames = pressure.overlapFrames,
         predictedOverlapRate = pressure.overlapRate,
         predictedFirstOverlapFrame = pressure.firstOverlapFrame,
+        predictedPressureLabel = pressure.diagnosis and pressure.diagnosis.label or "",
+        predictedPressureSeverity = pressure.diagnosis and pressure.diagnosis.severity or "",
     }
 end
 
@@ -2527,6 +2583,9 @@ local function resource_summary_chips(resource)
         end
         if summary.predictedOverlapRate and summary.predictedOverlapRate > 0 then
             add("overlap " .. tostring(math.floor(summary.predictedOverlapRate * 100 + 0.5)) .. "%")
+        end
+        if summary.predictedPressureLabel and summary.predictedPressureLabel ~= "" then
+            add(summary.predictedPressureLabel)
         end
         if summary.hasRescue then
             add("rescue")
