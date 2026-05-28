@@ -25,6 +25,7 @@ local function run_content_api_smoke()
     expect(catalog.class_builds and catalog.class_builds.Fighter, "catalog should expose class builds")
     expect(#(catalog.item_choices or {}) >= 4, "catalog should expose curated item choices")
     expect(catalog.build_archetypes and catalog.build_archetypes.Fighter and #(catalog.build_archetypes.Fighter or {}) >= 2, "catalog should expose build archetypes")
+    expect(catalog.action_guides and catalog.action_guides.Fighter and catalog.action_guides.Fighter.primary, "catalog should expose class action guides")
     expect(#(catalog.bot_profiles or {}) >= 4, "catalog should expose bot skill profiles")
     expect(#(catalog.package_component_sets or {}) >= 5, "catalog should expose package component sets")
     expect(#(catalog.micro_drills or {}) >= 5, "catalog should expose micro drills")
@@ -200,6 +201,29 @@ local function run_content_api_smoke()
     expect(has_rescue_micro, "fight setup should explain the rescue body-block action")
     expect(has_necro_regen_micro, "fight setup should preserve necromancer regen-specific micro")
     expect(has_effective_window, "fight setup should include human-skill effective windows")
+    expect(fight_setup.actionGuide and #(fight_setup.actionGuide.actions or {}) >= 3, "fight setup should expose action guide rows")
+
+    local action_guide = parse_response("action guide", ContentApi.action_guide_json(config))
+    local has_regen_action = false
+    local has_rescue_call = false
+    for _, action in ipairs(action_guide.actions or {}) do
+        if action.name == "Baleful Regeneration" and action.beats and action.beats.rescue then
+            has_regen_action = true
+        end
+    end
+    for _, beat in ipairs(action_guide.beatPlan or {}) do
+        if beat.id == "rescue" then
+            for _, call in ipairs(beat.calls or {}) do
+                if call.name == "Baleful Regeneration" or call.name == "Pain" then
+                    has_rescue_call = true
+                end
+            end
+        end
+    end
+    expect(action_guide.stance and action_guide.stance.positioning == "regen attrition", "action guide should expose class stance")
+    expect(has_regen_action, "action guide should expose regen as a rescue-relevant action")
+    expect(has_rescue_call, "action guide should attach concrete action calls to rescue beats")
+    expect(action_guide.warnings and #(action_guide.warnings or {}) >= 1, "action guide should expose class-specific warnings")
 
     local component_config = [[{
         "className": "Fighter",
@@ -650,6 +674,7 @@ local function run_content_api_smoke()
     expect(workspace.controlModel and workspace.controlModel.botProfile and workspace.controlModel.botProfile.id == "human", "workspace should expose selected control model")
     expect(workspace.packageMatrix and (workspace.packageMatrix.count or 0) >= 20, "workspace should expose package matrix resources")
     expect(workspace.resourceMatrix and (workspace.resourceMatrix.count or 0) == #(workspace.resourceMatrix.resources or {}), "workspace should expose generated resources")
+    expect(workspace.actionGuide and #(workspace.actionGuide.beatPlan or {}) >= 1, "workspace should expose action guide")
 
     local presentation = parse_response("presentation", ContentApi.presentation_json(config))
     expect(presentation.selected and presentation.selected.objective and presentation.selected.objective.primary == "Gragh", "presentation should expose selected objective")
@@ -657,6 +682,8 @@ local function run_content_api_smoke()
     expect(presentation.commandPreviews and presentation.commandPreviews.launch and presentation.commandPreviews.launch.text:find("engine.StartLanarts"), "presentation should expose launch command text")
     expect(presentation.commandPreviews and presentation.commandPreviews.balance and presentation.commandPreviews.balance.text:find("engine.StartBalanceRun"), "presentation should expose balance command text")
     expect(presentation.mapPreviews and #presentation.mapPreviews >= 3, "presentation should expose map preview cards")
+    expect(presentation.actionGuide and #(presentation.actionGuide.actions or {}) >= 3, "presentation should expose action guide")
+    expect(presentation.beatPlan and #(presentation.beatPlan or {}) >= 1, "presentation should expose action beat plan")
     local has_map_preview_threat_card = false
     for _, card in ipairs(presentation.mapPreviews or {}) do
         if card.threatProfile and (card.threatProfile.score or 0) > 0 then

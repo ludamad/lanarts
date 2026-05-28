@@ -13,6 +13,8 @@ local MONSTER_EVAL_CONFIG_BY_CLASS = {
 }
 
 local DEFAULT_MONSTER_EVAL_CONFIGS = "BaseFighter,BaseNecromancer,BaseStormcaller,BasePyrocaster"
+local action_guide_payload
+local telemetry_watch_for
 
 local function parse_json_object(raw_json)
     if not raw_json or raw_json == "" then
@@ -963,6 +965,7 @@ local function build_options_payload(config)
         upcomingSpells = upcoming_spells,
         loadout = loadout,
         loadoutReadiness = loadout_readiness_for_config(config, loadout, known_spells),
+        actionGuide = action_guide_payload and action_guide_payload(config) or nil,
         buildArchetypes = build_archetype_rows(config),
         itemChoices = item_choices_for_config(config),
         args = launch_args(config),
@@ -2019,7 +2022,7 @@ local function pressure_diagnosis_for(rhythms, preview)
         severity = "ok"
         notes[#notes + 1] = "Package has overlap, but the stack should remain readable."
     else
-        label = "Serial beats"
+        label = "Serial timings"
         severity = "light"
         notes[#notes + 1] = "Rhythms rarely overlap; the fight may feel like isolated mechanics."
     end
@@ -2271,7 +2274,7 @@ local function micro_action_for(rhythm, control_model)
         end
         return {
             priority = 2,
-            action = "Kite the primary around the portal, tag the spawn early, and reset to keep-away range before the next beat.",
+            action = "Kite the primary around the portal, tag the spawn early, and reset to keep-away range before the next timed threat.",
             posture = "kite cleanup",
             failure = "adds never force lost casting distance",
             telemetry = {"avg_max_visible_enemies", "kills_per_1000_combat_frames", "avg_ranged_keepaway_frames"},
@@ -2322,7 +2325,7 @@ local function micro_action_for(rhythm, control_model)
 
     return {
         priority = 9,
-        action = "Read the package beat, trade only inside the class posture, and check whether the bot profile is carrying the clear.",
+        action = "Read the package timing, trade only inside the class posture, and check whether the bot profile is carrying the clear.",
         posture = control_model.positioning or class_range or "class posture",
         failure = "clear rate hides the actual micro requirement",
         telemetry = {"win_rate", "avg_min_hp_pct"},
@@ -2386,6 +2389,206 @@ local function threat_windows_for(rhythms)
         }
     end
     return rows
+end
+
+local function class_action_guide(class_name)
+    return (Catalog.action_guides or {})[class_name or ""] or {}
+end
+
+local function action_row(kind, slot, name, label, role, level, spec)
+    spec = spec or {}
+    return {
+        kind = kind,
+        slot = slot,
+        input = spec.input or slot,
+        name = name or label or slot,
+        label = label or name or slot,
+        role = role or "",
+        level = level,
+        purpose = spec.purpose or "",
+        timing = spec.timing or "",
+        tags = copy_array(spec.tags or {}),
+        telemetry = copy_array(spec.telemetry or {}),
+        beats = copy_object(spec.beats or {}),
+    }
+end
+
+local function primary_action_row_for(config, guide)
+    local class_build = class_build_for(config.className)
+    local spec = guide.primary or {}
+    local label = spec.label or class_build.starting_weapon or "Weapon"
+    return action_row("primary", "weapon", class_build.starting_weapon or "Weapon", label, "primary", 1, spec)
+end
+
+local function spell_action_rows_for(class_name, known_spells)
+    local guide = class_action_guide(class_name)
+    local rows = {}
+    for idx, spell in ipairs(known_spells or {}) do
+        local spec = guide.spells and guide.spells[spell.name or ""] or {}
+        local row = action_row("spell", "spell" .. tostring(idx), spell.name, spell.name, spell.role, spell.level, spec)
+        row.input = spec.input or ("Spell " .. tostring(idx))
+        rows[#rows + 1] = row
+    end
+    return rows
+end
+
+local function loadout_has_item(loadout, needle)
+    needle = tostring(needle or ""):lower()
+    for _, spec in ipairs(loadout and loadout.items or {}) do
+        local item = tostring(spec.item or ""):lower()
+        if item:find(needle, 1, true) then
+            return true
+        end
+    end
+    return false
+end
+
+local function consumable_action_rows(loadout, package_summary)
+    local rows = {}
+    if loadout_has_item(loadout, "health potion") then
+        rows[#rows + 1] = action_row("item", "item", "Health Potion", "Health Potion", "survival", nil, {
+            input = "Item",
+            purpose = "Emergency survival buffer; do not let potion use hide enemy damage or failed micro.",
+            timing = package_summary and package_summary.hasRescue
+                and "After a rescue block if the next timed threat is not already firing."
+                or "After a damage window, before re-entering contact.",
+            tags = {"survival", "consumable"},
+            telemetry = {"avg_min_hp_pct", "death_rate"},
+        })
+    end
+    if loadout_has_item(loadout, "mana potion") then
+        rows[#rows + 1] = action_row("item", "item", "Mana Potion", "Mana Potion", "casting", nil, {
+            input = "Item",
+            purpose = "Casting uptime buffer for long package runs.",
+            timing = "Use during low-overlap recovery windows, not during rescue or AOE movement.",
+            tags = {"casting", "consumable"},
+            telemetry = {"damage_dealt_per_1000_combat_frames"},
+        })
+    end
+    return rows
+end
+
+local function beat_action_calls(beat, actions)
+    local calls = {}
+    for _, action in ipairs(actions or {}) do
+        local use = action.beats and action.beats[beat.id or ""]
+        if use and use ~= "" then
+            calls[#calls + 1] = {
+                slot = action.slot,
+                input = action.input,
+                name = action.name,
+                label = action.label,
+                kind = action.kind,
+                use = use,
+                tags = copy_array(action.tags or {}),
+                telemetry = copy_array(action.telemetry or {}),
+            }
+        end
+    end
+    if #calls == 0 and actions and actions[1] then
+        local fallback = actions[1]
+        calls[#calls + 1] = {
+            slot = fallback.slot,
+            input = fallback.input,
+            name = fallback.name,
+            label = fallback.label,
+            kind = fallback.kind,
+            use = fallback.timing ~= "" and fallback.timing or fallback.purpose,
+            tags = copy_array(fallback.tags or {}),
+            telemetry = copy_array(fallback.telemetry or {}),
+        }
+    end
+    return calls
+end
+
+local function action_guide_warnings(config, class, package_summary, actions, loadout_readiness)
+    local warnings = {}
+    if #(actions or {}) <= 1 then
+        warnings[#warnings + 1] = "No known spell buttons at this level; this setup mostly tests movement, weapon timing, and gear."
+    end
+    if package_summary and package_summary.hasRescue and class.range == "far" then
+        warnings[#warnings + 1] = "Rescue timings intentionally force ranged classes to break keep-away spacing."
+    end
+    if config.className == "Necromancer" then
+        warnings[#warnings + 1] = "Necromancer reads must use regen-adjusted damage, not raw damage taken."
+    end
+    for _, gap in ipairs(loadout_readiness and loadout_readiness.gaps or {}) do
+        warnings[#warnings + 1] = gap
+        if #warnings >= 4 then
+            break
+        end
+    end
+    return warnings
+end
+
+action_guide_payload = function(config)
+    local class = class_lookup()[config.className] or {}
+    local guide = class_action_guide(config.className)
+    local known_spells, upcoming_spells = spell_rows_for_level(config.className, config.level)
+    local loadout = loadout_for_config(config)
+    local selected_intensity_row = selected_intensity(config)
+    local selected_encounter = encounter_lookup()[config.encounter or ""]
+    local encounter = encounter_with_components(selected_encounter, config.packageComponents)
+    local rhythms = encounter_rhythms(encounter, selected_intensity_row)
+    local package_summary = package_summary_from_rhythms(rhythms)
+    local control_model = control_model_for(config)
+    local micro_plan = micro_plan_for(rhythms, control_model)
+    local pressure_preview = pressure_preview_for(rhythms)
+    local loadout_readiness = loadout_readiness_for_config(config, loadout, known_spells)
+
+    local actions = {primary_action_row_for(config, guide)}
+    for _, row in ipairs(spell_action_rows_for(config.className, known_spells)) do
+        actions[#actions + 1] = row
+    end
+    for _, row in ipairs(consumable_action_rows(loadout, package_summary)) do
+        actions[#actions + 1] = row
+    end
+
+    local beat_plan = {}
+    for _, beat in ipairs(micro_plan or {}) do
+        beat_plan[#beat_plan + 1] = {
+            id = beat.id,
+            label = beat.label,
+            priority = beat.priority,
+            firstFrame = beat.firstFrame,
+            loopFrames = beat.loopFrames,
+            read = beat.read,
+            target = beat.target,
+            posture = beat.posture,
+            action = beat.action,
+            failure = beat.failure,
+            reactionTaxFrames = beat.reactionTaxFrames,
+            effectiveWindowFrames = beat.effectiveWindowFrames,
+            perfectWindowFrames = beat.perfectWindowFrames,
+            calls = beat_action_calls(beat, actions),
+            telemetry = copy_array(beat.telemetry or {}),
+        }
+    end
+
+    return {
+        schema = 1,
+        config = config,
+        stance = {
+            className = config.className,
+            label = actions[1] and actions[1].label or class.role or config.className,
+            role = class.role or "",
+            range = class.range or "",
+            positioning = class.positioning or "",
+            targetDistance = control_model.targetDistance or 0,
+            notes = class.control_notes or class.balance_focus or "",
+            botProfile = control_model.botProfile,
+        },
+        actions = actions,
+        beatPlan = beat_plan,
+        knownSpells = known_spells,
+        upcomingSpells = upcoming_spells,
+        loadoutReadiness = loadout_readiness,
+        packageSummary = package_summary,
+        pressurePreview = pressure_preview,
+        threats = threat_windows_for(rhythms),
+        telemetry = telemetry_watch_for(config, package_summary),
+        warnings = action_guide_warnings(config, class, package_summary, actions, loadout_readiness),
+    }
 end
 
 local function primary_enemy_for(config, encounter)
@@ -2566,7 +2769,7 @@ local function matchup_read_for(config, encounter)
     }
 end
 
-local function telemetry_watch_for(config, package_summary)
+telemetry_watch_for = function(config, package_summary)
     local rows = {}
     append_metric(rows, "win_rate", "Win rate", "overall clear check")
     append_metric(rows, "death_rate", "Death rate", "survival floor")
@@ -2647,6 +2850,7 @@ local function fight_setup_payload(config)
         matchup = matchup_read_for(config, encounter),
         threats = threat_windows_for(rhythms),
         microPlan = micro_plan,
+        actionGuide = action_guide_payload(config),
         pressurePreview = pressure_preview,
         packageSummary = package_summary,
         telemetry = telemetry_watch_for(config, package_summary),
@@ -2684,6 +2888,7 @@ local function run_summary_payload(config)
         upcomingSpells = upcoming_spells,
         loadout = loadout,
         loadoutReadiness = loadout_readiness_for_config(config, loadout, known_spells),
+        actionGuide = action_guide_payload(config),
         map = selected.map,
         mapAlgorithm = selected.mapAlgorithm,
         encounter = encounter,
@@ -2771,7 +2976,7 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
         comparator = "<=",
         threshold = 0.55,
         target = "<=55% minimum HP",
-        reason = "The drill should produce real danger instead of cosmetic package beats.",
+        reason = "The drill should produce real danger instead of cosmetic package timings.",
     })
 
     if package_summary and package_summary.hasRescue then
@@ -2947,6 +3152,7 @@ local function micro_drill_rows(config)
             pressurePreview = pressure_preview,
             scorecard = scorecard,
             microPlan = micro_plan_for(rhythms, control_model),
+            actionGuide = action_guide_payload(drill_config),
             telemetry = telemetry_watch_for(drill_config, package_summary),
             args = launch_args(drill_config),
             balanceArgs = balance_args(drill_config),
@@ -3788,6 +3994,7 @@ local function presentation_payload(config)
     local analysis_plan = analysis_plan_payload(config)
     local build_matrix = build_matrix_payload(config)
     local micro_drills = micro_drills_payload(config)
+    local action_guide = action_guide_payload(config)
 
     return {
         schema = 1,
@@ -3802,6 +4009,7 @@ local function presentation_payload(config)
         },
         buildArchetypes = build_matrix.builds or {},
         microDrills = micro_drills.drills or {},
+        actionGuide = action_guide,
         mapPreviews = preview_cards(map_generation),
         resourceGroups = {
             {
@@ -3844,6 +4052,7 @@ local function presentation_payload(config)
         telemetry = fight_setup.telemetry or {},
         threats = fight_setup.threats or {},
         microPlan = fight_setup.microPlan or {},
+        beatPlan = action_guide.beatPlan or {},
         matchup = run_summary.matchup or fight_setup.matchup,
         pressurePreview = fight_setup.pressurePreview or {},
         warnings = run_summary.warnings or {},
@@ -3856,6 +4065,7 @@ local function workspace_payload(config)
         schema = 1,
         config = config,
         loadoutOptions = build_options_payload(config),
+        actionGuide = action_guide_payload(config),
         buildMatrix = build_matrix_payload(config),
         microDrills = micro_drills_payload(config),
         runSummary = run_summary_payload(config),
@@ -3904,6 +4114,10 @@ end
 
 function M.micro_drills_json(raw_json)
     return encode(micro_drills_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.action_guide_json(raw_json)
+    return encode(action_guide_payload(normalized_config(parse_json_object(raw_json))))
 end
 
 function M.run_summary_json(raw_json)

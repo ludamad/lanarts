@@ -490,6 +490,273 @@ M.build_archetypes = {
     },
 }
 
+M.action_guides = {
+    Fighter = {
+        primary = {
+            label = "Melee pressure",
+            input = "Weapon",
+            purpose = "Stay close, keep the primary vulnerable, and spend HP only when contact produces pressure.",
+            timing = "Re-enter after pulse active frames and before rescue lines resolve.",
+            beats = {
+                rescue = "Hold near the primary, then cut into the line during the clutch window.",
+                summon = "Drop the primary only long enough to delete the add before cap pressure builds.",
+                pulse = "Step out during windup, then immediately re-enter contact.",
+                orbit = "Stutter-step around the lane instead of treating orb hits as free contact tax.",
+            },
+            tags = {"melee", "rescue", "contact"},
+            telemetry = {"combat_frame_rate", "avg_min_hp_pct", "avg_rescue_intercept_frames"},
+        },
+        spells = {
+            Berserk = {
+                purpose = "Short burst window when the package is not forcing a movement solve.",
+                timing = "Use after a pulse or rescue timing, not while crossing a line.",
+                beats = {
+                    summon = "Burst the add wave if cap pressure is rising.",
+                    orbit = "Use only when the orbit lane is off the melee angle.",
+                },
+                tags = {"burst", "melee"},
+                telemetry = {"damage_dealt_per_1000_combat_frames", "avg_min_hp_pct"},
+            },
+            ["Dash Attack"] = {
+                purpose = "Commit tool for rescue lines, add swaps, and gap recovery.",
+                timing = "Save it when a rescue or pulse reset is coming soon.",
+                beats = {
+                    rescue = "Dash across the strike line if walking would miss the clutch window.",
+                    summon = "Dash through add spawns, then turn back to the primary.",
+                    pulse = "Use after the pulse resolves to restore melee uptime.",
+                },
+                tags = {"mobility", "rescue"},
+                telemetry = {"avg_rescue_intercept_frames", "combat_frame_rate"},
+            },
+            ["Power Strike"] = {
+                purpose = "Close-range control when the primary is available.",
+                timing = "Spend it after movement windows, not before a forced disengage.",
+                beats = {
+                    orbit = "Punish the primary when the lane rotates off your angle.",
+                    summon = "Use on the highest-value add if cleanup is slipping.",
+                },
+                tags = {"control", "melee"},
+                telemetry = {"damage_dealt_per_1000_combat_frames"},
+            },
+        },
+    },
+    Necromancer = {
+        primary = {
+            label = "Pain-range attrition",
+            input = "Weapon",
+            purpose = "Fight close enough for Pain and regen value; gross damage taken is intentionally misleading.",
+            timing = "Refresh regen before contact windows instead of after the HP drop.",
+            beats = {
+                rescue = "Body-block late while regen is already active.",
+                summon = "Let summons contest adds while you keep Pain range on the primary.",
+                pulse = "Move only far enough to clear the AOE, then return to Pain range.",
+                orbit = "Hold close if regen offset covers the hit; otherwise reset around the lane.",
+            },
+            tags = {"regen", "close", "attrition"},
+            telemetry = {"avg_necromancer_regen_offset_pct", "avg_regen_adjusted_damage_taken_total", "avg_necromancer_close_frames"},
+        },
+        spells = {
+            ["Baleful Regeneration"] = {
+                purpose = "The core sustain loop; it must be active before taking package damage.",
+                timing = "Pre-cast before rescue, orbit, or contact windows.",
+                beats = {
+                    rescue = "Pre-cast before the block so the trade reads as regen-adjusted damage.",
+                    orbit = "Refresh before choosing to eat an orb lane.",
+                    pulse = "Refresh before re-entering after the AOE.",
+                },
+                tags = {"regen", "survival"},
+                telemetry = {"avg_necromancer_regen_offset_pct", "avg_necromancer_regen_frames"},
+            },
+            ["Summon Dark Aspect"] = {
+                purpose = "Add contest and primary distraction without leaving Pain range.",
+                timing = "Use on summon timings or when forced to disengage.",
+                beats = {
+                    summon = "Drop it as the portal warns so cleanup starts before cap saturation.",
+                    rescue = "Use only if the rescue line is already covered.",
+                },
+                tags = {"summon", "control"},
+                telemetry = {"avg_max_visible_enemies", "kills_per_1000_combat_frames"},
+            },
+            ["Skeleton Army"] = {
+                purpose = "High-commit add pressure and cleanup reset.",
+                timing = "Save for stacked summon or full-package overlap.",
+                beats = {
+                    summon = "Use when add cap is about to become the real failure condition.",
+                    orbit = "Use while kiting around lane pressure.",
+                },
+                tags = {"summon", "cleanup"},
+                telemetry = {"kills_per_1000_combat_frames", "avg_max_visible_enemies"},
+            },
+        },
+    },
+    Pyrocaster = {
+        primary = {
+            label = "Fire keep-away",
+            input = "Weapon",
+            purpose = "Hold casting distance and check whether red resistance is suppressing conversion.",
+            timing = "Only step in when the package has a clean recovery window.",
+            beats = {
+                rescue = "Break spacing deliberately for the save, then reset before the next cast lane collapses.",
+                summon = "Kite around portal spawns instead of face-tanking add cleanup.",
+                pulse = "Cast until windup, sidestep, then resume at range.",
+                orbit = "Use the orbit lane as the casting boundary.",
+            },
+            tags = {"red", "ranged", "spacing"},
+            telemetry = {"avg_ranged_keepaway_frames", "avg_ranged_close_enemy_frames", "damage_dealt_per_1000_combat_frames"},
+        },
+        spells = {
+            ["Fire Bolt"] = {
+                purpose = "Baseline ranged conversion check.",
+                timing = "Use whenever spacing is preserved and red resistance is not flattening output.",
+                beats = {
+                    pulse = "Continue until the windup starts, then cancel into movement.",
+                    orbit = "Punish when the lane rotates off the shot angle.",
+                },
+                tags = {"red", "ranged"},
+                telemetry = {"damage_dealt_per_1000_combat_frames"},
+            },
+            ["Ring of Flames"] = {
+                purpose = "Risky step-in damage and add cleanup.",
+                timing = "Use only when the next rescue or pulse timing will not punish the dive.",
+                beats = {
+                    summon = "Step in to burn adds if the escape lane is clear.",
+                    orbit = "Dive after the orbit lane passes, then leave.",
+                    rescue = "Do not dive if the ally line is about to fire.",
+                },
+                tags = {"red", "zone", "cleanup"},
+                telemetry = {"avg_pyrocaster_ring_combat_frames", "avg_min_hp_pct"},
+            },
+            Dragonform = {
+                purpose = "Burst form for clean package recovery windows.",
+                timing = "Use after stacked pressure resolves, not before a forced dodge.",
+                beats = {
+                    summon = "Use to convert add cleanup into boss pressure after the wave stabilizes.",
+                    pulse = "Transform after the active frames end.",
+                },
+                tags = {"burst", "red"},
+                telemetry = {"damage_dealt_per_1000_combat_frames"},
+            },
+        },
+    },
+    Stormcaller = {
+        primary = {
+            label = "White keep-away",
+            input = "Weapon",
+            purpose = "Hold range while checking whether white damage is overtuned against the package.",
+            timing = "Preserve spacing unless a rescue lane explicitly forces a commit.",
+            beats = {
+                rescue = "Commit for the save, then immediately rebuild keep-away distance.",
+                summon = "Use chain and storm tools to clear adds without losing the primary angle.",
+                pulse = "Sidestep during windup and keep the cast lane open.",
+                orbit = "Cast from just outside the rotating lane.",
+            },
+            tags = {"white", "ranged", "spacing"},
+            telemetry = {"avg_ranged_keepaway_frames", "avg_ranged_close_enemy_frames", "damage_dealt_per_1000_combat_frames"},
+        },
+        spells = {
+            ["Energy Spear"] = {
+                purpose = "Baseline ranged pressure and boss conversion.",
+                timing = "Use when the primary angle is open.",
+                beats = {
+                    orbit = "Fire when the lane opens a straight shot.",
+                    pulse = "Resume immediately after the AOE active frames.",
+                },
+                tags = {"white", "ranged"},
+                telemetry = {"damage_dealt_per_1000_combat_frames"},
+            },
+            ["Chain Lightning"] = {
+                purpose = "Add cleanup and grouped pressure.",
+                timing = "Use as summon waves begin to stack.",
+                beats = {
+                    summon = "Hit the wave early so adds create lost spacing instead of a hard cap.",
+                    rescue = "Use only after the body-block route is safe.",
+                },
+                tags = {"white", "cleanup"},
+                telemetry = {"kills_per_1000_combat_frames", "avg_max_visible_enemies"},
+            },
+            ["Tornado Storm"] = {
+                purpose = "Zone control during package overlap.",
+                timing = "Drop it on recovery windows or when adds threaten spacing.",
+                beats = {
+                    summon = "Zone add spawns while kiting the primary.",
+                    pulse = "Place after sidestep so the storm does not cover a bad position.",
+                    orbit = "Use when lane pressure pins the primary path.",
+                },
+                tags = {"white", "zone"},
+                telemetry = {"avg_ranged_keepaway_frames", "damage_dealt_per_1000_combat_frames"},
+            },
+        },
+    },
+    Templar = {
+        primary = {
+            label = "Hold-line melee",
+            input = "Weapon",
+            purpose = "Stay close and spend defensive margin on controlled contact rather than free tanking.",
+            timing = "Anchor the primary, then reset only for package timings.",
+            beats = {
+                rescue = "Body-block early enough to hold the line, but measure whether saves are too free.",
+                summon = "Peel adds before they become the actual objective.",
+                pulse = "Drop contact during windup and return after active frames.",
+                orbit = "Hold only if defensive margin survives repeated lane hits.",
+            },
+            tags = {"melee", "defense", "rescue"},
+            telemetry = {"avg_min_hp_pct", "combat_frame_rate", "avg_package_rescue_save_rate"},
+        },
+        spells = {
+            ["Power Strike"] = {
+                purpose = "Close-range control and boss pressure.",
+                timing = "Spend after movement windows.",
+                beats = {
+                    summon = "Use on the dangerous add if cleanup is late.",
+                    orbit = "Punish the primary when the lane clears.",
+                },
+                tags = {"control", "melee"},
+                telemetry = {"damage_dealt_per_1000_combat_frames"},
+            },
+            ["Dash Attack"] = {
+                purpose = "Defensive reposition and rescue commit.",
+                timing = "Hold for rescue or pulse recovery.",
+                beats = {
+                    rescue = "Dash into the line when walking would miss the block.",
+                    pulse = "Dash back to contact after the AOE.",
+                },
+                tags = {"mobility", "rescue"},
+                telemetry = {"avg_rescue_intercept_frames", "combat_frame_rate"},
+            },
+        },
+    },
+    Rogue = {
+        primary = {
+            label = "Mobile close pressure",
+            input = "Weapon",
+            purpose = "Use movement to re-enter contact without assuming Fighter durability.",
+            timing = "Stab during recovery windows and leave before stacked pressure resolves on you.",
+            beats = {
+                rescue = "Use mobility to cross the line late without camping inside boss contact.",
+                summon = "Target-swap quickly; saturated adds should punish sloppy uptime.",
+                pulse = "Leave on windup and re-enter from the safe side.",
+                orbit = "Thread around lanes instead of eating orb ticks.",
+            },
+            tags = {"melee", "mobility", "rescue"},
+            telemetry = {"combat_frame_rate", "avg_min_hp_pct", "avg_rescue_intercept_frames"},
+        },
+        spells = {
+            ["Dash Attack"] = {
+                purpose = "Core reposition, rescue, and add-cleanup tool.",
+                timing = "Save for the timing window that would otherwise force lost contact.",
+                beats = {
+                    rescue = "Dash across the rescue line inside the clutch window.",
+                    summon = "Dash through add spawns and reset before cap pressure builds.",
+                    pulse = "Dash out or back in depending on windup timing.",
+                    orbit = "Cross the lane only when the angle is clear.",
+                },
+                tags = {"mobility", "rescue", "cleanup"},
+                telemetry = {"avg_rescue_intercept_frames", "kills_per_1000_combat_frames"},
+            },
+        },
+    },
+}
+
 M.item_choices = {
     {
         id = "consumables",
@@ -2134,6 +2401,7 @@ function M.catalog()
         loadouts = M.loadout_presets,
         loadout_names = M.loadout_preset_names(),
         build_archetypes = M.build_archetypes,
+        action_guides = M.action_guides,
         class_builds = M.class_builds,
         item_choices = M.item_choices,
         intensities = M.intensities,

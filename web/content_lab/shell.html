@@ -1080,6 +1080,11 @@
       </section>
 
       <section class="section">
+        <div class="section-title">How To Play</div>
+        <div class="fight-setup" id="actionGuideInfo"></div>
+      </section>
+
+      <section class="section">
         <div class="section-title">Resources</div>
         <div class="row">
           <div class="field">
@@ -1418,6 +1423,7 @@
       let packageResources = [];
       let resolvedRun = null;
       let fightSetup = null;
+      let actionGuide = null;
       let loadoutOptions = null;
       let enemyOptions = null;
       let analysisPlan = null;
@@ -1715,7 +1721,7 @@
         const card = document.createElement('div');
         card.className = 'micro-card';
         const title = document.createElement('strong');
-        title.textContent = `${row.label || row.id || 'Beat'} - ${row.posture || row.read || 'micro'}`;
+        title.textContent = `${row.label || row.id || 'Threat'} - ${row.posture || row.read || 'micro'}`;
         const timing = document.createElement('code');
         const window = row.effectiveWindowFrames !== undefined
           ? `${row.effectiveWindowFrames}f effective`
@@ -2058,7 +2064,105 @@
         }
       }
 
+      function renderActionGuide(guide) {
+        const host = $('actionGuideInfo');
+        host.innerHTML = '';
+        if (!guide) {
+          const pending = document.createElement('div');
+          pending.className = 'muted';
+          pending.textContent = state.runtimeReady ? 'No action guide selected' : 'Runtime data pending';
+          host.appendChild(pending);
+          return;
+        }
+
+        const stance = guide.stance || {};
+        const stanceRow = document.createElement('div');
+        stanceRow.className = 'item-chips';
+        addChip(stanceRow, stance.className || currentConfig().className || 'class');
+        addChip(stanceRow, stance.positioning || stance.range || 'positioning');
+        addChip(stanceRow, `${stance.targetDistance || 0}px target`);
+        if (stance.botProfile) {
+          addChip(stanceRow, stance.botProfile.label || stance.botProfile.id || 'Human');
+        }
+        appendSummaryLine(host, 'Stance', stanceRow);
+
+        const actions = guide.actions || [];
+        if (actions.length) {
+          const grid = document.createElement('div');
+          grid.className = 'threat-grid';
+          actions.slice(0, 5).forEach((action) => {
+            const card = document.createElement('div');
+            card.className = 'micro-card';
+            const title = document.createElement('strong');
+            title.textContent = `${action.input || action.slot || 'Use'} - ${action.label || action.name || 'Action'}`;
+            const timing = document.createElement('code');
+            timing.textContent = action.timing || action.purpose || action.role || '';
+            const purpose = document.createElement('span');
+            purpose.textContent = action.purpose || '';
+            card.appendChild(title);
+            if (timing.textContent) {
+              card.appendChild(timing);
+            }
+            if (purpose.textContent && purpose.textContent !== timing.textContent) {
+              card.appendChild(purpose);
+            }
+            const chips = chipRow([
+              action.role,
+              ...((action.tags || []).slice(0, 3)),
+              ...((action.telemetry || []).slice(0, 2)),
+            ]);
+            if (chips.childElementCount) {
+              card.appendChild(chips);
+            }
+            grid.appendChild(card);
+          });
+          appendSummaryLine(host, 'Actions', grid);
+        }
+
+        const timings = guide.beatPlan || [];
+        if (timings.length) {
+          const grid = document.createElement('div');
+          grid.className = 'threat-grid';
+          timings.slice(0, 5).forEach((timingRow) => {
+            const card = document.createElement('div');
+            card.className = 'micro-card';
+            const title = document.createElement('strong');
+            title.textContent = `${timingRow.label || timingRow.id || 'Threat'} - ${timingRow.read || 'read'}`;
+            const timing = document.createElement('code');
+            timing.textContent = `${timingRow.firstFrame || 0}f first / ${timingRow.loopFrames || 0}f loop`;
+            const action = document.createElement('span');
+            action.textContent = timingRow.action || '';
+            card.appendChild(title);
+            card.appendChild(timing);
+            if (action.textContent) {
+              card.appendChild(action);
+            }
+            (timingRow.calls || []).slice(0, 3).forEach((call) => {
+              const line = document.createElement('span');
+              line.textContent = `${call.input || call.slot || 'Use'} ${call.label || call.name || ''}: ${call.use || ''}`;
+              card.appendChild(line);
+            });
+            grid.appendChild(card);
+          });
+          appendSummaryLine(host, 'Timings', grid);
+        }
+
+        if ((guide.warnings || []).length) {
+          const warnings = document.createElement('div');
+          warnings.className = 'warning-list';
+          (guide.warnings || []).slice(0, 4).forEach((warning) => {
+            const chip = document.createElement('span');
+            chip.textContent = warning;
+            warnings.appendChild(chip);
+          });
+          appendSummaryLine(host, 'Notes', warnings);
+        }
+      }
+
       function addChip(host, text, className) {
+        if (text === undefined || text === null || String(text) === '') {
+          return;
+        }
         const chip = document.createElement('span');
         chip.textContent = text;
         if (className) {
@@ -2642,6 +2746,11 @@
         renderFightSetup(fightSetup);
       }
 
+      function updateActionGuide() {
+        actionGuide = callContentApi('lanarts_content_action_guide_json', currentConfig());
+        renderActionGuide(actionGuide);
+      }
+
       function updateEnemyOptions() {
         enemyOptions = callContentApi('lanarts_content_enemy_options_json', currentConfig());
         renderEnemyOptions(enemyOptions);
@@ -2683,6 +2792,7 @@
         loadoutOptions = workspace.loadoutOptions || null;
         resolvedRun = workspace.runSummary || null;
         fightSetup = workspace.fightSetup || null;
+        actionGuide = workspace.actionGuide || (fightSetup && fightSetup.actionGuide) || null;
         enemyOptions = workspace.enemyOptions || null;
         analysisPlan = workspace.analysisPlan || null;
         presentation = callContentApi('lanarts_content_presentation_json', currentConfig());
@@ -2701,6 +2811,7 @@
         renderBuildOptions(loadoutOptions);
         renderRunSummary(resolvedRun);
         renderFightSetup(fightSetup);
+        renderActionGuide(actionGuide);
         renderEnemyOptions(enemyOptions);
         renderAnalysisPlan(analysisPlan);
         renderPresentationBoard(presentation);
@@ -2719,6 +2830,7 @@
         updateLoadoutOptions();
         updateRunSummary();
         updateFightSetup();
+        updateActionGuide();
         updateEnemyOptions();
         updateAnalysisPlan();
         updatePresentation();
