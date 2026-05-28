@@ -328,7 +328,7 @@ local function draw_package_hud(director)
         row_count = row_count + 1
     end
     if package.rescue then
-        row_count = row_count + 1
+        row_count = row_count + 2
     end
     if package.escort then
         row_count = row_count + 1
@@ -373,17 +373,27 @@ local function draw_package_hud(director)
         local pulls = director.rescue_pulls or 0
         local active, blocked, remaining, late = active_rescue_strikes()
         local value
+        local color = delta <= 60 and COL_PALE_YELLOW or COL_PALE_GREEN
+        local pct = 1 - delta / interval
         if active > 0 then
             local prefix = late and "clutch " or (blocked and "hold " or "block ")
             value = prefix .. format_frames(remaining or 0)
+            color = late and COL_PALE_YELLOW or COL_PALE_GREEN
+            pct = 1
         elseif (director.rescue_pull_active_frames or 0) > 0 then
             value = "pull " .. format_frames(director.rescue_pull_active_frames)
+            color = COL_PALE_YELLOW
+            pct = 1
         else
-            local margin = director.rescue_last_margin
-            local attempts = saves + (director.rescue_misses or 0)
-            value = saves .. "/" .. attempts .. " c" .. clutch_saves .. " p" .. pulls .. (margin and (" " .. margin .. "f") or "")
+            value = "next " .. format_frames(delta)
         end
-        draw_hud_row(y, "SAVE", value, late and COL_PALE_YELLOW or COL_PALE_GREEN, active > 0 and 1 or 1 - delta / interval)
+        draw_hud_row(y, "SAVE", value, color, pct)
+        y = y + HUD_ROW_H
+
+        local margin = director.rescue_last_margin
+        local attempts = saves + (director.rescue_misses or 0)
+        local stats_value = saves .. "/" .. attempts .. " c" .. clutch_saves .. " p" .. pulls .. (margin and (" " .. margin .. "f") or "")
+        draw_hud_row(y, "RATE", stats_value, COL_PALE_GREEN, safe_rate(saves, math.max(1, attempts)))
         y = y + HUD_ROW_H
     end
     if package.escort then
