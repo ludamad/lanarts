@@ -51,6 +51,16 @@ Update note from the handoff pass:
 - The existing rescue system already has late/perfect saves, pull snap bursts, danger-window coverage, pull discipline, taunt strain, and counter-window telemetry. The remaining gap is making "snap opportunity now" a first-class active state before the save resolves.
 - Before implementing anything, re-check `git status --short` and the latest `git log --oneline -10`; this prompt may be older than the current branch head.
 
+Session update (Claude, 2026-05-28) — three committed slices on top of `d83f9314`:
+
+- `b6930556` Clarify rescue snap timing and expose anti-cheese telemetry. The snap (precision pull) is now a first-class active rescue state, suppressed when an early camper has pre-solved the line. Added a SNAP HUD row + closing snap-aperture draw, `package_rescue_active_snap_*` live fields, `snap_window_frames` / `snap_ready_frames` / `snap_ready_rate`, a `broad_pull_index` (pull uptime weighted by non-timed pulls), and a `broad-pull` scorecard check. Taunt was not strengthened; camping still resolves as a generic save.
+- `88718649` Give FURY/DREAD punish a non-rescue break path. Clean dodge-streak milestones (MICRO x3/x5+) now claw back un-broken `micro_punish` healing, capped at the heal earned, so duels and other non-rescue packages keep a skill-gated counterplay. `streak_break` / `streak_break_label` are catalog-tunable (Gragh 7, Crypt Keeper 4).
+- `0923cece` Flag instrument-limited and illegible package losses. New `package_difficulty` non-lethal-stall warning (win <=5%, death <=5%, >=75% step-limit) and `package_micro` legibility warning (micro <=-20 with >=5 avoidable hits/run), operationalizing "if everyone loses because warnings are unreadable, improve readability before tuning numbers."
+
+Highest-signal balance finding (do not lose this): a fixed-seed `gragh-duel` level-5 sweep clears 0% for Fighter/Pyrocaster/Stormcaller and ~33% for Necromancer, but across human AND skilled AND perfect bot profiles every class sits at step_limit with -20 to -71 micro, 6-8 avoidable hits/run, best dodge streak ~3, and 56-85 HP of FURY healing. This is instrument-limited: the scripted bots cannot dodge Gragh's overlapping orbit+pulse+sweep (pressure dominance ~0.85, overlap ~0.8) well enough to build streaks or out-damage the heal in the step budget. Do NOT nerf Gragh damage off this. The real next investigations are (a) Gragh mechanic readability / spacing of overlapping beats, and (b) whether the automated dodge/pathing logic is a usable measurement instrument for dense late packages. Validate readability changes with draw smokes, not bot win rate.
+
+Possible next slices: reduce gragh-duel pressure dominance/overlap for legibility (variety, not damage); add a non-Gragh full package (Workstream 2); or improve the bot's hazard-avoidance so late packages become measurable.
+
 ## User Goal
 
 The broad goal is to make late-game Lanarts content more fun, legible, difficult in the right ways, and measurable.
