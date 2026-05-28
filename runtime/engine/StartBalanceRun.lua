@@ -1,10 +1,12 @@
 local argparse = require "argparse"
+local json = require "json"
 local EngineInternal = require "core.EngineInternal"
 local ResourceLoading = require "engine.ResourceLoading"
 local StartEngine = require "engine.StartEngine"
 local EngineHooks = require "engine.EngineBase"
 
 local DEFAULT_CLASSES = "Fighter,Templar,Rogue,Necromancer,Pyrocaster,Stormcaller"
+local ContentApi
 local ContentLaunch
 local ContentLabHazards
 local GameState
@@ -20,6 +22,11 @@ end
 local function load_content_launch()
     ContentLaunch = ContentLaunch or require "engine.ContentLaunch"
     return ContentLaunch
+end
+
+local function load_content_api()
+    ContentApi = ContentApi or require "engine.ContentApi"
+    return ContentApi
 end
 
 local function load_content_lab_hazards()
@@ -1492,7 +1499,7 @@ end
 local function add_report_row(rows, class_name, severity, category, metric, value, baseline, message)
     local delta = value - baseline
     local delta_pct = baseline ~= 0 and delta / math.abs(baseline) or 0
-    rows[#rows + 1] = {
+    local row = {
         class = class_name,
         severity = severity,
         category = category,
@@ -1503,6 +1510,8 @@ local function add_report_row(rows, class_name, severity, category, metric, valu
         delta_pct = format_rate(delta_pct),
         message = message,
     }
+    rows[#rows + 1] = row
+    return row
 end
 
 local function report_class_name(row)
@@ -1525,6 +1534,160 @@ local function has_package_report_data(row)
         or (tonumber(row.avg_package_frames) or 0) > 0
         or (tonumber(row.avg_package_pressure_max_count) or 0) > 0
         or (tonumber(row.avg_package_rescue_opportunities) or 0) > 0
+end
+
+local drill_scorecards_by_key_cache
+
+local function drill_scorecard_key(class_name, level, encounter, package_components, package_intensity, bot_profile)
+    return table.concat({
+        tostring(class_name or ""),
+        tostring(level or ""),
+        tostring(encounter or ""),
+        tostring(package_components or ""),
+        tostring(package_intensity or ""),
+        tostring(bot_profile or ""),
+    }, "\n")
+end
+
+local function drill_scorecards_by_key()
+    if drill_scorecards_by_key_cache then
+        return drill_scorecards_by_key_cache
+    end
+    local result = {}
+    local ok, raw = pcall(function()
+        return load_content_api().micro_drills_json("{}")
+    end)
+    if not ok then
+        drill_scorecards_by_key_cache = result
+        return result
+    end
+    local parsed_ok, payload = json.parse(raw or "")
+    if not parsed_ok then
+        drill_scorecards_by_key_cache = result
+        return result
+    end
+    for _, drill in ipairs(payload.drills or {}) do
+        local config = drill.config or {}
+        local key = drill_scorecard_key(
+            config.className,
+            config.level,
+            config.encounter,
+            config.packageComponents,
+            config.intensity,
+            config.botProfile
+        )
+        result[key] = drill
+    end
+    drill_scorecards_by_key_cache = result
+    return result
+end
+
+local function scorecard_passes(value, comparator, threshold)
+    if comparator == ">=" then
+        return value >= threshold
+    elseif comparator == ">" then
+        return value > threshold
+    elseif comparator == "<=" then
+        return value <= threshold
+    elseif comparator == "<" then
+        return value < threshold
+    elseif comparator == "==" then
+        return value == threshold
+    end
+    return true
+end
+
+local function scorecard_failure_severity(id, runs, min_runs)
+    if runs < min_runs then
+        return "info"
+    end
+    if id == "clear-floor" or id == "rescue-save" or id == "ally-margin" then
+        return "critical"
+    end
+    return "warning"
+end
+
+local function add_drill_scorecard_report_rows(rows, row, class_name, runs, min_runs)
+    if (row.encounter or "") == "" then
+        return
+    end
+    local key = drill_scorecard_key(
+        row.class,
+        tonumber(row.start_level) or row.start_level,
+        row.encounter,
+        row.package_components,
+        row.package_intensity,
+        row.bot_profile
+    )
+    local drill = drill_scorecards_by_key()[key]
+    if not drill or not drill.scorecard then
+        return
+    end
+
+    local passed_count = 0
+    local total_count = 0
+    for _, score in ipairs(drill.scorecard.rows or {}) do
+        local metric = score.metric or ""
+        local value = tonumber(row[metric]) or 0
+        local threshold = tonumber(score.threshold) or 0
+        local passed = scorecard_passes(value, score.comparator or "", threshold)
+        total_count = total_count + 1
+        if passed then
+            passed_count = passed_count + 1
+        end
+        local severity = passed and "info" or scorecard_failure_severity(score.id, runs, min_runs)
+        local report = add_report_row(
+            rows,
+            class_name,
+            severity,
+            "drill_scorecard",
+            metric,
+            value,
+            threshold,
+            string.format(
+                "%s %s %s: %s is %.3f, target %s (%s).",
+                class_name,
+                passed and "passes" or "misses",
+                drill.label or "drill scorecard",
+                score.label or metric,
+                value,
+                score.target or tostring(threshold),
+                score.reason or "scorecard target"
+            )
+        )
+        report.drill_id = drill.id or ""
+        report.drill_label = drill.label or ""
+        report.scorecard_id = score.id or ""
+        report.target = score.target or ""
+        report.comparator = score.comparator or ""
+        report.threshold = format_rate(threshold)
+        report.passed = passed and "true" or "false"
+        report.reason = score.reason or ""
+    end
+
+    local summary = add_report_row(
+        rows,
+        class_name,
+        total_count > 0 and passed_count == total_count and "info" or scorecard_failure_severity("summary", runs, min_runs),
+        "drill_scorecard",
+        "scorecard_pass_rate",
+        total_count > 0 and passed_count / total_count or 0,
+        1,
+        string.format(
+            "%s passed %d/%d %s scorecard targets.",
+            class_name,
+            passed_count,
+            total_count,
+            drill.label or "drill"
+        )
+    )
+    summary.drill_id = drill.id or ""
+    summary.drill_label = drill.label or ""
+    summary.scorecard_id = "summary"
+    summary.target = "all targets"
+    summary.comparator = "=="
+    summary.threshold = "1"
+    summary.passed = total_count > 0 and passed_count == total_count and "true" or "false"
 end
 
 local function add_package_report_rows(rows, row, class_name, runs, min_runs)
@@ -1809,6 +1972,7 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
         end
 
         add_package_report_rows(rows, row, class_name, runs, min_runs)
+        add_drill_scorecard_report_rows(rows, row, class_name, runs, min_runs)
 
         local combat_rate = tonumber(row.combat_frame_rate) or 0
         local combat_rate_baseline = baselines.combat_frame_rate or 0
@@ -2482,11 +2646,12 @@ local function run_balance(raw_args)
         })
         write_csv(args.report_out, report_rows, {
             "severity", "category", "class", "metric", "value", "baseline",
-            "delta", "delta_pct", "message",
+            "delta", "delta_pct", "drill_id", "drill_label", "scorecard_id",
+            "target", "comparator", "threshold", "passed", "reason", "message",
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 17,
+                schema_version = 18,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
                 map_profile = args.map_profile,

@@ -10,9 +10,9 @@ trap "{ rm -rf \"$temp_dir\"; }" EXIT
     --levels 5 \
     --loadout_preset late \
     --bot_profile human \
-    --encounter executioner-blade-package \
+    --encounter executioner-rescue-package \
     --package_intensity high \
-    --package_components orbit,pulse \
+    --package_components escort,orbit,pulse,rescue \
     --out="$temp_dir/balance_runs.csv" \
     --samples_out="$temp_dir/balance_samples.csv" \
     --spells_out="$temp_dir/balance_spells.csv" \
@@ -52,5 +52,7 @@ grep -q "avg_package_rescue_pull_uptime_rate" "$temp_dir/balance_classes.csv"
 grep -q "avg_package_rescue_perfect_rate" "$temp_dir/balance_classes.csv"
 grep -q "avg_package_rescue_save_rate" "$temp_dir/balance_classes.csv"
 grep -q "package_pressure" "$temp_dir/balance_report.csv"
-grep -q "executioner-blade-package" "$temp_dir/balance_runs.json"
-grep -q "orbit,pulse" "$temp_dir/balance_runs.json"
+grep -q "drill_scorecard" "$temp_dir/balance_report.csv"
+grep -q "avg_package_rescue_pull_uptime_rate" "$temp_dir/balance_report.csv"
+grep -q "executioner-rescue-package" "$temp_dir/balance_runs.json"
+grep -q "escort,orbit,pulse,rescue" "$temp_dir/balance_runs.json"

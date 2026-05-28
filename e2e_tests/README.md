@@ -107,6 +107,10 @@ Balance simulations:
     Rescue-package report rows summarize save, clutch, perfect, pull, and
     taunt-uptime rates, then warn when pull/taunt control or early parking is
     replacing the intended few-frame body-block micro.
+    When a balance run matches a content-lab micro drill, the report also emits
+    drill_scorecard rows for that drill's pass/fail targets, including rescue
+    saves, perfect saves, taunt reliance, add cleanup, stack overlap, spacing,
+    and regen correction where relevant.
     Orb, summon, and AOE package rows likewise expose active/warning counts and
     remaining frames so timeline samples can be matched against the in-game HUD.
     Use --package_components orbit,pulse,summon,escort,rescue to isolate
