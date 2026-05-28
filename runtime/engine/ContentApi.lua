@@ -783,6 +783,7 @@ local function encounter_rhythms(encounter, intensity)
     if package.rescue then
         local windup = scaled_frames(package.rescue.windup, 68, intensity)
         local late_window = scaled_frames(package.rescue.late_window, 22, intensity)
+        local perfect_window = scaled_frames(package.rescue.perfect_window, 6, intensity)
         rows[#rows + 1] = {
             id = "rescue",
             label = "Rescue",
@@ -793,6 +794,7 @@ local function encounter_rhythms(encounter, intensity)
             windup = windup,
             lateWindow = late_window,
             clutchWindow = late_window,
+            perfectWindow = perfect_window,
             radius = package.rescue.radius,
             blockRadius = package.rescue.block_radius,
             allyDamage = scaled_damage(package.rescue.ally_damage, 10, intensity),
@@ -1626,6 +1628,7 @@ local function package_summary_from_rhythms(rhythms)
     local fastest_loop
     local has_rescue = false
     local rescue_clutch_window
+    local rescue_perfect_window
     local rescue_pull_frames
     local has_summons = false
     local summon_cap
@@ -1643,6 +1646,7 @@ local function package_summary_from_rhythms(rhythms)
         if rhythm.id == "rescue" then
             has_rescue = true
             rescue_clutch_window = rhythm.clutchWindow or rhythm.lateWindow
+            rescue_perfect_window = rhythm.perfectWindow
             rescue_pull_frames = rhythm.pullFrames
         elseif rhythm.id == "summon" then
             has_summons = true
@@ -1659,6 +1663,7 @@ local function package_summary_from_rhythms(rhythms)
         fastestLoopFrames = fastest_loop or 0,
         hasRescue = has_rescue,
         rescueClutchWindow = rescue_clutch_window,
+        rescuePerfectWindow = rescue_perfect_window,
         rescuePullFrames = rescue_pull_frames,
         hasSummons = has_summons,
         summonCap = summon_cap,
@@ -1855,6 +1860,7 @@ local function micro_plan_for(rhythms, control_model)
             dropRiskPct = buffer.dropRiskPct,
             windowFrames = buffer.windowFrames,
             effectiveWindowFrames = buffer.effectiveWindowFrames,
+            perfectWindowFrames = rhythm.perfectWindow,
         }
     end
     table.sort(rows, function(a, b)
@@ -1878,6 +1884,7 @@ local function threat_windows_for(rhythms)
             windupFrames = rhythm.windup,
             activeFrames = rhythm.active or rhythm.clutchWindow or rhythm.lateWindow,
             clutchFrames = rhythm.clutchWindow or rhythm.lateWindow,
+            perfectFrames = rhythm.perfectWindow,
             pullFrames = rhythm.pullFrames,
             damage = rhythm.damage or rhythm.allyDamage,
             blockDamage = rhythm.blockDamage,
@@ -1978,6 +1985,7 @@ local function telemetry_watch_for(config, package_summary)
             append_metric(rows, "avg_package_escort_hp_pct", "Ally HP", "escort survival margin")
             append_metric(rows, "avg_package_rescue_save_rate", "Save rate", "rescue reliability")
             append_metric(rows, "avg_package_rescue_clutch_rate", "Clutch rate", "late-window saves")
+            append_metric(rows, "avg_package_rescue_perfect_rate", "Perfect rate", "few-frame saves")
             append_metric(rows, "avg_package_rescue_pull_rate", "Pull rate", "taunt/body-block interaction")
             append_metric(rows, "avg_package_rescue_pull_uptime_rate", "Taunt uptime", "forced target-control share")
             append_metric(rows, "avg_package_rescue_misses", "Misses", "failed rescue windows")

@@ -71,12 +71,12 @@ Balance simulations:
     Use --encounter and --package_intensity to run the same content-lab
     packaged arenas used by the web shell, for example
     --encounter gragh-rescue-package --package_intensity high. Packaged runs
-    emit package_outcome, escort HP, rescue saves, clutch saves, pull redirects,
-    and misses in run and sample rows; ally-down package failures end the run
+    emit package_outcome, escort HP, rescue saves, clutch/perfect saves, pull
+    redirects, and misses in run and sample rows; ally-down package failures end the run
     as ally_down. Automated players also emit rescue_intercept_frames,
     rescue_hold_frames, and rescue_late_reaction_frames so package clears can
     be separated from actual body-block micro. Package rows also derive rescue
-    opportunities plus save, clutch, and pull rates so rescue packages can be
+    opportunities plus save, clutch, perfect, and pull rates so rescue packages can be
     compared without hand-calculating rates from raw counts. Package rows expose
     primary target HP, current package aggro target, the current/next package
     threat, and live rescue-window fields such as next strike, active count,
