@@ -2901,6 +2901,8 @@ telemetry_watch_for = function(config, package_summary)
             append_metric(rows, "avg_package_rescue_pull_snap_bursts", "Pull snaps", "visible clutch/perfect pull snap payoffs")
             append_metric(rows, "avg_package_rescue_perfect_pull_snap_bursts", "Perfect snaps", "visible perfect-pull snap payoffs")
             append_metric(rows, "avg_package_rescue_pull_uptime_rate", "Taunt uptime", "forced target-control share")
+            append_metric(rows, "avg_package_rescue_taunt_strain_rate", "Taunt strain", "share of pull uptime from non-clutch forced target control")
+            append_metric(rows, "avg_package_rescue_taunt_strain_breaks", "Strain pulses", "anti-cheese resistance pulses from early pull uptime")
             append_metric(rows, "avg_package_rescue_counter_windows", "Counters", "clutch/perfect saves that opened the boss")
             append_metric(rows, "avg_package_rescue_counter_damage_total", "Counter dmg", "boss damage from timed rescue openings")
             append_metric(rows, "avg_package_rescue_counter_stagger_frames", "Stagger", "boss stun frames from timed rescue openings")
@@ -3189,6 +3191,15 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
             threshold = list_has(drill.tags, "taunt") and 0.45 or 0.35,
             target = list_has(drill.tags, "taunt") and ">=45% disciplined pulls" or ">=35% disciplined pulls",
             reason = "No-pull body blocks are neutral, but pull-heavy rescues should be late-window snap saves rather than broad target-control uptime.",
+        })
+        add({
+            id = "taunt-strain",
+            label = "Taunt strain",
+            metric = "avg_package_rescue_taunt_strain_rate",
+            comparator = "<=",
+            threshold = 0.40,
+            target = "<=40% strained pull uptime",
+            reason = "Early pull uptime should become visible pressure, while clutch/perfect snap pulls remain safe.",
         })
         add({
             id = "ally-margin",

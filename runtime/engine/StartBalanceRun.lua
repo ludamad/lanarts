@@ -700,6 +700,11 @@ local function package_state_fields(player)
             package_rescue_perfect_pull_snap_bursts = "",
             package_rescue_pull_total_frames = "",
             package_rescue_pull_uptime_rate = "",
+            package_rescue_taunt_safe_frames = "",
+            package_rescue_taunt_strain_frames = "",
+            package_rescue_taunt_strain_rate = "",
+            package_rescue_taunt_strain_breaks = "",
+            package_rescue_taunt_strain_pulses = "",
             package_rescue_counter_windows = "",
             package_rescue_counter_damage_total = "",
             package_rescue_counter_stagger_frames = "",
@@ -820,6 +825,11 @@ local function package_state_fields(player)
         package_rescue_perfect_pull_snap_bursts = state.rescue_perfect_pull_snap_bursts or 0,
         package_rescue_pull_total_frames = state.rescue_pull_total_frames or 0,
         package_rescue_pull_uptime_rate = format_rate(state.rescue_pull_uptime_rate or 0),
+        package_rescue_taunt_safe_frames = state.rescue_taunt_safe_frames or 0,
+        package_rescue_taunt_strain_frames = state.rescue_taunt_strain_frames or 0,
+        package_rescue_taunt_strain_rate = format_rate(state.rescue_taunt_strain_rate or 0),
+        package_rescue_taunt_strain_breaks = state.rescue_taunt_strain_breaks or 0,
+        package_rescue_taunt_strain_pulses = state.rescue_taunt_strain_pulses or 0,
         package_rescue_counter_windows = state.rescue_counter_windows or 0,
         package_rescue_counter_damage_total = format_rate(state.rescue_counter_damage_total or 0),
         package_rescue_counter_stagger_frames = state.rescue_counter_stagger_frames or 0,
@@ -1257,6 +1267,9 @@ local SUMMARY_METRICS = {
     "package_rescue_timed_pull_rate", "package_rescue_pull_discipline_rate", "package_rescue_perfect_pull_rate",
     "package_rescue_pull_snap_bursts", "package_rescue_perfect_pull_snap_bursts",
     "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
+    "package_rescue_taunt_safe_frames", "package_rescue_taunt_strain_frames",
+    "package_rescue_taunt_strain_rate", "package_rescue_taunt_strain_breaks",
+    "package_rescue_taunt_strain_pulses",
     "package_rescue_counter_windows", "package_rescue_counter_damage_total",
     "package_rescue_counter_stagger_frames",
     "package_pressure_active_count", "package_pressure_warning_count", "package_pressure_total_count",
@@ -2128,6 +2141,11 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local pull_discipline_rate = tonumber(row.avg_package_rescue_pull_discipline_rate) or timed_pull_rate
     local perfect_pull_rate = tonumber(row.avg_package_rescue_perfect_pull_rate) or 0
     local pull_uptime = tonumber(row.avg_package_rescue_pull_uptime_rate) or 0
+    local taunt_safe_frames = tonumber(row.avg_package_rescue_taunt_safe_frames) or 0
+    local taunt_strain_frames = tonumber(row.avg_package_rescue_taunt_strain_frames) or 0
+    local taunt_strain_rate = tonumber(row.avg_package_rescue_taunt_strain_rate) or 0
+    local taunt_strain_breaks = tonumber(row.avg_package_rescue_taunt_strain_breaks) or 0
+    local taunt_strain_pulses = tonumber(row.avg_package_rescue_taunt_strain_pulses) or 0
     local clutch_pulls = tonumber(row.avg_package_rescue_clutch_pulls) or 0
     local perfect_pulls = tonumber(row.avg_package_rescue_perfect_pulls) or 0
     local pull_snap_bursts = tonumber(row.avg_package_rescue_pull_snap_bursts) or 0
@@ -2147,7 +2165,7 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         save_rate,
         0,
         string.format(
-            "%s rescue reads in %s averaged %.1f opportunities/run: save %.1f%%, clutch %.1f%%, perfect %.1f%%, early %.1f%%, timing %.2f, cues %.1f/%.1f perfect, pull %.1f%%, pull discipline %.1f%%, timed pulls %.1f%%, perfect pulls %.1f%%, taunt uptime %.1f%%, counter %.1f windows, %.1f damage, %.1f stagger, fatal miss %.1f, survived miss %.1f.",
+            "%s rescue reads in %s averaged %.1f opportunities/run: save %.1f%%, clutch %.1f%%, perfect %.1f%%, early %.1f%%, timing %.2f, cues %.1f/%.1f perfect, pull %.1f%%, pull discipline %.1f%%, timed pulls %.1f%%, perfect pulls %.1f%%, taunt uptime %.1f%%, strain %.1f%%, counter %.1f windows, %.1f damage, %.1f stagger, fatal miss %.1f, survived miss %.1f.",
             class_name,
             encounter,
             rescue_opportunities,
@@ -2163,6 +2181,7 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
             timed_pull_rate * 100,
             perfect_pull_rate * 100,
             pull_uptime * 100,
+            taunt_strain_rate * 100,
             counter_windows,
             counter_damage,
             counter_stagger,
@@ -2228,6 +2247,23 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
                 perfect_pull_snap_bursts,
                 pull_discipline_rate * 100,
                 timed_pull_rate * 100
+            )
+        )
+        add_report_row(
+            rows,
+            class_name,
+            taunt_strain_breaks > 0 and "warning" or "info",
+            "package_pull_strain",
+            "avg_package_rescue_taunt_strain_rate",
+            taunt_strain_rate,
+            0.30,
+            string.format(
+                "%s rescue pulls in %s spent %.1f frames in clutch/perfect snap safety and %.1f frames in early-pull strain; strain triggered %.1f resistance pulses/run.",
+                class_name,
+                encounter,
+                taunt_safe_frames,
+                taunt_strain_frames,
+                taunt_strain_pulses
             )
         )
     end
@@ -2318,6 +2354,24 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
                 pull_rate * 100,
                 encounter,
                 pull_discipline_rate * 100
+            )
+        )
+    end
+
+    if taunt_strain_rate >= 0.35 and taunt_strain_breaks > 0 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_pull_strain",
+            "avg_package_rescue_taunt_strain_rate",
+            taunt_strain_rate,
+            0.35,
+            string.format(
+                "%s converted %.1f%% of pull uptime in %s into taunt strain; early forced-target control is being punished instead of treated as a clean rescue.",
+                class_name,
+                taunt_strain_rate * 100,
+                encounter
             )
         )
     end
@@ -3121,6 +3175,9 @@ local function run_balance(raw_args)
             "package_rescue_timed_pull_rate", "package_rescue_pull_discipline_rate", "package_rescue_perfect_pull_rate",
             "package_rescue_pull_snap_bursts", "package_rescue_perfect_pull_snap_bursts",
             "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
+            "package_rescue_taunt_safe_frames", "package_rescue_taunt_strain_frames",
+            "package_rescue_taunt_strain_rate", "package_rescue_taunt_strain_breaks",
+            "package_rescue_taunt_strain_pulses",
             "package_rescue_counter_windows", "package_rescue_counter_damage_total",
             "package_rescue_counter_stagger_frames",
             "package_rescue_misses",
@@ -3213,6 +3270,9 @@ local function run_balance(raw_args)
             "package_rescue_timed_pull_rate", "package_rescue_pull_discipline_rate", "package_rescue_perfect_pull_rate",
             "package_rescue_pull_snap_bursts", "package_rescue_perfect_pull_snap_bursts",
             "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
+            "package_rescue_taunt_safe_frames", "package_rescue_taunt_strain_frames",
+            "package_rescue_taunt_strain_rate", "package_rescue_taunt_strain_breaks",
+            "package_rescue_taunt_strain_pulses",
             "package_rescue_counter_windows", "package_rescue_counter_damage_total",
             "package_rescue_counter_stagger_frames",
             "package_rescue_misses",
@@ -3323,6 +3383,9 @@ local function run_balance(raw_args)
             "avg_package_rescue_timed_pull_rate", "avg_package_rescue_pull_discipline_rate", "avg_package_rescue_perfect_pull_rate",
             "avg_package_rescue_pull_snap_bursts", "avg_package_rescue_perfect_pull_snap_bursts",
             "avg_package_rescue_pull_total_frames", "avg_package_rescue_pull_uptime_rate",
+            "avg_package_rescue_taunt_safe_frames", "avg_package_rescue_taunt_strain_frames",
+            "avg_package_rescue_taunt_strain_rate", "avg_package_rescue_taunt_strain_breaks",
+            "avg_package_rescue_taunt_strain_pulses",
             "avg_package_rescue_counter_windows", "avg_package_rescue_counter_damage_total",
             "avg_package_rescue_counter_stagger_frames",
             "avg_package_rescue_misses",

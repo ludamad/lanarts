@@ -1511,6 +1511,28 @@ local function draw_package_hud(director)
         local pull_color = pull_active > 0 and COL_PALE_YELLOW or (pull_uptime >= 0.30 and COL_PALE_YELLOW or COL_LIGHT_GRAY)
         draw_hud_row(y, "TAUNT", pull_value, pull_color, pull_uptime)
         y = y + HUD_ROW_H
+
+        local strain_threshold = scale_frames(rescue.taunt_strain_threshold, 46, director.intensity or normalize_intensity(nil))
+        local strain_charge = director.rescue_taunt_strain_charge or 0
+        local strain_breaks = director.rescue_taunt_strain_breaks or 0
+        local strain_frames = director.rescue_taunt_strain_frames or 0
+        local safe_frames = director.rescue_taunt_safe_frames or 0
+        local strain_pct = math.min(1, safe_rate(strain_charge, strain_threshold))
+        local strain_value
+        local strain_color
+        if pull_active > 0 and (director.rescue_pull_active_clutch or director.rescue_pull_active_perfect) then
+            strain_value = (director.rescue_pull_active_perfect and "perfect safe " or "clutch safe ") .. format_frames(pull_active)
+            strain_color = director.rescue_pull_active_perfect and COL_WHITE or COL_PALE_GREEN
+            strain_pct = 0
+        elseif pull_active > 0 then
+            strain_value = "strain " .. math.floor(strain_charge) .. "/" .. strain_threshold .. " b" .. strain_breaks
+            strain_color = strain_pct >= 0.75 and COL_PALE_RED or COL_PALE_YELLOW
+        else
+            strain_value = format_frames(strain_frames) .. " bad " .. format_frames(safe_frames) .. " safe"
+            strain_color = strain_breaks > 0 and COL_PALE_RED or COL_LIGHT_GRAY
+        end
+        draw_hud_row(y, "STRAIN", strain_value, strain_color, strain_pct)
+        y = y + HUD_ROW_H
     end
     if package.escort then
         local count, hp, max_hp = escort_health()
@@ -1585,6 +1607,9 @@ local function package_result(director, outcome)
     local perfect_pull_rate = safe_rate(perfect_pulls, pulls)
     local pull_total_frames = director.rescue_pull_total_frames or 0
     local pull_uptime_rate = safe_rate(pull_total_frames, math.max(1, frames))
+    local taunt_safe_frames = director.rescue_taunt_safe_frames or 0
+    local taunt_strain_frames = director.rescue_taunt_strain_frames or 0
+    local taunt_strain_rate = safe_rate(taunt_strain_frames, math.max(1, pull_total_frames))
     local pressure = package_pressure_state(director, director.package or {})
     local aggro_tracking = aggro_tracking_fields(director)
     local rescue_danger = rescue_danger_cover_fields(director)
@@ -1593,7 +1618,7 @@ local function package_result(director, outcome)
     local best_pull = director.rescue_best_pull_margin
     local escort_text = count > 0 and string.format("ally %d/%d", math.ceil(hp), math.ceil(max_hp)) or "ally down"
     local rescue_text = (saves > 0 or misses > 0)
-        and string.format("saves %d/%d (%s), clutch %d (%s), perfect %d (%s), early %d (%s), pulls %d (%s disciplined), taunt %s%s%s", saves, opportunities, format_pct(save_rate), clutch, format_pct(clutch_rate), perfect, format_pct(perfect_rate), early, format_pct(early_rate), pulls, format_pct(pull_discipline), format_pct(pull_uptime_rate), best and (", best " .. best .. "f") or "", best_pull and (", pull " .. best_pull .. "f") or "")
+        and string.format("saves %d/%d (%s), clutch %d (%s), perfect %d (%s), early %d (%s), pulls %d (%s disciplined), taunt %s, strain %s%s%s", saves, opportunities, format_pct(save_rate), clutch, format_pct(clutch_rate), perfect, format_pct(perfect_rate), early, format_pct(early_rate), pulls, format_pct(pull_discipline), format_pct(pull_uptime_rate), format_pct(taunt_strain_rate), best and (", best " .. best .. "f") or "", best_pull and (", pull " .. best_pull .. "f") or "")
         or "no rescue strikes"
     return {
         outcome = outcome,
@@ -1655,6 +1680,11 @@ local function package_result(director, outcome)
         rescue_perfect_pull_snap_bursts = director.rescue_perfect_pull_snap_bursts or 0,
         rescue_pull_total_frames = pull_total_frames,
         rescue_pull_uptime_rate = pull_uptime_rate,
+        rescue_taunt_safe_frames = taunt_safe_frames,
+        rescue_taunt_strain_frames = taunt_strain_frames,
+        rescue_taunt_strain_rate = taunt_strain_rate,
+        rescue_taunt_strain_breaks = director.rescue_taunt_strain_breaks or 0,
+        rescue_taunt_strain_pulses = director.rescue_taunt_strain_pulses or 0,
         rescue_counter_windows = director.rescue_counter_windows or 0,
         rescue_counter_damage_total = director.rescue_counter_damage_total or 0,
         rescue_counter_stagger_frames = director.rescue_counter_stagger_frames or 0,
@@ -1796,6 +1826,11 @@ local function package_state_from_director(director)
         rescue_perfect_pull_snap_bursts = director.rescue_perfect_pull_snap_bursts or 0,
         rescue_pull_total_frames = director.rescue_pull_total_frames or 0,
         rescue_pull_uptime_rate = safe_rate(director.rescue_pull_total_frames or 0, math.max(1, director.elapsed or 0)),
+        rescue_taunt_safe_frames = director.rescue_taunt_safe_frames or 0,
+        rescue_taunt_strain_frames = director.rescue_taunt_strain_frames or 0,
+        rescue_taunt_strain_rate = safe_rate(director.rescue_taunt_strain_frames or 0, math.max(1, director.rescue_pull_total_frames or 0)),
+        rescue_taunt_strain_breaks = director.rescue_taunt_strain_breaks or 0,
+        rescue_taunt_strain_pulses = director.rescue_taunt_strain_pulses or 0,
         rescue_counter_windows = director.rescue_counter_windows or 0,
         rescue_counter_damage_total = director.rescue_counter_damage_total or 0,
         rescue_counter_stagger_frames = director.rescue_counter_stagger_frames or 0,
@@ -2129,12 +2164,12 @@ function M.create_pulse(args)
         magic_percentage = args.magic_percentage or 1,
         affects_escorts = args.affects_escorts,
         redamage_cooldown = args.redamage_cooldown or 18,
-        micro_label = "AOE",
-        micro_color = COL_PALE_RED,
-        micro_thread_label = "AOE THREAD",
+        micro_label = args.micro_label or "AOE",
+        micro_color = args.micro_color or COL_PALE_RED,
+        micro_thread_label = args.micro_thread_label or "AOE THREAD",
         micro_dodge_eligible = true,
         micro_dodge_xy = copy_xy(args.xy),
-        micro_dodge_label = "AOE EVADE",
+        micro_dodge_label = args.micro_dodge_label or "AOE EVADE",
         micro_hit_points = args.micro_hit_points or -10,
         micro_dodge_points = args.micro_dodge_points or 8,
         hit_cooldowns = {},
@@ -2181,6 +2216,77 @@ function M.create_pulse(args)
                 draw_world_circle(COL_PALE_RED, self.xy, radius, 0.08 * fade, 0.25 * fade)
             end
         end,
+    }
+end
+
+local function trigger_taunt_strain(director)
+    if not director or director.destroyed then
+        return
+    end
+    local package = director.package or {}
+    local rescue = package.rescue or {}
+    local intensity = director.intensity or normalize_intensity(nil)
+    local source = director.rescue_pull_active_source
+    if not source or source.destroyed then
+        source = primary_monster(package.primary)
+    end
+    local target = director.rescue_pull_active_target
+    local xy = target and not target.destroyed and xy_of(target)
+        or source and not source.destroyed and xy_of(source)
+        or center_of_players()
+        or director.xy
+    if not xy then
+        return
+    end
+
+    director.rescue_taunt_strain_breaks = (director.rescue_taunt_strain_breaks or 0) + 1
+    director.rescue_taunt_strain_pulses = (director.rescue_taunt_strain_pulses or 0) + 1
+    director.rescue_taunt_strain_last_timer = 64
+    director.rescue_taunt_strain_charge = 0
+    director.rescue_taunt_strain_cooldown = scale_frames(rescue.taunt_strain_cooldown, 52, intensity)
+
+    ImpactFX.world_burst {
+        map = director.map,
+        xy = xy,
+        color = COL_PALE_RED,
+        label = "TAUNT STRAIN",
+        radius = 54,
+        duration = 34,
+        drift = 0.30,
+    }
+    ImpactFX.screen_flash {
+        map = director.map,
+        color = COL_PALE_RED,
+        alpha = 0.055,
+        duration = 8,
+    }
+    add_micro_event(director, {
+        kind = "hit",
+        points = -8,
+        break_streak = true,
+        label = "TAUNT STRAIN",
+        color = COL_PALE_RED,
+        xy = xy,
+        duration = 46,
+    })
+
+    M.create_pulse {
+        map = director.map,
+        source = source,
+        director = director,
+        xy = xy,
+        windup = scale_frames(rescue.taunt_strain_windup, 30, intensity),
+        active = scale_frames(rescue.taunt_strain_active, 16, intensity),
+        linger = 12,
+        radius = rescue.taunt_strain_radius or 52,
+        damage = scale_damage(rescue.taunt_strain_damage, 3, intensity),
+        power = scale_damage(rescue.taunt_strain_power, 22, intensity),
+        redamage_cooldown = 18,
+        micro_label = "TAUNT",
+        micro_thread_label = "TAUNT THREAD",
+        micro_dodge_label = "TAUNT EVADE",
+        micro_hit_points = -8,
+        micro_dodge_points = 6,
     }
 end
 
@@ -2539,6 +2645,10 @@ function M.create_pull_tether(args)
                     if not self.director.rescue_pull_active_id or self.director.rescue_pull_active_id == self.id then
                         self.director.rescue_pull_active_frames = 0
                         self.director.rescue_pull_active_id = nil
+                        self.director.rescue_pull_active_clutch = false
+                        self.director.rescue_pull_active_perfect = false
+                        self.director.rescue_pull_active_source = nil
+                        self.director.rescue_pull_active_target = nil
                     end
                 end
                 GameObject.destroy(self)
@@ -2549,6 +2659,10 @@ function M.create_pull_tether(args)
                 self.director.rescue_pull_active_frames = remaining
                 self.director.rescue_pull_active_id = self.id
                 self.director.rescue_pull_target = self.target.name
+                self.director.rescue_pull_active_clutch = self.was_clutch
+                self.director.rescue_pull_active_perfect = self.was_perfect
+                self.director.rescue_pull_active_source = self.source
+                self.director.rescue_pull_active_target = self.target
             end
             if not self.snap_fired and (self.was_clutch or self.was_perfect) then
                 self.snap_fired = true
@@ -3500,6 +3614,12 @@ function M.add_director(game_map, package, intensity)
         rescue_perfect_pull_snap_bursts = 0,
         rescue_pull_active_frames = 0,
         rescue_pull_total_frames = 0,
+        rescue_taunt_safe_frames = 0,
+        rescue_taunt_strain_frames = 0,
+        rescue_taunt_strain_charge = 0,
+        rescue_taunt_strain_cooldown = 0,
+        rescue_taunt_strain_breaks = 0,
+        rescue_taunt_strain_pulses = 0,
         rescue_counter_windows = 0,
         rescue_counter_damage_total = 0,
         rescue_counter_stagger_frames = 0,
@@ -3550,6 +3670,25 @@ function M.add_director(game_map, package, intensity)
             end
             if (self.rescue_pull_active_frames or 0) > 0 then
                 self.rescue_pull_total_frames = (self.rescue_pull_total_frames or 0) + 1
+                if self.rescue_pull_active_clutch or self.rescue_pull_active_perfect then
+                    self.rescue_taunt_safe_frames = (self.rescue_taunt_safe_frames or 0) + 1
+                    self.rescue_taunt_strain_charge = math.max(0, (self.rescue_taunt_strain_charge or 0) - 2)
+                else
+                    self.rescue_taunt_strain_frames = (self.rescue_taunt_strain_frames or 0) + 1
+                    self.rescue_taunt_strain_charge = (self.rescue_taunt_strain_charge or 0) + 1
+                end
+            else
+                self.rescue_taunt_strain_charge = math.max(0, (self.rescue_taunt_strain_charge or 0) - 1)
+            end
+            if (self.rescue_taunt_strain_cooldown or 0) > 0 then
+                self.rescue_taunt_strain_cooldown = self.rescue_taunt_strain_cooldown - 1
+            end
+            if (self.rescue_taunt_strain_last_timer or 0) > 0 then
+                self.rescue_taunt_strain_last_timer = self.rescue_taunt_strain_last_timer - 1
+            end
+            if (self.rescue_taunt_strain_charge or 0) >= scale_frames((self.package.rescue or {}).taunt_strain_threshold, 46, self.intensity)
+                and (self.rescue_taunt_strain_cooldown or 0) <= 0 then
+                trigger_taunt_strain(self)
             end
             record_aggro_state(self)
             if #living_players() == 0 then
