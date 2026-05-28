@@ -7,10 +7,10 @@ Content lab APIs:
     ./run.sh --headless engine.StartContentApiSmoke
 
     Validates that the content-lab catalog, resolved run summary, enemy option
-    APIs, analysis plan, and generated resource matrix return parseable JSON
-    with the expected high-level shape. Map-generation payloads include
-    deterministic preview geometry and enemy pins so the web lab does not have
-    to invent local-only sketches for algorithm comparisons.
+    APIs, fight setup, analysis plan, and generated resource matrix return
+    parseable JSON with the expected high-level shape. Map-generation payloads
+    include deterministic preview geometry and enemy pins so the web lab does
+    not have to invent local-only sketches for algorithm comparisons.
     Run summaries also expose StartBalanceRun args for the selected class,
     level, loadout, map or encounter, and package pressure.
     Enemy option APIs expose curated enemy groups, packs, arena launch args,

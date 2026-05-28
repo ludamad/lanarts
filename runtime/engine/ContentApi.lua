@@ -1517,6 +1517,221 @@ local function package_summary_from_rhythms(rhythms)
     }
 end
 
+local function metric_row(key, label, note)
+    return {
+        key = key,
+        label = label,
+        note = note,
+    }
+end
+
+local function append_metric(rows, key, label, note)
+    rows[#rows + 1] = metric_row(key, label, note)
+end
+
+local function threat_target_for(rhythm)
+    if rhythm.id == "rescue" then
+        return "ally line"
+    end
+    if rhythm.id == "escort" then
+        return rhythm.monster or "ally"
+    end
+    if rhythm.id == "summon" then
+        return "arena"
+    end
+    if rhythm.affectsEscorts then
+        return "player + ally"
+    end
+    return "player"
+end
+
+local function threat_read_for(rhythm)
+    if rhythm.id == "orbit" then
+        return "orbit pathing"
+    elseif rhythm.id == "pulse" then
+        return "windup escape"
+    elseif rhythm.id == "summon" then
+        return "add cleanup"
+    elseif rhythm.id == "escort" then
+        return "ally spacing"
+    elseif rhythm.id == "rescue" then
+        return "pull/body-block"
+    end
+    return "fight rhythm"
+end
+
+local function threat_windows_for(rhythms)
+    local rows = {}
+    for _, rhythm in ipairs(rhythms or {}) do
+        rows[#rows + 1] = {
+            id = rhythm.id,
+            label = rhythm.label or rhythm.id,
+            firstFrame = rhythm.offset or 0,
+            loopFrames = rhythm.interval or 0,
+            windowFrames = rhythm.duration or 0,
+            windupFrames = rhythm.windup,
+            activeFrames = rhythm.active or rhythm.clutchWindow or rhythm.lateWindow,
+            clutchFrames = rhythm.clutchWindow or rhythm.lateWindow,
+            pullFrames = rhythm.pullFrames,
+            damage = rhythm.damage or rhythm.allyDamage,
+            blockDamage = rhythm.blockDamage,
+            count = rhythm.count,
+            maxAlive = rhythm.maxAlive,
+            target = threat_target_for(rhythm),
+            read = threat_read_for(rhythm),
+        }
+    end
+    return rows
+end
+
+local function primary_enemy_for(config, encounter)
+    local custom = split_csv(config.monsters)
+    if #custom > 0 then
+        return custom[1], custom
+    end
+    if encounter and encounter.package and encounter.package.primary then
+        return encounter.package.primary, copy_array(encounter.monsters or {encounter.package.primary})
+    end
+    if encounter and encounter.monsters and #(encounter.monsters or {}) > 0 then
+        return encounter.monsters[1], copy_array(encounter.monsters)
+    end
+    return "", {}
+end
+
+local function package_allies_for(encounter)
+    local allies = {}
+    local escort = encounter and encounter.package and encounter.package.escort
+    if escort then
+        allies[#allies + 1] = {
+            monster = escort.monster or "ally",
+            count = escort.count or 1,
+            hp = escort.hp,
+        }
+    end
+    return allies
+end
+
+local function fight_objective_for(config, selected, encounter, package_summary)
+    local primary, monsters = primary_enemy_for(config, encounter)
+    local allies = package_allies_for(encounter)
+    if encounter and (encounter.id or "") ~= "" then
+        local label
+        if package_summary and package_summary.hasRescue then
+            label = string.format("Defeat %s while keeping the ally alive", primary ~= "" and primary or "the package")
+        elseif encounter.package then
+            label = string.format("Defeat %s through the package rhythms", primary ~= "" and primary or "the package")
+        elseif encounter.kind and encounter.kind:find("baseline") then
+            label = string.format("Baseline duel against %s", primary ~= "" and primary or encounter.label or encounter.id)
+        else
+            label = string.format("Defeat %s", primary ~= "" and primary or encounter.label or encounter.id)
+        end
+        return {
+            type = encounter.package and "package" or "duel",
+            label = label,
+            primary = primary,
+            monsters = monsters,
+            allies = allies,
+            arena = copy_object(encounter.arena or {}),
+            clear = package_summary and package_summary.hasRescue and "primary down, ally alive" or "hostiles down",
+            failure = package_summary and package_summary.hasRescue and "ally down or player death" or "player death",
+        }
+    end
+
+    local map_label = selected.map and (selected.map.label or selected.map.id) or "Campaign World"
+    local algorithm_label = selected.mapAlgorithm and (selected.mapAlgorithm.label or selected.mapAlgorithm.id) or map_label
+    return {
+        type = "map",
+        label = string.format("Run %s", algorithm_label or map_label),
+        primary = "",
+        monsters = monsters,
+        allies = {},
+        map = selected.map,
+        mapAlgorithm = selected.mapAlgorithm,
+        clear = "map survival and pacing",
+        failure = "player death",
+    }
+end
+
+local function telemetry_watch_for(config, package_summary)
+    local rows = {}
+    append_metric(rows, "win_rate", "Win rate", "overall clear check")
+    append_metric(rows, "death_rate", "Death rate", "survival floor")
+    append_metric(rows, "avg_frames", "Run frames", "pacing")
+    append_metric(rows, "combat_frame_rate", "Combat rate", "enemy contact exposure")
+    append_metric(rows, "avg_min_hp_pct", "Min HP", "near-death pressure")
+
+    if package_summary then
+        append_metric(rows, "avg_package_frames", "Package time", "package clear pacing")
+        if package_summary.hasSummons then
+            append_metric(rows, "avg_max_visible_enemies", "Enemy cap", "add saturation")
+            append_metric(rows, "kills_per_1000_combat_frames", "Kill tempo", "add cleanup pace")
+        end
+        if package_summary.hasRescue then
+            append_metric(rows, "avg_package_escort_hp_pct", "Ally HP", "escort survival margin")
+            append_metric(rows, "avg_package_rescue_save_rate", "Save rate", "rescue reliability")
+            append_metric(rows, "avg_package_rescue_clutch_rate", "Clutch rate", "late-window saves")
+            append_metric(rows, "avg_package_rescue_pull_rate", "Pull rate", "taunt/body-block interaction")
+            append_metric(rows, "avg_package_rescue_misses", "Misses", "failed rescue windows")
+            append_metric(rows, "avg_rescue_intercept_frames", "Intercept", "body-block movement")
+            append_metric(rows, "avg_rescue_hold_frames", "Hold", "frames spent holding the line")
+            append_metric(rows, "avg_rescue_late_reaction_frames", "Late reaction", "human skill buffer")
+        end
+    end
+
+    local class = class_lookup()[config.className] or {}
+    if class.range == "far" then
+        append_metric(rows, "avg_ranged_keepaway_frames", "Keep-away", "ranged spacing uptime")
+        append_metric(rows, "avg_ranged_close_enemy_frames", "Forced close", "enemy access to caster")
+        append_metric(rows, "avg_ranged_close_gragh_frames", "Gragh close", "boss contact pressure")
+    end
+    if config.className == "Necromancer" then
+        append_metric(rows, "avg_necromancer_regen_offset_pct", "Regen offset", "gross damage correction")
+        append_metric(rows, "avg_regen_adjusted_damage_taken_total", "Adjusted damage", "damage after regen")
+        append_metric(rows, "avg_necromancer_regen_recovered_total", "Regen total", "sustain volume")
+        append_metric(rows, "avg_necromancer_regen_frames", "Regen frames", "regen uptime")
+        append_metric(rows, "avg_necromancer_close_frames", "Close frames", "Pain-range commitment")
+    end
+    return rows
+end
+
+local function fight_setup_payload(config)
+    local selected = {
+        class = class_lookup()[config.className],
+        level = level_lookup()[config.level],
+        map = map_lookup()[config.mapDesc or ""],
+        mapAlgorithm = selected_map_algorithm(config),
+        encounter = encounter_lookup()[config.encounter or ""],
+        intensity = selected_intensity(config),
+    }
+    local encounter = encounter_with_components(selected.encounter, config.packageComponents)
+    local rhythms = encounter_rhythms(encounter, selected.intensity)
+    local package_summary = package_summary_from_rhythms(rhythms)
+    local control_model = control_model_for(config)
+    return {
+        schema = 1,
+        config = config,
+        objective = fight_objective_for(config, selected, encounter, package_summary),
+        role = {
+            className = config.className,
+            classRole = selected.class and selected.class.role or "",
+            positioning = control_model.positioning or "",
+            targetDistance = control_model.targetDistance or 0,
+            botProfile = control_model.botProfile,
+            decisionInterval = control_model.decisionInterval or 1,
+            notes = control_model.notes or "",
+        },
+        loadout = loadout_for_config(config),
+        threats = threat_windows_for(rhythms),
+        packageSummary = package_summary,
+        telemetry = telemetry_watch_for(config, package_summary),
+        warnings = warnings_for(config, selected),
+        commands = {
+            launch = launch_args(config),
+            balance = balance_args(config),
+        },
+    }
+end
+
 local function run_summary_payload(config)
     local known_spells, upcoming_spells = spell_rows_for_level(config.className, config.level)
     local selected = {
@@ -1883,6 +2098,7 @@ local function workspace_payload(config)
         enemyOptions = enemy_options_payload(config),
         mapGeneration = map_generation_payload(config),
         mapMatrix = map_matrix_payload(config),
+        fightSetup = fight_setup_payload(config),
         analysisPlan = analysis_plan,
         packageMatrix = package_matrix_payload(config),
         resourceMatrix = resource_matrix_payload(config),
@@ -1920,6 +2136,10 @@ end
 
 function M.run_summary_json(raw_json)
     return encode(run_summary_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.fight_setup_json(raw_json)
+    return encode(fight_setup_payload(normalized_config(parse_json_object(raw_json))))
 end
 
 function M.map_preview_json(raw_json)

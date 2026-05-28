@@ -127,6 +127,27 @@ local function run_content_api_smoke()
     expect(summary.controlModel and summary.controlModel.botProfile and summary.controlModel.botProfile.id == "human", "summary should expose selected human control model")
     expect(summary.controlModel and summary.controlModel.classRange == "close", "summary should expose class positioning model")
 
+    local fight_setup = parse_response("fight setup", ContentApi.fight_setup_json(config))
+    expect(fight_setup.objective and fight_setup.objective.primary == "Gragh", "fight setup should expose primary objective enemy")
+    expect(fight_setup.objective and #(fight_setup.objective.allies or {}) >= 1, "fight setup should expose rescue ally")
+    expect(fight_setup.role and fight_setup.role.positioning == "regen attrition", "fight setup should expose class posture")
+    expect(fight_setup.packageSummary and fight_setup.packageSummary.hasRescue, "fight setup should expose rescue package summary")
+    expect(#(fight_setup.telemetry or {}) >= 10, "fight setup should expose telemetry watch fields")
+    local has_fight_rescue_window = false
+    local has_fight_regen_metric = false
+    for _, threat in ipairs(fight_setup.threats or {}) do
+        if threat.id == "rescue" and (threat.pullFrames or 0) > 0 then
+            has_fight_rescue_window = true
+        end
+    end
+    for _, metric in ipairs(fight_setup.telemetry or {}) do
+        if metric.key == "avg_necromancer_regen_offset_pct" then
+            has_fight_regen_metric = true
+        end
+    end
+    expect(has_fight_rescue_window, "fight setup should expose rescue timing windows")
+    expect(has_fight_regen_metric, "fight setup should expose necromancer regen telemetry")
+
     local component_config = [[{
         "className": "Fighter",
         "level": 5,
@@ -460,6 +481,7 @@ local function run_content_api_smoke()
 
     local workspace = parse_response("workspace", ContentApi.workspace_json(config))
     expect(workspace.runSummary and workspace.runSummary.config.className == "Necromancer", "workspace should expose run summary")
+    expect(workspace.fightSetup and workspace.fightSetup.objective and workspace.fightSetup.objective.primary == "Gragh", "workspace should expose fight setup")
     expect(workspace.loadoutOptions and #(workspace.loadoutOptions.knownSpells or {}) >= 1, "workspace should expose loadout options")
     expect(workspace.enemyOptions and workspace.enemyOptions.monsterEvalArgs, "workspace should expose enemy options")
     expect(workspace.mapGeneration and #(workspace.mapGeneration.previews or {}) >= 3, "workspace should expose map previews")

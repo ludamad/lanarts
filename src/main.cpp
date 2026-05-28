@@ -255,6 +255,10 @@ extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_run_summary_json(con
     return content_api_call("run_summary_json", raw_json);
 }
 
+extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_fight_setup_json(const char* raw_json) {
+    return content_api_call("fight_setup_json", raw_json);
+}
+
 extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_resource_matrix_json(const char* raw_json) {
     return content_api_call("resource_matrix_json", raw_json);
 }

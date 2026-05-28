@@ -310,6 +310,50 @@
       line-height: 1.35;
     }
 
+    .fight-setup {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #14191e;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .threat-grid {
+      display: grid;
+      gap: 6px;
+    }
+
+    .threat-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 6px;
+      padding: 7px;
+      border: 1px solid #303841;
+      border-radius: 6px;
+      background: #11161b;
+    }
+
+    .threat-card strong {
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    .threat-card code {
+      color: var(--accent-2);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+    }
+
+    .threat-card span {
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
     .summary-line {
       display: grid;
       grid-template-columns: 78px minmax(0, 1fr);
@@ -862,6 +906,11 @@
       </section>
 
       <section class="section">
+        <div class="section-title">Fight Setup</div>
+        <div class="fight-setup" id="fightSetup"></div>
+      </section>
+
+      <section class="section">
         <div class="section-title">Resources</div>
         <div class="row">
           <div class="field">
@@ -1166,6 +1215,7 @@
       let mapResources = [];
       let packageResources = [];
       let resolvedRun = null;
+      let fightSetup = null;
       let loadoutOptions = null;
       let enemyOptions = null;
       let analysisPlan = null;
@@ -1507,6 +1557,91 @@
         appendSummaryLine(host, 'Balance', balanceArgs);
       }
 
+      function renderFightSetup(setup) {
+        const host = $('fightSetup');
+        host.innerHTML = '';
+        if (!setup) {
+          const pending = document.createElement('div');
+          pending.className = 'muted';
+          pending.textContent = state.runtimeReady ? 'No fight setup selected' : 'Runtime data pending';
+          host.appendChild(pending);
+          return;
+        }
+
+        const objective = setup.objective || {};
+        const goal = document.createElement('div');
+        goal.className = 'item-chips';
+        addChip(goal, objective.label || 'Selected run');
+        if (objective.primary) {
+          addChip(goal, objective.primary);
+        }
+        (objective.allies || []).forEach((ally) => {
+          addChip(goal, `${ally.monster || 'ally'} ${ally.hp || '?'}hp`);
+        });
+        if (objective.clear) {
+          addChip(goal, objective.clear);
+        }
+        appendSummaryLine(host, 'Goal', goal);
+
+        if (setup.role) {
+          const role = document.createElement('div');
+          role.className = 'item-chips';
+          addChip(role, setup.role.classRole || setup.role.className || 'class');
+          addChip(role, setup.role.positioning || 'positioning');
+          addChip(role, `${setup.role.targetDistance || 0}px target`);
+          const profile = setup.role.botProfile || {};
+          addChip(role, profile.label || profile.id || 'Human');
+          appendSummaryLine(host, 'Role', role);
+        }
+
+        const threats = setup.threats || [];
+        if (threats.length) {
+          const grid = document.createElement('div');
+          grid.className = 'threat-grid';
+          threats.forEach((threat) => {
+            const card = document.createElement('div');
+            card.className = 'threat-card';
+            const label = document.createElement('strong');
+            label.textContent = threat.label || threat.id || 'Threat';
+            const timing = document.createElement('code');
+            timing.textContent = `${threat.firstFrame || 0}f / ${threat.loopFrames || 0}f`;
+            const detail = document.createElement('span');
+            const parts = [threat.read || '', threat.target || ''];
+            if (threat.activeFrames) {
+              parts.push(`${threat.activeFrames}f active`);
+            }
+            if (threat.clutchFrames) {
+              parts.push(`${threat.clutchFrames}f clutch`);
+            }
+            if (threat.pullFrames) {
+              parts.push(`${threat.pullFrames}f pull`);
+            }
+            if (threat.maxAlive) {
+              parts.push(`cap ${threat.maxAlive}`);
+            }
+            detail.textContent = parts.filter(Boolean).join(' | ');
+            card.appendChild(label);
+            card.appendChild(timing);
+            card.appendChild(detail);
+            grid.appendChild(card);
+          });
+          appendSummaryLine(host, 'Windows', grid);
+        }
+
+        const telemetry = setup.telemetry || [];
+        if (telemetry.length) {
+          const metrics = document.createElement('div');
+          metrics.className = 'item-chips';
+          telemetry.slice(0, 14).forEach((metric) => {
+            addChip(metrics, metric.label || metric.key);
+          });
+          if (telemetry.length > 14) {
+            addChip(metrics, `+${telemetry.length - 14}`);
+          }
+          appendSummaryLine(host, 'Watch', metrics);
+        }
+      }
+
       function addChip(host, text, className) {
         const chip = document.createElement('span');
         chip.textContent = text;
@@ -1746,6 +1881,11 @@
         renderRunSummary(resolvedRun);
       }
 
+      function updateFightSetup() {
+        fightSetup = callContentApi('lanarts_content_fight_setup_json', currentConfig());
+        renderFightSetup(fightSetup);
+      }
+
       function updateEnemyOptions() {
         enemyOptions = callContentApi('lanarts_content_enemy_options_json', currentConfig());
         renderEnemyOptions(enemyOptions);
@@ -1781,6 +1921,7 @@
         }
         loadoutOptions = workspace.loadoutOptions || null;
         resolvedRun = workspace.runSummary || null;
+        fightSetup = workspace.fightSetup || null;
         enemyOptions = workspace.enemyOptions || null;
         analysisPlan = workspace.analysisPlan || null;
         mapResources = workspace.mapMatrix && workspace.mapMatrix.resources
@@ -1794,6 +1935,7 @@
           : [];
         renderBuildOptions(loadoutOptions);
         renderRunSummary(resolvedRun);
+        renderFightSetup(fightSetup);
         renderEnemyOptions(enemyOptions);
         renderAnalysisPlan(analysisPlan);
         drawPreviews(workspace.mapGeneration);
@@ -1810,6 +1952,7 @@
         }
         updateLoadoutOptions();
         updateRunSummary();
+        updateFightSetup();
         updateEnemyOptions();
         updateAnalysisPlan();
         drawPreviews();
