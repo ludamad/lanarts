@@ -100,12 +100,14 @@ Balance simulations:
     summons, rotating web knots, crossing venom lanes, a web nova beat, and
     Giant Spider cleanup.
     emit package_outcome, escort HP, rescue saves, clutch/perfect saves,
-    clutch/perfect rescue window cues, pull redirects, and misses in run and sample rows; ally-down package failures end the run
+    clutch/perfect rescue window cues, danger-clock coverage, pull redirects,
+    and misses in run and sample rows; ally-down package failures end the run
     as ally_down. Automated players also emit rescue_intercept_frames,
     rescue_hold_frames, and rescue_late_reaction_frames so package clears can
     be separated from actual body-block micro. Package rows also derive rescue
     opportunities plus save, clutch, perfect, early, timing-score, pull,
-    timed-pull, perfect-pull, and counter-opening rates
+    timed-pull, perfect-pull, late/perfect cover, uncovered danger-window,
+    and counter-opening rates
     so rescue packages can be compared without hand-calculating rates from raw
     counts. Package rows also expose threaded dodge openings plus opening
     damage/stagger totals so clean footwork can be separated from brute-force
@@ -124,7 +126,8 @@ Balance simulations:
     flagged when forced target control is carrying the fight instead of
     few-frame snap-pull saves.
     Rescue-package report rows summarize save, clutch, perfect, early,
-    timing-score, pull, timed-pull, perfect-pull, taunt-uptime, counter-window, counter-damage,
+    timing-score, pull, timed-pull, perfect-pull, taunt-uptime, late-cover,
+    perfect-cover, uncovered danger-window, counter-window, counter-damage,
     counter-stagger, fatal-miss, and buffered-miss rates, then warn when
     pull/taunt control or early parking is replacing the intended few-frame
     body-block micro.

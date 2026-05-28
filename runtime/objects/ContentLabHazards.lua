@@ -1102,6 +1102,7 @@ local active_sweeps
 local active_rescue_strikes
 local rescue_intercept_hint
 local rescue_window_state
+local rescue_danger_cover_fields
 local next_threat_state
 local package_pressure_state
 
@@ -1405,6 +1406,7 @@ local function package_result(director, outcome)
     local pull_uptime_rate = safe_rate(pull_total_frames, math.max(1, frames))
     local pressure = package_pressure_state(director, director.package or {})
     local aggro_tracking = aggro_tracking_fields(director)
+    local rescue_danger = rescue_danger_cover_fields(director)
     local sweep_warning_count, sweep_active_count, sweep_warning_remaining, sweep_active_remaining = active_sweeps()
     local best = director.rescue_best_margin
     local best_pull = director.rescue_best_pull_margin
@@ -1453,6 +1455,12 @@ local function package_result(director, outcome)
         rescue_timing_score = timing_score,
         rescue_window_cues = director.rescue_window_cues or 0,
         rescue_perfect_window_cues = director.rescue_perfect_window_cues or 0,
+        rescue_late_window_frames = rescue_danger.rescue_late_window_frames,
+        rescue_late_uncovered_frames = rescue_danger.rescue_late_uncovered_frames,
+        rescue_late_cover_rate = rescue_danger.rescue_late_cover_rate,
+        rescue_perfect_window_frames = rescue_danger.rescue_perfect_window_frames,
+        rescue_perfect_uncovered_frames = rescue_danger.rescue_perfect_uncovered_frames,
+        rescue_perfect_cover_rate = rescue_danger.rescue_perfect_cover_rate,
         rescue_perfect_window = director.rescue_perfect_window,
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
         rescue_pulls = pulls,
@@ -1528,6 +1536,7 @@ local function package_state_from_director(director)
     local aggro_tracking = aggro_tracking_fields(director)
     local next_threat = next_threat_state(director, director.package or {})
     local pressure = package_pressure_state(director, director.package or {})
+    local rescue_danger = rescue_danger_cover_fields(director)
     local rescue_state
     if director.package and director.package.rescue then
         rescue_state = rescue_window_state(director, director.package.rescue)
@@ -1586,6 +1595,12 @@ local function package_state_from_director(director)
         rescue_timing_score = safe_rate(clutch + perfect, saves),
         rescue_window_cues = director.rescue_window_cues or 0,
         rescue_perfect_window_cues = director.rescue_perfect_window_cues or 0,
+        rescue_late_window_frames = rescue_danger.rescue_late_window_frames,
+        rescue_late_uncovered_frames = rescue_danger.rescue_late_uncovered_frames,
+        rescue_late_cover_rate = rescue_danger.rescue_late_cover_rate,
+        rescue_perfect_window_frames = rescue_danger.rescue_perfect_window_frames,
+        rescue_perfect_uncovered_frames = rescue_danger.rescue_perfect_uncovered_frames,
+        rescue_perfect_cover_rate = rescue_danger.rescue_perfect_cover_rate,
         rescue_perfect_window = director.rescue_perfect_window,
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
         rescue_pulls = pulls,
@@ -1800,6 +1815,90 @@ local function rescue_window_cue(strike, perfect)
         duration = perfect and 30 or 24,
         drift = 0.22,
     }
+end
+
+local function record_rescue_danger_frame(strike, remaining, blocked)
+    local director = strike and strike.director
+    if not director or director.destroyed then
+        return
+    end
+    remaining = tonumber(remaining) or 0
+    if remaining <= (strike.late_window or 0) then
+        director.rescue_late_window_frames = (director.rescue_late_window_frames or 0) + 1
+        if blocked then
+            director.rescue_blocked_late_frames = (director.rescue_blocked_late_frames or 0) + 1
+        else
+            director.rescue_late_uncovered_frames = (director.rescue_late_uncovered_frames or 0) + 1
+        end
+    end
+    if remaining <= (strike.perfect_window or 0) then
+        director.rescue_perfect_window_frames = (director.rescue_perfect_window_frames or 0) + 1
+        if blocked then
+            director.rescue_blocked_perfect_frames = (director.rescue_blocked_perfect_frames or 0) + 1
+        else
+            director.rescue_perfect_uncovered_frames = (director.rescue_perfect_uncovered_frames or 0) + 1
+        end
+    end
+end
+
+rescue_danger_cover_fields = function(director)
+    local late_frames = director.rescue_late_window_frames or 0
+    local perfect_frames = director.rescue_perfect_window_frames or 0
+    local late_uncovered = director.rescue_late_uncovered_frames or 0
+    local perfect_uncovered = director.rescue_perfect_uncovered_frames or 0
+    return {
+        rescue_late_window_frames = late_frames,
+        rescue_perfect_window_frames = perfect_frames,
+        rescue_late_uncovered_frames = late_uncovered,
+        rescue_perfect_uncovered_frames = perfect_uncovered,
+        rescue_late_cover_rate = safe_rate(late_frames - late_uncovered, late_frames),
+        rescue_perfect_cover_rate = safe_rate(perfect_frames - perfect_uncovered, perfect_frames),
+    }
+end
+
+local function draw_rescue_danger_clock(strike, from_xy, to_xy, remaining, blocked, perfect_call, last_call)
+    if not last_call or strike.resolved then
+        return
+    end
+    local late_window = math.max(1, strike.late_window or 1)
+    local perfect_window = math.max(1, strike.perfect_window or 1)
+    local window = perfect_call and perfect_window or late_window
+    local pct = math.max(0, math.min(1, remaining / window))
+    local color = perfect_call and COL_WHITE
+        or blocked and COL_PALE_GREEN
+        or COL_PALE_RED
+    local center = Display.to_screen_xy(to_xy)
+    local radius = (strike.strike_radius or 42) + (perfect_call and 34 or 26)
+    local start_angle = -math.pi / 2
+    Display.draw_arc(
+        with_alpha(color, perfect_call and 0.88 or blocked and 0.70 or 0.82),
+        center,
+        radius,
+        start_angle,
+        start_angle + math.pi * 2 * pct,
+        perfect_call and 4 or 3,
+        20
+    )
+    local ticks = perfect_call and 6 or 8
+    local remaining_ticks = math.ceil(ticks * pct)
+    local spin = (strike.elapsed or 0) * (perfect_call and -0.072 or -0.044)
+    for idx = 1, ticks do
+        local lit = idx <= remaining_ticks
+        local angle = start_angle + spin + (idx - 0.5) * math.pi * 2 / ticks
+        local tick_xy = {
+            to_xy[1] + math.cos(angle) * radius,
+            to_xy[2] + math.sin(angle) * radius,
+        }
+        draw_world_circle(lit and color or COL_LIGHT_GRAY, tick_xy, lit and 3.6 or 2.0, 0.01, lit and 0.72 or 0.18)
+    end
+
+    local cut_xy = segment_point_at(from_xy, to_xy, math.max(0.05, math.min(0.95, 1 - pct * 0.75)))
+    draw_world_circle(color, cut_xy, perfect_call and 8 or 6, 0.03, perfect_call and 0.86 or 0.62)
+    local label_xy = {center[1], center[2] - radius - 12}
+    local label = blocked and (perfect_call and "HOLD PERFECT" or "HOLD CLUTCH")
+        or perfect_call and "CUT PERFECT"
+        or "CUT NOW"
+    draw_text(color, Display.CENTER, label_xy, label .. " " .. tostring(math.max(0, remaining)) .. "f")
 end
 
 local function finish_package(director, outcome)
@@ -2407,6 +2506,7 @@ function M.create_rescue_strike(args)
                     self.perfect_cue_fired = true
                     rescue_window_cue(self, true)
                 end
+                record_rescue_danger_frame(self, remaining, blocker ~= nil)
             end
             if not self.resolved and self.elapsed >= self.windup then
                 local blocker = self.current_blocker
@@ -2584,6 +2684,7 @@ function M.create_rescue_strike(args)
                 if perfect_call then
                     draw_world_circle(COL_WHITE, to_xy, (self.strike_radius + 23) * pulse, 0.01, 0.80)
                 end
+                draw_rescue_danger_clock(self, from_xy, to_xy, remaining, self.current_blocker ~= nil, perfect_call, last_call)
             end
             local label_xy = Display.to_screen_xy({to_xy[1], to_xy[2] - self.strike_radius - 14})
             local label
@@ -3202,6 +3303,12 @@ function M.add_director(game_map, package, intensity)
         rescue_early_saves = 0,
         rescue_window_cues = 0,
         rescue_perfect_window_cues = 0,
+        rescue_late_window_frames = 0,
+        rescue_late_uncovered_frames = 0,
+        rescue_blocked_late_frames = 0,
+        rescue_perfect_window_frames = 0,
+        rescue_perfect_uncovered_frames = 0,
+        rescue_blocked_perfect_frames = 0,
         rescue_perfect_window = scale_frames((package.rescue or {}).perfect_window, 6, intensity),
         rescue_pulls = 0,
         rescue_clutch_pulls = 0,
