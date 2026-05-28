@@ -1074,10 +1074,11 @@ for name in *{"Ranger", "Fighter", "Templar", "Rogue", "Green Mage", "Black Mage
 
 DICE_ROLL_INTERVAL = 240
 DICE_BUFF_DURATION = 150
-DICE_ROLL_ANIMATION = 48
-DICE_ROLL_REVEAL_FRAMES = 9
-DICE_ROLL_TICK_PERIOD = 6
-DICE_ROLL_LOCK_STAGE_FRAMES = {10, 24, DICE_ROLL_ANIMATION - DICE_ROLL_REVEAL_FRAMES}
+DICE_ROLL_ANIMATION = 60
+DICE_ROLL_REVEAL_FRAMES = 10
+DICE_ROLL_TICK_PERIOD = 5
+DICE_MINOR_COOLDOWN_TRIM = 45
+DICE_ROLL_LOCK_STAGE_FRAMES = {12, 30, DICE_ROLL_ANIMATION - DICE_ROLL_REVEAL_FRAMES}
 DICE_ROLL_LOCK_LABELS = {"PIPS", "TUMBLE", "FACE"}
 DICE_INITIAL_ROLL_DELAY = DICE_ROLL_INTERVAL - DICE_BUFF_DURATION - DICE_ROLL_ANIMATION
 DICE_FULL_BAG_MASK = 63
@@ -1140,6 +1141,15 @@ dicebinder_record_refresh = (effect, caster, spell_name, total_key, effective_ke
     dicebinder_increment(effect, total_key)
     if caster\spell_cooldown(spell_name) > 0
         dicebinder_increment(effect, effective_key)
+
+dicebinder_trim_cooldown = (effect, caster, spell_name, frames, total_key, effective_key) ->
+    current = caster\spell_cooldown(spell_name) or 0
+    return 0 unless current > 0
+    shaved = math.min(current, frames)
+    caster\set_spell_cooldown(spell_name, math.max(0, current - frames))
+    dicebinder_increment(effect, total_key, shaved)
+    dicebinder_increment(effect, effective_key)
+    shaved
 
 dicebinder_record_roll = (effect, caster, roll, entry, previous_roll) ->
     dicebinder_increment(effect, "rolls_total")
@@ -1299,12 +1309,15 @@ dicebinder_resolve_roll = (effect, caster) ->
     effect.next_roll = math.max(1, (effect.roll_interval or DICE_ROLL_INTERVAL) - DICE_ROLL_ANIMATION)
     dicebinder_record_roll(effect, caster, roll, entry, previous_roll)
 
-    if roll == 5
+    if roll == 4
+        dicebinder_trim_cooldown(effect, caster, "Dash Attack", DICE_MINOR_COOLDOWN_TRIM, "cooldown_trim_frames", "dash_trim_effective")
+        dicebinder_trim_cooldown(effect, caster, "Power Strike", math.floor(DICE_MINOR_COOLDOWN_TRIM * 0.75), "cooldown_trim_frames", "power_trim_effective")
+    elseif roll == 5
         caster\set_spell_cooldown("Dash Attack", 0)
     elseif roll == 6
         caster\set_spell_cooldown("Power Strike", 0)
         caster\set_spell_cooldown("Dash Attack", 0)
-        caster\heal_hp(6 + caster.stats.level * 2)
+        caster\heal_hp(4 + caster.stats.level)
         caster\heal_mp(8 + caster.stats.level)
 
     dicebinder_emit_roll_fx(caster, roll, entry)
@@ -1336,10 +1349,13 @@ dicebinder_step_roll_animation = (effect, caster) ->
     effect.rolling_time = math.max(0, (effect.rolling_time or 0) - 1)
     elapsed = (effect.rolling_total or DICE_ROLL_ANIMATION) - effect.rolling_time
     period = math.max(2, math.floor(2 + elapsed / 12))
+    previous_preview = effect.preview_roll or 0
     if effect.rolling_time <= DICE_ROLL_REVEAL_FRAMES
         effect.preview_roll = if effect.pending_roll and effect.pending_roll > 0 then effect.pending_roll else effect.preview_roll or 1
     elseif elapsed % period == 0
         effect.preview_roll = (effect.preview_roll or 0) % 6 + 1
+    if effect.preview_roll ~= previous_preview
+        dicebinder_increment(effect, "roll_face_swaps")
     dicebinder_update_roll_lock(effect, caster, elapsed)
     dicebinder_emit_roll_tick_fx(effect, caster, elapsed)
     if effect.rolling_time <= 0
@@ -1352,20 +1368,22 @@ DataW.effect_create {
         if @buff_time and @buff_time > 0
             switch @buff_kind
                 when "fleet"
-                    new.speed += 0.8
+                    new.speed += 0.7
                 when "guard"
-                    new.defence += 3
-                    new.willpower += 3
+                    new.defence += 2
+                    new.willpower += 2
                 when "edge"
-                    new.strength += 3
+                    new.strength += 2
+                    new.melee_cooldown_multiplier *= 0.97
                 when "focus"
-                    new.spell_cooldown_multiplier *= 0.72
+                    new.spell_cooldown_multiplier *= 0.84
                 when "dash"
-                    new.speed += 1.25
-                    new.melee_cooldown_multiplier *= 0.94
+                    new.speed += 1.0
+                    new.melee_cooldown_multiplier *= 0.96
                 when "jackpot"
-                    new.melee_cooldown_multiplier *= 0.82
-                    new.spell_cooldown_multiplier *= 0.82
+                    new.speed += 0.45
+                    new.melee_cooldown_multiplier *= 0.90
+                    new.spell_cooldown_multiplier *= 0.90
     init_func: (caster) =>
         @roll_interval = DICE_ROLL_INTERVAL
         @next_roll = DICE_INITIAL_ROLL_DELAY
@@ -1384,9 +1402,13 @@ DataW.effect_create {
         @roll_animations_total = 0
         @roll_animation_frames = 0
         @roll_buildup_fx = 0
+        @roll_face_swaps = 0
         @roll_reveal_cues = 0
         @roll_lock_cues = 0
         @roll_suspense_pips = 0
+        @cooldown_trim_frames = 0
+        @dash_trim_effective = 0
+        @power_trim_effective = 0
         @rolls_total = 0
         @high_rolls = 0
         @utility_rolls = 0

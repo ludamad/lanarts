@@ -1537,12 +1537,13 @@ for _index_0 = 1, #_list_2 do
 end
 local DICE_ROLL_INTERVAL = 240
 local DICE_BUFF_DURATION = 150
-local DICE_ROLL_ANIMATION = 48
-local DICE_ROLL_REVEAL_FRAMES = 9
-local DICE_ROLL_TICK_PERIOD = 6
+local DICE_ROLL_ANIMATION = 60
+local DICE_ROLL_REVEAL_FRAMES = 10
+local DICE_ROLL_TICK_PERIOD = 5
+local DICE_MINOR_COOLDOWN_TRIM = 45
 local DICE_ROLL_LOCK_STAGE_FRAMES = {
-  10,
-  24,
+  12,
+  30,
   DICE_ROLL_ANIMATION - DICE_ROLL_REVEAL_FRAMES
 }
 local DICE_ROLL_LOCK_LABELS = {
@@ -1668,6 +1669,18 @@ dicebinder_record_refresh = function(effect, caster, spell_name, total_key, effe
   if caster:spell_cooldown(spell_name) > 0 then
     return dicebinder_increment(effect, effective_key)
   end
+end
+local dicebinder_trim_cooldown
+dicebinder_trim_cooldown = function(effect, caster, spell_name, frames, total_key, effective_key)
+  local current = caster:spell_cooldown(spell_name) or 0
+  if not (current > 0) then
+    return 0
+  end
+  local shaved = math.min(current, frames)
+  caster:set_spell_cooldown(spell_name, math.max(0, current - frames))
+  dicebinder_increment(effect, total_key, shaved)
+  dicebinder_increment(effect, effective_key)
+  return shaved
 end
 local dicebinder_record_roll
 dicebinder_record_roll = function(effect, caster, roll, entry, previous_roll)
@@ -1902,12 +1915,15 @@ dicebinder_resolve_roll = function(effect, caster)
   effect.rolling_time = 0
   effect.next_roll = math.max(1, (effect.roll_interval or DICE_ROLL_INTERVAL) - DICE_ROLL_ANIMATION)
   dicebinder_record_roll(effect, caster, roll, entry, previous_roll)
-  if roll == 5 then
+  if roll == 4 then
+    dicebinder_trim_cooldown(effect, caster, "Dash Attack", DICE_MINOR_COOLDOWN_TRIM, "cooldown_trim_frames", "dash_trim_effective")
+    dicebinder_trim_cooldown(effect, caster, "Power Strike", math.floor(DICE_MINOR_COOLDOWN_TRIM * 0.75), "cooldown_trim_frames", "power_trim_effective")
+  elseif roll == 5 then
     caster:set_spell_cooldown("Dash Attack", 0)
   elseif roll == 6 then
     caster:set_spell_cooldown("Power Strike", 0)
     caster:set_spell_cooldown("Dash Attack", 0)
-    caster:heal_hp(6 + caster.stats.level * 2)
+    caster:heal_hp(4 + caster.stats.level)
     caster:heal_mp(8 + caster.stats.level)
   end
   dicebinder_emit_roll_fx(caster, roll, entry)
@@ -1942,6 +1958,7 @@ dicebinder_step_roll_animation = function(effect, caster)
   effect.rolling_time = math.max(0, (effect.rolling_time or 0) - 1)
   local elapsed = (effect.rolling_total or DICE_ROLL_ANIMATION) - effect.rolling_time
   local period = math.max(2, math.floor(2 + elapsed / 12))
+  local previous_preview = effect.preview_roll or 0
   if effect.rolling_time <= DICE_ROLL_REVEAL_FRAMES then
     if effect.pending_roll and effect.pending_roll > 0 then
       effect.preview_roll = effect.pending_roll
@@ -1950,6 +1967,9 @@ dicebinder_step_roll_animation = function(effect, caster)
     end
   elseif elapsed % period == 0 then
     effect.preview_roll = (effect.preview_roll or 0) % 6 + 1
+  end
+  if effect.preview_roll ~= previous_preview then
+    dicebinder_increment(effect, "roll_face_swaps")
   end
   dicebinder_update_roll_lock(effect, caster, elapsed)
   dicebinder_emit_roll_tick_fx(effect, caster, elapsed)
@@ -1964,20 +1984,22 @@ DataW.effect_create({
     if self.buff_time and self.buff_time > 0 then
       local _exp_0 = self.buff_kind
       if "fleet" == _exp_0 then
-        new.speed = new.speed + 0.8
+        new.speed = new.speed + 0.7
       elseif "guard" == _exp_0 then
-        new.defence = new.defence + 3
-        new.willpower = new.willpower + 3
+        new.defence = new.defence + 2
+        new.willpower = new.willpower + 2
       elseif "edge" == _exp_0 then
-        new.strength = new.strength + 3
+        new.strength = new.strength + 2
+        new.melee_cooldown_multiplier = new.melee_cooldown_multiplier * 0.97
       elseif "focus" == _exp_0 then
-        new.spell_cooldown_multiplier = new.spell_cooldown_multiplier * 0.72
+        new.spell_cooldown_multiplier = new.spell_cooldown_multiplier * 0.84
       elseif "dash" == _exp_0 then
-        new.speed = new.speed + 1.25
-        new.melee_cooldown_multiplier = new.melee_cooldown_multiplier * 0.94
+        new.speed = new.speed + 1.0
+        new.melee_cooldown_multiplier = new.melee_cooldown_multiplier * 0.96
       elseif "jackpot" == _exp_0 then
-        new.melee_cooldown_multiplier = new.melee_cooldown_multiplier * 0.82
-        new.spell_cooldown_multiplier = new.spell_cooldown_multiplier * 0.82
+        new.speed = new.speed + 0.45
+        new.melee_cooldown_multiplier = new.melee_cooldown_multiplier * 0.90
+        new.spell_cooldown_multiplier = new.spell_cooldown_multiplier * 0.90
       end
     end
   end,
@@ -1999,9 +2021,13 @@ DataW.effect_create({
     self.roll_animations_total = 0
     self.roll_animation_frames = 0
     self.roll_buildup_fx = 0
+    self.roll_face_swaps = 0
     self.roll_reveal_cues = 0
     self.roll_lock_cues = 0
     self.roll_suspense_pips = 0
+    self.cooldown_trim_frames = 0
+    self.dash_trim_effective = 0
+    self.power_trim_effective = 0
     self.rolls_total = 0
     self.high_rolls = 0
     self.utility_rolls = 0

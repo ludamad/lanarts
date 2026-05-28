@@ -2932,9 +2932,11 @@ telemetry_watch_for = function(config, package_summary)
         append_metric(rows, "avg_dice_jackpot_rolls", "Jackpots", "roll-six swing windows")
         append_metric(rows, "avg_dice_roll_animation_frames", "Roll anim", "animated anticipation frames")
         append_metric(rows, "avg_dice_roll_buildup_fx", "Roll FX", "pip bursts during anticipation")
+        append_metric(rows, "avg_dice_roll_face_swaps", "Face swaps", "visible tumbling face changes during roll animation")
         append_metric(rows, "avg_dice_roll_lock_cues", "Lock cues", "staged dice lock-in beats")
         append_metric(rows, "avg_dice_roll_suspense_pips", "Suspense pips", "extra lock-in pips during roll animation")
         append_metric(rows, "avg_dice_roll_reveal_cues", "Reveal cues", "late high-roll flashes")
+        append_metric(rows, "avg_dice_cooldown_trim_frames", "Trim frames", "bounded roll-four partial cooldown refund")
         append_metric(rows, "avg_dice_longest_high_streak", "High streak", "high-roll clump check")
         append_metric(rows, "avg_dice_repeat_rolls", "Repeats", "same face after a bag refill")
         append_metric(rows, "avg_dice_bag_refills", "D6 bag", "fair-bag cycle refills")
@@ -3304,6 +3306,15 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
             threshold = 6,
             target = ">=6 lock cues/run",
             reason = "The roll should have visible staged anticipation before the face resolves.",
+        })
+        add({
+            id = "dice-motion",
+            label = "Face motion",
+            metric = "avg_dice_roll_face_swaps",
+            comparator = ">=",
+            threshold = 12,
+            target = ">=12 face swaps/run",
+            reason = "Rolls should visibly tumble over time instead of showing one static preview face.",
         })
         add({
             id = "dice-variety",

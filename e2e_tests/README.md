@@ -151,11 +151,12 @@ Balance simulations:
     mechanic hits, plus package_micro_punish_break_total when clutch/perfect
     rescue saves break that Fury back off.
     Dicebinder runs also emit dice_rolls_total, per-face roll counts,
-    roll buildup FX, lock cues, suspense pips, reveal cues, high-roll streaks,
-    repeat rolls, effective Dash/Power refreshes, jackpot rolls, and buff
-    active frames so skill-dice RNG can be modeled separately from package execution.
-    Dicebinder drill scorecards also watch roll cadence, animation frames,
-    lock-in cues, variety switches, repeat caps, and buff uptime directly.
+    face swaps, roll buildup FX, lock cues, suspense pips, reveal cues,
+    cooldown-trim frames, high-roll streaks, repeat rolls, effective Dash/Power
+    refreshes, jackpot rolls, and buff active frames so skill-dice RNG can be
+    modeled separately from package execution. Dicebinder drill scorecards also
+    watch roll cadence, animation frames, face motion, lock-in cues, variety
+    switches, repeat caps, and buff uptime directly.
     Drills tagged `stress` replace the practice clear-floor check with a
     skill-buffer ceiling, which models late-game content that a primitive
     human-profile bot should not clear reliably.
@@ -184,11 +185,11 @@ Balance simulations:
     LANARTS_SKIP_BUILD=1 to reuse existing binaries, or LANARTS_DRAW_SMOKE=1
     to also exercise the normal native draw path for procedural FX without
     entering the slower Emscripten loop.
-    Dicebinder reports include fair-bag roll counts, animation frames, staged
-    buildup FX, lock cues, suspense pips, reveal cues, high-roll streaks,
-    repeat rolls, bag refills, dash-window frames, and effective cooldown
-    refreshes so exciting D6 windows can be checked without hiding class power
-    inside RNG streaks.
+    Dicebinder reports include fair-bag roll counts, animation frames, face
+    swaps, staged buildup FX, lock cues, suspense pips, reveal cues, cooldown
+    trims, high-roll streaks, repeat rolls, bag refills, dash-window frames, and
+    effective cooldown refreshes so exciting D6 windows can be checked without
+    hiding class power inside RNG streaks.
     The content API smoke also honors LANARTS_SKIP_BUILD=1, so Lua/catalog
     changes can be checked against the existing native binary without a rebuild.
     For ad hoc tuning, use ./e2e_tests/run_content_lab_native.sh with the same

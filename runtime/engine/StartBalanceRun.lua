@@ -864,9 +864,13 @@ local DICEBINDER_METRICS = {
     "dice_roll_animations_total",
     "dice_roll_animation_frames",
     "dice_roll_buildup_fx",
+    "dice_roll_face_swaps",
     "dice_roll_reveal_cues",
     "dice_roll_lock_cues",
     "dice_roll_suspense_pips",
+    "dice_cooldown_trim_frames",
+    "dice_dash_trim_effective",
+    "dice_power_trim_effective",
     "dice_bag_refills",
     "dice_high_rolls",
     "dice_utility_rolls",
@@ -913,9 +917,13 @@ local function dicebinder_state_fields(player)
     fields.dice_roll_animations_total = effect.roll_animations_total or 0
     fields.dice_roll_animation_frames = effect.roll_animation_frames or 0
     fields.dice_roll_buildup_fx = effect.roll_buildup_fx or 0
+    fields.dice_roll_face_swaps = effect.roll_face_swaps or 0
     fields.dice_roll_reveal_cues = effect.roll_reveal_cues or 0
     fields.dice_roll_lock_cues = effect.roll_lock_cues or 0
     fields.dice_roll_suspense_pips = effect.roll_suspense_pips or 0
+    fields.dice_cooldown_trim_frames = effect.cooldown_trim_frames or 0
+    fields.dice_dash_trim_effective = effect.dash_trim_effective or 0
+    fields.dice_power_trim_effective = effect.power_trim_effective or 0
     fields.dice_bag_refills = effect.bag_refills or 0
     fields.dice_high_rolls = effect.high_rolls or 0
     fields.dice_utility_rolls = effect.utility_rolls or 0
@@ -1224,7 +1232,8 @@ local SUMMARY_METRICS = {
     "dice_roll_6_count", "dice_dash_refreshes", "dice_dash_effective_refreshes",
     "dice_power_refreshes", "dice_power_effective_refreshes", "dice_jackpot_rolls",
     "dice_roll_animations_total", "dice_roll_animation_frames", "dice_roll_buildup_fx",
-    "dice_roll_reveal_cues", "dice_roll_lock_cues", "dice_roll_suspense_pips",
+    "dice_roll_face_swaps", "dice_roll_reveal_cues", "dice_roll_lock_cues", "dice_roll_suspense_pips",
+    "dice_cooldown_trim_frames", "dice_dash_trim_effective", "dice_power_trim_effective",
     "dice_bag_refills", "dice_high_rolls", "dice_utility_rolls",
     "dice_longest_high_streak", "dice_repeat_rolls", "dice_roll_variety_switches",
     "dice_buff_active_frames", "dice_fleet_frames", "dice_guard_frames",
@@ -2505,9 +2514,11 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                 local jackpots = tonumber(row.avg_dice_jackpot_rolls) or 0
                 local animation_frames = tonumber(row.avg_dice_roll_animation_frames) or 0
                 local buildup_fx = tonumber(row.avg_dice_roll_buildup_fx) or 0
+                local face_swaps = tonumber(row.avg_dice_roll_face_swaps) or 0
                 local reveal_cues = tonumber(row.avg_dice_roll_reveal_cues) or 0
                 local lock_cues = tonumber(row.avg_dice_roll_lock_cues) or 0
                 local suspense_pips = tonumber(row.avg_dice_roll_suspense_pips) or 0
+                local trim_frames = tonumber(row.avg_dice_cooldown_trim_frames) or 0
                 local bag_refills = tonumber(row.avg_dice_bag_refills) or 0
                 local longest_high_streak = tonumber(row.avg_dice_longest_high_streak) or 0
                 local repeats = tonumber(row.avg_dice_repeat_rolls) or 0
@@ -2525,14 +2536,16 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                     rolls,
                     0,
                     string.format(
-                        "%s skill dice averaged %.1f rolls/run, %.1f animation frames/run, %.1f buildup FX/run, %.1f lock cues/run, %.1f suspense pips/run, %.1f reveal cues/run, %.1f effective Dash refreshes, %.1f effective Power refreshes, %.1f jackpots, %.1f%% high rolls, %.1f high-roll streak, %.1f repeat rolls, %.1f%% max-face share, %.1f bag refills, and %.1f%% buff uptime.",
+                        "%s skill dice averaged %.1f rolls/run, %.1f animation frames/run, %.1f face swaps/run, %.1f buildup FX/run, %.1f lock cues/run, %.1f suspense pips/run, %.1f reveal cues/run, %.1f cooldown-trim frames, %.1f effective Dash refreshes, %.1f effective Power refreshes, %.1f jackpots, %.1f%% high rolls, %.1f high-roll streak, %.1f repeat rolls, %.1f%% max-face share, %.1f bag refills, and %.1f%% buff uptime.",
                         class_name,
                         rolls,
                         animation_frames,
+                        face_swaps,
                         buildup_fx,
                         lock_cues,
                         suspense_pips,
                         reveal_cues,
+                        trim_frames,
                         dash_refreshes,
                         power_refreshes,
                         jackpots,
@@ -3126,7 +3139,8 @@ local function run_balance(raw_args)
             "dice_power_refreshes", "dice_power_effective_refreshes",
             "dice_jackpot_rolls", "dice_roll_animations_total",
             "dice_roll_animation_frames", "dice_roll_buildup_fx",
-            "dice_roll_reveal_cues", "dice_roll_lock_cues", "dice_roll_suspense_pips",
+            "dice_roll_face_swaps", "dice_roll_reveal_cues", "dice_roll_lock_cues", "dice_roll_suspense_pips",
+            "dice_cooldown_trim_frames", "dice_dash_trim_effective", "dice_power_trim_effective",
             "dice_bag_refills",
             "dice_high_rolls", "dice_utility_rolls", "dice_longest_high_streak",
             "dice_repeat_rolls", "dice_roll_variety_switches", "dice_buff_active_frames",
@@ -3217,7 +3231,8 @@ local function run_balance(raw_args)
             "dice_power_refreshes", "dice_power_effective_refreshes",
             "dice_jackpot_rolls", "dice_roll_animations_total",
             "dice_roll_animation_frames", "dice_roll_buildup_fx",
-            "dice_roll_reveal_cues", "dice_roll_lock_cues", "dice_roll_suspense_pips",
+            "dice_roll_face_swaps", "dice_roll_reveal_cues", "dice_roll_lock_cues", "dice_roll_suspense_pips",
+            "dice_cooldown_trim_frames", "dice_dash_trim_effective", "dice_power_trim_effective",
             "dice_bag_refills",
             "dice_high_rolls", "dice_utility_rolls", "dice_longest_high_streak",
             "dice_repeat_rolls", "dice_roll_variety_switches", "dice_buff_active_frames",
@@ -3276,8 +3291,9 @@ local function run_balance(raw_args)
             "avg_dice_roll_6_count", "avg_dice_dash_refreshes", "avg_dice_dash_effective_refreshes",
             "avg_dice_power_refreshes", "avg_dice_power_effective_refreshes", "avg_dice_jackpot_rolls",
             "avg_dice_roll_animations_total", "avg_dice_roll_animation_frames",
-            "avg_dice_roll_buildup_fx", "avg_dice_roll_reveal_cues", "avg_dice_roll_lock_cues",
-            "avg_dice_roll_suspense_pips", "avg_dice_bag_refills",
+            "avg_dice_roll_buildup_fx", "avg_dice_roll_face_swaps", "avg_dice_roll_reveal_cues", "avg_dice_roll_lock_cues",
+            "avg_dice_roll_suspense_pips", "avg_dice_cooldown_trim_frames",
+            "avg_dice_dash_trim_effective", "avg_dice_power_trim_effective", "avg_dice_bag_refills",
             "avg_dice_high_rolls", "avg_dice_utility_rolls", "avg_dice_longest_high_streak",
             "avg_dice_repeat_rolls", "avg_dice_roll_variety_switches",
             "avg_dice_buff_active_frames", "avg_dice_fleet_frames", "avg_dice_guard_frames",

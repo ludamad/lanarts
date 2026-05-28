@@ -336,17 +336,32 @@ function M.draw_die_badge(obj, args)
     )
     if rolling then
         local trail_spin = frame * 0.16
-        for idx = 1, 3 do
-            local trail_pct = (rolling_pct + idx * 0.23) % 1
-            local angle = trail_spin + idx * TWO_PI / 3 + rolling_pct * 2.2
-            local dist = 31 + trail_pct * 15
+        for idx = 1, 5 do
+            local trail_pct = (rolling_pct + idx * 0.17) % 1
+            local angle = trail_spin + idx * TWO_PI / 5 + rolling_pct * 2.2
+            local dist = 29 + trail_pct * 18
             local trail_roll = ((roll + idx - 2) % 6) + 1
             local trail_xy = {xy[1] + math.cos(angle) * dist, xy[2] + math.sin(angle) * dist * 0.58}
-            draw_die_face(trail_xy, trail_roll, 10 + trail_pct * 5, color, 0.18 + trail_pct * 0.26)
+            draw_die_face(trail_xy, trail_roll, 9 + trail_pct * 5, color, 0.14 + trail_pct * 0.24)
         end
     end
     Display.draw_rectangle(alpha(COL_BLACK, rolling and 0.58 or 0.48), box)
     Display.draw_rectangle_outline(alpha(color, rolling and (0.82 + pulse * 0.16) or 0.78), box, rolling and 2 or 1)
+    if rolling then
+        local rail_y = box[4] + 9
+        for face = 1, 6 do
+            local face_x = xy[1] - 25 + (face - 1) * 10
+            local locked = face <= lock_stage * 2
+            local active = face == math.max(1, roll)
+            draw_die_face(
+                {face_x, rail_y},
+                face,
+                active and 8.5 or 6.5,
+                active and color or COL_WHITE,
+                active and 0.58 or locked and 0.34 or 0.18
+            )
+        end
+    end
     local has_die = roll > 0 and label ~= ""
     local text_x = xy[1]
     if has_die then
