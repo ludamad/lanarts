@@ -68,6 +68,8 @@ grep -q "waxanarian-venom-package" web/content_lab/shell.html
 grep -q "source or player" runtime/objects/ContentLabHazards.lua
 grep -q "MICRO" runtime/objects/ContentLabHazards.lua
 grep -q "BEAT" runtime/objects/ContentLabHazards.lua
+grep -q "draw_package_beat_wheel" runtime/objects/ContentLabHazards.lua
+grep -q "compact beat wheel" web/content_lab/README.md
 grep -q "FURY" runtime/objects/ContentLabHazards.lua
 grep -q "THREAD" runtime/objects/ContentLabHazards.lua
 grep -q "COUNTER" runtime/objects/ContentLabHazards.lua

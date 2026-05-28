@@ -1114,6 +1114,131 @@ local rescue_danger_cover_fields
 local next_threat_state
 local package_pressure_state
 
+local function beat_state(id, label, color, pct, active, warning)
+    return {
+        id = id,
+        label = label,
+        color = color or COL_LIGHT_GRAY,
+        pct = math.max(0, math.min(1, pct or 0)),
+        active = active == true,
+        warning = warning == true,
+    }
+end
+
+local function package_beat_states(director, package, intensity)
+    local states = {}
+    local elapsed = director.elapsed or 0
+    local function add(state)
+        if state then
+            states[#states + 1] = state
+        end
+    end
+
+    if package.orbit then
+        local interval, offset = scaled_interval_and_offset(package.orbit, 300, 40, intensity)
+        local delta = next_delta(elapsed, interval, offset)
+        local active = active_orbs()
+        add(beat_state(
+            "orbit",
+            "O",
+            active > 0 and COL_PALE_BLUE or COL_LIGHT_GRAY,
+            active > 0 and 1 or 1 - delta / interval,
+            active > 0,
+            false
+        ))
+    end
+    if package.pulse then
+        local interval, offset = scaled_interval_and_offset(package.pulse, 150, 70, intensity)
+        local delta = next_delta(elapsed, interval, offset)
+        local warning, active = active_pulses()
+        add(beat_state(
+            "pulse",
+            "A",
+            active > 0 and COL_PALE_RED or warning > 0 and COL_PALE_YELLOW or COL_LIGHT_GRAY,
+            active > 0 and 1 or warning > 0 and 0.82 or 1 - delta / interval,
+            active > 0,
+            warning > 0
+        ))
+    end
+    if package.sweep then
+        local interval, offset = scaled_interval_and_offset(package.sweep, 180, 52, intensity)
+        local delta = next_delta(elapsed, interval, offset)
+        local warning, active = active_sweeps()
+        add(beat_state(
+            "sweep",
+            "S",
+            active > 0 and COL_PALE_RED or warning > 0 and COL_PALE_YELLOW or COL_LIGHT_GRAY,
+            active > 0 and 1 or warning > 0 and 0.82 or 1 - delta / interval,
+            active > 0,
+            warning > 0
+        ))
+    end
+    if package.summon then
+        local interval, offset = scaled_interval_and_offset(package.summon, 360, 120, intensity)
+        local delta = next_delta(elapsed, interval, offset)
+        local warning = active_summon_portals()
+        add(beat_state(
+            "summon",
+            "D",
+            warning > 0 and COL_PALE_YELLOW or COL_LIGHT_GRAY,
+            warning > 0 and 0.82 or 1 - delta / interval,
+            false,
+            warning > 0
+        ))
+    end
+    if package.rescue then
+        local rescue = rescue_window_state(director, package.rescue)
+        local pulling = (director.rescue_pull_active_frames or 0) > 0
+        local active = rescue.active_count and rescue.active_count > 0
+        local color = pulling and COL_PALE_YELLOW
+            or rescue.perfect and COL_WHITE
+            or rescue.late and COL_PALE_YELLOW
+            or active and COL_PALE_GREEN
+            or COL_LIGHT_GRAY
+        add(beat_state(
+            "rescue",
+            "R",
+            color,
+            (pulling or active) and 1 or 1 - (rescue.next_frames or 0) / math.max(1, rescue.interval or 1),
+            pulling or active,
+            rescue.late or rescue.perfect
+        ))
+    end
+    return states
+end
+
+local function draw_package_beat_wheel(director, package, intensity)
+    local states = package_beat_states(director, package, intensity)
+    if #states == 0 then
+        return
+    end
+    local center = {HUD_X + HUD_W - 24, HUD_Y + 14}
+    local radius = 13
+    local frame = director.elapsed or 0
+    Display.draw_circle(with_alpha(COL_BLACK, 0.42), center, radius + 7)
+    Display.draw_circle_outline(with_alpha(COL_PALE_BLUE, 0.30), center, radius + 7, 1)
+    for idx, state in ipairs(states) do
+        local angle = -math.pi / 2 + (idx - 1) * math.pi * 2 / #states
+        local xy = {center[1] + math.cos(angle) * radius, center[2] + math.sin(angle) * radius}
+        local pulse = (state.active or state.warning) and (1.2 + 0.18 * math.sin(frame * 0.30 + idx)) or 1
+        local dot_radius = (state.active and 4.5 or state.warning and 3.8 or 3.0) * pulse
+        Display.draw_circle(with_alpha(state.color, state.active and 0.82 or state.warning and 0.62 or 0.34), xy, dot_radius)
+        Display.draw_circle_outline(with_alpha(state.color, 0.78), xy, dot_radius + 1, 1)
+        draw_text(COL_WHITE, Display.CENTER, {xy[1], xy[2] - 4}, state.label)
+        if not state.active and not state.warning then
+            Display.draw_arc(
+                with_alpha(state.color, 0.58),
+                xy,
+                dot_radius + 3,
+                -math.pi / 2,
+                -math.pi / 2 + math.pi * 2 * state.pct,
+                1,
+                10
+            )
+        end
+    end
+end
+
 local function draw_package_hud(director)
     local package = director.package or {}
     local intensity = director.intensity
@@ -1152,6 +1277,7 @@ local function draw_package_hud(director)
     Display.draw_rectangle_outline(with_alpha(COL_PALE_BLUE, 0.34), {HUD_X, HUD_Y, HUD_X + HUD_W, HUD_Y + panel_h}, 1)
     local title = "Package " .. (intensity.label or intensity.id or "Standard")
     draw_text(COL_PALE_BLUE, Display.LEFT_TOP, {HUD_X + 8, HUD_Y + 5}, title)
+    draw_package_beat_wheel(director, package, intensity)
 
     local y = HUD_Y + 24
     if has_threat_rows then
