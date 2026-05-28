@@ -1388,6 +1388,19 @@
         host.appendChild(row);
       }
 
+      function commandText(command) {
+        return (command || []).map((arg) => {
+          const text = String(arg === undefined || arg === null ? '' : arg);
+          if (!text) {
+            return "''";
+          }
+          if (/^[A-Za-z0-9_./:=@%+-]+$/.test(text)) {
+            return text;
+          }
+          return "'" + text.replace(/'/g, "'\\''") + "'";
+        }).join(' ');
+      }
+
       function renderRunSummary(summary) {
         const host = $('runSummary');
         host.innerHTML = '';
@@ -1485,11 +1498,11 @@
         }
 
         const args = document.createElement('code');
-        args.textContent = (summary.args || []).join(' ');
+        args.textContent = commandText(summary.args);
         appendSummaryLine(host, 'Args', args);
 
         const balanceArgs = document.createElement('code');
-        balanceArgs.textContent = (summary.balanceArgs || []).join(' ');
+        balanceArgs.textContent = commandText(summary.balanceArgs);
         appendSummaryLine(host, 'Balance', balanceArgs);
       }
 
@@ -1624,7 +1637,7 @@
 
       function appendCommandLine(host, labelText, command) {
         const code = document.createElement('code');
-        code.textContent = (command || []).join(' ');
+        code.textContent = commandText(command);
         appendSummaryLine(host, labelText, code);
       }
 
@@ -2299,7 +2312,7 @@
         state.started = true;
         document.body.classList.add('running');
         $('status').lastElementChild.textContent = `${config.className} L${config.level} running`;
-        appendOutput(`launch ${args.join(' ')}`);
+        appendOutput(`launch ${commandText(args)}`);
         Module.callMain(args);
       }
 
