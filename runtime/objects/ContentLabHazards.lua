@@ -312,6 +312,8 @@ local function draw_escort_markers()
 end
 
 local summon_count
+local active_orbs
+local active_pulses
 local active_rescue_strikes
 local rescue_window_state
 
@@ -346,14 +348,26 @@ local function draw_package_hud(director)
         local orbit = package.orbit
         local interval, offset = scaled_interval_and_offset(orbit, 300, 40, intensity)
         local delta = next_delta(director.elapsed, interval, offset)
-        draw_hud_row(y, "ORBS", format_frames(delta), COL_PALE_BLUE, 1 - delta / interval)
+        local active, remaining = active_orbs()
+        if active > 0 then
+            draw_hud_row(y, "ORBS", "active " .. active .. " " .. format_frames(remaining or 0), COL_PALE_BLUE, 1)
+        else
+            draw_hud_row(y, "ORBS", format_frames(delta), COL_PALE_BLUE, 1 - delta / interval)
+        end
         y = y + HUD_ROW_H
     end
     if package.pulse then
         local pulse = package.pulse
         local interval, offset = scaled_interval_and_offset(pulse, 150, 70, intensity)
         local delta = next_delta(director.elapsed, interval, offset)
-        draw_hud_row(y, "AOE", format_frames(delta), COL_PALE_RED, 1 - delta / interval)
+        local warning, active, warning_remaining, active_remaining = active_pulses()
+        if active > 0 then
+            draw_hud_row(y, "AOE", "active " .. format_frames(active_remaining or 0), COL_PALE_RED, 1)
+        elseif warning > 0 then
+            draw_hud_row(y, "AOE", "warn " .. format_frames(warning_remaining or 0), COL_PALE_YELLOW, 1)
+        else
+            draw_hud_row(y, "AOE", format_frames(delta), COL_PALE_RED, 1 - delta / interval)
+        end
         y = y + HUD_ROW_H
     end
     if package.summon then
@@ -505,6 +519,8 @@ local function package_state_from_director(director)
     local clutch = director.rescue_clutch_saves or 0
     local pulls = director.rescue_pulls or 0
     local opportunities = saves + misses
+    local orb_count, orb_remaining = active_orbs()
+    local pulse_warning_count, pulse_active_count, pulse_warning_remaining, pulse_active_remaining = active_pulses()
     local rescue_state
     if director.package and director.package.rescue then
         rescue_state = rescue_window_state(director, director.package.rescue)
@@ -517,6 +533,12 @@ local function package_state_from_director(director)
         escort_count = count,
         escort_hp = hp,
         escort_max_hp = max_hp,
+        orb_active_count = orb_count,
+        orb_active_remaining = orb_remaining,
+        pulse_warning_count = pulse_warning_count,
+        pulse_warning_remaining = pulse_warning_remaining,
+        pulse_active_count = pulse_active_count,
+        pulse_active_remaining = pulse_active_remaining,
         rescue_saves = saves,
         rescue_opportunities = opportunities,
         rescue_save_rate = safe_rate(saves, opportunities),
@@ -675,6 +697,10 @@ function M.create_pulse(args)
         solid = false,
         depth = HAZARD_DEPTH,
         elapsed = 0,
+        content_lab_pulse = true,
+        windup_frames = windup,
+        active_frames = active,
+        linger_frames = linger,
         source = args.source,
         damage = args.damage or 4,
         power = args.power or 22,
@@ -712,6 +738,7 @@ function M.create_orb(args)
         solid = false,
         depth = HAZARD_DEPTH,
         elapsed = 0,
+        content_lab_orb = true,
         source = args.source,
         center_xy = copy_xy(args.center_xy),
         anchor = args.anchor,
@@ -1123,6 +1150,43 @@ function summon_count()
         end
     end
     return count
+end
+
+function active_orbs()
+    local count = 0
+    local best_remaining
+    for _, obj in ipairs(Map.objects_list()) do
+        if obj and not obj.destroyed and obj.content_lab_orb then
+            count = count + 1
+            local remaining = math.max(0, (obj.duration or 0) - (obj.elapsed or 0))
+            best_remaining = math.min(best_remaining or remaining, remaining)
+        end
+    end
+    return count, best_remaining
+end
+
+function active_pulses()
+    local warning_count = 0
+    local active_count = 0
+    local warning_remaining
+    local active_remaining
+    for _, obj in ipairs(Map.objects_list()) do
+        if obj and not obj.destroyed and obj.content_lab_pulse then
+            local elapsed = obj.elapsed or 0
+            local windup = obj.windup_frames or 0
+            local active = obj.active_frames or 0
+            if elapsed <= windup then
+                warning_count = warning_count + 1
+                local remaining = math.max(0, windup - elapsed)
+                warning_remaining = math.min(warning_remaining or remaining, remaining)
+            elseif elapsed <= windup + active then
+                active_count = active_count + 1
+                local remaining = math.max(0, windup + active - elapsed)
+                active_remaining = math.min(active_remaining or remaining, remaining)
+            end
+        end
+    end
+    return warning_count, active_count, warning_remaining, active_remaining
 end
 
 function active_rescue_strikes()
