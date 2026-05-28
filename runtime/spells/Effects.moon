@@ -1073,6 +1073,10 @@ for name in *{"Ranger", "Fighter", "Templar", "Rogue", "Green Mage", "Black Mage
 
 DICE_ROLL_INTERVAL = 240
 DICE_BUFF_DURATION = 150
+DICE_ROLL_ANIMATION = 36
+DICE_INITIAL_ROLL_DELAY = DICE_ROLL_INTERVAL - DICE_BUFF_DURATION - DICE_ROLL_ANIMATION
+DICE_FULL_BAG_MASK = 63
+DICE_FACE_BITS = {1, 2, 4, 8, 16, 32}
 DICE_ROLLS = {
     [1]: {kind: "fleet", label: "Fleet step", short: "SPD", color: COL_PALE_GREEN}
     [2]: {kind: "guard", label: "Guard stance", short: "GRD", color: COL_PALE_BLUE}
@@ -1084,6 +1088,40 @@ DICE_ROLLS = {
 
 dicebinder_increment = (effect, key, amount=1) ->
     effect[key] = (effect[key] or 0) + amount
+
+dicebinder_face_available = (mask, face) ->
+    bit = DICE_FACE_BITS[face] or 0
+    bit > 0 and math.floor(mask / bit) % 2 >= 1
+
+dicebinder_bag_count = (mask) ->
+    count = 0
+    for face=1,6
+        count += 1 if dicebinder_face_available(mask, face)
+    count
+
+dicebinder_remove_from_bag = (mask, face) ->
+    bit = DICE_FACE_BITS[face] or 0
+    if bit > 0 and dicebinder_face_available(mask, face)
+        return mask - bit
+    mask
+
+dicebinder_next_fair_roll = (effect) ->
+    mask = effect.bag_mask or DICE_FULL_BAG_MASK
+    remaining = dicebinder_bag_count(mask)
+    if remaining <= 0
+        mask = DICE_FULL_BAG_MASK
+        remaining = 6
+        dicebinder_increment(effect, "bag_refills")
+    pick = math.random(1, remaining)
+    seen = 0
+    for face=1,6
+        if dicebinder_face_available(mask, face)
+            seen += 1
+            if seen == pick
+                effect.bag_mask = dicebinder_remove_from_bag(mask, face)
+                return face
+    effect.bag_mask = DICE_FULL_BAG_MASK - 1
+    1
 
 dicebinder_record_refresh = (effect, caster, spell_name, total_key, effective_key) ->
     dicebinder_increment(effect, total_key)
@@ -1100,14 +1138,17 @@ dicebinder_record_roll = (effect, caster, roll, entry) ->
         dicebinder_record_refresh(effect, caster, "Dash Attack", "dash_refreshes", "dash_effective_refreshes")
         dicebinder_record_refresh(effect, caster, "Power Strike", "power_refreshes", "power_effective_refreshes")
 
-dicebinder_roll = (effect, caster) ->
-    roll = math.random(1, 6)
+dicebinder_resolve_roll = (effect, caster) ->
+    roll = if effect.pending_roll and effect.pending_roll > 0 then effect.pending_roll else dicebinder_next_fair_roll(effect)
     entry = DICE_ROLLS[roll]
     effect.last_roll = roll
     effect.roll_color = entry.color
     effect.buff_kind = entry.kind
     effect.buff_time = DICE_BUFF_DURATION
-    effect.next_roll = effect.roll_interval or DICE_ROLL_INTERVAL
+    effect.pending_roll = 0
+    effect.preview_roll = roll
+    effect.rolling_time = 0
+    effect.next_roll = math.max(1, (effect.roll_interval or DICE_ROLL_INTERVAL) - DICE_ROLL_ANIMATION)
     dicebinder_record_roll(effect, caster, roll, entry)
 
     if roll == 5
@@ -1138,6 +1179,34 @@ dicebinder_roll = (effect, caster) ->
         if caster\is_local_player()
             EventLog.add("Skill die #{roll}: #{entry.label}.", entry.color)
 
+dicebinder_start_roll = (effect, caster) ->
+    effect.pending_roll = dicebinder_next_fair_roll(effect)
+    effect.preview_roll = math.random(1, 6)
+    effect.rolling_time = DICE_ROLL_ANIMATION
+    effect.rolling_total = DICE_ROLL_ANIMATION
+    effect.roll_color = COL_WHITE
+    dicebinder_increment(effect, "roll_animations_total")
+    ImpactFX.world_burst {
+        map: caster.map
+        xy: caster.xy
+        color: COL_WHITE
+        label: "D6"
+        radius: 58
+        duration: DICE_ROLL_ANIMATION
+    }
+
+dicebinder_step_roll_animation = (effect, caster) ->
+    dicebinder_increment(effect, "roll_animation_frames")
+    effect.rolling_time = math.max(0, (effect.rolling_time or 0) - 1)
+    elapsed = (effect.rolling_total or DICE_ROLL_ANIMATION) - effect.rolling_time
+    period = math.max(2, math.floor(2 + elapsed / 12))
+    if effect.rolling_time <= 7
+        effect.preview_roll = if effect.pending_roll and effect.pending_roll > 0 then effect.pending_roll else effect.preview_roll or 1
+    elseif elapsed % period == 0
+        effect.preview_roll = (effect.preview_roll or 0) % 6 + 1
+    if effect.rolling_time <= 0
+        dicebinder_resolve_roll(effect, caster)
+
 DataW.effect_create {
     name: "Dicebinder"
     stat_func: (obj, old, new) =>
@@ -1158,11 +1227,19 @@ DataW.effect_create {
                     new.spell_cooldown_multiplier *= 0.82
     init_func: (caster) =>
         @roll_interval = DICE_ROLL_INTERVAL
-        @next_roll = 90
+        @next_roll = DICE_INITIAL_ROLL_DELAY
         @last_roll = 0
         @roll_color = COL_PALE_BLUE
         @buff_kind = "none"
         @buff_time = 0
+        @pending_roll = 0
+        @preview_roll = 0
+        @rolling_time = 0
+        @rolling_total = DICE_ROLL_ANIMATION
+        @bag_mask = DICE_FULL_BAG_MASK
+        @bag_refills = 0
+        @roll_animations_total = 0
+        @roll_animation_frames = 0
         @rolls_total = 0
         @dash_refreshes = 0
         @dash_effective_refreshes = 0
@@ -1173,23 +1250,35 @@ DataW.effect_create {
         for roll=1,6
             @["roll_#{roll}_count"] = 0
     step_func: (caster) =>
-        @next_roll -= 1
         if @buff_time and @buff_time > 0
             dicebinder_increment(@, "buff_active_frames")
             dicebinder_increment(@, "#{@buff_kind}_frames") if @buff_kind and @buff_kind ~= "none"
             @buff_time -= 1
+        if @rolling_time and @rolling_time > 0
+            dicebinder_step_roll_animation(@, caster)
+            return
+        @next_roll -= 1
         if @next_roll <= 0
-            dicebinder_roll(@, caster)
+            dicebinder_start_roll(@, caster)
     draw_func: (caster) =>
-        entry = DICE_ROLLS[@last_roll or 0]
+        rolling = @rolling_time and @rolling_time > 0
+        shown_roll = if rolling
+            if @rolling_time <= 7 and @pending_roll and @pending_roll > 0 then @pending_roll
+            elseif @preview_roll and @preview_roll > 0 then @preview_roll
+            else 1
+        else @last_roll or 0
+        entry = DICE_ROLLS[shown_roll]
         ProceduralEffects.draw_die_badge caster, {
-            roll: @last_roll or 0
+            roll: shown_roll
             remaining: @next_roll or 0
             interval: @roll_interval or DICE_ROLL_INTERVAL
-            color: @roll_color or COL_PALE_BLUE
-            label: (entry and entry.short) or ""
+            color: (rolling and entry and entry.color) or @roll_color or COL_PALE_BLUE
+            label: (rolling and ((@rolling_time or 0) <= 7 and entry and entry.short or "ROLL")) or (entry and entry.short) or ""
             buff_remaining: @buff_time or 0
             buff_duration: DICE_BUFF_DURATION
+            rolling: rolling
+            rolling_remaining: @rolling_time or 0
+            rolling_total: @rolling_total or DICE_ROLL_ANIMATION
         }
 }
 

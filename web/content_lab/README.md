@@ -55,7 +55,7 @@ Package HUDs also show current aggro, with a world link from the primary enemy t
 Package HUDs include NEXT and BEAT rows that summarize the active or nearest package beat, keeping AOE, orbs, sweeps, summons, portals, and rescue-line timing readable during heavy micro.
 Package HUDs also include a STACK row, and balance rows expose peak stack plus overlap rate so full-package fights can be checked for actual simultaneous micro pressure.
 Boss package draws now use a reusable procedural pressure-field aura that grows and spins harder when overlapping package beats stack up.
-Dicebinder's live D6 badge shows the current roll role and remaining buff arc so cooldown-refresh windows are readable during boss-package drills.
+Dicebinder's live D6 badge animates through a short rolling anticipation window, then shows the resolved roll role and remaining buff arc so cooldown-refresh windows are readable during boss-package drills. Rolls use a fair six-face bag before refilling, keeping the class varied without letting jackpot streaks dominate balance reads.
 Package HUDs include a MICRO row that scores clean hazard dodges, rescue saves, streaks, and avoidable hits while the fight is happening.
 Rescue HUDs include TAUNT uptime, and balance rows expose pull/taunt total frames plus uptime rate so rescue-package clears can be separated from forced-target-control cheese.
 Balance rows also expose perfect-save counts/rates to distinguish ordinary clutch blocks from the last-few-frame saves that make rescue packages feel sharp.
@@ -63,7 +63,7 @@ Balance rows expose early-save rate, rescue timing score, rescue counter windows
 Balance rows expose package micro score, best streak, threaded avoid count, and avoidable mechanic-hit count so lab runs can separate clean execution from brute-force clears. Orb and sweep avoids only score when the player was actually close to the hazard lane; expired off-screen hazards no longer inflate dodge counts.
 Package reports and drill scorecards flag clears with negative micro score so a primitive automated player surviving the fight does not automatically count as healthy content.
 Gragh packages also expose `package_micro_punish_total`: avoidable package hits feed Gragh Fury, healing the primary up to an overheal cap so brute-force melee clears have an in-fight cost. In-game, the package HUD shows a FURY row and Gragh flashes with a short red burst when the punish triggers; clutch/perfect rescue saves can break some Fury back off and emit `package_micro_punish_break_total`.
-Dicebinder runs expose skill-dice telemetry such as `dice_rolls_total`, roll-face counts, effective Dash/Power refreshes, jackpot rolls, and buff active frames so RNG windows can be separated from baseline package execution.
+Dicebinder runs expose skill-dice telemetry such as `dice_rolls_total`, roll-face counts, roll animation frames, bag refills, effective Dash/Power refreshes, jackpot rolls, dash-window frames, and buff active frames so RNG windows can be separated from baseline package execution.
 Summon waves use short visible add portals before enemies appear, so add pressure has a readable cleanup beat instead of an instant spawn.
 Orb, sweep, and AOE rows switch from spawn countdowns to active/warning state while those package threats are live.
 Rescue packages also show a live READ row for cut-lane, clutch, hold, and pull-target states while the line is active.

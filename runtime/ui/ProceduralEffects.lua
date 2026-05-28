@@ -268,27 +268,56 @@ function M.draw_die_badge(obj, args)
     local remaining = math.max(0, args.remaining or 0)
     local interval = math.max(1, args.interval or 1)
     local pct = remaining / interval
+    local rolling = args.rolling == true
+    local rolling_remaining = math.max(0, args.rolling_remaining or 0)
+    local rolling_total = math.max(1, args.rolling_total or 1)
+    local rolling_pct = clamp(1 - rolling_remaining / rolling_total, 0, 1)
     local label = args.label or ""
     local buff_remaining = math.max(0, args.buff_remaining or 0)
     local buff_duration = math.max(1, args.buff_duration or 1)
     local buff_pct = clamp(buff_remaining / buff_duration, 0, 1)
     local color = args.color or COL_PALE_BLUE
     local xy = screen_xy({obj.x, obj.y - (obj.radius or 14) - 30})
-    local w = label ~= "" and 64 or 48
-    local h = label ~= "" and 28 or 20
+    local pulse = 0.5 + 0.5 * math.sin((GameState.frame or 0) * 0.32)
+    local w = rolling and 72 or label ~= "" and 64 or 48
+    local h = rolling and 32 or label ~= "" and 28 or 20
     local box = {xy[1] - w / 2, xy[2] - h / 2, xy[1] + w / 2, xy[2] + h / 2}
-    Display.draw_radial_gradient({120, 170, 255, 35}, {20, 30, 70, 0}, xy, label ~= "" and 39 or 34, 5)
-    Display.draw_rectangle(alpha(COL_BLACK, 0.48), box)
-    Display.draw_rectangle_outline(alpha(color, 0.78), box, 1)
+    Display.draw_radial_gradient(
+        rolling and alpha(color, 0.20 + pulse * 0.12) or {120, 170, 255, 35},
+        {20, 30, 70, 0},
+        xy,
+        rolling and (43 + pulse * 5) or label ~= "" and 39 or 34,
+        5
+    )
+    Display.draw_rectangle(alpha(COL_BLACK, rolling and 0.58 or 0.48), box)
+    Display.draw_rectangle_outline(alpha(color, rolling and (0.82 + pulse * 0.16) or 0.78), box, rolling and 2 or 1)
     if label ~= "" then
         Fonts.small:draw({color = alpha(COL_WHITE, 0.95), origin = Display.CENTER}, {xy[1], xy[2] - 7}, "D6 " .. tostring(roll))
         Fonts.small:draw({color = alpha(color, 0.95), origin = Display.CENTER}, {xy[1], xy[2] + 7}, label)
     else
         Fonts.small:draw({color = alpha(COL_WHITE, 0.95), origin = Display.CENTER}, {xy[1], xy[2] - 1}, "D6 " .. tostring(roll))
     end
-    Display.draw_arc(alpha(color, 0.88), xy, label ~= "" and 36 or 31, -math.pi / 2, -math.pi / 2 + TWO_PI * (1 - pct), 2, 18)
+    local outer_radius = rolling and 40 or label ~= "" and 36 or 31
+    local outer_pct = rolling and rolling_pct or 1 - pct
+    Display.draw_arc(alpha(color, rolling and 0.95 or 0.88), xy, outer_radius, -math.pi / 2, -math.pi / 2 + TWO_PI * outer_pct, rolling and 3 or 2, 18)
+    if rolling then
+        local spin = (GameState.frame or 0) * 0.19
+        Display.draw_arc(alpha(COL_WHITE, 0.26 + pulse * 0.28), xy, outer_radius + 5, spin, spin + math.pi * 0.74, 2, 18)
+        Display.draw_arc(alpha(color, 0.20 + pulse * 0.24), xy, outer_radius - 8, -spin * 0.7, -spin * 0.7 + math.pi * 1.18, 2, 18)
+        for idx = 1, 6 do
+            local angle = spin + idx * TWO_PI / 6
+            local inner = outer_radius - 3
+            local outer = outer_radius + 3 + pulse * 2
+            Display.draw_line(
+                alpha(color, 0.18 + pulse * 0.18),
+                {xy[1] + math.cos(angle) * inner, xy[2] + math.sin(angle) * inner},
+                {xy[1] + math.cos(angle) * outer, xy[2] + math.sin(angle) * outer},
+                1
+            )
+        end
+    end
     if buff_pct > 0 then
-        Display.draw_arc(alpha(COL_WHITE, 0.70), xy, label ~= "" and 26 or 23, -math.pi / 2, -math.pi / 2 + TWO_PI * buff_pct, 2, 16)
+        Display.draw_arc(alpha(COL_WHITE, 0.70), xy, rolling and 27 or label ~= "" and 26 or 23, -math.pi / 2, -math.pi / 2 + TWO_PI * buff_pct, 2, 16)
     end
 end
 

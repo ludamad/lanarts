@@ -2908,7 +2908,10 @@ telemetry_watch_for = function(config, package_summary)
         append_metric(rows, "avg_dice_dash_effective_refreshes", "Dash refresh", "cooldown refunds that mattered")
         append_metric(rows, "avg_dice_power_effective_refreshes", "Power refresh", "Power Strike refunds that mattered")
         append_metric(rows, "avg_dice_jackpot_rolls", "Jackpots", "roll-six swing windows")
+        append_metric(rows, "avg_dice_roll_animation_frames", "Roll anim", "animated anticipation frames")
+        append_metric(rows, "avg_dice_bag_refills", "D6 bag", "fair-bag cycle refills")
         append_metric(rows, "avg_dice_buff_active_frames", "Buff frames", "skill dice uptime")
+        append_metric(rows, "avg_dice_dash_frames", "Dash window", "roll-five window uptime")
     end
     return rows
 end
