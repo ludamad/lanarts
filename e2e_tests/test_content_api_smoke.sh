@@ -20,5 +20,6 @@ grep -q "avg_package_micro_punish_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_early_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timing_score" runtime/engine/StartBalanceRun.lua
 grep -q "MICRO" runtime/objects/ContentLabHazards.lua
+grep -q "FURY" runtime/objects/ContentLabHazards.lua
 grep -q "THREAD" runtime/objects/ContentLabHazards.lua
 env SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1 ./run.sh --headless engine.StartContentApiSmoke "$@"

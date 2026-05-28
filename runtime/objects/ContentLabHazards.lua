@@ -237,6 +237,22 @@ local function apply_micro_punish(hazard)
     director.micro_punish_total = (director.micro_punish_total or 0) + applied
     director.micro_punish_events = (director.micro_punish_events or 0) + 1
     director.micro_punish_last_label = punish.label or "FURY"
+    director.micro_punish_last_amount = applied
+    director.micro_punish_last_timer = 72
+    ImpactFX.screen_flash {
+        map = director.map,
+        color = COL_PALE_RED,
+        alpha = 0.08,
+        duration = 10,
+    }
+    ImpactFX.world_burst {
+        map = director.map,
+        xy = xy_of(primary),
+        color = COL_PALE_RED,
+        label = punish.label or "FURY",
+        radius = 54,
+        duration = 30,
+    }
     if M.create_feedback_label then
         M.create_feedback_label {
             map = director.map,
@@ -621,6 +637,39 @@ local function draw_aggro_marker(director, package)
     draw_text(color, Display.CENTER, label_xy, label)
 end
 
+local function micro_punish_cap(package)
+    local primary = primary_monster(package and package.primary)
+    local punish = package and package.micro_punish
+    if not primary or not punish then
+        return 0
+    end
+    local estats = primary:effective_stats()
+    local max_hp = math.max(1, estats.max_hp or primary.stats.max_hp or primary.stats.hp or 1)
+    return max_hp * math.max(0.01, tonumber(punish.overheal_cap_pct) or 0.25)
+end
+
+local function draw_micro_punish_marker(director, package)
+    if not package or not package.micro_punish or (director.micro_punish_last_timer or 0) <= 0 then
+        return
+    end
+    local primary = primary_monster(package.primary)
+    if not primary then
+        return
+    end
+    local timer = director.micro_punish_last_timer or 0
+    local intensity = math.min(1, timer / 72)
+    ProceduralEffects.draw_boss_aura(primary, {
+        palette = "red",
+        radius = (primary.radius or 16) + 42 + 16 * intensity,
+        intensity = 0.55 + 0.35 * intensity,
+        rotation_speed = 0.042,
+        spoke_speed = -0.026,
+    })
+    local amount = director.micro_punish_last_amount or 0
+    local label_xy = Display.to_screen_xy({primary.x, primary.y - (primary.radius or 16) - 44})
+    draw_text(COL_PALE_RED, Display.CENTER, label_xy, (director.micro_punish_last_label or "FURY") .. " +" .. tostring(math.ceil(amount)))
+end
+
 local summon_count
 local active_summon_portals
 local active_orbs
@@ -638,6 +687,9 @@ local function draw_package_hud(director)
     local has_threat_rows = package.orbit or package.pulse or package.sweep or package.summon or package.rescue
     if has_threat_rows then
         row_count = row_count + 3
+    end
+    if package.micro_punish then
+        row_count = row_count + 1
     end
     if package.orbit then
         row_count = row_count + 1
@@ -696,6 +748,18 @@ local function draw_package_hud(director)
         end
         draw_hud_row(y, "MICRO", micro_value, micro_color, math.min(1, math.max(0, score) / 120))
         y = y + HUD_ROW_H
+
+        if package.micro_punish then
+            local total = director.micro_punish_total or 0
+            local events = director.micro_punish_events or 0
+            local cap = micro_punish_cap(package)
+            local value = events > 0 and ("+" .. tostring(math.ceil(total)) .. " h" .. tostring(events)) or "on hit"
+            local color = (director.micro_punish_last_timer or 0) > 0 and COL_PALE_RED
+                or events > 0 and COL_PALE_YELLOW
+                or COL_LIGHT_GRAY
+            draw_hud_row(y, "FURY", value, color, safe_rate(total, cap))
+            y = y + HUD_ROW_H
+        end
     end
     if package.orbit then
         local orbit = package.orbit
@@ -853,6 +917,7 @@ local function draw_package_hud(director)
 
     draw_escort_markers()
     draw_aggro_marker(director, package)
+    draw_micro_punish_marker(director, package)
 end
 
 local function result_color(outcome)
@@ -2479,6 +2544,9 @@ function M.add_director(game_map, package, intensity)
             self.elapsed = self.elapsed + 1
             if (self.micro_last_timer or 0) > 0 then
                 self.micro_last_timer = self.micro_last_timer - 1
+            end
+            if (self.micro_punish_last_timer or 0) > 0 then
+                self.micro_punish_last_timer = self.micro_punish_last_timer - 1
             end
             if (self.rescue_pull_active_frames or 0) > 0 then
                 self.rescue_pull_total_frames = (self.rescue_pull_total_frames or 0) + 1
