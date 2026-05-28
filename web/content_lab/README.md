@@ -31,4 +31,5 @@ Some rescue packages also add a timed rescue line; the ally takes the heavy hit 
 The in-game package HUD counts saves and marks blocks that start inside the final rescue window as clutch saves.
 When a package clears or fails, the game posts a compact result banner with elapsed time and rescue stats.
 `--package_intensity` scales package tempo, damage, and summon counts from the same encounter definition, which keeps pressure sweeps comparable.
+`--package_components` can isolate package parts such as `orbit`, `pulse`, `summon`, or `escort,rescue`; the lab uses this for component probes without replacing full-package baselines.
 `--bot_profile` selects the automated-player skill buffer (`perfect`, `skilled`, `human`, or `sloppy`) for balance runs. The lab defaults to `human`, while skill-buffer sweeps make it clear when a package only fails under lower execution or only wins under perfect automation.

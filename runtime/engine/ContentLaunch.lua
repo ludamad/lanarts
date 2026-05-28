@@ -22,6 +22,58 @@ local function split_csv(value)
     return result
 end
 
+local COMPONENT_ALIASES = {
+    ally = "escort",
+    aoe = "pulse",
+    add = "summon",
+    adds = "summon",
+    orbs = "orbit",
+    rescue_lane = "rescue",
+}
+
+local COMPONENT_ORDER = {"escort", "orbit", "pulse", "summon", "rescue"}
+
+local function package_component_set(value)
+    local selected = {}
+    for _, part in ipairs(split_csv(value)) do
+        part = tostring(part or ""):lower():gsub("[^a-z_]+", "_")
+        part = COMPONENT_ALIASES[part] or part
+        if part == "full" or part == "all" then
+            return nil
+        end
+        selected[part] = true
+    end
+    if selected.rescue then
+        selected.escort = true
+    end
+    local has_any = false
+    for _, component in ipairs(COMPONENT_ORDER) do
+        if selected[component] then
+            has_any = true
+        end
+    end
+    return has_any and selected or nil
+end
+
+local function filtered_package(package, components)
+    if not package then
+        return nil
+    end
+    local selected = package_component_set(components)
+    if not selected then
+        return package
+    end
+    local result = {
+        primary = package.primary,
+    }
+    for _, component in ipairs(COMPONENT_ORDER) do
+        if selected[component] and package[component] then
+            result[component] = package[component]
+        end
+    end
+    return result
+end
+
 local function parse_item_spec(value)
     local spec = tostring(value or ""):gsub("^%s+", ""):gsub("%s+$", "")
     if spec == "" then
@@ -189,7 +241,11 @@ function M.generate_encounter_arena(options)
     local arena_options = encounter and encounter.arena or {}
     local game_map = require("map_descs.DebugArena"):generate_and_spawn(monsters, arena_options)
     if encounter and encounter.package then
-        require("objects.ContentLabHazards").add_director(game_map, encounter.package, intensity_by_id(options.package_intensity))
+        require("objects.ContentLabHazards").add_director(
+            game_map,
+            filtered_package(encounter.package, options.package_components),
+            intensity_by_id(options.package_intensity)
+        )
     end
     return game_map
 end

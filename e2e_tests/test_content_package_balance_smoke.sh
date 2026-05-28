@@ -12,6 +12,7 @@ trap "{ rm -rf \"$temp_dir\"; }" EXIT
     --bot_profile human \
     --encounter executioner-blade-package \
     --package_intensity high \
+    --package_components orbit,pulse \
     --out="$temp_dir/balance_runs.csv" \
     --samples_out="$temp_dir/balance_samples.csv" \
     --spells_out="$temp_dir/balance_spells.csv" \
@@ -30,6 +31,8 @@ test -s "$temp_dir/balance_classes.csv"
 test -s "$temp_dir/balance_enemy_stats.csv"
 test -s "$temp_dir/balance_runs.json"
 grep -q "package_outcome" "$temp_dir/balance_runs.csv"
+grep -q "package_components" "$temp_dir/balance_runs.csv"
 grep -q "package_rescue_save_rate" "$temp_dir/balance_runs.csv"
 grep -q "avg_package_rescue_save_rate" "$temp_dir/balance_classes.csv"
 grep -q "executioner-blade-package" "$temp_dir/balance_runs.json"
+grep -q "orbit,pulse" "$temp_dir/balance_runs.json"

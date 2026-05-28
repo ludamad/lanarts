@@ -107,6 +107,51 @@ M.bot_profiles = {
     },
 }
 
+M.package_component_sets = {
+    {
+        id = "",
+        label = "Full package",
+        components = "",
+        description = "Use every rhythm declared by the encounter.",
+    },
+    {
+        id = "orbit",
+        label = "Orbs only",
+        components = "orbit",
+        description = "Isolate rotating hitbox pressure.",
+    },
+    {
+        id = "pulse",
+        label = "AOE only",
+        components = "pulse",
+        description = "Isolate player-targeted AOE rhythm.",
+    },
+    {
+        id = "summon",
+        label = "Adds only",
+        components = "summon",
+        description = "Isolate summon/add cleanup pressure.",
+    },
+    {
+        id = "escort,rescue",
+        label = "Rescue lane",
+        components = "escort,rescue",
+        description = "Isolate ally-protection and body-block pull timing.",
+    },
+    {
+        id = "escort,orbit,pulse,rescue",
+        label = "No adds",
+        components = "escort,orbit,pulse,rescue",
+        description = "Run package pressure without summon waves.",
+    },
+    {
+        id = "orbit,pulse,summon",
+        label = "No rescue",
+        components = "orbit,pulse,summon",
+        description = "Run offensive package pressure without the ally rescue lane.",
+    },
+}
+
 M.class_builds = {
     Fighter = {
         starting_weapon = "Mace",
@@ -1727,6 +1772,7 @@ function M.catalog()
         item_choices = M.item_choices,
         intensities = M.intensities,
         bot_profiles = M.bot_profiles,
+        package_component_sets = M.package_component_sets,
         maps = M.maps,
         map_algorithms = M.map_algorithms,
         encounters = M.encounters,

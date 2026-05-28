@@ -92,6 +92,54 @@ local function normalize_bot_profile_name(value)
     return "human"
 end
 
+local COMPONENT_ALIASES = {
+    ally = "escort",
+    aoe = "pulse",
+    add = "summon",
+    adds = "summon",
+    orbs = "orbit",
+    rescue_lane = "rescue",
+}
+
+local COMPONENT_ORDER = {"escort", "orbit", "pulse", "summon", "rescue"}
+
+local function normalize_package_components(value)
+    local selected = {}
+    for part in tostring(value or ""):gmatch("[^,]+") do
+        part = part:gsub("^%s+", ""):gsub("%s+$", ""):lower():gsub("[^a-z_]+", "_")
+        part = COMPONENT_ALIASES[part] or part
+        if part == "full" or part == "all" then
+            return ""
+        end
+        selected[part] = true
+    end
+    if selected.rescue then
+        selected.escort = true
+    end
+    local parts = {}
+    for _, component in ipairs(COMPONENT_ORDER) do
+        if selected[component] then
+            parts[#parts + 1] = component
+        end
+    end
+    return table.concat(parts, ",")
+end
+
+local function package_component_lookup(value)
+    local selected = {}
+    for _, component in ipairs(COMPONENT_ORDER) do
+        selected[component] = false
+    end
+    local normalized = normalize_package_components(value)
+    if normalized == "" then
+        return nil
+    end
+    for part in normalized:gmatch("[^,]+") do
+        selected[part] = true
+    end
+    return selected
+end
+
 local function normalized_config(config)
     config = config or {}
     local map_desc, map_profile, map_algorithm = normalize_map_selection(
@@ -105,6 +153,7 @@ local function normalized_config(config)
         seed = tostring(config.seed or "1"),
         preset = tostring(config.preset or config.loadout_preset or "none"),
         intensity = tostring(config.intensity or config.packageIntensity or config.package_intensity or "standard"),
+        packageComponents = normalize_package_components(config.packageComponents or config.package_components or ""),
         customLoadout = tostring(config.customLoadout or config.loadout or ""),
         mapDesc = map_desc,
         mapProfile = map_profile,
@@ -144,6 +193,10 @@ local function launch_args(config)
         args[#args + 1] = config.encounter
         args[#args + 1] = "--package_intensity"
         args[#args + 1] = config.intensity
+        if config.packageComponents ~= "" then
+            args[#args + 1] = "--package_components"
+            args[#args + 1] = config.packageComponents
+        end
     end
     if config.monsters ~= "" then
         args[#args + 1] = "--monsters"
@@ -191,6 +244,10 @@ local function balance_args(config)
         args[#args + 1] = config.encounter
         args[#args + 1] = "--package_intensity"
         args[#args + 1] = config.intensity
+        if config.packageComponents ~= "" then
+            args[#args + 1] = "--package_components"
+            args[#args + 1] = config.packageComponents
+        end
     end
     if config.monsters ~= "" then
         args[#args + 1] = "--monsters"
@@ -715,6 +772,38 @@ local function encounter_rhythms(encounter, intensity)
     return rows
 end
 
+local function filtered_package(package, components)
+    if not package then
+        return nil
+    end
+    local selected = package_component_lookup(components)
+    if not selected then
+        return package
+    end
+    local result = {
+        primary = package.primary,
+    }
+    for _, component in ipairs(COMPONENT_ORDER) do
+        if selected[component] and package[component] then
+            result[component] = package[component]
+        end
+    end
+    return result
+end
+
+local function encounter_with_components(encounter, components)
+    if not encounter or not encounter.package then
+        return encounter
+    end
+    local selected = package_component_lookup(components)
+    if not selected then
+        return encounter
+    end
+    local result = copy_object(encounter)
+    result.package = filtered_package(encounter.package, components)
+    return result
+end
+
 local function warnings_for(config, selected)
     local warnings = {}
     if config.level > 5 then
@@ -727,6 +816,18 @@ local function warnings_for(config, selected)
     end
     if selected.encounter and selected.encounter.kind and selected.encounter.kind:find("baseline") then
         warnings[#warnings + 1] = "Baseline duels are control cases; use package variants for encounter tuning."
+    end
+    if config.packageComponents ~= "" and selected.encounter and selected.encounter.package then
+        local components = package_component_lookup(config.packageComponents)
+        local has_component = false
+        for component, enabled in pairs(components or {}) do
+            if enabled and selected.encounter.package[component] then
+                has_component = true
+            end
+        end
+        if not has_component then
+            warnings[#warnings + 1] = "Selected package parts are not present on this encounter."
+        end
     end
     if config.botProfile == "perfect" then
         warnings[#warnings + 1] = "Perfect automation is a ceiling profile; use human/sloppy sweeps for fairness checks."
@@ -757,6 +858,7 @@ local function resource_entry(group, name, meta, goal, config, seed_offset, extr
         preset = config.preset,
         intensity = config.intensity,
         customLoadout = config.customLoadout,
+        packageComponents = config.packageComponents,
         botProfile = config.botProfile,
         mapDesc = config.mapDesc,
         mapProfile = config.mapProfile,
@@ -1074,7 +1176,8 @@ local function run_summary_payload(config)
         encounter = encounter_lookup()[config.encounter or ""],
         intensity = selected_intensity(config),
     }
-    local rhythms = encounter_rhythms(selected.encounter, selected.intensity)
+    local encounter = encounter_with_components(selected.encounter, config.packageComponents)
+    local rhythms = encounter_rhythms(encounter, selected.intensity)
     return {
         schema = 1,
         config = config,
@@ -1087,7 +1190,7 @@ local function run_summary_payload(config)
         loadout = loadout_for_config(config),
         map = selected.map,
         mapAlgorithm = selected.mapAlgorithm,
-        encounter = selected.encounter,
+        encounter = encounter,
         intensity = selected.intensity,
         rhythms = rhythms,
         packageSummary = package_summary_from_rhythms(rhythms),
@@ -1113,7 +1216,8 @@ end
 
 local function package_resource_entry(group, name, meta, goal, config, encounter, seed_offset, extras)
     local intensity = selected_intensity(config)
-    local rhythms = encounter_rhythms(encounter, intensity)
+    local component_encounter = encounter_with_components(encounter, config.packageComponents)
+    local rhythms = encounter_rhythms(component_encounter, intensity)
     local package_summary = package_summary_from_rhythms(rhythms)
     local extra = copy_object(extras or {})
     extra.encounterLabel = encounter and encounter.label or config.encounter
@@ -1136,6 +1240,22 @@ local function package_base_config(config, encounter)
     next_config.encounter = encounter.id or ""
     next_config.monsters = ""
     return next_config
+end
+
+local function package_has_any_component(package, components)
+    if not package then
+        return false
+    end
+    local selected = package_component_lookup(components)
+    if not selected then
+        return true
+    end
+    for component, enabled in pairs(selected) do
+        if enabled and package[component] then
+            return true
+        end
+    end
+    return false
 end
 
 local function package_matrix_payload(config)
@@ -1211,6 +1331,27 @@ local function package_matrix_payload(config)
                     controlModel = control_model_for(next_config),
                 }
             )
+        end
+
+        for idx, component_set in ipairs(Catalog.package_component_sets or {}) do
+            local components = component_set.components or component_set.id or ""
+            if components ~= "" and package_has_any_component(selected_package.package, components) then
+                local next_config = package_base_config(config, selected_package)
+                next_config.packageComponents = normalize_package_components(components)
+                resources[#resources + 1] = package_resource_entry(
+                    "Selected package component probes",
+                    component_set.label or component_set.id,
+                    string.format("%s, %s", selected_package.label or selected_package.id, component_set.label or components),
+                    component_set.description or "package component isolation probe",
+                    next_config,
+                    selected_package,
+                    80 + idx,
+                    {
+                        packageRole = "component-probe",
+                        packageComponents = next_config.packageComponents,
+                    }
+                )
+            end
         end
     end
 

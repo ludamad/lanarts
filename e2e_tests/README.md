@@ -76,6 +76,9 @@ Balance simulations:
     be separated from actual body-block micro. Package rows also derive rescue
     opportunities plus save, clutch, and pull rates so rescue packages can be
     compared without hand-calculating rates from raw counts.
+    Use --package_components orbit,pulse,summon,escort,rescue to isolate
+    package parts while keeping the same encounter arena, monsters, and
+    pressure preset. A rescue component automatically keeps its escort target.
     Use --loadout_preset late to give each class a representative equipped
     late-game kit without inflating the starting level. Use --loadout to append
     comma-separated item specs such as `Health Potion*3,Hydra Ring`, and

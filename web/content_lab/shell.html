@@ -789,6 +789,18 @@
           </select>
         </div>
         <div class="field">
+          <label for="packageComponents">Package parts</label>
+          <select id="packageComponents">
+            <option value="">Full package</option>
+            <option value="orbit">Orbs only</option>
+            <option value="pulse">AOE only</option>
+            <option value="summon">Adds only</option>
+            <option value="escort,rescue">Rescue lane</option>
+            <option value="escort,orbit,pulse,rescue">No adds</option>
+            <option value="orbit,pulse,summon">No rescue</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="customMonsters">Custom monsters</label>
           <input id="customMonsters" spellcheck="false" placeholder="Mummoner, Executioner">
         </div>
@@ -946,6 +958,16 @@
         {id: 'skilled', label: 'Skilled', decisionInterval: 2, spellSkipChance: 0.04, itemSkipChance: 0.04, weaponSkipChance: 0.02, movementNoiseChance: 0.02},
         {id: 'human', label: 'Human', decisionInterval: 4, spellSkipChance: 0.12, itemSkipChance: 0.14, weaponSkipChance: 0.06, movementNoiseChance: 0.07},
         {id: 'sloppy', label: 'Sloppy', decisionInterval: 7, spellSkipChance: 0.25, itemSkipChance: 0.28, weaponSkipChance: 0.14, movementNoiseChance: 0.14},
+      ];
+
+      let packageComponentSets = [
+        {id: '', label: 'Full package', components: ''},
+        {id: 'orbit', label: 'Orbs only', components: 'orbit'},
+        {id: 'pulse', label: 'AOE only', components: 'pulse'},
+        {id: 'summon', label: 'Adds only', components: 'summon'},
+        {id: 'escort,rescue', label: 'Rescue lane', components: 'escort,rescue'},
+        {id: 'escort,orbit,pulse,rescue', label: 'No adds', components: 'escort,orbit,pulse,rescue'},
+        {id: 'orbit,pulse,summon', label: 'No rescue', components: 'orbit,pulse,summon'},
       ];
 
       let resources = [
@@ -1193,6 +1215,7 @@
           level: String(resource.level || 1),
           preset: resource.preset || 'none',
           intensity: resource.intensity || 'standard',
+          packageComponents: resource.packageComponents || resource.package_components || '',
           customLoadout: resource.customLoadout || resource.loadout || '',
           mapDesc: resource.mapDesc || '',
           mapProfile: resource.mapProfile || '',
@@ -1221,6 +1244,7 @@
         replaceOptions($('enemyPack'), [{id: '', label: 'None'}].concat(catalog.enemy_packs || []), (entry) => entry.id || '', (entry) => entry.label || entry.id || 'None');
         replaceOptions($('analysisGoal'), catalog.analysis_goals || analysisGoals, (entry) => entry.id || '', (entry) => entry.label || entry.id || 'Goal');
         replaceOptions($('botProfile'), catalog.bot_profiles || botProfiles, (entry) => entry.id || 'human', (entry) => entry.label || entry.id || 'Human');
+        replaceOptions($('packageComponents'), catalog.package_component_sets || packageComponentSets, (entry) => entry.components || entry.id || '', (entry) => entry.label || entry.id || 'Full package');
         rebuildLoadoutPresets(catalog.loadouts, catalog.loadout_names);
         mapAlgorithms = catalog.map_algorithms || mapAlgorithms;
         encounters = catalog.encounters || encounters;
@@ -1229,6 +1253,7 @@
         enemyPacks = [{id: '', label: 'None', monsters: []}].concat(catalog.enemy_packs || []);
         analysisGoals = catalog.analysis_goals || analysisGoals;
         botProfiles = catalog.bot_profiles || botProfiles;
+        packageComponentSets = catalog.package_component_sets || packageComponentSets;
         resources = (catalog.resources || []).map(normalizeResource);
         mapProfiles = (catalog.map_algorithms || catalog.maps || []).slice(0, 4).map(normalizePreviewProfile);
         rebuildMapAlgorithms($('mapDesc').value, $('mapAlgorithm').value);
@@ -1266,6 +1291,7 @@
           seed: $('seed').value.trim() || '1',
           preset: state.preset,
           intensity: $('intensity').value,
+          packageComponents: $('packageComponents').value || '',
           customLoadout: $('customLoadout').value.trim(),
           mapDesc: $('mapDesc').value,
           mapProfile: algorithm ? (algorithm.mapProfile || '') : '',
@@ -1351,6 +1377,12 @@
             addChip(packageInfo, 'ally risk');
           }
           appendSummaryLine(host, 'Package', packageInfo);
+        }
+
+        if (summary.config && summary.config.packageComponents) {
+          const parts = document.createElement('div');
+          parts.textContent = summary.config.packageComponents;
+          appendSummaryLine(host, 'Parts', parts);
         }
 
         if (summary.mapAlgorithm && summary.mapAlgorithm.label) {
@@ -1664,6 +1696,7 @@
         $('mapAlgorithm').value = config.mapAlgorithm || mapAlgorithmIdFor(config.mapDesc || '', config.mapProfile || '');
         $('encounter').value = config.encounter || '';
         $('intensity').value = config.intensity || 'standard';
+        $('packageComponents').value = config.packageComponents || '';
         $('customMonsters').value = config.monsters || '';
         $('enemyGroup').value = config.enemyGroup || $('enemyGroup').value || 'overworld-ambient';
         $('enemyPack').value = config.enemyPack || '';
@@ -1701,8 +1734,34 @@
         return Math.max(1, Math.ceil(Number(raw === undefined || raw === null ? 1 : raw) * Math.max(0.1, Number(intensity.summons || 1))));
       }
 
+      function componentSet(value) {
+        const parts = String(value || '').split(',').map((part) => part.trim()).filter(Boolean);
+        if (!parts.length) {
+          return null;
+        }
+        const set = new Set(parts);
+        if (set.has('rescue')) {
+          set.add('escort');
+        }
+        return set;
+      }
+
+      function packageForComponents(pkg, components) {
+        const selected = componentSet(components);
+        if (!selected) {
+          return pkg || {};
+        }
+        const result = {primary: pkg.primary};
+        ['escort', 'orbit', 'pulse', 'summon', 'rescue'].forEach((key) => {
+          if (selected.has(key) && pkg[key]) {
+            result[key] = pkg[key];
+          }
+        });
+        return result;
+      }
+
       function encounterRhythms(encounter) {
-        const pkg = (encounter && encounter.package) || {};
+        const pkg = packageForComponents((encounter && encounter.package) || {}, $('packageComponents').value || '');
         const intensity = selectedIntensity();
         const rows = [];
         if (pkg.orbit) {
@@ -1897,6 +1956,9 @@
         if (config.encounter) {
           args.push('--encounter', config.encounter);
           args.push('--package_intensity', config.intensity || 'standard');
+          if (config.packageComponents) {
+            args.push('--package_components', config.packageComponents);
+          }
         }
         if (config.monsters) {
           args.push('--monsters', config.monsters);
@@ -1936,6 +1998,9 @@
         if (config.intensity && config.intensity !== 'standard') {
           query.set('pressure', config.intensity);
         }
+        if (config.packageComponents) {
+          query.set('parts', config.packageComponents);
+        }
         if (config.monsters) {
           query.set('monsters', config.monsters);
         }
@@ -1970,6 +2035,7 @@
           mapProfile: query.get('profile') || '',
           encounter: query.get('encounter') || '',
           intensity: query.get('pressure') || 'standard',
+          packageComponents: query.get('parts') || '',
           monsters: query.get('monsters') || '',
           enemyGroup: query.get('enemyGroup') || 'overworld-ambient',
           enemyPack: query.get('enemyPack') || '',
@@ -2135,10 +2201,11 @@
           button.className = 'resource';
           const goal = resource.goal ? `<span>${resource.goal}</span>` : '';
           const pressure = resource.intensity && resource.intensity !== 'standard' ? ` ${resource.intensity}` : '';
+          const parts = resource.packageComponents ? ` ${resource.packageComponents}` : '';
           const skill = resource.botProfile && resource.botProfile !== 'human' ? ` ${resource.botProfile}` : '';
           const summary = packageSummaryText(resource.packageSummary);
           const summaryNode = summary ? `<span>${summary}</span>` : '';
-          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${skill}</code>`;
+          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${parts}${skill}</code>`;
           button.addEventListener('click', () => {
             setConfig(resource);
           });
@@ -2164,7 +2231,7 @@
             refreshLab();
           });
         });
-        ['className', 'level', 'seed', 'customLoadout', 'mapAlgorithm', 'encounter', 'intensity', 'customMonsters', 'enemyGroup', 'analysisGoal', 'botProfile'].forEach((id) => {
+        ['className', 'level', 'seed', 'customLoadout', 'mapAlgorithm', 'encounter', 'intensity', 'packageComponents', 'customMonsters', 'enemyGroup', 'analysisGoal', 'botProfile'].forEach((id) => {
           $(id).addEventListener('input', refreshLab);
           $(id).addEventListener('change', refreshLab);
         });

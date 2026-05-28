@@ -25,6 +25,7 @@ local function run_content_api_smoke()
     expect(catalog.class_builds and catalog.class_builds.Fighter, "catalog should expose class builds")
     expect(#(catalog.item_choices or {}) >= 4, "catalog should expose curated item choices")
     expect(#(catalog.bot_profiles or {}) >= 4, "catalog should expose bot skill profiles")
+    expect(#(catalog.package_component_sets or {}) >= 5, "catalog should expose package component sets")
     expect(#(catalog.analysis_goals or {}) >= 3, "catalog should expose analysis goals")
     expect(#(catalog.enemy_groups or {}) >= 3, "catalog should expose enemy groups")
     expect(#(catalog.enemy_packs or {}) >= 3, "catalog should expose enemy packs")
@@ -36,6 +37,7 @@ local function run_content_api_smoke()
     local has_executioner_package = false
     local has_executioner_rescue_package = false
     local has_human_bot_profile = false
+    local has_rescue_component_set = false
     local has_pyro_keepaway_model = false
     local has_executioner_baseline = false
     local has_predator_thicket = false
@@ -50,6 +52,11 @@ local function run_content_api_smoke()
     for _, profile in ipairs(catalog.bot_profiles or {}) do
         if profile.id == "human" and (profile.decisionInterval or 0) > 1 then
             has_human_bot_profile = true
+        end
+    end
+    for _, component_set in ipairs(catalog.package_component_sets or {}) do
+        if component_set.components == "escort,rescue" then
+            has_rescue_component_set = true
         end
     end
     for _, class in ipairs(catalog.classes or {}) do
@@ -76,6 +83,7 @@ local function run_content_api_smoke()
     expect(has_executioner_package, "catalog should expose the Executioner blade package")
     expect(has_executioner_rescue_package, "catalog should expose the Executioner rescue package")
     expect(has_human_bot_profile, "catalog should expose the human bot profile")
+    expect(has_rescue_component_set, "catalog should expose rescue lane component set")
     expect(has_pyro_keepaway_model, "catalog should expose ranged class control metadata")
     expect(has_predator_thicket, "catalog should expose the predator thicket overworld profile")
     expect(has_ruin_crossroads, "catalog should expose the ruin crossroads overworld profile")
@@ -109,6 +117,27 @@ local function run_content_api_smoke()
     expect(summary.packageSummary and summary.packageSummary.hitsEscorts, "summary should expose ally-risk package summary")
     expect(summary.controlModel and summary.controlModel.botProfile and summary.controlModel.botProfile.id == "human", "summary should expose selected human control model")
     expect(summary.controlModel and summary.controlModel.classRange == "close", "summary should expose class positioning model")
+
+    local component_config = [[{
+        "className": "Fighter",
+        "level": 5,
+        "preset": "late",
+        "seed": "22455",
+        "encounter": "gragh-rescue-package",
+        "intensity": "high",
+        "packageComponents": "rescue"
+    }]]
+    local component_summary = parse_response("component summary", ContentApi.run_summary_json(component_config))
+    expect(component_summary.config.packageComponents == "escort,rescue", "component summary should normalize rescue to escort,rescue")
+    expect(component_summary.packageSummary and component_summary.packageSummary.hasRescue, "component summary should keep rescue rhythm")
+    expect(component_summary.packageSummary and not component_summary.packageSummary.hasSummons, "component summary should filter summon rhythm")
+    local has_component_arg = false
+    for _, arg in ipairs(component_summary.args or {}) do
+        if arg == "--package_components" then
+            has_component_arg = true
+        end
+    end
+    expect(has_component_arg, "component summary should expose package component launch arg")
 
     local executioner_baseline_config = [[{
         "className": "Templar",
@@ -312,6 +341,7 @@ local function run_content_api_smoke()
     local has_package_class_sweep = false
     local has_package_pressure_sweep = false
     local has_package_skill_buffer = false
+    local has_package_component_probe = false
     local has_rescue_check = false
     for _, resource in ipairs(package_matrix.resources or {}) do
         if resource.group == "Package baselines" and resource.encounter == "gragh-rescue-package" then
@@ -322,6 +352,8 @@ local function run_content_api_smoke()
             has_package_pressure_sweep = resource.packageSummary and resource.packageSummary.fastestLoopFrames > 0
         elseif resource.group == "Selected package skill buffer" and resource.botProfile == "sloppy" then
             has_package_skill_buffer = resource.controlModel and resource.controlModel.botProfile and resource.controlModel.botProfile.id == "sloppy"
+        elseif resource.group == "Selected package component probes" and resource.packageComponents == "escort,rescue" then
+            has_package_component_probe = resource.packageSummary and resource.packageSummary.hasRescue and not resource.packageSummary.hasSummons
         elseif resource.group == "Rescue package checks" and resource.className == "Necromancer" then
             has_rescue_check = resource.packageSummary and resource.packageSummary.hitsEscorts
         end
@@ -330,6 +362,7 @@ local function run_content_api_smoke()
     expect(has_package_class_sweep, "package matrix should include selected-package class sweeps")
     expect(has_package_pressure_sweep, "package matrix should include selected-package pressure sweeps")
     expect(has_package_skill_buffer, "package matrix should include selected-package skill-buffer sweeps")
+    expect(has_package_component_probe, "package matrix should include selected-package component probes")
     expect(has_rescue_check, "package matrix should include rescue package checks")
 
     local enemy_options = parse_response("enemy options", ContentApi.enemy_options_json(config))

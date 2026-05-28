@@ -672,6 +672,7 @@ local function sample_run(run, telemetry, samples, reason)
         encounter = run.encounter or "",
         monsters = run.monsters or "",
         package_intensity = run.package_intensity or "",
+        package_components = run.package_components or "",
         frame = GameState.frame,
         reason = reason or "interval",
         level = snap.level,
@@ -757,6 +758,7 @@ local function summarize_run(run, telemetry, outcome)
         encounter = run.encounter or "",
         monsters = run.monsters or "",
         package_intensity = run.package_intensity or "",
+        package_components = run.package_components or "",
         outcome = outcome,
         frames = GameState.frame,
         level = snap.level or 0,
@@ -954,6 +956,7 @@ local function aggregate_summary_rows(summaries)
         local encounter = row.encounter or ""
         local monsters = row.monsters or ""
         local package_intensity = row.package_intensity or ""
+        local package_components = row.package_components or ""
         local key = group_key(class_name, start_level, loadout, bot_profile)
         local aggregate = groups[key]
         if not aggregate then
@@ -968,6 +971,7 @@ local function aggregate_summary_rows(summaries)
                 encounter = encounter,
                 monsters = monsters,
                 package_intensity = package_intensity,
+                package_components = package_components,
                 runs = 0,
                 outcomes = {},
                 sums = {},
@@ -1000,6 +1004,7 @@ local function aggregate_summary_rows(summaries)
             encounter = aggregate.encounter,
             monsters = aggregate.monsters,
             package_intensity = aggregate.package_intensity,
+            package_components = aggregate.package_components,
             runs = aggregate.runs,
             wins = wins,
             clears = aggregate.outcomes.cleared or 0,
@@ -1839,6 +1844,7 @@ local function game_init(run, telemetry, bot_options)
                 encounter = bot_options.encounter,
                 monsters = bot_options.monsters,
                 package_intensity = bot_options.package_intensity,
+                package_components = bot_options.package_components,
             }
         end
     elseif bot_options.start_map_desc and bot_options.start_map_desc ~= "" then
@@ -1986,6 +1992,7 @@ local function run_balance(raw_args)
     parser:option("--encounter", "Optional content-lab encounter id to start each run in an arena.", "")
     parser:option("--monsters", "Comma-separated monster names to start each run in a content-lab arena.", "")
     parser:option("--package_intensity", "Content-lab package pressure preset for arena encounters.", "standard")
+    parser:option("--package_components", "Optional comma-separated package components: orbit,pulse,summon,escort,rescue.", "")
     parser:option("--loadout_preset", "Equipment preset for each class: none or late.", "none")
     parser:option("--loadout", "Comma-separated item specs to add to every run, using Item or Item*COUNT.", "")
     parser:option("--loadout_label", "Optional label for this loadout in outputs.", "")
@@ -2036,6 +2043,7 @@ local function run_balance(raw_args)
         run.encounter = args.encounter or ""
         run.monsters = args.monsters or ""
         run.package_intensity = args.package_intensity or ""
+        run.package_components = args.package_components or ""
     end
     local summaries = {}
     local samples = {}
@@ -2061,7 +2069,7 @@ local function run_balance(raw_args)
         local report_rows = balance_report_rows(class_rows, tonumber(args.min_report_runs), tonumber(args.report_delta_pct))
         write_csv(args.out, summaries, {
             "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile",
-            "objective_enemy", "start_map_desc", "map_profile", "encounter", "monsters", "package_intensity",
+            "objective_enemy", "start_map_desc", "map_profile", "encounter", "monsters", "package_intensity", "package_components",
             "outcome", "frames", "level", "xp",
             "hp", "max_hp", "hp_pct", "min_hp", "min_hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
@@ -2091,7 +2099,7 @@ local function run_balance(raw_args)
         })
         write_csv(args.samples_out, samples, {
             "run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile",
-            "objective_enemy", "start_map_desc", "map_profile", "encounter", "monsters", "package_intensity",
+            "objective_enemy", "start_map_desc", "map_profile", "encounter", "monsters", "package_intensity", "package_components",
             "frame", "reason", "level", "xp",
             "hp", "max_hp", "hp_pct", "mp", "max_mp", "mp_pct", "kills",
             "player_kills", "deaths", "deepest_floor", "current_floor", "map_label",
@@ -2138,7 +2146,7 @@ local function run_balance(raw_args)
         })
         write_csv(args.aggregate_out, class_rows, {
             "class", "start_level", "loadout", "bot_profile", "objective_enemy", "start_map_desc",
-            "map_profile", "encounter", "monsters", "package_intensity",
+            "map_profile", "encounter", "monsters", "package_intensity", "package_components",
             "runs", "wins", "clears", "ally_downs", "package_failures", "deaths", "step_limits", "bot_stalls",
             "game_loop_exits", "win_rate", "death_rate", "outcome_counts",
             "combat_frame_rate", "explore_frame_rate", "rest_frame_rate",
@@ -2183,13 +2191,14 @@ local function run_balance(raw_args)
         })
         if args.json_out and args.json_out ~= "" then
             file_dump_json(args.json_out, {
-                schema_version = 16,
+                schema_version = 17,
                 seed_mode = seed_mode,
                 start_map_desc = args.start_map_desc,
                 map_profile = args.map_profile,
                 encounter = args.encounter,
                 monsters = args.monsters,
                 package_intensity = args.package_intensity,
+                package_components = args.package_components,
                 bot_profile = args.bot_profile,
                 loadout_preset = loadout_preset,
                 loadout = loadout.name,
@@ -2262,6 +2271,7 @@ local function run_balance(raw_args)
             encounter = args.encounter,
             monsters = args.monsters,
             package_intensity = args.package_intensity,
+            package_components = args.package_components,
             objective_enemy = parse_bool(args.hunt_objective) and args.objective_enemy or "",
         }
 
