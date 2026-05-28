@@ -2088,6 +2088,367 @@ local function resource_matrix_payload(config)
     }
 end
 
+local function shell_arg(value)
+    local text = tostring(value == nil and "" or value)
+    if text == "" then
+        return "''"
+    end
+    if text:match("^[A-Za-z0-9_./:=@%%+%-]+$") then
+        return text
+    end
+    return "'" .. text:gsub("'", "'\\''") .. "'"
+end
+
+local function command_text(args)
+    local parts = {}
+    for _, arg in ipairs(args or {}) do
+        parts[#parts + 1] = shell_arg(arg)
+    end
+    return table.concat(parts, " ")
+end
+
+local function option_rows(entries, value_key, label_key)
+    local rows = {}
+    for _, entry in ipairs(entries or {}) do
+        local value = entry[value_key or "id"]
+        rows[#rows + 1] = {
+            value = value == nil and "" or tostring(value),
+            label = entry[label_key or "label"] or entry[value_key or "id"] or "",
+            phase = entry.phase,
+            description = entry.description,
+            primary = entry.primary == true,
+        }
+    end
+    return rows
+end
+
+local function controls_payload(config)
+    local map_algorithms = algorithms_for_map(config.mapDesc or "")
+    if #map_algorithms == 0 then
+        map_algorithms = Catalog.map_algorithms or {}
+    end
+    return {
+        {
+            id = "className",
+            label = "Class",
+            value = config.className,
+            options = option_rows(Catalog.classes or {}, "id", "label"),
+        },
+        {
+            id = "level",
+            label = "Level",
+            value = tostring(config.level),
+            options = option_rows(Catalog.levels or {}, "value", "label"),
+        },
+        {
+            id = "preset",
+            label = "Loadout",
+            value = config.preset,
+            options = (function()
+                local rows = {}
+                for _, name in ipairs(Catalog.loadout_order or {}) do
+                    local preset = Catalog.loadout_presets and Catalog.loadout_presets[name] or {}
+                    rows[#rows + 1] = {
+                        value = name,
+                        label = preset.label or name,
+                        description = preset.description or "",
+                    }
+                end
+                return rows
+            end)(),
+        },
+        {
+            id = "mapDesc",
+            label = "Map generator",
+            value = config.mapDesc,
+            options = option_rows(Catalog.maps or {}, "id", "label"),
+        },
+        {
+            id = "mapAlgorithm",
+            label = "Map algorithm",
+            value = config.mapAlgorithm,
+            options = option_rows(map_algorithms, "id", "label"),
+        },
+        {
+            id = "encounter",
+            label = "Encounter",
+            value = config.encounter,
+            options = option_rows(Catalog.encounters or {}, "id", "label"),
+        },
+        {
+            id = "intensity",
+            label = "Pressure",
+            value = config.intensity,
+            options = option_rows(Catalog.intensities or {}, "id", "label"),
+        },
+        {
+            id = "packageComponents",
+            label = "Package parts",
+            value = config.packageComponents,
+            options = option_rows(Catalog.package_component_sets or {}, "components", "label"),
+        },
+        {
+            id = "enemyGroup",
+            label = "Enemy group",
+            value = config.enemyGroup,
+            options = option_rows(Catalog.enemy_groups or {}, "id", "label"),
+        },
+        {
+            id = "enemyPack",
+            label = "Enemy pack",
+            value = config.enemyPack,
+            options = (function()
+                local rows = {{value = "", label = "None"}}
+                for _, pack in ipairs(Catalog.enemy_packs or {}) do
+                    rows[#rows + 1] = {
+                        value = pack.id or "",
+                        label = pack.label or pack.id or "",
+                        description = pack.goal or pack.description or "",
+                    }
+                end
+                return rows
+            end)(),
+        },
+        {
+            id = "goal",
+            label = "Goal",
+            value = config.goal,
+            options = option_rows(Catalog.analysis_goals or {}, "id", "label"),
+        },
+        {
+            id = "botProfile",
+            label = "Bot skill",
+            value = config.botProfile,
+            options = option_rows(Catalog.bot_profiles or {}, "id", "label"),
+        },
+    }
+end
+
+local function command_preview(args)
+    return {
+        args = args or {},
+        text = command_text(args or {}),
+    }
+end
+
+local function resource_summary_chips(resource)
+    local chips = {}
+    local function add(value)
+        if value ~= nil and tostring(value) ~= "" then
+            chips[#chips + 1] = tostring(value)
+        end
+    end
+    add(resource.className)
+    add("L" .. tostring(resource.level or 1))
+    if resource.preset and resource.preset ~= "none" then
+        add(resource.preset)
+    end
+    if resource.intensity and resource.intensity ~= "standard" then
+        add(resource.intensity)
+    end
+    if resource.botProfile and resource.botProfile ~= "human" then
+        add(resource.botProfile)
+    end
+    if resource.packageComponents and resource.packageComponents ~= "" then
+        add(resource.packageComponents)
+    end
+    if resource.mapProfile and resource.mapProfile ~= "" then
+        add(resource.mapProfile)
+    end
+    if resource.monsters and resource.monsters ~= "" then
+        add(resource.monsters)
+    end
+    if resource.packageSummary then
+        local summary = resource.packageSummary
+        if summary.fastestLoopFrames and summary.fastestLoopFrames > 0 then
+            add(tostring(summary.fastestLoopFrames) .. "f loop")
+        end
+        if summary.hasRescue then
+            add("rescue")
+        end
+        if summary.hasSummons then
+            add("adds")
+        end
+    end
+    if resource.signature and resource.signature.enemyMix then
+        add(resource.signature.enemyMix)
+    elseif resource.signature and resource.signature.ambientEnemies then
+        add(tostring(resource.signature.ambientEnemies) .. " ambient")
+    end
+    return chips
+end
+
+local function resource_card(resource)
+    return {
+        id = resource.id,
+        group = resource.group,
+        title = resource.name,
+        subtitle = resource.meta or resource.goal or "",
+        goal = resource.goal or "",
+        chips = resource_summary_chips(resource),
+        config = {
+            className = resource.className,
+            level = resource.level,
+            preset = resource.preset,
+            intensity = resource.intensity,
+            packageComponents = resource.packageComponents,
+            botProfile = resource.botProfile,
+            customLoadout = resource.customLoadout,
+            mapDesc = resource.mapDesc,
+            mapProfile = resource.mapProfile,
+            mapAlgorithm = resource.mapAlgorithm,
+            encounter = resource.encounter,
+            monsters = resource.monsters,
+            enemyGroup = resource.enemyGroup,
+            enemyPack = resource.enemyPack,
+            goal = resource.analysisGoal,
+            seed = resource.seed,
+        },
+        command = command_preview(resource.args),
+        balance = command_preview(resource.balanceArgs),
+        packageSummary = resource.packageSummary,
+        previewMode = resource.previewMode,
+        signature = resource.signature,
+        monsterEval = resource.monsterEvalArgs and command_preview(resource.monsterEvalArgs) or nil,
+    }
+end
+
+local function resource_cards(resources)
+    local cards = {}
+    for _, resource in ipairs(resources or {}) do
+        cards[#cards + 1] = resource_card(resource)
+    end
+    return cards
+end
+
+local function preview_card(preview)
+    local stats = preview.previewPlan and preview.previewPlan.stats or {}
+    local chips = {}
+    local function add(value)
+        if value ~= nil and tostring(value) ~= "" then
+            chips[#chips + 1] = tostring(value)
+        end
+    end
+    add(preview.mapProfile)
+    add(preview.phase)
+    if stats.rooms then
+        add(tostring(stats.rooms) .. " rooms")
+    end
+    if stats.ambientEnemies then
+        add(tostring(stats.ambientEnemies) .. " ambient")
+    end
+    if stats.enemyMix and stats.enemyMix ~= "" then
+        add(stats.enemyMix)
+    end
+    return {
+        id = preview.id,
+        title = preview.label or preview.id,
+        subtitle = preview.description or "",
+        chips = chips,
+        mapDesc = preview.mapDesc,
+        mapProfile = preview.mapProfile,
+        mapAlgorithm = preview.mapAlgorithm,
+        previewMode = preview.preview_mode,
+        previewPlan = preview.previewPlan,
+        command = command_preview(preview.args),
+        balance = command_preview(preview.balanceArgs),
+    }
+end
+
+local function preview_cards(map_generation)
+    local cards = {}
+    for _, preview in ipairs(map_generation and map_generation.previews or {}) do
+        cards[#cards + 1] = preview_card(preview)
+    end
+    return cards
+end
+
+local function selected_summary(config, run_summary, fight_setup)
+    local objective = fight_setup and fight_setup.objective or {}
+    local map = run_summary and run_summary.map or nil
+    local map_algorithm = run_summary and run_summary.mapAlgorithm or nil
+    local encounter = run_summary and run_summary.encounter or nil
+    local loadout = run_summary and run_summary.loadout or nil
+    local class = run_summary and run_summary.class or nil
+    local bot_profile = run_summary and run_summary.botProfile or selected_bot_profile(config)
+    return {
+        title = objective.label
+            or (encounter and (encounter.label or encounter.id))
+            or (map_algorithm and (map_algorithm.label or map_algorithm.id))
+            or (map and (map.label or map.id))
+            or "Lanarts content lab",
+        subtitle = string.format(
+            "%s L%d, %s loadout, %s bot",
+            config.className,
+            tonumber(config.level) or 1,
+            loadout and (loadout.label or loadout.id) or config.preset,
+            bot_profile and (bot_profile.label or bot_profile.id) or config.botProfile
+        ),
+        class = class,
+        loadout = loadout,
+        map = map,
+        mapAlgorithm = map_algorithm,
+        encounter = encounter,
+        objective = objective,
+        botProfile = bot_profile,
+        controlModel = run_summary and run_summary.controlModel or control_model_for(config),
+    }
+end
+
+local function presentation_payload(config)
+    local run_summary = run_summary_payload(config)
+    local fight_setup = fight_setup_payload(config)
+    local map_generation = map_generation_payload(config)
+    local map_matrix = map_matrix_payload(config)
+    local package_matrix = package_matrix_payload(config)
+    local resource_matrix = resource_matrix_payload(config)
+    local enemy_matrix = enemy_matrix_payload(config, 90)
+    local analysis_plan = analysis_plan_payload(config)
+
+    return {
+        schema = 1,
+        config = config,
+        selected = selected_summary(config, run_summary, fight_setup),
+        controls = controls_payload(config),
+        commandPreviews = {
+            launch = command_preview(run_summary.args),
+            balance = command_preview(run_summary.balanceArgs),
+            classSweep = command_preview(analysis_plan.commands and analysis_plan.commands.classSweep),
+            monsterEval = command_preview(analysis_plan.commands and analysis_plan.commands.monsterEval),
+        },
+        mapPreviews = preview_cards(map_generation),
+        resourceGroups = {
+            {
+                id = "map",
+                label = "Map matrix",
+                count = map_matrix.count or 0,
+                cards = resource_cards(map_matrix.resources),
+            },
+            {
+                id = "package",
+                label = "Package matrix",
+                count = package_matrix.count or 0,
+                cards = resource_cards(package_matrix.resources),
+            },
+            {
+                id = "enemy",
+                label = "Enemy probes",
+                count = enemy_matrix.count or 0,
+                cards = resource_cards(enemy_matrix.resources),
+            },
+            {
+                id = "orthogonal",
+                label = "Orthogonal resources",
+                count = resource_matrix.count or 0,
+                cards = resource_cards(resource_matrix.resources),
+            },
+        },
+        telemetry = fight_setup.telemetry or {},
+        threats = fight_setup.threats or {},
+        warnings = run_summary.warnings or {},
+    }
+end
+
 local function workspace_payload(config)
     local analysis_plan = analysis_plan_payload(config)
     return {
@@ -2179,6 +2540,10 @@ end
 
 function M.workspace_json(raw_json)
     return encode(workspace_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.presentation_json(raw_json)
+    return encode(presentation_payload(normalized_config(parse_json_object(raw_json))))
 end
 
 return M

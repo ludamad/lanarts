@@ -270,6 +270,10 @@ extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_package_matrix_json(
 extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_workspace_json(const char* raw_json) {
     return content_api_call("workspace_json", raw_json);
 }
+
+extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_presentation_json(const char* raw_json) {
+    return content_api_call("presentation_json", raw_json);
+}
 #endif
 
 

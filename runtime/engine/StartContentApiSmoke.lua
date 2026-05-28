@@ -493,6 +493,55 @@ local function run_content_api_smoke()
     expect(workspace.packageMatrix and (workspace.packageMatrix.count or 0) >= 20, "workspace should expose package matrix resources")
     expect(workspace.resourceMatrix and (workspace.resourceMatrix.count or 0) == #(workspace.resourceMatrix.resources or {}), "workspace should expose generated resources")
 
+    local presentation = parse_response("presentation", ContentApi.presentation_json(config))
+    expect(presentation.selected and presentation.selected.objective and presentation.selected.objective.primary == "Gragh", "presentation should expose selected objective")
+    expect(presentation.controls and #presentation.controls >= 10, "presentation should expose UI controls")
+    expect(presentation.commandPreviews and presentation.commandPreviews.launch and presentation.commandPreviews.launch.text:find("engine.StartLanarts"), "presentation should expose launch command text")
+    expect(presentation.commandPreviews and presentation.commandPreviews.balance and presentation.commandPreviews.balance.text:find("engine.StartBalanceRun"), "presentation should expose balance command text")
+    expect(presentation.mapPreviews and #presentation.mapPreviews >= 3, "presentation should expose map preview cards")
+    local has_class_control = false
+    local has_level_control = false
+    local has_map_algorithm_control = false
+    for _, control in ipairs(presentation.controls or {}) do
+        if control.id == "className" and #(control.options or {}) >= 4 then
+            has_class_control = true
+        elseif control.id == "level" and #(control.options or {}) >= 5 then
+            has_level_control = true
+        elseif control.id == "mapAlgorithm" and #(control.options or {}) >= 1 then
+            has_map_algorithm_control = true
+        end
+    end
+    expect(has_class_control, "presentation should expose class control options")
+    expect(has_level_control, "presentation should expose level control options")
+    expect(has_map_algorithm_control, "presentation should expose map algorithm options")
+    local groups = {}
+    local has_rescue_card = false
+    local has_enemy_card = false
+    for _, group in ipairs(presentation.resourceGroups or {}) do
+        groups[group.id or ""] = group
+        if group.id == "package" then
+            for _, card in ipairs(group.cards or {}) do
+                if card.packageSummary and card.packageSummary.hasRescue then
+                    has_rescue_card = true
+                end
+            end
+        elseif group.id == "enemy" then
+            for _, card in ipairs(group.cards or {}) do
+                if card.monsterEval and card.monsterEval.text and card.monsterEval.text:find("StartMonsterEvals") then
+                    has_enemy_card = true
+                end
+            end
+        end
+    end
+    expect(groups.map and (groups.map.count or 0) >= 12, "presentation should expose map resource group")
+    expect(groups.package and (groups.package.count or 0) >= 20, "presentation should expose package resource group")
+    expect(groups.enemy and (groups.enemy.count or 0) >= 12, "presentation should expose enemy resource group")
+    expect(groups.orthogonal and (groups.orthogonal.count or 0) >= 30, "presentation should expose orthogonal resource group")
+    expect(has_rescue_card, "presentation package cards should preserve rescue summaries")
+    expect(has_enemy_card, "presentation enemy cards should expose monster-eval commands")
+    expect(presentation.telemetry and #presentation.telemetry >= 10, "presentation should expose telemetry watch rows")
+    expect(presentation.threats and #presentation.threats >= 2, "presentation should expose threat timing rows")
+
     print(string.format(
         "Content API smoke complete: %d classes, %d maps, %d encounters, %d generated resources.",
         #(catalog.classes or {}),
