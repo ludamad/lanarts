@@ -231,6 +231,15 @@ local function run_content_api_smoke()
     expect(analysis_plan.commands and analysis_plan.commands.classSweep, "analysis plan should expose class sweep args")
     expect(analysis_plan.enemyMatrix and (analysis_plan.enemyMatrix.count or 0) >= 12, "analysis plan should expose enemy resources")
 
+    local workspace = parse_response("workspace", ContentApi.workspace_json(config))
+    expect(workspace.runSummary and workspace.runSummary.config.className == "Necromancer", "workspace should expose run summary")
+    expect(workspace.loadoutOptions and #(workspace.loadoutOptions.knownSpells or {}) >= 1, "workspace should expose loadout options")
+    expect(workspace.enemyOptions and workspace.enemyOptions.monsterEvalArgs, "workspace should expose enemy options")
+    expect(workspace.mapGeneration and #(workspace.mapGeneration.previews or {}) >= 3, "workspace should expose map previews")
+    expect(workspace.analysisPlan and workspace.analysisPlan.commands and workspace.analysisPlan.commands.classSweep, "workspace should expose analysis commands")
+    expect(workspace.commands and workspace.commands.monsterEval, "workspace should expose top-level commands")
+    expect(workspace.resourceMatrix and (workspace.resourceMatrix.count or 0) == #(workspace.resourceMatrix.resources or {}), "workspace should expose generated resources")
+
     print(string.format(
         "Content API smoke complete: %d classes, %d maps, %d encounters, %d generated resources.",
         #(catalog.classes or {}),

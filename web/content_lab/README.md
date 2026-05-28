@@ -20,6 +20,7 @@ The shell reads its runtime data from the exported content APIs:
 - `lanarts_content_analysis_plan_json(config)` returns the selected launch, balance, class-sweep, monster-eval, enemy, and map-generation plan.
 - `lanarts_content_run_summary_json(config)` resolves a selection into launch args, loadout items, pressure-scaled encounter rhythms, and balance notes.
 - `lanarts_content_resource_matrix_json(config)` expands the current selection into class, pressure, map, and encounter sweeps for quick orthogonal comparisons.
+- `lanarts_content_workspace_json(config)` composes the current selection into one UI payload: loadout options, run summary, enemy options, map previews, analysis plan, and generated resources.
 
 Encounter launches use `--encounter` for curated 1v1/package tests, or `--monsters` for a comma-separated custom arena.
 Direct map launches use `--start_map_desc`, and overworld profile selections add `--map_profile` so the same seed can compare `open_meadow`, `broken_grove`, and `old_stones`.

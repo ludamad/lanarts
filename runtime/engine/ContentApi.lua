@@ -953,34 +953,7 @@ local function analysis_plan_payload(config)
     }
 end
 
-function M.catalog_json()
-    return encode(Catalog.catalog())
-end
-
-function M.launch_args_json(raw_json)
-    local config = normalized_config(parse_json_object(raw_json))
-    return encode({
-        schema = 1,
-        config = config,
-        args = launch_args(config),
-    })
-end
-
-function M.balance_args_json(raw_json)
-    local config = normalized_config(parse_json_object(raw_json))
-    return encode({
-        schema = 1,
-        config = config,
-        args = balance_args(config),
-    })
-end
-
-function M.loadout_options_json(raw_json)
-    return encode(build_options_payload(normalized_config(parse_json_object(raw_json))))
-end
-
-function M.run_summary_json(raw_json)
-    local config = normalized_config(parse_json_object(raw_json))
+local function run_summary_payload(config)
     local known_spells, upcoming_spells = spell_rows_for_level(config.className, config.level)
     local selected = {
         class = class_lookup()[config.className],
@@ -990,7 +963,7 @@ function M.run_summary_json(raw_json)
         encounter = encounter_lookup()[config.encounter or ""],
         intensity = selected_intensity(config),
     }
-    return encode({
+    return {
         schema = 1,
         config = config,
         class = selected.class,
@@ -1007,42 +980,21 @@ function M.run_summary_json(raw_json)
         warnings = warnings_for(config, selected),
         args = launch_args(config),
         balanceArgs = balance_args(config),
-    })
+    }
 end
 
-function M.map_preview_json(raw_json)
-    local config = normalized_config(parse_json_object(raw_json))
-    local payload = map_generation_payload(config)
-    payload.encounter = encounter_lookup()[config.encounter or ""]
-    return encode(payload)
-end
-
-function M.map_generation_json(raw_json)
-    return encode(map_generation_payload(normalized_config(parse_json_object(raw_json))))
-end
-
-function M.enemy_options_json(raw_json)
-    return encode(enemy_options_payload(normalized_config(parse_json_object(raw_json))))
-end
-
-function M.enemy_matrix_json(raw_json)
-    local config = normalized_config(parse_json_object(raw_json))
-    local resources = enemy_probe_resources(config, 90)
-    return encode({
+local function enemy_matrix_payload(config, start_offset)
+    local resources = enemy_probe_resources(config, start_offset or 90)
+    return {
         schema = 1,
         config = config,
         count = #resources,
         options = enemy_options_payload(config),
         resources = resources,
-    })
+    }
 end
 
-function M.analysis_plan_json(raw_json)
-    return encode(analysis_plan_payload(normalized_config(parse_json_object(raw_json))))
-end
-
-function M.resource_matrix_json(raw_json)
-    local config = normalized_config(parse_json_object(raw_json))
+local function resource_matrix_payload(config)
     local resources = {}
     local base_map = config.mapDesc
     local base_encounter = config.encounter
@@ -1153,12 +1105,88 @@ function M.resource_matrix_json(raw_json)
 
     append_resources(resources, enemy_probe_resources(config, 90))
 
-    return encode({
+    return {
         schema = 1,
         config = config,
         count = #resources,
         resources = resources,
+    }
+end
+
+local function workspace_payload(config)
+    local analysis_plan = analysis_plan_payload(config)
+    return {
+        schema = 1,
+        config = config,
+        loadoutOptions = build_options_payload(config),
+        runSummary = run_summary_payload(config),
+        enemyOptions = enemy_options_payload(config),
+        mapGeneration = map_generation_payload(config),
+        analysisPlan = analysis_plan,
+        resourceMatrix = resource_matrix_payload(config),
+        commands = analysis_plan.commands,
+    }
+end
+
+function M.catalog_json()
+    return encode(Catalog.catalog())
+end
+
+function M.launch_args_json(raw_json)
+    local config = normalized_config(parse_json_object(raw_json))
+    return encode({
+        schema = 1,
+        config = config,
+        args = launch_args(config),
     })
+end
+
+function M.balance_args_json(raw_json)
+    local config = normalized_config(parse_json_object(raw_json))
+    return encode({
+        schema = 1,
+        config = config,
+        args = balance_args(config),
+    })
+end
+
+function M.loadout_options_json(raw_json)
+    return encode(build_options_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.run_summary_json(raw_json)
+    return encode(run_summary_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.map_preview_json(raw_json)
+    local config = normalized_config(parse_json_object(raw_json))
+    local payload = map_generation_payload(config)
+    payload.encounter = encounter_lookup()[config.encounter or ""]
+    return encode(payload)
+end
+
+function M.map_generation_json(raw_json)
+    return encode(map_generation_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.enemy_options_json(raw_json)
+    return encode(enemy_options_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.enemy_matrix_json(raw_json)
+    return encode(enemy_matrix_payload(normalized_config(parse_json_object(raw_json)), 90))
+end
+
+function M.analysis_plan_json(raw_json)
+    return encode(analysis_plan_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.resource_matrix_json(raw_json)
+    return encode(resource_matrix_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.workspace_json(raw_json)
+    return encode(workspace_payload(normalized_config(parse_json_object(raw_json))))
 end
 
 return M

@@ -1003,20 +1003,26 @@
       let loadoutOptions = null;
       let enemyOptions = null;
       let analysisPlan = null;
+      let workspace = null;
 
       function callContentApi(name, payload) {
         if (!state.runtimeReady || !Module.ccall) {
           return null;
         }
-        const raw = payload === undefined
-          ? Module.ccall(name, 'string', [], [])
-          : Module.ccall(name, 'string', ['string'], [JSON.stringify(payload)]);
-        const parsed = JSON.parse(raw);
-        if (parsed && parsed.error) {
-          appendOutput(parsed.error);
+        try {
+          const raw = payload === undefined
+            ? Module.ccall(name, 'string', [], [])
+            : Module.ccall(name, 'string', ['string'], [JSON.stringify(payload)]);
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.error) {
+            appendOutput(parsed.error);
+            return null;
+          }
+          return parsed;
+        } catch (err) {
+          appendOutput(`${name} failed: ${err && err.message ? err.message : err}`);
           return null;
         }
-        return parsed;
       }
 
       function normalizePreviewProfile(map) {
@@ -1111,7 +1117,7 @@
           monsters: resource.monsters || '',
           enemyGroup: resource.enemyGroup || '',
           enemyPack: resource.enemyPack || '',
-          goal: resource.analysisGoal || resource.goalId || '',
+          analysisGoal: resource.analysisGoal || resource.goalId || '',
           seed: String(resource.seed || 1),
         };
       }
@@ -1468,8 +1474,32 @@
         wireResources();
       }
 
+      function updateWorkspace() {
+        workspace = callContentApi('lanarts_content_workspace_json', currentConfig());
+        if (!workspace) {
+          return false;
+        }
+        loadoutOptions = workspace.loadoutOptions || null;
+        resolvedRun = workspace.runSummary || null;
+        enemyOptions = workspace.enemyOptions || null;
+        analysisPlan = workspace.analysisPlan || null;
+        generatedResources = workspace.resourceMatrix && workspace.resourceMatrix.resources
+          ? workspace.resourceMatrix.resources.map(normalizeResource)
+          : [];
+        renderBuildOptions(loadoutOptions);
+        renderRunSummary(resolvedRun);
+        renderEnemyOptions(enemyOptions);
+        renderAnalysisPlan(analysisPlan);
+        drawPreviews(workspace.mapGeneration);
+        wireResources();
+        return true;
+      }
+
       function refreshLab() {
         renderCustomLoadout();
+        if (updateWorkspace()) {
+          return;
+        }
         updateLoadoutOptions();
         updateRunSummary();
         updateEnemyOptions();
@@ -1491,7 +1521,8 @@
         $('customMonsters').value = config.monsters || '';
         $('enemyGroup').value = config.enemyGroup || $('enemyGroup').value || 'overworld-ambient';
         $('enemyPack').value = config.enemyPack || '';
-        $('analysisGoal').value = config.goal || config.analysisGoal || 'enemy-balance';
+        const goalId = config.analysisGoal || config.goalId || (analysisGoals.some((entry) => entry.id === config.goal) ? config.goal : '');
+        $('analysisGoal').value = goalId || 'enemy-balance';
         setPreset(config.preset || 'none');
         refreshLab();
       }
@@ -1833,13 +1864,14 @@
         }
       }
 
-      function drawPreviews() {
+      function drawPreviews(previewResponse) {
         renderEncounterInfo();
         const seed = currentConfig().seed || '1';
         $('previewSeed').textContent = `seed ${seed}`;
         const grid = $('previewGrid');
         grid.innerHTML = '';
-        const previewResponse = callContentApi('lanarts_content_map_generation_json', currentConfig())
+        previewResponse = previewResponse
+          || callContentApi('lanarts_content_map_generation_json', currentConfig())
           || callContentApi('lanarts_content_map_preview_json', currentConfig());
         const profiles = previewResponse && previewResponse.previews
           ? previewResponse.previews.map(normalizePreviewProfile)
