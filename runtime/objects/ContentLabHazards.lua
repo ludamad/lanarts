@@ -110,6 +110,17 @@ local function scale_count(value, fallback, intensity)
     return math.max(1, math.ceil((tonumber(value or fallback) or fallback) * intensity.summons))
 end
 
+local function scale_summon_count(summon, key, fallback, intensity)
+    local value = tonumber(summon and summon[key])
+    if value == nil then
+        value = fallback
+    end
+    if summon and summon.scale_with_intensity == false then
+        return math.max(1, math.ceil(value))
+    end
+    return scale_count(value, fallback, intensity)
+end
+
 local function living_players()
     local players = {}
     for _, player in ipairs(Map.players_list()) do
@@ -2675,7 +2686,7 @@ end
 local function spawn_summons(director, package)
     local summon = package.summon or {}
     local intensity = director.intensity
-    local max_alive = scale_count(summon.max_alive, 4, intensity)
+    local max_alive = scale_summon_count(summon, "max_alive", 4, intensity)
     if summon_count() + active_summon_portals() >= max_alive then
         return
     end
@@ -2685,7 +2696,7 @@ local function spawn_summons(director, package)
     if #monsters == 0 then
         return
     end
-    local count = scale_count(summon.count, 1, intensity)
+    local count = scale_summon_count(summon, "count", 1, intensity)
     local radius = summon.radius or 150
     local windup = scale_frames(summon.windup, 24, intensity)
     for idx = 1, count do

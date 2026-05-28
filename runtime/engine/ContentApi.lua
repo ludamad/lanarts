@@ -1015,6 +1015,17 @@ local function scaled_count(value, fallback, intensity)
     return math.max(1, math.ceil((tonumber(count) or 1) * math.max(0.1, tonumber(intensity.summons) or 1)))
 end
 
+local function scaled_summon_count(summon, key, fallback, intensity)
+    local count = tonumber(summon and summon[key])
+    if count == nil then
+        count = fallback
+    end
+    if summon and summon.scale_with_intensity == false then
+        return math.max(1, math.ceil(count))
+    end
+    return scaled_count(count, fallback, intensity)
+end
+
 local function safe_rate(num, denom)
     denom = tonumber(denom) or 0
     if denom <= 0 then
@@ -1122,8 +1133,8 @@ local function encounter_rhythms(encounter, intensity)
             duration = windup,
             windup = windup,
             monsters = copy_array(package.summon.monsters or {}),
-            count = scaled_count(package.summon.count, 1, intensity),
-            maxAlive = scaled_count(package.summon.max_alive, 4, intensity),
+            count = scaled_summon_count(package.summon, "count", 1, intensity),
+            maxAlive = scaled_summon_count(package.summon, "max_alive", 4, intensity),
         }
     end
     return rows
