@@ -20,6 +20,12 @@ Content lab APIs:
     Loadout payloads include a readiness read that maps selected gear and known
     spells to the active package demands, such as rescue blocks, add cleanup,
     AOE movement, and orb spacing.
+    Run summaries and fight setup payloads also include class/enemy matchup
+    reads for red/fire, white, and black resistance checks, with telemetry keys
+    that explain whether the pairing is suppressing damage conversion.
+    Generated resource matrices include a caster-matchup sweep for Pyrocaster
+    red-resist checks, Stormcaller counter/mirror checks, and Necromancer
+    black-resist regen checks.
 
 Balance simulations:
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --classes Fighter,Necromancer,Pyrocaster,Stormcaller

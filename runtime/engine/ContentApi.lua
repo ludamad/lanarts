@@ -2369,6 +2369,116 @@ local function fight_objective_for(config, selected, encounter, package_summary)
     }
 end
 
+local ENEMY_MATCHUP_TAGS = {
+    ["Red Dragon"] = {"red_resistant", "fire_projectile", "boss"},
+    ["Purple Dragon"] = {"red_resistant", "fire_projectile", "summon_pressure", "boss"},
+    ["Fire Bat"] = {"red_resistant", "fire_projectile", "add"},
+    ["Imp"] = {"red_resistant", "fire_projectile", "add"},
+    ["Firelord"] = {"red_resistant", "contact"},
+    ["Hell Warrior"] = {"red_resistant", "contact"},
+    ["Ogre Mage"] = {"red_resistant", "fire_projectile", "caster"},
+    ["Cloud Elemental"] = {"white_resistant", "ranged"},
+    ["Storm Elemental"] = {"white_resistant", "ranged"},
+    ["Hell Storm"] = {"white_resistant", "ranged"},
+    ["Crypt Keeper"] = {"black_resistant", "aura", "summon_pressure"},
+    ["Mummoner"] = {"black_resistant", "summon_pressure"},
+    ["Executioner"] = {"black_resistant", "contact"},
+    ["Mana Sapper"] = {"black_resistant", "support"},
+}
+
+local function matchup_tags_for_monsters(monsters, encounter)
+    local tags = {}
+    local function add(tag)
+        tags[tag] = (tags[tag] or 0) + 1
+    end
+    for _, monster in ipairs(monsters or {}) do
+        for _, tag in ipairs(ENEMY_MATCHUP_TAGS[monster] or {}) do
+            add(tag)
+        end
+    end
+    local package = encounter and encounter.package
+    if package and package.summon then
+        for _, monster in ipairs(package.summon.monsters or {}) do
+            for _, tag in ipairs(ENEMY_MATCHUP_TAGS[monster] or {}) do
+                add(tag)
+            end
+        end
+    end
+    return tags
+end
+
+local function matchup_read_for(config, encounter)
+    local _, monsters = primary_enemy_for(config, encounter)
+    local tags = matchup_tags_for_monsters(monsters, encounter)
+    local risks = {}
+    local strengths = {}
+    local notes = {}
+    local telemetry = {"damage_dealt_per_1000_combat_frames", "avg_objective_damage_total", "avg_min_hp_pct"}
+    local severity = "neutral"
+    local label = "baseline matchup"
+
+    local function risk(text)
+        risks[#risks + 1] = text
+        severity = severity == "high" and "high" or "warning"
+    end
+    local function high_risk(text)
+        risks[#risks + 1] = text
+        severity = "high"
+    end
+    local function strength(text)
+        strengths[#strengths + 1] = text
+    end
+
+    if config.className == "Pyrocaster" then
+        if (tags.red_resistant or 0) > 0 then
+            high_risk("red/fire resistance can suppress Pyrocaster conversion")
+            label = "fire-resist check"
+            telemetry[#telemetry + 1] = "avg_pyrocaster_ring_combat_frames"
+        end
+        if (tags.fire_projectile or 0) > 0 then
+            risk("enemy fire/projectile pressure tests ranged spacing while casting")
+        end
+    elseif config.className == "Stormcaller" then
+        if (tags.red_resistant or 0) > 0 then
+            strength("white damage avoids the red/fire resistance check")
+            label = "caster counter-check"
+        end
+        if (tags.white_resistant or 0) > 0 then
+            high_risk("white-resistant enemies can flatten Stormcaller overperformance")
+            label = "white mirror check"
+        end
+    elseif config.className == "Necromancer" then
+        if (tags.black_resistant or 0) > 0 then
+            high_risk("black-resistant enemies can make gross regen trades misleading")
+            label = "black-resist check"
+        end
+        telemetry[#telemetry + 1] = "avg_necromancer_regen_offset_pct"
+    end
+
+    if (tags.summon_pressure or 0) > 0 then
+        notes[#notes + 1] = "Summon pressure should be read with add cleanup and visible-enemy telemetry."
+        telemetry[#telemetry + 1] = "kills_per_1000_combat_frames"
+    end
+    if (tags.contact or 0) > 0 then
+        notes[#notes + 1] = "Contact pressure can hide caster damage problems behind survival failures."
+    end
+    if #risks == 0 and #strengths == 0 then
+        notes[#notes + 1] = "No explicit elemental counter read for this class/enemy pairing."
+    end
+
+    return {
+        schema = 1,
+        label = label,
+        severity = severity,
+        monsters = monsters,
+        tags = tags,
+        risks = risks,
+        strengths = strengths,
+        notes = notes,
+        telemetry = telemetry,
+    }
+end
+
 local function telemetry_watch_for(config, package_summary)
     local rows = {}
     append_metric(rows, "win_rate", "Win rate", "overall clear check")
@@ -2447,6 +2557,7 @@ local function fight_setup_payload(config)
         },
         loadout = loadout,
         loadoutReadiness = loadout_readiness_for_config(config, loadout, known_spells),
+        matchup = matchup_read_for(config, encounter),
         threats = threat_windows_for(rhythms),
         microPlan = micro_plan,
         pressurePreview = pressure_preview,
@@ -2489,6 +2600,7 @@ local function run_summary_payload(config)
         map = selected.map,
         mapAlgorithm = selected.mapAlgorithm,
         encounter = encounter,
+        matchup = matchup_read_for(config, encounter),
         intensity = selected.intensity,
         rhythms = rhythms,
         pressurePreview = pressure_preview,
@@ -2701,6 +2813,76 @@ local function enemy_matrix_payload(config, start_offset)
     }
 end
 
+local function append_caster_matchup_resources(resources, config, start_offset)
+    local specs = {
+        {
+            name = "Pyro Red Dragon resist",
+            meta = "L5, late loadout, red package",
+            goal = "fire-resistance conversion check",
+            className = "Pyrocaster",
+            encounter = "red-dragon-duel",
+            level = 5,
+            preset = "late",
+            intensity = "high",
+        },
+        {
+            name = "Stormcaller Red Dragon counter",
+            meta = "L5, late loadout, red package",
+            goal = "same red package without fire-resist penalty",
+            className = "Stormcaller",
+            encounter = "red-dragon-duel",
+            level = 5,
+            preset = "late",
+            intensity = "high",
+        },
+        {
+            name = "Stormcaller white mirror",
+            meta = "L3, Cloud Elemental duel",
+            goal = "white-resistance overperformance check",
+            className = "Stormcaller",
+            monsters = "Cloud Elemental",
+            level = 3,
+            preset = "none",
+            intensity = "standard",
+        },
+        {
+            name = "Necro Crypt resist",
+            meta = "L5, late loadout, black package",
+            goal = "regen-adjusted black-resistance check",
+            className = "Necromancer",
+            encounter = "crypt-keeper-aura-package",
+            level = 5,
+            preset = "late",
+            intensity = "high",
+        },
+    }
+    local encounters = encounter_lookup()
+    for idx, spec in ipairs(specs) do
+        local next_config = copy_object(config)
+        next_config.className = spec.className
+        next_config.level = spec.level
+        next_config.preset = spec.preset
+        next_config.intensity = spec.intensity
+        next_config.mapDesc = ""
+        next_config.mapProfile = ""
+        next_config.mapAlgorithm = ""
+        next_config.encounter = spec.encounter or ""
+        next_config.monsters = spec.monsters or ""
+        local encounter = encounters[next_config.encounter or ""]
+        resources[#resources + 1] = resource_entry(
+            "Caster matchup sweep",
+            spec.name,
+            spec.meta,
+            spec.goal,
+            next_config,
+            (start_offset or 110) + idx,
+            {
+                matchup = matchup_read_for(next_config, encounter),
+            }
+        )
+    end
+end
+
 local function resource_matrix_payload(config)
     local resources = {}
     local base_map = config.mapDesc
@@ -2785,6 +2967,8 @@ local function resource_matrix_payload(config)
             }
         )
     end
+
+    append_caster_matchup_resources(resources, config, 110)
 
     append_resources(resources, map_probe_resources(config, 40))
 
@@ -3022,6 +3206,12 @@ local function resource_summary_chips(resource)
             add(tostring(resource.mapThreat.clusteredPairs) .. " clusters")
         end
     end
+    if resource.matchup then
+        add(resource.matchup.label)
+        if resource.matchup.severity and resource.matchup.severity ~= "neutral" then
+            add(resource.matchup.severity)
+        end
+    end
     return chips
 end
 
@@ -3057,6 +3247,7 @@ local function resource_card(resource)
         previewMode = resource.previewMode,
         signature = resource.signature,
         mapThreat = resource.mapThreat,
+        matchup = resource.matchup,
         previewStats = resource.previewStats,
         monsterEval = resource.monsterEvalArgs and command_preview(resource.monsterEvalArgs) or nil,
     }
@@ -3152,6 +3343,7 @@ local function selected_summary(config, run_summary, fight_setup)
         objective = objective,
         botProfile = bot_profile,
         controlModel = run_summary and run_summary.controlModel or control_model_for(config),
+        matchup = run_summary and run_summary.matchup or nil,
     }
 end
 
@@ -3206,6 +3398,7 @@ local function presentation_payload(config)
         telemetry = fight_setup.telemetry or {},
         threats = fight_setup.threats or {},
         microPlan = fight_setup.microPlan or {},
+        matchup = run_summary.matchup or fight_setup.matchup,
         pressurePreview = fight_setup.pressurePreview or {},
         warnings = run_summary.warnings or {},
     }

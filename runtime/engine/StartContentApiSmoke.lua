@@ -365,6 +365,20 @@ local function run_content_api_smoke()
     expect(red_rhythms.orbit and red_rhythms.pulse and red_rhythms.summon, "red dragon should expose full package rhythms")
     expect(red_dragon_summary.encounter and red_dragon_summary.encounter.suggestedLevel == 5, "red dragon should expose late-game suggested level")
     expect(red_dragon_summary.encounter and red_dragon_summary.encounter.suggestedPreset == "late", "red dragon should expose late-game suggested loadout")
+    expect(red_dragon_summary.matchup and red_dragon_summary.matchup.severity == "high", "pyrocaster red dragon summary should flag fire-resist matchup risk")
+    expect(red_dragon_summary.matchup and #(red_dragon_summary.matchup.risks or {}) >= 1, "pyrocaster red dragon matchup should explain the risk")
+    expect(red_dragon_summary.matchup and red_dragon_summary.matchup.tags and (red_dragon_summary.matchup.tags.red_resistant or 0) > 0, "pyrocaster red dragon matchup should expose red-resist tags")
+
+    local storm_red_config = [[{
+        "className": "Stormcaller",
+        "level": 5,
+        "preset": "late",
+        "seed": "22480",
+        "encounter": "red-dragon-duel",
+        "intensity": "high"
+    }]]
+    local storm_red_summary = parse_response("storm red dragon summary", ContentApi.run_summary_json(storm_red_config))
+    expect(storm_red_summary.matchup and #(storm_red_summary.matchup.strengths or {}) >= 1, "stormcaller red dragon summary should expose red-resist counter strength")
 
     local centaur_config = [[{
         "className": "Rogue",
@@ -474,6 +488,10 @@ local function run_content_api_smoke()
     local has_late_loadout = false
     local has_perfect_skill_buffer = false
     local has_sloppy_skill_buffer = false
+    local has_pyro_red_resource = false
+    local has_storm_red_resource = false
+    local has_storm_white_resource = false
+    local has_necro_black_resource = false
     for _, resource in ipairs(matrix.resources or {}) do
         if resource.group == "Encounter sweep" and resource.encounter == "giant-chicken-duel" then
             has_chicken_resource = true
@@ -490,12 +508,21 @@ local function run_content_api_smoke()
         elseif resource.group == "Skill buffer sweep" and resource.encounter == "gragh-rescue-package" then
             has_perfect_skill_buffer = has_perfect_skill_buffer or resource.botProfile == "perfect"
             has_sloppy_skill_buffer = has_sloppy_skill_buffer or resource.botProfile == "sloppy"
+        elseif resource.group == "Caster matchup sweep" and resource.className == "Pyrocaster" and resource.encounter == "red-dragon-duel" then
+            has_pyro_red_resource = resource.matchup and resource.matchup.severity == "high"
+        elseif resource.group == "Caster matchup sweep" and resource.className == "Stormcaller" and resource.encounter == "red-dragon-duel" then
+            has_storm_red_resource = resource.matchup and #(resource.matchup.strengths or {}) >= 1
+        elseif resource.group == "Caster matchup sweep" and resource.className == "Stormcaller" and resource.monsters == "Cloud Elemental" then
+            has_storm_white_resource = resource.matchup and resource.matchup.severity == "high"
+        elseif resource.group == "Caster matchup sweep" and resource.className == "Necromancer" and resource.encounter == "crypt-keeper-aura-package" then
+            has_necro_black_resource = resource.matchup and resource.matchup.severity == "high"
         end
     end
     expect(has_chicken_resource, "matrix should include Giant Chicken package coverage")
     expect(has_mummoner_resource, "matrix should include Mummoner package coverage")
     expect(has_none_loadout and has_gragh_loadout and has_late_loadout, "matrix should include loadout sweep coverage")
     expect(has_perfect_skill_buffer and has_sloppy_skill_buffer, "matrix should include skill-buffer sweep coverage")
+    expect(has_pyro_red_resource and has_storm_red_resource and has_storm_white_resource and has_necro_black_resource, "matrix should include caster-delta matchup resources")
 
     local package_matrix = parse_response("package matrix", ContentApi.package_matrix_json(config))
     expect((package_matrix.count or 0) == #(package_matrix.resources or {}), "package matrix count should match resources")
@@ -626,6 +653,7 @@ local function run_content_api_smoke()
     expect(presentation.telemetry and #presentation.telemetry >= 10, "presentation should expose telemetry watch rows")
     expect(presentation.threats and #presentation.threats >= 2, "presentation should expose threat timing rows")
     expect(presentation.microPlan and #presentation.microPlan >= 3, "presentation should expose micro plan rows")
+    expect(presentation.matchup and tostring(presentation.matchup.label or "") ~= "", "presentation should expose matchup read")
     expect(presentation.pressurePreview and (presentation.pressurePreview.peakStack or 0) >= 2, "presentation should expose pressure density preview")
     expect(presentation.pressurePreview and presentation.pressurePreview.diagnosis and tostring(presentation.pressurePreview.diagnosis.label or "") ~= "", "presentation should expose pressure diagnosis")
 

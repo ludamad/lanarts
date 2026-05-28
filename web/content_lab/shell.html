@@ -1314,6 +1314,30 @@
           seed: '9500',
         },
         {
+          name: 'Pyro Red Dragon resist',
+          meta: 'L5, late loadout, red package',
+          className: 'Pyrocaster',
+          level: '5',
+          preset: 'late',
+          mapDesc: '',
+          encounter: 'red-dragon-duel',
+          intensity: 'high',
+          monsters: '',
+          seed: '22482',
+        },
+        {
+          name: 'Stormcaller Red Dragon counter',
+          meta: 'L5, late loadout, red package',
+          className: 'Stormcaller',
+          level: '5',
+          preset: 'late',
+          mapDesc: '',
+          encounter: 'red-dragon-duel',
+          intensity: 'high',
+          monsters: '',
+          seed: '22482',
+        },
+        {
           name: 'Fighter Giant Chicken package',
           meta: 'L2, no loadout, micro package',
           className: 'Fighter',
@@ -1510,6 +1534,7 @@
           tags: resource.tags || [],
           signature: resource.signature || null,
           mapThreat: resource.mapThreat || resource.map_threat || null,
+          matchup: resource.matchup || null,
           previewStats: resource.previewStats || resource.preview_stats || null,
           seed: String(resource.seed || 1),
         };
@@ -1745,6 +1770,20 @@
         return box;
       }
 
+      function renderMatchupRead(matchup) {
+        const box = document.createElement('div');
+        box.className = 'item-chips';
+        if (!matchup) {
+          return box;
+        }
+        addChip(box, matchup.label || 'matchup', matchup.severity === 'high' ? 'locked' : 'stat');
+        (matchup.risks || []).slice(0, 3).forEach((text) => addChip(box, text, 'locked'));
+        (matchup.strengths || []).slice(0, 3).forEach((text) => addChip(box, text));
+        (matchup.notes || []).slice(0, 2).forEach((text) => addChip(box, text));
+        (matchup.telemetry || []).slice(0, 3).forEach((key) => addChip(box, key));
+        return box;
+      }
+
       function renderRunSummary(summary) {
         const host = $('runSummary');
         host.innerHTML = '';
@@ -1786,6 +1825,10 @@
 
         if (summary.loadoutReadiness) {
           appendSummaryLine(host, 'Build Fit', renderLoadoutReadiness(summary.loadoutReadiness));
+        }
+
+        if (summary.matchup) {
+          appendSummaryLine(host, 'Matchup', renderMatchupRead(summary.matchup));
         }
 
         if (summary.packageSummary && summary.packageSummary.rhythmCount) {
@@ -1901,6 +1944,10 @@
           const profile = setup.role.botProfile || {};
           addChip(role, profile.label || profile.id || 'Human');
           appendSummaryLine(host, 'Role', role);
+        }
+
+        if (setup.matchup) {
+          appendSummaryLine(host, 'Matchup', renderMatchupRead(setup.matchup));
         }
 
         if (setup.pressurePreview && (setup.pressurePreview.peakStack || setup.pressurePreview.overlapFrames)) {
@@ -2273,6 +2320,14 @@
         }
         if (watch.childElementCount > 1) {
           host.appendChild(watch);
+        }
+
+        if (payload.matchup) {
+          const matchupSection = document.createElement('div');
+          matchupSection.className = 'presentation-section';
+          appendBoardTitle(matchupSection, 'Matchup');
+          matchupSection.appendChild(renderMatchupRead(payload.matchup));
+          host.appendChild(matchupSection);
         }
 
         if (payload.pressurePreview && (payload.pressurePreview.peakStack || payload.pressurePreview.overlapFrames)) {
@@ -3175,6 +3230,27 @@
         return parts.join(' | ');
       }
 
+      function matchupSummaryText(matchup) {
+        if (!matchup) {
+          return '';
+        }
+        const parts = [];
+        if (matchup.label) {
+          parts.push(matchup.label);
+        }
+        if (matchup.severity && matchup.severity !== 'neutral') {
+          parts.push(matchup.severity);
+        }
+        const risk = matchup.risks && matchup.risks.length ? matchup.risks[0] : '';
+        const strength = matchup.strengths && matchup.strengths.length ? matchup.strengths[0] : '';
+        if (risk) {
+          parts.push(risk);
+        } else if (strength) {
+          parts.push(strength);
+        }
+        return parts.join(' | ');
+      }
+
       function mapThreatText(threat) {
         if (!threat) {
           return '';
@@ -3216,9 +3292,11 @@
           const skill = resource.botProfile && resource.botProfile !== 'human' ? ` ${resource.botProfile}` : '';
           const summary = packageSummaryText(resource.packageSummary);
           const mapSummary = mapSummaryText(resource);
+          const matchupSummary = matchupSummaryText(resource.matchup);
           const summaryNode = summary ? `<span>${summary}</span>` : '';
           const mapSummaryNode = mapSummary ? `<span>${mapSummary}</span>` : '';
-          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${mapSummaryNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${parts}${skill}</code>`;
+          const matchupNode = matchupSummary ? `<span>${matchupSummary}</span>` : '';
+          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${mapSummaryNode}${matchupNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${parts}${skill}</code>`;
           button.addEventListener('click', () => {
             setConfig(resource);
           });
