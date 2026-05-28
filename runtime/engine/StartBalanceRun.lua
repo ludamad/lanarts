@@ -1518,6 +1518,169 @@ local function report_class_name(row)
     return class_name .. suffix
 end
 
+local function has_package_report_data(row)
+    return (row.encounter or "") ~= ""
+        or (tonumber(row.avg_package_frames) or 0) > 0
+        or (tonumber(row.avg_package_pressure_max_count) or 0) > 0
+        or (tonumber(row.avg_package_rescue_opportunities) or 0) > 0
+end
+
+local function add_package_report_rows(rows, row, class_name, runs, min_runs)
+    if not has_package_report_data(row) then
+        return
+    end
+
+    local encounter = (row.encounter or "") ~= "" and row.encounter or "package"
+    local win_rate = tonumber(row.win_rate) or 0
+    local death_rate = tonumber(row.death_rate) or 0
+    local min_hp_pct = tonumber(row.avg_min_hp_pct) or 0
+    local pressure_peak = tonumber(row.avg_package_pressure_max_count) or 0
+    local pressure_overlap = tonumber(row.avg_package_pressure_overlap_rate) or 0
+    local package_frames = tonumber(row.avg_package_frames) or 0
+
+    add_report_row(
+        rows,
+        class_name,
+        "info",
+        "package_pressure",
+        "avg_package_pressure_overlap_rate",
+        pressure_overlap,
+        0,
+        string.format(
+            "%s package pressure in %s averaged %.1f peak stack and %.1f%% overlap over %.0f package frames.",
+            class_name,
+            encounter,
+            pressure_peak,
+            pressure_overlap * 100,
+            package_frames
+        )
+    )
+
+    if runs >= min_runs and win_rate >= 0.95 and death_rate <= 0.05 and min_hp_pct >= 0.45 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_difficulty",
+            "win_rate",
+            win_rate,
+            0.95,
+            string.format(
+                "%s cleared %s %.1f%% of the time with %.1f%% average minimum HP; the selected automation profile may be over-clearing this package.",
+                class_name,
+                encounter,
+                win_rate * 100,
+                min_hp_pct * 100
+            )
+        )
+    end
+
+    if pressure_peak >= 2 and pressure_overlap < 0.05 then
+        add_report_row(
+            rows,
+            class_name,
+            "info",
+            "package_pressure",
+            "avg_package_pressure_overlap_rate",
+            pressure_overlap,
+            0.05,
+            string.format(
+                "%s saw stacked package components in %s, but overlap averaged only %.1f%%; verify the fight is not just serial single-beat pressure.",
+                class_name,
+                encounter,
+                pressure_overlap * 100
+            )
+        )
+    end
+
+    local rescue_opportunities = tonumber(row.avg_package_rescue_opportunities) or 0
+    if rescue_opportunities <= 0 then
+        return
+    end
+
+    local save_rate = tonumber(row.avg_package_rescue_save_rate) or 0
+    local clutch_rate = tonumber(row.avg_package_rescue_clutch_rate) or 0
+    local perfect_rate = tonumber(row.avg_package_rescue_perfect_rate) or 0
+    local pull_rate = tonumber(row.avg_package_rescue_pull_rate) or 0
+    local pull_uptime = tonumber(row.avg_package_rescue_pull_uptime_rate) or 0
+
+    add_report_row(
+        rows,
+        class_name,
+        "info",
+        "package_micro",
+        "avg_package_rescue_save_rate",
+        save_rate,
+        0,
+        string.format(
+            "%s rescue reads in %s averaged %.1f opportunities/run: save %.1f%%, clutch %.1f%%, perfect %.1f%%, pull %.1f%%, taunt uptime %.1f%%.",
+            class_name,
+            encounter,
+            rescue_opportunities,
+            save_rate * 100,
+            clutch_rate * 100,
+            perfect_rate * 100,
+            pull_rate * 100,
+            pull_uptime * 100
+        )
+    )
+
+    if runs >= min_runs and save_rate < 0.50 then
+        add_report_row(
+            rows,
+            class_name,
+            "critical",
+            "package_micro",
+            "avg_package_rescue_save_rate",
+            save_rate,
+            0.50,
+            string.format(
+                "%s saved only %.1f%% of rescue strikes in %s; ally failure may dominate the encounter.",
+                class_name,
+                save_rate * 100,
+                encounter
+            )
+        )
+    end
+
+    if pull_uptime >= 0.30 and win_rate >= 0.50 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_micro",
+            "avg_package_rescue_pull_uptime_rate",
+            pull_uptime,
+            0.30,
+            string.format(
+                "%s spent %.1f%% of %s under rescue pull/taunt control; verify forced target control is not carrying the clear.",
+                class_name,
+                pull_uptime * 100,
+                encounter
+            )
+        )
+    end
+
+    if win_rate >= 0.75 and save_rate >= 0.75 and clutch_rate < 0.20 and perfect_rate <= 0.01 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_micro",
+            "avg_package_rescue_clutch_rate",
+            clutch_rate,
+            0.20,
+            string.format(
+                "%s is clearing %s with reliable saves but only %.1f%% clutch and %.1f%% perfect timing; the rescue may be solved by early parking instead of few-frame micro.",
+                class_name,
+                encounter,
+                clutch_rate * 100,
+                perfect_rate * 100
+            )
+        )
+    end
+end
+
 local function balance_report_rows(class_rows, min_runs, relative_threshold)
     local rows = {}
     local baselines_by_group = {}
@@ -1642,6 +1805,8 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                 )
             end
         end
+
+        add_package_report_rows(rows, row, class_name, runs, min_runs)
 
         local combat_rate = tonumber(row.combat_frame_rate) or 0
         local combat_rate_baseline = baselines.combat_frame_rate or 0

@@ -84,9 +84,14 @@ Balance simulations:
     blocked/late state, and active pull target for HUD and replay checks.
     Package pressure rows track active/warning component stacks, peak stack,
     and overlap rate, which helps distinguish true full-package micro from
-    isolated single-beat pressure.
+    isolated single-beat pressure. The report also emits package_pressure and
+    package_difficulty rows when package overlap is only serial pressure or
+    the selected automation profile is clearing too comfortably.
     Rescue package rows also track pull/taunt total frames and uptime rate, so
     clears can be flagged when forced target control is carrying the fight.
+    Rescue-package report rows summarize save, clutch, perfect, pull, and
+    taunt-uptime rates, then warn when pull/taunt control or early parking is
+    replacing the intended few-frame body-block micro.
     Orb, summon, and AOE package rows likewise expose active/warning counts and
     remaining frames so timeline samples can be matched against the in-game HUD.
     Use --package_components orbit,pulse,summon,escort,rescue to isolate
