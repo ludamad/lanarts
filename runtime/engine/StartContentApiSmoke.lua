@@ -37,6 +37,7 @@ local function run_content_api_smoke()
     local has_executioner_package = false
     local has_executioner_rescue_package = false
     local has_centaur_package = false
+    local has_crypt_keeper_package = false
     local has_human_bot_profile = false
     local has_rescue_component_set = false
     local has_pyro_keepaway_model = false
@@ -78,6 +79,8 @@ local function run_content_api_smoke()
             has_executioner_rescue_package = true
         elseif encounter.id == "centaur-volley-package" and encounter.package then
             has_centaur_package = true
+        elseif encounter.id == "crypt-keeper-aura-package" and encounter.package then
+            has_crypt_keeper_package = true
         end
     end
     expect(has_giant_chicken_package, "catalog should expose Giant Chicken as a package")
@@ -86,6 +89,7 @@ local function run_content_api_smoke()
     expect(has_executioner_package, "catalog should expose the Executioner blade package")
     expect(has_executioner_rescue_package, "catalog should expose the Executioner rescue package")
     expect(has_centaur_package, "catalog should expose the Centaur Hunter volley package")
+    expect(has_crypt_keeper_package, "catalog should expose the Crypt Keeper aura package")
     expect(has_human_bot_profile, "catalog should expose the human bot profile")
     expect(has_rescue_component_set, "catalog should expose rescue lane component set")
     expect(has_pyro_keepaway_model, "catalog should expose ranged class control metadata")
@@ -278,6 +282,23 @@ local function run_content_api_smoke()
     expect(centaur_rhythms.orbit and centaur_rhythms.pulse and centaur_rhythms.summon, "centaur volley should expose full package rhythms")
     expect(centaur_summary.encounter and centaur_summary.encounter.suggestedLevel == 5, "centaur volley should expose late-game suggested level")
     expect(centaur_summary.packageSummary and centaur_summary.packageSummary.hasSummons, "centaur volley should expose add pressure summary")
+
+    local crypt_config = [[{
+        "className": "Stormcaller",
+        "level": 5,
+        "preset": "late",
+        "seed": "22438",
+        "encounter": "crypt-keeper-aura-package",
+        "intensity": "high"
+    }]]
+    local crypt_summary = parse_response("crypt keeper summary", ContentApi.run_summary_json(crypt_config))
+    local crypt_rhythms = {}
+    for _, rhythm in ipairs(crypt_summary.rhythms or {}) do
+        crypt_rhythms[rhythm.id] = true
+    end
+    expect(crypt_rhythms.orbit and crypt_rhythms.pulse and crypt_rhythms.summon, "crypt keeper should expose full package rhythms")
+    expect(crypt_summary.encounter and crypt_summary.encounter.suggestedPreset == "late", "crypt keeper should expose late-game suggested loadout")
+    expect(crypt_summary.packageSummary and crypt_summary.packageSummary.hasSummons, "crypt keeper should expose add pressure summary")
 
     local chicken_config = [[{
         "className": "Fighter",

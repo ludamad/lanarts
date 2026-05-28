@@ -802,6 +802,8 @@
             <option value="executioner-blade-package">Executioner blade package</option>
             <option value="executioner-rescue-package">Executioner rescue package</option>
             <option value="hell-pressure-pair">Hell pressure pair</option>
+            <option value="centaur-volley-package">Centaur Hunter volley package</option>
+            <option value="crypt-keeper-aura-package">Crypt Keeper aura package</option>
           </select>
         </div>
         <div class="encounter-info" id="encounterInfo" hidden></div>
@@ -953,6 +955,7 @@
         {id: 'executioner-rescue-package', label: 'Executioner rescue package', kind: 'rescue package', phase: 'late multiplayer', suggestedLevel: 5, suggestedPreset: 'late', features: ['protect ally', 'body-block rescue', 'pull/taunt window', 'rotating blades', 'Hound adds', 'short AOE windows']},
         {id: 'hell-pressure-pair', label: 'Hell pressure pair', kind: 'enemy mix package', phase: 'late enemy mix', suggestedLevel: 5, suggestedPreset: 'late', features: ['support pressure', 'melee bodyguard', 'ember orbit', 'targeted pulse', 'Imp adds']},
         {id: 'centaur-volley-package', label: 'Centaur Hunter volley package', kind: 'ranged package', phase: 'late ranged micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['ranged pursuit', 'rotating arrow lanes', 'volley AOE rhythm', 'Hound adds']},
+        {id: 'crypt-keeper-aura-package', label: 'Crypt Keeper aura package', kind: 'boss package', phase: 'late black micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['black aura pressure', 'bone orbit', 'pain nova rhythm', 'Skeleton adds']},
       ];
 
       let intensities = [
@@ -1132,6 +1135,18 @@
           intensity: 'high',
           monsters: '',
           seed: '22435',
+        },
+        {
+          name: 'Stormcaller Crypt package',
+          meta: 'L5, late loadout, black aura package',
+          className: 'Stormcaller',
+          level: '5',
+          preset: 'late',
+          mapDesc: '',
+          encounter: 'crypt-keeper-aura-package',
+          intensity: 'high',
+          monsters: '',
+          seed: '22438',
         },
         {
           name: 'Rogue Executioner package',
