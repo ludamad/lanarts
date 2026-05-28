@@ -221,6 +221,8 @@ local function add_micro_event(director, args)
     end
     if args.break_streak then
         director.micro_streak = 0
+    elseif args.no_streak then
+        director.micro_streak = director.micro_streak or 0
     elseif points > 0 then
         director.micro_streak = (director.micro_streak or 0) + 1
         director.micro_best_streak = math.max(director.micro_best_streak or 0, director.micro_streak or 0)
@@ -719,10 +721,11 @@ local function draw_package_hud(director)
         local saves = director.rescue_saves or 0
         local clutch_saves = director.rescue_clutch_saves or 0
         local perfect_saves = director.rescue_perfect_saves or 0
+        local early_saves = director.rescue_early_saves or 0
         local pulls = director.rescue_pulls or 0
         local margin = director.rescue_last_margin
         local attempts = saves + (director.rescue_misses or 0)
-        local stats_value = saves .. "/" .. attempts .. " c" .. clutch_saves .. " f" .. perfect_saves .. " p" .. pulls .. (margin and (" " .. margin .. "f") or "")
+        local stats_value = saves .. "/" .. attempts .. " c" .. clutch_saves .. " f" .. perfect_saves .. " e" .. early_saves .. " p" .. pulls .. (margin and (" " .. margin .. "f") or "")
         draw_hud_row(y, "RATE", stats_value, COL_PALE_GREEN, safe_rate(saves, math.max(1, attempts)))
         y = y + HUD_ROW_H
 
@@ -786,6 +789,7 @@ local function package_result(director, outcome)
     local saves = director.rescue_saves or 0
     local clutch = director.rescue_clutch_saves or 0
     local perfect = director.rescue_perfect_saves or 0
+    local early = director.rescue_early_saves or 0
     local misses = director.rescue_misses or 0
     local pulls = director.rescue_pulls or 0
     local opportunities = saves + misses
@@ -793,6 +797,8 @@ local function package_result(director, outcome)
     local save_rate = safe_rate(saves, opportunities)
     local clutch_rate = safe_rate(clutch, saves)
     local perfect_rate = safe_rate(perfect, saves)
+    local early_rate = safe_rate(early, saves)
+    local timing_score = safe_rate(clutch + perfect, saves)
     local pull_rate = safe_rate(pulls, saves)
     local pull_total_frames = director.rescue_pull_total_frames or 0
     local pull_uptime_rate = safe_rate(pull_total_frames, math.max(1, frames))
@@ -801,7 +807,7 @@ local function package_result(director, outcome)
     local best = director.rescue_best_margin
     local escort_text = count > 0 and string.format("ally %d/%d", math.ceil(hp), math.ceil(max_hp)) or "ally down"
     local rescue_text = (saves > 0 or misses > 0)
-        and string.format("saves %d/%d (%s), clutch %d (%s), perfect %d (%s), pulls %d, taunt %s%s", saves, opportunities, format_pct(save_rate), clutch, format_pct(clutch_rate), perfect, format_pct(perfect_rate), pulls, format_pct(pull_uptime_rate), best and (", best " .. best .. "f") or "")
+        and string.format("saves %d/%d (%s), clutch %d (%s), perfect %d (%s), early %d (%s), pulls %d, taunt %s%s", saves, opportunities, format_pct(save_rate), clutch, format_pct(clutch_rate), perfect, format_pct(perfect_rate), early, format_pct(early_rate), pulls, format_pct(pull_uptime_rate), best and (", best " .. best .. "f") or "")
         or "no rescue strikes"
     return {
         outcome = outcome,
@@ -827,6 +833,9 @@ local function package_result(director, outcome)
         rescue_clutch_rate = clutch_rate,
         rescue_perfect_saves = perfect,
         rescue_perfect_rate = perfect_rate,
+        rescue_early_saves = early,
+        rescue_early_rate = early_rate,
+        rescue_timing_score = timing_score,
         rescue_perfect_window = director.rescue_perfect_window,
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
         rescue_pulls = pulls,
@@ -867,6 +876,7 @@ local function package_state_from_director(director)
     local misses = director.rescue_misses or 0
     local clutch = director.rescue_clutch_saves or 0
     local perfect = director.rescue_perfect_saves or 0
+    local early = director.rescue_early_saves or 0
     local pulls = director.rescue_pulls or 0
     local opportunities = saves + misses
     local orb_count, orb_remaining = active_orbs()
@@ -917,6 +927,9 @@ local function package_state_from_director(director)
         rescue_clutch_rate = safe_rate(clutch, saves),
         rescue_perfect_saves = perfect,
         rescue_perfect_rate = safe_rate(perfect, saves),
+        rescue_early_saves = early,
+        rescue_early_rate = safe_rate(early, saves),
+        rescue_timing_score = safe_rate(clutch + perfect, saves),
         rescue_perfect_window = director.rescue_perfect_window,
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
         rescue_pulls = pulls,
@@ -1627,16 +1640,29 @@ function M.create_rescue_strike(args)
                             self.director.rescue_perfect_saves = (self.director.rescue_perfect_saves or 0) + 1
                             self.director.rescue_best_perfect_margin = math.min(self.director.rescue_best_perfect_margin or margin, margin)
                         end
+                        if not self.was_clutch then
+                            self.director.rescue_early_saves = (self.director.rescue_early_saves or 0) + 1
+                        end
+                        local save_points = self.was_perfect and 60
+                            or self.was_clutch and 42
+                            or self.pulled and 6
+                            or 8
+                        if (self.was_clutch or self.was_perfect) and self.pulled then
+                            save_points = save_points + 5
+                        end
+                        local save_label = self.was_perfect and "PERFECT SAVE"
+                            or self.was_clutch and "CLUTCH SAVE"
+                            or self.pulled and "EARLY PULL"
+                            or "EARLY COVER"
+                        local save_color = self.was_perfect and COL_WHITE
+                            or self.was_clutch and COL_PALE_YELLOW
+                            or COL_LIGHT_GRAY
                         add_micro_event(self.director, {
                             kind = "save",
-                            points = 30 + (self.was_perfect and 25 or self.was_clutch and 12 or 0) + (self.pulled and 5 or 0),
-                            label = self.was_perfect and "PERFECT SAVE"
-                                or self.was_clutch and "CLUTCH SAVE"
-                                or self.pulled and "SAVE PULL"
-                                or "SAVE",
-                            color = self.was_perfect and COL_WHITE
-                                or self.was_clutch and COL_PALE_YELLOW
-                                or COL_PALE_GREEN,
+                            points = save_points,
+                            no_streak = not self.was_clutch,
+                            label = save_label,
+                            color = save_color,
                             xy = xy_of(blocker),
                             duration = self.was_perfect and 76 or 62,
                             drift = 0.52,
@@ -2324,6 +2350,7 @@ function M.add_director(game_map, package, intensity)
         rescue_misses = 0,
         rescue_clutch_saves = 0,
         rescue_perfect_saves = 0,
+        rescue_early_saves = 0,
         rescue_perfect_window = scale_frames((package.rescue or {}).perfect_window, 6, intensity),
         rescue_pulls = 0,
         rescue_pull_active_frames = 0,

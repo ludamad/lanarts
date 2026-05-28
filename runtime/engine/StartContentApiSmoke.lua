@@ -176,6 +176,8 @@ local function run_content_api_smoke()
     local has_necro_regen_micro = false
     local has_sweep_micro = false
     local has_effective_window = false
+    local has_early_save_metric = false
+    local has_timing_score_metric = false
     for _, threat in ipairs(fight_setup.threats or {}) do
         if threat.id == "rescue" and (threat.pullFrames or 0) > 0 then
             has_fight_rescue_window = true
@@ -193,6 +195,10 @@ local function run_content_api_smoke()
             has_taunt_uptime_metric = true
         elseif metric.key == "avg_package_rescue_perfect_rate" then
             has_perfect_metric = true
+        elseif metric.key == "avg_package_rescue_early_rate" then
+            has_early_save_metric = true
+        elseif metric.key == "avg_package_rescue_timing_score" then
+            has_timing_score_metric = true
         elseif metric.key == "avg_package_sweep_active_count" then
             has_sweep_metric = true
         elseif metric.key == "avg_package_micro_score" then
@@ -218,6 +224,8 @@ local function run_content_api_smoke()
     expect(has_fight_regen_metric, "fight setup should expose necromancer regen telemetry")
     expect(has_taunt_uptime_metric, "fight setup should expose taunt uptime telemetry")
     expect(has_perfect_metric, "fight setup should expose perfect-save telemetry")
+    expect(has_early_save_metric, "fight setup should expose early-save telemetry")
+    expect(has_timing_score_metric, "fight setup should expose rescue timing quality telemetry")
     expect(has_sweep_metric, "fight setup should expose sweep telemetry")
     expect(has_micro_score_metric, "fight setup should expose micro score telemetry")
     expect(has_micro_streak_metric, "fight setup should expose micro streak telemetry")
@@ -359,14 +367,21 @@ local function run_content_api_smoke()
                 and #(drill.microPlan or {}) >= 1
             local has_perfect_metric = false
             local has_taunt_metric = false
+            local has_early_metric = false
+            local has_timing_metric = false
             for _, row in ipairs(drill.scorecard and drill.scorecard.rows or {}) do
                 if row.metric == "avg_package_rescue_perfect_rate" then
                     has_perfect_metric = true
                 elseif row.metric == "avg_package_rescue_pull_uptime_rate" then
                     has_taunt_metric = true
+                elseif row.metric == "avg_package_rescue_early_rate" then
+                    has_early_metric = true
+                elseif row.metric == "avg_package_rescue_timing_score" then
+                    has_timing_metric = true
                 end
             end
-            has_gragh_rescue_scorecard = drill.scorecard and #(drill.scorecard.rows or {}) >= 6 and has_perfect_metric and has_taunt_metric
+            has_gragh_rescue_scorecard = drill.scorecard and #(drill.scorecard.rows or {}) >= 8
+                and has_perfect_metric and has_taunt_metric and has_early_metric and has_timing_metric
         end
     end
     expect(has_gragh_rescue_drill, "micro drills should expose launchable Gragh rescue timing practice")

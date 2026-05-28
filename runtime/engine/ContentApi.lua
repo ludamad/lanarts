@@ -2846,6 +2846,8 @@ telemetry_watch_for = function(config, package_summary)
             append_metric(rows, "avg_package_rescue_save_rate", "Save rate", "rescue reliability")
             append_metric(rows, "avg_package_rescue_clutch_rate", "Clutch rate", "late-window saves")
             append_metric(rows, "avg_package_rescue_perfect_rate", "Perfect rate", "few-frame saves")
+            append_metric(rows, "avg_package_rescue_early_rate", "Early saves", "saves started outside clutch window")
+            append_metric(rows, "avg_package_rescue_timing_score", "Timing score", "clutch plus perfect timing quality")
             append_metric(rows, "avg_package_rescue_pull_rate", "Pull rate", "taunt/body-block interaction")
             append_metric(rows, "avg_package_rescue_pull_uptime_rate", "Taunt uptime", "forced target-control share")
             append_metric(rows, "avg_package_rescue_misses", "Misses", "failed rescue windows")
@@ -3053,6 +3055,24 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
             threshold = list_has(drill.tags, "perfect") and 0.12 or 0.05,
             target = list_has(drill.tags, "perfect") and ">=12% perfect saves" or ">=5% perfect saves",
             reason = "Few-frame saves are the intended high-skill moment.",
+        })
+        add({
+            id = "early-parking",
+            label = "Early parking",
+            metric = "avg_package_rescue_early_rate",
+            comparator = "<=",
+            threshold = list_has(drill.tags, "perfect") and 0.40 or 0.55,
+            target = list_has(drill.tags, "perfect") and "<=40% early saves" or "<=55% early saves",
+            reason = "The rescue should be solved by late body-block reads, not camping the line.",
+        })
+        add({
+            id = "timing-quality",
+            label = "Timing quality",
+            metric = "avg_package_rescue_timing_score",
+            comparator = ">=",
+            threshold = list_has(drill.tags, "perfect") and 0.35 or 0.20,
+            target = list_has(drill.tags, "perfect") and ">=0.35 timing score" or ">=0.20 timing score",
+            reason = "Clutch and perfect saves should appear often enough to prove few-frame micro.",
         })
         add({
             id = "taunt-cheese",

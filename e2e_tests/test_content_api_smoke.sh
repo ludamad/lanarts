@@ -16,5 +16,7 @@ grep -q "lanarts_content_presentation_json" web/content_lab/shell.html
 grep -q "Sweeps only" web/content_lab/shell.html
 grep -q "avg_package_sweep_active_count" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_score" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_rescue_early_rate" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_rescue_timing_score" runtime/engine/StartBalanceRun.lua
 grep -q "MICRO" runtime/objects/ContentLabHazards.lua
 env SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1 ./run.sh --headless engine.StartContentApiSmoke "$@"
