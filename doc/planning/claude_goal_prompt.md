@@ -21,6 +21,7 @@ The recent branch has been focused on boss polish, automated balance tests, the 
 Recent commits at the time this prompt was written:
 
 ```text
+f78a695f Add Claude continuation prompt
 c32654df Expand Crypt Keeper package pressure
 f882b511 Polish Dicebinder roll balance
 81e5e153 Track rescue cut commitment
@@ -41,6 +42,14 @@ git log --oneline -10
 ```
 
 Do not revert unrelated or user-authored changes. If the working tree is dirty, inspect the changed files and work with them unless they block the task.
+
+Update note from the handoff pass:
+
+- The prompt file itself was added in `f78a695f`.
+- A later Codex pass began inspecting rescue snap timing, HUD rows, taunt strain, and telemetry, but the user stopped that implementation pass before any gameplay files were edited.
+- As of that stop, no new rescue snap telemetry or HUD changes had been committed after `f78a695f`.
+- The existing rescue system already has late/perfect saves, pull snap bursts, danger-window coverage, pull discipline, taunt strain, and counter-window telemetry. The remaining gap is making "snap opportunity now" a first-class active state before the save resolves.
+- Before implementing anything, re-check `git status --short` and the latest `git log --oneline -10`; this prompt may be older than the current branch head.
 
 ## User Goal
 
