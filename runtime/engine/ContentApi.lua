@@ -979,6 +979,219 @@ local function selected_map_algorithm(config)
     return map_algorithm_by_id(map_algorithm_id_for(config.mapDesc, config.mapProfile))
 end
 
+local function hash_text(value)
+    local hash = 5381
+    local text = tostring(value or "")
+    for idx = 1, #text do
+        hash = (hash * 33 + text:byte(idx)) % 2147483647
+    end
+    return hash
+end
+
+local function preview_rng(seed)
+    local state = math.floor(tonumber(seed) or hash_text(seed))
+    state = state % 2147483647
+    if state <= 0 then
+        state = 1
+    end
+    return function()
+        state = (state * 48271) % 2147483647
+        return state / 2147483647
+    end
+end
+
+local function trim(value)
+    return tostring(value or ""):gsub("^%s+", ""):gsub("%s+$", "")
+end
+
+local function roll_signature_count(value, random, fallback)
+    if type(value) == "number" then
+        return math.max(0, math.floor(value + 0.5))
+    end
+    local text = trim(value)
+    if text == "" or text == "mixed" or text == "profiled" then
+        return fallback
+    end
+    local low, high = text:match("^([0-9]+)%s*%-%s*([0-9]+)$")
+    if low and high then
+        low = tonumber(low) or fallback
+        high = tonumber(high) or low
+        if high < low then
+            low, high = high, low
+        end
+        return low + math.floor(random() * (high - low + 1))
+    end
+
+    local total = 0
+    local matched = false
+    for term in text:gmatch("[^%+]+") do
+        term = trim(term)
+        local dice_count, sides = term:match("^([0-9]*)d([0-9]+)$")
+        if sides then
+            matched = true
+            dice_count = tonumber(dice_count) or 1
+            sides = tonumber(sides) or 1
+            for _ = 1, math.max(1, dice_count) do
+                total = total + 1 + math.floor(random() * math.max(1, sides))
+            end
+        else
+            local number = tonumber(term)
+            if number then
+                matched = true
+                total = total + number
+            end
+        end
+    end
+    if matched then
+        return math.max(0, math.floor(total + 0.5))
+    end
+    return fallback
+end
+
+local function preview_enemy_names(signature, mode)
+    local mix = tostring(signature and signature.enemyMix or ""):lower()
+    local names = {}
+    local function add(label)
+        names[#names + 1] = label
+    end
+    if mix:find("mamba") then
+        add("Black Mamba")
+    end
+    if mix:find("cloud") then
+        add("Cloud Elemental")
+    end
+    if mix:find("mouther") then
+        add("Mouther")
+    end
+    if mix:find("hound") then
+        add("Hound")
+    end
+    if mix:find("skeleton") then
+        add("Skeleton")
+    end
+    if #names == 0 and tostring(mode or ""):find("overworld") then
+        names = {"Sheep", "Black Mamba", "Skeleton", "Cloud Elemental"}
+    elseif #names == 0 then
+        names = {"ambient"}
+    end
+    return names
+end
+
+local function preview_plan_for_algorithm(algorithm, config, seed_offset)
+    local width = 112
+    local height = 72
+    local mode = algorithm.preview_mode or "world"
+    local signature = algorithm.signature or {}
+    local density = tonumber(algorithm.density) or 0.30
+    local seed = (tonumber(config.seed) or hash_text(config.seed)) + hash_text(algorithm.id or algorithm.label or mode) + (seed_offset or 0) * 7919
+    local random = preview_rng(seed)
+    local room_count = roll_signature_count(signature.rooms, random, 6 + math.floor(random() * 8))
+    local region_count = roll_signature_count(signature.regions, random, 5 + math.floor(random() * 5))
+    local ambient_count = roll_signature_count(signature.ambientEnemies, random, mode:find("overworld") and 7 or 3)
+    local vault_count = roll_signature_count(signature.vaults, random, 1 + math.floor(random() * 3))
+    local statue_count = roll_signature_count(signature.statues, random, 1 + math.floor(random() * 4))
+
+    room_count = math.max(3, math.min(16, room_count))
+    region_count = math.max(2, math.min(12, region_count))
+    ambient_count = math.max(0, math.min(12, ambient_count))
+    vault_count = math.max(0, math.min(6, vault_count))
+    statue_count = math.max(0, math.min(8, statue_count))
+
+    local rooms = {}
+    local max_radius = math.max(7, 18 * (1 - math.min(0.55, density)))
+    for idx = 1, room_count do
+        local rx = 7 + math.floor(random() * max_radius)
+        local ry = 5 + math.floor(random() * math.max(5, max_radius * 0.70))
+        rooms[#rooms + 1] = {
+            x = 7 + math.floor(random() * (width - 14)),
+            y = 6 + math.floor(random() * (height - 12)),
+            rx = rx,
+            ry = ry,
+            rotation = random() * 3.14159,
+            fill = random() > 0.45 and "floor" or "floor2",
+            shape = random() > 0.82 and "rect" or "ellipse",
+        }
+    end
+
+    local corridors = {}
+    for idx = 1, math.min(#rooms - 1, region_count + 1) do
+        local a = rooms[idx]
+        local b = rooms[idx + 1]
+        corridors[#corridors + 1] = {
+            x1 = a.x,
+            y1 = a.y,
+            x2 = b.x,
+            y2 = b.y,
+            width = 3 + math.floor(random() * 2),
+            color = "floor2",
+        }
+    end
+
+    local rivers = {}
+    if mode == "world" or mode == "overworld" or mode:find("river") or (mode:find("overworld") and random() > 0.55) then
+        local y = 9 + math.floor(random() * (height - 18))
+        local points = {}
+        for x = 0, width, 9 do
+            y = math.max(8, math.min(height - 8, y + math.floor(random() * 11) - 5))
+            points[#points + 1] = {x = x, y = y}
+        end
+        rivers[#rivers + 1] = {
+            points = points,
+            width = mode:find("river") and 4 or 3,
+            color = "accent",
+        }
+    end
+
+    local props = {}
+    for idx = 1, vault_count do
+        props[#props + 1] = {
+            kind = "vault",
+            x = 6 + math.floor(random() * (width - 12)),
+            y = 6 + math.floor(random() * (height - 12)),
+        }
+    end
+    for idx = 1, statue_count do
+        props[#props + 1] = {
+            kind = "statue",
+            x = 6 + math.floor(random() * (width - 12)),
+            y = 6 + math.floor(random() * (height - 12)),
+        }
+    end
+
+    local enemy_names = preview_enemy_names(signature, mode)
+    local enemy_pins = {}
+    for idx = 1, ambient_count do
+        enemy_pins[#enemy_pins + 1] = {
+            monster = enemy_names[1 + math.floor(random() * #enemy_names)],
+            x = 6 + math.floor(random() * (width - 12)),
+            y = 6 + math.floor(random() * (height - 12)),
+        }
+    end
+
+    return {
+        schema = 1,
+        width = width,
+        height = height,
+        seed = tostring(seed),
+        mode = mode,
+        density = density,
+        palette = copy_object(algorithm.palette or {}),
+        rooms = rooms,
+        corridors = corridors,
+        rivers = rivers,
+        props = props,
+        enemyPins = enemy_pins,
+        stats = {
+            regions = region_count,
+            rooms = room_count,
+            ambientEnemies = ambient_count,
+            enemyMix = signature.enemyMix or "",
+            vaults = vault_count,
+            statues = statue_count,
+        },
+    }
+end
+
 local function map_preview_entry(algorithm, config, seed_offset)
     local preview_config = copy_object(config)
     preview_config.mapDesc = algorithm.mapDesc or ""
@@ -1001,6 +1214,7 @@ local function map_preview_entry(algorithm, config, seed_offset)
         tags = copy_array(algorithm.tags or {}),
         palette = algorithm.palette,
         signature = algorithm.signature,
+        previewPlan = preview_plan_for_algorithm(algorithm, config, seed_offset or 0),
         runConfig = preview_config,
         args = launch_args(preview_config),
         balanceArgs = balance_args(preview_config),

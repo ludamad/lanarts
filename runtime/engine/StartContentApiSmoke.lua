@@ -211,6 +211,8 @@ local function run_content_api_smoke()
     local has_river_preview = false
     local has_predator_preview = false
     local has_ruin_preview = false
+    local has_preview_geometry = false
+    local has_preview_enemy_pins = false
     for _, preview in ipairs(map_generation.previews or {}) do
         if preview.mapProfile == "river_road" then
             has_river_preview = true
@@ -219,8 +221,16 @@ local function run_content_api_smoke()
         elseif preview.mapProfile == "ruin_crossroads" then
             has_ruin_preview = true
         end
+        if preview.previewPlan and #(preview.previewPlan.rooms or {}) >= 3 and #(preview.previewPlan.corridors or {}) >= 1 then
+            has_preview_geometry = true
+        end
+        if preview.previewPlan and #(preview.previewPlan.enemyPins or {}) >= 1 then
+            has_preview_enemy_pins = true
+        end
     end
     expect(has_river_preview and has_predator_preview and has_ruin_preview, "map generation should expose new overworld profile previews")
+    expect(has_preview_geometry, "map generation should expose deterministic preview geometry")
+    expect(has_preview_enemy_pins, "map generation should expose preview enemy pins")
     local launch_args = parse_response("launch args", ContentApi.launch_args_json(map_config))
     local has_map_profile = false
     for _, arg in ipairs(launch_args.args or {}) do

@@ -1201,6 +1201,7 @@
           mode: map.preview_mode || map.mode || 'world',
           density: Number(map.density || 0.30),
           palette: map.palette || null,
+          previewPlan: map.previewPlan || map.preview_plan || null,
           runConfig: map.runConfig || null,
         };
       }
@@ -2200,8 +2201,111 @@
         };
       }
 
+      function previewColor(palette, key, fallback) {
+        const value = palette && palette[key];
+        if (!value) {
+          return fallback;
+        }
+        return String(value).charAt(0) === '#' ? value : fallback;
+      }
+
+      function pathPoints(ctx, points) {
+        if (!points || !points.length) {
+          return false;
+        }
+        ctx.beginPath();
+        ctx.moveTo(Number(points[0].x || 0), Number(points[0].y || 0));
+        points.slice(1).forEach((point) => {
+          ctx.lineTo(Number(point.x || 0), Number(point.y || 0));
+        });
+        return true;
+      }
+
+      function previewArray(value) {
+        return Array.isArray(value) ? value : [];
+      }
+
+      function drawApiPreview(ctx, plan, profile) {
+        const width = Number(plan.width || 112);
+        const height = Number(plan.height || 72);
+        const palette = plan.palette || profile.palette || {};
+        const floor = previewColor(palette, 'floor', '#31553c');
+        const floor2 = previewColor(palette, 'floor2', '#416447');
+        const wall = previewColor(palette, 'wall', '#1d2922');
+        const accent = previewColor(palette, 'accent', '#25465a');
+        ctx.canvas.width = width;
+        ctx.canvas.height = height;
+        ctx.fillStyle = wall;
+        ctx.fillRect(0, 0, width, height);
+
+        previewArray(plan.corridors).forEach((corridor) => {
+          ctx.strokeStyle = corridor.color === 'floor' ? floor : floor2;
+          ctx.lineWidth = Number(corridor.width || 4);
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(Number(corridor.x1 || 0), Number(corridor.y1 || 0));
+          ctx.lineTo(Number(corridor.x2 || 0), Number(corridor.y2 || 0));
+          ctx.stroke();
+        });
+
+        previewArray(plan.rooms).forEach((room) => {
+          const x = Number(room.x || 0);
+          const y = Number(room.y || 0);
+          const rx = Number(room.rx || 8);
+          const ry = Number(room.ry || 6);
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(Number(room.rotation || 0));
+          ctx.fillStyle = room.fill === 'floor2' ? floor2 : floor;
+          if (room.shape === 'rect') {
+            ctx.fillRect(-rx, -ry, rx * 2, ry * 2);
+          } else {
+            ctx.beginPath();
+            ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        });
+
+        previewArray(plan.rivers).forEach((river) => {
+          ctx.strokeStyle = river.color === 'floor2' ? floor2 : accent;
+          ctx.lineWidth = Number(river.width || 3);
+          ctx.lineCap = 'round';
+          if (pathPoints(ctx, previewArray(river.points))) {
+            ctx.stroke();
+          }
+        });
+
+        previewArray(plan.props).forEach((prop) => {
+          const x = Number(prop.x || 0);
+          const y = Number(prop.y || 0);
+          ctx.fillStyle = prop.kind === 'vault' ? '#d7c37a' : '#bfc4a2';
+          ctx.fillRect(x - 1, y - 1, 3, 3);
+        });
+
+        previewArray(plan.enemyPins).forEach((pin) => {
+          const x = Number(pin.x || 0);
+          const y = Number(pin.y || 0);
+          const monster = String(pin.monster || '').toLowerCase();
+          ctx.fillStyle = monster.includes('cloud') ? '#b9d7ff'
+            : monster.includes('hound') || monster.includes('mamba') ? '#d36a5c'
+              : monster.includes('skeleton') ? '#ddd7bc'
+                : '#f0b05a';
+          ctx.beginPath();
+          ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#171d22';
+          ctx.lineWidth = 0.75;
+          ctx.stroke();
+        });
+      }
+
       function drawPreview(canvas, profile, seedText) {
         const ctx = canvas.getContext('2d');
+        if (profile.previewPlan) {
+          drawApiPreview(ctx, profile.previewPlan, profile);
+          return;
+        }
         const width = 112;
         const height = 72;
         canvas.width = width;

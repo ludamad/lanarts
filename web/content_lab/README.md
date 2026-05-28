@@ -13,7 +13,7 @@ The shell reads its runtime data from the exported content APIs:
 - `lanarts_content_catalog_json()` returns classes, class control metadata, bot skill profiles, level labels, loadout presets, map generators, map algorithms, encounters, and saved resource presets.
 - `lanarts_content_launch_args_json(config)` normalizes a selected run and returns the `engine.StartLanarts` arguments.
 - `lanarts_content_loadout_options_json(config)` resolves class build metadata, known spells, preset items, and class-relevant curated item choices.
-- `lanarts_content_map_generation_json(config)` returns selectable map algorithms, preview metadata, and resolved run/balance args for each preview.
+- `lanarts_content_map_generation_json(config)` returns selectable map algorithms, deterministic preview geometry with enemy pins, and resolved run/balance args for each preview.
 - `lanarts_content_map_preview_json(config)` is kept as a compatible alias for the preview grid payload.
 - `lanarts_content_map_matrix_json(config)` expands selected-seed, overworld-algorithm, and late-map probes for map-generation balance runs.
 - `lanarts_content_enemy_options_json(config)` returns curated enemy groups, packs, selected monster lists, and `StartMonsterEvals` args.
