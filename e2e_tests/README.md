@@ -96,6 +96,9 @@ Balance simulations:
     plus hell-warrior-flame-package for fast red contact pressure with capped
     extra Imp portals and readable flame lanes, and stara-pain-star-package
     for black aura/projectile pressure with skull lanes and Skeleton cleanup.
+    pixulloch-web-package adds a larger final-boss arena with native black
+    summons, rotating web knots, crossing venom lanes, a web nova beat, and
+    Giant Spider cleanup.
     emit package_outcome, escort HP, rescue saves, clutch/perfect saves,
     clutch/perfect rescue window cues, pull redirects, and misses in run and sample rows; ally-down package failures end the run
     as ally_down. Automated players also emit rescue_intercept_frames,

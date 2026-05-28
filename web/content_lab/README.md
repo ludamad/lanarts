@@ -72,3 +72,4 @@ When a package clears or fails, the game posts a compact result banner with elap
 `--package_intensity` scales package tempo, damage, and summon counts from the same encounter definition, which keeps pressure sweeps comparable.
 `--package_components` can isolate package parts such as `orbit`, `pulse`, `sweep`, `summon`, or `escort,rescue`; the lab uses this for component probes without replacing full-package baselines.
 `--bot_profile` selects the automated-player skill buffer (`perfect`, `skilled`, `human`, or `sloppy`) for balance runs. The lab defaults to `human`, while skill-buffer sweeps make it clear when a package only fails under lower execution or only wins under perfect automation.
+Pixulloch has a larger final-boss web package in the lab with native black summons, rotating web knots, crossing venom lanes, a close web nova, and Giant Spider portals so late 1v1 testing includes a distinct final-boss pressure shape.
