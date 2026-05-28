@@ -25,3 +25,4 @@ build*/
 cmake-build*
 .directory
 package/
+saves/experiments/
