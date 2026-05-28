@@ -2854,6 +2854,7 @@ telemetry_watch_for = function(config, package_summary)
 
     if package_summary then
         append_metric(rows, "avg_package_frames", "Package time", "package clear pacing")
+        append_metric(rows, "avg_package_primary_hp_pct", "Boss HP left", "boss HP fraction at fight end (low on a stall means almost-won, raise step budget)")
         append_metric(rows, "avg_package_pressure_max_count", "Peak stack", "simultaneous package demands")
         append_metric(rows, "avg_package_pressure_overlap_rate", "Overlap rate", "share of frames with stacked pressure")
         append_metric(rows, "avg_package_pressure_sync_rate", "Sync rate", "share of frames with 3+ simultaneous package demands")

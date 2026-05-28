@@ -1362,7 +1362,7 @@ local SUMMARY_METRICS = {
     "dice_buff_active_frames", "dice_fleet_frames", "dice_guard_frames",
     "dice_edge_frames", "dice_focus_frames", "dice_dash_frames", "dice_jackpot_frames",
     "package_frames", "package_escort_count", "package_escort_hp", "package_escort_max_hp",
-    "package_escort_hp_pct", "package_rescue_saves", "package_rescue_clutch_saves",
+    "package_escort_hp_pct", "package_primary_hp_pct", "package_rescue_saves", "package_rescue_clutch_saves",
     "package_aggro_frames", "package_aggro_player_frames", "package_aggro_player_rate",
     "package_aggro_ally_frames", "package_aggro_ally_rate", "package_aggro_other_frames",
     "package_aggro_other_rate", "package_aggro_none_frames", "package_aggro_none_rate",
@@ -2277,22 +2277,43 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
 
     local step_limits = tonumber(row.step_limits) or 0
     local step_limit_rate = runs > 0 and step_limits / runs or 0
+    local boss_hp_left = tonumber(row.avg_package_primary_hp_pct) or 0
     if runs >= min_runs and win_rate <= 0.05 and death_rate <= 0.05 and step_limit_rate >= 0.75 then
-        add_report_row(
-            rows,
-            class_name,
-            "warning",
-            "package_difficulty",
-            "win_rate",
-            win_rate,
-            0.05,
-            string.format(
-                "%s neither cleared nor died in %s (%.1f%% step-limit stalls); the package is not resolving inside the step budget. Verify damage output, killability, and readability before tuning enemy damage -- a 0%% clear here is likely instrument-limited, not proof the fight is too hard.",
+        if boss_hp_left > 0 and boss_hp_left <= 0.25 then
+            add_report_row(
+                rows,
                 class_name,
-                encounter,
-                step_limit_rate * 100
+                "warning",
+                "package_difficulty",
+                "avg_package_primary_hp_pct",
+                boss_hp_left,
+                0.25,
+                string.format(
+                    "%s stalled out the step budget in %s (%.1f%% step-limit) with the boss at only %.1f%% HP; this is almost-won, not too hard -- raise the step budget for this duel rather than tuning enemy stats.",
+                    class_name,
+                    encounter,
+                    step_limit_rate * 100,
+                    boss_hp_left * 100
+                )
             )
-        )
+        else
+            add_report_row(
+                rows,
+                class_name,
+                "warning",
+                "package_difficulty",
+                "win_rate",
+                win_rate,
+                0.05,
+                string.format(
+                    "%s neither cleared nor died in %s (%.1f%% step-limit stalls, boss left at %.1f%% HP); the package is not resolving inside the step budget. Verify damage output, killability, and readability before tuning enemy damage -- a 0%% clear here is likely instrument-limited, not proof the fight is too hard.",
+                    class_name,
+                    encounter,
+                    step_limit_rate * 100,
+                    boss_hp_left * 100
+                )
+            )
+        end
     end
 
     if runs >= min_runs and micro_score <= -20 and micro_hits >= 5 then
@@ -3787,7 +3808,7 @@ local function run_balance(raw_args)
             "avg_ranged_close_gragh_frames", "avg_rescue_intercept_frames",
             "avg_rescue_hold_frames", "avg_rescue_late_reaction_frames", "avg_necromancer_regen_frames",
             "avg_necromancer_regen_recovered_total",
-            "avg_package_frames", "avg_package_escort_hp_pct", "avg_package_rescue_saves",
+            "avg_package_frames", "avg_package_escort_hp_pct", "avg_package_primary_hp_pct", "avg_package_rescue_saves",
             "avg_package_aggro_frames", "avg_package_aggro_player_frames", "avg_package_aggro_player_rate",
             "avg_package_aggro_ally_frames", "avg_package_aggro_ally_rate",
             "avg_package_aggro_other_frames", "avg_package_aggro_other_rate",
