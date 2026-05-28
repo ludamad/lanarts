@@ -43,6 +43,9 @@ grep -q "avg_dice_roll_suspense_pips" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_guard_cues" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_anti_repeat_rerolls" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_cooldown_trim_frames" runtime/engine/StartBalanceRun.lua
+grep -q "avg_dice_high_roll_rate" runtime/engine/StartBalanceRun.lua
+grep -q "avg_dice_distinct_faces" runtime/engine/StartBalanceRun.lua
+grep -q "avg_dice_max_face_share" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_longest_high_streak" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_longest_utility_streak" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_high_streak_breaks" runtime/engine/StartBalanceRun.lua
@@ -51,6 +54,9 @@ grep -q "dice-animation" runtime/engine/ContentApi.lua
 grep -q "dice-motion" runtime/engine/ContentApi.lua
 grep -q "dice-surge" runtime/engine/ContentApi.lua
 grep -q "dice-finale" runtime/engine/ContentApi.lua
+grep -q "dice-face-spread" runtime/engine/ContentApi.lua
+grep -q "dice-high-share" runtime/engine/ContentApi.lua
+grep -q "dice-face-cap" runtime/engine/ContentApi.lua
 grep -q "dice-high-streak-cap" runtime/engine/ContentApi.lua
 grep -q "dice-dry-streak-cap" runtime/engine/ContentApi.lua
 grep -q "avg_package_rescue_avg_clutch_margin" runtime/engine/ContentApi.lua

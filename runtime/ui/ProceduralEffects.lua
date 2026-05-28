@@ -319,21 +319,24 @@ function M.draw_die_badge(obj, args)
     local buff_pct = clamp(buff_remaining / buff_duration, 0, 1)
     local color = args.color or COL_PALE_BLUE
     local frame = GameState.frame or 0
+    local near_drop = rolling and rolling_pct >= 0.78 and rolling_pct < 0.91
+    local final_lock = rolling and rolling_pct >= 0.91
+    local tension = rolling and clamp((lock_stage + surge_stage) / (lock_total + surge_total), 0, 1) or 0
     local base_xy = screen_xy({obj.x, obj.y - (obj.radius or 14) - 30})
-    local shake = rolling and (0.8 + rolling_pct * 2.0 + surge_stage * 0.18) or 0
+    local shake = rolling and (0.8 + rolling_pct * 2.0 + surge_stage * 0.18 + (final_lock and 1.4 or near_drop and 0.7 or 0)) or 0
     local xy = {
         base_xy[1] + math.sin(frame * 0.73) * shake,
         base_xy[2] + math.cos(frame * 0.61) * shake * 0.45,
     }
     local pulse = 0.5 + 0.5 * math.sin(frame * 0.32)
-    local w = rolling and 92 or label ~= "" and 72 or 48
-    local h = rolling and 38 or label ~= "" and 30 or 20
+    local w = rolling and (final_lock and 102 or near_drop and 98 or 92) or label ~= "" and 72 or 48
+    local h = rolling and (final_lock and 43 or near_drop and 40 or 38) or label ~= "" and 30 or 20
     local box = {xy[1] - w / 2, xy[2] - h / 2, xy[1] + w / 2, xy[2] + h / 2}
     Display.draw_radial_gradient(
-        rolling and alpha(color, 0.20 + pulse * 0.12) or {120, 170, 255, 35},
+        rolling and alpha(color, 0.20 + pulse * 0.12 + tension * 0.07 + (final_lock and 0.10 or 0)) or {120, 170, 255, 35},
         {20, 30, 70, 0},
         xy,
-        rolling and (43 + pulse * 5) or label ~= "" and 39 or 34,
+        rolling and (43 + pulse * 5 + tension * 9 + (final_lock and 7 or 0)) or label ~= "" and 39 or 34,
         5
     )
     if rolling then
@@ -349,7 +352,11 @@ function M.draw_die_badge(obj, args)
         end
     end
     Display.draw_rectangle(alpha(COL_BLACK, rolling and 0.58 or 0.48), box)
-    Display.draw_rectangle_outline(alpha(color, rolling and (0.82 + pulse * 0.16) or 0.78), box, rolling and 2 or 1)
+    if near_drop then
+        local drop_box = {box[1] - 3, box[2] - 3, box[3] + 3, box[4] + 3}
+        Display.draw_rectangle_outline(alpha(COL_WHITE, 0.24 + pulse * 0.28), drop_box, 1)
+    end
+    Display.draw_rectangle_outline(alpha(color, rolling and (0.82 + pulse * 0.16 + tension * 0.12) or 0.78), box, rolling and 2 or 1)
     if rolling then
         local rail_y = box[4] + 9
         for face = 1, 6 do
@@ -378,9 +385,12 @@ function M.draw_die_badge(obj, args)
     local has_die = roll > 0 and label ~= ""
     local text_x = xy[1]
     if has_die then
-        local die_size = rolling and 21 or 18
+        local die_size = rolling and (final_lock and 26 or near_drop and 23 or 21) or 18
+        if rolling then
+            draw_die_face({box[1] + 17 + 3, xy[2] + 3}, roll, die_size, COL_BLACK, 0.38)
+        end
         draw_die_face({box[1] + 17, xy[2]}, roll, die_size, color, rolling and 1 or 0.88)
-        text_x = xy[1] + 11
+        text_x = xy[1] + (final_lock and 16 or 11)
     end
     if label ~= "" then
         Fonts.small:draw({color = alpha(COL_WHITE, 0.95), origin = Display.CENTER}, {text_x, xy[2] - 7}, "D6 " .. tostring(roll))
@@ -399,6 +409,11 @@ function M.draw_die_badge(obj, args)
             local surge_pct = surge_stage / surge_total
             Display.draw_arc(alpha(color, 0.26 + surge_pct * 0.44), xy, outer_radius + 10, -math.pi / 2, -math.pi / 2 + TWO_PI * surge_pct, 2, 20)
             Display.draw_arc(alpha(COL_WHITE, 0.16 + surge_pct * 0.20), xy, outer_radius + 14, spin * -0.42, spin * -0.42 + math.pi * (0.38 + surge_pct), 1, 18)
+        end
+        if near_drop or final_lock then
+            local burst_alpha = final_lock and 0.46 or 0.30
+            Display.draw_arc(alpha(COL_WHITE, burst_alpha), xy, outer_radius + 18, spin * 0.52, spin * 0.52 + math.pi * 0.86, 2, 20)
+            Display.draw_arc(alpha(color, burst_alpha + 0.10), xy, outer_radius + 22, -spin * 0.37, -spin * 0.37 + math.pi * 0.62, final_lock and 3 or 2, 20)
         end
         for idx = 1, 6 do
             local angle = spin + idx * TWO_PI / 6

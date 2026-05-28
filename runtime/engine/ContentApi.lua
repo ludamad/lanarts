@@ -2953,6 +2953,9 @@ telemetry_watch_for = function(config, package_summary)
         append_metric(rows, "avg_dice_roll_reveal_cues", "Reveal cues", "late final-face flashes")
         append_metric(rows, "avg_dice_roll_finale_fx", "Finale FX", "resolved payoff bursts")
         append_metric(rows, "avg_dice_cooldown_trim_frames", "Trim frames", "bounded roll-four partial cooldown refund")
+        append_metric(rows, "avg_dice_high_roll_rate", "High share", "bounded share of roll-five/six payoff windows")
+        append_metric(rows, "avg_dice_distinct_faces", "Face spread", "distinct D6 faces seen per run")
+        append_metric(rows, "avg_dice_max_face_share", "Face cap", "largest single-face concentration")
         append_metric(rows, "avg_dice_longest_high_streak", "High streak", "high-roll clump check")
         append_metric(rows, "avg_dice_longest_utility_streak", "Dry streak", "low-roll dry spell check")
         append_metric(rows, "avg_dice_high_streak_breaks", "High guard", "high-roll clumps actively delayed")
@@ -3412,6 +3415,33 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
             threshold = 1,
             target = ">=1 face switch/run",
             reason = "The fair-bag dice should produce varied outcomes instead of repeating one result.",
+        })
+        add({
+            id = "dice-face-spread",
+            label = "Face spread",
+            metric = "avg_dice_distinct_faces",
+            comparator = ">=",
+            threshold = 2,
+            target = ">=2 distinct faces/run",
+            reason = "Short boss drills should still show more than one D6 role so the class is not a single-buff read.",
+        })
+        add({
+            id = "dice-high-share",
+            label = "High-share cap",
+            metric = "avg_dice_high_roll_rate",
+            comparator = "<=",
+            threshold = 0.50,
+            target = "<=50% high rolls",
+            reason = "Dash and jackpot refreshes should be exciting spikes, not the majority of the class profile.",
+        })
+        add({
+            id = "dice-face-cap",
+            label = "Face cap",
+            metric = "avg_dice_max_face_share",
+            comparator = "<=",
+            threshold = 0.67,
+            target = "<=67% one-face share",
+            reason = "The fair bag should stop one repeated face from dominating short-run balance reads.",
         })
         add({
             id = "dice-repeat-cap",

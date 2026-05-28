@@ -945,7 +945,10 @@ local DICEBINDER_METRICS = {
     "dice_bag_refills",
     "dice_anti_repeat_rerolls",
     "dice_high_rolls",
+    "dice_high_roll_rate",
     "dice_utility_rolls",
+    "dice_distinct_faces",
+    "dice_max_face_share",
     "dice_longest_high_streak",
     "dice_longest_utility_streak",
     "dice_high_streak_breaks",
@@ -980,9 +983,16 @@ local function dicebinder_state_fields(player)
     fields.dice_pending_roll = effect.pending_roll or ""
     fields.dice_rolling_frames = effect.rolling_time or 0
     fields.dice_rolls_total = effect.rolls_total or 0
+    local max_face_count = 0
+    local distinct_faces = 0
     for roll = 1, 6 do
         local key = "dice_roll_" .. tostring(roll) .. "_count"
-        fields[key] = effect["roll_" .. tostring(roll) .. "_count"] or 0
+        local count = effect["roll_" .. tostring(roll) .. "_count"] or 0
+        fields[key] = count
+        max_face_count = math.max(max_face_count, count)
+        if count > 0 then
+            distinct_faces = distinct_faces + 1
+        end
     end
     fields.dice_dash_refreshes = effect.dash_refreshes or 0
     fields.dice_dash_effective_refreshes = effect.dash_effective_refreshes or 0
@@ -1005,7 +1015,10 @@ local function dicebinder_state_fields(player)
     fields.dice_bag_refills = effect.bag_refills or 0
     fields.dice_anti_repeat_rerolls = effect.anti_repeat_rerolls or 0
     fields.dice_high_rolls = effect.high_rolls or 0
+    fields.dice_high_roll_rate = format_rate(safe_div(fields.dice_high_rolls, fields.dice_rolls_total))
     fields.dice_utility_rolls = effect.utility_rolls or 0
+    fields.dice_distinct_faces = distinct_faces
+    fields.dice_max_face_share = format_rate(safe_div(max_face_count, fields.dice_rolls_total))
     fields.dice_longest_high_streak = effect.longest_high_streak or 0
     fields.dice_longest_utility_streak = effect.longest_utility_streak or 0
     fields.dice_high_streak_breaks = effect.high_streak_breaks or 0
@@ -1318,7 +1331,8 @@ local SUMMARY_METRICS = {
     "dice_roll_surge_cues", "dice_roll_finale_fx", "dice_roll_suspense_pips",
     "dice_roll_guard_cues",
     "dice_cooldown_trim_frames", "dice_dash_trim_effective", "dice_power_trim_effective",
-    "dice_bag_refills", "dice_anti_repeat_rerolls", "dice_high_rolls", "dice_utility_rolls",
+    "dice_bag_refills", "dice_anti_repeat_rerolls", "dice_high_rolls", "dice_high_roll_rate", "dice_utility_rolls",
+    "dice_distinct_faces", "dice_max_face_share",
     "dice_longest_high_streak", "dice_longest_utility_streak",
     "dice_high_streak_breaks", "dice_low_streak_breaks",
     "dice_repeat_rolls", "dice_roll_variety_switches",
@@ -2827,6 +2841,7 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                 local high_streak_breaks = tonumber(row.avg_dice_high_streak_breaks) or 0
                 local low_streak_breaks = tonumber(row.avg_dice_low_streak_breaks) or 0
                 local repeats = tonumber(row.avg_dice_repeat_rolls) or 0
+                local distinct_faces = tonumber(row.avg_dice_distinct_faces) or 0
                 local high_rolls = (tonumber(row.avg_dice_roll_5_count) or 0) + (tonumber(row.avg_dice_roll_6_count) or 0)
                 local max_face = 0
                 for face = 1, 6 do
@@ -2841,7 +2856,7 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                     rolls,
                     0,
                     string.format(
-                        "%s skill dice averaged %.1f rolls/run, %.1f animation frames/run, %.1f face swaps/run, %.1f buildup FX/run, %.1f surge cues/run, %.1f lock cues/run, %.1f suspense pips/run, %.1f guard cues/run, %.1f reveal cues/run, %.1f finale FX/run, %.1f cooldown-trim frames, %.1f effective Dash refreshes, %.1f effective Power refreshes, %.1f jackpots, %.1f%% high rolls, %.1f high-roll streak, %.1f utility streak, %.1f high-streak guards, %.1f dry-streak guards, %.1f repeat rolls, %.1f anti-repeat rerolls, %.1f%% max-face share, %.1f bag refills, and %.1f%% buff uptime.",
+                        "%s skill dice averaged %.1f rolls/run, %.1f animation frames/run, %.1f face swaps/run, %.1f buildup FX/run, %.1f surge cues/run, %.1f lock cues/run, %.1f suspense pips/run, %.1f guard cues/run, %.1f reveal cues/run, %.1f finale FX/run, %.1f cooldown-trim frames, %.1f effective Dash refreshes, %.1f effective Power refreshes, %.1f jackpots, %.1f%% high rolls, %.1f distinct faces/run, %.1f high-roll streak, %.1f utility streak, %.1f high-streak guards, %.1f dry-streak guards, %.1f repeat rolls, %.1f anti-repeat rerolls, %.1f%% max-face share, %.1f bag refills, and %.1f%% buff uptime.",
                         class_name,
                         rolls,
                         animation_frames,
@@ -2858,6 +2873,7 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                         power_refreshes,
                         jackpots,
                         safe_div(high_rolls, rolls) * 100,
+                        distinct_faces,
                         longest_high_streak,
                         longest_utility_streak,
                         high_streak_breaks,
@@ -3475,7 +3491,8 @@ local function run_balance(raw_args)
             "dice_roll_guard_cues",
             "dice_cooldown_trim_frames", "dice_dash_trim_effective", "dice_power_trim_effective",
             "dice_bag_refills", "dice_anti_repeat_rerolls",
-            "dice_high_rolls", "dice_utility_rolls", "dice_longest_high_streak",
+            "dice_high_rolls", "dice_high_roll_rate", "dice_utility_rolls",
+            "dice_distinct_faces", "dice_max_face_share", "dice_longest_high_streak",
             "dice_longest_utility_streak", "dice_high_streak_breaks", "dice_low_streak_breaks",
             "dice_repeat_rolls", "dice_roll_variety_switches", "dice_buff_active_frames",
             "dice_fleet_frames", "dice_guard_frames", "dice_edge_frames",
@@ -3589,7 +3606,8 @@ local function run_balance(raw_args)
             "dice_roll_guard_cues",
             "dice_cooldown_trim_frames", "dice_dash_trim_effective", "dice_power_trim_effective",
             "dice_bag_refills", "dice_anti_repeat_rerolls",
-            "dice_high_rolls", "dice_utility_rolls", "dice_longest_high_streak",
+            "dice_high_rolls", "dice_high_roll_rate", "dice_utility_rolls",
+            "dice_distinct_faces", "dice_max_face_share", "dice_longest_high_streak",
             "dice_longest_utility_streak", "dice_high_streak_breaks", "dice_low_streak_breaks",
             "dice_repeat_rolls", "dice_roll_variety_switches", "dice_buff_active_frames",
             "dice_fleet_frames", "dice_guard_frames", "dice_edge_frames",
@@ -3650,7 +3668,8 @@ local function run_balance(raw_args)
             "avg_dice_roll_buildup_fx", "avg_dice_roll_face_swaps", "avg_dice_roll_reveal_cues", "avg_dice_roll_lock_cues",
             "avg_dice_roll_surge_cues", "avg_dice_roll_finale_fx", "avg_dice_roll_suspense_pips", "avg_dice_roll_guard_cues", "avg_dice_cooldown_trim_frames",
             "avg_dice_dash_trim_effective", "avg_dice_power_trim_effective", "avg_dice_bag_refills", "avg_dice_anti_repeat_rerolls",
-            "avg_dice_high_rolls", "avg_dice_utility_rolls", "avg_dice_longest_high_streak",
+            "avg_dice_high_rolls", "avg_dice_high_roll_rate", "avg_dice_utility_rolls",
+            "avg_dice_distinct_faces", "avg_dice_max_face_share", "avg_dice_longest_high_streak",
             "avg_dice_longest_utility_streak", "avg_dice_high_streak_breaks", "avg_dice_low_streak_breaks",
             "avg_dice_repeat_rolls", "avg_dice_roll_variety_switches",
             "avg_dice_buff_active_frames", "avg_dice_fleet_frames", "avg_dice_guard_frames",
