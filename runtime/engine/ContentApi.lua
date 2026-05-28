@@ -1016,6 +1016,105 @@ local function map_generation_payload(config)
     }
 end
 
+local function map_resource_extras(algorithm)
+    return {
+        previewMode = algorithm.preview_mode or "world",
+        density = algorithm.density or 0.30,
+        phase = algorithm.phase or "",
+        tags = copy_array(algorithm.tags or {}),
+        signature = copy_object(algorithm.signature or {}),
+        palette = algorithm.palette,
+    }
+end
+
+local function config_for_map_algorithm(config, algorithm)
+    local next_config = copy_object(config)
+    next_config.level = math.min(5, math.max(1, tonumber(next_config.level) or 1))
+    next_config.mapDesc = algorithm.mapDesc or ""
+    next_config.mapProfile = algorithm.mapProfile or ""
+    next_config.mapAlgorithm = algorithm.id or map_algorithm_id_for(next_config.mapDesc, next_config.mapProfile)
+    next_config.encounter = ""
+    next_config.monsters = ""
+    return next_config
+end
+
+local function map_probe_resources(config, start_offset)
+    local resources = {}
+    local offset = start_offset or 40
+    local selected_algorithm = selected_map_algorithm(config) or map_algorithm_by_id(config.mapAlgorithm or "")
+
+    if selected_algorithm then
+        for idx = 1, 4 do
+            local next_config = config_for_map_algorithm(config, selected_algorithm)
+            local seed = (tonumber(config.seed) or 1) + idx - 1
+            resources[#resources + 1] = resource_entry(
+                "Selected map seed sweep",
+                string.format("Seed %d", seed),
+                selected_algorithm.label or selected_algorithm.id or "selected map",
+                "same map algorithm across nearby seeds",
+                next_config,
+                idx - 1,
+                map_resource_extras(selected_algorithm)
+            )
+        end
+    end
+
+    for idx, algorithm in ipairs(overworld_algorithms()) do
+        local next_config = config_for_map_algorithm(config, algorithm)
+        resources[#resources + 1] = resource_entry(
+            "Overworld algorithm sweep",
+            algorithm.label or algorithm.id,
+            string.format("L%d, %s", next_config.level, algorithm.phase or "opening"),
+            algorithm.description or "initial-map generation comparison",
+            next_config,
+            offset + idx,
+            map_resource_extras(algorithm)
+        )
+    end
+
+    for idx, map in ipairs(late_maps()) do
+        local algorithm = selected_map_algorithm({
+            mapDesc = map.id,
+            mapProfile = "",
+            mapAlgorithm = map_algorithm_id_for(map.id, ""),
+        }) or {
+            id = map_algorithm_id_for(map.id, ""),
+            label = map.label,
+            mapDesc = map.id,
+            mapProfile = "",
+            preview_mode = map.preview_mode,
+            density = map.density,
+            phase = map.phase,
+            palette = map.palette,
+        }
+        local next_config = config_for_map_algorithm(config, algorithm)
+        next_config.level = 5
+        next_config.preset = next_config.preset == "none" and "late" or next_config.preset
+        resources[#resources + 1] = resource_entry(
+            "Late map sweep",
+            map.label or map.id,
+            string.format("L%d, %s loadout", next_config.level, next_config.preset),
+            "late-map enemy pool and routing comparison",
+            next_config,
+            offset + 30 + idx,
+            map_resource_extras(algorithm)
+        )
+    end
+
+    return resources
+end
+
+local function map_matrix_payload(config)
+    local resources = map_probe_resources(config, 40)
+    return {
+        schema = 1,
+        config = config,
+        generation = map_generation_payload(config),
+        count = #resources,
+        resources = resources,
+    }
+end
+
 local function enemy_probe_resources(config, start_offset)
     local resources = {}
     local seed_offset = start_offset or 90
@@ -1487,47 +1586,7 @@ local function resource_matrix_payload(config)
         )
     end
 
-    for idx, map in ipairs(late_maps()) do
-        local next_config = {}
-        for key, value in pairs(config) do
-            next_config[key] = value
-        end
-        next_config.level = 5
-        next_config.preset = next_config.preset == "none" and "late" or next_config.preset
-        next_config.mapDesc = map.id
-        next_config.mapProfile = ""
-        next_config.mapAlgorithm = map_algorithm_id_for(map.id, "")
-        next_config.encounter = ""
-        resources[#resources + 1] = resource_entry(
-            "Map sweep",
-            map.label or map.id,
-            string.format("L%d, %s loadout", next_config.level, next_config.preset),
-            "late-map enemy pool comparison",
-            next_config,
-            40 + idx
-        )
-    end
-
-    for idx, algorithm in ipairs(overworld_algorithms()) do
-        local next_config = {}
-        for key, value in pairs(config) do
-            next_config[key] = value
-        end
-        next_config.level = math.min(5, math.max(1, next_config.level))
-        next_config.mapDesc = algorithm.mapDesc or "map_descs.Overworld"
-        next_config.mapProfile = algorithm.mapProfile or ""
-        next_config.mapAlgorithm = algorithm.id or ""
-        next_config.encounter = ""
-        next_config.monsters = ""
-        resources[#resources + 1] = resource_entry(
-            "Overworld algorithm sweep",
-            algorithm.label or algorithm.id,
-            string.format("L%d, %s", next_config.level, algorithm.phase or "opening"),
-            algorithm.description or "initial-map generation comparison",
-            next_config,
-            55 + idx
-        )
-    end
+    append_resources(resources, map_probe_resources(config, 40))
 
     for idx, encounter in ipairs(package_encounters()) do
         local next_config = {}
@@ -1570,6 +1629,7 @@ local function workspace_payload(config)
         runSummary = run_summary_payload(config),
         enemyOptions = enemy_options_payload(config),
         mapGeneration = map_generation_payload(config),
+        mapMatrix = map_matrix_payload(config),
         analysisPlan = analysis_plan,
         packageMatrix = package_matrix_payload(config),
         resourceMatrix = resource_matrix_payload(config),
@@ -1618,6 +1678,10 @@ end
 
 function M.map_generation_json(raw_json)
     return encode(map_generation_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.map_matrix_json(raw_json)
+    return encode(map_matrix_payload(normalized_config(parse_json_object(raw_json))))
 end
 
 function M.enemy_options_json(raw_json)

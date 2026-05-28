@@ -235,6 +235,10 @@ extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_map_generation_json(
     return content_api_call("map_generation_json", raw_json);
 }
 
+extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_map_matrix_json(const char* raw_json) {
+    return content_api_call("map_matrix_json", raw_json);
+}
+
 extern "C" EMSCRIPTEN_KEEPALIVE const char* lanarts_content_enemy_options_json(const char* raw_json) {
     return content_api_call("enemy_options_json", raw_json);
 }

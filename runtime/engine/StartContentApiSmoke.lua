@@ -219,6 +219,25 @@ local function run_content_api_smoke()
     end
     expect(has_map_profile, "launch args should preserve map profile")
 
+    local map_matrix = parse_response("map matrix", ContentApi.map_matrix_json(map_config))
+    expect((map_matrix.count or 0) == #(map_matrix.resources or {}), "map matrix count should match resources")
+    expect((map_matrix.count or 0) >= 12, "map matrix should expose map-focused resources")
+    local has_selected_seed = false
+    local has_overworld_algorithm = false
+    local has_late_map = false
+    for _, resource in ipairs(map_matrix.resources or {}) do
+        if resource.group == "Selected map seed sweep" and resource.mapProfile == "broken_grove" and resource.previewMode then
+            has_selected_seed = true
+        elseif resource.group == "Overworld algorithm sweep" and resource.mapProfile == "predator_thicket" then
+            has_overworld_algorithm = true
+        elseif resource.group == "Late map sweep" and resource.mapDesc == "map_descs.Hell" then
+            has_late_map = true
+        end
+    end
+    expect(has_selected_seed, "map matrix should include selected algorithm seed sweep")
+    expect(has_overworld_algorithm, "map matrix should include overworld algorithm sweep")
+    expect(has_late_map, "map matrix should include late-map sweep")
+
     local red_dragon_config = [[{
         "className": "Pyrocaster",
         "level": 5,
@@ -389,6 +408,7 @@ local function run_content_api_smoke()
     expect(workspace.loadoutOptions and #(workspace.loadoutOptions.knownSpells or {}) >= 1, "workspace should expose loadout options")
     expect(workspace.enemyOptions and workspace.enemyOptions.monsterEvalArgs, "workspace should expose enemy options")
     expect(workspace.mapGeneration and #(workspace.mapGeneration.previews or {}) >= 3, "workspace should expose map previews")
+    expect(workspace.mapMatrix and (workspace.mapMatrix.count or 0) >= 12, "workspace should expose map matrix resources")
     expect(workspace.analysisPlan and workspace.analysisPlan.commands and workspace.analysisPlan.commands.classSweep, "workspace should expose analysis commands")
     expect(workspace.commands and workspace.commands.monsterEval, "workspace should expose top-level commands")
     expect(workspace.botProfiles and #(workspace.botProfiles or {}) >= 4, "workspace should expose bot profiles")
