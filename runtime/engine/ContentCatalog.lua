@@ -1000,8 +1000,8 @@ M.encounters = {
         label = "Gragh rescue package",
         kind = "rescue package",
         phase = "late multiplayer",
-        description = "A fragile ally starts in the arena so Gragh's pressure creates pull, taunt, and body-block rescue windows.",
-        features = {"protect ally", "body-block rescue", "pull/taunt window", "rotating orbs", "short AOE windows"},
+        description = "A fragile ally starts in the arena so Gragh's pressure creates pull, taunt, body-block rescue windows, and Hound target swaps.",
+        features = {"protect ally", "body-block rescue", "pull/taunt window", "rotating orbs", "short AOE windows", "Hound adds"},
         monsters = {"Gragh"},
         arena = {
             room_size = {18, 18},
@@ -1036,6 +1036,14 @@ M.encounters = {
                 damage = 3.0,
                 power = 24,
                 affects_escorts = true,
+            },
+            summon = {
+                interval = 470,
+                offset = 172,
+                monsters = {"Hound"},
+                count = 1,
+                radius = 132,
+                max_alive = 1,
             },
             rescue = {
                 interval = 205,
