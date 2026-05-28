@@ -322,6 +322,95 @@ local function draw_escort_markers()
     end
 end
 
+local function aggro_role(target)
+    if not target or target.destroyed then
+        return "none"
+    end
+    if target.content_lab_ally then
+        return "ally"
+    end
+    if target.is_enemy == false then
+        return "player"
+    end
+    if target.team == PLAYER_TEAM then
+        return "ally"
+    end
+    return "other"
+end
+
+local function target_name(target)
+    if not target or target.destroyed then
+        return ""
+    end
+    return target.name or target.class_name or "target"
+end
+
+local function aggro_state(package)
+    local primary = primary_monster(package and package.primary)
+    if not primary then
+        return {
+            role = "none",
+            target = nil,
+            target_name = "",
+            primary = nil,
+        }
+    end
+    local target = primary.target
+    if target and target.destroyed then
+        target = nil
+    end
+    return {
+        role = aggro_role(target),
+        target = target,
+        target_name = target_name(target),
+        primary = primary,
+    }
+end
+
+local function aggro_color(role)
+    if role == "player" then
+        return COL_PALE_GREEN
+    elseif role == "ally" then
+        return COL_PALE_RED
+    elseif role == "other" then
+        return COL_PALE_YELLOW
+    end
+    return COL_LIGHT_GRAY
+end
+
+local function aggro_value(state, director)
+    if (director.rescue_pull_active_frames or 0) > 0 then
+        return "taunt " .. (director.rescue_pull_target or state.target_name or "target")
+    end
+    if state.role == "none" then
+        return "none"
+    end
+    if state.target_name and state.target_name ~= "" then
+        return state.role .. " " .. state.target_name
+    end
+    return state.role
+end
+
+local function draw_aggro_marker(director, package)
+    local state = aggro_state(package)
+    if not state.primary or not state.target then
+        return
+    end
+    local color = aggro_color(state.role)
+    local primary_xy = xy_of(state.primary)
+    local target_xy = xy_of(state.target)
+    local alpha = state.role == "ally" and 0.62 or 0.42
+    draw_world_link(color, primary_xy, target_xy, state.role == "ally" and 4 or 3, alpha)
+    draw_world_circle(color, primary_xy, (state.primary.radius or 16) + 6, 0.02, alpha)
+    draw_world_circle(color, target_xy, (state.target.radius or 12) + 5, 0.02, alpha)
+    local label_xy = Display.to_screen_xy({primary_xy[1], primary_xy[2] - (state.primary.radius or 16) - 28})
+    local label = (director.rescue_pull_active_frames or 0) > 0 and "TAUNTED"
+        or state.role == "ally" and "ON ALLY"
+        or state.role == "player" and "ON PLAYER"
+        or "AGGRO"
+    draw_text(color, Display.CENTER, label_xy, label)
+end
+
 local summon_count
 local active_orbs
 local active_pulses
@@ -348,7 +437,7 @@ local function draw_package_hud(director)
         row_count = row_count + 1
     end
     if package.primary then
-        row_count = row_count + 1
+        row_count = row_count + 2
     end
 
     local panel_h = 12 + row_count * HUD_ROW_H
@@ -465,9 +554,16 @@ local function draw_package_hud(director)
         local pct = max_hp > 0 and hp / max_hp or 0
         local value = count > 0 and string.format("%d/%d", math.ceil(hp), math.ceil(max_hp)) or "down"
         draw_hud_row(y, "TARGET", value, pct <= 0.25 and COL_PALE_RED or COL_PALE_BLUE, pct)
+        y = y + HUD_ROW_H
+
+        local state = aggro_state(package)
+        local color = aggro_color(state.role)
+        local value_pct = state.role == "player" and 1 or state.role == "ally" and 1 or 0
+        draw_hud_row(y, "AGGRO", aggro_value(state, director), color, value_pct)
     end
 
     draw_escort_markers()
+    draw_aggro_marker(director, package)
 end
 
 local function result_color(outcome)
@@ -498,6 +594,7 @@ local function package_result(director, outcome)
     local misses = director.rescue_misses or 0
     local pulls = director.rescue_pulls or 0
     local opportunities = saves + misses
+    local aggro = aggro_state(director.package or {})
     local save_rate = safe_rate(saves, opportunities)
     local clutch_rate = safe_rate(clutch, saves)
     local pull_rate = safe_rate(pulls, saves)
@@ -521,6 +618,8 @@ local function package_result(director, outcome)
         primary_count = primary_count,
         primary_hp = primary_hp,
         primary_max_hp = primary_max_hp,
+        aggro_target_role = aggro.role,
+        aggro_target_name = aggro.target_name,
         rescue_saves = saves,
         rescue_opportunities = opportunities,
         rescue_save_rate = save_rate,
@@ -548,6 +647,7 @@ local function package_state_from_director(director)
     local opportunities = saves + misses
     local orb_count, orb_remaining = active_orbs()
     local pulse_warning_count, pulse_active_count, pulse_warning_remaining, pulse_active_remaining = active_pulses()
+    local aggro = aggro_state(director.package or {})
     local rescue_state
     if director.package and director.package.rescue then
         rescue_state = rescue_window_state(director, director.package.rescue)
@@ -564,6 +664,8 @@ local function package_state_from_director(director)
         primary_count = primary_count,
         primary_hp = primary_hp,
         primary_max_hp = primary_max_hp,
+        aggro_target_role = aggro.role,
+        aggro_target_name = aggro.target_name,
         orb_active_count = orb_count,
         orb_active_remaining = orb_remaining,
         pulse_warning_count = pulse_warning_count,

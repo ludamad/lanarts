@@ -233,6 +233,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
     luawrap::bind_getter(getters["team"], &CombatGameInst::team);
     luawrap::bind_getter(getters["vision_radius"], &CombatGameInst::vision_radius);
     luawrap::bind_setter(setters["vision_radius"], &CombatGameInst::vision_radius);
+    LUAWRAP_GETTER(getters, target, lua_api::gamestate(L)->get_instance(OBJ->target()));
 	getters["stats"].bind_function(lapi_gameinst_stats);
 	LUAWRAP_SETTER(setters, sprite_name, std::string, OBJ->get_sprite() = res::sprite_id(VAL));
 
