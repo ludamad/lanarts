@@ -1102,6 +1102,51 @@ local function draw_micro_counter_marker(director, package)
     draw_text(color, Display.CENTER, label_xy, (director.micro_counter_last_label or "THREAD OPEN") .. detail)
 end
 
+local function draw_micro_streak_marker(director)
+    if not director or director.destroyed then
+        return
+    end
+    local streak = director.micro_streak or 0
+    local timer = director.micro_last_timer or 0
+    local points = director.micro_last_points or 0
+    if streak <= 0 and timer <= 0 then
+        return
+    end
+    local broken = points < 0 and timer > 0
+    local fade = timer > 0 and math.max(0.18, math.min(1, timer / 72)) or 0.28
+    local color = broken and COL_PALE_RED
+        or streak >= 5 and COL_WHITE
+        or director.micro_last_color or COL_PALE_BLUE
+    local frame = director.elapsed or 0
+    for _, player in ipairs(living_players()) do
+        local xy = xy_of(player)
+        local screen_xy = Display.to_screen_xy(xy)
+        local radius = (player.radius or 12) + 12 + math.min(18, streak * 2)
+        local pulse = math.sin(frame * 0.24) * (broken and 2.5 or 1.4)
+        draw_world_circle(color, xy, radius + pulse, broken and 0.03 or 0.018, broken and 0.58 * fade or 0.34 + math.min(0.28, streak * 0.035))
+        if streak > 0 and not broken then
+            local spin = frame * 0.055
+            local arcs = streak >= 5 and 3 or 2
+            for idx = 1, arcs do
+                local start = spin + idx * math.pi * 2 / arcs
+                Display.draw_arc(
+                    with_alpha(color, (0.34 + math.min(0.22, streak * 0.025)) * fade),
+                    screen_xy,
+                    radius + 5 + idx * 2,
+                    start,
+                    start + math.pi * (0.52 + math.min(0.28, streak * 0.035)),
+                    streak >= 5 and 2 or 1,
+                    12
+                )
+            end
+        end
+        if broken or streak >= 3 then
+            local label = broken and "BROKEN" or ("MICRO x" .. tostring(streak))
+            draw_text(color, Display.CENTER, {screen_xy[1], screen_xy[2] - radius - 16}, label)
+        end
+    end
+end
+
 local summon_count
 local active_summon_portals
 local active_orbs
@@ -1493,6 +1538,7 @@ local function draw_package_hud(director)
     draw_micro_punish_marker(director, package)
     draw_micro_counter_marker(director, package)
     draw_rescue_counter_marker(director, package)
+    draw_micro_streak_marker(director)
 end
 
 local function result_color(outcome)
