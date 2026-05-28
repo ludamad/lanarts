@@ -2,6 +2,7 @@ local Display = require "core.Display"
 local EventLog = require "ui.EventLog"
 local GameObject = require "core.GameObject"
 local Map = require "core.Map"
+local ImpactFX = require "ui.ImpactFX"
 local ProceduralEffects = require "ui.ProceduralEffects"
 
 local M = {}
@@ -892,10 +893,31 @@ local function rescue_feedback(strike, blocker)
         drift = strike.saved and 0.52 or 0.42,
     }
     if strike.saved then
+        local fx_label = strike.was_perfect and "PERFECT"
+            or strike.was_clutch and "CLUTCH"
+            or "SAVE"
+        if strike.pulled then
+            fx_label = fx_label .. " PULL"
+        end
+        ImpactFX.rescue_save {
+            map = game_map,
+            blocker = blocker,
+            target = strike.target,
+            color = strike.was_perfect and COL_WHITE or strike.was_clutch and COL_PALE_YELLOW or COL_PALE_GREEN,
+            label = fx_label,
+            target_label = strike.pulled and "TAUNTED" or "COVERED",
+            flash_alpha = strike.was_perfect and 0.34 or strike.was_clutch and 0.28 or 0.20,
+            radius = strike.was_perfect and 92 or strike.was_clutch and 82 or 72,
+        }
         local source_name = object_label(strike.source, "enemy")
         local blocker_name = object_label(blocker, "rescuer")
         EventLog.add(text .. ": " .. source_name .. " retargeted to " .. blocker_name .. ".", color)
     else
+        ImpactFX.rescue_miss {
+            map = game_map,
+            strike = strike,
+            target = strike.target,
+        }
         EventLog.add("Rescue missed: " .. object_label(strike.target, "ally") .. " was hit.", color)
     end
 end
@@ -1965,6 +1987,16 @@ function M.add_director(game_map, package, intensity)
                     rotation_speed = 0.013,
                     spoke_speed = -0.006,
                 })
+            end
+            local pressure = package_pressure_state(self, self.package)
+            local total = pressure.total_count or 0
+            if total >= 2 then
+                ProceduralEffects.draw_screen_edges {
+                    color = total >= 4 and COL_PALE_RED or total >= 3 and COL_PALE_YELLOW or COL_PALE_BLUE,
+                    alpha = math.min(0.22, 0.045 + total * 0.028),
+                    thickness = 18 + total * 3,
+                    passes = 3,
+                }
             end
             draw_package_hud(self)
         end,

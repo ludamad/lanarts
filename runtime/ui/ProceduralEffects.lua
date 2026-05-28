@@ -121,6 +121,60 @@ function M.draw_boss_aura(obj, args)
     }
 end
 
+function M.draw_world_burst(args)
+    args = args or {}
+    local xy = screen_xy(args.xy)
+    local frame = args.frame or 0
+    local duration = math.max(1, args.duration or 36)
+    local pct = math.max(0, math.min(1, frame / duration))
+    local fade = math.max(0, 1 - pct)
+    local color = args.color or COL_WHITE
+    local radius = args.radius or 72
+    local pulse_radius = radius * (0.22 + pct * 0.92)
+
+    Display.draw_radial_gradient(
+        alpha(color, 0.18 * fade),
+        {color[1] or 255, color[2] or 255, color[3] or 255, 0},
+        xy,
+        pulse_radius,
+        args.gradient_steps or 5
+    )
+    Display.draw_circle_outline(alpha(color, 0.82 * fade), xy, pulse_radius, args.line_width or 2)
+    Display.draw_circle_outline(alpha(COL_WHITE, 0.34 * fade), xy, math.max(4, pulse_radius * 0.52), 1)
+
+    local spokes = args.spokes or 8
+    for idx = 1, spokes do
+        local angle = idx * TWO_PI / spokes + frame * (args.rotation_speed or 0.08)
+        local inner = pulse_radius * 0.24
+        local outer = pulse_radius * (0.82 + 0.12 * math.sin(frame * 0.3 + idx))
+        Display.draw_line(
+            alpha(color, 0.34 * fade),
+            {xy[1] + math.cos(angle) * inner, xy[2] + math.sin(angle) * inner},
+            {xy[1] + math.cos(angle) * outer, xy[2] + math.sin(angle) * outer},
+            1
+        )
+    end
+end
+
+function M.draw_screen_edges(args)
+    args = args or {}
+    local w, h = unpack(Display.display_size)
+    local color = args.color or COL_WHITE
+    local alpha_value = math.max(0, math.min(1, args.alpha or args.intensity or 0.18))
+    local thickness = math.max(1, args.thickness or 18)
+    local passes = args.passes or 3
+
+    for idx = 1, passes do
+        local pct = idx / passes
+        local a = alpha_value * (1 - (idx - 1) / passes)
+        local t = thickness * pct
+        Display.draw_rectangle(alpha(color, a), {0, 0, w, t})
+        Display.draw_rectangle(alpha(color, a), {0, h - t, w, h})
+        Display.draw_rectangle(alpha(color, a), {0, 0, t, h})
+        Display.draw_rectangle(alpha(color, a), {w - t, 0, w, h})
+    end
+end
+
 function M.draw_die_badge(obj, args)
     if not obj or obj.destroyed or not Map.object_visible(obj) then
         return

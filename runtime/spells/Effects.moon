@@ -9,6 +9,7 @@ SpellObjects = require "objects.SpellObjects"
 DataW = require "DataWrapped"
 TypeEffectUtils = require "spells.TypeEffectUtils"
 BonusesUtils = require "items.BonusesUtils"
+ImpactFX = require "ui.ImpactFX"
 ProceduralEffects = require "ui.ProceduralEffects"
 
 damage_source_name = (attacker, defender) ->
@@ -1097,6 +1098,22 @@ dicebinder_roll = (effect, caster) ->
         caster\set_spell_cooldown("Dash Attack", 0)
         caster\heal_hp(6 + caster.stats.level * 2)
         caster\heal_mp(8 + caster.stats.level)
+
+    ImpactFX.world_burst {
+        map: caster.map
+        xy: caster.xy
+        color: entry.color
+        label: "D6 #{roll}"
+        radius: (if roll >= 5 then 78 else 56)
+        duration: (if roll >= 5 then 42 else 30)
+    }
+    if roll >= 5
+        ImpactFX.screen_flash {
+            map: caster.map
+            color: entry.color
+            alpha: (if roll == 6 then 0.24 else 0.16)
+            duration: 14
+        }
 
     for _ in screens()
         if caster\is_local_player()

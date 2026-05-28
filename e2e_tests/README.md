@@ -37,6 +37,7 @@ Content lab APIs:
 Balance simulations:
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --classes Fighter,Necromancer,Pyrocaster,Stormcaller
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --levels 1,3
+    ./e2e_tests/test_content_lab_native_fast.sh
     ./e2e_tests/test_content_package_balance_smoke.sh
 
     Outputs default to saves/balance_runs.csv, saves/balance_samples.csv,
@@ -131,6 +132,11 @@ Balance simulations:
     and loadout so equipped late-map sweeps are not baselined against starter
     gear runs.
     Use --min_report_runs and --report_delta_pct to tune report sensitivity.
+    For content-lab iteration, prefer ./e2e_tests/test_content_lab_native_fast.sh
+    before rebuilding Emscripten. It runs the same packaged Gragh/Dicebinder
+    and rescue-package content through the native build with audio muted. Set
+    LANARTS_DRAW_SMOKE=1 to also exercise the normal native draw path for
+    procedural FX without entering the slower Emscripten loop.
 
 Monster simulations:
     ./run.sh --headless engine.StartMonsterEvals --steps 1000 --runs 3 --level 1 --monster GiantRat,Hound,CloudElemental
