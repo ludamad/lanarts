@@ -416,11 +416,16 @@ local active_orbs
 local active_pulses
 local active_rescue_strikes
 local rescue_window_state
+local next_threat_state
 
 local function draw_package_hud(director)
     local package = director.package or {}
     local intensity = director.intensity
     local row_count = 1
+    local has_threat_rows = package.orbit or package.pulse or package.summon or package.rescue
+    if has_threat_rows then
+        row_count = row_count + 1
+    end
     if package.orbit then
         row_count = row_count + 1
     end
@@ -447,6 +452,14 @@ local function draw_package_hud(director)
     draw_text(COL_PALE_BLUE, Display.LEFT_TOP, {HUD_X + 8, HUD_Y + 5}, title)
 
     local y = HUD_Y + 24
+    if has_threat_rows then
+        local threat = next_threat_state(director, package)
+        local value = threat.label
+            and ((threat.state and threat.state ~= "next" and (threat.label .. " " .. threat.state .. " ") or (threat.label .. " ")) .. format_frames(threat.frames or 0))
+            or "none"
+        draw_hud_row(y, "NEXT", value, threat.color or COL_LIGHT_GRAY, threat.pct or 0)
+        y = y + HUD_ROW_H
+    end
     if package.orbit then
         local orbit = package.orbit
         local interval, offset = scaled_interval_and_offset(orbit, 300, 40, intensity)
@@ -648,6 +661,7 @@ local function package_state_from_director(director)
     local orb_count, orb_remaining = active_orbs()
     local pulse_warning_count, pulse_active_count, pulse_warning_remaining, pulse_active_remaining = active_pulses()
     local aggro = aggro_state(director.package or {})
+    local next_threat = next_threat_state(director, director.package or {})
     local rescue_state
     if director.package and director.package.rescue then
         rescue_state = rescue_window_state(director, director.package.rescue)
@@ -666,6 +680,10 @@ local function package_state_from_director(director)
         primary_max_hp = primary_max_hp,
         aggro_target_role = aggro.role,
         aggro_target_name = aggro.target_name,
+        next_threat_id = next_threat.id,
+        next_threat_label = next_threat.label,
+        next_threat_state = next_threat.state,
+        next_threat_frames = next_threat.frames,
         orb_active_count = orb_count,
         orb_active_remaining = orb_remaining,
         pulse_warning_count = pulse_warning_count,
@@ -1359,6 +1377,118 @@ function rescue_window_state(director, rescue)
         blocked = blocked,
         remaining = remaining,
         late = late,
+    }
+end
+
+local function upcoming_candidate(package, intensity, elapsed, id, label, entry, fallback_interval, fallback_offset)
+    if not entry then
+        return nil
+    end
+    local interval, offset = scaled_interval_and_offset(entry, fallback_interval, fallback_offset, intensity)
+    local frames = next_delta(elapsed, interval, offset)
+    return {
+        id = id,
+        label = label,
+        state = "next",
+        frames = frames,
+        interval = interval,
+        pct = 1 - frames / math.max(1, interval),
+        color = COL_LIGHT_GRAY,
+    }
+end
+
+function next_threat_state(director, package)
+    director = director or {}
+    package = package or {}
+    local intensity = director.intensity or normalize_intensity(nil)
+    local elapsed = director.elapsed or 0
+
+    local rescue = package.rescue and rescue_window_state(director, package.rescue) or nil
+    if (director.rescue_pull_active_frames or 0) > 0 then
+        return {
+            id = "pull",
+            label = "PULL",
+            state = "active",
+            frames = director.rescue_pull_active_frames or 0,
+            pct = 1,
+            color = COL_PALE_YELLOW,
+        }
+    elseif rescue and rescue.active_count and rescue.active_count > 0 then
+        return {
+            id = "rescue",
+            label = rescue.late and "SAVE" or "LINE",
+            state = rescue.blocked and "hold" or rescue.late and "clutch" or "block",
+            frames = rescue.remaining or 0,
+            pct = 1,
+            color = rescue.blocked and COL_PALE_GREEN or rescue.late and COL_PALE_YELLOW or COL_PALE_GREEN,
+        }
+    end
+
+    local pulse_warning, pulse_active, pulse_warning_remaining, pulse_active_remaining = active_pulses()
+    if pulse_active > 0 then
+        return {
+            id = "pulse",
+            label = "AOE",
+            state = "active",
+            frames = pulse_active_remaining or 0,
+            pct = 1,
+            color = COL_PALE_RED,
+        }
+    elseif pulse_warning > 0 then
+        return {
+            id = "pulse",
+            label = "AOE",
+            state = "warn",
+            frames = pulse_warning_remaining or 0,
+            pct = 1,
+            color = COL_PALE_YELLOW,
+        }
+    end
+
+    local orb_count, orb_remaining = active_orbs()
+    if orb_count > 0 then
+        return {
+            id = "orbit",
+            label = "ORBS",
+            state = "active",
+            frames = orb_remaining or 0,
+            pct = 1,
+            color = COL_PALE_BLUE,
+        }
+    end
+
+    local candidates = {}
+    local function add(candidate)
+        if candidate then
+            candidates[#candidates + 1] = candidate
+        end
+    end
+    add(upcoming_candidate(package, intensity, elapsed, "orbit", "ORBS", package.orbit, 300, 40))
+    add(upcoming_candidate(package, intensity, elapsed, "pulse", "AOE", package.pulse, 150, 70))
+    add(upcoming_candidate(package, intensity, elapsed, "summon", "ADDS", package.summon, 360, 120))
+    add(upcoming_candidate(package, intensity, elapsed, "rescue", "SAVE", package.rescue, 205, 54))
+
+    local best
+    for _, candidate in ipairs(candidates) do
+        if not best or (candidate.frames or 0) < (best.frames or 0) then
+            best = candidate
+        end
+    end
+    if best then
+        if (best.frames or 0) <= 45 then
+            best.color = best.id == "pulse" and COL_PALE_RED or COL_PALE_YELLOW
+        else
+            best.color = best.id == "orbit" and COL_PALE_BLUE or best.id == "rescue" and COL_PALE_GREEN or COL_LIGHT_GRAY
+        end
+        return best
+    end
+    return {
+        id = "",
+        label = "",
+        state = "",
+        frames = "",
+        pct = 0,
+        color = COL_LIGHT_GRAY,
     }
 end
 

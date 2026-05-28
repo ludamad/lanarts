@@ -78,9 +78,9 @@ Balance simulations:
     be separated from actual body-block micro. Package rows also derive rescue
     opportunities plus save, clutch, and pull rates so rescue packages can be
     compared without hand-calculating rates from raw counts. Package rows expose
-    primary target HP, current package aggro target, and live rescue-window
-    fields such as next strike, active count, blocked/late state, and active
-    pull target for HUD and replay checks.
+    primary target HP, current package aggro target, the current/next package
+    threat, and live rescue-window fields such as next strike, active count,
+    blocked/late state, and active pull target for HUD and replay checks.
     Orb and AOE package rows likewise expose active/warning counts and remaining
     frames so timeline samples can be matched against the in-game HUD.
     Use --package_components orbit,pulse,summon,escort,rescue to isolate
