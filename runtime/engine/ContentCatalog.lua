@@ -1623,6 +1623,8 @@ M.encounters = {
                 label = "GRAGH FURY",
                 heal_primary = 8,
                 overheal_cap_pct = 0.35,
+                clutch_break = 12,
+                perfect_break = 28,
             },
             orbit = {
                 interval = 260,
@@ -1687,6 +1689,8 @@ M.encounters = {
                 label = "GRAGH FURY",
                 heal_primary = 8,
                 overheal_cap_pct = 0.35,
+                clutch_break = 12,
+                perfect_break = 28,
             },
             escort = {
                 monster = "Spectral Beast",

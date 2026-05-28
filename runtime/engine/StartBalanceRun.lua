@@ -638,6 +638,8 @@ local function package_state_fields(player)
             package_micro_events = "",
             package_micro_punish_total = "",
             package_micro_punish_events = "",
+            package_micro_punish_break_total = "",
+            package_micro_punish_break_events = "",
             package_summon_warning_count = "",
             package_summon_warning_remaining = "",
             package_orb_active_count = "",
@@ -717,6 +719,8 @@ local function package_state_fields(player)
         package_micro_events = state.micro_events or 0,
         package_micro_punish_total = format_rate(state.micro_punish_total or 0),
         package_micro_punish_events = state.micro_punish_events or 0,
+        package_micro_punish_break_total = format_rate(state.micro_punish_break_total or 0),
+        package_micro_punish_break_events = state.micro_punish_break_events or 0,
         package_summon_warning_count = state.summon_warning_count or 0,
         package_summon_warning_remaining = state.summon_warning_remaining or "",
         package_orb_active_count = state.orb_active_count or 0,
@@ -1057,6 +1061,7 @@ local SUMMARY_METRICS = {
     "package_micro_score", "package_micro_streak", "package_micro_best_streak",
     "package_micro_hits", "package_micro_dodges", "package_micro_events",
     "package_micro_punish_total", "package_micro_punish_events",
+    "package_micro_punish_break_total", "package_micro_punish_break_events",
     "package_sweep_warning_count", "package_sweep_active_count",
 }
 
@@ -1742,6 +1747,7 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local micro_dodges = tonumber(row.avg_package_micro_dodges) or 0
     local micro_best_streak = tonumber(row.avg_package_micro_best_streak) or 0
     local micro_punish_total = tonumber(row.avg_package_micro_punish_total) or 0
+    local micro_punish_break_total = tonumber(row.avg_package_micro_punish_break_total) or 0
 
     add_report_row(
         rows,
@@ -1770,13 +1776,14 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         micro_score,
         0,
         string.format(
-            "%s package execution in %s averaged %.1f micro score, %.1f threaded avoids, %.1f mechanic hits, %.1f punish, and %.1f best streak.",
+            "%s package execution in %s averaged %.1f micro score, %.1f threaded avoids, %.1f mechanic hits, %.1f punish, %.1f break, and %.1f best streak.",
             class_name,
             encounter,
             micro_score,
             micro_dodges,
             micro_hits,
             micro_punish_total,
+            micro_punish_break_total,
             micro_best_streak
         )
     )
@@ -2604,6 +2611,7 @@ local function run_balance(raw_args)
             "package_micro_score", "package_micro_streak", "package_micro_best_streak",
             "package_micro_hits", "package_micro_dodges", "package_micro_events",
             "package_micro_punish_total", "package_micro_punish_events",
+            "package_micro_punish_break_total", "package_micro_punish_break_events",
             "package_summon_warning_count", "package_summon_warning_remaining",
             "package_orb_active_count", "package_orb_active_remaining",
             "package_pulse_warning_count", "package_pulse_warning_remaining",
@@ -2662,6 +2670,7 @@ local function run_balance(raw_args)
             "package_micro_score", "package_micro_streak", "package_micro_best_streak",
             "package_micro_hits", "package_micro_dodges", "package_micro_events",
             "package_micro_punish_total", "package_micro_punish_events",
+            "package_micro_punish_break_total", "package_micro_punish_break_events",
             "package_summon_warning_count", "package_summon_warning_remaining",
             "package_orb_active_count", "package_orb_active_remaining",
             "package_pulse_warning_count", "package_pulse_warning_remaining",
@@ -2747,6 +2756,7 @@ local function run_balance(raw_args)
             "avg_package_micro_score", "avg_package_micro_best_streak",
             "avg_package_micro_hits", "avg_package_micro_dodges",
             "avg_package_micro_punish_total", "avg_package_micro_punish_events",
+            "avg_package_micro_punish_break_total", "avg_package_micro_punish_break_events",
             "avg_package_sweep_warning_count", "avg_package_sweep_active_count",
         })
         write_csv(args.spell_stats_out, spell_stat_rows, {

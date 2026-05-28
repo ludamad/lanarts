@@ -232,7 +232,7 @@ echo "  out: $out_dir"
 if command -v ruby >/dev/null 2>&1; then
     ruby -rcsv -e '
         row = CSV.read(ARGV[0], headers: true).first || {}
-        keys = %w[outcome frames package_outcome package_micro_score package_micro_punish_total package_rescue_save_rate package_rescue_early_rate package_rescue_timing_score package_pressure_overlap_rate]
+        keys = %w[outcome frames package_outcome package_micro_score package_micro_punish_total package_micro_punish_break_total package_rescue_save_rate package_rescue_early_rate package_rescue_timing_score package_pressure_overlap_rate]
         puts keys.map { |key| "#{key}=#{row[key] || ""}" }.join(" ")
     ' "$out_dir/runs.csv"
 fi

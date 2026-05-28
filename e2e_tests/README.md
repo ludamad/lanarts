@@ -126,7 +126,8 @@ Balance simulations:
     near-miss threaded avoids; hazards that expire without threatening a player
     no longer inflate the count. Gragh packages also emit
     package_micro_punish_total for Gragh Fury healing caused by avoidable
-    mechanic hits.
+    mechanic hits, plus package_micro_punish_break_total when clutch/perfect
+    rescue saves break that Fury back off.
     Use --package_components orbit,pulse,sweep,summon,escort,rescue to isolate
     package parts while keeping the same encounter arena, monsters, and
     pressure preset. A rescue component automatically keeps its escort target.

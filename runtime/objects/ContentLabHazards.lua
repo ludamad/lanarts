@@ -265,6 +265,57 @@ local function apply_micro_punish(hazard)
     end
 end
 
+local function apply_micro_punish_break(director, amount, label, color)
+    local package = director and director.package
+    local punish = package and package.micro_punish
+    if not punish or not amount or amount <= 0 then
+        return 0
+    end
+    local primary = primary_monster(package.primary)
+    if not primary or primary.destroyed then
+        return 0
+    end
+    local intensity = director.intensity or normalize_intensity(nil)
+    amount = amount * (intensity.damage or 1)
+    local before = primary.stats.hp or 0
+    local after = math.max(1, before - amount)
+    local applied = math.max(0, before - after)
+    if applied <= 0 then
+        return 0
+    end
+    primary.stats.hp = after
+    director.micro_punish_break_total = (director.micro_punish_break_total or 0) + applied
+    director.micro_punish_break_events = (director.micro_punish_break_events or 0) + 1
+    director.micro_punish_break_last_label = label or "FURY BREAK"
+    director.micro_punish_break_last_amount = applied
+    director.micro_punish_break_last_timer = 72
+    ImpactFX.screen_flash {
+        map = director.map,
+        color = color or COL_WHITE,
+        alpha = 0.10,
+        duration = 12,
+    }
+    ImpactFX.world_burst {
+        map = director.map,
+        xy = xy_of(primary),
+        color = color or COL_WHITE,
+        label = label or "FURY BREAK",
+        radius = 64,
+        duration = 34,
+    }
+    if M.create_feedback_label then
+        M.create_feedback_label {
+            map = director.map,
+            xy = xy_of(primary),
+            text = (label or "FURY BREAK") .. " -" .. tostring(math.ceil(applied)),
+            color = color or COL_WHITE,
+            duration = 58,
+            drift = 0.42,
+        }
+    end
+    return applied
+end
+
 local function add_micro_event(director, args)
     if not director or director.destroyed then
         return
@@ -649,25 +700,34 @@ local function micro_punish_cap(package)
 end
 
 local function draw_micro_punish_marker(director, package)
-    if not package or not package.micro_punish or (director.micro_punish_last_timer or 0) <= 0 then
+    if not package or not package.micro_punish then
         return
     end
     local primary = primary_monster(package.primary)
     if not primary then
         return
     end
-    local timer = director.micro_punish_last_timer or 0
+    local break_timer = director.micro_punish_break_last_timer or 0
+    local timer = break_timer > 0 and break_timer or (director.micro_punish_last_timer or 0)
+    if timer <= 0 then
+        return
+    end
+    local breaking = break_timer > 0
     local intensity = math.min(1, timer / 72)
+    local color = breaking and COL_WHITE or COL_PALE_RED
     ProceduralEffects.draw_boss_aura(primary, {
-        palette = "red",
+        palette = breaking and "blue" or "red",
         radius = (primary.radius or 16) + 42 + 16 * intensity,
         intensity = 0.55 + 0.35 * intensity,
-        rotation_speed = 0.042,
-        spoke_speed = -0.026,
+        rotation_speed = breaking and -0.050 or 0.042,
+        spoke_speed = breaking and 0.030 or -0.026,
     })
-    local amount = director.micro_punish_last_amount or 0
+    local amount = breaking and (director.micro_punish_break_last_amount or 0)
+        or (director.micro_punish_last_amount or 0)
+    local label = breaking and (director.micro_punish_break_last_label or "FURY BREAK")
+        or (director.micro_punish_last_label or "FURY")
     local label_xy = Display.to_screen_xy({primary.x, primary.y - (primary.radius or 16) - 44})
-    draw_text(COL_PALE_RED, Display.CENTER, label_xy, (director.micro_punish_last_label or "FURY") .. " +" .. tostring(math.ceil(amount)))
+    draw_text(color, Display.CENTER, label_xy, label .. (breaking and " -" or " +") .. tostring(math.ceil(amount)))
 end
 
 local summon_count
@@ -752,9 +812,13 @@ local function draw_package_hud(director)
         if package.micro_punish then
             local total = director.micro_punish_total or 0
             local events = director.micro_punish_events or 0
+            local break_total = director.micro_punish_break_total or 0
             local cap = micro_punish_cap(package)
-            local value = events > 0 and ("+" .. tostring(math.ceil(total)) .. " h" .. tostring(events)) or "on hit"
-            local color = (director.micro_punish_last_timer or 0) > 0 and COL_PALE_RED
+            local value = events > 0
+                and ("+" .. tostring(math.ceil(total)) .. " b" .. tostring(math.ceil(break_total)))
+                or "on hit"
+            local color = (director.micro_punish_break_last_timer or 0) > 0 and COL_WHITE
+                or (director.micro_punish_last_timer or 0) > 0 and COL_PALE_RED
                 or events > 0 and COL_PALE_YELLOW
                 or COL_LIGHT_GRAY
             draw_hud_row(y, "FURY", value, color, safe_rate(total, cap))
@@ -1018,6 +1082,8 @@ local function package_result(director, outcome)
         micro_events = director.micro_events or 0,
         micro_punish_total = director.micro_punish_total or 0,
         micro_punish_events = director.micro_punish_events or 0,
+        micro_punish_break_total = director.micro_punish_break_total or 0,
+        micro_punish_break_events = director.micro_punish_break_events or 0,
         sweep_warning_count = sweep_warning_count,
         sweep_warning_remaining = sweep_warning_remaining,
         sweep_active_count = sweep_active_count,
@@ -1122,6 +1188,8 @@ local function package_state_from_director(director)
         micro_events = director.micro_events or 0,
         micro_punish_total = director.micro_punish_total or 0,
         micro_punish_events = director.micro_punish_events or 0,
+        micro_punish_break_total = director.micro_punish_break_total or 0,
+        micro_punish_break_events = director.micro_punish_break_events or 0,
     }
 end
 
@@ -1812,6 +1880,18 @@ function M.create_rescue_strike(args)
                         if self.was_perfect then
                             self.director.rescue_perfect_saves = (self.director.rescue_perfect_saves or 0) + 1
                             self.director.rescue_best_perfect_margin = math.min(self.director.rescue_best_perfect_margin or margin, margin)
+                        end
+                        local punish = self.director.package and self.director.package.micro_punish
+                        if punish and self.was_clutch then
+                            local break_amount = self.was_perfect
+                                and (tonumber(punish.perfect_break) or tonumber(punish.clutch_break) or 0)
+                                or (tonumber(punish.clutch_break) or 0)
+                            apply_micro_punish_break(
+                                self.director,
+                                break_amount,
+                                self.was_perfect and "PERFECT BREAK" or "CLUTCH BREAK",
+                                self.was_perfect and COL_WHITE or COL_PALE_BLUE
+                            )
                         end
                         if not self.was_clutch then
                             self.director.rescue_early_saves = (self.director.rescue_early_saves or 0) + 1
@@ -2538,6 +2618,8 @@ function M.add_director(game_map, package, intensity)
         micro_events = 0,
         micro_punish_total = 0,
         micro_punish_events = 0,
+        micro_punish_break_total = 0,
+        micro_punish_break_events = 0,
         micro_last_timer = 0,
         escort_required = package.escort ~= nil,
         on_step = function(self)
@@ -2547,6 +2629,9 @@ function M.add_director(game_map, package, intensity)
             end
             if (self.micro_punish_last_timer or 0) > 0 then
                 self.micro_punish_last_timer = self.micro_punish_last_timer - 1
+            end
+            if (self.micro_punish_break_last_timer or 0) > 0 then
+                self.micro_punish_break_last_timer = self.micro_punish_break_last_timer - 1
             end
             if (self.rescue_pull_active_frames or 0) > 0 then
                 self.rescue_pull_total_frames = (self.rescue_pull_total_frames or 0) + 1

@@ -17,6 +17,7 @@ grep -q "Sweeps only" web/content_lab/shell.html
 grep -q "avg_package_sweep_active_count" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_score" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_punish_total" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_micro_punish_break_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_early_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timing_score" runtime/engine/StartBalanceRun.lua
 grep -q "MICRO" runtime/objects/ContentLabHazards.lua

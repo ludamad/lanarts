@@ -107,6 +107,20 @@ local COMPONENT_ALIASES = {
 }
 
 local COMPONENT_ORDER = {"escort", "orbit", "pulse", "sweep", "summon", "rescue"}
+local COMPONENT_KEYS = {}
+for _, component in ipairs(COMPONENT_ORDER) do
+    COMPONENT_KEYS[component] = true
+end
+
+local function copy_package_metadata(package)
+    local result = {}
+    for key, value in pairs(package or {}) do
+        if not COMPONENT_KEYS[key] then
+            result[key] = value
+        end
+    end
+    return result
+end
 
 local function normalize_package_components(value)
     local selected = {}
@@ -796,7 +810,7 @@ local function package_for_readiness(config)
     if not selected then
         return package, encounter
     end
-    local filtered = {primary = package.primary}
+    local filtered = copy_package_metadata(package)
     for _, component in ipairs(COMPONENT_ORDER) do
         if selected[component] and package[component] then
             filtered[component] = package[component]
@@ -1119,9 +1133,7 @@ local function filtered_package(package, components)
     if not selected then
         return package
     end
-    local result = {
-        primary = package.primary,
-    }
+    local result = copy_package_metadata(package)
     for _, component in ipairs(COMPONENT_ORDER) do
         if selected[component] and package[component] then
             result[component] = package[component]
@@ -2834,6 +2846,7 @@ telemetry_watch_for = function(config, package_summary)
         append_metric(rows, "avg_package_micro_dodges", "Threaded avoids", "targeted or near-miss hazard avoids")
         append_metric(rows, "avg_package_micro_hits", "Mechanic hits", "avoidable hazard failures")
         append_metric(rows, "avg_package_micro_punish_total", "Punish", "boss recovery from avoidable failures")
+        append_metric(rows, "avg_package_micro_punish_break_total", "Break", "clutch/perfect save pressure refund")
         if package_summary.hasSweep then
             append_metric(rows, "avg_package_sweep_active_count", "Sweep active", "crossing-lane pressure uptime")
             append_metric(rows, "avg_package_sweep_warning_count", "Sweep warns", "crossing-lane read windows")

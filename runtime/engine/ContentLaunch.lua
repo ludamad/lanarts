@@ -35,6 +35,20 @@ local COMPONENT_ALIASES = {
 }
 
 local COMPONENT_ORDER = {"escort", "orbit", "pulse", "sweep", "summon", "rescue"}
+local COMPONENT_KEYS = {}
+for _, component in ipairs(COMPONENT_ORDER) do
+    COMPONENT_KEYS[component] = true
+end
+
+local function copy_package_metadata(package)
+    local result = {}
+    for key, value in pairs(package or {}) do
+        if not COMPONENT_KEYS[key] then
+            result[key] = value
+        end
+    end
+    return result
+end
 
 local function package_component_set(value)
     local selected = {}
@@ -66,9 +80,7 @@ local function filtered_package(package, components)
     if not selected then
         return package
     end
-    local result = {
-        primary = package.primary,
-    }
+    local result = copy_package_metadata(package)
     for _, component in ipairs(COMPONENT_ORDER) do
         if selected[component] and package[component] then
             result[component] = package[component]
