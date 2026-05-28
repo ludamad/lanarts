@@ -952,6 +952,7 @@
         {id: 'executioner-blade-package', label: 'Executioner blade package', kind: 'melee package', phase: 'late melee micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['melee pursuit', 'rotating blades', 'Hound adds', 'short AOE windows']},
         {id: 'executioner-rescue-package', label: 'Executioner rescue package', kind: 'rescue package', phase: 'late multiplayer', suggestedLevel: 5, suggestedPreset: 'late', features: ['protect ally', 'body-block rescue', 'pull/taunt window', 'rotating blades', 'Hound adds', 'short AOE windows']},
         {id: 'hell-pressure-pair', label: 'Hell pressure pair', kind: 'enemy mix package', phase: 'late enemy mix', suggestedLevel: 5, suggestedPreset: 'late', features: ['support pressure', 'melee bodyguard', 'ember orbit', 'targeted pulse', 'Imp adds']},
+        {id: 'centaur-volley-package', label: 'Centaur Hunter volley package', kind: 'ranged package', phase: 'late ranged micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['ranged pursuit', 'rotating arrow lanes', 'volley AOE rhythm', 'Hound adds']},
       ];
 
       let intensities = [
@@ -1119,6 +1120,18 @@
           intensity: 'standard',
           monsters: '',
           seed: '22410',
+        },
+        {
+          name: 'Rogue Centaur package',
+          meta: 'L5, late loadout, ranged package',
+          className: 'Rogue',
+          level: '5',
+          preset: 'late',
+          mapDesc: '',
+          encounter: 'centaur-volley-package',
+          intensity: 'high',
+          monsters: '',
+          seed: '22435',
         },
         {
           name: 'Rogue Executioner package',

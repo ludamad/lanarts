@@ -36,6 +36,7 @@ local function run_content_api_smoke()
     local has_mummoner_package = false
     local has_executioner_package = false
     local has_executioner_rescue_package = false
+    local has_centaur_package = false
     local has_human_bot_profile = false
     local has_rescue_component_set = false
     local has_pyro_keepaway_model = false
@@ -75,6 +76,8 @@ local function run_content_api_smoke()
             has_executioner_package = true
         elseif encounter.id == "executioner-rescue-package" then
             has_executioner_rescue_package = true
+        elseif encounter.id == "centaur-volley-package" and encounter.package then
+            has_centaur_package = true
         end
     end
     expect(has_giant_chicken_package, "catalog should expose Giant Chicken as a package")
@@ -82,6 +85,7 @@ local function run_content_api_smoke()
     expect(has_executioner_baseline, "catalog should mark the plain Executioner duel as a baseline")
     expect(has_executioner_package, "catalog should expose the Executioner blade package")
     expect(has_executioner_rescue_package, "catalog should expose the Executioner rescue package")
+    expect(has_centaur_package, "catalog should expose the Centaur Hunter volley package")
     expect(has_human_bot_profile, "catalog should expose the human bot profile")
     expect(has_rescue_component_set, "catalog should expose rescue lane component set")
     expect(has_pyro_keepaway_model, "catalog should expose ranged class control metadata")
@@ -257,6 +261,23 @@ local function run_content_api_smoke()
     expect(red_rhythms.orbit and red_rhythms.pulse and red_rhythms.summon, "red dragon should expose full package rhythms")
     expect(red_dragon_summary.encounter and red_dragon_summary.encounter.suggestedLevel == 5, "red dragon should expose late-game suggested level")
     expect(red_dragon_summary.encounter and red_dragon_summary.encounter.suggestedPreset == "late", "red dragon should expose late-game suggested loadout")
+
+    local centaur_config = [[{
+        "className": "Rogue",
+        "level": 5,
+        "preset": "late",
+        "seed": "22435",
+        "encounter": "centaur-volley-package",
+        "intensity": "high"
+    }]]
+    local centaur_summary = parse_response("centaur volley summary", ContentApi.run_summary_json(centaur_config))
+    local centaur_rhythms = {}
+    for _, rhythm in ipairs(centaur_summary.rhythms or {}) do
+        centaur_rhythms[rhythm.id] = true
+    end
+    expect(centaur_rhythms.orbit and centaur_rhythms.pulse and centaur_rhythms.summon, "centaur volley should expose full package rhythms")
+    expect(centaur_summary.encounter and centaur_summary.encounter.suggestedLevel == 5, "centaur volley should expose late-game suggested level")
+    expect(centaur_summary.packageSummary and centaur_summary.packageSummary.hasSummons, "centaur volley should expose add pressure summary")
 
     local chicken_config = [[{
         "className": "Fighter",
