@@ -96,8 +96,8 @@ Balance simulations:
     plus hell-warrior-flame-package for fast red contact pressure with capped
     extra Imp portals and readable flame lanes, and stara-pain-star-package
     for black aura/projectile pressure with skull lanes and Skeleton cleanup.
-    emit package_outcome, escort HP, rescue saves, clutch/perfect saves, pull
-    redirects, and misses in run and sample rows; ally-down package failures end the run
+    emit package_outcome, escort HP, rescue saves, clutch/perfect saves,
+    clutch/perfect rescue window cues, pull redirects, and misses in run and sample rows; ally-down package failures end the run
     as ally_down. Automated players also emit rescue_intercept_frames,
     rescue_hold_frames, and rescue_late_reaction_frames so package clears can
     be separated from actual body-block micro. Package rows also derive rescue

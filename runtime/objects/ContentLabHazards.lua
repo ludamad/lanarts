@@ -917,6 +917,7 @@ local active_orbs
 local active_pulses
 local active_sweeps
 local active_rescue_strikes
+local rescue_intercept_hint
 local rescue_window_state
 local next_threat_state
 local package_pressure_state
@@ -1251,6 +1252,8 @@ local function package_result(director, outcome)
         rescue_early_saves = early,
         rescue_early_rate = early_rate,
         rescue_timing_score = timing_score,
+        rescue_window_cues = director.rescue_window_cues or 0,
+        rescue_perfect_window_cues = director.rescue_perfect_window_cues or 0,
         rescue_perfect_window = director.rescue_perfect_window,
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
         rescue_pulls = pulls,
@@ -1366,6 +1369,8 @@ local function package_state_from_director(director)
         rescue_early_saves = early,
         rescue_early_rate = safe_rate(early, saves),
         rescue_timing_score = safe_rate(clutch + perfect, saves),
+        rescue_window_cues = director.rescue_window_cues or 0,
+        rescue_perfect_window_cues = director.rescue_perfect_window_cues or 0,
         rescue_perfect_window = director.rescue_perfect_window,
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
         rescue_pulls = pulls,
@@ -1543,6 +1548,40 @@ local function rescue_feedback(strike, blocker)
         }
         EventLog.add("Rescue missed: " .. object_label(strike.target, "ally") .. " was hit.", color)
     end
+end
+
+local function rescue_window_cue(strike, perfect)
+    local game_map = strike.strike_map or strike.map
+    if not game_map then
+        return
+    end
+    local color = perfect and COL_WHITE or COL_PALE_YELLOW
+    local label = perfect and "PERFECT WINDOW" or "CLUTCH WINDOW"
+    local cue_xy = rescue_intercept_hint(strike)
+    if not cue_xy then
+        cue_xy = strike.target and xy_of(strike.target) or strike.xy
+    end
+    if strike.director and not strike.director.destroyed then
+        strike.director.rescue_window_cues = (strike.director.rescue_window_cues or 0) + 1
+        if perfect then
+            strike.director.rescue_perfect_window_cues = (strike.director.rescue_perfect_window_cues or 0) + 1
+        end
+    end
+    ImpactFX.screen_flash {
+        map = game_map,
+        color = color,
+        alpha = perfect and 0.10 or 0.065,
+        duration = perfect and 10 or 7,
+    }
+    ImpactFX.world_burst {
+        map = game_map,
+        xy = cue_xy,
+        color = color,
+        label = label,
+        radius = perfect and 66 or 52,
+        duration = perfect and 30 or 24,
+        drift = 0.22,
+    }
 end
 
 local function finish_package(director, outcome)
@@ -1945,7 +1984,7 @@ local function rescue_blocker(strike)
     return best
 end
 
-local function rescue_intercept_hint(strike)
+rescue_intercept_hint = function(strike)
     local target = strike.target
     if not target or target.destroyed then
         return nil
@@ -2117,6 +2156,8 @@ function M.create_rescue_strike(args)
         pulled = false,
         was_clutch = false,
         was_perfect = false,
+        clutch_cue_fired = false,
+        perfect_cue_fired = false,
         current_blocker = nil,
         block_started_elapsed = nil,
         clutch_margin = nil,
@@ -2138,6 +2179,15 @@ function M.create_rescue_strike(args)
                 else
                     self.current_blocker = nil
                     self.block_started_elapsed = nil
+                end
+                local remaining = math.max(0, self.windup - self.elapsed)
+                if not self.clutch_cue_fired and remaining <= self.late_window then
+                    self.clutch_cue_fired = true
+                    rescue_window_cue(self, false)
+                end
+                if not self.perfect_cue_fired and remaining <= self.perfect_window then
+                    self.perfect_cue_fired = true
+                    rescue_window_cue(self, true)
                 end
             end
             if not self.resolved and self.elapsed >= self.windup then
@@ -2302,6 +2352,17 @@ function M.create_rescue_strike(args)
             if last_call and not self.resolved then
                 local pulse = 1 + math.sin(self.elapsed * 0.55) * 0.08
                 draw_world_circle(COL_PALE_YELLOW, to_xy, (self.strike_radius + 9 + clutch_pct * 12) * pulse, 0.02, 0.58 + clutch_pct * 0.24)
+                local pip_count = perfect_call and 6 or 4
+                for idx = 1, pip_count do
+                    local t = (idx - 0.5) / pip_count
+                    local pip_xy = {
+                        from_xy[1] + (to_xy[1] - from_xy[1]) * t,
+                        from_xy[2] + (to_xy[2] - from_xy[2]) * t,
+                    }
+                    local beat = 0.5 + 0.5 * math.sin(self.elapsed * 0.44 + idx * 1.2)
+                    local pip_color = perfect_call and COL_WHITE or COL_PALE_YELLOW
+                    draw_world_circle(pip_color, pip_xy, perfect_call and 4 + beat * 2 or 3 + beat * 1.4, 0.015, (0.34 + beat * 0.32) * (perfect_call and 1.12 or 1))
+                end
                 if perfect_call then
                     draw_world_circle(COL_WHITE, to_xy, (self.strike_radius + 23) * pulse, 0.01, 0.80)
                 end
@@ -2921,6 +2982,8 @@ function M.add_director(game_map, package, intensity)
         rescue_clutch_saves = 0,
         rescue_perfect_saves = 0,
         rescue_early_saves = 0,
+        rescue_window_cues = 0,
+        rescue_perfect_window_cues = 0,
         rescue_perfect_window = scale_frames((package.rescue or {}).perfect_window, 6, intensity),
         rescue_pulls = 0,
         rescue_clutch_pulls = 0,

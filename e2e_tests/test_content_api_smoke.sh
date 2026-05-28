@@ -30,6 +30,7 @@ grep -q "dicebinder_emit_roll_fx" runtime/spells/Effects.moon
 grep -q "draw_die_face" runtime/ui/ProceduralEffects.lua
 grep -q "avg_package_rescue_early_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timing_score" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_rescue_window_cues" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_counter_windows" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_fatal_misses" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timed_pull_rate" runtime/engine/StartBalanceRun.lua
