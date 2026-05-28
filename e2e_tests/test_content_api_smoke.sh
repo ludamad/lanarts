@@ -72,6 +72,8 @@ grep -q "pixulloch-web-package" runtime/engine/ContentCatalog.lua
 grep -q "pixulloch-web-package" web/content_lab/shell.html
 grep -q "waxanarian-venom-package" runtime/engine/ContentCatalog.lua
 grep -q "waxanarian-venom-package" web/content_lab/shell.html
+grep -q "nesso-arrow-storm-package" runtime/engine/ContentCatalog.lua
+grep -q "nesso-arrow-storm-package" web/content_lab/shell.html
 grep -q "source or player" runtime/objects/ContentLabHazards.lua
 grep -q "MICRO" runtime/objects/ContentLabHazards.lua
 grep -q "BEAT" runtime/objects/ContentLabHazards.lua
