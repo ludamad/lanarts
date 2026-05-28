@@ -1,29 +1,49 @@
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-temp_dir=`mktemp -d`
-trap "{ rm -rf \"$temp_dir\"; }" EXIT
+cd "$(dirname "$0")/.."
 
-env SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1 ./run.sh --headless engine.StartBalanceRun \
-    --steps 360 \
-    --runs 1 \
-    --classes Rogue \
-    --levels 5 \
-    --loadout_preset late \
-    --bot_profile human \
-    --encounter executioner-rescue-package \
-    --package_intensity high \
-    --package_components escort,orbit,pulse,sweep,rescue \
-    --out="$temp_dir/balance_runs.csv" \
-    --samples_out="$temp_dir/balance_samples.csv" \
-    --spells_out="$temp_dir/balance_spells.csv" \
-    --aggregate_out="$temp_dir/balance_classes.csv" \
-    --spell_stats_out="$temp_dir/balance_spell_stats.csv" \
-    --damage_stats_out="$temp_dir/balance_damage_stats.csv" \
-    --damage_dealt_stats_out="$temp_dir/balance_damage_dealt_stats.csv" \
-    --objective_damage_stats_out="$temp_dir/balance_objective_damage_stats.csv" \
-    --enemy_stats_out="$temp_dir/balance_enemy_stats.csv" \
-    --report_out="$temp_dir/balance_report.csv" \
-    --json_out="$temp_dir/balance_runs.json"
+temp_dir=$(mktemp -d)
+trap 'rm -rf "$temp_dir"' EXIT
+
+repo_dir=$(pwd)
+headless_exe="${LANARTS_HEADLESS_EXE:-$repo_dir/build_debug_headless/src/lanarts}"
+build_env=(SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1)
+
+if [[ "${LANARTS_SKIP_BUILD:-0}" == "0" ]]; then
+    env "${build_env[@]}" ./run.sh --headless --build >/dev/null
+fi
+
+if [[ ! -x "$headless_exe" ]]; then
+    echo "Native executable not found: $headless_exe" >&2
+    echo "Run without LANARTS_SKIP_BUILD=1, or set LANARTS_HEADLESS_EXE." >&2
+    exit 1
+fi
+
+(
+    cd runtime
+    env "${build_env[@]}" "$headless_exe" engine.StartBalanceRun \
+        --steps 360 \
+        --runs 1 \
+        --classes Rogue \
+        --levels 5 \
+        --loadout_preset late \
+        --bot_profile human \
+        --encounter executioner-rescue-package \
+        --package_intensity high \
+        --package_components escort,orbit,pulse,sweep,rescue \
+        --out="$temp_dir/balance_runs.csv" \
+        --samples_out="$temp_dir/balance_samples.csv" \
+        --spells_out="$temp_dir/balance_spells.csv" \
+        --aggregate_out="$temp_dir/balance_classes.csv" \
+        --spell_stats_out="$temp_dir/balance_spell_stats.csv" \
+        --damage_stats_out="$temp_dir/balance_damage_stats.csv" \
+        --damage_dealt_stats_out="$temp_dir/balance_damage_dealt_stats.csv" \
+        --objective_damage_stats_out="$temp_dir/balance_objective_damage_stats.csv" \
+        --enemy_stats_out="$temp_dir/balance_enemy_stats.csv" \
+        --report_out="$temp_dir/balance_report.csv" \
+        --json_out="$temp_dir/balance_runs.json"
+)
 
 test -s "$temp_dir/balance_runs.csv"
 test -s "$temp_dir/balance_samples.csv"
