@@ -37,6 +37,8 @@ grep -q "mana-sapper-ritual-package" runtime/engine/ContentCatalog.lua
 grep -q "mana-sapper-ritual-package" web/content_lab/shell.html
 grep -q "hell-warrior-flame-package" runtime/engine/ContentCatalog.lua
 grep -q "hell-warrior-flame-package" web/content_lab/shell.html
+grep -q "stara-pain-star-package" runtime/engine/ContentCatalog.lua
+grep -q "stara-pain-star-package" web/content_lab/shell.html
 grep -q "source or player" runtime/objects/ContentLabHazards.lua
 grep -q "MICRO" runtime/objects/ContentLabHazards.lua
 grep -q "BEAT" runtime/objects/ContentLabHazards.lua

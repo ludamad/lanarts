@@ -70,7 +70,7 @@ local function round_xy(xy)
 end
 
 local function palette_for_primary(name)
-    if name == "Crypt Keeper" or name == "Purple Dragon" or name == "Mana Sapper" then
+    if name == "Crypt Keeper" or name == "Purple Dragon" or name == "Mana Sapper" or name == "Stara" or name == "Pixulloch" then
         return "black"
     elseif name == "Red Dragon" or name == "Gragh" or name == "Hell Warrior" or name == "Executioner" then
         return "red"

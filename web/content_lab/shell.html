@@ -1011,6 +1011,7 @@
             <option value="hell-pressure-pair">Hell pressure pair</option>
             <option value="hell-warrior-flame-package">Hell Warrior flame package</option>
             <option value="mana-sapper-ritual-package">Mana Sapper ritual package</option>
+            <option value="stara-pain-star-package">Stara pain-star package</option>
             <option value="centaur-volley-package">Centaur Hunter volley package</option>
             <option value="crypt-keeper-aura-package">Crypt Keeper aura package</option>
           </select>
@@ -1187,6 +1188,7 @@
         {id: 'hell-pressure-pair', label: 'Hell pressure pair', kind: 'enemy mix package', phase: 'late enemy mix', suggestedLevel: 5, suggestedPreset: 'late', features: ['support pressure', 'melee bodyguard', 'ember orbit', 'targeted pulse', 'Imp adds']},
         {id: 'hell-warrior-flame-package', label: 'Hell Warrior flame package', kind: 'red melee package', phase: 'late melee micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['fast melee pursuit', 'ember rings', 'crossing flame lanes', 'brand pulse rhythm', 'capped Imp portal']},
         {id: 'mana-sapper-ritual-package', label: 'Mana Sapper ritual package', kind: 'black package', phase: 'late black micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['mana-sap aura', 'rotating sigils', 'crossing shadow lanes', 'sap nova rhythm', 'Imp adds']},
+        {id: 'stara-pain-star-package', label: 'Stara pain-star package', kind: 'black boss package', phase: 'late black micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['pain aura pressure', 'rotating pain stars', 'crossing skull lanes', 'pain nova rhythm', 'Skeleton adds']},
         {id: 'centaur-volley-package', label: 'Centaur Hunter volley package', kind: 'ranged package', phase: 'late ranged micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['ranged pursuit', 'rotating arrow lanes', 'volley AOE rhythm', 'Hound adds']},
         {id: 'crypt-keeper-aura-package', label: 'Crypt Keeper aura package', kind: 'boss package', phase: 'late black micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['black aura pressure', 'bone orbit', 'pain nova rhythm', 'Skeleton adds']},
       ];
@@ -1422,6 +1424,18 @@
           packageComponents: 'orbit,pulse,sweep',
           monsters: '',
           seed: '22516',
+        },
+        {
+          name: 'Stormcaller Stara package',
+          meta: 'L5, late loadout, black pain package',
+          className: 'Stormcaller',
+          level: '5',
+          preset: 'late',
+          mapDesc: '',
+          encounter: 'stara-pain-star-package',
+          intensity: 'high',
+          monsters: '',
+          seed: '22520',
         },
         {
           name: 'Rogue Centaur package',

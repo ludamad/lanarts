@@ -94,7 +94,8 @@ Balance simulations:
     include solo 1v1 full-package cases such as mana-sapper-ritual-package,
     where a support enemy is tested with orbit, AOE, sweep, and add rhythms,
     plus hell-warrior-flame-package for fast red contact pressure with capped
-    extra Imp portals and readable flame lanes.
+    extra Imp portals and readable flame lanes, and stara-pain-star-package
+    for black aura/projectile pressure with skull lanes and Skeleton cleanup.
     emit package_outcome, escort HP, rescue saves, clutch/perfect saves, pull
     redirects, and misses in run and sample rows; ally-down package failures end the run
     as ally_down. Automated players also emit rescue_intercept_frames,
