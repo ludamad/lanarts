@@ -5,7 +5,7 @@ local iowrite = io.write --performance
 local M = {}
 
 local levels = {}
-for i,v in ipairs {"VERBOSE", "INFO", "WARN", "NONE"} do M[v] = v ; levels[v] = i end
+for i,v in ipairs {"VERBOSE", "INFO", "WARN", "ERROR", "NONE"} do M[v] = v ; levels[v] = i end
 
 function M.set_log_level(log)
 	local level = levels[log]
@@ -16,9 +16,10 @@ function M.set_log_level(log)
 	for k,l in pairs(levels) do
 	    if k ~= "NONE" then
             local colors = {
-            	VERBOSE = '\27[37;2m',
-            	INFO = '\27[33;2m',
-            	WARN = '\27[31m',
+                VERBOSE = '\27[37;2m',
+                INFO = '\27[33;2m',
+                WARN = '\27[31m',
+                ERROR = '\27[31;1m',
             }
             local reset = '\27[0m'
             local prefix = colors[k] .. '[' .. k:lower() .. '] ' .. reset

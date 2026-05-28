@@ -35,8 +35,9 @@ Task = newtype {
 }
 
 M.run_all = () ->
+    i = 1
     while i <= #TASKS
-        task_state,  = TASKS[i]()
+        task_state = TASKS[i]()
         if not task_state then
             for _, f in ipairs(TASKS[i].completion_listeners) do
                 f()

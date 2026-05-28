@@ -34,7 +34,9 @@ return function(--[[Optional]] dont_load_draw_globals)
     require "globals.StringUtils"
 
     log "Read modules that must be initialized."
-    require "ErrorReporting"
+    if not __EMSCRIPTEN then
+        require "ErrorReporting"
+    end
 
     if not dont_load_draw_globals then
         log "Read globals that involve core.Display or similar"

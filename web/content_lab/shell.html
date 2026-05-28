@@ -1443,7 +1443,7 @@
             appendOutput(parsed.error);
             return null;
           }
-          return parsed;
+          return normalizeApiLists(parsed);
         } catch (err) {
           appendOutput(`${name} failed: ${err && err.message ? err.message : err}`);
           return null;
@@ -1466,10 +1466,93 @@
         };
       }
 
+      function asList(value) {
+        if (Array.isArray(value)) {
+          return value;
+        }
+        if (!value || typeof value !== 'object') {
+          return [];
+        }
+        const numericKeys = Object.keys(value)
+          .filter((key) => /^\d+$/.test(key))
+          .sort((a, b) => Number(a) - Number(b));
+        return numericKeys.map((key) => value[key]);
+      }
+
+      function isListFieldKey(key) {
+        return [
+          'actions',
+          'allies',
+          'analysis_goals',
+          'beatPlan',
+          'bot_profiles',
+          'buildArchetypes',
+          'calls',
+          'cards',
+          'choices',
+          'classes',
+          'corridors',
+          'demands',
+          'encounters',
+          'enemy_groups',
+          'enemy_packs',
+          'enemyPins',
+          'features',
+          'gaps',
+          'item_choices',
+          'itemChoices',
+          'items',
+          'knownSpells',
+          'levels',
+          'map_algorithms',
+          'mapPreviews',
+          'maps',
+          'micro_drills',
+          'microDrills',
+          'microPlan',
+          'monsters',
+          'notes',
+          'package_component_sets',
+          'previews',
+          'props',
+          'resourceGroups',
+          'resources',
+          'rhythmIds',
+          'rhythms',
+          'risks',
+          'rivers',
+          'rooms',
+          'rows',
+          'strengths',
+          'tags',
+          'telemetry',
+          'threats',
+          'upcomingSpells',
+          'warnings',
+          'windows',
+        ].includes(key || '');
+      }
+
+      function normalizeApiLists(value, key) {
+        if (isListFieldKey(key)) {
+          return asList(value).map((entry) => normalizeApiLists(entry));
+        }
+        if (Array.isArray(value)) {
+          return value.map((entry) => normalizeApiLists(entry));
+        }
+        if (!value || typeof value !== 'object') {
+          return value;
+        }
+        return Object.fromEntries(Object.entries(value).map(([childKey, childValue]) => [
+          childKey,
+          normalizeApiLists(childValue, childKey),
+        ]));
+      }
+
       function replaceOptions(select, entries, valueFor, labelFor) {
         const current = select.value;
         select.innerHTML = '';
-        entries.forEach((entry) => {
+        asList(entries).forEach((entry) => {
           const option = document.createElement('option');
           option.value = valueFor(entry);
           option.textContent = labelFor(entry);
@@ -1784,16 +1867,16 @@
           return box;
         }
         addChip(box, `${readiness.label || 'readiness'} ${readiness.score || 0}`, 'stat');
-        (readiness.demands || []).slice(0, 4).forEach((demand) => {
+        asList(readiness.demands).slice(0, 4).forEach((demand) => {
           addChip(box, demand.label || demand.id);
         });
-        (readiness.strengths || []).slice(0, 3).forEach((text) => {
+        asList(readiness.strengths).slice(0, 3).forEach((text) => {
           addChip(box, text);
         });
-        (readiness.gaps || []).slice(0, 3).forEach((text) => {
+        asList(readiness.gaps).slice(0, 3).forEach((text) => {
           addChip(box, text, 'locked');
         });
-        (readiness.notes || []).slice(0, 2).forEach((text) => {
+        asList(readiness.notes).slice(0, 2).forEach((text) => {
           addChip(box, text);
         });
         return box;
@@ -1806,10 +1889,10 @@
           return box;
         }
         addChip(box, matchup.label || 'matchup', matchup.severity === 'high' ? 'locked' : 'stat');
-        (matchup.risks || []).slice(0, 3).forEach((text) => addChip(box, text, 'locked'));
-        (matchup.strengths || []).slice(0, 3).forEach((text) => addChip(box, text));
-        (matchup.notes || []).slice(0, 2).forEach((text) => addChip(box, text));
-        (matchup.telemetry || []).slice(0, 3).forEach((key) => addChip(box, key));
+        asList(matchup.risks).slice(0, 3).forEach((text) => addChip(box, text, 'locked'));
+        asList(matchup.strengths).slice(0, 3).forEach((text) => addChip(box, text));
+        asList(matchup.notes).slice(0, 2).forEach((text) => addChip(box, text));
+        asList(matchup.telemetry).slice(0, 3).forEach((key) => addChip(box, key));
         return box;
       }
 
@@ -1820,13 +1903,14 @@
           return box;
         }
         addChip(box, scorecard.label || 'scorecard', 'stat');
-        (scorecard.rows || []).slice(0, limit).forEach((row) => {
+        const rows = asList(scorecard.rows);
+        rows.slice(0, limit).forEach((row) => {
           const target = row.target ? ` ${row.target}` : '';
           const text = `${row.label || row.metric || 'metric'}${target}`;
           addChip(box, text, row.comparator === '<=' ? 'locked' : undefined);
         });
-        if ((scorecard.rows || []).length > limit) {
-          addChip(box, `+${scorecard.rows.length - limit}`);
+        if (rows.length > limit) {
+          addChip(box, `+${rows.length - limit}`);
         }
         return box;
       }
@@ -2249,7 +2333,7 @@
             button.type = 'button';
             const score = readiness.score === undefined ? '' : ` ${readiness.score}`;
             button.textContent = `${readiness.label || 'fit'}${score}`;
-            button.title = [build.role, (build.tags || []).join(', ')].filter(Boolean).join(' | ');
+            button.title = [build.role, asList(build.tags).join(', ')].filter(Boolean).join(' | ');
             button.addEventListener('click', () => {
               const next = {
                 ...currentConfig(),
@@ -2258,11 +2342,13 @@
               setConfig(next);
             });
             buttons.appendChild(button);
-            if ((readiness.strengths || []).length || (readiness.gaps || []).length) {
+            const strengths = asList(readiness.strengths);
+            const gaps = asList(readiness.gaps);
+            if (strengths.length || gaps.length) {
               const chips = document.createElement('div');
               chips.className = 'item-chips';
-              (readiness.strengths || []).slice(0, 2).forEach((text) => addChip(chips, text));
-              (readiness.gaps || []).slice(0, 2).forEach((text) => addChip(chips, text, 'locked'));
+              strengths.slice(0, 2).forEach((text) => addChip(chips, text));
+              gaps.slice(0, 2).forEach((text) => addChip(chips, text, 'locked'));
               groupNode.appendChild(label);
               groupNode.appendChild(buttons);
               groupNode.appendChild(chips);
@@ -3566,8 +3652,10 @@
         if (matchup.severity && matchup.severity !== 'neutral') {
           parts.push(matchup.severity);
         }
-        const risk = matchup.risks && matchup.risks.length ? matchup.risks[0] : '';
-        const strength = matchup.strengths && matchup.strengths.length ? matchup.strengths[0] : '';
+        const risks = asList(matchup.risks);
+        const strengths = asList(matchup.strengths);
+        const risk = risks.length ? risks[0] : '';
+        const strength = strengths.length ? strengths[0] : '';
         if (risk) {
           parts.push(risk);
         } else if (strength) {
@@ -3584,8 +3672,10 @@
         if (readiness.label) {
           parts.push(`${readiness.label}${readiness.score === undefined ? '' : ` ${readiness.score}`}`);
         }
-        const strength = readiness.strengths && readiness.strengths.length ? readiness.strengths[0] : '';
-        const gap = readiness.gaps && readiness.gaps.length ? readiness.gaps[0] : '';
+        const strengths = asList(readiness.strengths);
+        const gaps = asList(readiness.gaps);
+        const strength = strengths.length ? strengths[0] : '';
+        const gap = gaps.length ? gaps[0] : '';
         if (strength) {
           parts.push(strength);
         }

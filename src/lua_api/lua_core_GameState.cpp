@@ -23,8 +23,8 @@
 // TODO use for settings save as well
 void ensure_fs_sync() {
     EM_ASM(
-				// save
-				FS.syncfs(false, console.error);
+        // save
+        FS.syncfs(false, console.error);
     );
 }
 void ensure_fs_init() {
@@ -33,10 +33,12 @@ void ensure_fs_init() {
         initialized = true;
         // Mount '/saves' as IDBFS so that it persists
         EM_ASM(
-						FS.mkdir('/saves');
-						FS.mount(IDBFS, {}, '/saves');
-						// populate
-						FS.syncfs(true, console.error);
+            if (!FS.analyzePath('/saves').exists) {
+                FS.mkdir('/saves');
+            }
+            FS.mount(IDBFS, {}, '/saves');
+            // populate
+            FS.syncfs(true, console.error);
         );
     }
 }

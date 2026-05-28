@@ -58,10 +58,13 @@ start_engine = (config) ->
             debug.attach_debugger()
 
         -- (2) Handle error reporting options
-        ErrorReporting = require "ErrorReporting"
-        if config.nofilter
-            ErrorReporting.filter_patterns = {}
-        ErrorReporting.context = tonumber(config.context) or ErrorReporting.context
+        if __EMSCRIPTEN
+            ErrorReporting = {filter_patterns: {}, context: 4}
+        else
+            ErrorReporting = require "ErrorReporting"
+            if config.nofilter
+                ErrorReporting.filter_patterns = {}
+            ErrorReporting.context = tonumber(config.context) or ErrorReporting.context
 
         -- (3) Initialize subsystems + game state object
         engine_init(config.settings)

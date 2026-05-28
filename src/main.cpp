@@ -85,16 +85,18 @@ static void lua_vm_configure(lua_State* L) {
 }
 #endif
 
-static lua_State* init_luastate() {
+static lua_State* init_luastate(bool include_script_tools = true) {
 	lua_State* L = lua_api::create_configured_luastate();
 	lua_vm_configure(L);
 	lua_api::add_search_path(L, "?.lua");
-    // Open lpeg as the moonscript library depends on lpeg, and the moonscript library is called during error reporting.
-    luaopen_lpeg(L);
-    lua_pop(L, 1);
-    // Open luafilesystem for file manipulation
-    luaopen_lfs(L);
-    luawrap::globals(L)["package"]["loaded"]["lfs"].pop();
+    if (include_script_tools) {
+        // Open lpeg as the moonscript library depends on lpeg, and the moonscript library is called during error reporting.
+        luaopen_lpeg(L);
+        lua_pop(L, 1);
+        // Open luafilesystem for file manipulation.
+        luaopen_lfs(L);
+        luawrap::globals(L)["package"]["loaded"]["lfs"].pop();
+    }
     lua_api::register_lua_libraries(L);
     return L;
 }
@@ -156,13 +158,11 @@ static const char* content_api_error(const std::string& message) {
 static lua_State* content_api_luastate() {
     static lua_State* L = nullptr;
     if (L == nullptr) {
-        L = init_luastate();
+        L = init_luastate(false);
         const char* setup =
             "package.path = package.path .. ';dependencies/?.lua'\n"
             "package.path = package.path .. ';dependencies/socket/?.lua'\n"
-            "require('Logging').set_log_level('ERROR')\n"
-            "require('GlobalVariableSetup')(true)\n"
-            "require('moonscript.base').insert_loader()\n";
+            "require('Logging').set_log_level('ERROR')\n";
         if (luaL_dostring(L, setup) != 0) {
             std::string err = lua_tostring(L, -1) ? lua_tostring(L, -1) : "unknown Lua setup error";
             lua_settop(L, 0);

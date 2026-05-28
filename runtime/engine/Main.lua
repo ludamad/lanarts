@@ -6,6 +6,9 @@
 -- (1) Setup paths
 package.path = package.path .. ';dependencies/?.lua'
 package.path = package.path .. ';dependencies/socket/?.lua'
+if __EMSCRIPTEN then
+    package.path = 'compiled_moon/?.lua;' .. package.path
+end
 
 -- (2) Surpress noisy input
 require("Logging").set_log_level(os.getenv("LANARTS_LOG") or "WARN")
@@ -13,8 +16,12 @@ require("Logging").set_log_level(os.getenv("LANARTS_LOG") or "WARN")
 -- (3) Include necessary global modifications
 require("GlobalVariableSetup")(--[[Surpress loading draw-related globals?]] os.getenv("LANARTS_HEADLESS") ~= nil)
 
--- (4) Ensure moonscript loading is inserted
-require("moonscript.base").insert_loader()
+-- (4) Ensure moonscript loading is inserted.
+-- Emscripten uses precompiled Lua in compiled_moon/ to avoid the LPeg-backed
+-- MoonScript parser at browser runtime.
+if not __EMSCRIPTEN then
+    require("moonscript.base").insert_loader()
+end
 
 -- Default usage:
 --   On normal desktop play: ./lanarts engine.StartLanarts *args*

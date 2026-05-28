@@ -28,5 +28,8 @@ else()
 endif()
 
 add_definitions(-DIMGUI_DISABLE_INCLUDE_IMCONFIG_H)
-add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
-
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+    add_definitions(-DIMGUI_IMPL_OPENGL_ES2)
+else()
+    add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
+endif()

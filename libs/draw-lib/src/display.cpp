@@ -241,7 +241,9 @@ void ldraw::display_draw_finish() {
             if (w > 0 && h > 0) {
                 std::vector<unsigned char> pixels(w * h * 3);
                 glPixelStorei(GL_PACK_ALIGNMENT, 1);
+#ifndef __EMSCRIPTEN__
                 glReadBuffer(GL_BACK);
+#endif
                 glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
 
                 char path[1024];
