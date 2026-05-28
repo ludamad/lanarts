@@ -851,6 +851,7 @@
         {key: 'overworld-random', label: 'Overworld mix', mapDesc: 'map_descs.Overworld', mapAlgorithm: 'overworld-random', mapProfile: '', mode: 'overworld', density: 0.22},
         {key: 'overworld-open-meadow', label: 'Open meadow', mapDesc: 'map_descs.Overworld', mapAlgorithm: 'overworld-open-meadow', mapProfile: 'open_meadow', mode: 'overworld-open', density: 0.18},
         {key: 'overworld-broken-grove', label: 'Broken grove', mapDesc: 'map_descs.Overworld', mapAlgorithm: 'overworld-broken-grove', mapProfile: 'broken_grove', mode: 'overworld-grove', density: 0.26},
+        {key: 'overworld-river-road', label: 'River road', mapDesc: 'map_descs.Overworld', mapAlgorithm: 'overworld-river-road', mapProfile: 'river_road', mode: 'overworld-river', density: 0.24},
       ];
 
       let mapAlgorithms = [
@@ -859,6 +860,9 @@
         {id: 'overworld-open-meadow', label: 'Open meadow', mapDesc: 'map_descs.Overworld', mapProfile: 'open_meadow'},
         {id: 'overworld-broken-grove', label: 'Broken grove', mapDesc: 'map_descs.Overworld', mapProfile: 'broken_grove'},
         {id: 'overworld-old-stones', label: 'Old stones', mapDesc: 'map_descs.Overworld', mapProfile: 'old_stones'},
+        {id: 'overworld-river-road', label: 'River road', mapDesc: 'map_descs.Overworld', mapProfile: 'river_road'},
+        {id: 'overworld-predator-thicket', label: 'Predator thicket', mapDesc: 'map_descs.Overworld', mapProfile: 'predator_thicket', density: 0.30},
+        {id: 'overworld-ruin-crossroads', label: 'Ruin crossroads', mapDesc: 'map_descs.Overworld', mapProfile: 'ruin_crossroads'},
       ];
 
       let encounters = [
@@ -892,6 +896,7 @@
             {name: 'Skeleton', role: 'basic undead contact'},
             {name: 'Cloud Elemental', role: 'opening caster pressure'},
             {name: 'Mouther', role: 'opening melee disruption'},
+            {name: 'Hound', role: 'rare predator pressure'},
           ],
         },
       ];
@@ -915,6 +920,45 @@
           encounter: '',
           monsters: '',
           seed: '17300',
+        },
+        {
+          name: 'River road opener',
+          meta: 'L1, no loadout, connected Overworld',
+          className: 'Fighter',
+          level: '1',
+          preset: 'none',
+          mapDesc: 'map_descs.Overworld',
+          mapProfile: 'river_road',
+          mapAlgorithm: 'overworld-river-road',
+          encounter: '',
+          monsters: '',
+          seed: '17320',
+        },
+        {
+          name: 'Predator thicket opener',
+          meta: 'L2, no loadout, tight Overworld',
+          className: 'Rogue',
+          level: '2',
+          preset: 'none',
+          mapDesc: 'map_descs.Overworld',
+          mapProfile: 'predator_thicket',
+          mapAlgorithm: 'overworld-predator-thicket',
+          encounter: '',
+          monsters: '',
+          seed: '17340',
+        },
+        {
+          name: 'Ruin crossroads opener',
+          meta: 'L1, no loadout, landmark Overworld',
+          className: 'Necromancer',
+          level: '1',
+          preset: 'none',
+          mapDesc: 'map_descs.Overworld',
+          mapProfile: 'ruin_crossroads',
+          mapAlgorithm: 'overworld-ruin-crossroads',
+          encounter: '',
+          monsters: '',
+          seed: '17360',
         },
         {
           name: 'Necromancer regen abuse',

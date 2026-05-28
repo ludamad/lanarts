@@ -41,6 +41,61 @@ OVERWORLD_AMBIENT_ENEMIES = table.tconcat OldMaps.medium_animals, {
     {enemy: "Mouther", chance: 10}
 }
 
+OVERWORLD_MEADOW_ENEMIES = {
+    {enemy: "Sheep", chance: 70, group_chance: 45, group_size: 2}
+    {enemy: "Chicken", chance: 18}
+    {enemy: "Giant Rat", chance: 16}
+    {enemy: "Giant Bat", chance: 12}
+    {enemy: "Black Mamba", chance: 16}
+    {enemy: "Skeleton", chance: 10}
+    {enemy: "Cloud Elemental", chance: 6}
+}
+
+OVERWORLD_GROVE_ENEMIES = {
+    {enemy: "Sheep", chance: 25, group_chance: 25, group_size: 2}
+    {enemy: "Giant Spider", chance: 24}
+    {enemy: "Black Mamba", chance: 28}
+    {enemy: "Skeleton", chance: 18}
+    {enemy: "Cloud Elemental", chance: 18, group_chance: 30, group_size: 2}
+    {enemy: "Mouther", chance: 18}
+}
+
+OVERWORLD_STONES_ENEMIES = {
+    {enemy: "Sheep", chance: 15, group_chance: 20, group_size: 2}
+    {enemy: "Giant Bat", chance: 16}
+    {enemy: "Skeleton", chance: 36}
+    {enemy: "Cloud Elemental", chance: 22, group_chance: 25, group_size: 2}
+    {enemy: "Mouther", chance: 18}
+    {enemy: "Black Mamba", chance: 12}
+}
+
+OVERWORLD_RIVER_ENEMIES = {
+    {enemy: "Sheep", chance: 28, group_chance: 35, group_size: 2}
+    {enemy: "Giant Rat", chance: 14}
+    {enemy: "Black Mamba", chance: 34}
+    {enemy: "Cloud Elemental", chance: 24, group_chance: 35, group_size: 2}
+    {enemy: "Skeleton", chance: 12}
+    {enemy: "Mouther", chance: 10}
+}
+
+OVERWORLD_PREDATOR_ENEMIES = {
+    {enemy: "Sheep", chance: 14, group_chance: 20, group_size: 2}
+    {enemy: "Giant Spider", chance: 22}
+    {enemy: "Black Mamba", chance: 38}
+    {enemy: "Mouther", chance: 25}
+    {enemy: "Skeleton", chance: 16}
+    {enemy: "Hound", chance: 5}
+}
+
+OVERWORLD_RUIN_ENEMIES = {
+    {enemy: "Sheep", chance: 12, group_chance: 20, group_size: 2}
+    {enemy: "Giant Bat", chance: 14}
+    {enemy: "Skeleton", chance: 42}
+    {enemy: "Cloud Elemental", chance: 20, group_chance: 20, group_size: 2}
+    {enemy: "Mouther", chance: 16}
+    {enemy: "Black Mamba", chance: 10}
+}
+
 OVERWORLD_VAULT_ENEMIES = table.tconcat OldMaps.medium_enemies, {
     {enemy: "Black Mamba", chance: 35}
     {enemy: "Mouther", chance: 25}
@@ -63,6 +118,7 @@ OVERWORLD_PROFILES = {
         small_vaults: {1, 2}
         mini_features: {Vaults.cavern, Vaults.stone_henge, Vaults.stone_henge}
         ambient_enemies: 7
+        enemy_entries: OVERWORLD_MEADOW_ENEMIES
         n_statues: 3
     }
     {
@@ -79,6 +135,7 @@ OVERWORLD_PROFILES = {
         small_vaults: {2, 4}
         mini_features: {Vaults.cavern, Vaults.cavern, Vaults.stone_henge, Vaults.stone_henge}
         ambient_enemies: 8
+        enemy_entries: OVERWORLD_GROVE_ENEMIES
         n_statues: 4
     }
     {
@@ -95,7 +152,59 @@ OVERWORLD_PROFILES = {
         small_vaults: {3, 5}
         mini_features: {Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge, Vaults.cavern}
         ambient_enemies: 9
+        enemy_entries: OVERWORLD_STONES_ENEMIES
         n_statues: 6
+    }
+    {
+        name: "river_road"
+        region_base: 6
+        region_rolls: {2, 2, 2}
+        connect_base: 4
+        connect_rolls: {4, 3, 3}
+        room_base: 7
+        room_rolls: {4, 4, 2}
+        size_base: 90
+        shell: 23
+        ridges: {2, 4}
+        small_vaults: {1, 3}
+        mini_features: {Vaults.cavern, Vaults.stone_henge, Vaults.cavern}
+        ambient_enemies: 8
+        enemy_entries: OVERWORLD_RIVER_ENEMIES
+        n_statues: 2
+    }
+    {
+        name: "predator_thicket"
+        region_base: 6
+        region_rolls: {2, 2}
+        connect_base: 2
+        connect_rolls: {3, 2, 2}
+        room_base: 6
+        room_rolls: {3, 3, 2}
+        size_base: 90
+        shell: 21
+        ridges: {2, 4}
+        small_vaults: {1, 1}
+        mini_features: {Vaults.cavern, Vaults.cavern, Vaults.stone_henge}
+        ambient_enemies: 9
+        enemy_entries: OVERWORLD_PREDATOR_ENEMIES
+        n_statues: 1
+    }
+    {
+        name: "ruin_crossroads"
+        region_base: 9
+        region_rolls: {2, 2, 2}
+        connect_base: 3
+        connect_rolls: {3, 3, 2}
+        room_base: 6
+        room_rolls: {3, 3, 3}
+        size_base: 94
+        shell: 21
+        ridges: {2, 3}
+        small_vaults: {3, 4}
+        mini_features: {Vaults.stone_henge, Vaults.stone_henge, Vaults.cavern, Vaults.stone_henge}
+        ambient_enemies: 8
+        enemy_entries: OVERWORLD_RUIN_ENEMIES
+        n_statues: 7
     }
 }
 
@@ -132,6 +241,7 @@ place_doors_and_statues = (region_set, profile) ->
 
 overworld_items_and_enemies = (region_set, profile) ->
     {:map, :regions} = region_set
+    enemy_entries = profile.enemy_entries or OVERWORLD_AMBIENT_ENEMIES
 
     for region in *regions
         area = region\bbox()
@@ -143,7 +253,7 @@ overworld_items_and_enemies = (region_set, profile) ->
             item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, sqr)
 
-        OldMaps.generate_from_enemy_entries(map, OVERWORLD_AMBIENT_ENEMIES, profile.ambient_enemies, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        OldMaps.generate_from_enemy_entries(map, enemy_entries, profile.ambient_enemies, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
     return true
 
 -----------------------------

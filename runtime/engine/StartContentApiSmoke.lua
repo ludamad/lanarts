@@ -28,12 +28,21 @@ local function run_content_api_smoke()
     expect(#(catalog.enemy_groups or {}) >= 3, "catalog should expose enemy groups")
     expect(#(catalog.enemy_packs or {}) >= 3, "catalog should expose enemy packs")
     expect(#(catalog.maps or {}) >= 4, "catalog should expose map generators")
-    expect(#(catalog.map_algorithms or {}) >= 4, "catalog should expose map algorithms")
+    expect(#(catalog.map_algorithms or {}) >= 7, "catalog should expose map algorithms")
     expect(#(catalog.encounters or {}) >= 10, "catalog should expose packaged encounters")
     local has_giant_chicken_package = false
     local has_mummoner_package = false
     local has_executioner_package = false
     local has_executioner_rescue_package = false
+    local has_predator_thicket = false
+    local has_ruin_crossroads = false
+    for _, algorithm in ipairs(catalog.map_algorithms or {}) do
+        if algorithm.id == "overworld-predator-thicket" then
+            has_predator_thicket = true
+        elseif algorithm.id == "overworld-ruin-crossroads" then
+            has_ruin_crossroads = true
+        end
+    end
     for _, encounter in ipairs(catalog.encounters or {}) do
         if encounter.id == "giant-chicken-duel" and encounter.package then
             has_giant_chicken_package = true
@@ -49,6 +58,8 @@ local function run_content_api_smoke()
     expect(has_mummoner_package, "catalog should expose Mummoner as a package")
     expect(has_executioner_package, "catalog should expose the Executioner blade package")
     expect(has_executioner_rescue_package, "catalog should expose the Executioner rescue package")
+    expect(has_predator_thicket, "catalog should expose the predator thicket overworld profile")
+    expect(has_ruin_crossroads, "catalog should expose the ruin crossroads overworld profile")
 
     local config = [[{
         "className": "Necromancer",
@@ -106,7 +117,20 @@ local function run_content_api_smoke()
     }]]
     local map_generation = parse_response("map generation", ContentApi.map_generation_json(map_config))
     expect(map_generation.selectedAlgorithm and map_generation.selectedAlgorithm.mapProfile == "broken_grove", "map generation should resolve overworld profile")
-    expect(#(map_generation.previews or {}) >= 3, "map generation should expose profile previews")
+    expect(#(map_generation.previews or {}) >= 6, "map generation should expose profile previews")
+    local has_river_preview = false
+    local has_predator_preview = false
+    local has_ruin_preview = false
+    for _, preview in ipairs(map_generation.previews or {}) do
+        if preview.mapProfile == "river_road" then
+            has_river_preview = true
+        elseif preview.mapProfile == "predator_thicket" then
+            has_predator_preview = true
+        elseif preview.mapProfile == "ruin_crossroads" then
+            has_ruin_preview = true
+        end
+    end
+    expect(has_river_preview and has_predator_preview and has_ruin_preview, "map generation should expose new overworld profile previews")
     local launch_args = parse_response("launch args", ContentApi.launch_args_json(map_config))
     local has_map_profile = false
     for _, arg in ipairs(launch_args.args or {}) do
