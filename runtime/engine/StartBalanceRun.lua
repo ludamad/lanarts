@@ -672,6 +672,8 @@ local function package_state_fields(player)
             package_rescue_perfect_pulls = "",
             package_rescue_timed_pull_rate = "",
             package_rescue_perfect_pull_rate = "",
+            package_rescue_pull_snap_bursts = "",
+            package_rescue_perfect_pull_snap_bursts = "",
             package_rescue_pull_total_frames = "",
             package_rescue_pull_uptime_rate = "",
             package_rescue_counter_windows = "",
@@ -766,6 +768,8 @@ local function package_state_fields(player)
         package_rescue_perfect_pulls = state.rescue_perfect_pulls or 0,
         package_rescue_timed_pull_rate = format_rate(state.rescue_timed_pull_rate or 0),
         package_rescue_perfect_pull_rate = format_rate(state.rescue_perfect_pull_rate or 0),
+        package_rescue_pull_snap_bursts = state.rescue_pull_snap_bursts or 0,
+        package_rescue_perfect_pull_snap_bursts = state.rescue_perfect_pull_snap_bursts or 0,
         package_rescue_pull_total_frames = state.rescue_pull_total_frames or 0,
         package_rescue_pull_uptime_rate = format_rate(state.rescue_pull_uptime_rate or 0),
         package_rescue_counter_windows = state.rescue_counter_windows or 0,
@@ -1165,6 +1169,7 @@ local SUMMARY_METRICS = {
     "package_rescue_timing_score", "package_rescue_pull_rate",
     "package_rescue_clutch_pulls", "package_rescue_perfect_pulls",
     "package_rescue_timed_pull_rate", "package_rescue_perfect_pull_rate",
+    "package_rescue_pull_snap_bursts", "package_rescue_perfect_pull_snap_bursts",
     "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
     "package_rescue_counter_windows", "package_rescue_counter_damage_total",
     "package_rescue_counter_stagger_frames",
@@ -1977,6 +1982,8 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local pull_uptime = tonumber(row.avg_package_rescue_pull_uptime_rate) or 0
     local clutch_pulls = tonumber(row.avg_package_rescue_clutch_pulls) or 0
     local perfect_pulls = tonumber(row.avg_package_rescue_perfect_pulls) or 0
+    local pull_snap_bursts = tonumber(row.avg_package_rescue_pull_snap_bursts) or 0
+    local perfect_pull_snap_bursts = tonumber(row.avg_package_rescue_perfect_pull_snap_bursts) or 0
     local counter_windows = tonumber(row.avg_package_rescue_counter_windows) or 0
     local counter_damage = tonumber(row.avg_package_rescue_counter_damage_total) or 0
     local counter_stagger = tonumber(row.avg_package_rescue_counter_stagger_frames) or 0
@@ -2023,11 +2030,13 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
             timed_pull_rate,
             0,
             string.format(
-                "%s rescue pulls in %s averaged %.1f clutch pulls and %.1f perfect pulls/run; %.1f%% of pulls started inside the late save window.",
+                "%s rescue pulls in %s averaged %.1f clutch pulls, %.1f perfect pulls, %.1f snap bursts, and %.1f perfect snap bursts/run; %.1f%% of pulls started inside the late save window.",
                 class_name,
                 encounter,
                 clutch_pulls,
                 perfect_pulls,
+                pull_snap_bursts,
+                perfect_pull_snap_bursts,
                 timed_pull_rate * 100
             )
         )
@@ -2875,6 +2884,7 @@ local function run_balance(raw_args)
             "package_rescue_pulls", "package_rescue_pull_rate",
             "package_rescue_clutch_pulls", "package_rescue_perfect_pulls",
             "package_rescue_timed_pull_rate", "package_rescue_perfect_pull_rate",
+            "package_rescue_pull_snap_bursts", "package_rescue_perfect_pull_snap_bursts",
             "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
             "package_rescue_counter_windows", "package_rescue_counter_damage_total",
             "package_rescue_counter_stagger_frames",
@@ -2951,6 +2961,7 @@ local function run_balance(raw_args)
             "package_rescue_pulls", "package_rescue_pull_rate",
             "package_rescue_clutch_pulls", "package_rescue_perfect_pulls",
             "package_rescue_timed_pull_rate", "package_rescue_perfect_pull_rate",
+            "package_rescue_pull_snap_bursts", "package_rescue_perfect_pull_snap_bursts",
             "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
             "package_rescue_counter_windows", "package_rescue_counter_damage_total",
             "package_rescue_counter_stagger_frames",
@@ -3040,6 +3051,7 @@ local function run_balance(raw_args)
             "avg_package_rescue_pulls", "avg_package_rescue_pull_rate",
             "avg_package_rescue_clutch_pulls", "avg_package_rescue_perfect_pulls",
             "avg_package_rescue_timed_pull_rate", "avg_package_rescue_perfect_pull_rate",
+            "avg_package_rescue_pull_snap_bursts", "avg_package_rescue_perfect_pull_snap_bursts",
             "avg_package_rescue_pull_total_frames", "avg_package_rescue_pull_uptime_rate",
             "avg_package_rescue_counter_windows", "avg_package_rescue_counter_damage_total",
             "avg_package_rescue_counter_stagger_frames",

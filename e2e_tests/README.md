@@ -113,8 +113,9 @@ Balance simulations:
     package_difficulty rows when package overlap is only serial pressure or
     the selected automation profile is clearing too comfortably.
     Rescue package rows also track pull/taunt total frames, uptime rate, and
-    late-window pull rates, so clears can be flagged when forced target control
-    is carrying the fight instead of few-frame snap-pull saves.
+    late-window pull rates, plus pull-snap burst counts, so clears can be
+    flagged when forced target control is carrying the fight instead of
+    few-frame snap-pull saves.
     Rescue-package report rows summarize save, clutch, perfect, early,
     timing-score, pull, timed-pull, perfect-pull, taunt-uptime, counter-window, counter-damage,
     counter-stagger, fatal-miss, and buffered-miss rates, then warn when

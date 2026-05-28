@@ -31,6 +31,8 @@ grep -q "avg_package_rescue_timing_score" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_counter_windows" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_fatal_misses" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_rescue_timed_pull_rate" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_rescue_pull_snap_bursts" runtime/engine/StartBalanceRun.lua
+grep -q "PERFECT SNAP" runtime/objects/ContentLabHazards.lua
 grep -q "mana-sapper-ritual-package" runtime/engine/ContentCatalog.lua
 grep -q "mana-sapper-ritual-package" web/content_lab/shell.html
 grep -q "hell-warrior-flame-package" runtime/engine/ContentCatalog.lua

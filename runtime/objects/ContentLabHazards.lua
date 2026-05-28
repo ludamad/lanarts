@@ -1259,6 +1259,8 @@ local function package_result(director, outcome)
         rescue_perfect_pulls = perfect_pulls,
         rescue_timed_pull_rate = timed_pull_rate,
         rescue_perfect_pull_rate = perfect_pull_rate,
+        rescue_pull_snap_bursts = director.rescue_pull_snap_bursts or 0,
+        rescue_perfect_pull_snap_bursts = director.rescue_perfect_pull_snap_bursts or 0,
         rescue_pull_total_frames = pull_total_frames,
         rescue_pull_uptime_rate = pull_uptime_rate,
         rescue_counter_windows = director.rescue_counter_windows or 0,
@@ -1372,6 +1374,8 @@ local function package_state_from_director(director)
         rescue_perfect_pulls = perfect_pulls,
         rescue_timed_pull_rate = safe_rate(clutch_pulls, pulls),
         rescue_perfect_pull_rate = safe_rate(perfect_pulls, pulls),
+        rescue_pull_snap_bursts = director.rescue_pull_snap_bursts or 0,
+        rescue_perfect_pull_snap_bursts = director.rescue_perfect_pull_snap_bursts or 0,
         rescue_pull_total_frames = director.rescue_pull_total_frames or 0,
         rescue_pull_uptime_rate = safe_rate(director.rescue_pull_total_frames or 0, math.max(1, director.elapsed or 0)),
         rescue_counter_windows = director.rescue_counter_windows or 0,
@@ -1962,6 +1966,15 @@ local function rescue_intercept_hint(strike)
     return best_xy, best_player, best_dist
 end
 
+local function rescue_pull_color(was_perfect, was_clutch)
+    if was_perfect then
+        return COL_WHITE
+    elseif was_clutch then
+        return COL_PALE_YELLOW
+    end
+    return COL_PALE_GREEN
+end
+
 function M.create_pull_tether(args)
     return GameObject.object_create {
         map = args.map,
@@ -1977,6 +1990,7 @@ function M.create_pull_tether(args)
         was_clutch = args.was_clutch,
         was_perfect = args.was_perfect,
         clutch_margin = args.clutch_margin,
+        snap_fired = false,
         content_lab_pull_tether = true,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
@@ -1997,6 +2011,41 @@ function M.create_pull_tether(args)
                 self.director.rescue_pull_active_id = self.id
                 self.director.rescue_pull_target = self.target.name
             end
+            if not self.snap_fired and (self.was_clutch or self.was_perfect) then
+                self.snap_fired = true
+                local color = rescue_pull_color(self.was_perfect, self.was_clutch)
+                local label = self.was_perfect and "PERFECT SNAP" or "CLUTCH SNAP"
+                if self.director and not self.director.destroyed then
+                    self.director.rescue_pull_snap_bursts = (self.director.rescue_pull_snap_bursts or 0) + 1
+                    if self.was_perfect then
+                        self.director.rescue_perfect_pull_snap_bursts = (self.director.rescue_perfect_pull_snap_bursts or 0) + 1
+                    end
+                end
+                ImpactFX.screen_flash {
+                    map = self.map,
+                    color = color,
+                    alpha = self.was_perfect and 0.13 or 0.075,
+                    duration = self.was_perfect and 12 or 9,
+                }
+                ImpactFX.world_burst {
+                    map = self.map,
+                    xy = xy_of(self.source),
+                    color = color,
+                    label = label,
+                    radius = self.was_perfect and 76 or 62,
+                    duration = self.was_perfect and 38 or 30,
+                    drift = 0.34,
+                }
+                ImpactFX.world_burst {
+                    map = self.map,
+                    xy = xy_of(self.target),
+                    color = COL_PALE_GREEN,
+                    label = "PULLED",
+                    radius = self.was_perfect and 58 or 48,
+                    duration = self.was_perfect and 34 or 28,
+                    drift = 0.28,
+                }
+            end
         end,
         on_draw = function(self)
             if not self.source or self.source.destroyed or not self.target or self.target.destroyed then
@@ -2007,11 +2056,22 @@ function M.create_pull_tether(args)
             local from_xy = xy_of(self.source)
             local to_xy = xy_of(self.target)
             local alpha = 0.18 + pct * 0.45
-            local pull_color = self.was_perfect and COL_WHITE
-                or self.was_clutch and COL_PALE_YELLOW
-                or COL_PALE_GREEN
+            local pull_color = rescue_pull_color(self.was_perfect, self.was_clutch)
             local pulse = 1 + math.sin(self.elapsed * 0.36) * 0.08
             draw_world_link(pull_color, from_xy, to_xy, self.was_clutch and 5 or 4, alpha)
+            local sparks = self.was_perfect and 6 or self.was_clutch and 4 or 3
+            for idx = 1, sparks do
+                local t = (self.elapsed * (self.was_clutch and 0.060 or 0.038) + idx / sparks) % 1
+                local spark_xy = {
+                    from_xy[1] + (to_xy[1] - from_xy[1]) * t,
+                    from_xy[2] + (to_xy[2] - from_xy[2]) * t,
+                }
+                local spark_alpha = (0.10 + pct * 0.25) * (self.was_clutch and 1.15 or 0.85)
+                draw_world_circle(pull_color, spark_xy, self.was_perfect and 6 or 4, 0.02, spark_alpha)
+                if self.was_perfect then
+                    draw_world_circle(COL_WHITE, spark_xy, 2, 0.01, 0.42 * pct)
+                end
+            end
             draw_world_circle(pull_color, from_xy, ((self.source.radius or 14) + 7) * pulse, 0.03, 0.48 + pct * 0.26)
             draw_world_circle(COL_PALE_GREEN, to_xy, (self.target.radius or 12) + 6, 0.02, 0.40 + pct * 0.24)
             local source_label = Display.to_screen_xy({from_xy[1], from_xy[2] - (self.source.radius or 14) - 20})
@@ -2865,6 +2925,8 @@ function M.add_director(game_map, package, intensity)
         rescue_pulls = 0,
         rescue_clutch_pulls = 0,
         rescue_perfect_pulls = 0,
+        rescue_pull_snap_bursts = 0,
+        rescue_perfect_pull_snap_bursts = 0,
         rescue_pull_active_frames = 0,
         rescue_pull_total_frames = 0,
         rescue_counter_windows = 0,
