@@ -297,6 +297,17 @@ local function escort_health()
     return count, hp, max_hp
 end
 
+local function primary_health(package)
+    local primary = primary_monster(package and package.primary)
+    if not primary then
+        return 0, 0, 0, package and package.primary or ""
+    end
+    local hp = math.max(0, primary.stats.hp or 0)
+    local estats = primary:effective_stats()
+    local max_hp = math.max(1, estats.max_hp or primary.stats.max_hp or primary.stats.hp or 1)
+    return 1, hp, max_hp, primary.name or package.primary or ""
+end
+
 local function draw_escort_markers()
     for _, escort in ipairs(living_escorts()) do
         local estats = escort:effective_stats()
@@ -334,6 +345,9 @@ local function draw_package_hud(director)
         row_count = row_count + 3
     end
     if package.escort then
+        row_count = row_count + 1
+    end
+    if package.primary then
         row_count = row_count + 1
     end
 
@@ -444,6 +458,13 @@ local function draw_package_hud(director)
         local pct = max_hp > 0 and hp / max_hp or 0
         local value = count > 0 and string.format("%d/%d", math.ceil(hp), math.ceil(max_hp)) or "down"
         draw_hud_row(y, "ALLY", value, pct <= 0.35 and COL_PALE_RED or COL_PALE_GREEN, pct)
+        y = y + HUD_ROW_H
+    end
+    if package.primary then
+        local count, hp, max_hp = primary_health(package)
+        local pct = max_hp > 0 and hp / max_hp or 0
+        local value = count > 0 and string.format("%d/%d", math.ceil(hp), math.ceil(max_hp)) or "down"
+        draw_hud_row(y, "TARGET", value, pct <= 0.25 and COL_PALE_RED or COL_PALE_BLUE, pct)
     end
 
     draw_escort_markers()
@@ -469,6 +490,7 @@ end
 
 local function package_result(director, outcome)
     local count, hp, max_hp = escort_health()
+    local primary_count, primary_hp, primary_max_hp, primary_name = primary_health(director.package or {})
     local frames = director.elapsed or 0
     local seconds = frames / 60
     local saves = director.rescue_saves or 0
@@ -495,6 +517,10 @@ local function package_result(director, outcome)
         escort_count = count,
         escort_hp = hp,
         escort_max_hp = max_hp,
+        primary_name = primary_name,
+        primary_count = primary_count,
+        primary_hp = primary_hp,
+        primary_max_hp = primary_max_hp,
         rescue_saves = saves,
         rescue_opportunities = opportunities,
         rescue_save_rate = save_rate,
@@ -514,6 +540,7 @@ local function package_state_from_director(director)
         return nil
     end
     local count, hp, max_hp = escort_health()
+    local primary_count, primary_hp, primary_max_hp, primary_name = primary_health(director.package or {})
     local saves = director.rescue_saves or 0
     local misses = director.rescue_misses or 0
     local clutch = director.rescue_clutch_saves or 0
@@ -533,6 +560,10 @@ local function package_state_from_director(director)
         escort_count = count,
         escort_hp = hp,
         escort_max_hp = max_hp,
+        primary_name = primary_name,
+        primary_count = primary_count,
+        primary_hp = primary_hp,
+        primary_max_hp = primary_max_hp,
         orb_active_count = orb_count,
         orb_active_remaining = orb_remaining,
         pulse_warning_count = pulse_warning_count,

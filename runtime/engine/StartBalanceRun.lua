@@ -605,6 +605,11 @@ local function package_state_fields(player)
             package_escort_hp = "",
             package_escort_max_hp = "",
             package_escort_hp_pct = "",
+            package_primary_name = "",
+            package_primary_count = "",
+            package_primary_hp = "",
+            package_primary_max_hp = "",
+            package_primary_hp_pct = "",
             package_orb_active_count = "",
             package_orb_active_remaining = "",
             package_pulse_warning_count = "",
@@ -633,6 +638,8 @@ local function package_state_fields(player)
     end
     local escort_hp = tonumber(state.escort_hp) or 0
     local escort_max_hp = tonumber(state.escort_max_hp) or 0
+    local primary_hp = tonumber(state.primary_hp) or 0
+    local primary_max_hp = tonumber(state.primary_max_hp) or 0
     return {
         package_outcome = state.outcome or "",
         package_frames = state.frames or 0,
@@ -640,6 +647,11 @@ local function package_state_fields(player)
         package_escort_hp = format_rate(escort_hp),
         package_escort_max_hp = format_rate(escort_max_hp),
         package_escort_hp_pct = escort_max_hp > 0 and format_rate(escort_hp / escort_max_hp) or "",
+        package_primary_name = state.primary_name or "",
+        package_primary_count = state.primary_count or 0,
+        package_primary_hp = format_rate(primary_hp),
+        package_primary_max_hp = format_rate(primary_max_hp),
+        package_primary_hp_pct = primary_max_hp > 0 and format_rate(primary_hp / primary_max_hp) or "",
         package_orb_active_count = state.orb_active_count or 0,
         package_orb_active_remaining = state.orb_active_remaining or "",
         package_pulse_warning_count = state.pulse_warning_count or 0,
@@ -2102,6 +2114,8 @@ local function run_balance(raw_args)
             "enemies_alive", "visible_enemies", "spells_known",
             "package_outcome", "package_frames", "package_escort_count", "package_escort_hp",
             "package_escort_max_hp", "package_escort_hp_pct", "package_rescue_saves",
+            "package_primary_name", "package_primary_count", "package_primary_hp",
+            "package_primary_max_hp", "package_primary_hp_pct",
             "package_orb_active_count", "package_orb_active_remaining",
             "package_pulse_warning_count", "package_pulse_warning_remaining",
             "package_pulse_active_count", "package_pulse_active_remaining",
@@ -2139,6 +2153,8 @@ local function run_balance(raw_args)
             "alive_enemy_hp", "alive_enemy_max_hp", "spells_known",
             "package_outcome", "package_frames", "package_escort_count", "package_escort_hp",
             "package_escort_max_hp", "package_escort_hp_pct", "package_rescue_saves",
+            "package_primary_name", "package_primary_count", "package_primary_hp",
+            "package_primary_max_hp", "package_primary_hp_pct",
             "package_orb_active_count", "package_orb_active_remaining",
             "package_pulse_warning_count", "package_pulse_warning_remaining",
             "package_pulse_active_count", "package_pulse_active_remaining",

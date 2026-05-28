@@ -31,6 +31,7 @@ Packaged encounters can also expose rhythm metadata for the shell's timeline vie
 Rescue packages may spawn allied monsters on the player team, giving pull, taunt, and body-block tests a fragile target without requiring extra local controllers.
 Some rescue packages also add a timed rescue line; the ally takes the heavy hit unless a player intercepts the line during the windup.
 The in-game package HUD counts saves and marks blocks that start inside the final rescue window as clutch saves.
+Package HUDs show primary target HP so threat timing can be read against actual clear progress.
 Orb and AOE rows switch from spawn countdowns to active/warning state while those package threats are live.
 Rescue packages also show a live READ row for cut-lane, clutch, hold, and pull-target states while the line is active.
 When a package clears or fails, the game posts a compact result banner with elapsed time and rescue stats.
