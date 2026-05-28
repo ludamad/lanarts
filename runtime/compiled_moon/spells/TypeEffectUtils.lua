@@ -87,13 +87,7 @@ end
 local get_resistance
 get_resistance = function(obj, type)
   local raw_resist = get_effect_stat(obj, TYPE_RESIST_EFFECT[type])
-  if raw_resist <= -100 then
-    return 1.5
-  end
-  if raw_resist >= 100 then
-    return 0.5
-  end
-  local resist = math.max(math.min(math.floor(raw_resist), 5), -5)
+  local resist = math.max(math.min(raw_resist, 1), -1)
   return 1 - resist / 10
 end
 local hit_func

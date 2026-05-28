@@ -83,14 +83,9 @@ get_power = (obj, type) ->
 -- Returns a modifier, 0 signifying complete resistance, 1 signifying no resistance, and amounts > 1 signifying weakness
 get_resistance = (obj, type) ->
     raw_resist = get_effect_stat(obj, TYPE_RESIST_EFFECT[type])
-    -- Values over 100 or -100 signify extremes (extreme weakness and resistance)
-    if raw_resist <= -100
-        return 1.5
-    if raw_resist >= 100
-        return 0.5
-    -- Otherwise, resistances are capped between -5 and +5 (inclusive)
-    resist = math.max(math.min(math.floor(raw_resist), 5), -5)
-    -- from 0.75 to 1.25x
+    -- Design: soft elemental matchups only. Cap the damage modifier at +-10% either way
+    -- (resist or weakness) so there are no hard elemental counters; extremes collapse to the cap.
+    resist = math.max(math.min(raw_resist, 1), -1)
     return 1 - resist / 10
 
 -- Default implementation of projectile hit function, in Lua

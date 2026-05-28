@@ -2796,8 +2796,8 @@ local function matchup_read_for(config, encounter)
 
     if config.className == "Pyrocaster" then
         if (tags.red_resistant or 0) > 0 then
-            high_risk("red/fire resistance can suppress Pyrocaster conversion")
-            label = "fire-resist check"
+            notes[#notes + 1] = "Red/fire resistance is soft here (capped at <=10%); it no longer suppresses Pyrocaster conversion, so off-element is viable."
+            label = "soft fire-resist matchup"
             telemetry[#telemetry + 1] = "avg_pyrocaster_ring_combat_frames"
         end
         if (tags.fire_projectile or 0) > 0 then
@@ -2805,16 +2805,15 @@ local function matchup_read_for(config, encounter)
         end
     elseif config.className == "Stormcaller" then
         if (tags.red_resistant or 0) > 0 then
-            strength("white damage avoids the red/fire resistance check")
-            label = "caster counter-check"
+            notes[#notes + 1] = "White damage's edge against red/fire targets is now soft (<=10%); element choice is a minor factor, not a counter."
         end
         if (tags.white_resistant or 0) > 0 then
-            high_risk("white-resistant enemies can flatten Stormcaller overperformance")
+            notes[#notes + 1] = "White resistance is soft here (capped at <=10%); it trims but does not flatten Stormcaller output."
             label = "white mirror check"
         end
     elseif config.className == "Necromancer" then
         if (tags.black_resistant or 0) > 0 then
-            high_risk("black-resistant enemies can make gross regen trades misleading")
+            notes[#notes + 1] = "Black resistance is soft here (capped at <=10%); read survivability with regen-adjusted damage, not the elemental matchup."
             label = "black-resist check"
         end
         telemetry[#telemetry + 1] = "avg_necromancer_regen_offset_pct"

@@ -41,7 +41,7 @@ The shell renders a content board from `lanarts_content_presentation_json(config
 Build templates apply concrete loadout strings from the API, then immediately recompute the selected fight readiness and commands.
 Drill cards are concrete launch configurations for practicing specific package reads such as perfect rescue blocks, rescue under orb pressure, orb/AOE footwork, add cleanup, and full stacked package reads. Drill scorecards name the balance metrics that prove whether the practice target is healthy or being cheesed.
 The shell also exposes a Drill selector and `drill` URL parameter; choosing one applies the API's full drill config before recomputing commands, scorecards, and preview resources.
-Run and fight payloads include matchup reads for red/fire, white, and black resistance checks so Pyrocaster, Stormcaller, and Necromancer comparisons can be selected before running sweeps.
+Run and fight payloads include matchup reads for red/fire, white, and black resistance checks so Pyrocaster, Stormcaller, and Necromancer comparisons can be selected before running sweeps. Elemental matchups are soft by design: type resistance/weakness is capped at +-10% damage either way, so element choice is a minor edge, not a hard counter.
 Encounter launches use `--encounter` for curated 1v1/package tests, or `--monsters` for a comma-separated custom arena.
 Direct map launches use `--start_map_desc`, and overworld profile selections add `--map_profile` so the same seed can compare profiles such as `open_meadow`, `broken_grove`, `river_road`, `predator_thicket`, and `ruin_crossroads`.
 Packaged encounters can also expose rhythm metadata for the shell's timeline view, so orbit, AOE, sweep, and summon loops are visible before launch.

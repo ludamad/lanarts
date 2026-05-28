@@ -28,8 +28,10 @@ Content lab APIs:
     micro plans. Presentation controls expose those drills as selectable API
     options so the web lab can apply a full practice config from one selector.
     Run summaries and fight setup payloads also include class/enemy matchup
-    reads for red/fire, white, and black resistance checks, with telemetry keys
-    that explain whether the pairing is suppressing damage conversion.
+    reads for red/fire, white, and black resistance checks. Elemental
+    matchups are intentionally soft: type resistance/weakness is capped at
+    +-10% damage either way (no hard counters), so these reads flag a minor
+    element edge rather than a damage-suppressing counter.
     Generated resource matrices include a caster-matchup sweep for Pyrocaster
     red-resist checks, Stormcaller counter/mirror checks, and Necromancer
     black-resist regen checks.

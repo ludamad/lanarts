@@ -494,8 +494,8 @@ local function run_content_api_smoke()
     expect(red_rhythms.orbit and red_rhythms.pulse and red_rhythms.summon, "red dragon should expose full package rhythms")
     expect(red_dragon_summary.encounter and red_dragon_summary.encounter.suggestedLevel == 5, "red dragon should expose late-game suggested level")
     expect(red_dragon_summary.encounter and red_dragon_summary.encounter.suggestedPreset == "late", "red dragon should expose late-game suggested loadout")
-    expect(red_dragon_summary.matchup and red_dragon_summary.matchup.severity == "high", "pyrocaster red dragon summary should flag fire-resist matchup risk")
-    expect(red_dragon_summary.matchup and #(red_dragon_summary.matchup.risks or {}) >= 1, "pyrocaster red dragon matchup should explain the risk")
+    expect(red_dragon_summary.matchup and red_dragon_summary.matchup.severity ~= "high", "pyrocaster red dragon fire resistance is soft (<=10%); the matchup must not read as a high-severity counter")
+    expect(red_dragon_summary.matchup and #(red_dragon_summary.matchup.notes or {}) >= 1, "pyrocaster red dragon matchup should note the soft (<=10%) fire-resist matchup")
     expect(red_dragon_summary.matchup and red_dragon_summary.matchup.tags and (red_dragon_summary.matchup.tags.red_resistant or 0) > 0, "pyrocaster red dragon matchup should expose red-resist tags")
 
     local storm_red_config = [[{
@@ -507,7 +507,7 @@ local function run_content_api_smoke()
         "intensity": "high"
     }]]
     local storm_red_summary = parse_response("storm red dragon summary", ContentApi.run_summary_json(storm_red_config))
-    expect(storm_red_summary.matchup and #(storm_red_summary.matchup.strengths or {}) >= 1, "stormcaller red dragon summary should expose red-resist counter strength")
+    expect(storm_red_summary.matchup and #(storm_red_summary.matchup.notes or {}) >= 1, "stormcaller red dragon matchup should note the soft (<=10%) element edge")
 
     local centaur_config = [[{
         "className": "Rogue",
@@ -644,13 +644,13 @@ local function run_content_api_smoke()
             has_perfect_skill_buffer = has_perfect_skill_buffer or resource.botProfile == "perfect"
             has_sloppy_skill_buffer = has_sloppy_skill_buffer or resource.botProfile == "sloppy"
         elseif resource.group == "Caster matchup sweep" and resource.className == "Pyrocaster" and resource.encounter == "red-dragon-duel" then
-            has_pyro_red_resource = resource.matchup and resource.matchup.severity == "high"
+            has_pyro_red_resource = resource.matchup and resource.matchup.tags and (resource.matchup.tags.red_resistant or 0) > 0
         elseif resource.group == "Caster matchup sweep" and resource.className == "Stormcaller" and resource.encounter == "red-dragon-duel" then
-            has_storm_red_resource = resource.matchup and #(resource.matchup.strengths or {}) >= 1
+            has_storm_red_resource = resource.matchup and resource.matchup.tags and (resource.matchup.tags.red_resistant or 0) > 0
         elseif resource.group == "Caster matchup sweep" and resource.className == "Stormcaller" and resource.monsters == "Cloud Elemental" then
-            has_storm_white_resource = resource.matchup and resource.matchup.severity == "high"
+            has_storm_white_resource = resource.matchup and resource.matchup.tags and (resource.matchup.tags.white_resistant or 0) > 0
         elseif resource.group == "Caster matchup sweep" and resource.className == "Necromancer" and resource.encounter == "crypt-keeper-aura-package" then
-            has_necro_black_resource = resource.matchup and resource.matchup.severity == "high"
+            has_necro_black_resource = resource.matchup and resource.matchup.tags and (resource.matchup.tags.black_resistant or 0) > 0
         end
     end
     expect(has_chicken_resource, "matrix should include Giant Chicken package coverage")
