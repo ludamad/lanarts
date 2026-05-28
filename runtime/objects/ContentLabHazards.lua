@@ -217,10 +217,44 @@ local function damage_overlapping_players(hazard, xy, radius)
     end
 end
 
+local function damage_segment_overlapping_players(hazard, from_xy, to_xy, radius)
+    step_cooldowns(hazard.hit_cooldowns)
+    for _, player in ipairs(living_player_team_targets(hazard.affects_escorts)) do
+        local player_radius = player.target_radius or player.radius or 12
+        if dist_to_segment_sqr(xy_of(player), from_xy, to_xy) <= sqr(radius + player_radius)
+                and not hazard.hit_cooldowns[player.id] then
+            hazard.hit_cooldowns[player.id] = hazard.redamage_cooldown
+            damage_player(hazard, player)
+        end
+    end
+end
+
+local function segment_endpoints(center, angle, length)
+    local half = length / 2
+    local dx = math.cos(angle) * half
+    local dy = math.sin(angle) * half
+    return {
+        center[1] - dx,
+        center[2] - dy,
+    }, {
+        center[1] + dx,
+        center[2] + dy,
+    }
+end
+
 local function draw_world_circle(color, xy, radius, fill_alpha, outline_alpha)
     local screen_xy = Display.to_screen_xy(xy)
     Display.draw_circle(with_alpha(color, fill_alpha), screen_xy, radius)
     Display.draw_circle_outline(with_alpha(color, outline_alpha), screen_xy, radius, 2)
+end
+
+local function draw_world_line(color, from_xy, to_xy, width, alpha)
+    Display.draw_line(
+        with_alpha(color, alpha),
+        Display.to_screen_xy(from_xy),
+        Display.to_screen_xy(to_xy),
+        width or 1
+    )
 end
 
 local function draw_world_link(color, from_xy, to_xy, radius, alpha)
@@ -428,6 +462,7 @@ local summon_count
 local active_summon_portals
 local active_orbs
 local active_pulses
+local active_sweeps
 local active_rescue_strikes
 local rescue_window_state
 local next_threat_state
@@ -437,7 +472,7 @@ local function draw_package_hud(director)
     local package = director.package or {}
     local intensity = director.intensity
     local row_count = 1
-    local has_threat_rows = package.orbit or package.pulse or package.summon or package.rescue
+    local has_threat_rows = package.orbit or package.pulse or package.sweep or package.summon or package.rescue
     if has_threat_rows then
         row_count = row_count + 2
     end
@@ -445,6 +480,9 @@ local function draw_package_hud(director)
         row_count = row_count + 1
     end
     if package.pulse then
+        row_count = row_count + 1
+    end
+    if package.sweep then
         row_count = row_count + 1
     end
     if package.summon then
@@ -507,6 +545,20 @@ local function draw_package_hud(director)
             draw_hud_row(y, "AOE", "warn " .. format_frames(warning_remaining or 0), COL_PALE_YELLOW, 1)
         else
             draw_hud_row(y, "AOE", format_frames(delta), COL_PALE_RED, 1 - delta / interval)
+        end
+        y = y + HUD_ROW_H
+    end
+    if package.sweep then
+        local sweep = package.sweep
+        local interval, offset = scaled_interval_and_offset(sweep, 180, 52, intensity)
+        local delta = next_delta(director.elapsed, interval, offset)
+        local warning, active, warning_remaining, active_remaining = active_sweeps()
+        if active > 0 then
+            draw_hud_row(y, "SWEEP", "active " .. format_frames(active_remaining or 0), COL_PALE_RED, 1)
+        elseif warning > 0 then
+            draw_hud_row(y, "SWEEP", "warn " .. format_frames(warning_remaining or 0), COL_PALE_YELLOW, 1)
+        else
+            draw_hud_row(y, "SWEEP", format_frames(delta), COL_PALE_RED, 1 - delta / interval)
         end
         y = y + HUD_ROW_H
     end
@@ -664,6 +716,7 @@ local function package_result(director, outcome)
     local pull_total_frames = director.rescue_pull_total_frames or 0
     local pull_uptime_rate = safe_rate(pull_total_frames, math.max(1, frames))
     local pressure = package_pressure_state(director, director.package or {})
+    local sweep_warning_count, sweep_active_count, sweep_warning_remaining, sweep_active_remaining = active_sweeps()
     local best = director.rescue_best_margin
     local escort_text = count > 0 and string.format("ally %d/%d", math.ceil(hp), math.ceil(max_hp)) or "ally down"
     local rescue_text = (saves > 0 or misses > 0)
@@ -710,6 +763,10 @@ local function package_result(director, outcome)
         pressure_overlap_frames = director.pressure_overlap_frames or 0,
         pressure_overlap_rate = safe_rate(director.pressure_overlap_frames or 0, math.max(1, frames)),
         pressure_labels = pressure.labels or "",
+        sweep_warning_count = sweep_warning_count,
+        sweep_warning_remaining = sweep_warning_remaining,
+        sweep_active_count = sweep_active_count,
+        sweep_active_remaining = sweep_active_remaining,
     }
 end
 
@@ -728,6 +785,7 @@ local function package_state_from_director(director)
     local orb_count, orb_remaining = active_orbs()
     local summon_warning_count, summon_warning_remaining = active_summon_portals()
     local pulse_warning_count, pulse_active_count, pulse_warning_remaining, pulse_active_remaining = active_pulses()
+    local sweep_warning_count, sweep_active_count, sweep_warning_remaining, sweep_active_remaining = active_sweeps()
     local aggro = aggro_state(director.package or {})
     local next_threat = next_threat_state(director, director.package or {})
     local pressure = package_pressure_state(director, director.package or {})
@@ -761,6 +819,10 @@ local function package_state_from_director(director)
         pulse_warning_remaining = pulse_warning_remaining,
         pulse_active_count = pulse_active_count,
         pulse_active_remaining = pulse_active_remaining,
+        sweep_warning_count = sweep_warning_count,
+        sweep_warning_remaining = sweep_warning_remaining,
+        sweep_active_count = sweep_active_count,
+        sweep_active_remaining = sweep_active_remaining,
         rescue_saves = saves,
         rescue_opportunities = opportunities,
         rescue_save_rate = safe_rate(saves, opportunities),
@@ -1006,6 +1068,133 @@ function M.create_pulse(args)
             else
                 local fade = 1 - (self.elapsed - windup - active) / linger
                 draw_world_circle(COL_PALE_RED, self.xy, radius, 0.08 * fade, 0.25 * fade)
+            end
+        end,
+    }
+end
+
+local function sweep_base_center(obj)
+    if obj.anchor and not obj.anchor.destroyed then
+        return xy_of(obj.anchor)
+    end
+    return obj.center_xy
+end
+
+local function sweep_center_at(obj, elapsed)
+    local active_elapsed = math.max(0, math.min(obj.active_frames, elapsed - obj.windup_frames))
+    local active_pct = obj.active_frames > 0 and active_elapsed / obj.active_frames or 0
+    local offset = (active_pct - 0.5) * obj.travel
+    local normal_angle = obj.angle + math.pi / 2
+    local center = sweep_base_center(obj)
+    return {
+        center[1] + math.cos(normal_angle) * offset,
+        center[2] + math.sin(normal_angle) * offset,
+    }
+end
+
+local function draw_sweep_track(obj, color, alpha)
+    local start_center = sweep_center_at(obj, obj.windup_frames)
+    local end_center = sweep_center_at(obj, obj.windup_frames + obj.active_frames)
+    local a1, a2 = segment_endpoints(start_center, obj.angle, obj.length)
+    local b1, b2 = segment_endpoints(end_center, obj.angle, obj.length)
+    draw_world_line(color, a1, a2, 2, alpha * 0.55)
+    draw_world_line(color, b1, b2, 2, alpha * 0.55)
+    draw_world_link(color, a1, b1, 2, alpha * 0.32)
+    draw_world_link(color, a2, b2, 2, alpha * 0.32)
+end
+
+function M.create_sweep(args)
+    local windup = args.windup or 48
+    local active = args.active or 34
+    local linger = args.linger or 16
+    local width = args.width or 42
+    local length = args.length or 480
+    local travel = args.travel or 132
+    return GameObject.object_create {
+        map = args.map,
+        xy = copy_xy(args.center_xy or args.xy),
+        radius = 1,
+        solid = false,
+        depth = HAZARD_DEPTH,
+        elapsed = 0,
+        content_lab_sweep = true,
+        source = args.source,
+        center_xy = copy_xy(args.center_xy or args.xy),
+        anchor = args.anchor,
+        angle = args.angle or 0,
+        length = length,
+        travel = travel,
+        lane_radius = width / 2,
+        windup_frames = windup,
+        active_frames = active,
+        linger_frames = linger,
+        damage = args.damage or 3,
+        power = args.power or 24,
+        magic_percentage = args.magic_percentage or 1,
+        affects_escorts = args.affects_escorts,
+        redamage_cooldown = args.redamage_cooldown or 18,
+        hit_cooldowns = {},
+        on_step = function(self)
+            self.elapsed = self.elapsed + 1
+            local center = sweep_center_at(self, self.elapsed)
+            self.xy = center
+            if self.elapsed > windup and self.elapsed <= windup + active then
+                local from_xy, to_xy = segment_endpoints(center, self.angle, self.length)
+                damage_segment_overlapping_players(self, from_xy, to_xy, self.lane_radius)
+            elseif self.elapsed > windup + active + linger then
+                GameObject.destroy(self)
+            end
+        end,
+        on_draw = function(self)
+            local remaining = math.max(0, windup - self.elapsed)
+            local color = self.elapsed <= windup and COL_PALE_YELLOW
+                or self.elapsed <= windup + active and COL_PALE_RED
+                or COL_PALE_BLUE
+            local center = sweep_center_at(self, self.elapsed)
+            local from_xy, to_xy = segment_endpoints(center, self.angle, self.length)
+            if self.elapsed <= windup then
+                local progress = math.max(0, math.min(1, self.elapsed / math.max(1, windup)))
+                draw_sweep_track(self, COL_PALE_YELLOW, 0.22 + progress * 0.28)
+                draw_world_line(COL_PALE_YELLOW, from_xy, to_xy, math.max(2, self.lane_radius * 0.45), 0.18 + progress * 0.30)
+                draw_world_line(COL_WHITE, from_xy, to_xy, 2, 0.18 + progress * 0.22)
+                ProceduralEffects.draw_world_rune {
+                    xy = center,
+                    radius = math.max(26, self.lane_radius * 1.8),
+                    palette = "red",
+                    intensity = 0.40 + progress * 0.35,
+                    arcs = 2,
+                    spokes = 4,
+                    rotation_speed = 0.040,
+                    spoke_speed = -0.022,
+                    gradient_steps = 4,
+                }
+            elseif self.elapsed <= windup + active then
+                local active_pct = math.max(0, math.min(1, (self.elapsed - windup) / math.max(1, active)))
+                draw_sweep_track(self, COL_PALE_RED, 0.30)
+                draw_world_line(COL_PALE_RED, from_xy, to_xy, math.max(4, self.lane_radius * 1.35), 0.36)
+                draw_world_line(COL_PALE_YELLOW, from_xy, to_xy, math.max(3, self.lane_radius * 0.52), 0.52)
+                draw_world_circle(COL_PALE_RED, center, self.lane_radius * (1.45 + math.sin(self.elapsed * 0.5) * 0.06), 0.08, 0.68)
+                ProceduralEffects.draw_world_rune {
+                    xy = center,
+                    radius = math.max(34, self.lane_radius * 2.2),
+                    palette = "red",
+                    intensity = 0.70 + active_pct * 0.20,
+                    arcs = 3,
+                    spokes = 6,
+                    rotation_speed = 0.072,
+                    spoke_speed = -0.040,
+                    gradient_steps = 5,
+                }
+            else
+                local fade = 1 - (self.elapsed - windup - active) / math.max(1, linger)
+                draw_world_line(COL_PALE_BLUE, from_xy, to_xy, math.max(2, self.lane_radius * 0.50), 0.20 * fade)
+            end
+            local label_xy = Display.to_screen_xy({center[1], center[2] - self.lane_radius - 18})
+            local label = self.elapsed <= windup and ("SWEEP " .. format_frames(remaining))
+                or self.elapsed <= windup + active and "SWEEP"
+                or ""
+            if label ~= "" then
+                draw_text(color, Display.CENTER, label_xy, label)
             end
         end,
     }
@@ -1449,6 +1638,33 @@ local function spawn_player_pulses(director, package)
     end
 end
 
+local function spawn_sweep(director, package)
+    local sweep = package.sweep or {}
+    local intensity = director.intensity
+    local source = primary_monster(package.primary)
+    local anchor = sweep.anchor == "primary" and source or nil
+    local center = anchor and xy_of(anchor) or director.xy
+    local wave_index = director.sweep_wave_index or 0
+    director.sweep_wave_index = wave_index + 1
+    M.create_sweep {
+        map = director.map,
+        source = source,
+        anchor = anchor,
+        center_xy = center,
+        angle = (sweep.angle or 0) + wave_index * (sweep.angle_step or math.pi / 4),
+        length = sweep.length or 500,
+        width = sweep.width or 42,
+        travel = sweep.travel or 132,
+        windup = scale_frames(sweep.windup, 48, intensity),
+        active = scale_frames(sweep.active, 34, intensity),
+        linger = sweep.linger or 16,
+        damage = scale_damage(sweep.damage, 3, intensity),
+        power = scale_damage(sweep.power, 24, intensity),
+        affects_escorts = sweep.affects_escorts,
+        redamage_cooldown = sweep.redamage_cooldown or 18,
+    }
+end
+
 local function spawn_rescue_strike(director, package)
     local rescue = package.rescue or {}
     local target = rescue_target()
@@ -1568,6 +1784,30 @@ function active_pulses()
     return warning_count, active_count, warning_remaining, active_remaining
 end
 
+function active_sweeps()
+    local warning_count = 0
+    local active_count = 0
+    local warning_remaining
+    local active_remaining
+    for _, obj in ipairs(Map.objects_list()) do
+        if obj and not obj.destroyed and obj.content_lab_sweep then
+            local elapsed = obj.elapsed or 0
+            local windup = obj.windup_frames or 0
+            local active = obj.active_frames or 0
+            if elapsed <= windup then
+                warning_count = warning_count + 1
+                local remaining = math.max(0, windup - elapsed)
+                warning_remaining = math.min(warning_remaining or remaining, remaining)
+            elseif elapsed <= windup + active then
+                active_count = active_count + 1
+                local remaining = math.max(0, windup + active - elapsed)
+                active_remaining = math.min(active_remaining or remaining, remaining)
+            end
+        end
+    end
+    return warning_count, active_count, warning_remaining, active_remaining
+end
+
 function active_rescue_strikes()
     local count = 0
     local blocked = false
@@ -1642,6 +1882,13 @@ function package_pressure_state(director, package)
         add_active("aoe")
     elseif pulse_warning > 0 then
         add_warning("aoe")
+    end
+
+    local sweep_warning, sweep_active = active_sweeps()
+    if sweep_active > 0 then
+        add_active("sweep")
+    elseif sweep_warning > 0 then
+        add_warning("sweep")
     end
 
     if summon_count() > 0 then
@@ -1741,6 +1988,27 @@ function next_threat_state(director, package)
         }
     end
 
+    local sweep_warning, sweep_active, sweep_warning_remaining, sweep_active_remaining = active_sweeps()
+    if sweep_active > 0 then
+        return {
+            id = "sweep",
+            label = "SWEEP",
+            state = "active",
+            frames = sweep_active_remaining or 0,
+            pct = 1,
+            color = COL_PALE_RED,
+        }
+    elseif sweep_warning > 0 then
+        return {
+            id = "sweep",
+            label = "SWEEP",
+            state = "warn",
+            frames = sweep_warning_remaining or 0,
+            pct = 1,
+            color = COL_PALE_YELLOW,
+        }
+    end
+
     local orb_count, orb_remaining = active_orbs()
     if orb_count > 0 then
         return {
@@ -1773,6 +2041,7 @@ function next_threat_state(director, package)
     end
     add(upcoming_candidate(package, intensity, elapsed, "orbit", "ORBS", package.orbit, 300, 40))
     add(upcoming_candidate(package, intensity, elapsed, "pulse", "AOE", package.pulse, 150, 70))
+    add(upcoming_candidate(package, intensity, elapsed, "sweep", "SWEEP", package.sweep, 180, 52))
     add(upcoming_candidate(package, intensity, elapsed, "summon", "ADDS", package.summon, 360, 120))
     add(upcoming_candidate(package, intensity, elapsed, "rescue", "SAVE", package.rescue, 205, 54))
 
@@ -1786,7 +2055,10 @@ function next_threat_state(director, package)
         if (best.frames or 0) <= 45 then
             best.color = best.id == "pulse" and COL_PALE_RED or COL_PALE_YELLOW
         else
-            best.color = best.id == "orbit" and COL_PALE_BLUE or best.id == "rescue" and COL_PALE_GREEN or COL_LIGHT_GRAY
+            best.color = best.id == "orbit" and COL_PALE_BLUE
+                or best.id == "sweep" and COL_PALE_RED
+                or best.id == "rescue" and COL_PALE_GREEN
+                or COL_LIGHT_GRAY
         end
         return best
     end
@@ -1897,7 +2169,7 @@ end
 
 function M.add_director(game_map, package, intensity)
     package = package or {}
-    if not (package.orbit or package.pulse or package.summon or package.escort or package.rescue) then
+    if not (package.orbit or package.pulse or package.sweep or package.summon or package.escort or package.rescue) then
         return nil
     end
     intensity = normalize_intensity(intensity)
@@ -1953,6 +2225,14 @@ function M.add_director(game_map, package, intensity)
                 local offset = scale_offset(pulse.offset, 70, interval, self.intensity)
                 if self.elapsed % interval == offset then
                     spawn_player_pulses(self, self.package)
+                end
+            end
+            local sweep = self.package.sweep
+            if sweep then
+                local interval = scale_frames(sweep.interval, 180, self.intensity)
+                local offset = scale_offset(sweep.offset, 52, interval, self.intensity)
+                if self.elapsed % interval == offset then
+                    spawn_sweep(self, self.package)
                 end
             end
             local summon = self.package.summon

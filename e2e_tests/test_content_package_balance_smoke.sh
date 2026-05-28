@@ -3,7 +3,7 @@ set -e
 temp_dir=`mktemp -d`
 trap "{ rm -rf \"$temp_dir\"; }" EXIT
 
-./run.sh --headless engine.StartBalanceRun \
+env SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1 ./run.sh --headless engine.StartBalanceRun \
     --steps 360 \
     --runs 1 \
     --classes Rogue \
@@ -12,7 +12,7 @@ trap "{ rm -rf \"$temp_dir\"; }" EXIT
     --bot_profile human \
     --encounter executioner-rescue-package \
     --package_intensity high \
-    --package_components escort,orbit,pulse,rescue \
+    --package_components escort,orbit,pulse,sweep,rescue \
     --out="$temp_dir/balance_runs.csv" \
     --samples_out="$temp_dir/balance_samples.csv" \
     --spells_out="$temp_dir/balance_spells.csv" \
@@ -43,6 +43,7 @@ grep -q "package_rescue_save_rate" "$temp_dir/balance_runs.csv"
 grep -q "package_rescue_perfect_rate" "$temp_dir/balance_runs.csv"
 grep -q "package_orb_active_count" "$temp_dir/balance_samples.csv"
 grep -q "package_pulse_active_count" "$temp_dir/balance_samples.csv"
+grep -q "package_sweep_active_count" "$temp_dir/balance_samples.csv"
 grep -q "package_rescue_active_count" "$temp_dir/balance_samples.csv"
 grep -q "package_rescue_active_perfect" "$temp_dir/balance_samples.csv"
 grep -q "package_rescue_next_frames" "$temp_dir/balance_runs.csv"
@@ -51,8 +52,9 @@ grep -q "avg_package_pressure_overlap_rate" "$temp_dir/balance_classes.csv"
 grep -q "avg_package_rescue_pull_uptime_rate" "$temp_dir/balance_classes.csv"
 grep -q "avg_package_rescue_perfect_rate" "$temp_dir/balance_classes.csv"
 grep -q "avg_package_rescue_save_rate" "$temp_dir/balance_classes.csv"
+grep -q "avg_package_sweep_active_count" "$temp_dir/balance_classes.csv"
 grep -q "package_pressure" "$temp_dir/balance_report.csv"
 grep -q "drill_scorecard" "$temp_dir/balance_report.csv"
 grep -q "avg_package_rescue_pull_uptime_rate" "$temp_dir/balance_report.csv"
 grep -q "executioner-rescue-package" "$temp_dir/balance_runs.json"
-grep -q "escort,orbit,pulse,rescue" "$temp_dir/balance_runs.json"
+grep -q "escort,orbit,pulse,sweep,rescue" "$temp_dir/balance_runs.json"

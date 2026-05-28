@@ -61,7 +61,7 @@ run_balance "$headless_exe" rescue \
     --bot_profile human \
     --encounter executioner-rescue-package \
     --package_intensity high \
-    --package_components escort,orbit,pulse,rescue
+    --package_components escort,orbit,pulse,sweep,rescue
 
 test -s "$temp_dir/dicebinder_runs.csv"
 test -s "$temp_dir/rescue_runs.csv"
@@ -71,6 +71,8 @@ grep -q "package_pressure_max_count" "$temp_dir/dicebinder_runs.csv"
 grep -q "executioner-rescue-package" "$temp_dir/rescue_runs.json"
 grep -q "package_rescue_save_rate" "$temp_dir/rescue_runs.csv"
 grep -q "package_rescue_pull_uptime_rate" "$temp_dir/rescue_runs.csv"
+grep -q "package_sweep_active_count" "$temp_dir/rescue_runs.csv"
+grep -q "sweep" "$temp_dir/rescue_runs.json"
 
 if [[ "${LANARTS_DRAW_SMOKE:-0}" != "0" ]]; then
     run_balance "$native_exe" dicebinder_draw \
@@ -95,7 +97,7 @@ if [[ "${LANARTS_DRAW_SMOKE:-0}" != "0" ]]; then
         --bot_profile human \
         --encounter executioner-rescue-package \
         --package_intensity high \
-        --package_components escort,orbit,pulse,rescue \
+        --package_components escort,orbit,pulse,sweep,rescue \
         --draw_interval 60
 fi
 

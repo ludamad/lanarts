@@ -118,6 +118,8 @@ local function run_content_api_smoke()
     local has_rescue_perfect_window = false
     local has_rescue_summon = false
     local has_rescue_summon_windup = false
+    local has_rescue_sweep = false
+    local has_rescue_sweep_window = false
     for _, rhythm in ipairs(summary.rhythms or {}) do
         if rhythm.id == "rescue" then
             has_rescue_rhythm = true
@@ -126,15 +128,21 @@ local function run_content_api_smoke()
         elseif rhythm.id == "summon" then
             has_rescue_summon = true
             has_rescue_summon_windup = (rhythm.windup or 0) > 0
+        elseif rhythm.id == "sweep" then
+            has_rescue_sweep = true
+            has_rescue_sweep_window = (rhythm.windup or 0) > 0 and (rhythm.active or 0) > 0
         end
     end
     expect(has_rescue_rhythm, "summary should expose rescue rhythm metadata")
     expect(has_rescue_perfect_window, "summary should expose rescue perfect timing window")
     expect(has_rescue_summon, "Gragh rescue should expose add rhythm metadata")
     expect(has_rescue_summon_windup, "Gragh rescue should expose add portal windup")
+    expect(has_rescue_sweep, "Gragh rescue should expose sweep rhythm metadata")
+    expect(has_rescue_sweep_window, "Gragh rescue should expose sweep warning and active windows")
     expect(summary.packageSummary and summary.packageSummary.hasRescue, "summary should expose package rescue summary")
     expect(summary.packageSummary and (summary.packageSummary.rescuePerfectWindow or 0) > 0, "summary should expose package perfect-save summary")
     expect(summary.packageSummary and summary.packageSummary.hasSummons, "summary should expose package summon summary")
+    expect(summary.packageSummary and summary.packageSummary.hasSweep, "summary should expose package sweep summary")
     expect(summary.packageSummary and summary.packageSummary.hitsEscorts, "summary should expose ally-risk package summary")
     expect(summary.packageSummary and (summary.packageSummary.predictedPeakStack or 0) >= 2, "summary should expose predicted pressure stack")
     expect(summary.packageSummary and tostring(summary.packageSummary.predictedPressureLabel or "") ~= "", "summary should classify predicted pressure")
@@ -161,8 +169,10 @@ local function run_content_api_smoke()
     local has_fight_regen_metric = false
     local has_taunt_uptime_metric = false
     local has_perfect_metric = false
+    local has_sweep_metric = false
     local has_rescue_micro = false
     local has_necro_regen_micro = false
+    local has_sweep_micro = false
     local has_effective_window = false
     for _, threat in ipairs(fight_setup.threats or {}) do
         if threat.id == "rescue" and (threat.pullFrames or 0) > 0 then
@@ -181,6 +191,8 @@ local function run_content_api_smoke()
             has_taunt_uptime_metric = true
         elseif metric.key == "avg_package_rescue_perfect_rate" then
             has_perfect_metric = true
+        elseif metric.key == "avg_package_sweep_active_count" then
+            has_sweep_metric = true
         end
     end
     for _, row in ipairs(fight_setup.microPlan or {}) do
@@ -189,6 +201,8 @@ local function run_content_api_smoke()
             has_necro_regen_micro = tostring(row.action or ""):find("regen") ~= nil
             has_effective_window = (row.effectiveWindowFrames or 0) > 0 and (row.reactionTaxFrames or 0) > 0
             expect((row.perfectWindowFrames or 0) > 0, "rescue micro plan should expose perfect-save timing")
+        elseif row.id == "sweep" then
+            has_sweep_micro = tostring(row.action or ""):find("lane") ~= nil
         end
     end
     expect(has_fight_rescue_window, "fight setup should expose rescue timing windows")
@@ -198,8 +212,10 @@ local function run_content_api_smoke()
     expect(has_fight_regen_metric, "fight setup should expose necromancer regen telemetry")
     expect(has_taunt_uptime_metric, "fight setup should expose taunt uptime telemetry")
     expect(has_perfect_metric, "fight setup should expose perfect-save telemetry")
+    expect(has_sweep_metric, "fight setup should expose sweep telemetry")
     expect(has_rescue_micro, "fight setup should explain the rescue body-block action")
     expect(has_necro_regen_micro, "fight setup should preserve necromancer regen-specific micro")
+    expect(has_sweep_micro, "fight setup should explain sweep lane micro")
     expect(has_effective_window, "fight setup should include human-skill effective windows")
     expect(fight_setup.actionGuide and #(fight_setup.actionGuide.actions or {}) >= 3, "fight setup should expose action guide rows")
 

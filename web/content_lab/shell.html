@@ -1035,10 +1035,11 @@
             <option value="">Full package</option>
             <option value="orbit">Orbs only</option>
             <option value="pulse">AOE only</option>
+            <option value="sweep">Sweeps only</option>
             <option value="summon">Adds only</option>
             <option value="escort,rescue">Rescue lane</option>
-            <option value="escort,orbit,pulse,rescue">No adds</option>
-            <option value="orbit,pulse,summon">No rescue</option>
+            <option value="escort,orbit,pulse,sweep,rescue">No adds</option>
+            <option value="orbit,pulse,sweep,summon">No rescue</option>
           </select>
         </div>
         <div class="field">
@@ -1175,12 +1176,12 @@
         {id: 'giant-chicken-duel', label: 'Giant Chicken package', kind: 'micro package', phase: 'early micro', suggestedLevel: 2, suggestedPreset: 'none', features: ['dash pressure', 'rotating feathers', 'short AOE windows', 'Sheep adds']},
         {id: 'mummoner-duel', label: 'Mummoner package', kind: 'summon package', phase: 'summon pressure', suggestedLevel: 3, suggestedPreset: 'none', features: ['native Mummy summons', 'bone orbit', 'targeted AOE rhythm', 'Flying Skull adds']},
         {id: 'purple-dragon-package', label: 'Purple Dragon package', kind: 'boss package', phase: 'late micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['rotating orbs', 'targeted AOE rhythm', 'Fire Bat adds']},
-        {id: 'red-dragon-duel', label: 'Red Dragon package', kind: 'boss package', phase: 'late micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['projectile pressure', 'rotating embers', 'targeted AOE rhythm', 'Fire Bat adds']},
-        {id: 'gragh-duel', label: 'Gragh package', kind: 'boss package', phase: 'late micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['melee pursuit', 'rotating orbs', 'short AOE windows', 'Hound adds']},
-        {id: 'gragh-rescue-package', label: 'Gragh rescue package', kind: 'rescue package', phase: 'late multiplayer', suggestedLevel: 5, suggestedPreset: 'late', features: ['protect ally', 'body-block rescue', 'pull/taunt window', 'rotating orbs', 'short AOE windows', 'Hound adds']},
+        {id: 'red-dragon-duel', label: 'Red Dragon package', kind: 'boss package', phase: 'late micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['projectile pressure', 'rotating embers', 'crossing sweeps', 'targeted AOE rhythm', 'Fire Bat adds']},
+        {id: 'gragh-duel', label: 'Gragh package', kind: 'boss package', phase: 'late micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['melee pursuit', 'rotating orbs', 'crossing sweeps', 'short AOE windows', 'Hound adds']},
+        {id: 'gragh-rescue-package', label: 'Gragh rescue package', kind: 'rescue package', phase: 'late multiplayer', suggestedLevel: 5, suggestedPreset: 'late', features: ['protect ally', 'body-block rescue', 'pull/taunt window', 'rotating orbs', 'crossing sweeps', 'short AOE windows', 'Hound adds']},
         {id: 'executioner-duel', label: 'Executioner baseline duel', kind: 'baseline duel', phase: 'late melee', suggestedLevel: 5, suggestedPreset: 'late', features: ['baseline', 'no package rhythms']},
-        {id: 'executioner-blade-package', label: 'Executioner blade package', kind: 'melee package', phase: 'late melee micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['melee pursuit', 'rotating blades', 'Hound adds', 'short AOE windows']},
-        {id: 'executioner-rescue-package', label: 'Executioner rescue package', kind: 'rescue package', phase: 'late multiplayer', suggestedLevel: 5, suggestedPreset: 'late', features: ['protect ally', 'body-block rescue', 'pull/taunt window', 'rotating blades', 'Hound adds', 'short AOE windows']},
+        {id: 'executioner-blade-package', label: 'Executioner blade package', kind: 'melee package', phase: 'late melee micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['melee pursuit', 'rotating blades', 'crossing sweeps', 'Hound adds', 'short AOE windows']},
+        {id: 'executioner-rescue-package', label: 'Executioner rescue package', kind: 'rescue package', phase: 'late multiplayer', suggestedLevel: 5, suggestedPreset: 'late', features: ['protect ally', 'body-block rescue', 'pull/taunt window', 'rotating blades', 'crossing sweeps', 'Hound adds', 'short AOE windows']},
         {id: 'hell-pressure-pair', label: 'Hell pressure pair', kind: 'enemy mix package', phase: 'late enemy mix', suggestedLevel: 5, suggestedPreset: 'late', features: ['support pressure', 'melee bodyguard', 'ember orbit', 'targeted pulse', 'Imp adds']},
         {id: 'centaur-volley-package', label: 'Centaur Hunter volley package', kind: 'ranged package', phase: 'late ranged micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['ranged pursuit', 'rotating arrow lanes', 'volley AOE rhythm', 'Hound adds']},
         {id: 'crypt-keeper-aura-package', label: 'Crypt Keeper aura package', kind: 'boss package', phase: 'late black micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['black aura pressure', 'bone orbit', 'pain nova rhythm', 'Skeleton adds']},
@@ -1227,10 +1228,11 @@
         {id: '', label: 'Full package', components: ''},
         {id: 'orbit', label: 'Orbs only', components: 'orbit'},
         {id: 'pulse', label: 'AOE only', components: 'pulse'},
+        {id: 'sweep', label: 'Sweeps only', components: 'sweep'},
         {id: 'summon', label: 'Adds only', components: 'summon'},
         {id: 'escort,rescue', label: 'Rescue lane', components: 'escort,rescue'},
-        {id: 'escort,orbit,pulse,rescue', label: 'No adds', components: 'escort,orbit,pulse,rescue'},
-        {id: 'orbit,pulse,summon', label: 'No rescue', components: 'orbit,pulse,summon'},
+        {id: 'escort,orbit,pulse,sweep,rescue', label: 'No adds', components: 'escort,orbit,pulse,sweep,rescue'},
+        {id: 'orbit,pulse,sweep,summon', label: 'No rescue', components: 'orbit,pulse,sweep,summon'},
       ];
 
       let microDrills = [
@@ -1988,6 +1990,9 @@
           }
           if (summary.packageSummary.hasSummons) {
             addChip(packageInfo, `adds cap ${summary.packageSummary.summonCap || 1}`);
+          }
+          if (summary.packageSummary.hasSweep) {
+            addChip(packageInfo, 'sweep lanes');
           }
           if (summary.packageSummary.hitsEscorts) {
             addChip(packageInfo, 'ally risk');
@@ -3013,7 +3018,7 @@
           return pkg || {};
         }
         const result = {primary: pkg.primary};
-        ['escort', 'orbit', 'pulse', 'summon', 'rescue'].forEach((key) => {
+        ['escort', 'orbit', 'pulse', 'sweep', 'summon', 'rescue'].forEach((key) => {
           if (selected.has(key) && pkg[key]) {
             result[key] = pkg[key];
           }
@@ -3048,6 +3053,20 @@
             activeStart: windup,
             active,
             meta: `player-targeted${pkg.pulse.affects_escorts ? ' plus ally' : ''}, ${windup}f warning, ${active}f active, damage ${scaledDamage(pkg.pulse.damage, 4, intensity).toFixed(1)}`,
+          });
+        }
+        if (pkg.sweep) {
+          const windup = scaledFrames(pkg.sweep.windup, 48, intensity);
+          const active = scaledFrames(pkg.sweep.active, 34, intensity);
+          rows.push({
+            id: 'sweep',
+            label: 'Sweep',
+            offset: scaledFrames(pkg.sweep.offset, 52, intensity),
+            interval: scaledFrames(pkg.sweep.interval, 180, intensity),
+            duration: windup + active,
+            activeStart: windup,
+            active,
+            meta: `crossing lane${pkg.sweep.affects_escorts ? ' plus ally' : ''}, ${windup}f warning, ${active}f active, damage ${scaledDamage(pkg.sweep.damage, 3, intensity).toFixed(1)}`,
           });
         }
         if (pkg.escort) {
@@ -3102,6 +3121,9 @@
         }
         if (row.id === 'pulse') {
           return `player-targeted${row.affectsEscorts ? ' plus ally' : ''}, ${row.windup || 0}f warning, ${row.active || 0}f active, damage ${Number(row.damage || 0).toFixed(1)}`;
+        }
+        if (row.id === 'sweep') {
+          return `crossing lane${row.affectsEscorts ? ' plus ally' : ''}, ${row.windup || 0}f warning, ${row.active || 0}f active, damage ${Number(row.damage || 0).toFixed(1)}`;
         }
         if (row.id === 'escort') {
           return `protect ${row.monster || 'ally'}, ${row.hp || '?'} hp`;

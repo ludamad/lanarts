@@ -113,9 +113,9 @@ Balance simulations:
     drill_scorecard rows for that drill's pass/fail targets, including rescue
     saves, perfect saves, taunt reliance, add cleanup, stack overlap, spacing,
     and regen correction where relevant.
-    Orb, summon, and AOE package rows likewise expose active/warning counts and
+    Orb, sweep, summon, and AOE package rows likewise expose active/warning counts and
     remaining frames so timeline samples can be matched against the in-game HUD.
-    Use --package_components orbit,pulse,summon,escort,rescue to isolate
+    Use --package_components orbit,pulse,sweep,summon,escort,rescue to isolate
     package parts while keeping the same encounter arena, monsters, and
     pressure preset. A rescue component automatically keeps its escort target.
     Content API fight setup rows also expose a per-rhythm micro plan with

@@ -99,11 +99,14 @@ local COMPONENT_ALIASES = {
     aoe = "pulse",
     add = "summon",
     adds = "summon",
+    lane = "sweep",
+    lanes = "sweep",
     orbs = "orbit",
     rescue_lane = "rescue",
+    sweeps = "sweep",
 }
 
-local COMPONENT_ORDER = {"escort", "orbit", "pulse", "summon", "rescue"}
+local COMPONENT_ORDER = {"escort", "orbit", "pulse", "sweep", "summon", "rescue"}
 
 local function normalize_package_components(value)
     local selected = {}
@@ -1037,6 +1040,25 @@ local function encounter_rhythms(encounter, intensity)
             radius = package.pulse.radius,
             damage = scaled_damage(package.pulse.damage, 4, intensity),
             affectsEscorts = package.pulse.affects_escorts == true,
+        }
+    end
+    if package.sweep then
+        local windup = scaled_frames(package.sweep.windup, 48, intensity)
+        local active = scaled_frames(package.sweep.active, 34, intensity)
+        rows[#rows + 1] = {
+            id = "sweep",
+            label = "Sweep",
+            offset = scaled_frames(package.sweep.offset, 52, intensity),
+            interval = scaled_frames(package.sweep.interval, 180, intensity),
+            duration = windup + active,
+            activeStart = windup,
+            windup = windup,
+            active = active,
+            width = package.sweep.width,
+            length = package.sweep.length,
+            travel = package.sweep.travel,
+            damage = scaled_damage(package.sweep.damage, 3, intensity),
+            affectsEscorts = package.sweep.affects_escorts == true,
         }
     end
     if package.escort then
@@ -2126,6 +2148,7 @@ local function package_summary_from_rhythms(rhythms)
     local rescue_pull_frames
     local has_summons = false
     local summon_cap
+    local has_sweep = false
     local hits_escorts = false
     for _, rhythm in ipairs(rhythms or {}) do
         rhythm_ids[#rhythm_ids + 1] = rhythm.id
@@ -2145,6 +2168,8 @@ local function package_summary_from_rhythms(rhythms)
         elseif rhythm.id == "summon" then
             has_summons = true
             summon_cap = rhythm.maxAlive
+        elseif rhythm.id == "sweep" then
+            has_sweep = true
         end
         if rhythm.affectsEscorts then
             hits_escorts = true
@@ -2161,6 +2186,7 @@ local function package_summary_from_rhythms(rhythms)
         rescuePullFrames = rescue_pull_frames,
         hasSummons = has_summons,
         summonCap = summon_cap,
+        hasSweep = has_sweep,
         hitsEscorts = hits_escorts,
         predictedPeakStack = pressure.peakStack,
         predictedOverlapFrames = pressure.overlapFrames,
@@ -2193,6 +2219,9 @@ local function threat_target_for(rhythm)
     if rhythm.id == "summon" then
         return "arena"
     end
+    if rhythm.id == "sweep" then
+        return rhythm.affectsEscorts and "route + ally" or "route"
+    end
     if rhythm.affectsEscorts then
         return "player + ally"
     end
@@ -2204,6 +2233,8 @@ local function threat_read_for(rhythm)
         return "orbit pathing"
     elseif rhythm.id == "pulse" then
         return "windup escape"
+    elseif rhythm.id == "sweep" then
+        return "crossing lane"
     elseif rhythm.id == "summon" then
         return "add cleanup"
     elseif rhythm.id == "escort" then
@@ -2294,6 +2325,23 @@ local function micro_action_for(rhythm, control_model)
             action = "Keep casting until windup starts, sidestep out, and preserve roughly " .. tostring(target_distance) .. "px spacing.",
             posture = "caster sidestep",
             failure = "AOE never collapses keep-away uptime",
+            telemetry = {"avg_ranged_keepaway_frames", "avg_ranged_close_enemy_frames"},
+        }
+    elseif rhythm.id == "sweep" then
+        if close_class then
+            return {
+                priority = 3,
+                action = "Hold contact only until the lane warns, then cross after the sweep passes or commit through with a mobility button.",
+                posture = "lane crossing",
+                failure = "melee ignores the sweep and keeps perfect boss uptime",
+                telemetry = {"avg_min_hp_pct", "combat_frame_rate"},
+            }
+        end
+        return {
+            priority = 3,
+            action = "Treat the sweep as a hard boundary, preserve casting distance on the safe side, and cross only during recovery.",
+            posture = "ranged lane reset",
+            failure = "lane pressure never forces a lost cast angle or distance reset",
             telemetry = {"avg_ranged_keepaway_frames", "avg_ranged_close_enemy_frames"},
         }
     elseif rhythm.id == "orbit" then
@@ -2781,6 +2829,10 @@ telemetry_watch_for = function(config, package_summary)
         append_metric(rows, "avg_package_frames", "Package time", "package clear pacing")
         append_metric(rows, "avg_package_pressure_max_count", "Peak stack", "simultaneous package demands")
         append_metric(rows, "avg_package_pressure_overlap_rate", "Overlap rate", "share of frames with stacked pressure")
+        if package_summary.hasSweep then
+            append_metric(rows, "avg_package_sweep_active_count", "Sweep active", "crossing-lane pressure uptime")
+            append_metric(rows, "avg_package_sweep_warning_count", "Sweep warns", "crossing-lane read windows")
+        end
         if package_summary.hasSummons then
             append_metric(rows, "avg_max_visible_enemies", "Enemy cap", "add saturation")
             append_metric(rows, "kills_per_1000_combat_frames", "Kill tempo", "add cleanup pace")

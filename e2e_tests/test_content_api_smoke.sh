@@ -13,4 +13,6 @@ grep -q "actionGuide" web/content_lab/shell.html
 grep -q "microDrill" web/content_lab/shell.html
 grep -q "Drill Scorecard" web/content_lab/shell.html
 grep -q "lanarts_content_presentation_json" web/content_lab/shell.html
-./run.sh --headless engine.StartContentApiSmoke "$@"
+grep -q "Sweeps only" web/content_lab/shell.html
+grep -q "avg_package_sweep_active_count" runtime/engine/StartBalanceRun.lua
+env SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1 ./run.sh --headless engine.StartContentApiSmoke "$@"

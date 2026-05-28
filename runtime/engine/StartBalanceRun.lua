@@ -638,6 +638,10 @@ local function package_state_fields(player)
             package_pulse_warning_remaining = "",
             package_pulse_active_count = "",
             package_pulse_active_remaining = "",
+            package_sweep_warning_count = "",
+            package_sweep_warning_remaining = "",
+            package_sweep_active_count = "",
+            package_sweep_active_remaining = "",
             package_rescue_saves = "",
             package_rescue_opportunities = "",
             package_rescue_save_rate = "",
@@ -702,6 +706,10 @@ local function package_state_fields(player)
         package_pulse_warning_remaining = state.pulse_warning_remaining or "",
         package_pulse_active_count = state.pulse_active_count or 0,
         package_pulse_active_remaining = state.pulse_active_remaining or "",
+        package_sweep_warning_count = state.sweep_warning_count or 0,
+        package_sweep_warning_remaining = state.sweep_warning_remaining or "",
+        package_sweep_active_count = state.sweep_active_count or 0,
+        package_sweep_active_remaining = state.sweep_active_remaining or "",
         package_rescue_saves = state.rescue_saves or 0,
         package_rescue_opportunities = state.rescue_opportunities or ((state.rescue_saves or 0) + (state.rescue_misses or 0)),
         package_rescue_save_rate = format_rate(state.rescue_save_rate or 0),
@@ -1023,6 +1031,7 @@ local SUMMARY_METRICS = {
     "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
     "package_pressure_active_count", "package_pressure_warning_count", "package_pressure_total_count",
     "package_pressure_max_count", "package_pressure_overlap_frames", "package_pressure_overlap_rate",
+    "package_sweep_warning_count", "package_sweep_active_count",
 }
 
 local function add_summary_metric(aggregate, row, key)
@@ -2407,7 +2416,7 @@ local function run_balance(raw_args)
     parser:option("--encounter", "Optional content-lab encounter id to start each run in an arena.", "")
     parser:option("--monsters", "Comma-separated monster names to start each run in a content-lab arena.", "")
     parser:option("--package_intensity", "Content-lab package pressure preset for arena encounters.", "standard")
-    parser:option("--package_components", "Optional comma-separated package components: orbit,pulse,summon,escort,rescue.", "")
+    parser:option("--package_components", "Optional comma-separated package components: orbit,pulse,sweep,summon,escort,rescue.", "")
     parser:option("--loadout_preset", "Equipment preset for each class: none or late.", "none")
     parser:option("--loadout", "Comma-separated item specs to add to every run, using Item or Item*COUNT.", "")
     parser:option("--loadout_label", "Optional label for this loadout in outputs.", "")
@@ -2504,6 +2513,8 @@ local function run_balance(raw_args)
             "package_orb_active_count", "package_orb_active_remaining",
             "package_pulse_warning_count", "package_pulse_warning_remaining",
             "package_pulse_active_count", "package_pulse_active_remaining",
+            "package_sweep_warning_count", "package_sweep_warning_remaining",
+            "package_sweep_active_count", "package_sweep_active_remaining",
             "package_rescue_opportunities", "package_rescue_save_rate",
             "package_rescue_clutch_saves", "package_rescue_clutch_rate",
             "package_rescue_perfect_saves", "package_rescue_perfect_rate",
@@ -2555,6 +2566,8 @@ local function run_balance(raw_args)
             "package_orb_active_count", "package_orb_active_remaining",
             "package_pulse_warning_count", "package_pulse_warning_remaining",
             "package_pulse_active_count", "package_pulse_active_remaining",
+            "package_sweep_warning_count", "package_sweep_warning_remaining",
+            "package_sweep_active_count", "package_sweep_active_remaining",
             "package_rescue_opportunities", "package_rescue_save_rate",
             "package_rescue_clutch_saves", "package_rescue_clutch_rate",
             "package_rescue_perfect_saves", "package_rescue_perfect_rate",
@@ -2627,6 +2640,7 @@ local function run_balance(raw_args)
             "avg_package_rescue_pull_total_frames", "avg_package_rescue_pull_uptime_rate",
             "avg_package_rescue_misses",
             "avg_package_pressure_max_count", "avg_package_pressure_overlap_rate",
+            "avg_package_sweep_warning_count", "avg_package_sweep_active_count",
         })
         write_csv(args.spell_stats_out, spell_stat_rows, {
             "class", "start_level", "loadout", "bot_profile", "spell", "class_runs", "runs_using", "use_rate",

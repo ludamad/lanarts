@@ -27,11 +27,14 @@ local COMPONENT_ALIASES = {
     aoe = "pulse",
     add = "summon",
     adds = "summon",
+    lane = "sweep",
+    lanes = "sweep",
     orbs = "orbit",
     rescue_lane = "rescue",
+    sweeps = "sweep",
 }
 
-local COMPONENT_ORDER = {"escort", "orbit", "pulse", "summon", "rescue"}
+local COMPONENT_ORDER = {"escort", "orbit", "pulse", "sweep", "summon", "rescue"}
 
 local function package_component_set(value)
     local selected = {}
