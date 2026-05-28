@@ -418,6 +418,7 @@ local active_pulses
 local active_rescue_strikes
 local rescue_window_state
 local next_threat_state
+local package_pressure_state
 
 local function draw_package_hud(director)
     local package = director.package or {}
@@ -425,7 +426,7 @@ local function draw_package_hud(director)
     local row_count = 1
     local has_threat_rows = package.orbit or package.pulse or package.summon or package.rescue
     if has_threat_rows then
-        row_count = row_count + 1
+        row_count = row_count + 2
     end
     if package.orbit then
         row_count = row_count + 1
@@ -459,6 +460,15 @@ local function draw_package_hud(director)
             and ((threat.state and threat.state ~= "next" and (threat.label .. " " .. threat.state .. " ") or (threat.label .. " ")) .. format_frames(threat.frames or 0))
             or "none"
         draw_hud_row(y, "NEXT", value, threat.color or COL_LIGHT_GRAY, threat.pct or 0)
+        y = y + HUD_ROW_H
+
+        local pressure = package_pressure_state(director, package)
+        local peak = math.max(director.pressure_max_count or 0, pressure.total_count or 0)
+        local stack_value = tostring(pressure.total_count or 0) .. " now / " .. tostring(peak) .. " peak"
+        local stack_color = (pressure.total_count or 0) >= 3 and COL_PALE_RED
+            or (pressure.total_count or 0) >= 2 and COL_PALE_YELLOW
+            or COL_LIGHT_GRAY
+        draw_hud_row(y, "STACK", stack_value, stack_color, math.min(1, (pressure.total_count or 0) / 4))
         y = y + HUD_ROW_H
     end
     if package.orbit then
@@ -629,6 +639,7 @@ local function package_result(director, outcome)
     local pull_rate = safe_rate(pulls, saves)
     local pull_total_frames = director.rescue_pull_total_frames or 0
     local pull_uptime_rate = safe_rate(pull_total_frames, math.max(1, frames))
+    local pressure = package_pressure_state(director, director.package or {})
     local best = director.rescue_best_margin
     local escort_text = count > 0 and string.format("ally %d/%d", math.ceil(hp), math.ceil(max_hp)) or "ally down"
     local rescue_text = (saves > 0 or misses > 0)
@@ -664,6 +675,13 @@ local function package_result(director, outcome)
         rescue_best_margin = best,
         rescue_last_margin = director.rescue_last_margin,
         rescue_last_pull_frames = director.rescue_last_pull_frames,
+        pressure_active_count = pressure.active_count or 0,
+        pressure_warning_count = pressure.warning_count or 0,
+        pressure_total_count = pressure.total_count or 0,
+        pressure_max_count = math.max(director.pressure_max_count or 0, pressure.total_count or 0),
+        pressure_overlap_frames = director.pressure_overlap_frames or 0,
+        pressure_overlap_rate = safe_rate(director.pressure_overlap_frames or 0, math.max(1, frames)),
+        pressure_labels = pressure.labels or "",
     }
 end
 
@@ -683,6 +701,7 @@ local function package_state_from_director(director)
     local pulse_warning_count, pulse_active_count, pulse_warning_remaining, pulse_active_remaining = active_pulses()
     local aggro = aggro_state(director.package or {})
     local next_threat = next_threat_state(director, director.package or {})
+    local pressure = package_pressure_state(director, director.package or {})
     local rescue_state
     if director.package and director.package.rescue then
         rescue_state = rescue_window_state(director, director.package.rescue)
@@ -733,6 +752,13 @@ local function package_state_from_director(director)
         rescue_active_late = rescue_state and rescue_state.late or false,
         rescue_pull_active_frames = director.rescue_pull_active_frames or 0,
         rescue_pull_target = director.rescue_pull_target,
+        pressure_active_count = pressure.active_count or 0,
+        pressure_warning_count = pressure.warning_count or 0,
+        pressure_total_count = pressure.total_count or 0,
+        pressure_max_count = math.max(director.pressure_max_count or 0, pressure.total_count or 0),
+        pressure_overlap_frames = director.pressure_overlap_frames or 0,
+        pressure_overlap_rate = safe_rate(director.pressure_overlap_frames or 0, math.max(1, director.elapsed or 0)),
+        pressure_labels = pressure.labels or "",
     }
 end
 
@@ -1465,6 +1491,61 @@ function rescue_window_state(director, rescue)
     }
 end
 
+function package_pressure_state(director, package)
+    director = director or {}
+    package = package or {}
+    local active_count = 0
+    local warning_count = 0
+    local labels = {}
+
+    local function add_active(label)
+        active_count = active_count + 1
+        labels[#labels + 1] = label
+    end
+
+    local function add_warning(label)
+        warning_count = warning_count + 1
+        labels[#labels + 1] = label
+    end
+
+    local orb_count = active_orbs()
+    if orb_count > 0 then
+        add_active("orbs")
+    end
+
+    local pulse_warning, pulse_active = active_pulses()
+    if pulse_active > 0 then
+        add_active("aoe")
+    elseif pulse_warning > 0 then
+        add_warning("aoe")
+    end
+
+    if summon_count() > 0 then
+        add_active("adds")
+    end
+    local summon_warning = active_summon_portals()
+    if summon_warning > 0 then
+        add_warning("portal")
+    end
+
+    local rescue_active = package.rescue and active_rescue_strikes() or 0
+    if rescue_active > 0 then
+        add_active("rescue")
+    end
+
+    if (director.rescue_pull_active_frames or 0) > 0 then
+        add_active("pull")
+    end
+
+    local total_count = active_count + warning_count
+    return {
+        active_count = active_count,
+        warning_count = warning_count,
+        total_count = total_count,
+        labels = table.concat(labels, "+"),
+    }
+end
+
 local function upcoming_candidate(package, intensity, elapsed, id, label, entry, fallback_interval, fallback_offset)
     if not entry then
         return nil
@@ -1706,6 +1787,8 @@ function M.add_director(game_map, package, intensity)
         rescue_pulls = 0,
         rescue_pull_active_frames = 0,
         rescue_pull_total_frames = 0,
+        pressure_max_count = 0,
+        pressure_overlap_frames = 0,
         escort_required = package.escort ~= nil,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
@@ -1755,6 +1838,11 @@ function M.add_director(game_map, package, intensity)
                 if self.elapsed % interval == offset then
                     spawn_rescue_strike(self, self.package)
                 end
+            end
+            local pressure = package_pressure_state(self, self.package)
+            self.pressure_max_count = math.max(self.pressure_max_count or 0, pressure.total_count or 0)
+            if (pressure.total_count or 0) >= 2 then
+                self.pressure_overlap_frames = (self.pressure_overlap_frames or 0) + 1
             end
         end,
         on_draw = function(self)

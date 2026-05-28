@@ -1815,6 +1815,8 @@ local function telemetry_watch_for(config, package_summary)
 
     if package_summary then
         append_metric(rows, "avg_package_frames", "Package time", "package clear pacing")
+        append_metric(rows, "avg_package_pressure_max_count", "Peak stack", "simultaneous package demands")
+        append_metric(rows, "avg_package_pressure_overlap_rate", "Overlap rate", "share of frames with stacked pressure")
         if package_summary.hasSummons then
             append_metric(rows, "avg_max_visible_enemies", "Enemy cap", "add saturation")
             append_metric(rows, "kills_per_1000_combat_frames", "Kill tempo", "add cleanup pace")

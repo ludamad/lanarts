@@ -81,6 +81,9 @@ Balance simulations:
     primary target HP, current package aggro target, the current/next package
     threat, and live rescue-window fields such as next strike, active count,
     blocked/late state, and active pull target for HUD and replay checks.
+    Package pressure rows track active/warning component stacks, peak stack,
+    and overlap rate, which helps distinguish true full-package micro from
+    isolated single-beat pressure.
     Rescue package rows also track pull/taunt total frames and uptime rate, so
     clears can be flagged when forced target control is carrying the fight.
     Orb, summon, and AOE package rows likewise expose active/warning counts and
