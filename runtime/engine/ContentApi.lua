@@ -283,6 +283,40 @@ local function class_build_for(class_name)
     return Catalog.class_builds[class_name or ""] or {}
 end
 
+local STAT_ROWS = {
+    {"hp", "HP"},
+    {"mp", "MP"},
+    {"strength", "STR"},
+    {"defence", "DEF"},
+    {"magic", "MAG"},
+    {"willpower", "WIL"},
+}
+
+local function class_stats_for_level(class_name, level)
+    local class_build = class_build_for(class_name)
+    local base = class_build.base or {}
+    local per_level = class_build.per_level or {}
+    local level_index = math.max(0, (tonumber(level) or 1) - 1)
+    local values = {}
+    local rows = {}
+    for _, entry in ipairs(STAT_ROWS) do
+        local id, label = entry[1], entry[2]
+        local value = (tonumber(base[id]) or 0) + (tonumber(per_level[id]) or 0) * level_index
+        value = math.floor(value + 0.5)
+        values[id] = value
+        rows[#rows + 1] = {
+            id = id,
+            label = label,
+            value = value,
+        }
+    end
+    return {
+        level = tonumber(level) or 1,
+        values = values,
+        rows = rows,
+    }
+end
+
 local function spell_rows_for_level(class_name, level)
     local known = {}
     local upcoming = {}
@@ -658,6 +692,7 @@ local function build_options_payload(config)
         schema = 1,
         config = config,
         classBuild = class_build_for(config.className),
+        resolvedStats = class_stats_for_level(config.className, config.level),
         controlModel = control_model_for(config),
         knownSpells = known_spells,
         upcomingSpells = upcoming_spells,
@@ -1286,6 +1321,7 @@ local function run_summary_payload(config)
         class = selected.class,
         level = selected.level or {value = config.level, label = tostring(config.level)},
         classBuild = class_build_for(config.className),
+        resolvedStats = class_stats_for_level(config.className, config.level),
         controlModel = control_model_for(config),
         knownSpells = known_spells,
         upcomingSpells = upcoming_spells,

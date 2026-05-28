@@ -353,6 +353,18 @@
       background: #241f16;
     }
 
+    .item-chips span.locked {
+      color: var(--muted);
+      border-color: #303841;
+      background: #151a1f;
+    }
+
+    .item-chips span.stat {
+      color: #ffffff;
+      border-color: #486757;
+      background: #1c2b25;
+    }
+
     .tag-list {
       display: flex;
       flex-wrap: wrap;
@@ -1453,10 +1465,18 @@
         appendSummaryLine(host, 'Balance', balanceArgs);
       }
 
-      function addChip(host, text) {
+      function addChip(host, text, className) {
         const chip = document.createElement('span');
         chip.textContent = text;
+        if (className) {
+          chip.className = className;
+        }
         host.appendChild(chip);
+      }
+
+      function spellChipText(spell) {
+        const role = spell.role ? ` ${spell.role}` : '';
+        return `L${spell.level || 1} ${spell.name}${role}`;
       }
 
       function renderBuildOptions(options) {
@@ -1475,13 +1495,17 @@
           addChip(basics, build.starting_weapon);
         }
         ((build.starting_items || [])).forEach((item) => addChip(basics, item));
-        const base = build.base || {};
-        if (base.hp || base.mp) {
-          addChip(basics, `${base.hp || 0} HP`);
-          addChip(basics, `${base.mp || 0} MP`);
-        }
         if (basics.childElementCount > 0) {
           buildHost.appendChild(basics);
+        }
+
+        if (options.resolvedStats && (options.resolvedStats.rows || []).length) {
+          const stats = document.createElement('div');
+          stats.className = 'item-chips';
+          (options.resolvedStats.rows || []).forEach((row) => {
+            addChip(stats, `${row.label} ${row.value}`, 'stat');
+          });
+          buildHost.appendChild(stats);
         }
 
         if (options.controlModel) {
@@ -1499,10 +1523,12 @@
         }
 
         const known = options.knownSpells || [];
-        if (known.length) {
+        const upcoming = options.upcomingSpells || [];
+        if (known.length || upcoming.length) {
           const spellRow = document.createElement('div');
           spellRow.className = 'item-chips';
-          known.forEach((spell) => addChip(spellRow, spell.name));
+          known.forEach((spell) => addChip(spellRow, spellChipText(spell)));
+          upcoming.forEach((spell) => addChip(spellRow, spellChipText(spell), 'locked'));
           buildHost.appendChild(spellRow);
         }
 

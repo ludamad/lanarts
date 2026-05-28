@@ -99,6 +99,7 @@ local function run_content_api_smoke()
     local summary = parse_response("run summary", ContentApi.run_summary_json(config))
     expect(summary.config.className == "Necromancer", "summary should preserve class")
     expect(summary.loadout and #(summary.loadout.items or {}) > 0, "summary should resolve loadout")
+    expect(summary.resolvedStats and summary.resolvedStats.values and (summary.resolvedStats.values.hp or 0) > 115, "summary should resolve selected-level class stats")
     expect(summary.rhythms and #summary.rhythms >= 2, "summary should expose package rhythms")
     local has_rescue_rhythm = false
     local has_rescue_summon = false
@@ -176,6 +177,7 @@ local function run_content_api_smoke()
 
     local loadout_options = parse_response("loadout options", ContentApi.loadout_options_json(config))
     expect(loadout_options.classBuild and loadout_options.classBuild.spells, "loadout options should expose class build")
+    expect(loadout_options.resolvedStats and #(loadout_options.resolvedStats.rows or {}) >= 6, "loadout options should expose selected-level stat rows")
     expect(#(loadout_options.knownSpells or {}) >= 1, "loadout options should expose known spells")
     expect(#(loadout_options.itemChoices or {}) >= 3, "loadout options should expose item picker groups")
     local has_necro_amulet = false
