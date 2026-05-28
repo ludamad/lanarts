@@ -1723,6 +1723,28 @@
         }).join(' ');
       }
 
+      function renderLoadoutReadiness(readiness) {
+        const box = document.createElement('div');
+        box.className = 'item-chips';
+        if (!readiness) {
+          return box;
+        }
+        addChip(box, `${readiness.label || 'readiness'} ${readiness.score || 0}`, 'stat');
+        (readiness.demands || []).slice(0, 4).forEach((demand) => {
+          addChip(box, demand.label || demand.id);
+        });
+        (readiness.strengths || []).slice(0, 3).forEach((text) => {
+          addChip(box, text);
+        });
+        (readiness.gaps || []).slice(0, 3).forEach((text) => {
+          addChip(box, text, 'locked');
+        });
+        (readiness.notes || []).slice(0, 2).forEach((text) => {
+          addChip(box, text);
+        });
+        return box;
+      }
+
       function renderRunSummary(summary) {
         const host = $('runSummary');
         host.innerHTML = '';
@@ -1761,6 +1783,10 @@
           }
         }
         appendSummaryLine(host, 'Loadout', loadout);
+
+        if (summary.loadoutReadiness) {
+          appendSummaryLine(host, 'Build Fit', renderLoadoutReadiness(summary.loadoutReadiness));
+        }
 
         if (summary.packageSummary && summary.packageSummary.rhythmCount) {
           const packageInfo = document.createElement('div');
@@ -1999,6 +2025,10 @@
             addChip(control, model.notes);
           }
           buildHost.appendChild(control);
+        }
+
+        if (options.loadoutReadiness) {
+          buildHost.appendChild(renderLoadoutReadiness(options.loadoutReadiness));
         }
 
         const known = options.knownSpells || [];

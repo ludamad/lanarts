@@ -686,8 +686,216 @@ local function item_choices_for_config(config)
     return groups
 end
 
+local function tag_lookup_for_items()
+    local lookup = {}
+    for _, group in ipairs(Catalog.item_choices or {}) do
+        for _, choice in ipairs(group.choices or {}) do
+            lookup[choice.name or ""] = copy_array(choice.tags or {})
+        end
+    end
+    return lookup
+end
+
+local function add_trait(traits, key, amount)
+    traits[key] = (traits[key] or 0) + (amount or 1)
+end
+
+local function loadout_traits(config, loadout, known_spells)
+    local traits = {}
+    local tags_by_item = tag_lookup_for_items()
+    local specs = {}
+    local class_build = class_build_for(config.className)
+    if class_build.starting_weapon then
+        specs[#specs + 1] = {item = class_build.starting_weapon, amount = 1}
+    end
+    for _, item in ipairs(class_build.starting_items or {}) do
+        specs[#specs + 1] = {item = item, amount = 1}
+    end
+    for _, spec in ipairs(loadout and loadout.items or {}) do
+        specs[#specs + 1] = spec
+    end
+    for _, spec in ipairs(specs) do
+        local item = tostring(spec.item or "")
+        local amount = math.max(1, tonumber(spec.amount) or 1)
+        local lower = item:lower()
+        for _, tag in ipairs(tags_by_item[item] or {}) do
+            add_trait(traits, tag, amount)
+        end
+        if lower:find("potion") then
+            if lower:find("mana") then
+                add_trait(traits, "casting", amount)
+            else
+                add_trait(traits, "survival", amount)
+            end
+            add_trait(traits, "consumable", amount)
+        end
+        if lower:find("vitality") or lower:find("healing") or lower:find("fortification")
+            or lower:find("stone") or lower:find("plate") or lower:find("chainmail")
+            or lower:find("armour") then
+            add_trait(traits, "survival", amount)
+        end
+        if lower:find("staff") or lower:find("wizard") or lower:find("magician")
+            or lower:find("spells") or lower:find("robe") or lower:find("moonstone")
+            or lower:find("wishful") then
+            add_trait(traits, "casting", amount)
+        end
+        if lower:find("pain") then
+            add_trait(traits, "regen", amount)
+        end
+        if lower:find("fear") then
+            add_trait(traits, "control", amount)
+        end
+        if lower:find("scimitar") or lower:find("broadsword") or lower:find("club")
+            or lower:find("mace") or lower:find("slaying") or lower:find("vampirism") then
+            add_trait(traits, "melee", amount)
+        end
+        if lower:find("boots") or lower:find("dash") then
+            add_trait(traits, "mobility", amount)
+        end
+    end
+    for _, spell in ipairs(known_spells or {}) do
+        local role = tostring(spell.role or "")
+        if role ~= "" then
+            add_trait(traits, role, 1)
+        end
+        if role == "gap close" or role == "mobility" then
+            add_trait(traits, "mobility", 1)
+        elseif role == "regen" then
+            add_trait(traits, "regen", 1)
+        elseif role == "summon" then
+            add_trait(traits, "summon", 1)
+        elseif role == "control" or role == "melee control" then
+            add_trait(traits, "control", 1)
+        elseif role == "burst" then
+            add_trait(traits, "damage", 1)
+        end
+    end
+    if config.className == "Necromancer" then
+        add_trait(traits, "regen", 1)
+    elseif config.className == "Fighter" or config.className == "Rogue" or config.className == "Templar" then
+        add_trait(traits, "melee", 1)
+    else
+        add_trait(traits, "casting", 1)
+    end
+    return traits
+end
+
+local function package_for_readiness(config)
+    local encounter = encounter_lookup()[config.encounter or ""]
+    local package = encounter and encounter.package
+    if not package then
+        return nil, encounter
+    end
+    local selected = package_component_lookup(config.packageComponents)
+    if not selected then
+        return package, encounter
+    end
+    local filtered = {primary = package.primary}
+    for _, component in ipairs(COMPONENT_ORDER) do
+        if selected[component] and package[component] then
+            filtered[component] = package[component]
+        end
+    end
+    return filtered, encounter
+end
+
+local function loadout_readiness_for_config(config, loadout, known_spells)
+    local traits = loadout_traits(config, loadout, known_spells)
+    local package = package_for_readiness(config)
+    local stats = class_stats_for_level(config.className, config.level).values or {}
+    local control_model = control_model_for(config)
+    local score = 45
+    local demands = {}
+    local strengths = {}
+    local gaps = {}
+    local notes = {}
+
+    local function demand(key, label)
+        demands[#demands + 1] = {id = key, label = label}
+    end
+    local function strength(text)
+        strengths[#strengths + 1] = text
+        score = score + 7
+    end
+    local function gap(text)
+        gaps[#gaps + 1] = text
+        score = score - 9
+    end
+
+    if package and package.rescue then
+        demand("rescue", "body-block rescue")
+        if (traits.survival or 0) >= 3 or (traits.regen or 0) >= 2 or (stats.hp or 0) >= 175 then
+            strength("block survival")
+        else
+            gap("thin block survival")
+        end
+        if (traits.mobility or 0) > 0 or (traits.regen or 0) > 0 then
+            strength("rescue commit tool")
+        else
+            gap("no clear rescue commit tool")
+        end
+    end
+    if package and package.summon then
+        demand("summon", "add cleanup")
+        if (traits.summon or 0) > 0 or (traits.damage or 0) > 0 or (traits.melee or 0) >= 2 or (traits.casting or 0) >= 2 then
+            strength("add cleanup")
+        else
+            gap("weak add cleanup")
+        end
+    end
+    if package and package.pulse then
+        demand("pulse", "AOE movement")
+        if (traits.mobility or 0) > 0 or (control_model.classRange or "") == "ranged" then
+            strength("AOE repositioning")
+        else
+            notes[#notes + 1] = "AOE reads rely on footwork rather than an explicit mobility tool."
+        end
+    end
+    if package and package.orbit then
+        demand("orbit", "orb spacing")
+        if (traits.survival or 0) >= 2 or (control_model.classRange or "") == "ranged" then
+            strength("orb tolerance")
+        else
+            notes[#notes + 1] = "Orb hits will quickly reveal whether the build has enough margin."
+        end
+    end
+    if not package then
+        demand("general", "map/enemy probe")
+        if (traits.survival or 0) > 0 then
+            strength("survival margin")
+        end
+        if (traits.casting or 0) > 0 or (traits.melee or 0) > 0 then
+            strength("primary offense")
+        end
+    end
+
+    if config.className == "Necromancer" and (traits.regen or 0) > 0 then
+        notes[#notes + 1] = "Necromancer sustain is regen-adjusted; gross damage alone will mislead."
+    end
+    if (traits.consumable or 0) >= 4 then
+        notes[#notes + 1] = "Consumable-heavy loadout can hide pacing or damage problems in short runs."
+    end
+
+    score = math.max(0, math.min(100, score))
+    local label = score >= 78 and "ready"
+        or score >= 58 and "workable"
+        or score >= 38 and "thin"
+        or "risky"
+    return {
+        schema = 1,
+        score = score,
+        label = label,
+        traits = traits,
+        demands = demands,
+        strengths = strengths,
+        gaps = gaps,
+        notes = notes,
+    }
+end
+
 local function build_options_payload(config)
     local known_spells, upcoming_spells = spell_rows_for_level(config.className, config.level)
+    local loadout = loadout_for_config(config)
     return {
         schema = 1,
         config = config,
@@ -696,7 +904,8 @@ local function build_options_payload(config)
         controlModel = control_model_for(config),
         knownSpells = known_spells,
         upcomingSpells = upcoming_spells,
-        loadout = loadout_for_config(config),
+        loadout = loadout,
+        loadoutReadiness = loadout_readiness_for_config(config, loadout, known_spells),
         itemChoices = item_choices_for_config(config),
         args = launch_args(config),
         balanceArgs = balance_args(config),
@@ -2207,6 +2416,8 @@ local function telemetry_watch_for(config, package_summary)
 end
 
 local function fight_setup_payload(config)
+    local known_spells = spell_rows_for_level(config.className, config.level)
+    local loadout = loadout_for_config(config)
     local selected = {
         class = class_lookup()[config.className],
         level = level_lookup()[config.level],
@@ -2234,7 +2445,8 @@ local function fight_setup_payload(config)
             decisionInterval = control_model.decisionInterval or 1,
             notes = control_model.notes or "",
         },
-        loadout = loadout_for_config(config),
+        loadout = loadout,
+        loadoutReadiness = loadout_readiness_for_config(config, loadout, known_spells),
         threats = threat_windows_for(rhythms),
         microPlan = micro_plan,
         pressurePreview = pressure_preview,
@@ -2250,6 +2462,7 @@ end
 
 local function run_summary_payload(config)
     local known_spells, upcoming_spells = spell_rows_for_level(config.className, config.level)
+    local loadout = loadout_for_config(config)
     local selected = {
         class = class_lookup()[config.className],
         level = level_lookup()[config.level],
@@ -2271,7 +2484,8 @@ local function run_summary_payload(config)
         controlModel = control_model_for(config),
         knownSpells = known_spells,
         upcomingSpells = upcoming_spells,
-        loadout = loadout_for_config(config),
+        loadout = loadout,
+        loadoutReadiness = loadout_readiness_for_config(config, loadout, known_spells),
         map = selected.map,
         mapAlgorithm = selected.mapAlgorithm,
         encounter = encounter,

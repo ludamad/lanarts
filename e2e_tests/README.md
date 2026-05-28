@@ -17,6 +17,9 @@ Content lab APIs:
     Enemy option APIs expose curated enemy groups, packs, arena launch args,
     StartBalanceRun args, and StartMonsterEvals args so the web lab can build
     enemy-balance probes without relying on free-text monster names.
+    Loadout payloads include a readiness read that maps selected gear and known
+    spells to the active package demands, such as rescue blocks, add cleanup,
+    AOE movement, and orb spacing.
 
 Balance simulations:
     ./run.sh --headless engine.StartBalanceRun --steps 20000 --runs 5 --classes Fighter,Necromancer,Pyrocaster,Stormcaller
