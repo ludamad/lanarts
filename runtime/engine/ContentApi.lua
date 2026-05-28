@@ -1106,6 +1106,10 @@ local function encounter_rhythms(encounter, intensity)
             allyDamage = scaled_damage(package.rescue.ally_damage, 10, intensity),
             blockDamage = scaled_damage(package.rescue.block_damage, 4, intensity),
             pullFrames = scaled_frames(package.rescue.pull_frames, 90, intensity),
+            clutchCounterDamage = scaled_damage(package.rescue.clutch_counter_damage, 0, intensity),
+            perfectCounterDamage = scaled_damage(package.rescue.perfect_counter_damage, 0, intensity),
+            clutchCounterStun = scaled_frames(package.rescue.clutch_counter_stun, 0, intensity),
+            perfectCounterStun = scaled_frames(package.rescue.perfect_counter_stun, 0, intensity),
         }
     end
     if package.summon then
@@ -2864,6 +2868,9 @@ telemetry_watch_for = function(config, package_summary)
             append_metric(rows, "avg_package_rescue_timing_score", "Timing score", "clutch plus perfect timing quality")
             append_metric(rows, "avg_package_rescue_pull_rate", "Pull rate", "taunt/body-block interaction")
             append_metric(rows, "avg_package_rescue_pull_uptime_rate", "Taunt uptime", "forced target-control share")
+            append_metric(rows, "avg_package_rescue_counter_windows", "Counters", "clutch/perfect saves that opened the boss")
+            append_metric(rows, "avg_package_rescue_counter_damage_total", "Counter dmg", "boss damage from timed rescue openings")
+            append_metric(rows, "avg_package_rescue_counter_stagger_frames", "Stagger", "boss stun frames from timed rescue openings")
             append_metric(rows, "avg_package_rescue_misses", "Misses", "failed rescue windows")
             append_metric(rows, "avg_rescue_intercept_frames", "Intercept", "body-block movement")
             append_metric(rows, "avg_rescue_hold_frames", "Hold", "frames spent holding the line")

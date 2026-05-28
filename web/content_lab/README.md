@@ -48,7 +48,7 @@ Packaged encounters can also expose rhythm metadata for the shell's timeline vie
 Level-5 package arenas use larger 30-32 tile rooms so stacked orb, sweep, rescue, and add pressure has room to read without turning the fight into corridor pinball.
 Rescue packages may spawn allied monsters on the player team, giving pull, taunt, and body-block tests a fragile target without requiring extra local controllers.
 Some rescue packages also add a timed rescue line; the ally takes the heavy hit unless a player intercepts the line during the windup.
-The in-game package HUD counts saves and marks blocks that start inside the final rescue window as clutch saves, with a tighter perfect-save band for few-frame body-blocks. Live rescue cues now call out that perfect band before the strike resolves.
+The in-game package HUD counts saves and marks blocks that start inside the final rescue window as clutch saves, with a tighter perfect-save band for few-frame body-blocks. Live rescue cues now call out that perfect band before the strike resolves, and clutch/perfect saves can open a short boss counter window.
 Package HUDs show primary target HP so threat timing can be read against actual clear progress.
 Package HUDs also show current aggro, with a world link from the primary enemy to its target so taunt/pull state is readable during rescue windows.
 Package HUDs include a NEXT row that summarizes the active or nearest package beat, keeping AOE, orbs, sweeps, summons, and rescue-line timing readable during heavy micro.
@@ -56,7 +56,7 @@ Package HUDs also include a STACK row, and balance rows expose peak stack plus o
 Package HUDs include a MICRO row that scores clean hazard dodges, rescue saves, streaks, and avoidable hits while the fight is happening.
 Rescue HUDs include TAUNT uptime, and balance rows expose pull/taunt total frames plus uptime rate so rescue-package clears can be separated from forced-target-control cheese.
 Balance rows also expose perfect-save counts/rates to distinguish ordinary clutch blocks from the last-few-frame saves that make rescue packages feel sharp.
-Balance rows expose early-save rate and rescue timing score so few-frame saves can be modeled separately from players camping the rescue line before the strike becomes urgent.
+Balance rows expose early-save rate, rescue timing score, and rescue counter windows/damage/stagger so few-frame saves can be modeled separately from players camping the rescue line before the strike becomes urgent.
 Balance rows expose package micro score, best streak, threaded avoid count, and avoidable mechanic-hit count so lab runs can separate clean execution from brute-force clears. Orb and sweep avoids only score when the player was actually close to the hazard lane; expired off-screen hazards no longer inflate dodge counts.
 Package reports and drill scorecards flag clears with negative micro score so a primitive automated player surviving the fight does not automatically count as healthy content.
 Gragh packages also expose `package_micro_punish_total`: avoidable package hits feed Gragh Fury, healing the primary up to an overheal cap so brute-force melee clears have an in-fight cost. In-game, the package HUD shows a FURY row and Gragh flashes with a short red burst when the punish triggers; clutch/perfect rescue saves can break some Fury back off and emit `package_micro_punish_break_total`.

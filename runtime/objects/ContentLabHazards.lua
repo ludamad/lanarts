@@ -316,6 +316,76 @@ local function apply_micro_punish_break(director, amount, label, color)
     return applied
 end
 
+local function apply_rescue_counter(director, strike, blocker)
+    local package = director and director.package
+    local rescue = package and package.rescue
+    if not rescue or not strike or not strike.was_clutch then
+        return 0
+    end
+    local primary = primary_monster(package.primary)
+    if not primary or primary.destroyed then
+        return 0
+    end
+    local intensity = director.intensity or normalize_intensity(nil)
+    local damage = strike.was_perfect
+        and (tonumber(rescue.perfect_counter_damage) or tonumber(rescue.clutch_counter_damage) or 0)
+        or (tonumber(rescue.clutch_counter_damage) or 0)
+    local stagger = strike.was_perfect
+        and (tonumber(rescue.perfect_counter_stun) or tonumber(rescue.clutch_counter_stun) or 0)
+        or (tonumber(rescue.clutch_counter_stun) or 0)
+    damage = damage * (intensity.damage or 1)
+    stagger = math.max(0, math.floor(stagger * (intensity.tempo or 1)))
+    if damage <= 0 and stagger <= 0 then
+        return 0
+    end
+
+    local before = primary.stats.hp or 0
+    local after = damage > 0 and math.max(1, before - damage) or before
+    local applied = math.max(0, before - after)
+    if applied > 0 then
+        primary.stats.hp = after
+    end
+    if stagger > 0 and primary.add_effect then
+        primary:add_effect("Stun", stagger)
+    end
+
+    director.rescue_counter_windows = (director.rescue_counter_windows or 0) + 1
+    director.rescue_counter_damage_total = (director.rescue_counter_damage_total or 0) + applied
+    director.rescue_counter_stagger_frames = (director.rescue_counter_stagger_frames or 0) + stagger
+    director.rescue_counter_last_damage = applied
+    director.rescue_counter_last_stagger = stagger
+    director.rescue_counter_last_label = strike.was_perfect and "PERFECT COUNTER" or "CLUTCH COUNTER"
+    director.rescue_counter_last_timer = 72
+    director.rescue_counter_last_perfect = strike.was_perfect
+
+    local color = strike.was_perfect and COL_WHITE or COL_PALE_GREEN
+    ImpactFX.screen_flash {
+        map = director.map,
+        color = color,
+        alpha = strike.was_perfect and 0.16 or 0.10,
+        duration = 12,
+    }
+    ImpactFX.world_burst {
+        map = director.map,
+        xy = xy_of(primary),
+        color = color,
+        label = director.rescue_counter_last_label,
+        radius = strike.was_perfect and 78 or 62,
+        duration = strike.was_perfect and 42 or 34,
+    }
+    if blocker and M.create_feedback_label then
+        M.create_feedback_label {
+            map = director.map,
+            xy = xy_of(blocker),
+            text = "OPENING",
+            color = color,
+            duration = 52,
+            drift = 0.44,
+        }
+    end
+    return applied
+end
+
 local function add_micro_event(director, args)
     if not director or director.destroyed then
         return
@@ -730,6 +800,36 @@ local function draw_micro_punish_marker(director, package)
     draw_text(color, Display.CENTER, label_xy, label .. (breaking and " -" or " +") .. tostring(math.ceil(amount)))
 end
 
+local function draw_rescue_counter_marker(director, package)
+    if not package or not package.rescue or (director.rescue_counter_last_timer or 0) <= 0 then
+        return
+    end
+    local primary = primary_monster(package.primary)
+    if not primary then
+        return
+    end
+    local timer = director.rescue_counter_last_timer or 0
+    local intensity = math.min(1, timer / 72)
+    local perfect = director.rescue_counter_last_perfect
+    local color = perfect and COL_WHITE or COL_PALE_GREEN
+    ProceduralEffects.draw_boss_aura(primary, {
+        palette = perfect and "blue" or "green",
+        radius = (primary.radius or 16) + 36 + 14 * intensity,
+        intensity = 0.44 + 0.30 * intensity,
+        rotation_speed = perfect and -0.044 or -0.032,
+        spoke_speed = perfect and 0.034 or 0.026,
+    })
+    local damage = director.rescue_counter_last_damage or 0
+    local stagger = director.rescue_counter_last_stagger or 0
+    local label = director.rescue_counter_last_label or "COUNTER"
+    local detail = damage > 0 and (" -" .. tostring(math.ceil(damage))) or ""
+    if stagger > 0 then
+        detail = detail .. " " .. tostring(stagger) .. "f"
+    end
+    local label_xy = Display.to_screen_xy({primary.x, primary.y - (primary.radius or 16) - 62})
+    draw_text(color, Display.CENTER, label_xy, label .. detail)
+end
+
 local summon_count
 local active_summon_portals
 local active_orbs
@@ -982,6 +1082,7 @@ local function draw_package_hud(director)
     draw_escort_markers()
     draw_aggro_marker(director, package)
     draw_micro_punish_marker(director, package)
+    draw_rescue_counter_marker(director, package)
 end
 
 local function result_color(outcome)
@@ -1063,6 +1164,9 @@ local function package_result(director, outcome)
         rescue_pull_rate = pull_rate,
         rescue_pull_total_frames = pull_total_frames,
         rescue_pull_uptime_rate = pull_uptime_rate,
+        rescue_counter_windows = director.rescue_counter_windows or 0,
+        rescue_counter_damage_total = director.rescue_counter_damage_total or 0,
+        rescue_counter_stagger_frames = director.rescue_counter_stagger_frames or 0,
         rescue_misses = misses,
         rescue_best_margin = best,
         rescue_last_margin = director.rescue_last_margin,
@@ -1161,6 +1265,9 @@ local function package_state_from_director(director)
         rescue_pull_rate = safe_rate(pulls, saves),
         rescue_pull_total_frames = director.rescue_pull_total_frames or 0,
         rescue_pull_uptime_rate = safe_rate(director.rescue_pull_total_frames or 0, math.max(1, director.elapsed or 0)),
+        rescue_counter_windows = director.rescue_counter_windows or 0,
+        rescue_counter_damage_total = director.rescue_counter_damage_total or 0,
+        rescue_counter_stagger_frames = director.rescue_counter_stagger_frames or 0,
         rescue_misses = misses,
         rescue_best_margin = director.rescue_best_margin,
         rescue_last_margin = director.rescue_last_margin,
@@ -1893,6 +2000,9 @@ function M.create_rescue_strike(args)
                                 self.was_perfect and COL_WHITE or COL_PALE_BLUE
                             )
                         end
+                        if self.was_clutch then
+                            apply_rescue_counter(self.director, self, blocker)
+                        end
                         if not self.was_clutch then
                             self.director.rescue_early_saves = (self.director.rescue_early_saves or 0) + 1
                         end
@@ -2608,6 +2718,9 @@ function M.add_director(game_map, package, intensity)
         rescue_pulls = 0,
         rescue_pull_active_frames = 0,
         rescue_pull_total_frames = 0,
+        rescue_counter_windows = 0,
+        rescue_counter_damage_total = 0,
+        rescue_counter_stagger_frames = 0,
         pressure_max_count = 0,
         pressure_overlap_frames = 0,
         micro_score = 0,
@@ -2632,6 +2745,9 @@ function M.add_director(game_map, package, intensity)
             end
             if (self.micro_punish_break_last_timer or 0) > 0 then
                 self.micro_punish_break_last_timer = self.micro_punish_break_last_timer - 1
+            end
+            if (self.rescue_counter_last_timer or 0) > 0 then
+                self.rescue_counter_last_timer = self.rescue_counter_last_timer - 1
             end
             if (self.rescue_pull_active_frames or 0) > 0 then
                 self.rescue_pull_total_frames = (self.rescue_pull_total_frames or 0) + 1
