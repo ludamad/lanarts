@@ -2275,6 +2275,26 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         )
     end
 
+    if runs >= min_runs and win_rate >= 0.50 and micro_score <= -40 and micro_hits >= 10 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_micro",
+            "avg_package_micro_score",
+            micro_score,
+            -40,
+            string.format(
+                "%s cleared %s %.1f%% of the time while averaging %.1f micro score and eating %.1f avoidable mechanic hits/run; this is a brute-force/face-tank clear, so the package punish is not deterring sloppy play. Make the in-fight cost bite harder before assuming the fight is healthy -- do not read this clear as clean execution.",
+                class_name,
+                encounter,
+                win_rate * 100,
+                micro_score,
+                micro_hits
+            )
+        )
+    end
+
     local step_limits = tonumber(row.step_limits) or 0
     local step_limit_rate = runs > 0 and step_limits / runs or 0
     local boss_hp_left = tonumber(row.avg_package_primary_hp_pct) or 0

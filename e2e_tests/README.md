@@ -130,6 +130,11 @@ Balance simulations:
     package_difficulty rows when package overlap is only serial pressure, sync
     beats are missing, package variety is weak, or the selected automation
     profile is clearing too comfortably.
+    A brute-force/face-tank warning also fires when a class clears a
+    package >=50% of the time while averaging <=-40 micro and >=10
+    avoidable hits/run, so a sloppy high-clear is not mistaken for clean
+    execution; the fix is to make the in-fight cost bite harder, not to
+    nerf base enemy damage that clean players already respect.
     Rescue package rows also track pull/taunt total frames, uptime rate,
     pull-discipline rate, taunt-strain rate, late-window pull rates, and
     average timed-pull margins, plus pull-snap burst and strain-pulse counts,
