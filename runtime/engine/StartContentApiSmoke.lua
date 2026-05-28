@@ -297,6 +297,7 @@ local function run_content_api_smoke()
     expect((micro_drills.count or 0) == #(micro_drills.drills or {}), "micro drill count should match drills")
     expect((micro_drills.count or 0) >= 5, "micro drills should expose practice drills")
     local has_gragh_rescue_drill = false
+    local has_gragh_rescue_scorecard = false
     for _, drill in ipairs(micro_drills.drills or {}) do
         if drill.id == "gragh-perfect-rescue" then
             has_gragh_rescue_drill = drill.config
@@ -307,9 +308,20 @@ local function run_content_api_smoke()
                 and (drill.loadoutReadiness.score or 0) > 0
                 and drill.microPlan
                 and #(drill.microPlan or {}) >= 1
+            local has_perfect_metric = false
+            local has_taunt_metric = false
+            for _, row in ipairs(drill.scorecard and drill.scorecard.rows or {}) do
+                if row.metric == "avg_package_rescue_perfect_rate" then
+                    has_perfect_metric = true
+                elseif row.metric == "avg_package_rescue_pull_uptime_rate" then
+                    has_taunt_metric = true
+                end
+            end
+            has_gragh_rescue_scorecard = drill.scorecard and #(drill.scorecard.rows or {}) >= 6 and has_perfect_metric and has_taunt_metric
         end
     end
     expect(has_gragh_rescue_drill, "micro drills should expose launchable Gragh rescue timing practice")
+    expect(has_gragh_rescue_scorecard, "micro drills should expose rescue scorecard metrics")
 
     local map_config = [[{
         "className": "Fighter",
@@ -548,7 +560,7 @@ local function run_content_api_smoke()
             has_late_loadout = has_late_loadout or resource.preset == "late"
         elseif resource.group == "Build archetype sweep" and resource.buildArchetype and resource.loadoutReadiness then
             has_build_archetype_resource = true
-        elseif resource.group == "Micro drill sweep" and resource.microDrill and resource.packageSummary then
+        elseif resource.group == "Micro drill sweep" and resource.microDrill and resource.packageSummary and resource.scorecard then
             has_micro_drill_resource = true
         elseif resource.group == "Skill buffer sweep" and resource.encounter == "gragh-rescue-package" then
             has_perfect_skill_buffer = has_perfect_skill_buffer or resource.botProfile == "perfect"
@@ -670,6 +682,7 @@ local function run_content_api_smoke()
     local has_rescue_card = false
     local has_enemy_card = false
     local has_map_threat_card = false
+    local has_drill_scorecard_card = false
     for _, group in ipairs(presentation.resourceGroups or {}) do
         groups[group.id or ""] = group
         if group.id == "package" then
@@ -690,6 +703,12 @@ local function run_content_api_smoke()
                     has_enemy_card = true
                 end
             end
+        elseif group.id == "drill" then
+            for _, card in ipairs(group.cards or {}) do
+                if card.scorecard and #(card.scorecard.rows or {}) >= 1 then
+                    has_drill_scorecard_card = true
+                end
+            end
         end
     end
     expect(groups.map and (groups.map.count or 0) >= 12, "presentation should expose map resource group")
@@ -699,6 +718,7 @@ local function run_content_api_smoke()
     expect(groups.enemy and (groups.enemy.count or 0) >= 12, "presentation should expose enemy resource group")
     expect(groups.orthogonal and (groups.orthogonal.count or 0) >= 30, "presentation should expose orthogonal resource group")
     expect(has_rescue_card, "presentation package cards should preserve rescue summaries")
+    expect(has_drill_scorecard_card, "presentation drill cards should preserve scorecards")
     expect(has_map_threat_card, "presentation map cards should expose map threat profiles")
     expect(has_enemy_card, "presentation enemy cards should expose monster-eval commands")
     expect(presentation.telemetry and #presentation.telemetry >= 10, "presentation should expose telemetry watch rows")

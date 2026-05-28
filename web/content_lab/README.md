@@ -14,7 +14,7 @@ The shell reads its runtime data from the exported content APIs:
 - `lanarts_content_launch_args_json(config)` normalizes a selected run and returns the `engine.StartLanarts` arguments.
 - `lanarts_content_loadout_options_json(config)` resolves class build metadata, known spells, preset items, class-relevant curated item choices, build archetypes, and a loadout-readiness read for the selected fight.
 - `lanarts_content_build_matrix_json(config)` expands the selected class into curated build archetypes with resolved loadouts, readiness scores, launch args, and balance args.
-- `lanarts_content_micro_drills_json(config)` returns launchable rescue, orb/AOE, add-cleanup, and stacked-package practice drills with isolated package components, readiness, pressure previews, micro plans, launch args, and balance args.
+- `lanarts_content_micro_drills_json(config)` returns launchable rescue, orb/AOE, add-cleanup, and stacked-package practice drills with isolated package components, readiness, pressure previews, scorecards, micro plans, launch args, and balance args.
 - `lanarts_content_map_generation_json(config)` returns selectable map algorithms, deterministic preview geometry with enemy pins, map threat profiles, and resolved run/balance args for each preview.
 - `lanarts_content_map_preview_json(config)` is kept as a compatible alias for the preview grid payload.
 - `lanarts_content_map_matrix_json(config)` expands selected-seed, overworld-algorithm, and late-map probes for map-generation balance runs, including preview-derived threat profiles for quick comparison.
@@ -30,7 +30,7 @@ The shell reads its runtime data from the exported content APIs:
 
 The shell renders a content board from `lanarts_content_presentation_json(config)` so the selected objective, commands, telemetry, threat windows, pressure density preview, class-specific micro plan, map-preview threat cards, enemy probes, package probes, and orthogonal resources are visible together.
 Build templates apply concrete loadout strings from the API, then immediately recompute the selected fight readiness and commands.
-Drill cards are concrete launch configurations for practicing specific package reads such as perfect rescue blocks, rescue under orb pressure, orb/AOE footwork, add cleanup, and full stacked package reads.
+Drill cards are concrete launch configurations for practicing specific package reads such as perfect rescue blocks, rescue under orb pressure, orb/AOE footwork, add cleanup, and full stacked package reads. Drill scorecards name the balance metrics that prove whether the practice target is healthy or being cheesed.
 Run and fight payloads include matchup reads for red/fire, white, and black resistance checks so Pyrocaster, Stormcaller, and Necromancer comparisons can be selected before running sweeps.
 Encounter launches use `--encounter` for curated 1v1/package tests, or `--monsters` for a comma-separated custom arena.
 Direct map launches use `--start_map_desc`, and overworld profile selections add `--map_profile` so the same seed can compare profiles such as `open_meadow`, `broken_grove`, `river_road`, `predator_thicket`, and `ruin_crossroads`.

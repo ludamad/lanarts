@@ -2718,6 +2718,193 @@ local function micro_drill_config(config, drill)
     return normalized_config(next_config)
 end
 
+local function list_has(values, needle)
+    for _, value in ipairs(values or {}) do
+        if value == needle then
+            return true
+        end
+    end
+    return false
+end
+
+local function drill_scorecard_for(drill, drill_config, package_summary, pressure_preview, matchup)
+    local rows = {}
+    local telemetry = {}
+    local notes = {}
+    local seen = {}
+    local function watch(metric)
+        if metric and metric ~= "" and not seen[metric] then
+            telemetry[#telemetry + 1] = metric
+            seen[metric] = true
+        end
+    end
+    local function add(row)
+        rows[#rows + 1] = row
+        watch(row.metric)
+    end
+
+    add({
+        id = "clear-floor",
+        label = "Clear floor",
+        metric = "win_rate",
+        comparator = ">=",
+        threshold = 0.35,
+        target = ">=35% human clears",
+        reason = "Practice drills should be learnable without perfect automation.",
+    })
+    add({
+        id = "clear-ceiling",
+        label = "Ceiling check",
+        metric = "win_rate",
+        comparator = "<=",
+        threshold = 0.90,
+        target = "<=90% human clears",
+        reason = "A primitive human-profile bot clearing every run means the drill is too forgiving.",
+    })
+    add({
+        id = "near-death",
+        label = "Pressure floor",
+        metric = "avg_min_hp_pct",
+        comparator = "<=",
+        threshold = 0.55,
+        target = "<=55% minimum HP",
+        reason = "The drill should produce real danger instead of cosmetic package beats.",
+    })
+
+    if package_summary and package_summary.hasRescue then
+        add({
+            id = "rescue-save",
+            label = "Save reliability",
+            metric = "avg_package_rescue_save_rate",
+            comparator = ">=",
+            threshold = 0.60,
+            target = ">=60% saves",
+            reason = "The core read is protecting the ally, not merely killing the boss.",
+        })
+        add({
+            id = "rescue-perfect",
+            label = "Perfect saves",
+            metric = "avg_package_rescue_perfect_rate",
+            comparator = ">=",
+            threshold = list_has(drill.tags, "perfect") and 0.12 or 0.05,
+            target = list_has(drill.tags, "perfect") and ">=12% perfect saves" or ">=5% perfect saves",
+            reason = "Few-frame saves are the intended high-skill moment.",
+        })
+        add({
+            id = "taunt-cheese",
+            label = "Taunt reliance",
+            metric = "avg_package_rescue_pull_uptime_rate",
+            comparator = "<=",
+            threshold = 0.35,
+            target = "<=35% pull uptime",
+            reason = "High forced-target uptime means taunt is carrying the rescue lane.",
+        })
+        add({
+            id = "ally-margin",
+            label = "Ally margin",
+            metric = "avg_package_escort_hp_pct",
+            comparator = ">=",
+            threshold = 0.20,
+            target = ">=20% ally HP",
+            reason = "Successful clears should leave evidence that the ally was actually protected.",
+        })
+    else
+        notes[#notes + 1] = "No rescue lane in this drill; rescue-save metrics are intentionally absent."
+    end
+
+    if package_summary and package_summary.hasSummons then
+        add({
+            id = "add-tempo",
+            label = "Add cleanup",
+            metric = "kills_per_1000_combat_frames",
+            comparator = ">=",
+            threshold = 2.5,
+            target = ">=2.5 kills / 1000 combat frames",
+            reason = "Summon drills should fail when adds are ignored or cleanup is too slow.",
+        })
+        add({
+            id = "enemy-cap",
+            label = "Enemy cap",
+            metric = "avg_max_visible_enemies",
+            comparator = "<=",
+            threshold = (package_summary.summonCap or 4) + 1,
+            target = "<=summon cap + 1",
+            reason = "Add pressure should saturate but not become unreadable clutter.",
+        })
+    end
+
+    if pressure_preview and (pressure_preview.peakStack or 0) >= 2 then
+        add({
+            id = "stack-present",
+            label = "Stack present",
+            metric = "avg_package_pressure_max_count",
+            comparator = ">=",
+            threshold = pressure_preview.peakStack or 2,
+            target = ">=" .. tostring(pressure_preview.peakStack or 2) .. " active/warning stack",
+            reason = "The drill should preserve the package overlap advertised by the preview.",
+        })
+        add({
+            id = "overlap-rate",
+            label = "Overlap rate",
+            metric = "avg_package_pressure_overlap_rate",
+            comparator = ">=",
+            threshold = math.max(0.05, tonumber(pressure_preview.overlapRate) or 0.05),
+            target = "overlap visible in samples",
+            reason = "Without overlap this becomes serial pressure rather than micro layering.",
+        })
+    end
+
+    local class = class_lookup()[drill_config.className] or {}
+    if class.range == "far" or list_has(drill.tags, "ranged") then
+        add({
+            id = "keepaway",
+            label = "Keep-away",
+            metric = "avg_ranged_keepaway_frames",
+            comparator = ">",
+            threshold = 0,
+            target = ">0 keep-away frames",
+            reason = "Ranged drills should prove the class is maintaining space rather than face-tanking.",
+        })
+        add({
+            id = "forced-close",
+            label = "Forced close",
+            metric = "avg_ranged_close_enemy_frames",
+            comparator = ">",
+            threshold = 0,
+            target = ">0 forced-close frames",
+            reason = "The enemy package should still create access windows against ranged classes.",
+        })
+    end
+
+    if drill_config.className == "Necromancer" then
+        add({
+            id = "regen-offset",
+            label = "Regen offset",
+            metric = "avg_necromancer_regen_offset_pct",
+            comparator = ">",
+            threshold = 0,
+            target = ">0 regen offset",
+            reason = "Necromancer pressure must be read after regen correction.",
+        })
+    end
+
+    if matchup and matchup.severity == "high" then
+        notes[#notes + 1] = "This drill includes a high-severity class/enemy matchup check."
+        for _, metric in ipairs(matchup.telemetry or {}) do
+            watch(metric)
+        end
+    end
+
+    return {
+        schema = 1,
+        label = "Drill scorecard",
+        summary = drill.focus or drill.role or "",
+        rows = rows,
+        telemetry = telemetry,
+        notes = notes,
+    }
+end
+
 local function micro_drill_rows(config)
     local rows = {}
     local encounters = encounter_lookup()
@@ -2730,6 +2917,9 @@ local function micro_drill_rows(config)
         local loadout = loadout_for_config(drill_config)
         local build = build_archetype_by_id(drill_config.className, drill.buildId)
         local control_model = control_model_for(drill_config)
+        local pressure_preview = pressure_preview_for(rhythms)
+        local matchup = matchup_read_for(drill_config, encounter)
+        local scorecard = drill_scorecard_for(drill, drill_config, package_summary, pressure_preview, matchup)
         rows[#rows + 1] = {
             id = drill.id or "",
             label = drill.label or drill.id or "",
@@ -2745,13 +2935,14 @@ local function micro_drill_rows(config)
             } or nil,
             loadout = loadout,
             loadoutReadiness = loadout_readiness_for_config(drill_config, loadout, known_spells),
-            matchup = matchup_read_for(drill_config, encounter),
+            matchup = matchup,
             knownSpells = known_spells,
             upcomingSpells = upcoming_spells,
             encounter = encounter,
             rhythms = rhythms,
             packageSummary = package_summary,
-            pressurePreview = pressure_preview_for(rhythms),
+            pressurePreview = pressure_preview,
+            scorecard = scorecard,
             microPlan = micro_plan_for(rhythms, control_model),
             telemetry = telemetry_watch_for(drill_config, package_summary),
             args = launch_args(drill_config),
@@ -2794,6 +2985,7 @@ local function micro_drill_resources(config, start_offset)
                 matchup = drill.matchup,
                 packageSummary = drill.packageSummary,
                 pressurePreview = drill.pressurePreview,
+                scorecard = drill.scorecard,
             }
         )
     end
@@ -3366,6 +3558,15 @@ local function resource_summary_chips(resource)
             add(tag)
         end
     end
+    if resource.scorecard then
+        add(resource.scorecard.label or "scorecard")
+        for _, row in ipairs(resource.scorecard.rows or {}) do
+            add(row.label)
+            if #chips >= 12 then
+                break
+            end
+        end
+    end
     if resource.mapProfile and resource.mapProfile ~= "" then
         add(resource.mapProfile)
     end
@@ -3450,6 +3651,7 @@ local function resource_card(resource)
         packageSummary = resource.packageSummary,
         pressurePreview = resource.pressurePreview,
         microDrill = resource.microDrill,
+        scorecard = resource.scorecard,
         buildArchetype = resource.buildArchetype,
         loadoutReadiness = resource.loadoutReadiness,
         previewMode = resource.previewMode,

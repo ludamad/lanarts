@@ -1534,6 +1534,7 @@
           packageSummary: resource.packageSummary || null,
           pressurePreview: resource.pressurePreview || null,
           microDrill: resource.microDrill || null,
+          scorecard: resource.scorecard || null,
           buildArchetype: resource.buildArchetype || null,
           loadoutReadiness: resource.loadoutReadiness || null,
           previewMode: resource.previewMode || resource.preview_mode || '',
@@ -1789,6 +1790,24 @@
         (matchup.strengths || []).slice(0, 3).forEach((text) => addChip(box, text));
         (matchup.notes || []).slice(0, 2).forEach((text) => addChip(box, text));
         (matchup.telemetry || []).slice(0, 3).forEach((key) => addChip(box, key));
+        return box;
+      }
+
+      function renderScorecard(scorecard, limit = 5) {
+        const box = document.createElement('div');
+        box.className = 'item-chips';
+        if (!scorecard) {
+          return box;
+        }
+        addChip(box, scorecard.label || 'scorecard', 'stat');
+        (scorecard.rows || []).slice(0, limit).forEach((row) => {
+          const target = row.target ? ` ${row.target}` : '';
+          const text = `${row.label || row.metric || 'metric'}${target}`;
+          addChip(box, text, row.comparator === '<=' ? 'locked' : undefined);
+        });
+        if ((scorecard.rows || []).length > limit) {
+          addChip(box, `+${scorecard.rows.length - limit}`);
+        }
         return box;
       }
 
@@ -2387,6 +2406,7 @@
           microDrills.slice(0, 4).forEach((drill) => {
             const summary = drill.packageSummary || {};
             const preview = drill.pressurePreview || {};
+            const scoreRows = drill.scorecard && drill.scorecard.rows ? drill.scorecard.rows : [];
             list.appendChild(boardCard({
               title: drill.label,
               subtitle: drill.focus || drill.role,
@@ -2396,6 +2416,8 @@
                 drill.config && drill.config.intensity,
                 summary.fastestLoopFrames ? `${summary.fastestLoopFrames}f loop` : '',
                 preview.peakStack ? `stack ${preview.peakStack}` : '',
+                scoreRows[0] ? `${scoreRows[0].label} ${scoreRows[0].target}` : '',
+                scoreRows[1] ? `${scoreRows[1].label} ${scoreRows[1].target}` : '',
                 ...((drill.tags || []).slice(0, 2)),
               ],
               config: drill.config,
@@ -2435,6 +2457,24 @@
           appendBoardTitle(matchupSection, 'Matchup');
           matchupSection.appendChild(renderMatchupRead(payload.matchup));
           host.appendChild(matchupSection);
+        }
+
+        const selectedDrill = (payload.microDrills || []).find((drill) => {
+          const cfg = drill.config || {};
+          const current = payload.config || {};
+          return cfg.className === current.className
+            && String(cfg.level) === String(current.level)
+            && (cfg.encounter || '') === (current.encounter || '')
+            && (cfg.packageComponents || '') === (current.packageComponents || '')
+            && (cfg.intensity || '') === (current.intensity || '')
+            && String(cfg.seed || '') === String(current.seed || '');
+        });
+        if (selectedDrill && selectedDrill.scorecard) {
+          const scoreSection = document.createElement('div');
+          scoreSection.className = 'presentation-section';
+          appendBoardTitle(scoreSection, 'Drill Scorecard');
+          scoreSection.appendChild(renderScorecard(selectedDrill.scorecard, 8));
+          host.appendChild(scoreSection);
         }
 
         if (payload.pressurePreview && (payload.pressurePreview.peakStack || payload.pressurePreview.overlapFrames)) {
@@ -3327,6 +3367,18 @@
         return parts.join(' | ');
       }
 
+      function scorecardSummaryText(scorecard) {
+        if (!scorecard) {
+          return '';
+        }
+        const rows = scorecard.rows || [];
+        const parts = [];
+        rows.slice(0, 3).forEach((row) => {
+          parts.push(`${row.label || row.metric}${row.target ? ` ${row.target}` : ''}`);
+        });
+        return parts.join(' | ');
+      }
+
       function mapSummaryText(resource) {
         if (!resource || !resource.previewMode) {
           return '';
@@ -3430,15 +3482,17 @@
           const skill = resource.botProfile && resource.botProfile !== 'human' ? ` ${resource.botProfile}` : '';
           const summary = packageSummaryText(resource.packageSummary);
           const drillSummary = microDrillSummaryText(resource.microDrill);
+          const scorecardSummary = scorecardSummaryText(resource.scorecard);
           const mapSummary = mapSummaryText(resource);
           const matchupSummary = matchupSummaryText(resource.matchup);
           const readinessSummary = readinessSummaryText(resource.loadoutReadiness);
           const summaryNode = summary ? `<span>${summary}</span>` : '';
           const drillSummaryNode = drillSummary ? `<span>${drillSummary}</span>` : '';
+          const scorecardNode = scorecardSummary ? `<span>${scorecardSummary}</span>` : '';
           const mapSummaryNode = mapSummary ? `<span>${mapSummary}</span>` : '';
           const matchupNode = matchupSummary ? `<span>${matchupSummary}</span>` : '';
           const readinessNode = readinessSummary ? `<span>${readinessSummary}</span>` : '';
-          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${drillSummaryNode}${mapSummaryNode}${matchupNode}${readinessNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${parts}${skill}</code>`;
+          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${drillSummaryNode}${scorecardNode}${mapSummaryNode}${matchupNode}${readinessNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${parts}${skill}</code>`;
           button.addEventListener('click', () => {
             setConfig(resource);
           });
