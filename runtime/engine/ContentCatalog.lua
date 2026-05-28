@@ -1550,8 +1550,8 @@ M.encounters = {
         label = "Red Dragon package",
         kind = "boss package",
         phase = "late micro",
-        description = "Sustained projectile dodging, ember orbits, crossing flame sweeps, Fire Bat snaps, and burn-pressure comparison.",
-        features = {"projectile pressure", "rotating embers", "crossing sweeps", "targeted AOE rhythm", "Fire Bat adds"},
+        description = "Sustained projectile dodging, ember orbits, crossing flame sweeps, Fire Bat snaps, and DRAGONFIRE burn that heals the dragon when avoidable mechanics are eaten.",
+        features = {"projectile pressure", "rotating embers", "crossing sweeps", "targeted AOE rhythm", "Fire Bat adds", "DRAGONFIRE on mechanic hits"},
         suggestedLevel = 5,
         suggestedPreset = "late",
         monsters = {"Red Dragon"},
@@ -1560,6 +1560,13 @@ M.encounters = {
         },
         package = {
             primary = "Red Dragon",
+            micro_punish = {
+                label = "DRAGONFIRE",
+                heal_primary = 7,
+                overheal_cap_pct = 0.30,
+                streak_break = 6,
+                streak_break_label = "EMBER BREAK",
+            },
             orbit = {
                 interval = 255,
                 offset = 42,

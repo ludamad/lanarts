@@ -31,6 +31,7 @@ grep -q "hazard_dodge_frames" runtime/engine/StartBalanceRun.lua
 grep -q "_hazard_dodge_action" runtime/ai/AutomatedPlayerInputSource.lua
 grep -q "almost-won, not too hard" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_primary_hp_pct" runtime/engine/ContentApi.lua
+grep -q "DRAGONFIRE on mechanic hits" runtime/engine/ContentCatalog.lua
 grep -q "streak_break" runtime/engine/ContentCatalog.lua
 grep -q "MICRO BREAK" runtime/objects/ContentLabHazards.lua
 grep -q "avg_package_pressure_sync_bursts" runtime/engine/StartBalanceRun.lua
