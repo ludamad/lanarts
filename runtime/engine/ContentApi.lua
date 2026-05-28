@@ -669,6 +669,9 @@ local function warnings_for(config, selected)
     if selected.class and selected.class.range == "far" and selected.encounter and selected.encounter.kind and selected.encounter.kind:find("duel") then
         warnings[#warnings + 1] = "Ranged classes should be checked for keep-away uptime in arena encounters."
     end
+    if selected.encounter and selected.encounter.kind and selected.encounter.kind:find("baseline") then
+        warnings[#warnings + 1] = "Baseline duels are control cases; use package variants for encounter tuning."
+    end
     if config.className == "Necromancer" then
         warnings[#warnings + 1] = "Necromancer damage taken must be read with regen-adjusted pressure."
     end
@@ -1031,6 +1034,140 @@ local function run_summary_payload(config)
     }
 end
 
+local function selected_package_encounter(config)
+    local selected_encounter = encounter_lookup()[config.encounter or ""]
+    if selected_encounter and selected_encounter.package then
+        return selected_encounter
+    end
+    for _, encounter in ipairs(package_encounters()) do
+        if encounter.id == "gragh-rescue-package" then
+            return encounter
+        end
+    end
+    return package_encounters()[1]
+end
+
+local function package_resource_entry(group, name, meta, goal, config, encounter, seed_offset, extras)
+    local intensity = selected_intensity(config)
+    local rhythms = encounter_rhythms(encounter, intensity)
+    local package_summary = package_summary_from_rhythms(rhythms)
+    local extra = copy_object(extras or {})
+    extra.encounterLabel = encounter and encounter.label or config.encounter
+    extra.encounterKind = encounter and encounter.kind or ""
+    extra.encounterPhase = encounter and encounter.phase or ""
+    extra.suggestedLevel = encounter and encounter.suggestedLevel or nil
+    extra.suggestedPreset = encounter and encounter.suggestedPreset or nil
+    extra.rhythms = rhythms
+    extra.packageSummary = package_summary
+    return resource_entry(group, name, meta, goal, config, seed_offset, extra)
+end
+
+local function package_base_config(config, encounter)
+    local next_config = copy_object(config)
+    next_config.level = encounter_resource_level(encounter)
+    next_config.preset = encounter_resource_preset(encounter, next_config.preset, next_config.level)
+    next_config.mapDesc = ""
+    next_config.mapProfile = ""
+    next_config.mapAlgorithm = ""
+    next_config.encounter = encounter.id or ""
+    next_config.monsters = ""
+    return next_config
+end
+
+local function package_matrix_payload(config)
+    local resources = {}
+    local packages = package_encounters()
+    local selected_package = selected_package_encounter(config)
+
+    for idx, encounter in ipairs(packages) do
+        local next_config = package_base_config(config, encounter)
+        next_config.intensity = "standard"
+        resources[#resources + 1] = package_resource_entry(
+            "Package baselines",
+            encounter.label or encounter.id,
+            string.format("L%d, %s, %s", next_config.level, next_config.preset, encounter.phase or encounter.kind or "package"),
+            "declared package baseline at its suggested level and loadout",
+            next_config,
+            encounter,
+            idx,
+            {
+                packageRole = "baseline",
+            }
+        )
+    end
+
+    if selected_package then
+        for idx, class in ipairs(Catalog.classes or {}) do
+            local next_config = package_base_config(config, selected_package)
+            next_config.className = class.id
+            resources[#resources + 1] = package_resource_entry(
+                "Selected package class sweep",
+                class.label or class.id,
+                string.format("%s, L%d, %s", selected_package.label or selected_package.id, next_config.level, next_config.intensity),
+                class.balance_focus or "class buffer against selected package",
+                next_config,
+                selected_package,
+                30 + idx,
+                {
+                    packageRole = "class-sweep",
+                }
+            )
+        end
+
+        for idx, intensity in ipairs(Catalog.intensities or {}) do
+            local next_config = package_base_config(config, selected_package)
+            next_config.intensity = intensity.id or "standard"
+            resources[#resources + 1] = package_resource_entry(
+                "Selected package pressure sweep",
+                intensity.label or intensity.id,
+                string.format("%s, %.2fx tempo", selected_package.label or selected_package.id, tonumber(intensity.tempo) or 1),
+                intensity.description or "package pressure comparison",
+                next_config,
+                selected_package,
+                50 + idx,
+                {
+                    packageRole = "pressure-sweep",
+                }
+            )
+        end
+    end
+
+    local rescue_classes = {"Fighter", "Necromancer", "Stormcaller"}
+    local class_by_id = class_lookup()
+    local rescue_offset = 70
+    for _, encounter in ipairs(packages) do
+        if encounter.package and encounter.package.rescue then
+            for _, class_name in ipairs(rescue_classes) do
+                local next_config = package_base_config(config, encounter)
+                next_config.className = class_name
+                next_config.intensity = "high"
+                rescue_offset = rescue_offset + 1
+                local class = class_by_id[class_name] or {label = class_name}
+                resources[#resources + 1] = package_resource_entry(
+                    "Rescue package checks",
+                    string.format("%s %s", class.label or class_name, encounter.label or encounter.id),
+                    string.format("L%d, high pressure, rescue timing", next_config.level),
+                    "body-block rescue read under class-specific positioning pressure",
+                    next_config,
+                    encounter,
+                    rescue_offset,
+                    {
+                        packageRole = "rescue-check",
+                    }
+                )
+            end
+        end
+    end
+
+    return {
+        schema = 1,
+        config = config,
+        selectedPackage = selected_package,
+        count = #resources,
+        resources = resources,
+    }
+end
+
 local function enemy_matrix_payload(config, start_offset)
     local resources = enemy_probe_resources(config, start_offset or 90)
     return {
@@ -1192,6 +1329,7 @@ local function workspace_payload(config)
         enemyOptions = enemy_options_payload(config),
         mapGeneration = map_generation_payload(config),
         analysisPlan = analysis_plan,
+        packageMatrix = package_matrix_payload(config),
         resourceMatrix = resource_matrix_payload(config),
         commands = analysis_plan.commands,
     }
@@ -1252,6 +1390,10 @@ end
 
 function M.resource_matrix_json(raw_json)
     return encode(resource_matrix_payload(normalized_config(parse_json_object(raw_json))))
+end
+
+function M.package_matrix_json(raw_json)
+    return encode(package_matrix_payload(normalized_config(parse_json_object(raw_json))))
 end
 
 function M.workspace_json(raw_json)

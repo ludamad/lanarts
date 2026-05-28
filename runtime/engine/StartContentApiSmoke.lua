@@ -34,6 +34,7 @@ local function run_content_api_smoke()
     local has_mummoner_package = false
     local has_executioner_package = false
     local has_executioner_rescue_package = false
+    local has_executioner_baseline = false
     local has_predator_thicket = false
     local has_ruin_crossroads = false
     for _, algorithm in ipairs(catalog.map_algorithms or {}) do
@@ -48,6 +49,8 @@ local function run_content_api_smoke()
             has_giant_chicken_package = true
         elseif encounter.id == "mummoner-duel" and encounter.package then
             has_mummoner_package = true
+        elseif encounter.id == "executioner-duel" and encounter.kind == "baseline duel" then
+            has_executioner_baseline = true
         elseif encounter.id == "executioner-blade-package" then
             has_executioner_package = true
         elseif encounter.id == "executioner-rescue-package" then
@@ -56,6 +59,7 @@ local function run_content_api_smoke()
     end
     expect(has_giant_chicken_package, "catalog should expose Giant Chicken as a package")
     expect(has_mummoner_package, "catalog should expose Mummoner as a package")
+    expect(has_executioner_baseline, "catalog should mark the plain Executioner duel as a baseline")
     expect(has_executioner_package, "catalog should expose the Executioner blade package")
     expect(has_executioner_rescue_package, "catalog should expose the Executioner rescue package")
     expect(has_predator_thicket, "catalog should expose the predator thicket overworld profile")
@@ -88,6 +92,24 @@ local function run_content_api_smoke()
     expect(summary.packageSummary and summary.packageSummary.hasRescue, "summary should expose package rescue summary")
     expect(summary.packageSummary and summary.packageSummary.hasSummons, "summary should expose package summon summary")
     expect(summary.packageSummary and summary.packageSummary.hitsEscorts, "summary should expose ally-risk package summary")
+
+    local executioner_baseline_config = [[{
+        "className": "Templar",
+        "level": 5,
+        "preset": "late",
+        "seed": "22440",
+        "encounter": "executioner-duel",
+        "intensity": "standard"
+    }]]
+    local executioner_baseline_summary = parse_response("executioner baseline summary", ContentApi.run_summary_json(executioner_baseline_config))
+    local has_baseline_warning = false
+    for _, warning in ipairs(executioner_baseline_summary.warnings or {}) do
+        if tostring(warning):find("control cases") then
+            has_baseline_warning = true
+        end
+    end
+    expect(executioner_baseline_summary.encounter and executioner_baseline_summary.encounter.kind == "baseline duel", "executioner duel should resolve as a baseline")
+    expect(has_baseline_warning, "baseline duel summary should steer tuning toward package variants")
     expect(summary.args and #summary.args > 0, "summary should expose launch args")
     expect(summary.balanceArgs and #summary.balanceArgs > 0, "summary should expose balance args")
 
@@ -255,6 +277,30 @@ local function run_content_api_smoke()
     expect(has_mummoner_resource, "matrix should include Mummoner package coverage")
     expect(has_none_loadout and has_gragh_loadout and has_late_loadout, "matrix should include loadout sweep coverage")
 
+    local package_matrix = parse_response("package matrix", ContentApi.package_matrix_json(config))
+    expect((package_matrix.count or 0) == #(package_matrix.resources or {}), "package matrix count should match resources")
+    expect((package_matrix.count or 0) >= 20, "package matrix should expose package-focused resources")
+    expect(package_matrix.selectedPackage and package_matrix.selectedPackage.id == "gragh-rescue-package", "package matrix should preserve selected package")
+    local has_package_baseline = false
+    local has_package_class_sweep = false
+    local has_package_pressure_sweep = false
+    local has_rescue_check = false
+    for _, resource in ipairs(package_matrix.resources or {}) do
+        if resource.group == "Package baselines" and resource.encounter == "gragh-rescue-package" then
+            has_package_baseline = resource.packageSummary and resource.packageSummary.hasRescue
+        elseif resource.group == "Selected package class sweep" and resource.className == "Fighter" then
+            has_package_class_sweep = resource.packageSummary and resource.packageSummary.hasSummons
+        elseif resource.group == "Selected package pressure sweep" and resource.intensity == "brutal" then
+            has_package_pressure_sweep = resource.packageSummary and resource.packageSummary.fastestLoopFrames > 0
+        elseif resource.group == "Rescue package checks" and resource.className == "Necromancer" then
+            has_rescue_check = resource.packageSummary and resource.packageSummary.hitsEscorts
+        end
+    end
+    expect(has_package_baseline, "package matrix should include package baselines with summaries")
+    expect(has_package_class_sweep, "package matrix should include selected-package class sweeps")
+    expect(has_package_pressure_sweep, "package matrix should include selected-package pressure sweeps")
+    expect(has_rescue_check, "package matrix should include rescue package checks")
+
     local enemy_options = parse_response("enemy options", ContentApi.enemy_options_json(config))
     expect(enemy_options.enemyGroups and #enemy_options.enemyGroups >= 3, "enemy options should expose enemy groups")
     expect(enemy_options.monsterEvalArgs and enemy_options.monsterEvalArgs[1] == "engine.StartMonsterEvals", "enemy options should expose monster eval args")
@@ -281,6 +327,7 @@ local function run_content_api_smoke()
     expect(workspace.mapGeneration and #(workspace.mapGeneration.previews or {}) >= 3, "workspace should expose map previews")
     expect(workspace.analysisPlan and workspace.analysisPlan.commands and workspace.analysisPlan.commands.classSweep, "workspace should expose analysis commands")
     expect(workspace.commands and workspace.commands.monsterEval, "workspace should expose top-level commands")
+    expect(workspace.packageMatrix and (workspace.packageMatrix.count or 0) >= 20, "workspace should expose package matrix resources")
     expect(workspace.resourceMatrix and (workspace.resourceMatrix.count or 0) == #(workspace.resourceMatrix.resources or {}), "workspace should expose generated resources")
 
     print(string.format(

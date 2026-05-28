@@ -757,6 +757,9 @@
             <option value="overworld-open-meadow">Open meadow</option>
             <option value="overworld-broken-grove">Broken grove</option>
             <option value="overworld-old-stones">Old stones</option>
+            <option value="overworld-river-road">River road</option>
+            <option value="overworld-predator-thicket">Predator thicket</option>
+            <option value="overworld-ruin-crossroads">Ruin crossroads</option>
           </select>
         </div>
         <div class="field">
@@ -769,7 +772,7 @@
             <option value="red-dragon-duel">Red Dragon package</option>
             <option value="gragh-duel">Gragh package</option>
             <option value="gragh-rescue-package">Gragh rescue package</option>
-            <option value="executioner-duel">Executioner duel</option>
+            <option value="executioner-duel">Executioner baseline duel</option>
             <option value="executioner-blade-package">Executioner blade package</option>
             <option value="executioner-rescue-package">Executioner rescue package</option>
             <option value="hell-pressure-pair">Hell pressure pair</option>
@@ -831,6 +834,11 @@
 
       <section class="section">
         <div class="section-title">Matrix</div>
+        <div class="resource-list" id="packageResources"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">All Resources</div>
         <div class="resource-list" id="resources"></div>
       </section>
     </aside>
@@ -886,7 +894,7 @@
         {id: 'red-dragon-duel', label: 'Red Dragon package', kind: 'boss package', phase: 'late micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['projectile pressure', 'rotating embers', 'targeted AOE rhythm', 'Fire Bat adds']},
         {id: 'gragh-duel', label: 'Gragh package', kind: 'boss package', phase: 'late micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['melee pursuit', 'rotating orbs', 'short AOE windows', 'Hound adds']},
         {id: 'gragh-rescue-package', label: 'Gragh rescue package', kind: 'rescue package', phase: 'late multiplayer', suggestedLevel: 5, suggestedPreset: 'late', features: ['protect ally', 'body-block rescue', 'pull/taunt window', 'rotating orbs', 'short AOE windows', 'Hound adds']},
-        {id: 'executioner-duel', label: 'Executioner duel', kind: 'duel', phase: 'late melee', suggestedLevel: 5, suggestedPreset: 'late'},
+        {id: 'executioner-duel', label: 'Executioner baseline duel', kind: 'baseline duel', phase: 'late melee', suggestedLevel: 5, suggestedPreset: 'late', features: ['baseline', 'no package rhythms']},
         {id: 'executioner-blade-package', label: 'Executioner blade package', kind: 'melee package', phase: 'late melee micro', suggestedLevel: 5, suggestedPreset: 'late', features: ['melee pursuit', 'rotating blades', 'Hound adds', 'short AOE windows']},
         {id: 'executioner-rescue-package', label: 'Executioner rescue package', kind: 'rescue package', phase: 'late multiplayer', suggestedLevel: 5, suggestedPreset: 'late', features: ['protect ally', 'body-block rescue', 'pull/taunt window', 'rotating blades', 'Hound adds', 'short AOE windows']},
         {id: 'hell-pressure-pair', label: 'Hell pressure pair', kind: 'enemy mix package', phase: 'late enemy mix', suggestedLevel: 5, suggestedPreset: 'late', features: ['support pressure', 'melee bodyguard', 'ember orbit', 'targeted pulse', 'Imp adds']},
@@ -1056,6 +1064,7 @@
       ];
 
       let generatedResources = [];
+      let packageResources = [];
       let resolvedRun = null;
       let loadoutOptions = null;
       let enemyOptions = null;
@@ -1175,6 +1184,7 @@
           enemyGroup: resource.enemyGroup || '',
           enemyPack: resource.enemyPack || '',
           analysisGoal: resource.analysisGoal || resource.goalId || '',
+          packageSummary: resource.packageSummary || null,
           seed: String(resource.seed || 1),
         };
       }
@@ -1202,6 +1212,7 @@
         mapProfiles = (catalog.map_algorithms || catalog.maps || []).slice(0, 4).map(normalizePreviewProfile);
         rebuildMapAlgorithms($('mapDesc').value, $('mapAlgorithm').value);
         wireResources();
+        wirePackageResources();
         setConfig(currentConfig());
       }
 
@@ -1549,6 +1560,12 @@
         wireResources();
       }
 
+      function updatePackageResources() {
+        const response = callContentApi('lanarts_content_package_matrix_json', currentConfig());
+        packageResources = response && response.resources ? response.resources.map(normalizeResource) : [];
+        wirePackageResources();
+      }
+
       function updateWorkspace() {
         workspace = callContentApi('lanarts_content_workspace_json', currentConfig());
         if (!workspace) {
@@ -1558,6 +1575,9 @@
         resolvedRun = workspace.runSummary || null;
         enemyOptions = workspace.enemyOptions || null;
         analysisPlan = workspace.analysisPlan || null;
+        packageResources = workspace.packageMatrix && workspace.packageMatrix.resources
+          ? workspace.packageMatrix.resources.map(normalizeResource)
+          : [];
         generatedResources = workspace.resourceMatrix && workspace.resourceMatrix.resources
           ? workspace.resourceMatrix.resources.map(normalizeResource)
           : [];
@@ -1566,6 +1586,7 @@
         renderEnemyOptions(enemyOptions);
         renderAnalysisPlan(analysisPlan);
         drawPreviews(workspace.mapGeneration);
+        wirePackageResources();
         wireResources();
         return true;
       }
@@ -1580,6 +1601,7 @@
         updateEnemyOptions();
         updateAnalysisPlan();
         drawPreviews();
+        updatePackageResources();
         updateGeneratedResources();
       }
 
@@ -2019,11 +2041,33 @@
         Module.callMain(args);
       }
 
-      function wireResources() {
-        const list = $('resources');
+      function packageSummaryText(summary) {
+        if (!summary) {
+          return '';
+        }
+        const parts = [];
+        if (summary.rhythmIds && summary.rhythmIds.length) {
+          parts.push(summary.rhythmIds.join('/'));
+        }
+        if (summary.fastestLoopFrames) {
+          parts.push(`${summary.fastestLoopFrames}f loop`);
+        }
+        if (summary.hasRescue) {
+          parts.push(`rescue ${summary.rescueClutchWindow || '?'}f`);
+        }
+        if (summary.hasSummons) {
+          parts.push(`adds cap ${summary.summonCap || '?'}`);
+        }
+        if (summary.hitsEscorts) {
+          parts.push('ally risk');
+        }
+        return parts.join(' | ');
+      }
+
+      function wireResourceList(list, entries) {
         list.innerHTML = '';
         let currentGroup = '';
-        resources.concat(generatedResources).forEach((resource) => {
+        entries.forEach((resource) => {
           const group = resource.group || 'Curated';
           if (group !== currentGroup) {
             currentGroup = group;
@@ -2037,7 +2081,9 @@
           button.className = 'resource';
           const goal = resource.goal ? `<span>${resource.goal}</span>` : '';
           const pressure = resource.intensity && resource.intensity !== 'standard' ? ` ${resource.intensity}` : '';
-          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${goal}</span><code>${resource.className} L${resource.level}${pressure}</code>`;
+          const summary = packageSummaryText(resource.packageSummary);
+          const summaryNode = summary ? `<span>${summary}</span>` : '';
+          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}</code>`;
           button.addEventListener('click', () => {
             setConfig(resource);
           });
@@ -2045,8 +2091,17 @@
         });
       }
 
+      function wireResources() {
+        wireResourceList($('resources'), resources.concat(generatedResources));
+      }
+
+      function wirePackageResources() {
+        wireResourceList($('packageResources'), packageResources);
+      }
+
       function initShell() {
         wireResources();
+        wirePackageResources();
         setConfig(configFromQuery());
         document.querySelectorAll('#loadoutPreset button').forEach((button) => {
           button.addEventListener('click', () => {
