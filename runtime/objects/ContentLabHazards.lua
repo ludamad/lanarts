@@ -1168,6 +1168,8 @@ local function package_result(director, outcome)
         rescue_counter_damage_total = director.rescue_counter_damage_total or 0,
         rescue_counter_stagger_frames = director.rescue_counter_stagger_frames or 0,
         rescue_misses = misses,
+        rescue_fatal_misses = director.rescue_fatal_misses or 0,
+        rescue_survived_misses = director.rescue_survived_misses or 0,
         rescue_best_margin = best,
         rescue_last_margin = director.rescue_last_margin,
         rescue_last_pull_frames = director.rescue_last_pull_frames,
@@ -1269,6 +1271,8 @@ local function package_state_from_director(director)
         rescue_counter_damage_total = director.rescue_counter_damage_total or 0,
         rescue_counter_stagger_frames = director.rescue_counter_stagger_frames or 0,
         rescue_misses = misses,
+        rescue_fatal_misses = director.rescue_fatal_misses or 0,
+        rescue_survived_misses = director.rescue_survived_misses or 0,
         rescue_best_margin = director.rescue_best_margin,
         rescue_last_margin = director.rescue_last_margin,
         rescue_last_pull_frames = director.rescue_last_pull_frames,
@@ -2035,9 +2039,17 @@ function M.create_rescue_strike(args)
                 else
                     self.saved = false
                     self.damage = self.ally_damage
+                    local before_hp = self.target.stats and self.target.stats.hp or 0
                     damage_player(self, self.target)
+                    local after_hp = self.target.stats and self.target.stats.hp or 0
+                    local fatal_miss = self.target.destroyed or (before_hp > 0 and after_hp <= 0)
                     if self.director and not self.director.destroyed then
                         self.director.rescue_misses = (self.director.rescue_misses or 0) + 1
+                        if fatal_miss then
+                            self.director.rescue_fatal_misses = (self.director.rescue_fatal_misses or 0) + 1
+                        else
+                            self.director.rescue_survived_misses = (self.director.rescue_survived_misses or 0) + 1
+                        end
                         add_micro_event(self.director, {
                             kind = "hit",
                             points = -35,
@@ -2721,6 +2733,8 @@ function M.add_director(game_map, package, intensity)
         rescue_counter_windows = 0,
         rescue_counter_damage_total = 0,
         rescue_counter_stagger_frames = 0,
+        rescue_fatal_misses = 0,
+        rescue_survived_misses = 0,
         pressure_max_count = 0,
         pressure_overlap_frames = 0,
         micro_score = 0,

@@ -111,9 +111,10 @@ Balance simulations:
     Rescue package rows also track pull/taunt total frames and uptime rate, so
     clears can be flagged when forced target control is carrying the fight.
     Rescue-package report rows summarize save, clutch, perfect, early,
-    timing-score, pull, taunt-uptime, counter-window, counter-damage, and
-    counter-stagger rates, then warn when pull/taunt control or early parking is
-    replacing the intended few-frame body-block micro.
+    timing-score, pull, taunt-uptime, counter-window, counter-damage,
+    counter-stagger, fatal-miss, and buffered-miss rates, then warn when
+    pull/taunt control or early parking is replacing the intended few-frame
+    body-block micro.
     When a balance run matches a content-lab micro drill, the report also emits
     drill_scorecard rows for that drill's pass/fail targets, including rescue
     saves, perfect saves, taunt reliance, add cleanup, stack overlap, spacing,

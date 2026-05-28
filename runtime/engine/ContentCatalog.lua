@@ -1695,7 +1695,7 @@ M.encounters = {
             escort = {
                 monster = "Spectral Beast",
                 count = 1,
-                hp = 88,
+                hp = 176,
                 radius = 122,
                 angle = 0,
             },

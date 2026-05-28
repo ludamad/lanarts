@@ -672,6 +672,8 @@ local function package_state_fields(player)
             package_rescue_counter_damage_total = "",
             package_rescue_counter_stagger_frames = "",
             package_rescue_misses = "",
+            package_rescue_fatal_misses = "",
+            package_rescue_survived_misses = "",
             package_rescue_best_margin = "",
             package_rescue_last_margin = "",
             package_rescue_last_pull_frames = "",
@@ -756,6 +758,8 @@ local function package_state_fields(player)
         package_rescue_counter_damage_total = format_rate(state.rescue_counter_damage_total or 0),
         package_rescue_counter_stagger_frames = state.rescue_counter_stagger_frames or 0,
         package_rescue_misses = state.rescue_misses or 0,
+        package_rescue_fatal_misses = state.rescue_fatal_misses or 0,
+        package_rescue_survived_misses = state.rescue_survived_misses or 0,
         package_rescue_best_margin = state.rescue_best_margin or "",
         package_rescue_last_margin = state.rescue_last_margin or "",
         package_rescue_last_pull_frames = state.rescue_last_pull_frames or "",
@@ -1126,6 +1130,7 @@ local SUMMARY_METRICS = {
     "package_frames", "package_escort_count", "package_escort_hp", "package_escort_max_hp",
     "package_escort_hp_pct", "package_rescue_saves", "package_rescue_clutch_saves",
     "package_rescue_perfect_saves", "package_rescue_pulls", "package_rescue_misses",
+    "package_rescue_fatal_misses", "package_rescue_survived_misses",
     "package_rescue_opportunities", "package_rescue_save_rate", "package_rescue_clutch_rate",
     "package_rescue_perfect_rate", "package_rescue_early_saves", "package_rescue_early_rate",
     "package_rescue_timing_score", "package_rescue_pull_rate",
@@ -1935,6 +1940,8 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local counter_windows = tonumber(row.avg_package_rescue_counter_windows) or 0
     local counter_damage = tonumber(row.avg_package_rescue_counter_damage_total) or 0
     local counter_stagger = tonumber(row.avg_package_rescue_counter_stagger_frames) or 0
+    local fatal_misses = tonumber(row.avg_package_rescue_fatal_misses) or 0
+    local survived_misses = tonumber(row.avg_package_rescue_survived_misses) or 0
 
     add_report_row(
         rows,
@@ -1945,7 +1952,7 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         save_rate,
         0,
         string.format(
-            "%s rescue reads in %s averaged %.1f opportunities/run: save %.1f%%, clutch %.1f%%, perfect %.1f%%, early %.1f%%, timing %.2f, pull %.1f%%, taunt uptime %.1f%%, counter %.1f windows, %.1f damage, %.1f stagger.",
+            "%s rescue reads in %s averaged %.1f opportunities/run: save %.1f%%, clutch %.1f%%, perfect %.1f%%, early %.1f%%, timing %.2f, pull %.1f%%, taunt uptime %.1f%%, counter %.1f windows, %.1f damage, %.1f stagger, fatal miss %.1f, survived miss %.1f.",
             class_name,
             encounter,
             rescue_opportunities,
@@ -1958,7 +1965,9 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
             pull_uptime * 100,
             counter_windows,
             counter_damage,
-            counter_stagger
+            counter_stagger,
+            fatal_misses,
+            survived_misses
         )
     )
 
@@ -1977,6 +1986,23 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
             counter_windows,
             counter_damage,
             counter_stagger
+        )
+    )
+
+    add_report_row(
+        rows,
+        class_name,
+        "info",
+        "package_rescue_miss_buffer",
+        "avg_package_rescue_fatal_misses",
+        fatal_misses,
+        0,
+        string.format(
+            "%s rescue misses in %s averaged %.1f fatal misses and %.1f buffered misses per run.",
+            class_name,
+            encounter,
+            fatal_misses,
+            survived_misses
         )
     )
 
@@ -2758,6 +2784,7 @@ local function run_balance(raw_args)
             "package_rescue_counter_windows", "package_rescue_counter_damage_total",
             "package_rescue_counter_stagger_frames",
             "package_rescue_misses",
+            "package_rescue_fatal_misses", "package_rescue_survived_misses",
             "package_rescue_best_margin", "package_rescue_last_margin", "package_rescue_last_pull_frames",
             "package_rescue_next_frames", "package_rescue_active_count", "package_rescue_active_remaining",
             "package_rescue_active_blocked", "package_rescue_active_late", "package_rescue_active_perfect",
@@ -2827,6 +2854,7 @@ local function run_balance(raw_args)
             "package_rescue_counter_windows", "package_rescue_counter_damage_total",
             "package_rescue_counter_stagger_frames",
             "package_rescue_misses",
+            "package_rescue_fatal_misses", "package_rescue_survived_misses",
             "package_rescue_best_margin", "package_rescue_last_margin", "package_rescue_last_pull_frames",
             "package_rescue_next_frames", "package_rescue_active_count", "package_rescue_active_remaining",
             "package_rescue_active_blocked", "package_rescue_active_late", "package_rescue_active_perfect",
@@ -2909,6 +2937,7 @@ local function run_balance(raw_args)
             "avg_package_rescue_counter_windows", "avg_package_rescue_counter_damage_total",
             "avg_package_rescue_counter_stagger_frames",
             "avg_package_rescue_misses",
+            "avg_package_rescue_fatal_misses", "avg_package_rescue_survived_misses",
             "avg_package_pressure_max_count", "avg_package_pressure_overlap_rate",
             "avg_package_micro_score", "avg_package_micro_best_streak",
             "avg_package_micro_hits", "avg_package_micro_dodges",
