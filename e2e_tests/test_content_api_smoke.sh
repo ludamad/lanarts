@@ -27,6 +27,8 @@ grep -q "avg_package_micro_punish_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_punish_break_total" runtime/engine/StartBalanceRun.lua
 grep -q "step-limit stalls" runtime/engine/StartBalanceRun.lua
 grep -q "improve mechanic readability before tuning" runtime/engine/StartBalanceRun.lua
+grep -q "hazard_dodge_frames" runtime/engine/StartBalanceRun.lua
+grep -q "_hazard_dodge_action" runtime/ai/AutomatedPlayerInputSource.lua
 grep -q "streak_break" runtime/engine/ContentCatalog.lua
 grep -q "MICRO BREAK" runtime/objects/ContentLabHazards.lua
 grep -q "avg_package_pressure_sync_bursts" runtime/engine/StartBalanceRun.lua

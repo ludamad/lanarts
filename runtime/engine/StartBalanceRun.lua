@@ -1134,6 +1134,8 @@ local function sample_run(run, telemetry, samples, reason)
         rescue_intercept_frames = telemetry.rescue_intercept_frames or 0,
         rescue_hold_frames = telemetry.rescue_hold_frames or 0,
         rescue_late_reaction_frames = telemetry.rescue_late_reaction_frames or 0,
+        hazard_dodge_frames = telemetry.hazard_dodge_frames or 0,
+        hazard_dodge_skip_frames = telemetry.hazard_dodge_skip_frames or 0,
         objective_hunt_enemy_frames = telemetry.objective_hunt_enemy_frames or 0,
         necromancer_close_frames = telemetry.necromancer_close_frames or 0,
         necromancer_pain_orders = necromancer_pain_orders,
@@ -1229,6 +1231,8 @@ local function summarize_run(run, telemetry, outcome)
         rescue_intercept_frames = telemetry.rescue_intercept_frames or 0,
         rescue_hold_frames = telemetry.rescue_hold_frames or 0,
         rescue_late_reaction_frames = telemetry.rescue_late_reaction_frames or 0,
+        hazard_dodge_frames = telemetry.hazard_dodge_frames or 0,
+        hazard_dodge_skip_frames = telemetry.hazard_dodge_skip_frames or 0,
         objective_hunt_enemy_frames = telemetry.objective_hunt_enemy_frames or 0,
         combat_frames = telemetry.combat_frames or 0,
         explore_frames = telemetry.explore_frames or 0,
@@ -1333,6 +1337,7 @@ local SUMMARY_METRICS = {
     "explore_frames", "rest_frames", "idle_frames", "random_walk_frames",
     "unstick_frames", "portal_stop_frames", "ranged_keepaway_frames",
     "ranged_close_enemy_frames", "ranged_close_gragh_frames", "rescue_intercept_frames",
+    "hazard_dodge_frames", "hazard_dodge_skip_frames",
     "rescue_hold_frames", "rescue_late_reaction_frames", "objective_hunt_enemy_frames", "necromancer_close_frames",
     "necromancer_pain_orders", "necromancer_pain_during_regen_orders",
     "necromancer_regen_frames", "necromancer_regen_recovered_total",
@@ -3611,6 +3616,7 @@ local function run_balance(raw_args)
             "hunt_enemy_frames", "ranged_keepaway_frames", "ranged_close_enemy_frames",
             "ranged_close_gragh_frames", "rescue_intercept_frames", "rescue_hold_frames",
             "rescue_late_reaction_frames",
+            "hazard_dodge_frames", "hazard_dodge_skip_frames",
             "necromancer_regen_frames", "necromancer_regen_recovered_total",
             "monster_kills", "visible_enemy_frames", "alive_enemy_counts",
             "alive_enemy_hp", "alive_enemy_max_hp",
@@ -3726,6 +3732,7 @@ local function run_balance(raw_args)
             "hunt_enemy_frames", "ranged_keepaway_frames", "ranged_close_enemy_frames",
             "ranged_close_gragh_frames", "rescue_intercept_frames", "rescue_hold_frames",
             "rescue_late_reaction_frames",
+            "hazard_dodge_frames", "hazard_dodge_skip_frames",
         })
         write_csv(args.spells_out, spell_rows, {"run_id", "seed", "seed_group", "class_run_index", "class", "start_level", "loadout", "bot_profile", "spell", "orders"})
         write_csv(args.damage_stats_out, damage_stat_rows, {

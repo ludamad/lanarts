@@ -2500,6 +2500,7 @@ function M.create_pulse(args)
         windup_frames = windup,
         active_frames = active,
         linger_frames = linger,
+        threat_radius = radius,
         director = args.director,
         source = args.source,
         damage = args.damage or 4,

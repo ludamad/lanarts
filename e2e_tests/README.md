@@ -182,6 +182,14 @@ Balance simulations:
     Drills tagged `stress` replace the practice clear-floor check with a
     skill-buffer ceiling, which models late-game content that a primitive
     human-profile bot should not clear reliably.
+    The automated player now actively dodges content-lab orb, pulse, and
+    sweep hazards (not just rescue lines), moving to the least-dangerous
+    adjacent tile when it stands inside or just ahead of an active/imminent
+    danger zone. Dodging is skill-gated: perfect reacts early with a wide
+    margin, while skilled/human/sloppy react later, with a smaller margin,
+    and sometimes skip the read (hazard_dodge_skip_chance). hazard_dodge_frames
+    and hazard_dodge_skip_frames are emitted per run so package micro is now a
+    usable measurement instrument rather than every profile eating mechanics.
     Use --package_components orbit,pulse,sweep,summon,escort,rescue to isolate
     package parts while keeping the same encounter arena, monsters, and
     pressure preset. A rescue component automatically keeps its escort target.

@@ -28,6 +28,9 @@ local DEFAULTS = {
     charging_keepaway_bonus = 24,
     melee_close = 46,
     stuck_end_frames = 720,
+    hazard_dodge_skip_chance = 0,
+    hazard_react_margin = 16,
+    hazard_lookahead_frames = 8,
 }
 
 local SKILL_PROFILES = {
@@ -38,6 +41,8 @@ local SKILL_PROFILES = {
         item_skip_chance = 0.04,
         weapon_skip_chance = 0.02,
         movement_noise_chance = 0.02,
+        hazard_dodge_skip_chance = 0.05,
+        hazard_react_margin = 12,
     },
     human = {
         decision_interval = 4,
@@ -45,6 +50,8 @@ local SKILL_PROFILES = {
         item_skip_chance = 0.14,
         weapon_skip_chance = 0.06,
         movement_noise_chance = 0.07,
+        hazard_dodge_skip_chance = 0.16,
+        hazard_react_margin = 8,
     },
     sloppy = {
         decision_interval = 7,
@@ -52,6 +59,8 @@ local SKILL_PROFILES = {
         item_skip_chance = 0.28,
         weapon_skip_chance = 0.14,
         movement_noise_chance = 0.14,
+        hazard_dodge_skip_chance = 0.34,
+        hazard_react_margin = 4,
     },
 }
 
@@ -238,6 +247,102 @@ local function active_rescue_strikes()
         return a_remaining < b_remaining
     end)
     return strikes
+end
+
+local function hazard_center(obj)
+    if obj.anchor and not obj.anchor.destroyed then
+        return obj.anchor.x, obj.anchor.y
+    end
+    local c = obj.center_xy or obj.xy
+    return c[1], c[2]
+end
+
+local function predict_orb_xy(obj, frames)
+    local angle = (obj.angle or 0) + (obj.angular_velocity or 0) * frames
+    local cx, cy = hazard_center(obj)
+    local r = obj.orbit_radius or 0
+    return cx + math.cos(angle) * r, cy + math.sin(angle) * r
+end
+
+local function sweep_segment(obj, elapsed)
+    local active = obj.active_frames or 0
+    local active_elapsed = math.max(0, math.min(active, elapsed - (obj.windup_frames or 0)))
+    local active_pct = active > 0 and active_elapsed / active or 0
+    local offset = (active_pct - 0.5) * (obj.travel or 0)
+    local normal = (obj.angle or 0) + math.pi / 2
+    local bx, by = hazard_center(obj)
+    local cx = bx + math.cos(normal) * offset
+    local cy = by + math.sin(normal) * offset
+    local half = (obj.length or 0) / 2
+    local ca, sa = math.cos(obj.angle or 0), math.sin(obj.angle or 0)
+    return {x = cx + ca * half, y = cy + sa * half}, {x = cx - ca * half, y = cy - sa * half}
+end
+
+-- Collect content-lab hazards that are active or imminent so the bot can dodge them.
+local function active_hazards()
+    local hazards = {}
+    for _, obj in ipairs(Map.objects_list()) do
+        if obj and not obj.destroyed then
+            if obj.content_lab_orb then
+                hazards[#hazards + 1] = obj
+            elseif obj.content_lab_pulse or obj.content_lab_sweep then
+                local e = obj.elapsed or 0
+                if e <= (obj.windup_frames or 0) + (obj.active_frames or 0) then
+                    hazards[#hazards + 1] = obj
+                end
+            end
+        end
+    end
+    return hazards
+end
+
+-- Graded danger at xy: 0 when clear, larger the deeper a point sits inside a hazard
+-- reach, so the dodge can pick the least-bad direction even when zones overlap.
+local function hazard_danger_at(hazards, x, y, lookahead, margin, player_radius)
+    local danger = 0
+    for _, obj in ipairs(hazards) do
+        if obj.content_lab_orb then
+            local reach = (obj.hit_radius or 0) + margin + player_radius
+            local cx, cy = obj.xy[1], obj.xy[2]
+            local dx, dy = x - cx, y - cy
+            local p = reach - math.sqrt(dx * dx + dy * dy)
+            local px, py = predict_orb_xy(obj, lookahead)
+            local pd = reach - math.sqrt((x - px) * (x - px) + (y - py) * (y - py))
+            danger = danger + math.max(0, p, pd)
+        elseif obj.content_lab_pulse then
+            local e = obj.elapsed or 0
+            local w = obj.windup_frames or 0
+            local a = obj.active_frames or 0
+            local weight = 0
+            if e > w and e <= w + a then
+                weight = 1.0
+            elseif e <= w and (w - e) <= lookahead then
+                weight = 0.7
+            end
+            if weight > 0 then
+                local reach = (obj.threat_radius or 0) + margin + player_radius
+                local dx, dy = x - obj.xy[1], y - obj.xy[2]
+                danger = danger + math.max(0, reach - math.sqrt(dx * dx + dy * dy)) * weight
+            end
+        elseif obj.content_lab_sweep then
+            local e = obj.elapsed or 0
+            local w = obj.windup_frames or 0
+            local a = obj.active_frames or 0
+            local weight, sample = 0, e
+            if e > w and e <= w + a then
+                weight, sample = 1.0, e + math.min(lookahead, w + a - e)
+            elseif e <= w and (w - e) <= lookahead then
+                weight, sample = 0.6, w + 1
+            end
+            if weight > 0 then
+                local pa, pb = sweep_segment(obj, sample)
+                local reach = (obj.lane_radius or 0) + margin + player_radius
+                local dist = math.sqrt(point_to_segment_sqr({x = x, y = y}, pa, pb))
+                danger = danger + math.max(0, reach - dist) * weight
+            end
+        end
+    end
+    return danger
 end
 
 local function best_direction_towards_xy(player, xy)
@@ -716,6 +821,43 @@ function AutomatedPlayerInputSource:_rescue_action()
     return self:_set_move(best_direction_towards_xy(player, block_xy)) or true
 end
 
+function AutomatedPlayerInputSource:_hazard_dodge_action()
+    local hazards = active_hazards()
+    if #hazards == 0 then
+        return false
+    end
+    local player = self.player
+    local margin = self.options.hazard_react_margin or 12
+    local lookahead = self.options.hazard_lookahead_frames or 8
+    local pr = player.target_radius or player.radius or 12
+    local here = hazard_danger_at(hazards, player.x, player.y, lookahead, margin, pr)
+    if here <= 0 then
+        return false
+    end
+    -- Skill gate: lower profiles sometimes fail to react in time.
+    if self:_chance(self.options.hazard_dodge_skip_chance) then
+        self:_record_scalar("hazard_dodge_skip_frames")
+        return false
+    end
+    local best_dir, best_danger = nil, here
+    for _, dir in ipairs(MOVE_DIRECTIONS) do
+        local nxy = {player.x + dir[1] * 16, player.y + dir[2] * 16}
+        if not Map.object_tile_check(player, nxy) then
+            local d = hazard_danger_at(hazards, nxy[1], nxy[2], lookahead, margin, pr)
+            if d < best_danger - 0.001 then
+                best_danger = d
+                best_dir = dir
+            end
+        end
+    end
+    if not best_dir then
+        return false
+    end
+    self.queued_movements = {}
+    self:_record_scalar("hazard_dodge_frames")
+    return self:_set_move(best_dir)
+end
+
 function AutomatedPlayerInputSource:_combat_move(enemies, ordered_spell)
     local closest = enemies[1]
     if not closest then
@@ -1004,6 +1146,11 @@ function AutomatedPlayerInputSource:step()
     self:_record_visible_enemies(enemies)
 
     if self:_rescue_action() then
+        self:_clear_stall_state()
+        self:_record_decision()
+        return
+    end
+    if self:_hazard_dodge_action() then
         self:_clear_stall_state()
         self:_record_decision()
         return
