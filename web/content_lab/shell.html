@@ -2096,6 +2096,7 @@
             if (summary.packageSummary.rescuePullFrames) {
               addChip(packageInfo, `${summary.packageSummary.rescuePullFrames}f pull`);
             }
+            addChip(packageInfo, 'snap-pull lane');
           }
           if (summary.packageSummary.hasSummons) {
             addChip(packageInfo, `adds cap ${summary.packageSummary.summonCap || 1}`);

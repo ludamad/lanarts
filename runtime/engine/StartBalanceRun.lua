@@ -725,6 +725,10 @@ local function package_state_fields(player)
             package_rescue_avg_timed_pull_margin = "",
             package_rescue_pull_snap_bursts = "",
             package_rescue_perfect_pull_snap_bursts = "",
+            package_rescue_snap_window_frames = "",
+            package_rescue_snap_ready_frames = "",
+            package_rescue_snap_ready_rate = "",
+            package_rescue_broad_pull_index = "",
             package_rescue_pull_total_frames = "",
             package_rescue_pull_uptime_rate = "",
             package_rescue_taunt_safe_frames = "",
@@ -751,6 +755,11 @@ local function package_state_fields(player)
             package_rescue_active_perfect = "",
             package_rescue_active_commit_distance = "",
             package_rescue_active_commit_ready = "",
+            package_rescue_active_snap_ready = "",
+            package_rescue_active_snap_perfect = "",
+            package_rescue_active_snap_window_open = "",
+            package_rescue_active_snap_distance = "",
+            package_rescue_active_snap_remaining = "",
             package_rescue_pull_active_frames = "",
             package_rescue_pull_target = "",
         }
@@ -879,6 +888,10 @@ local function package_state_fields(player)
         package_rescue_avg_timed_pull_margin = format_rate(state.rescue_avg_timed_pull_margin or 0),
         package_rescue_pull_snap_bursts = state.rescue_pull_snap_bursts or 0,
         package_rescue_perfect_pull_snap_bursts = state.rescue_perfect_pull_snap_bursts or 0,
+        package_rescue_snap_window_frames = state.rescue_snap_window_frames or 0,
+        package_rescue_snap_ready_frames = state.rescue_snap_ready_frames or 0,
+        package_rescue_snap_ready_rate = format_rate(state.rescue_snap_ready_rate or 0),
+        package_rescue_broad_pull_index = format_rate(state.rescue_broad_pull_index or 0),
         package_rescue_pull_total_frames = state.rescue_pull_total_frames or 0,
         package_rescue_pull_uptime_rate = format_rate(state.rescue_pull_uptime_rate or 0),
         package_rescue_taunt_safe_frames = state.rescue_taunt_safe_frames or 0,
@@ -905,6 +918,11 @@ local function package_state_fields(player)
         package_rescue_active_perfect = state.rescue_active_perfect and "true" or "false",
         package_rescue_active_commit_distance = state.rescue_active_commit_distance or "",
         package_rescue_active_commit_ready = state.rescue_active_commit_ready and "true" or "false",
+        package_rescue_active_snap_ready = state.rescue_active_snap_ready and "true" or "false",
+        package_rescue_active_snap_perfect = state.rescue_active_snap_perfect and "true" or "false",
+        package_rescue_active_snap_window_open = state.rescue_active_snap_window_open and "true" or "false",
+        package_rescue_active_snap_distance = state.rescue_active_snap_distance or "",
+        package_rescue_active_snap_remaining = state.rescue_active_snap_remaining or "",
         package_rescue_pull_active_frames = state.rescue_pull_active_frames or 0,
         package_rescue_pull_target = state.rescue_pull_target or "",
     }
@@ -1366,6 +1384,8 @@ local SUMMARY_METRICS = {
     "package_rescue_perfect_pull_margin_total", "package_rescue_avg_pull_margin",
     "package_rescue_avg_timed_pull_margin",
     "package_rescue_pull_snap_bursts", "package_rescue_perfect_pull_snap_bursts",
+    "package_rescue_snap_window_frames", "package_rescue_snap_ready_frames",
+    "package_rescue_snap_ready_rate", "package_rescue_broad_pull_index",
     "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
     "package_rescue_taunt_safe_frames", "package_rescue_taunt_strain_frames",
     "package_rescue_taunt_strain_rate", "package_rescue_taunt_strain_breaks",
@@ -2364,6 +2384,10 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local perfect_pulls = tonumber(row.avg_package_rescue_perfect_pulls) or 0
     local pull_snap_bursts = tonumber(row.avg_package_rescue_pull_snap_bursts) or 0
     local perfect_pull_snap_bursts = tonumber(row.avg_package_rescue_perfect_pull_snap_bursts) or 0
+    local snap_window_frames = tonumber(row.avg_package_rescue_snap_window_frames) or 0
+    local snap_ready_frames = tonumber(row.avg_package_rescue_snap_ready_frames) or 0
+    local snap_ready_rate = tonumber(row.avg_package_rescue_snap_ready_rate) or 0
+    local broad_pull_index = tonumber(row.avg_package_rescue_broad_pull_index) or 0
     local counter_windows = tonumber(row.avg_package_rescue_counter_windows) or 0
     local counter_damage = tonumber(row.avg_package_rescue_counter_damage_total) or 0
     local counter_stagger = tonumber(row.avg_package_rescue_counter_stagger_frames) or 0
@@ -2522,6 +2546,45 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
                 taunt_safe_frames,
                 taunt_strain_frames,
                 taunt_strain_pulses
+            )
+        )
+    end
+
+    add_report_row(
+        rows,
+        class_name,
+        "info",
+        "package_pull_snap",
+        "avg_package_rescue_snap_ready_rate",
+        snap_ready_rate,
+        0,
+        string.format(
+            "%s rescue snaps in %s averaged %.1f achievable snap-window frames/run with %.1f positioned-to-convert frames (%.1f%% snap-ready); broad-pull index %.2f.",
+            class_name,
+            encounter,
+            snap_window_frames,
+            snap_ready_frames,
+            snap_ready_rate * 100,
+            broad_pull_index
+        )
+    )
+
+    if broad_pull_index >= 0.20 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_micro",
+            "avg_package_rescue_broad_pull_index",
+            broad_pull_index,
+            0.20,
+            string.format(
+                "%s ran a %.2f broad-pull index in %s (pull uptime %.1f%% with only %.1f%% timed pulls); broad taunt is carrying the rescue lane instead of clutch/perfect snaps.",
+                class_name,
+                broad_pull_index,
+                encounter,
+                pull_uptime * 100,
+                timed_pull_rate * 100
             )
         )
     end
@@ -3708,6 +3771,8 @@ local function run_balance(raw_args)
             "avg_package_rescue_perfect_pull_margin_total", "avg_package_rescue_avg_pull_margin",
             "avg_package_rescue_avg_timed_pull_margin",
             "avg_package_rescue_pull_snap_bursts", "avg_package_rescue_perfect_pull_snap_bursts",
+            "avg_package_rescue_snap_window_frames", "avg_package_rescue_snap_ready_frames",
+            "avg_package_rescue_snap_ready_rate", "avg_package_rescue_broad_pull_index",
             "avg_package_rescue_pull_total_frames", "avg_package_rescue_pull_uptime_rate",
             "avg_package_rescue_taunt_safe_frames", "avg_package_rescue_taunt_strain_frames",
             "avg_package_rescue_taunt_strain_rate", "avg_package_rescue_taunt_strain_breaks",

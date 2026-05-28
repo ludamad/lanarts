@@ -101,6 +101,12 @@ grep -q "TAUNT STRAIN" runtime/objects/ContentLabHazards.lua
 grep -q "pull-discipline" runtime/engine/ContentApi.lua
 grep -q "avg_package_rescue_pull_snap_bursts" runtime/engine/StartBalanceRun.lua
 grep -q "PERFECT SNAP" runtime/objects/ContentLabHazards.lua
+grep -q "avg_package_rescue_snap_ready_rate" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_rescue_broad_pull_index" runtime/engine/StartBalanceRun.lua
+grep -q "package_rescue_active_snap_ready" runtime/engine/StartBalanceRun.lua
+grep -q "broad-pull" runtime/engine/ContentApi.lua
+grep -q "avg_package_rescue_snap_ready_rate" runtime/engine/ContentApi.lua
+grep -q "\"SNAP\"" runtime/objects/ContentLabHazards.lua
 grep -q "mana-sapper-ritual-package" runtime/engine/ContentCatalog.lua
 grep -q "mana-sapper-ritual-package" web/content_lab/shell.html
 grep -q "hell-warrior-flame-package" runtime/engine/ContentCatalog.lua

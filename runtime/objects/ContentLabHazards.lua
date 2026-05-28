@@ -1405,7 +1405,7 @@ local function draw_package_hud(director)
         row_count = row_count + 1
     end
     if package.rescue then
-        row_count = row_count + 6
+        row_count = row_count + 7
     end
     if package.escort then
         row_count = row_count + 1
@@ -1624,6 +1624,44 @@ local function draw_package_hud(director)
         draw_hud_row(y, "READ", read_value, read_color, read_pct)
         y = y + HUD_ROW_H
 
+        -- SNAP: the precision-pull opportunity as a first-class active state, kept distinct
+        -- from broad taunt uptime. Bright = convert now; dim = window open but not in range.
+        local snap_window_frames = director.rescue_snap_window_frames or 0
+        local snap_ready_frames = director.rescue_snap_ready_frames or 0
+        local snap_ready_rate = safe_rate(snap_ready_frames, math.max(1, snap_window_frames))
+        local snap_value
+        local snap_color = COL_LIGHT_GRAY
+        local snap_pct = 0
+        if (director.rescue_pull_active_frames or 0) > 0
+            and (director.rescue_pull_active_clutch or director.rescue_pull_active_perfect) then
+            snap_value = (director.rescue_pull_active_perfect and "perfect pull " or "clutch pull ")
+                .. format_frames(director.rescue_pull_active_frames)
+            snap_color = director.rescue_pull_active_perfect and COL_WHITE or COL_PALE_GREEN
+            snap_pct = 1
+        elseif state.snap_ready then
+            local dist_text = state.snap_distance and (" " .. tostring(state.snap_distance) .. "px") or ""
+            snap_value = (state.snap_perfect and "perfect snap" or "snap now")
+                .. dist_text .. " " .. format_frames(state.snap_remaining or 0)
+            snap_color = state.snap_perfect and COL_WHITE or COL_PALE_GREEN
+            snap_pct = 1
+        elseif state.snap_window_open then
+            snap_value = "open " .. format_frames(state.snap_remaining or 0)
+                .. (state.commit_distance and (" cut " .. tostring(state.commit_distance) .. "px") or "")
+            snap_color = COL_PALE_YELLOW
+            snap_pct = 1
+        elseif state.camping then
+            snap_value = "camped (generic)"
+            snap_color = COL_LIGHT_GRAY
+        else
+            snap_value = snap_window_frames > 0
+                and (snap_ready_frames .. "/" .. snap_window_frames .. " " .. format_pct(snap_ready_rate))
+                or "no snap yet"
+            snap_color = snap_window_frames > 0 and COL_PALE_GREEN or COL_LIGHT_GRAY
+            snap_pct = snap_ready_rate
+        end
+        draw_hud_row(y, "SNAP", snap_value, snap_color, snap_pct)
+        y = y + HUD_ROW_H
+
         local saves = director.rescue_saves or 0
         local clutch_saves = director.rescue_clutch_saves or 0
         local perfect_saves = director.rescue_perfect_saves or 0
@@ -1761,6 +1799,10 @@ local function package_result(director, outcome)
     local perfect_pull_rate = safe_rate(perfect_pulls, pulls)
     local pull_total_frames = director.rescue_pull_total_frames or 0
     local pull_uptime_rate = safe_rate(pull_total_frames, math.max(1, frames))
+    local snap_window_frames = director.rescue_snap_window_frames or 0
+    local snap_ready_frames = director.rescue_snap_ready_frames or 0
+    local snap_ready_rate = safe_rate(snap_ready_frames, snap_window_frames)
+    local broad_pull_index = pull_uptime_rate * (1 - timed_pull_rate)
     local taunt_safe_frames = director.rescue_taunt_safe_frames or 0
     local taunt_strain_frames = director.rescue_taunt_strain_frames or 0
     local taunt_strain_rate = safe_rate(taunt_strain_frames, math.max(1, pull_total_frames))
@@ -1854,6 +1896,10 @@ local function package_result(director, outcome)
         rescue_avg_timed_pull_margin = avg_timed_pull_margin,
         rescue_pull_snap_bursts = director.rescue_pull_snap_bursts or 0,
         rescue_perfect_pull_snap_bursts = director.rescue_perfect_pull_snap_bursts or 0,
+        rescue_snap_window_frames = snap_window_frames,
+        rescue_snap_ready_frames = snap_ready_frames,
+        rescue_snap_ready_rate = snap_ready_rate,
+        rescue_broad_pull_index = broad_pull_index,
         rescue_pull_total_frames = pull_total_frames,
         rescue_pull_uptime_rate = pull_uptime_rate,
         rescue_taunt_safe_frames = taunt_safe_frames,
@@ -2032,6 +2078,11 @@ local function package_state_from_director(director)
         rescue_avg_timed_pull_margin = avg_timed_pull_margin,
         rescue_pull_snap_bursts = director.rescue_pull_snap_bursts or 0,
         rescue_perfect_pull_snap_bursts = director.rescue_perfect_pull_snap_bursts or 0,
+        rescue_snap_window_frames = director.rescue_snap_window_frames or 0,
+        rescue_snap_ready_frames = director.rescue_snap_ready_frames or 0,
+        rescue_snap_ready_rate = safe_rate(director.rescue_snap_ready_frames or 0, director.rescue_snap_window_frames or 0),
+        rescue_broad_pull_index = safe_rate(director.rescue_pull_total_frames or 0, math.max(1, director.elapsed or 0))
+            * (1 - safe_rate(clutch_pulls, pulls)),
         rescue_pull_total_frames = director.rescue_pull_total_frames or 0,
         rescue_pull_uptime_rate = safe_rate(director.rescue_pull_total_frames or 0, math.max(1, director.elapsed or 0)),
         rescue_taunt_safe_frames = director.rescue_taunt_safe_frames or 0,
@@ -2058,6 +2109,11 @@ local function package_state_from_director(director)
         rescue_active_perfect = rescue_state and rescue_state.perfect or false,
         rescue_active_commit_distance = rescue_state and rescue_state.commit_distance or nil,
         rescue_active_commit_ready = rescue_state and rescue_state.commit_ready or false,
+        rescue_active_snap_ready = rescue_state and rescue_state.snap_ready or false,
+        rescue_active_snap_perfect = rescue_state and rescue_state.snap_perfect or false,
+        rescue_active_snap_window_open = rescue_state and rescue_state.snap_window_open or false,
+        rescue_active_snap_distance = rescue_state and rescue_state.snap_distance or nil,
+        rescue_active_snap_remaining = rescue_state and rescue_state.snap_remaining or nil,
         rescue_pull_active_frames = director.rescue_pull_active_frames or 0,
         rescue_pull_target = director.rescue_pull_target,
         pressure_active_count = pressure.active_count or 0,
@@ -2299,6 +2355,20 @@ local function record_rescue_danger_frame(strike, remaining, blocked)
         else
             director.rescue_perfect_uncovered_frames = (director.rescue_perfect_uncovered_frames or 0) + 1
             record_commit_frame(true)
+        end
+    end
+    local late_window = strike.late_window or 0
+    if late_window > 0 and remaining <= late_window then
+        -- Suppress snap windows that an early camper has already pre-solved as a generic save.
+        local camping = blocked and strike.block_started_elapsed
+            and ((strike.windup or 0) - strike.block_started_elapsed) > late_window
+        if not camping then
+            director.rescue_snap_window_frames = (director.rescue_snap_window_frames or 0) + 1
+            -- Ready: positioned to convert the precision pull right now -- either body-blocking
+            -- just-in-time inside the window, or cutting into the line from the commit zone.
+            if blocked or committed then
+                director.rescue_snap_ready_frames = (director.rescue_snap_ready_frames or 0) + 1
+            end
         end
     end
 end
@@ -3247,6 +3317,28 @@ function M.create_rescue_strike(args)
                         and (perfect_call and "PERFECT HOLD" or last_call and "CLUTCH HOLD" or "HOLD")
                         or (perfect_call and ("PERFECT CUT" .. distance_text) or last_call and ("CUT NOW" .. distance_text) or ("INTERCEPT" .. distance_text))
                     draw_text(hint_color, Display.CENTER, hint_label_xy, hint_label)
+                    -- Snap aperture: while the timing window is open and a save is actually
+                    -- convertible right now (and no early camper has pre-solved it), draw a
+                    -- closing ring of ticks. Brighter and tighter for the perfect window so a
+                    -- precision snap reads differently from a generic body block.
+                    local camping = self.current_blocker and self.block_started_elapsed
+                        and ((self.windup or 0) - self.block_started_elapsed) > self.late_window
+                    if last_call and not camping and (in_block_zone or in_commit_zone) then
+                        local window = perfect_call and math.max(1, self.perfect_window) or math.max(1, self.late_window)
+                        local close = 1 - math.max(0, math.min(1, remaining / window))
+                        local snap_color = perfect_call and COL_WHITE or COL_PALE_GREEN
+                        local aperture = block_radius + (perfect_call and 8 or 16) * (1 - close)
+                        local tick_count = perfect_call and 8 or 6
+                        for idx = 1, tick_count do
+                            local angle = (idx - 1) * math.pi * 2 / tick_count + self.elapsed * 0.05
+                            local tick_xy = {
+                                hint_xy[1] + math.cos(angle) * aperture,
+                                hint_xy[2] + math.sin(angle) * aperture,
+                            }
+                            draw_world_circle(snap_color, tick_xy, perfect_call and 3 or 2.4, 0.02, 0.45 + close * 0.45)
+                        end
+                        draw_world_circle(snap_color, hint_xy, aperture, 0.01, perfect_call and 0.55 or 0.34)
+                    end
                 end
             end
             draw_world_circle(color, to_xy, self.strike_radius * progress, self.resolved and 0.14 or 0.07, self.resolved and 0.70 or 0.45)
@@ -3542,9 +3634,25 @@ function active_rescue_commit_state()
                     best_score = score
                     best = commit
                     best.remaining = remaining
-                    best.late = remaining <= (obj.late_window or 0)
-                    best.perfect = remaining <= (obj.perfect_window or 0)
+                    local late_window = obj.late_window or 0
+                    local perfect_window = obj.perfect_window or 0
+                    best.late = remaining <= late_window
+                    best.perfect = remaining <= perfect_window
                     best.blocked = obj.current_blocker ~= nil
+                    -- A snap is the precision-pull opportunity: the timing window is open
+                    -- and no early camper is already holding the line (which would resolve as a
+                    -- generic save). A blocker that only just arrived inside the late window is
+                    -- still converting a snap, so it does not count as camping.
+                    local camping = false
+                    if obj.current_blocker and obj.block_started_elapsed then
+                        camping = ((obj.windup or 0) - obj.block_started_elapsed) > late_window
+                    end
+                    best.camping = camping
+                    best.snap_window = late_window
+                    best.snap_window_open = late_window > 0 and remaining <= late_window and not camping
+                    local reachable = best.in_block_zone or best.in_commit_zone
+                    best.snap_ready = best.snap_window_open and (best.blocked or reachable) or false
+                    best.snap_perfect = best.snap_ready and remaining <= perfect_window or false
                 end
             end
         end
@@ -3576,6 +3684,14 @@ function rescue_window_state(director, rescue)
         commit_ready = commit and commit.in_commit_zone or false,
         commit_player = commit and commit.player and commit.player.name or nil,
         commit_remaining = commit and commit.remaining or nil,
+        snap_ready = commit and commit.snap_ready or false,
+        snap_perfect = commit and commit.snap_perfect or false,
+        snap_window_open = commit and commit.snap_window_open or false,
+        snap_distance = commit and commit.snap_ready and commit.distance_to_block
+            and math.floor((commit.distance_to_block or 0) + 0.5) or nil,
+        snap_remaining = commit and commit.snap_window_open and commit.remaining or nil,
+        snap_window = commit and commit.snap_window or late_window,
+        camping = commit and commit.camping or false,
     }
 end
 
@@ -3935,6 +4051,8 @@ function M.add_director(game_map, package, intensity)
         rescue_perfect_window_frames = 0,
         rescue_perfect_uncovered_frames = 0,
         rescue_blocked_perfect_frames = 0,
+        rescue_snap_window_frames = 0,
+        rescue_snap_ready_frames = 0,
         rescue_perfect_window = scale_frames((package.rescue or {}).perfect_window, 6, intensity),
         rescue_margin_total = 0,
         rescue_clutch_margin_total = 0,

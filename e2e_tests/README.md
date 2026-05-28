@@ -135,6 +135,14 @@ Balance simulations:
     average timed-pull margins, plus pull-snap burst and strain-pulse counts,
     so clears can be flagged when forced target control is carrying the fight
     instead of few-frame snap-pull saves.
+    Rescue rows also expose the snap opportunity as a first-class state:
+    package_rescue_active_snap_ready / _distance / _remaining mark when a
+    clutch/perfect pull is convertible during a live line, while
+    package_rescue_snap_window_frames, _snap_ready_frames, and
+    _snap_ready_rate aggregate how often achievable snap windows were
+    actually positioned for. A package_rescue_broad_pull_index (pull
+    uptime weighted by non-timed pulls) and a broad-pull scorecard check
+    flag high taunt reliance when clutch/perfect pull rates are low.
     Rescue-package report rows summarize save, clutch, perfect, early,
     timing-score, pull, timed-pull, pull-discipline, perfect-pull,
     taunt-uptime, taunt-strain, late-cover, perfect-cover, uncovered
