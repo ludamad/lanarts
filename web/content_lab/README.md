@@ -36,6 +36,7 @@ The in-game package HUD counts saves and marks blocks that start inside the fina
 Package HUDs show primary target HP so threat timing can be read against actual clear progress.
 Package HUDs also show current aggro, with a world link from the primary enemy to its target so taunt/pull state is readable during rescue windows.
 Package HUDs include a NEXT row that summarizes the active or nearest package beat, keeping AOE, orbs, summons, and rescue-line timing readable during heavy micro.
+Summon waves use short visible add portals before enemies appear, so add pressure has a readable cleanup beat instead of an instant spawn.
 Orb and AOE rows switch from spawn countdowns to active/warning state while those package threats are live.
 Rescue packages also show a live READ row for cut-lane, clutch, hold, and pull-target states while the line is active.
 When a package clears or fails, the game posts a compact result banner with elapsed time and rescue stats.

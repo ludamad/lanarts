@@ -793,12 +793,14 @@ local function encounter_rhythms(encounter, intensity)
         }
     end
     if package.summon then
+        local windup = scaled_frames(package.summon.windup, 24, intensity)
         rows[#rows + 1] = {
             id = "summon",
             label = "Summons",
             offset = scaled_frames(package.summon.offset, 0, intensity),
             interval = scaled_frames(package.summon.interval, 1, intensity),
-            duration = 20,
+            duration = windup,
+            windup = windup,
             monsters = copy_array(package.summon.monsters or {}),
             count = scaled_count(package.summon.count, 1, intensity),
             maxAlive = scaled_count(package.summon.max_alive, 4, intensity),

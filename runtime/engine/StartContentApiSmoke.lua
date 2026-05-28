@@ -111,16 +111,19 @@ local function run_content_api_smoke()
     expect(summary.rhythms and #summary.rhythms >= 2, "summary should expose package rhythms")
     local has_rescue_rhythm = false
     local has_rescue_summon = false
+    local has_rescue_summon_windup = false
     for _, rhythm in ipairs(summary.rhythms or {}) do
         if rhythm.id == "rescue" then
             has_rescue_rhythm = true
             expect((rhythm.pullFrames or 0) > 0, "rescue rhythm should expose pull frames")
         elseif rhythm.id == "summon" then
             has_rescue_summon = true
+            has_rescue_summon_windup = (rhythm.windup or 0) > 0
         end
     end
     expect(has_rescue_rhythm, "summary should expose rescue rhythm metadata")
     expect(has_rescue_summon, "Gragh rescue should expose add rhythm metadata")
+    expect(has_rescue_summon_windup, "Gragh rescue should expose add portal windup")
     expect(summary.packageSummary and summary.packageSummary.hasRescue, "summary should expose package rescue summary")
     expect(summary.packageSummary and summary.packageSummary.hasSummons, "summary should expose package summon summary")
     expect(summary.packageSummary and summary.packageSummary.hitsEscorts, "summary should expose ally-risk package summary")

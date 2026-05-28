@@ -81,8 +81,8 @@ Balance simulations:
     primary target HP, current package aggro target, the current/next package
     threat, and live rescue-window fields such as next strike, active count,
     blocked/late state, and active pull target for HUD and replay checks.
-    Orb and AOE package rows likewise expose active/warning counts and remaining
-    frames so timeline samples can be matched against the in-game HUD.
+    Orb, summon, and AOE package rows likewise expose active/warning counts and
+    remaining frames so timeline samples can be matched against the in-game HUD.
     Use --package_components orbit,pulse,summon,escort,rescue to isolate
     package parts while keeping the same encounter arena, monsters, and
     pressure preset. A rescue component automatically keeps its escort target.

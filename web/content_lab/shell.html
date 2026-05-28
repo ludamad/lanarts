@@ -2412,13 +2412,15 @@
           });
         }
         if (pkg.summon) {
+          const windup = scaledFrames(pkg.summon.windup, 24, intensity);
           rows.push({
             id: 'summon',
             label: 'Summons',
             offset: scaledFrames(pkg.summon.offset, 0, intensity),
             interval: scaledFrames(pkg.summon.interval, 1, intensity),
-            duration: 20,
-            meta: `${scaledCount(pkg.summon.count, 1, intensity)} ${((pkg.summon.monsters || [])[0]) || 'add'} per wave, cap ${scaledCount(pkg.summon.max_alive, 4, intensity)}`,
+            duration: windup,
+            windup,
+            meta: `${windup}f portal, ${scaledCount(pkg.summon.count, 1, intensity)} ${((pkg.summon.monsters || [])[0]) || 'add'} per wave, cap ${scaledCount(pkg.summon.max_alive, 4, intensity)}`,
           });
         }
         return rows;
@@ -2443,7 +2445,8 @@
         }
         if (row.id === 'summon') {
           const monster = ((row.monsters || [])[0]) || 'add';
-          return `${row.count || 1} ${monster} per wave, cap ${row.maxAlive || 1}`;
+          const windup = row.windup ? `${row.windup}f portal, ` : '';
+          return `${windup}${row.count || 1} ${monster} per wave, cap ${row.maxAlive || 1}`;
         }
         return '';
       }

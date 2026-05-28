@@ -412,6 +412,7 @@ local function draw_aggro_marker(director, package)
 end
 
 local summon_count
+local active_summon_portals
 local active_orbs
 local active_pulses
 local active_rescue_strikes
@@ -491,8 +492,13 @@ local function draw_package_hud(director)
         local interval, offset = scaled_interval_and_offset(summon, 360, 120, intensity)
         local delta = next_delta(director.elapsed, interval, offset)
         local current = summon_count()
+        local warning_count, warning_remaining = active_summon_portals()
         local max_alive = scale_count(summon.max_alive, 4, intensity)
-        draw_hud_row(y, "ADDS", format_frames(delta) .. " " .. current .. "/" .. max_alive, COL_PALE_YELLOW, 1 - delta / interval)
+        if warning_count > 0 then
+            draw_hud_row(y, "ADDS", "warn " .. format_frames(warning_remaining or 0) .. " " .. current .. "/" .. max_alive, COL_PALE_YELLOW, 1)
+        else
+            draw_hud_row(y, "ADDS", format_frames(delta) .. " " .. current .. "/" .. max_alive, COL_PALE_YELLOW, 1 - delta / interval)
+        end
         y = y + HUD_ROW_H
     end
     if package.rescue then
@@ -659,6 +665,7 @@ local function package_state_from_director(director)
     local pulls = director.rescue_pulls or 0
     local opportunities = saves + misses
     local orb_count, orb_remaining = active_orbs()
+    local summon_warning_count, summon_warning_remaining = active_summon_portals()
     local pulse_warning_count, pulse_active_count, pulse_warning_remaining, pulse_active_remaining = active_pulses()
     local aggro = aggro_state(director.package or {})
     local next_threat = next_threat_state(director, director.package or {})
@@ -684,6 +691,8 @@ local function package_state_from_director(director)
         next_threat_label = next_threat.label,
         next_threat_state = next_threat.state,
         next_threat_frames = next_threat.frames,
+        summon_warning_count = summon_warning_count,
+        summon_warning_remaining = summon_warning_remaining,
         orb_active_count = orb_count,
         orb_active_remaining = orb_remaining,
         pulse_warning_count = pulse_warning_count,
@@ -926,6 +935,53 @@ function M.create_orb(args)
             local fade_out = math.min(1, (self.duration - self.elapsed) / 30)
             local alpha = math.max(0, math.min(fade_in, fade_out))
             draw_world_circle(COL_PALE_BLUE, self.xy, self.hit_radius, 0.20 * alpha, 0.78 * alpha)
+        end,
+    }
+end
+
+function M.create_summon_portal(args)
+    return GameObject.object_create {
+        map = args.map,
+        xy = copy_xy(args.xy),
+        radius = 1,
+        solid = false,
+        depth = HAZARD_DEPTH + 1,
+        elapsed = 0,
+        windup = args.windup or 24,
+        monster_type = args.monster_type,
+        director = args.director,
+        max_alive = args.max_alive or 4,
+        portal_radius = args.portal_radius or 24,
+        resolved = false,
+        content_lab_summon_portal = true,
+        on_step = function(self)
+            self.elapsed = self.elapsed + 1
+            if self.director and self.director.destroyed then
+                GameObject.destroy(self)
+                return
+            end
+            if not self.resolved and self.elapsed >= self.windup then
+                self.resolved = true
+                if self.monster_type and summon_count() < self.max_alive then
+                    GameObject.enemy_create {
+                        map = self.map,
+                        type = self.monster_type,
+                        xy = round_xy(self.xy),
+                        content_lab_summon = true,
+                    }
+                end
+                GameObject.destroy(self)
+            end
+        end,
+        on_draw = function(self)
+            local remaining = math.max(0, self.windup - self.elapsed)
+            local progress = math.max(0.15, math.min(1, self.elapsed / math.max(1, self.windup)))
+            local radius = self.portal_radius * (0.55 + progress * 0.45)
+            local pulse = 1 + math.sin(self.elapsed * 0.42) * 0.08
+            draw_world_circle(COL_PALE_YELLOW, self.xy, radius * pulse, 0.08 + progress * 0.10, 0.42 + progress * 0.32)
+            draw_world_circle(COL_PALE_RED, self.xy, math.max(6, radius * 0.42), 0.05, 0.35 + progress * 0.28)
+            local label_xy = Display.to_screen_xy({self.xy[1], self.xy[2] - self.portal_radius - 12})
+            draw_text(COL_PALE_YELLOW, Display.CENTER, label_xy, "ADD " .. format_frames(remaining))
         end,
     }
 end
@@ -1303,6 +1359,19 @@ function summon_count()
     return count
 end
 
+function active_summon_portals()
+    local count = 0
+    local best_remaining
+    for _, obj in ipairs(Map.objects_list()) do
+        if obj and not obj.destroyed and obj.content_lab_summon_portal and not obj.resolved then
+            count = count + 1
+            local remaining = math.max(0, (obj.windup or 0) - (obj.elapsed or 0))
+            best_remaining = math.min(best_remaining or remaining, remaining)
+        end
+    end
+    return count, best_remaining
+end
+
 function active_orbs()
     local count = 0
     local best_remaining
@@ -1457,6 +1526,18 @@ function next_threat_state(director, package)
         }
     end
 
+    local summon_warning_count, summon_warning_remaining = active_summon_portals()
+    if summon_warning_count > 0 then
+        return {
+            id = "summon",
+            label = "ADDS",
+            state = "warn",
+            frames = summon_warning_remaining or 0,
+            pct = 1,
+            color = COL_PALE_YELLOW,
+        }
+    end
+
     local candidates = {}
     local function add(candidate)
         if candidate then
@@ -1558,7 +1639,7 @@ local function spawn_summons(director, package)
     local summon = package.summon or {}
     local intensity = director.intensity
     local max_alive = scale_count(summon.max_alive, 4, intensity)
-    if summon_count() >= max_alive then
+    if summon_count() + active_summon_portals() >= max_alive then
         return
     end
     local anchor = primary_monster(package.primary)
@@ -1569,16 +1650,20 @@ local function spawn_summons(director, package)
     end
     local count = scale_count(summon.count, 1, intensity)
     local radius = summon.radius or 150
+    local windup = scale_frames(summon.windup, 24, intensity)
     for idx = 1, count do
-        if summon_count() >= max_alive then
+        if summon_count() + active_summon_portals() >= max_alive then
             return
         end
         local xy = summon_spawn_xy(director, center, radius, idx, count)
-        GameObject.enemy_create {
+        M.create_summon_portal {
             map = director.map,
-            type = monsters[((idx - 1) % #monsters) + 1],
+            director = director,
             xy = xy,
-            content_lab_summon = true,
+            monster_type = monsters[((idx - 1) % #monsters) + 1],
+            windup = windup,
+            max_alive = max_alive,
+            portal_radius = summon.portal_radius or 24,
         }
     end
 end
