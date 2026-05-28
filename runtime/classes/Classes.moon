@@ -209,6 +209,41 @@ Data.class_create {
     }
 }
 Data.class_create {
+    name: "Dicebinder",
+    sprites: (for i=1,2 do "spr_classes.rogue#{i}"),
+    available_spells: {
+        { spell: "Dash Attack", level_needed: 1 },
+        { spell: "Power Strike", level_needed: 2 },
+        { spell: "Berserk", level_needed: 3 },
+    },
+    start_stats: {
+        movespeed: 4,
+        hp: 125,
+        mp: 80,
+        hpregen: 4 / 60, -- Per 60 frames
+        mpregen: 2.5 / 60, -- Per 60 frames
+        strength: 5,
+        defence: 6,
+        willpower: 6,
+        magic: 5,
+        equipment: {
+          weapon: "Short Sword",
+          gold: 0,
+          inventory: {{item: "Health Potion"}, {item: "Mana Potion"}},
+        }
+    },
+    gain_per_level: {
+        hp: 18,
+        mp: 15,
+        hpregen: 1 / 60, -- Per 60 frames
+        mpregen: 0.5 / 60, -- Per 60 frames
+        magic: 1,
+        willpower: 2,
+        defence: 2,
+        strength: 2
+    }
+}
+Data.class_create {
     name: "Necromancer",
     sprites: {"spr_enemies.humanoid.necromancer"},
     available_spells: {

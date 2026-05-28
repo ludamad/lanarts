@@ -61,6 +61,16 @@ M.classes = {
         control_notes = "Use short dashes to re-enter contact without assuming Fighter durability.",
         balance_focus = "Useful for testing contact windows and pursuit pressure.",
     },
+    {
+        id = "Dicebinder",
+        label = "Dicebinder",
+        role = "skill dice tester",
+        range = "close",
+        targetDistance = 58,
+        positioning = "reactive close",
+        control_notes = "Play around passive D6 rolls that grant short buffs or refresh Dash/Power Strike.",
+        balance_focus = "Prototype class for procedural buff readability, cooldown manipulation, and boss micro pressure.",
+    },
 }
 
 M.bot_profiles = {
@@ -216,6 +226,22 @@ M.class_builds = {
             {name = "Dash Attack", level = 1, role = "mobility"},
         },
     },
+    Dicebinder = {
+        starting_weapon = "Short Sword",
+        starting_items = {"Health Potion", "Mana Potion"},
+        base = {hp = 125, mp = 80, strength = 5, defence = 6, magic = 5, willpower = 6},
+        per_level = {hp = 18, mp = 15, strength = 2, defence = 2, magic = 1, willpower = 2},
+        spells = {
+            {name = "Dash Attack", level = 1, role = "mobility"},
+            {name = "Power Strike", level = 2, role = "melee control"},
+            {name = "Berserk", level = 3, role = "burst"},
+        },
+        passive = {
+            name = "Skill Dice",
+            interval = 240,
+            description = "Rolls a D6 every four seconds for a short stat buff or cooldown refresh.",
+        },
+    },
 }
 
 M.levels = {
@@ -269,6 +295,14 @@ M.loadout_presets = {
             "Wizard's Hat",
             "Ring of Spells",
             "Amulet of Light",
+        },
+        Dicebinder = {
+            "Iron Broadsword",
+            "Chainmail",
+            "Leather Gloves",
+            "Leather Boots",
+            "Belt of Protection",
+            "Ring of Vitality",
         },
     },
     late = {
@@ -341,6 +375,17 @@ M.loadout_presets = {
             "Magician's Ring",
             "Ring of Spells",
             "Amulet of Light",
+        },
+        Dicebinder = {
+            "Iron Broadsword",
+            "Chainmail",
+            "Steel Gloves",
+            "Iron Helmet",
+            "Jack Boots",
+            "Belt of Protection",
+            "Ring of Vitality",
+            "Ring of Vampirism",
+            "Amulet of Fortification",
         },
     },
 }
@@ -486,6 +531,24 @@ M.build_archetypes = {
             preset = "none",
             items = {"Health Potion*2", "Iron Scimitar", "Leather Armour", "Leather Gloves", "Dank Belt", "Ring of Vampirism", "Amulet of Fear"},
             tags = {"melee", "damage", "control"},
+        },
+    },
+    Dicebinder = {
+        {
+            id = "dicebinder-cooldown-lab",
+            label = "Cooldown Lab",
+            role = "D6 cooldown refresh testing",
+            preset = "none",
+            items = {"Health Potion*2", "Mana Potion*2", "Iron Broadsword", "Chainmail", "Leather Gloves", "Leather Boots", "Ring of Vitality"},
+            tags = {"dice", "cooldown", "melee"},
+        },
+        {
+            id = "dicebinder-boss-micro",
+            label = "Boss Micro",
+            role = "reactive close-range boss package",
+            preset = "none",
+            items = {"Health Potion*3", "Iron Broadsword", "Chainmail", "Steel Gloves", "Jack Boots", "Belt of Protection", "Ring of Vampirism", "Amulet of Fortification"},
+            tags = {"dice", "boss", "survival"},
         },
     },
 }
@@ -755,6 +818,54 @@ M.action_guides = {
             },
         },
     },
+    Dicebinder = {
+        primary = {
+            label = "Dice tempo",
+            input = "Weapon",
+            purpose = "Stay close enough to convert random buffs without treating cooldown refreshes as guaranteed.",
+            timing = "Play conservatively until a roll opens a short window for Dash, Power Strike, or contact damage.",
+            beats = {
+                rescue = "Hold Dash for the line unless the die has already refreshed it.",
+                summon = "Use cooldown-refresh rolls to clean adds without giving up the primary for too long.",
+                pulse = "Leave on windup and only spend a roll-backed cooldown after active frames end.",
+                orbit = "Use fleet or guard rolls to cross the lane; otherwise respect the orbit as a hard boundary.",
+            },
+            tags = {"dice", "cooldown", "melee"},
+            telemetry = {"combat_frame_rate", "avg_min_hp_pct", "damage_dealt_per_1000_combat_frames"},
+        },
+        spells = {
+            ["Dash Attack"] = {
+                purpose = "Mobility and rescue button that becomes volatile when the D6 refreshes it.",
+                timing = "Spend after a refresh roll, or save it when the next rescue/pulse is near.",
+                beats = {
+                    rescue = "Use refresh rolls to take late line saves without camping the line.",
+                    pulse = "Dash back in only after the AOE resolves.",
+                },
+                tags = {"mobility", "dice"},
+                telemetry = {"avg_rescue_intercept_frames", "combat_frame_rate"},
+            },
+            ["Power Strike"] = {
+                purpose = "Cooldown-refresh payoff for short boss/add control bursts.",
+                timing = "Prefer using it during guard, edge, or jackpot windows.",
+                beats = {
+                    summon = "Convert a refresh into fast add cleanup.",
+                    orbit = "Spend the strike when orbit pressure has rotated off your contact lane.",
+                },
+                tags = {"control", "dice"},
+                telemetry = {"damage_dealt_per_1000_combat_frames"},
+            },
+            Berserk = {
+                purpose = "Fallback burst when dice rolls are defensive or movement-focused.",
+                timing = "Use after package pressure resolves, not before a forced disengage.",
+                beats = {
+                    summon = "Commit only if adds are stable or a cooldown roll is available.",
+                    pulse = "Avoid starting it during windup.",
+                },
+                tags = {"burst", "melee"},
+                telemetry = {"avg_min_hp_pct", "damage_dealt_per_1000_combat_frames"},
+            },
+        },
+    },
 }
 
 M.item_choices = {
@@ -771,7 +882,7 @@ M.item_choices = {
         id = "weapons",
         label = "Weapons",
         choices = {
-            {name = "Iron Broadsword", classes = {"Fighter", "Templar"}, tags = {"melee"}},
+            {name = "Iron Broadsword", classes = {"Fighter", "Templar", "Dicebinder"}, tags = {"melee"}},
             {name = "Gragh's Club", classes = {"Fighter"}, tags = {"melee", "late"}},
             {name = "Mace of Light", classes = {"Templar"}, tags = {"melee", "late"}},
             {name = "Iron Scimitar", classes = {"Rogue"}, tags = {"melee", "late"}},
@@ -785,7 +896,7 @@ M.item_choices = {
         label = "Armour",
         choices = {
             {name = "Leather Armour", classes = {"Rogue"}, tags = {"light"}},
-            {name = "Chainmail", classes = {"Fighter", "Templar"}, tags = {"medium"}},
+            {name = "Chainmail", classes = {"Fighter", "Templar", "Dicebinder"}, tags = {"medium"}},
             {name = "Red Dragonplate", classes = {"Fighter"}, tags = {"late"}},
             {name = "Crystalline Plate", classes = {"Templar"}, tags = {"late"}},
             {name = "Robe", classes = {"Necromancer", "Pyrocaster", "Stormcaller"}, tags = {"caster"}},
@@ -799,13 +910,13 @@ M.item_choices = {
         id = "small_gear",
         label = "Small gear",
         choices = {
-            {name = "Leather Gloves", classes = {"Fighter", "Rogue", "Templar"}},
-            {name = "Steel Gloves", classes = {"Fighter", "Templar"}},
+            {name = "Leather Gloves", classes = {"Fighter", "Rogue", "Templar", "Dicebinder"}},
+            {name = "Steel Gloves", classes = {"Fighter", "Templar", "Dicebinder"}},
             {name = "Runed Gloves", classes = {"Pyrocaster", "Stormcaller"}},
-            {name = "Iron Helmet", classes = {"Fighter", "Templar"}},
+            {name = "Iron Helmet", classes = {"Fighter", "Templar", "Dicebinder"}},
             {name = "Wizard's Hat", classes = {"Pyrocaster", "Stormcaller"}},
-            {name = "Leather Boots", classes = {"Fighter", "Rogue", "Templar"}},
-            {name = "Jack Boots", classes = {"Fighter", "Templar"}},
+            {name = "Leather Boots", classes = {"Fighter", "Rogue", "Templar", "Dicebinder"}},
+            {name = "Jack Boots", classes = {"Fighter", "Templar", "Dicebinder"}},
             {name = "Platelegs", classes = {"Fighter", "Templar"}},
             {name = "Magic Skirt", classes = {"Pyrocaster", "Stormcaller"}},
         },
@@ -814,7 +925,7 @@ M.item_choices = {
         id = "jewelry",
         label = "Jewelry",
         choices = {
-            {name = "Belt of Protection", classes = {"Fighter", "Templar"}},
+            {name = "Belt of Protection", classes = {"Fighter", "Templar", "Dicebinder"}},
             {name = "Belt of Slaying", classes = {"Fighter"}},
             {name = "Dank Belt", classes = {"Rogue"}},
             {name = "Wishful Belt", classes = {"Necromancer", "Pyrocaster", "Stormcaller"}},
@@ -833,7 +944,7 @@ M.item_choices = {
         label = "Amulets",
         choices = {
             {name = "Amulet of Healing", classes = {"Fighter"}, tags = {"survival"}},
-            {name = "Amulet of Fortification", classes = {"Templar"}, tags = {"survival"}},
+            {name = "Amulet of Fortification", classes = {"Templar", "Dicebinder"}, tags = {"survival"}},
             {name = "Amulet of Fear", classes = {"Rogue"}, tags = {"control"}},
             {name = "Amulet of Great Pain", classes = {"Necromancer"}, tags = {"regen"}},
             {name = "Amulet of Greater Fire", classes = {"Pyrocaster"}, tags = {"red"}},
@@ -1304,7 +1415,7 @@ M.encounters = {
         suggestedPreset = "none",
         monsters = {"Giant Chicken"},
         arena = {
-            room_size = {16, 16},
+            room_size = {22, 22},
         },
         package = {
             primary = "Giant Chicken",
@@ -1349,7 +1460,7 @@ M.encounters = {
         suggestedPreset = "none",
         monsters = {"Mummoner"},
         arena = {
-            room_size = {17, 17},
+            room_size = {23, 23},
         },
         package = {
             primary = "Mummoner",
@@ -1394,7 +1505,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Purple Dragon"},
         arena = {
-            room_size = {18, 18},
+            room_size = {27, 27},
         },
         package = {
             primary = "Purple Dragon",
@@ -1439,7 +1550,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Red Dragon"},
         arena = {
-            room_size = {18, 18},
+            room_size = {27, 27},
         },
         package = {
             primary = "Red Dragon",
@@ -1484,7 +1595,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Gragh"},
         arena = {
-            room_size = {17, 17},
+            room_size = {26, 26},
         },
         package = {
             primary = "Gragh",
@@ -1529,7 +1640,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Gragh"},
         arena = {
-            room_size = {18, 18},
+            room_size = {28, 28},
         },
         package = {
             primary = "Gragh",
@@ -1597,7 +1708,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Executioner"},
         arena = {
-            room_size = {15, 15},
+            room_size = {24, 24},
         },
     },
     {
@@ -1611,7 +1722,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Executioner"},
         arena = {
-            room_size = {16, 16},
+            room_size = {25, 25},
         },
         package = {
             primary = "Executioner",
@@ -1656,7 +1767,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Executioner"},
         arena = {
-            room_size = {17, 17},
+            room_size = {27, 27},
         },
         package = {
             primary = "Executioner",
@@ -1724,7 +1835,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Mana Sapper", "Executioner"},
         arena = {
-            room_size = {17, 17},
+            room_size = {26, 26},
         },
         package = {
             primary = "Executioner",
@@ -1769,7 +1880,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Centaur Hunter"},
         arena = {
-            room_size = {18, 18},
+            room_size = {27, 27},
         },
         package = {
             primary = "Centaur Hunter",
@@ -1814,7 +1925,7 @@ M.encounters = {
         suggestedPreset = "late",
         monsters = {"Crypt Keeper"},
         arena = {
-            room_size = {17, 17},
+            room_size = {26, 26},
         },
         package = {
             primary = "Crypt Keeper",
@@ -1929,6 +2040,21 @@ M.micro_drills = {
         botProfile = "human",
         seed = 22494,
         tags = {"orbit", "aoe", "ranged"},
+    },
+    {
+        id = "dicebinder-gragh-rolls",
+        label = "Dicebinder Gragh Rolls",
+        role = "skill dice boss micro",
+        focus = "Read whether periodic D6 buffs and cooldown refreshes create interesting Gragh windows without making survival free.",
+        className = "Dicebinder",
+        level = 5,
+        buildId = "dicebinder-boss-micro",
+        encounter = "gragh-duel",
+        packageComponents = "",
+        intensity = "high",
+        botProfile = "human",
+        seed = 22502,
+        tags = {"dice", "boss", "cooldown"},
     },
     {
         id = "mummoner-add-cleanup",
@@ -2229,6 +2355,19 @@ M.resources = {
         encounter = "gragh-duel",
         seed = 22420,
         goal = "melee overperformance against rhythm pressure",
+    },
+    {
+        id = "content-lab-dicebinder-gragh-package",
+        name = "Dicebinder Gragh package",
+        meta = "L5, late loadout, skill dice",
+        className = "Dicebinder",
+        level = 5,
+        preset = "late",
+        mapDesc = "",
+        encounter = "gragh-duel",
+        intensity = "high",
+        seed = 22502,
+        goal = "skill dice cooldown and buff readability under boss pressure",
     },
     {
         id = "content-lab-necro-gragh-package",

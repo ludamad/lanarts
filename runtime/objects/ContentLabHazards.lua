@@ -2,6 +2,7 @@ local Display = require "core.Display"
 local EventLog = require "ui.EventLog"
 local GameObject = require "core.GameObject"
 local Map = require "core.Map"
+local ProceduralEffects = require "ui.ProceduralEffects"
 
 local M = {}
 
@@ -65,6 +66,17 @@ end
 
 local function round_xy(xy)
     return {math.floor(xy[1] + 0.5), math.floor(xy[2] + 0.5)}
+end
+
+local function palette_for_primary(name)
+    if name == "Crypt Keeper" or name == "Purple Dragon" then
+        return "black"
+    elseif name == "Red Dragon" or name == "Gragh" or name == "Hell Warrior" then
+        return "red"
+    elseif name == "Waxanarian" then
+        return "green"
+    end
+    return "boss"
 end
 
 local function normalize_intensity(intensity)
@@ -944,8 +956,30 @@ function M.create_pulse(args)
         on_draw = function(self)
             if self.elapsed <= windup then
                 local progress = math.max(0, math.min(1, self.elapsed / windup))
+                ProceduralEffects.draw_world_rune {
+                    xy = self.xy,
+                    radius = math.max(18, radius * progress),
+                    palette = "red",
+                    intensity = 0.65 + progress * 0.35,
+                    arcs = 2,
+                    spokes = 4,
+                    rotation_speed = 0.034,
+                    spoke_speed = -0.018,
+                    gradient_steps = 5,
+                }
                 draw_world_circle(COL_PALE_RED, self.xy, radius * progress, 0.10 + progress * 0.12, 0.35 + progress * 0.35)
             elseif self.elapsed <= windup + active then
+                ProceduralEffects.draw_world_rune {
+                    xy = self.xy,
+                    radius = radius,
+                    palette = "red",
+                    intensity = 1.1,
+                    arcs = 4,
+                    spokes = 8,
+                    rotation_speed = 0.052,
+                    spoke_speed = -0.030,
+                    arc_length = math.pi * 0.92,
+                }
                 draw_world_circle(COL_RED, self.xy, radius, 0.22, 0.75)
             else
                 local fade = 1 - (self.elapsed - windup - active) / linger
@@ -999,6 +1033,17 @@ function M.create_orb(args)
             local fade_in = math.min(1, self.elapsed / 20)
             local fade_out = math.min(1, (self.duration - self.elapsed) / 30)
             local alpha = math.max(0, math.min(fade_in, fade_out))
+            ProceduralEffects.draw_world_rune {
+                xy = self.xy,
+                radius = self.hit_radius * 2.2,
+                palette = "blue",
+                intensity = alpha,
+                arcs = 2,
+                spokes = 4,
+                rotation_speed = 0.070,
+                spoke_speed = -0.045,
+                gradient_steps = 5,
+            }
             draw_world_circle(COL_PALE_BLUE, self.xy, self.hit_radius, 0.20 * alpha, 0.78 * alpha)
         end,
     }
@@ -1043,6 +1088,17 @@ function M.create_summon_portal(args)
             local progress = math.max(0.15, math.min(1, self.elapsed / math.max(1, self.windup)))
             local radius = self.portal_radius * (0.55 + progress * 0.45)
             local pulse = 1 + math.sin(self.elapsed * 0.42) * 0.08
+            ProceduralEffects.draw_world_rune {
+                xy = self.xy,
+                radius = radius * 1.35,
+                palette = "boss",
+                intensity = 0.75 + progress * 0.25,
+                arcs = 3,
+                spokes = 5,
+                rotation_speed = -0.050,
+                spoke_speed = 0.026,
+                gradient_steps = 5,
+            }
             draw_world_circle(COL_PALE_YELLOW, self.xy, radius * pulse, 0.08 + progress * 0.10, 0.42 + progress * 0.32)
             draw_world_circle(COL_PALE_RED, self.xy, math.max(6, radius * 0.42), 0.05, 0.35 + progress * 0.28)
             local label_xy = Display.to_screen_xy({self.xy[1], self.xy[2] - self.portal_radius - 12})
@@ -1900,6 +1956,16 @@ function M.add_director(game_map, package, intensity)
             end
         end,
         on_draw = function(self)
+            local primary = primary_monster(self.package.primary)
+            if primary then
+                ProceduralEffects.draw_boss_aura(primary, {
+                    palette = palette_for_primary(self.package.primary),
+                    radius = (primary.radius or 16) + 58,
+                    intensity = 0.72,
+                    rotation_speed = 0.013,
+                    spoke_speed = -0.006,
+                })
+            end
             draw_package_hud(self)
         end,
     }

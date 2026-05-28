@@ -9,6 +9,7 @@ SpellObjects = require "objects.SpellObjects"
 DataW = require "DataWrapped"
 TypeEffectUtils = require "spells.TypeEffectUtils"
 BonusesUtils = require "items.BonusesUtils"
+ProceduralEffects = require "ui.ProceduralEffects"
 
 damage_source_name = (attacker, defender) ->
     source = "Unattributed"
@@ -1068,6 +1069,78 @@ for name in *{"Ranger", "Fighter", "Templar", "Rogue", "Green Mage", "Black Mage
         --            play_sound "sound/allyislow1c.ogg"
         --    return damage
     }
+
+DICE_ROLL_INTERVAL = 240
+DICE_BUFF_DURATION = 150
+DICE_ROLLS = {
+    [1]: {kind: "fleet", label: "Fleet step", color: COL_PALE_GREEN}
+    [2]: {kind: "guard", label: "Guard stance", color: COL_PALE_BLUE}
+    [3]: {kind: "edge", label: "Killing edge", color: COL_PALE_RED}
+    [4]: {kind: "focus", label: "Flow state", color: COL_PALE_YELLOW}
+    [5]: {kind: "dash", label: "Dash ready", color: COL_WHITE}
+    [6]: {kind: "jackpot", label: "Power ready", color: COL_PALE_YELLOW}
+}
+
+dicebinder_roll = (effect, caster) ->
+    roll = math.random(1, 6)
+    entry = DICE_ROLLS[roll]
+    effect.last_roll = roll
+    effect.roll_color = entry.color
+    effect.buff_kind = entry.kind
+    effect.buff_time = DICE_BUFF_DURATION
+    effect.next_roll = effect.roll_interval or DICE_ROLL_INTERVAL
+
+    if roll == 5
+        caster\set_spell_cooldown("Dash Attack", 0)
+    elseif roll == 6
+        caster\set_spell_cooldown("Power Strike", 0)
+        caster\set_spell_cooldown("Dash Attack", 0)
+        caster\heal_hp(6 + caster.stats.level * 2)
+        caster\heal_mp(8 + caster.stats.level)
+
+    for _ in screens()
+        if caster\is_local_player()
+            EventLog.add("Skill die #{roll}: #{entry.label}.", entry.color)
+
+DataW.effect_create {
+    name: "Dicebinder"
+    stat_func: (obj, old, new) =>
+        new.ranged_cooldown_multiplier *= 1.25
+        if @buff_time and @buff_time > 0
+            switch @buff_kind
+                when "fleet"
+                    new.speed += 0.8
+                when "guard"
+                    new.defence += 3
+                    new.willpower += 3
+                when "edge"
+                    new.strength += 3
+                when "focus"
+                    new.spell_cooldown_multiplier *= 0.72
+                when "jackpot"
+                    new.melee_cooldown_multiplier *= 0.82
+                    new.spell_cooldown_multiplier *= 0.82
+    init_func: (caster) =>
+        @roll_interval = DICE_ROLL_INTERVAL
+        @next_roll = 90
+        @last_roll = 0
+        @roll_color = COL_PALE_BLUE
+        @buff_kind = "none"
+        @buff_time = 0
+    step_func: (caster) =>
+        @next_roll -= 1
+        if @buff_time and @buff_time > 0
+            @buff_time -= 1
+        if @next_roll <= 0
+            dicebinder_roll(@, caster)
+    draw_func: (caster) =>
+        ProceduralEffects.draw_die_badge caster, {
+            roll: @last_roll or 0
+            remaining: @next_roll or 0
+            interval: @roll_interval or DICE_ROLL_INTERVAL
+            color: @roll_color or COL_PALE_BLUE
+        }
+}
 
 -- Move in a direction, attacking everyone along the way
 DataW.effect_create {

@@ -59,6 +59,7 @@ local CLASS_SPELL_PRIORITIES = {
     Fighter = {"Berserk", "Power Strike", "Dash Attack"},
     Templar = {"Power Strike", "Dash Attack"},
     Rogue = {"Dash Attack"},
+    Dicebinder = {"Power Strike", "Dash Attack", "Berserk"},
     Necromancer = {"Baleful Regeneration", "Summon Dark Aspect", "Skeleton Army", "Link of Loyalty", "Unlink"},
     Pyrocaster = {"Dragonform", "Ring of Flames", "Fire Bolt"},
     Stormcaller = {"Energy Spear", "Chain Lightning", "Tornado Storm"},
@@ -80,6 +81,7 @@ local CLASS_KEEPAWAY = {
 local CLOSE_RANGE_CLASSES = {
     Fighter = true,
     Necromancer = true,
+    Dicebinder = true,
 }
 
 local SPELL_RETRY_DELAYS = {

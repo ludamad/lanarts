@@ -6,6 +6,7 @@ local World = require("core.World")
 local GameState = require("core.GameState")
 local Display = require("core.Display")
 local TypeEffectUtils = require("spells.TypeEffectUtils")
+local ProceduralEffects = require("ui.ProceduralEffects")
 local random_xy_near
 random_xy_near = function(obj)
   return {
@@ -13,9 +14,34 @@ random_xy_near = function(obj)
     obj.y + random(-32, 32)
   }
 end
+local BOSS_PALETTES = {
+  ["Crypt Keeper"] = "black",
+  ["Gragh"] = "red",
+  ["Hell Warrior"] = "red",
+  ["Pixulloch"] = "black",
+  ["Purple Dragon"] = "black",
+  ["Red Dragon"] = "red",
+  ["Stara"] = "black",
+  ["Waxanarian"] = "green"
+}
+local boss_palette
+boss_palette = function(obj)
+  return BOSS_PALETTES[obj.name] or "boss"
+end
 local draw_boss_name
 draw_boss_name = function(self)
   if Map.object_visible(self) then
+    ProceduralEffects.draw_boss_aura(self, {
+      palette = boss_palette(self),
+      radius = (self.radius or 16) + 46,
+      intensity = ((function()
+        if self.unique then
+          return 1
+        else
+          return 0.8
+        end
+      end)())
+    })
     local color = with_alpha(COL_WHITE, 0.75)
     local progress = math.abs(1 - (GameState.frame % 100) / 50)
     local screen_xy = Display.to_screen_xy({

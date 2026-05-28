@@ -28,3 +28,11 @@ void ldraw::draw_circle_outline(const Colour& clr, const PosF& pos,
 void ldraw::draw_line(const Colour& clr, const PosF& p1, const PosF& p2,
 		int linewidth) {
 }
+
+void ldraw::draw_arc(const Colour& clr, const PosF& pos, float radius,
+		float angle_start, float angle_end, int linewidth, int segments) {
+}
+
+void ldraw::draw_radial_gradient(const Colour& inner, const Colour& outer,
+		const PosF& pos, float radius, int steps) {
+}

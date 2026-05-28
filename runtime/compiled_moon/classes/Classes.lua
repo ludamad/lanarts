@@ -257,6 +257,65 @@ Data.class_create({
     strength = 2
   }
 })
+Data.class_create({
+  name = "Dicebinder",
+  sprites = ((function()
+    local _accum_0 = { }
+    local _len_0 = 1
+    for i = 1, 2 do
+      _accum_0[_len_0] = "spr_classes.rogue" .. tostring(i)
+      _len_0 = _len_0 + 1
+    end
+    return _accum_0
+  end)()),
+  available_spells = {
+    {
+      spell = "Dash Attack",
+      level_needed = 1
+    },
+    {
+      spell = "Power Strike",
+      level_needed = 2
+    },
+    {
+      spell = "Berserk",
+      level_needed = 3
+    }
+  },
+  start_stats = {
+    movespeed = 4,
+    hp = 125,
+    mp = 80,
+    hpregen = 4 / 60,
+    mpregen = 2.5 / 60,
+    strength = 5,
+    defence = 6,
+    willpower = 6,
+    magic = 5,
+    equipment = {
+      weapon = "Short Sword",
+      gold = 0,
+      inventory = {
+        {
+          item = "Health Potion"
+        },
+        {
+          item = "Mana Potion"
+        }
+      }
+    }
+  },
+  gain_per_level = {
+    hp = 18,
+    mp = 15,
+    hpregen = 1 / 60,
+    mpregen = 0.5 / 60,
+    magic = 1,
+    willpower = 2,
+    defence = 2,
+    strength = 2
+  }
+})
 return Data.class_create({
   name = "Necromancer",
   sprites = {

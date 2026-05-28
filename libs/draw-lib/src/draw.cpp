@@ -1,5 +1,6 @@
 #include <SDL_opengl.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <cmath>
 
@@ -108,4 +109,57 @@ void ldraw::draw_line(const Colour& clr, const PosF& p1, const PosF& p2,
 //
 //	if (linewidth != 1)
 //		glLineWidth(1);
+}
+
+static int arc_segment_count(float radius, float angle_delta, int requested) {
+    if (requested > 0) {
+        return requested;
+    }
+    float length = std::fabs(angle_delta) * std::max(radius, 1.0f);
+    return std::max(6, std::min(96, int(length / 6.0f)));
+}
+
+static Colour colour_lerp(const Colour& a, const Colour& b, float t) {
+    t = std::max(0.0f, std::min(1.0f, t));
+    return Colour(
+        int(a.r + (b.r - a.r) * t),
+        int(a.g + (b.g - a.g) * t),
+        int(a.b + (b.b - a.b) * t),
+        int(a.a + (b.a - a.a) * t)
+    ).clamp();
+}
+
+void ldraw::draw_arc(const Colour& clr, const PosF& pos, float radius,
+		float angle_start, float angle_end, int linewidth, int segments) {
+    if (radius < .5 || linewidth <= 0) {
+        return;
+    }
+    ImDrawList* list = ImGui::GetForegroundDrawList();
+    list->PathClear();
+    list->PathArcTo(
+        ImVec2(pos.x, pos.y),
+        radius,
+        angle_start,
+        angle_end,
+        arc_segment_count(radius, angle_end - angle_start, segments)
+    );
+    list->PathStroke(clr.as_rgba(), 0, linewidth);
+}
+
+void ldraw::draw_radial_gradient(const Colour& inner, const Colour& outer,
+		const PosF& pos, float radius, int steps) {
+    if (radius < .5) {
+        return;
+    }
+    steps = std::max(1, std::min(32, steps));
+    ImDrawList* list = ImGui::GetForegroundDrawList();
+    for (int i = steps; i >= 1; --i) {
+        float t = float(i - 1) / std::max(1, steps - 1);
+        Colour color = colour_lerp(inner, outer, t);
+        list->AddCircleFilled(
+            ImVec2(pos.x, pos.y),
+            radius * float(i) / float(steps),
+            color.as_rgba()
+        );
+    }
 }

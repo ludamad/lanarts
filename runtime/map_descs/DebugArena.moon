@@ -58,7 +58,7 @@ node_place_easy_overworld_rooms = () =>
     event_log("(RNG #%d) generating %d rooms", @rng\amount_generated(), n_rooms)
     regions = {}
     for i=1,n_rooms
-        size = @desc.room_size or {10, 10}
+        size = @desc.room_size or {20, 20}
         result = find_bbox(@region_set, size)
         if not result
             return false
@@ -93,7 +93,7 @@ node_place_easy_overworld_rooms = () =>
     return true
 
 DebugArena = MapDesc.create {
-    size: {20, 20}
+    size: {30, 30}
     children: {
         MapNode.create {
             place: node_place_easy_overworld_rooms
@@ -104,7 +104,13 @@ DebugArena = MapDesc.create {
 MAX_MAP_TRIES = 100
 generate = (portal_spawns, monster_spawns, options={}) ->
     DebugArena.monster_spawns = monster_spawns
-    DebugArena.room_size = options.room_size or {10, 10}
+    room_size = options.room_size or {20, 20}
+    map_size = options.map_size or {
+        math.max(30, room_size[1] + 6)
+        math.max(30, room_size[2] + 6)
+    }
+    DebugArena.room_size = room_size
+    DebugArena.map_args.size = map_size
     map = NewMaps.try_n_times MAX_MAP_TRIES, () -> DebugArena\compile(portal_spawns)
     game_map = NewMaps.generate_game_map(map)
     game_map.content_lab_spawn_bounds = {

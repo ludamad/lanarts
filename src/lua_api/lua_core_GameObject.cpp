@@ -218,6 +218,43 @@ static bool lapi_go_towards_if_free(LuaStackValue obj, PosF dir) {
     return go_towards_if_free(lua_api::gamestate(obj), obj.as<CombatGameInst*>(), dir.x, dir.y);
 }
 
+static spell_id spell_id_or_none(const char* spell_name) {
+    if (!spell_name || spell_name[0] == '\0') {
+        return -1;
+    }
+    auto id = game_spell_data.get_id(spell_name);
+    if (id == decltype(id)::NONE) {
+        return -1;
+    }
+    return static_cast<spell_id>(id);
+}
+
+static int lapi_spell_cooldown(CombatGameInst* inst, const char* spell_name) {
+    spell_id id = spell_id_or_none(spell_name);
+    if (id < 0) {
+        return -1;
+    }
+    auto& cooldowns = inst->cooldowns().spell_cooldowns;
+    auto it = cooldowns.find(id);
+    if (it == cooldowns.end()) {
+        return 0;
+    }
+    return it->second;
+}
+
+static bool lapi_set_spell_cooldown(CombatGameInst* inst, const char* spell_name, int frames) {
+    spell_id id = spell_id_or_none(spell_name);
+    if (id < 0) {
+        return false;
+    }
+    if (frames <= 0) {
+        inst->cooldowns().spell_cooldowns.erase(id);
+    } else {
+        inst->cooldowns().spell_cooldowns[id] = frames;
+    }
+    return true;
+}
+
 static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(CombatGameInst*);
 
@@ -306,6 +343,8 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_METHOD(methods, use_spell, OBJ->use_spell(lua_api::gamestate(L), game_spell_data.get(lua_tostring(L, 2)), luawrap::get<Pos>(L, 3), luawrap::get_defaulted<GameInst*>(L, 4, nullptr)));
 	LUAWRAP_METHOD(methods, try_use_spell, OBJ->try_use_spell(lua_api::gamestate(L), game_spell_data.get(lua_tostring(L, 2)), luawrap::get<Pos>(L, 3), luawrap::get_defaulted<GameInst*>(L, 4, nullptr)));
 	LUAWRAP_METHOD(methods, use_mp, OBJ->use_mp(lua_api::gamestate(L), lua_tonumber(L, 2)));
+    methods["spell_cooldown"].bind_function(lapi_spell_cooldown);
+    methods["set_spell_cooldown"].bind_function(lapi_set_spell_cooldown);
 
     methods["damage"].bind_function(lapi_combatgameinst_damage);
 	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);

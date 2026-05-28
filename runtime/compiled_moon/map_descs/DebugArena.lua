@@ -66,8 +66,8 @@ node_place_easy_overworld_rooms = function(self)
   local regions = { }
   for i = 1, n_rooms do
     local size = self.desc.room_size or {
-      10,
-      10
+      20,
+      20
     }
     local result = find_bbox(self.region_set, size)
     if not result then
@@ -122,8 +122,8 @@ node_place_easy_overworld_rooms = function(self)
 end
 local DebugArena = MapDesc.create({
   size = {
-    20,
-    20
+    30,
+    30
   },
   children = {
     MapNode.create({
@@ -138,10 +138,16 @@ generate = function(portal_spawns, monster_spawns, options)
     options = { }
   end
   DebugArena.monster_spawns = monster_spawns
-  DebugArena.room_size = options.room_size or {
-    10,
-    10
+  local room_size = options.room_size or {
+    20,
+    20
   }
+  local map_size = options.map_size or {
+    math.max(30, room_size[1] + 6),
+    math.max(30, room_size[2] + 6)
+  }
+  DebugArena.room_size = room_size
+  DebugArena.map_args.size = map_size
   local map = NewMaps.try_n_times(MAX_MAP_TRIES, function()
     return DebugArena:compile(portal_spawns)
   end)

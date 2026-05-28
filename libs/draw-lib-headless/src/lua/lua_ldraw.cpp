@@ -34,6 +34,34 @@ static int lua_draw_rectangle_outline(lua_State* L) {
 	return 0;
 }
 
+static int lua_draw_arc(lua_State* L) {
+	using namespace ldraw;
+	using namespace luawrap;
+	draw_arc(
+		get<Colour>(L, 1),
+		get<PosF>(L, 2),
+		get<float>(L, 3),
+		get<float>(L, 4),
+		get<float>(L, 5),
+		get_defaulted(L, 6, 1),
+		get_defaulted(L, 7, 0)
+	);
+	return 0;
+}
+
+static int lua_draw_radial_gradient(lua_State* L) {
+	using namespace ldraw;
+	using namespace luawrap;
+	draw_radial_gradient(
+		get<Colour>(L, 1),
+		get<Colour>(L, 2),
+		get<PosF>(L, 3),
+		get<float>(L, 4),
+		get_defaulted(L, 5, 8)
+	);
+	return 0;
+}
+
 static void draw_loop(LuaValue draw_func) {
 	exit(1); // Not supported in headless mode!
 }
@@ -51,6 +79,8 @@ void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcom
 	module["draw_circle_outline"].bind_function(draw_circle_outline);
 	module["draw_rectangle_outline"].bind_function(lua_draw_rectangle_outline);
 	module["draw_line"].bind_function(draw_line);
+	module["draw_arc"].bind_function(lua_draw_arc);
+	module["draw_radial_gradient"].bind_function(lua_draw_radial_gradient);
 	module["initialize"].bind_function(display_initialize);
 	module["draw_loop"].bind_function(draw_loop);
 	module["set_window_region"].bind_function(display_set_window_region);

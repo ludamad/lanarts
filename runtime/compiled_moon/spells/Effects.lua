@@ -9,6 +9,7 @@ local SpellObjects = require("objects.SpellObjects")
 local DataW = require("DataWrapped")
 local TypeEffectUtils = require("spells.TypeEffectUtils")
 local BonusesUtils = require("items.BonusesUtils")
+local ProceduralEffects = require("ui.ProceduralEffects")
 local damage_source_name
 damage_source_name = function(attacker, defender)
   local source = "Unattributed"
@@ -1527,6 +1528,110 @@ for _index_0 = 1, #_list_2 do
     end
   })
 end
+local DICE_ROLL_INTERVAL = 240
+local DICE_BUFF_DURATION = 150
+local DICE_ROLLS = {
+  [1] = {
+    kind = "fleet",
+    label = "Fleet step",
+    color = COL_PALE_GREEN
+  },
+  [2] = {
+    kind = "guard",
+    label = "Guard stance",
+    color = COL_PALE_BLUE
+  },
+  [3] = {
+    kind = "edge",
+    label = "Killing edge",
+    color = COL_PALE_RED
+  },
+  [4] = {
+    kind = "focus",
+    label = "Flow state",
+    color = COL_PALE_YELLOW
+  },
+  [5] = {
+    kind = "dash",
+    label = "Dash ready",
+    color = COL_WHITE
+  },
+  [6] = {
+    kind = "jackpot",
+    label = "Power ready",
+    color = COL_PALE_YELLOW
+  }
+}
+local dicebinder_roll
+dicebinder_roll = function(effect, caster)
+  local roll = math.random(1, 6)
+  local entry = DICE_ROLLS[roll]
+  effect.last_roll = roll
+  effect.roll_color = entry.color
+  effect.buff_kind = entry.kind
+  effect.buff_time = DICE_BUFF_DURATION
+  effect.next_roll = effect.roll_interval or DICE_ROLL_INTERVAL
+  if roll == 5 then
+    caster:set_spell_cooldown("Dash Attack", 0)
+  elseif roll == 6 then
+    caster:set_spell_cooldown("Power Strike", 0)
+    caster:set_spell_cooldown("Dash Attack", 0)
+    caster:heal_hp(6 + caster.stats.level * 2)
+    caster:heal_mp(8 + caster.stats.level)
+  end
+  for _ in screens() do
+    if caster:is_local_player() then
+      EventLog.add("Skill die " .. tostring(roll) .. ": " .. tostring(entry.label) .. ".", entry.color)
+    end
+  end
+end
+DataW.effect_create({
+  name = "Dicebinder",
+  stat_func = function(self, obj, old, new)
+    new.ranged_cooldown_multiplier = new.ranged_cooldown_multiplier * 1.25
+    if self.buff_time and self.buff_time > 0 then
+      local _exp_0 = self.buff_kind
+      if "fleet" == _exp_0 then
+        new.speed = new.speed + 0.8
+      elseif "guard" == _exp_0 then
+        new.defence = new.defence + 3
+        new.willpower = new.willpower + 3
+      elseif "edge" == _exp_0 then
+        new.strength = new.strength + 3
+      elseif "focus" == _exp_0 then
+        new.spell_cooldown_multiplier = new.spell_cooldown_multiplier * 0.72
+      elseif "jackpot" == _exp_0 then
+        new.melee_cooldown_multiplier = new.melee_cooldown_multiplier * 0.82
+        new.spell_cooldown_multiplier = new.spell_cooldown_multiplier * 0.82
+      end
+    end
+  end,
+  init_func = function(self, caster)
+    self.roll_interval = DICE_ROLL_INTERVAL
+    self.next_roll = 90
+    self.last_roll = 0
+    self.roll_color = COL_PALE_BLUE
+    self.buff_kind = "none"
+    self.buff_time = 0
+  end,
+  step_func = function(self, caster)
+    self.next_roll = self.next_roll - 1
+    if self.buff_time and self.buff_time > 0 then
+      self.buff_time = self.buff_time - 1
+    end
+    if self.next_roll <= 0 then
+      return dicebinder_roll(self, caster)
+    end
+  end,
+  draw_func = function(self, caster)
+    return ProceduralEffects.draw_die_badge(caster, {
+      roll = self.last_roll or 0,
+      remaining = self.next_roll or 0,
+      interval = self.roll_interval or DICE_ROLL_INTERVAL,
+      color = self.roll_color or COL_PALE_BLUE
+    })
+  end
+})
 DataW.effect_create({
   name = "Dash Attack",
   effected_sprite = "spr_effects.i-stealth",

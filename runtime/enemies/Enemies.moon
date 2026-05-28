@@ -6,11 +6,30 @@ World = require "core.World"
 GameState = require "core.GameState"
 Display = require "core.Display"
 TypeEffectUtils = require "spells.TypeEffectUtils"
+ProceduralEffects = require "ui.ProceduralEffects"
 
 random_xy_near = (obj) -> {obj.x + random(-32,32), obj.y + random(-32, 32)}
 
+BOSS_PALETTES = {
+    ["Crypt Keeper"]: "black"
+    ["Gragh"]: "red"
+    ["Hell Warrior"]: "red"
+    ["Pixulloch"]: "black"
+    ["Purple Dragon"]: "black"
+    ["Red Dragon"]: "red"
+    ["Stara"]: "black"
+    ["Waxanarian"]: "green"
+}
+
+boss_palette = (obj) -> BOSS_PALETTES[obj.name] or "boss"
+
 draw_boss_name = () => -- monster method
     if Map.object_visible(@)
+        ProceduralEffects.draw_boss_aura @, {
+            palette: boss_palette(@)
+            radius: (@radius or 16) + 46
+            intensity: (if @unique then 1 else 0.8)
+        }
         color = with_alpha(COL_WHITE, 0.75)
         progress = math.abs(1 - (GameState.frame % 100)/50)
         screen_xy = Display.to_screen_xy({@x, @y - 24 - 8 * progress})
