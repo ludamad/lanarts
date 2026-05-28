@@ -33,6 +33,7 @@ grep -q "almost-won, not too hard" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_primary_hp_pct" runtime/engine/ContentApi.lua
 grep -q "DRAGONFIRE on mechanic hits" runtime/engine/ContentCatalog.lua
 grep -q "brute-force/face-tank clear" runtime/engine/StartBalanceRun.lua
+grep -q "survivability is regen-masked" runtime/engine/StartBalanceRun.lua
 grep -q "streak_break" runtime/engine/ContentCatalog.lua
 grep -q "MICRO BREAK" runtime/objects/ContentLabHazards.lua
 grep -q "avg_package_pressure_sync_bursts" runtime/engine/StartBalanceRun.lua

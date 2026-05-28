@@ -2965,6 +2965,28 @@ local function balance_report_rows(class_rows, min_runs, relative_threshold)
                         adjusted_damage
                     )
                 )
+                local nec_win_rate = tonumber(row.win_rate) or 0
+                local nec_runs = tonumber(row.runs) or 0
+                if nec_runs >= min_runs and nec_win_rate >= 0.50 and offset_pct >= 0.40 then
+                    add_report_row(
+                        rows,
+                        class_name,
+                        "warning",
+                        "necromancer_regen",
+                        "avg_necromancer_regen_offset_pct",
+                        offset_pct,
+                        0.40,
+                        string.format(
+                            "%s cleared %.1f%% of %s, but %.1f%% of incoming damage was offset by Baleful Regeneration (gross %.1f/run vs %.1f/run regen-adjusted); do not read this clear as the package being easy -- the survivability is regen-masked, so judge Necromancer with regen-adjusted damage, not the win rate, before tuning the enemy.",
+                            class_name,
+                            nec_win_rate * 100,
+                            (row.encounter or "the package"),
+                            offset_pct * 100,
+                            gross_damage,
+                            adjusted_damage
+                        )
+                    )
+                end
             end
         end
 
