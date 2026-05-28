@@ -839,11 +839,28 @@ function AutomatedPlayerInputSource:_hazard_dodge_action()
         self:_record_scalar("hazard_dodge_skip_frames")
         return false
     end
-    local best_dir, best_danger = nil, here
+    -- Ranged classes must keep dodging away from the boss, not into it: fold a keep-away
+    -- penalty into the tile score so dodging an anchored hazard never pulls a kiter into melee.
+    local keepaway, nearest_enemy = 0, nil
+    if RANGED_CLASSES[player.class_name] then
+        nearest_enemy = visible_enemies(player)[1]
+        if nearest_enemy then
+            keepaway = self:_keepaway_for(nearest_enemy)
+        end
+    end
+    local function tile_cost(x, y)
+        local cost = hazard_danger_at(hazards, x, y, lookahead, margin, pr)
+        if nearest_enemy and not nearest_enemy.destroyed then
+            local dx, dy = x - nearest_enemy.x, y - nearest_enemy.y
+            cost = cost + math.max(0, keepaway - math.sqrt(dx * dx + dy * dy)) * 0.6
+        end
+        return cost
+    end
+    local best_dir, best_danger = nil, tile_cost(player.x, player.y)
     for _, dir in ipairs(MOVE_DIRECTIONS) do
         local nxy = {player.x + dir[1] * 16, player.y + dir[2] * 16}
         if not Map.object_tile_check(player, nxy) then
-            local d = hazard_danger_at(hazards, nxy[1], nxy[2], lookahead, margin, pr)
+            local d = tile_cost(nxy[1], nxy[2])
             if d < best_danger - 0.001 then
                 best_danger = d
                 best_dir = dir
