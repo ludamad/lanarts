@@ -856,7 +856,12 @@
       </section>
 
       <section class="section">
-        <div class="section-title">Matrix</div>
+        <div class="section-title">Map Matrix</div>
+        <div class="resource-list" id="mapResources"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">Package Matrix</div>
         <div class="resource-list" id="packageResources"></div>
       </section>
 
@@ -1104,6 +1109,7 @@
       ];
 
       let generatedResources = [];
+      let mapResources = [];
       let packageResources = [];
       let resolvedRun = null;
       let loadoutOptions = null;
@@ -1227,6 +1233,11 @@
           analysisGoal: resource.analysisGoal || resource.goalId || '',
           botProfile: resource.botProfile || 'human',
           packageSummary: resource.packageSummary || null,
+          previewMode: resource.previewMode || resource.preview_mode || '',
+          density: resource.density === undefined ? null : Number(resource.density),
+          phase: resource.phase || '',
+          tags: resource.tags || [],
+          signature: resource.signature || null,
           seed: String(resource.seed || 1),
         };
       }
@@ -1258,6 +1269,7 @@
         mapProfiles = (catalog.map_algorithms || catalog.maps || []).slice(0, 4).map(normalizePreviewProfile);
         rebuildMapAlgorithms($('mapDesc').value, $('mapAlgorithm').value);
         wireResources();
+        wireMapResources();
         wirePackageResources();
         setConfig(currentConfig());
       }
@@ -1641,6 +1653,12 @@
         wireResources();
       }
 
+      function updateMapResources() {
+        const response = callContentApi('lanarts_content_map_matrix_json', currentConfig());
+        mapResources = response && response.resources ? response.resources.map(normalizeResource) : [];
+        wireMapResources();
+      }
+
       function updatePackageResources() {
         const response = callContentApi('lanarts_content_package_matrix_json', currentConfig());
         packageResources = response && response.resources ? response.resources.map(normalizeResource) : [];
@@ -1656,6 +1674,9 @@
         resolvedRun = workspace.runSummary || null;
         enemyOptions = workspace.enemyOptions || null;
         analysisPlan = workspace.analysisPlan || null;
+        mapResources = workspace.mapMatrix && workspace.mapMatrix.resources
+          ? workspace.mapMatrix.resources.map(normalizeResource)
+          : [];
         packageResources = workspace.packageMatrix && workspace.packageMatrix.resources
           ? workspace.packageMatrix.resources.map(normalizeResource)
           : [];
@@ -1667,6 +1688,7 @@
         renderEnemyOptions(enemyOptions);
         renderAnalysisPlan(analysisPlan);
         drawPreviews(workspace.mapGeneration);
+        wireMapResources();
         wirePackageResources();
         wireResources();
         return true;
@@ -1682,6 +1704,7 @@
         updateEnemyOptions();
         updateAnalysisPlan();
         drawPreviews();
+        updateMapResources();
         updatePackageResources();
         updateGeneratedResources();
       }
@@ -2184,6 +2207,25 @@
         return parts.join(' | ');
       }
 
+      function mapSummaryText(resource) {
+        if (!resource || !resource.previewMode) {
+          return '';
+        }
+        const parts = [resource.previewMode];
+        if (resource.mapProfile) {
+          parts.push(resource.mapProfile);
+        }
+        if (resource.density !== null && !Number.isNaN(resource.density)) {
+          parts.push(`${Math.round(resource.density * 100)}% density`);
+        }
+        if (resource.signature && resource.signature.enemyMix) {
+          parts.push(resource.signature.enemyMix);
+        } else if (resource.signature && resource.signature.ambientEnemies) {
+          parts.push(`${resource.signature.ambientEnemies} ambient`);
+        }
+        return parts.join(' | ');
+      }
+
       function wireResourceList(list, entries) {
         list.innerHTML = '';
         let currentGroup = '';
@@ -2204,8 +2246,10 @@
           const parts = resource.packageComponents ? ` ${resource.packageComponents}` : '';
           const skill = resource.botProfile && resource.botProfile !== 'human' ? ` ${resource.botProfile}` : '';
           const summary = packageSummaryText(resource.packageSummary);
+          const mapSummary = mapSummaryText(resource);
           const summaryNode = summary ? `<span>${summary}</span>` : '';
-          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${parts}${skill}</code>`;
+          const mapSummaryNode = mapSummary ? `<span>${mapSummary}</span>` : '';
+          button.innerHTML = `<span><strong>${resource.name}</strong><span>${resource.meta}</span>${summaryNode}${mapSummaryNode}${goal}</span><code>${resource.className} L${resource.level}${pressure}${parts}${skill}</code>`;
           button.addEventListener('click', () => {
             setConfig(resource);
           });
@@ -2217,12 +2261,17 @@
         wireResourceList($('resources'), resources.concat(generatedResources));
       }
 
+      function wireMapResources() {
+        wireResourceList($('mapResources'), mapResources);
+      }
+
       function wirePackageResources() {
         wireResourceList($('packageResources'), packageResources);
       }
 
       function initShell() {
         wireResources();
+        wireMapResources();
         wirePackageResources();
         setConfig(configFromQuery());
         document.querySelectorAll('#loadoutPreset button').forEach((button) => {
