@@ -11,12 +11,25 @@ headless_exe="${LANARTS_HEADLESS_EXE:-$repo_dir/build_debug_headless/src/lanarts
 native_exe="${LANARTS_NATIVE_EXE:-$repo_dir/build_debug/src/lanarts}"
 
 build_env=(SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1)
+skip_build="${LANARTS_SKIP_BUILD:-0}"
+draw_smoke="${LANARTS_DRAW_SMOKE:-0}"
 
-if [[ "${LANARTS_SKIP_BUILD:-0}" == "0" ]]; then
+if [[ "$skip_build" == "0" ]]; then
     env "${build_env[@]}" ./run.sh --headless --build >/dev/null
-    if [[ "${LANARTS_DRAW_SMOKE:-0}" != "0" ]]; then
+    if [[ "$draw_smoke" != "0" ]]; then
         env "${build_env[@]}" ./run.sh --build >/dev/null
     fi
+fi
+
+if [[ ! -x "$headless_exe" ]]; then
+    echo "Native headless executable not found: $headless_exe" >&2
+    echo "Run without LANARTS_SKIP_BUILD=1, or set LANARTS_HEADLESS_EXE." >&2
+    exit 1
+fi
+if [[ "$draw_smoke" != "0" && ! -x "$native_exe" ]]; then
+    echo "Native draw executable not found: $native_exe" >&2
+    echo "Run without LANARTS_SKIP_BUILD=1, or set LANARTS_NATIVE_EXE." >&2
+    exit 1
 fi
 
 run_balance() {
@@ -87,7 +100,7 @@ grep -q "package_micro_dodges" "$temp_dir/rescue_runs.csv"
 grep -q "package_sweep_active_count" "$temp_dir/rescue_runs.csv"
 grep -q "sweep" "$temp_dir/rescue_runs.json"
 
-if [[ "${LANARTS_DRAW_SMOKE:-0}" != "0" ]]; then
+if [[ "$draw_smoke" != "0" ]]; then
     run_balance "$native_exe" dicebinder_draw \
         engine.StartBalanceRun \
         --steps 180 \

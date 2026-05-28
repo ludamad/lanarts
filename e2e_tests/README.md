@@ -161,6 +161,8 @@ Balance simulations:
     LANARTS_SKIP_BUILD=1 to reuse existing binaries, or LANARTS_DRAW_SMOKE=1
     to also exercise the normal native draw path for procedural FX without
     entering the slower Emscripten loop.
+    The content API smoke also honors LANARTS_SKIP_BUILD=1, so Lua/catalog
+    changes can be checked against the existing native binary without a rebuild.
     For ad hoc tuning, use ./e2e_tests/run_content_lab_native.sh with the same
     class, encounter, package component, bot profile, seed, and draw options
     surfaced by the web lab. It writes persistent CSV/JSON outputs under the

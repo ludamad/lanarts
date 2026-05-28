@@ -1,4 +1,7 @@
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
 
 grep -q "_lanarts_content_package_matrix_json" CMakeLists.txt
 grep -q "_lanarts_content_map_matrix_json" CMakeLists.txt
@@ -31,4 +34,10 @@ grep -q "FURY" runtime/objects/ContentLabHazards.lua
 grep -q "THREAD" runtime/objects/ContentLabHazards.lua
 grep -q "COUNTER" runtime/objects/ContentLabHazards.lua
 grep -q "draw_boss_pressure_aura" runtime/ui/ProceduralEffects.lua
-env SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1 ./run.sh --headless engine.StartContentApiSmoke "$@"
+
+run_args=(--headless)
+if [[ "${LANARTS_SKIP_BUILD:-0}" != "0" ]]; then
+    run_args+=(--force)
+fi
+
+env SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1 ./run.sh "${run_args[@]}" engine.StartContentApiSmoke "$@"
