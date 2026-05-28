@@ -281,6 +281,19 @@
       font-size: 13px;
     }
 
+    .encounter-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .compact-action {
+      min-height: 30px;
+      padding: 5px 8px;
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
     .build-info:empty {
       display: none;
     }
@@ -1709,6 +1722,17 @@
         return item;
       }
 
+      function applyEncounterBaseline(encounter) {
+        const config = currentConfig();
+        if (encounter.suggestedLevel) {
+          config.level = String(encounter.suggestedLevel);
+        }
+        if (encounter.suggestedPreset !== undefined) {
+          config.preset = encounter.suggestedPreset || 'none';
+        }
+        setConfig(config);
+      }
+
       function renderEncounterInfo() {
         const info = $('encounterInfo');
         const encounter = selectedEncounter();
@@ -1740,6 +1764,16 @@
           }
           baseline.textContent = `Model baseline: ${parts.join(', ')}`;
           info.appendChild(baseline);
+
+          const actions = document.createElement('div');
+          actions.className = 'encounter-actions';
+          const apply = document.createElement('button');
+          apply.type = 'button';
+          apply.className = 'secondary compact-action';
+          apply.textContent = 'Apply baseline';
+          apply.addEventListener('click', () => applyEncounterBaseline(encounter));
+          actions.appendChild(apply);
+          info.appendChild(actions);
         }
         const features = encounter.features || [];
         if (features.length) {
