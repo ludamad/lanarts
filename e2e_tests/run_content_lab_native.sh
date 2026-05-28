@@ -232,7 +232,7 @@ echo "  out: $out_dir"
 if command -v ruby >/dev/null 2>&1; then
     ruby -rcsv -e '
         row = CSV.read(ARGV[0], headers: true).first || {}
-        keys = %w[outcome frames package_outcome package_micro_score package_micro_punish_total package_micro_punish_break_total dice_rolls_total dice_roll_buildup_fx dice_roll_reveal_cues dice_high_rolls dice_longest_high_streak dice_repeat_rolls dice_dash_effective_refreshes dice_power_effective_refreshes package_rescue_save_rate package_rescue_early_rate package_rescue_timing_score package_rescue_window_cues package_rescue_perfect_window_cues package_rescue_counter_windows package_rescue_counter_damage_total package_rescue_fatal_misses package_rescue_survived_misses package_pressure_overlap_rate]
+        keys = %w[outcome frames package_outcome package_micro_score package_micro_punish_total package_micro_punish_break_total package_aggro_player_rate package_aggro_ally_rate package_aggro_inferred_rate package_aggro_switches dice_rolls_total dice_roll_buildup_fx dice_roll_reveal_cues dice_high_rolls dice_longest_high_streak dice_repeat_rolls dice_dash_effective_refreshes dice_power_effective_refreshes package_rescue_save_rate package_rescue_early_rate package_rescue_timing_score package_rescue_window_cues package_rescue_perfect_window_cues package_rescue_counter_windows package_rescue_counter_damage_total package_rescue_fatal_misses package_rescue_survived_misses package_pressure_overlap_rate]
         puts keys.map { |key| "#{key}=#{row[key] || ""}" }.join(" ")
     ' "$out_dir/runs.csv"
 fi

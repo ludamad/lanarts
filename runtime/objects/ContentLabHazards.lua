@@ -773,6 +773,21 @@ local function target_name(target)
     return target.name or target.class_name or "target"
 end
 
+local function inferred_aggro_target(primary)
+    local closest
+    local closest_dist
+    for _, target in ipairs(living_player_team_targets(true)) do
+        local dx = (target.x or 0) - (primary.x or 0)
+        local dy = (target.y or 0) - (primary.y or 0)
+        local dist = dx * dx + dy * dy
+        if not closest_dist or dist < closest_dist then
+            closest = target
+            closest_dist = dist
+        end
+    end
+    return closest
+end
+
 local function aggro_state(package)
     local primary = primary_monster(package and package.primary)
     if not primary then
@@ -781,17 +796,24 @@ local function aggro_state(package)
             target = nil,
             target_name = "",
             primary = nil,
+            inferred = false,
         }
     end
     local target = primary.target
     if target and target.destroyed then
         target = nil
     end
+    local inferred = false
+    if not target then
+        target = inferred_aggro_target(primary)
+        inferred = target ~= nil
+    end
     return {
         role = aggro_role(target),
         target = target,
         target_name = target_name(target),
         primary = primary,
+        inferred = inferred,
     }
 end
 
@@ -817,6 +839,69 @@ local function aggro_value(state, director)
         return state.role .. " " .. state.target_name
     end
     return state.role
+end
+
+local function aggro_role_frames(director, role)
+    if role == "player" then
+        return director.aggro_player_frames or 0
+    elseif role == "ally" then
+        return director.aggro_ally_frames or 0
+    elseif role == "other" then
+        return director.aggro_other_frames or 0
+    end
+    return director.aggro_none_frames or 0
+end
+
+local function aggro_role_rate(director, role)
+    return safe_rate(aggro_role_frames(director, role), math.max(1, director.aggro_frames or director.elapsed or 0))
+end
+
+local function aggro_tracking_fields(director)
+    local frames = math.max(1, director and (director.aggro_frames or director.elapsed) or 0)
+    local player_frames = director and director.aggro_player_frames or 0
+    local ally_frames = director and director.aggro_ally_frames or 0
+    local other_frames = director and director.aggro_other_frames or 0
+    local none_frames = director and director.aggro_none_frames or 0
+    return {
+        aggro_frames = director and director.aggro_frames or 0,
+        aggro_player_frames = player_frames,
+        aggro_player_rate = safe_rate(player_frames, frames),
+        aggro_ally_frames = ally_frames,
+        aggro_ally_rate = safe_rate(ally_frames, frames),
+        aggro_other_frames = other_frames,
+        aggro_other_rate = safe_rate(other_frames, frames),
+        aggro_none_frames = none_frames,
+        aggro_none_rate = safe_rate(none_frames, frames),
+        aggro_inferred_frames = director and director.aggro_inferred_frames or 0,
+        aggro_inferred_rate = safe_rate(director and director.aggro_inferred_frames or 0, frames),
+        aggro_switches = director and director.aggro_switches or 0,
+    }
+end
+
+local function record_aggro_state(director)
+    if not director then
+        return
+    end
+    local state = aggro_state(director.package or {})
+    local role = state.role or "none"
+    director.aggro_frames = (director.aggro_frames or 0) + 1
+    if role == "player" then
+        director.aggro_player_frames = (director.aggro_player_frames or 0) + 1
+    elseif role == "ally" then
+        director.aggro_ally_frames = (director.aggro_ally_frames or 0) + 1
+    elseif role == "other" then
+        director.aggro_other_frames = (director.aggro_other_frames or 0) + 1
+    else
+        director.aggro_none_frames = (director.aggro_none_frames or 0) + 1
+    end
+    if state.inferred then
+        director.aggro_inferred_frames = (director.aggro_inferred_frames or 0) + 1
+    end
+    local key = role .. ":" .. (state.target_name or "")
+    if director.aggro_last_key and director.aggro_last_key ~= key then
+        director.aggro_switches = (director.aggro_switches or 0) + 1
+    end
+    director.aggro_last_key = key
 end
 
 local function draw_aggro_marker(director, package)
@@ -1164,8 +1249,9 @@ local function draw_package_hud(director)
 
         local state = aggro_state(package)
         local color = aggro_color(state.role)
-        local value_pct = state.role == "player" and 1 or state.role == "ally" and 1 or 0
-        draw_hud_row(y, "AGGRO", aggro_value(state, director), color, value_pct)
+        local value_pct = aggro_role_rate(director, state.role)
+        local value = aggro_value(state, director) .. (state.inferred and "?" or "")
+        draw_hud_row(y, "AGGRO", value .. " " .. format_pct(value_pct), color, value_pct)
     end
 
     draw_escort_markers()
@@ -1218,6 +1304,7 @@ local function package_result(director, outcome)
     local pull_total_frames = director.rescue_pull_total_frames or 0
     local pull_uptime_rate = safe_rate(pull_total_frames, math.max(1, frames))
     local pressure = package_pressure_state(director, director.package or {})
+    local aggro_tracking = aggro_tracking_fields(director)
     local sweep_warning_count, sweep_active_count, sweep_warning_remaining, sweep_active_remaining = active_sweeps()
     local best = director.rescue_best_margin
     local best_pull = director.rescue_best_pull_margin
@@ -1242,6 +1329,18 @@ local function package_result(director, outcome)
         primary_max_hp = primary_max_hp,
         aggro_target_role = aggro.role,
         aggro_target_name = aggro.target_name,
+        aggro_frames = aggro_tracking.aggro_frames,
+        aggro_player_frames = aggro_tracking.aggro_player_frames,
+        aggro_player_rate = aggro_tracking.aggro_player_rate,
+        aggro_ally_frames = aggro_tracking.aggro_ally_frames,
+        aggro_ally_rate = aggro_tracking.aggro_ally_rate,
+        aggro_other_frames = aggro_tracking.aggro_other_frames,
+        aggro_other_rate = aggro_tracking.aggro_other_rate,
+        aggro_none_frames = aggro_tracking.aggro_none_frames,
+        aggro_none_rate = aggro_tracking.aggro_none_rate,
+        aggro_inferred_frames = aggro_tracking.aggro_inferred_frames,
+        aggro_inferred_rate = aggro_tracking.aggro_inferred_rate,
+        aggro_switches = aggro_tracking.aggro_switches,
         rescue_saves = saves,
         rescue_opportunities = opportunities,
         rescue_save_rate = save_rate,
@@ -1323,6 +1422,7 @@ local function package_state_from_director(director)
     local pulse_warning_count, pulse_active_count, pulse_warning_remaining, pulse_active_remaining = active_pulses()
     local sweep_warning_count, sweep_active_count, sweep_warning_remaining, sweep_active_remaining = active_sweeps()
     local aggro = aggro_state(director.package or {})
+    local aggro_tracking = aggro_tracking_fields(director)
     local next_threat = next_threat_state(director, director.package or {})
     local pressure = package_pressure_state(director, director.package or {})
     local rescue_state
@@ -1343,6 +1443,18 @@ local function package_state_from_director(director)
         primary_max_hp = primary_max_hp,
         aggro_target_role = aggro.role,
         aggro_target_name = aggro.target_name,
+        aggro_frames = aggro_tracking.aggro_frames,
+        aggro_player_frames = aggro_tracking.aggro_player_frames,
+        aggro_player_rate = aggro_tracking.aggro_player_rate,
+        aggro_ally_frames = aggro_tracking.aggro_ally_frames,
+        aggro_ally_rate = aggro_tracking.aggro_ally_rate,
+        aggro_other_frames = aggro_tracking.aggro_other_frames,
+        aggro_other_rate = aggro_tracking.aggro_other_rate,
+        aggro_none_frames = aggro_tracking.aggro_none_frames,
+        aggro_none_rate = aggro_tracking.aggro_none_rate,
+        aggro_inferred_frames = aggro_tracking.aggro_inferred_frames,
+        aggro_inferred_rate = aggro_tracking.aggro_inferred_rate,
+        aggro_switches = aggro_tracking.aggro_switches,
         next_threat_id = next_threat.id,
         next_threat_label = next_threat.label,
         next_threat_state = next_threat.state,
@@ -3012,6 +3124,13 @@ function M.add_director(game_map, package, intensity)
         micro_punish_break_total = 0,
         micro_punish_break_events = 0,
         micro_last_timer = 0,
+        aggro_frames = 0,
+        aggro_player_frames = 0,
+        aggro_ally_frames = 0,
+        aggro_other_frames = 0,
+        aggro_none_frames = 0,
+        aggro_inferred_frames = 0,
+        aggro_switches = 0,
         escort_required = package.escort ~= nil,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
@@ -3030,6 +3149,7 @@ function M.add_director(game_map, package, intensity)
             if (self.rescue_pull_active_frames or 0) > 0 then
                 self.rescue_pull_total_frames = (self.rescue_pull_total_frames or 0) + 1
             end
+            record_aggro_state(self)
             if #living_players() == 0 then
                 finish_package(self, "party down")
                 return

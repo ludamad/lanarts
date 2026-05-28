@@ -619,6 +619,18 @@ local function package_state_fields(player)
             package_primary_hp_pct = "",
             package_aggro_target_role = "",
             package_aggro_target_name = "",
+            package_aggro_frames = "",
+            package_aggro_player_frames = "",
+            package_aggro_player_rate = "",
+            package_aggro_ally_frames = "",
+            package_aggro_ally_rate = "",
+            package_aggro_other_frames = "",
+            package_aggro_other_rate = "",
+            package_aggro_none_frames = "",
+            package_aggro_none_rate = "",
+            package_aggro_inferred_frames = "",
+            package_aggro_inferred_rate = "",
+            package_aggro_switches = "",
             package_next_threat_id = "",
             package_next_threat_label = "",
             package_next_threat_state = "",
@@ -717,6 +729,18 @@ local function package_state_fields(player)
         package_primary_hp_pct = primary_max_hp > 0 and format_rate(primary_hp / primary_max_hp) or "",
         package_aggro_target_role = state.aggro_target_role or "",
         package_aggro_target_name = state.aggro_target_name or "",
+        package_aggro_frames = state.aggro_frames or 0,
+        package_aggro_player_frames = state.aggro_player_frames or 0,
+        package_aggro_player_rate = format_rate(state.aggro_player_rate or 0),
+        package_aggro_ally_frames = state.aggro_ally_frames or 0,
+        package_aggro_ally_rate = format_rate(state.aggro_ally_rate or 0),
+        package_aggro_other_frames = state.aggro_other_frames or 0,
+        package_aggro_other_rate = format_rate(state.aggro_other_rate or 0),
+        package_aggro_none_frames = state.aggro_none_frames or 0,
+        package_aggro_none_rate = format_rate(state.aggro_none_rate or 0),
+        package_aggro_inferred_frames = state.aggro_inferred_frames or 0,
+        package_aggro_inferred_rate = format_rate(state.aggro_inferred_rate or 0),
+        package_aggro_switches = state.aggro_switches or 0,
         package_next_threat_id = state.next_threat_id or "",
         package_next_threat_label = state.next_threat_label or "",
         package_next_threat_state = state.next_threat_state or "",
@@ -1182,6 +1206,10 @@ local SUMMARY_METRICS = {
     "dice_edge_frames", "dice_focus_frames", "dice_dash_frames", "dice_jackpot_frames",
     "package_frames", "package_escort_count", "package_escort_hp", "package_escort_max_hp",
     "package_escort_hp_pct", "package_rescue_saves", "package_rescue_clutch_saves",
+    "package_aggro_frames", "package_aggro_player_frames", "package_aggro_player_rate",
+    "package_aggro_ally_frames", "package_aggro_ally_rate", "package_aggro_other_frames",
+    "package_aggro_other_rate", "package_aggro_none_frames", "package_aggro_none_rate",
+    "package_aggro_inferred_frames", "package_aggro_inferred_rate", "package_aggro_switches",
     "package_rescue_perfect_saves", "package_rescue_pulls", "package_rescue_misses",
     "package_rescue_fatal_misses", "package_rescue_survived_misses",
     "package_rescue_opportunities", "package_rescue_save_rate", "package_rescue_clutch_rate",
@@ -1889,6 +1917,12 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local micro_best_streak = tonumber(row.avg_package_micro_best_streak) or 0
     local micro_punish_total = tonumber(row.avg_package_micro_punish_total) or 0
     local micro_punish_break_total = tonumber(row.avg_package_micro_punish_break_total) or 0
+    local aggro_player_rate = tonumber(row.avg_package_aggro_player_rate) or 0
+    local aggro_ally_rate = tonumber(row.avg_package_aggro_ally_rate) or 0
+    local aggro_other_rate = tonumber(row.avg_package_aggro_other_rate) or 0
+    local aggro_none_rate = tonumber(row.avg_package_aggro_none_rate) or 0
+    local aggro_inferred_rate = tonumber(row.avg_package_aggro_inferred_rate) or 0
+    local aggro_switches = tonumber(row.avg_package_aggro_switches) or 0
 
     add_report_row(
         rows,
@@ -1930,6 +1964,45 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
             micro_best_streak
         )
     )
+
+    add_report_row(
+        rows,
+        class_name,
+        "info",
+        "package_aggro",
+        "avg_package_aggro_player_rate",
+        aggro_player_rate,
+        0,
+        string.format(
+            "%s package aggro in %s averaged player %.1f%%, ally %.1f%%, other %.1f%%, none %.1f%%, inferred %.1f%%, and %.1f target switches/run.",
+            class_name,
+            encounter,
+            aggro_player_rate * 100,
+            aggro_ally_rate * 100,
+            aggro_other_rate * 100,
+            aggro_none_rate * 100,
+            aggro_inferred_rate * 100,
+            aggro_switches
+        )
+    )
+
+    if win_rate >= 0.50 and aggro_ally_rate >= 0.35 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_aggro",
+            "avg_package_aggro_ally_rate",
+            aggro_ally_rate,
+            0.35,
+            string.format(
+                "%s cleared %s while the primary targeted allies %.1f%% of package frames; check for forced-target cheese.",
+                class_name,
+                encounter,
+                aggro_ally_rate * 100
+            )
+        )
+    end
 
     if runs >= min_runs and win_rate >= 0.95 and death_rate <= 0.05 and min_hp_pct >= 0.45 then
         add_report_row(
@@ -2908,6 +2981,10 @@ local function run_balance(raw_args)
             "package_primary_name", "package_primary_count", "package_primary_hp",
             "package_primary_max_hp", "package_primary_hp_pct",
             "package_aggro_target_role", "package_aggro_target_name",
+            "package_aggro_frames", "package_aggro_player_frames", "package_aggro_player_rate",
+            "package_aggro_ally_frames", "package_aggro_ally_rate", "package_aggro_other_frames",
+            "package_aggro_other_rate", "package_aggro_none_frames", "package_aggro_none_rate",
+            "package_aggro_inferred_frames", "package_aggro_inferred_rate", "package_aggro_switches",
             "package_next_threat_id", "package_next_threat_label",
             "package_next_threat_state", "package_next_threat_frames",
             "package_pressure_active_count", "package_pressure_warning_count",
@@ -2989,6 +3066,10 @@ local function run_balance(raw_args)
             "package_primary_name", "package_primary_count", "package_primary_hp",
             "package_primary_max_hp", "package_primary_hp_pct",
             "package_aggro_target_role", "package_aggro_target_name",
+            "package_aggro_frames", "package_aggro_player_frames", "package_aggro_player_rate",
+            "package_aggro_ally_frames", "package_aggro_ally_rate", "package_aggro_other_frames",
+            "package_aggro_other_rate", "package_aggro_none_frames", "package_aggro_none_rate",
+            "package_aggro_inferred_frames", "package_aggro_inferred_rate", "package_aggro_switches",
             "package_next_threat_id", "package_next_threat_label",
             "package_next_threat_state", "package_next_threat_frames",
             "package_pressure_active_count", "package_pressure_warning_count",
@@ -3104,6 +3185,12 @@ local function run_balance(raw_args)
             "avg_rescue_hold_frames", "avg_rescue_late_reaction_frames", "avg_necromancer_regen_frames",
             "avg_necromancer_regen_recovered_total",
             "avg_package_frames", "avg_package_escort_hp_pct", "avg_package_rescue_saves",
+            "avg_package_aggro_frames", "avg_package_aggro_player_frames", "avg_package_aggro_player_rate",
+            "avg_package_aggro_ally_frames", "avg_package_aggro_ally_rate",
+            "avg_package_aggro_other_frames", "avg_package_aggro_other_rate",
+            "avg_package_aggro_none_frames", "avg_package_aggro_none_rate",
+            "avg_package_aggro_inferred_frames", "avg_package_aggro_inferred_rate",
+            "avg_package_aggro_switches",
             "avg_package_rescue_opportunities", "avg_package_rescue_save_rate",
             "avg_package_rescue_clutch_saves", "avg_package_rescue_clutch_rate",
             "avg_package_rescue_perfect_saves", "avg_package_rescue_perfect_rate",

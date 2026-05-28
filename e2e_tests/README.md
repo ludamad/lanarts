@@ -107,10 +107,11 @@ Balance simulations:
     opportunities plus save, clutch, perfect, early, timing-score, pull,
     timed-pull, perfect-pull, and counter-opening rates
     so rescue packages can be compared without hand-calculating rates from raw
-    counts. Package rows expose
-    primary target HP, current package aggro target, the current/next package
-    threat, and live rescue-window fields such as next strike, active count,
-    blocked/late/perfect state, and active pull target for HUD and replay checks.
+    counts. Package rows expose primary target HP, current package aggro
+    target, primary aggro player/ally/other/none rates, inferred-target rate,
+    target switches, the current/next package threat, and live rescue-window
+    fields such as next strike, active count, blocked/late/perfect state, and
+    active pull target for HUD and replay checks.
     Package pressure rows track active/warning component stacks, peak stack,
     and overlap rate, which helps distinguish true full-package micro from
     isolated single-beat pressure. The report also emits package_pressure and

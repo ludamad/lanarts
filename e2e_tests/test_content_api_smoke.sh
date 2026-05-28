@@ -23,6 +23,9 @@ grep -q "avg_package_micro_thread_cues" runtime/engine/StartBalanceRun.lua
 grep -q "MICRO x" runtime/objects/ContentLabHazards.lua
 grep -q "avg_package_micro_punish_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_punish_break_total" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_aggro_ally_rate" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_aggro_inferred_rate" runtime/engine/StartBalanceRun.lua
+grep -q "avg_package_aggro_switches" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_rolls_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_animation_frames" runtime/engine/StartBalanceRun.lua
 grep -q "avg_dice_roll_buildup_fx" runtime/engine/StartBalanceRun.lua
