@@ -158,6 +158,8 @@ local function run_content_api_smoke()
         red_rhythms[rhythm.id] = true
     end
     expect(red_rhythms.orbit and red_rhythms.pulse and red_rhythms.summon, "red dragon should expose full package rhythms")
+    expect(red_dragon_summary.encounter and red_dragon_summary.encounter.suggestedLevel == 5, "red dragon should expose late-game suggested level")
+    expect(red_dragon_summary.encounter and red_dragon_summary.encounter.suggestedPreset == "late", "red dragon should expose late-game suggested loadout")
 
     local chicken_config = [[{
         "className": "Fighter",
@@ -205,6 +207,8 @@ local function run_content_api_smoke()
         gragh_rhythms[rhythm.id] = true
     end
     expect(gragh_rhythms.orbit and gragh_rhythms.pulse and gragh_rhythms.summon, "gragh should expose full package rhythms")
+    expect(gragh_summary.encounter and gragh_summary.encounter.suggestedLevel == 5, "gragh should expose late-game suggested level")
+    expect(gragh_summary.encounter and gragh_summary.encounter.suggestedPreset == "late", "gragh should expose late-game suggested loadout")
 
     local hell_pair_config = [[{
         "className": "Rogue",
