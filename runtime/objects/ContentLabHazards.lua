@@ -70,9 +70,9 @@ local function round_xy(xy)
 end
 
 local function palette_for_primary(name)
-    if name == "Crypt Keeper" or name == "Purple Dragon" then
+    if name == "Crypt Keeper" or name == "Purple Dragon" or name == "Mana Sapper" then
         return "black"
-    elseif name == "Red Dragon" or name == "Gragh" or name == "Hell Warrior" then
+    elseif name == "Red Dragon" or name == "Gragh" or name == "Hell Warrior" or name == "Executioner" then
         return "red"
     elseif name == "Waxanarian" then
         return "green"
@@ -2880,18 +2880,28 @@ function M.add_director(game_map, package, intensity)
             end
         end,
         on_draw = function(self)
-            local primary = primary_monster(self.package.primary)
-            if primary then
-                ProceduralEffects.draw_boss_aura(primary, {
-                    palette = palette_for_primary(self.package.primary),
-                    radius = (primary.radius or 16) + 58,
-                    intensity = 0.72,
-                    rotation_speed = 0.013,
-                    spoke_speed = -0.006,
-                })
-            end
             local pressure = package_pressure_state(self, self.package)
             local total = pressure.total_count or 0
+            local primary = primary_monster(self.package.primary)
+            if primary then
+                local palette = palette_for_primary(self.package.primary)
+                ProceduralEffects.draw_boss_aura(primary, {
+                    palette = palette,
+                    radius = (primary.radius or 16) + 58 + math.min(18, total * 3),
+                    intensity = 0.62 + math.min(0.28, total * 0.06),
+                    rotation_speed = 0.013 + total * 0.002,
+                    spoke_speed = -0.006 - total * 0.001,
+                })
+                if total >= 2 then
+                    ProceduralEffects.draw_boss_pressure_aura(primary, {
+                        palette = palette,
+                        radius = (primary.radius or 16) + 72 + math.min(28, total * 7),
+                        pressure = total,
+                        active = pressure.active_count or 0,
+                        intensity = 0.34 + math.min(0.42, total * 0.09),
+                    })
+                end
+            end
             if total >= 2 then
                 ProceduralEffects.draw_screen_edges {
                     color = total >= 4 and COL_PALE_RED or total >= 3 and COL_PALE_YELLOW or COL_PALE_BLUE,

@@ -51,6 +51,16 @@ local function alpha(color, amount)
     return with_alpha(color, math.max(0, math.min(1, amount or 1)))
 end
 
+local function clamp(value, min_value, max_value)
+    value = tonumber(value) or 0
+    if value < min_value then
+        return min_value
+    elseif value > max_value then
+        return max_value
+    end
+    return value
+end
+
 function M.draw_world_rune(args)
     local xy = screen_xy(args.xy)
     local frame = args.frame or GameState.frame or 0
@@ -99,6 +109,80 @@ function M.draw_world_rune(args)
         }
         Display.draw_line(alpha(pal.spoke, (0.12 + pulse * 0.18) * intensity), from_xy, to_xy, args.spoke_width or 1)
     end
+end
+
+function M.draw_world_pressure_field(args)
+    args = args or {}
+    local xy = screen_xy(args.xy)
+    local frame = args.frame or GameState.frame or 0
+    local radius = args.radius or 96
+    local pressure = math.max(1, math.floor(tonumber(args.pressure or args.stack or 1) or 1))
+    local active = math.max(0, math.floor(tonumber(args.active or pressure) or pressure))
+    local pal = palette_for(args.palette)
+    local intensity = clamp(args.intensity or 1, 0, 1.6)
+    local beat = 0.5 + 0.5 * math.sin(frame * (args.beat_speed or 0.070) + pressure * 0.63)
+    local breath = 0.5 + 0.5 * math.sin(frame * (args.breath_speed or 0.031))
+
+    Display.draw_radial_gradient(
+        alpha(pal.arc, (0.08 + beat * 0.08) * intensity),
+        pal.outer,
+        xy,
+        radius * (0.98 + beat * 0.08),
+        args.gradient_steps or 7
+    )
+
+    local rings = args.rings or math.min(5, pressure + 2)
+    for idx = 1, rings do
+        local pct = idx / rings
+        local ring_radius = radius * (0.35 + pct * 0.62)
+            + math.sin(frame * 0.045 + idx * 1.7) * radius * 0.018
+        local ring_alpha = (0.11 + beat * 0.13) * (1 - pct * 0.32) * intensity
+        local color = idx <= active and pal.spoke or pal.arc
+        Display.draw_circle_outline(alpha(color, ring_alpha), xy, ring_radius, idx == rings and 2 or 1)
+    end
+
+    local arcs = args.arcs or math.min(7, pressure + 3)
+    for idx = 1, arcs do
+        local direction = idx % 2 == 0 and -0.76 or 1
+        local base = frame * (args.rotation_speed or 0.026) * direction
+        local start_angle = base + idx * TWO_PI / arcs + breath * 0.24
+        local length = args.arc_length or math.min(math.pi * 0.78, math.pi * (0.26 + pressure * 0.08))
+        local arc_radius = radius * (0.44 + (idx % 4) * 0.13)
+        local arc_alpha = (0.18 + beat * 0.18) * intensity
+        Display.draw_arc(
+            alpha(pal.arc, arc_alpha),
+            xy,
+            arc_radius,
+            start_angle,
+            start_angle + length,
+            args.line_width or 2,
+            args.segments or 24
+        )
+    end
+
+    local spokes = args.spokes or math.min(10, 4 + pressure * 2)
+    for idx = 1, spokes do
+        local angle = frame * (args.spoke_speed or -0.018) + idx * TWO_PI / spokes
+        local wobble = 1 + math.sin(frame * 0.050 + idx) * 0.05
+        local inner = radius * (0.20 + beat * 0.04)
+        local outer = radius * (0.86 + 0.08 * wobble)
+        Display.draw_line(
+            alpha(pal.spoke, (0.08 + beat * 0.12) * intensity),
+            {xy[1] + math.cos(angle) * inner, xy[2] + math.sin(angle) * inner},
+            {xy[1] + math.cos(angle) * outer, xy[2] + math.sin(angle) * outer},
+            args.spoke_width or 1
+        )
+    end
+end
+
+function M.draw_boss_pressure_aura(obj, args)
+    if not obj or obj.destroyed or not Map.object_visible(obj) then
+        return
+    end
+    args = args or {}
+    args.xy = {obj.x, obj.y}
+    args.radius = args.radius or ((obj.radius or 16) + 72)
+    M.draw_world_pressure_field(args)
 end
 
 function M.draw_boss_aura(obj, args)

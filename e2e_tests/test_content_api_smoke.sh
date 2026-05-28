@@ -30,4 +30,5 @@ grep -q "BEAT" runtime/objects/ContentLabHazards.lua
 grep -q "FURY" runtime/objects/ContentLabHazards.lua
 grep -q "THREAD" runtime/objects/ContentLabHazards.lua
 grep -q "COUNTER" runtime/objects/ContentLabHazards.lua
+grep -q "draw_boss_pressure_aura" runtime/ui/ProceduralEffects.lua
 env SDL_AUDIODRIVER=dummy LANARTS_MUTE_AUDIO=1 LANARTS_SMALL=1 ./run.sh --headless engine.StartContentApiSmoke "$@"
