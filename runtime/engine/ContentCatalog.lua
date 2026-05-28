@@ -1625,6 +1625,8 @@ M.encounters = {
                 overheal_cap_pct = 0.35,
                 clutch_break = 12,
                 perfect_break = 28,
+                streak_break = 7,
+                streak_break_label = "FURY BREAK",
             },
             orbit = {
                 interval = 260,
@@ -1691,6 +1693,8 @@ M.encounters = {
                 overheal_cap_pct = 0.35,
                 clutch_break = 12,
                 perfect_break = 28,
+                streak_break = 7,
+                streak_break_label = "FURY BREAK",
             },
             escort = {
                 monster = "Spectral Beast",
@@ -2393,6 +2397,8 @@ M.encounters = {
                 label = "DREAD",
                 heal_primary = 6,
                 overheal_cap_pct = 0.18,
+                streak_break = 4,
+                streak_break_label = "DREAD BREAK",
             },
             orbit = {
                 interval = 245,

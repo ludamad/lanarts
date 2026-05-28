@@ -165,7 +165,10 @@ Balance simulations:
     no longer inflate the count. Gragh packages also emit
     package_micro_punish_total for Gragh Fury healing caused by avoidable
     mechanic hits, plus package_micro_punish_break_total when clutch/perfect
-    rescue saves break that Fury back off.
+    rescue saves break that Fury back off. Clean dodge-streak milestones
+    (MICRO x3/x5+) also break un-broken Fury/Dread healing, so non-rescue
+    duels keep a skill-gated counterplay to the heal; the break is capped at
+    the healing earned so it is never free damage.
     Dicebinder runs also emit dice_rolls_total, per-face roll counts,
     face swaps, roll buildup FX, surge cues, lock cues, suspense pips, guard
     cues, reveal cues, finale FX, cooldown-trim frames, high-roll share,

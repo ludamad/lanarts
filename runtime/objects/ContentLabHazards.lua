@@ -517,6 +517,25 @@ local function add_micro_event(director, args)
                     duration = 8,
                 }
             end
+            -- Clean dodge-streak milestones claw back accumulated punish healing, so the
+            -- FURY/DREAD tax has a skill-gated counterplay even in non-rescue duels where no
+            -- clutch save exists to break it. Capped at the un-broken heal so it never becomes
+            -- free damage, and only sloppy-resistant streaks (x3/x5+) qualify.
+            local punish = director.package and director.package.micro_punish
+            if punish then
+                local remaining = (director.micro_punish_total or 0) - (director.micro_punish_break_total or 0)
+                if remaining > 0.5 then
+                    local base = tonumber(punish.streak_break)
+                        or math.max(4, (tonumber(punish.clutch_break) or 8) * 0.5)
+                    local amount = math.min(remaining, base * (streak >= 5 and 1.6 or 1))
+                    apply_micro_punish_break(
+                        director,
+                        amount,
+                        punish.streak_break_label or "MICRO BREAK",
+                        director.micro_last_color or COL_PALE_BLUE
+                    )
+                end
+            end
         end
     end
 end

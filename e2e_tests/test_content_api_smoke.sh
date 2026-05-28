@@ -25,6 +25,8 @@ grep -q "THREAD OPEN" runtime/objects/ContentLabHazards.lua
 grep -q "avg_package_micro_counter_windows" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_punish_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_punish_break_total" runtime/engine/StartBalanceRun.lua
+grep -q "streak_break" runtime/engine/ContentCatalog.lua
+grep -q "MICRO BREAK" runtime/objects/ContentLabHazards.lua
 grep -q "avg_package_pressure_sync_bursts" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_pressure_sync_rate" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_pressure_unique_components" runtime/engine/StartBalanceRun.lua
