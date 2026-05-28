@@ -393,6 +393,72 @@ local function apply_rescue_counter(director, strike, blocker)
     return applied
 end
 
+local function apply_micro_counter(hazard)
+    local director = hazard and hazard.director
+    local package = director and director.package
+    if not director or not package or not hazard.micro_thread_cued then
+        return 0
+    end
+    local primary = primary_monster(package.primary)
+    if not primary or primary.destroyed then
+        return 0
+    end
+    local intensity = director.intensity or normalize_intensity(nil)
+    local dodge_points = tonumber(hazard.micro_dodge_points) or 6
+    local damage = tonumber(hazard.micro_counter_damage)
+    if damage == nil then
+        damage = dodge_points * 0.25
+    end
+    damage = math.max(0, damage) * (intensity.damage or 1)
+    local stagger = tonumber(hazard.micro_counter_stun)
+    if stagger == nil then
+        stagger = math.min(10, 3 + math.max(0, director.micro_streak or 0))
+    end
+    stagger = math.max(0, math.floor(stagger * (intensity.tempo or 1)))
+    if damage <= 0 and stagger <= 0 then
+        return 0
+    end
+
+    local before = primary.stats.hp or 0
+    local after = damage > 0 and math.max(1, before - damage) or before
+    local applied = math.max(0, before - after)
+    if applied > 0 then
+        primary.stats.hp = after
+    end
+    if stagger > 0 and primary.add_effect then
+        primary:add_effect("Stun", stagger)
+    end
+
+    director.micro_counter_windows = (director.micro_counter_windows or 0) + 1
+    director.micro_counter_damage_total = (director.micro_counter_damage_total or 0) + applied
+    director.micro_counter_stagger_frames = (director.micro_counter_stagger_frames or 0) + stagger
+    director.micro_counter_last_damage = applied
+    director.micro_counter_last_stagger = stagger
+    director.micro_counter_last_label = hazard.micro_counter_label or "THREAD OPEN"
+    director.micro_counter_last_timer = 54
+
+    local color = hazard.micro_color or COL_PALE_BLUE
+    ImpactFX.world_burst {
+        map = director.map,
+        xy = xy_of(primary),
+        color = color,
+        label = director.micro_counter_last_label,
+        radius = 50 + math.min(20, (director.micro_streak or 0) * 3),
+        duration = 30,
+    }
+    if M.create_feedback_label then
+        M.create_feedback_label {
+            map = director.map,
+            xy = hazard.micro_dodge_xy or hazard.xy or xy_of(primary),
+            text = "OPENING",
+            color = color,
+            duration = 44,
+            drift = 0.36,
+        }
+    end
+    return applied
+end
+
 local function add_micro_event(director, args)
     if not director or director.destroyed then
         return
@@ -488,6 +554,7 @@ local function record_hazard_dodge(hazard)
         xy = hazard.micro_dodge_xy or hazard.xy,
         duration = 48,
     })
+    apply_micro_counter(hazard)
 end
 
 local function mark_hazard_dodge_eligible(hazard, xy, label)
@@ -996,6 +1063,37 @@ local function draw_rescue_counter_marker(director, package)
     draw_text(color, Display.CENTER, label_xy, label .. detail)
 end
 
+local function draw_micro_counter_marker(director, package)
+    if not package or (director.micro_counter_last_timer or 0) <= 0 then
+        return
+    end
+    local primary = primary_monster(package.primary)
+    if not primary then
+        return
+    end
+    local timer = director.micro_counter_last_timer or 0
+    local alpha = math.max(0, math.min(1, timer / 54))
+    local color = COL_PALE_BLUE
+    ProceduralEffects.draw_world_rune {
+        xy = xy_of(primary),
+        radius = (primary.radius or 16) + 42 + alpha * 16,
+        palette = palette_for_primary(package.primary),
+        intensity = 0.35 + alpha * 0.35,
+        arcs = 3,
+        spokes = 6,
+        rotation_speed = -0.036,
+        spoke_speed = 0.024,
+    }
+    local damage = director.micro_counter_last_damage or 0
+    local stagger = director.micro_counter_last_stagger or 0
+    local detail = damage > 0 and (" -" .. tostring(math.ceil(damage))) or ""
+    if stagger > 0 then
+        detail = detail .. " " .. tostring(stagger) .. "f"
+    end
+    local label_xy = Display.to_screen_xy({primary.x, primary.y - (primary.radius or 16) - 48})
+    draw_text(color, Display.CENTER, label_xy, (director.micro_counter_last_label or "THREAD OPEN") .. detail)
+end
+
 local summon_count
 local active_summon_portals
 local active_orbs
@@ -1075,7 +1173,8 @@ local function draw_package_hud(director)
         local streak = director.micro_streak or 0
         local hit_count = director.micro_hits or 0
         local dodge_count = director.micro_dodges or 0
-        local micro_value = tostring(score) .. " x" .. tostring(streak) .. " d" .. tostring(dodge_count) .. " h" .. tostring(hit_count)
+        local counter_count = director.micro_counter_windows or 0
+        local micro_value = tostring(score) .. " x" .. tostring(streak) .. " d" .. tostring(dodge_count) .. " h" .. tostring(hit_count) .. " o" .. tostring(counter_count)
         local micro_color = hit_count > 0 and COL_PALE_YELLOW or streak >= 4 and COL_PALE_GREEN or COL_LIGHT_GRAY
         if (director.micro_last_timer or 0) > 0 and director.micro_last_label and director.micro_last_label ~= "" then
             micro_color = director.micro_last_color or micro_color
@@ -1257,6 +1356,7 @@ local function draw_package_hud(director)
     draw_escort_markers()
     draw_aggro_marker(director, package)
     draw_micro_punish_marker(director, package)
+    draw_micro_counter_marker(director, package)
     draw_rescue_counter_marker(director, package)
 end
 
@@ -1391,6 +1491,9 @@ local function package_result(director, outcome)
         micro_events = director.micro_events or 0,
         micro_thread_cues = director.micro_thread_cues or 0,
         micro_streak_bursts = director.micro_streak_bursts or 0,
+        micro_counter_windows = director.micro_counter_windows or 0,
+        micro_counter_damage_total = director.micro_counter_damage_total or 0,
+        micro_counter_stagger_frames = director.micro_counter_stagger_frames or 0,
         micro_punish_total = director.micro_punish_total or 0,
         micro_punish_events = director.micro_punish_events or 0,
         micro_punish_break_total = director.micro_punish_break_total or 0,
@@ -1529,6 +1632,9 @@ local function package_state_from_director(director)
         micro_events = director.micro_events or 0,
         micro_thread_cues = director.micro_thread_cues or 0,
         micro_streak_bursts = director.micro_streak_bursts or 0,
+        micro_counter_windows = director.micro_counter_windows or 0,
+        micro_counter_damage_total = director.micro_counter_damage_total or 0,
+        micro_counter_stagger_frames = director.micro_counter_stagger_frames or 0,
         micro_punish_total = director.micro_punish_total or 0,
         micro_punish_events = director.micro_punish_events or 0,
         micro_punish_break_total = director.micro_punish_break_total or 0,
@@ -3119,6 +3225,9 @@ function M.add_director(game_map, package, intensity)
         micro_events = 0,
         micro_thread_cues = 0,
         micro_streak_bursts = 0,
+        micro_counter_windows = 0,
+        micro_counter_damage_total = 0,
+        micro_counter_stagger_frames = 0,
         micro_punish_total = 0,
         micro_punish_events = 0,
         micro_punish_break_total = 0,
@@ -3145,6 +3254,9 @@ function M.add_director(game_map, package, intensity)
             end
             if (self.rescue_counter_last_timer or 0) > 0 then
                 self.rescue_counter_last_timer = self.rescue_counter_last_timer - 1
+            end
+            if (self.micro_counter_last_timer or 0) > 0 then
+                self.micro_counter_last_timer = self.micro_counter_last_timer - 1
             end
             if (self.rescue_pull_active_frames or 0) > 0 then
                 self.rescue_pull_total_frames = (self.rescue_pull_total_frames or 0) + 1

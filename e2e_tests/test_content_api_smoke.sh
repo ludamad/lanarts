@@ -21,6 +21,8 @@ grep -q "avg_package_sweep_active_count" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_score" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_thread_cues" runtime/engine/StartBalanceRun.lua
 grep -q "MICRO x" runtime/objects/ContentLabHazards.lua
+grep -q "THREAD OPEN" runtime/objects/ContentLabHazards.lua
+grep -q "avg_package_micro_counter_windows" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_punish_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_micro_punish_break_total" runtime/engine/StartBalanceRun.lua
 grep -q "avg_package_aggro_ally_rate" runtime/engine/StartBalanceRun.lua

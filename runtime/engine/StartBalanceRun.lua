@@ -650,6 +650,9 @@ local function package_state_fields(player)
             package_micro_events = "",
             package_micro_thread_cues = "",
             package_micro_streak_bursts = "",
+            package_micro_counter_windows = "",
+            package_micro_counter_damage_total = "",
+            package_micro_counter_stagger_frames = "",
             package_micro_punish_total = "",
             package_micro_punish_events = "",
             package_micro_punish_break_total = "",
@@ -760,6 +763,9 @@ local function package_state_fields(player)
         package_micro_events = state.micro_events or 0,
         package_micro_thread_cues = state.micro_thread_cues or 0,
         package_micro_streak_bursts = state.micro_streak_bursts or 0,
+        package_micro_counter_windows = state.micro_counter_windows or 0,
+        package_micro_counter_damage_total = format_rate(state.micro_counter_damage_total or 0),
+        package_micro_counter_stagger_frames = state.micro_counter_stagger_frames or 0,
         package_micro_punish_total = format_rate(state.micro_punish_total or 0),
         package_micro_punish_events = state.micro_punish_events or 0,
         package_micro_punish_break_total = format_rate(state.micro_punish_break_total or 0),
@@ -1227,6 +1233,8 @@ local SUMMARY_METRICS = {
     "package_micro_score", "package_micro_streak", "package_micro_best_streak",
     "package_micro_hits", "package_micro_dodges", "package_micro_events",
     "package_micro_thread_cues", "package_micro_streak_bursts",
+    "package_micro_counter_windows", "package_micro_counter_damage_total",
+    "package_micro_counter_stagger_frames",
     "package_micro_punish_total", "package_micro_punish_events",
     "package_micro_punish_break_total", "package_micro_punish_break_events",
     "package_sweep_warning_count", "package_sweep_active_count",
@@ -1915,6 +1923,9 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local micro_thread_cues = tonumber(row.avg_package_micro_thread_cues) or 0
     local micro_streak_bursts = tonumber(row.avg_package_micro_streak_bursts) or 0
     local micro_best_streak = tonumber(row.avg_package_micro_best_streak) or 0
+    local micro_counter_windows = tonumber(row.avg_package_micro_counter_windows) or 0
+    local micro_counter_damage = tonumber(row.avg_package_micro_counter_damage_total) or 0
+    local micro_counter_stagger = tonumber(row.avg_package_micro_counter_stagger_frames) or 0
     local micro_punish_total = tonumber(row.avg_package_micro_punish_total) or 0
     local micro_punish_break_total = tonumber(row.avg_package_micro_punish_break_total) or 0
     local aggro_player_rate = tonumber(row.avg_package_aggro_player_rate) or 0
@@ -1951,12 +1962,15 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         micro_score,
         0,
         string.format(
-            "%s package execution in %s averaged %.1f micro score, %.1f threaded avoids, %.1f thread cues, %.1f streak bursts, %.1f mechanic hits, %.1f punish, %.1f break, and %.1f best streak.",
+            "%s package execution in %s averaged %.1f micro score, %.1f threaded avoids, %.1f thread cues, %.1f openings, %.1f opening damage, %.1f opening stagger, %.1f streak bursts, %.1f mechanic hits, %.1f punish, %.1f break, and %.1f best streak.",
             class_name,
             encounter,
             micro_score,
             micro_dodges,
             micro_thread_cues,
+            micro_counter_windows,
+            micro_counter_damage,
+            micro_counter_stagger,
             micro_streak_bursts,
             micro_hits,
             micro_punish_total,
@@ -2994,6 +3008,8 @@ local function run_balance(raw_args)
             "package_micro_score", "package_micro_streak", "package_micro_best_streak",
             "package_micro_hits", "package_micro_dodges", "package_micro_events",
             "package_micro_thread_cues", "package_micro_streak_bursts",
+            "package_micro_counter_windows", "package_micro_counter_damage_total",
+            "package_micro_counter_stagger_frames",
             "package_micro_punish_total", "package_micro_punish_events",
             "package_micro_punish_break_total", "package_micro_punish_break_events",
             "package_summon_warning_count", "package_summon_warning_remaining",
@@ -3079,6 +3095,8 @@ local function run_balance(raw_args)
             "package_micro_score", "package_micro_streak", "package_micro_best_streak",
             "package_micro_hits", "package_micro_dodges", "package_micro_events",
             "package_micro_thread_cues", "package_micro_streak_bursts",
+            "package_micro_counter_windows", "package_micro_counter_damage_total",
+            "package_micro_counter_stagger_frames",
             "package_micro_punish_total", "package_micro_punish_events",
             "package_micro_punish_break_total", "package_micro_punish_break_events",
             "package_summon_warning_count", "package_summon_warning_remaining",
@@ -3210,6 +3228,8 @@ local function run_balance(raw_args)
             "avg_package_micro_score", "avg_package_micro_best_streak",
             "avg_package_micro_hits", "avg_package_micro_dodges",
             "avg_package_micro_thread_cues", "avg_package_micro_streak_bursts",
+            "avg_package_micro_counter_windows", "avg_package_micro_counter_damage_total",
+            "avg_package_micro_counter_stagger_frames",
             "avg_package_micro_punish_total", "avg_package_micro_punish_events",
             "avg_package_micro_punish_break_total", "avg_package_micro_punish_break_events",
             "avg_package_sweep_warning_count", "avg_package_sweep_active_count",

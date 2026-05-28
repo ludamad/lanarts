@@ -107,7 +107,9 @@ Balance simulations:
     opportunities plus save, clutch, perfect, early, timing-score, pull,
     timed-pull, perfect-pull, and counter-opening rates
     so rescue packages can be compared without hand-calculating rates from raw
-    counts. Package rows expose primary target HP, current package aggro
+    counts. Package rows also expose threaded dodge openings plus opening
+    damage/stagger totals so clean footwork can be separated from brute-force
+    clears. Package rows expose primary target HP, current package aggro
     target, primary aggro player/ally/other/none rates, inferred-target rate,
     target switches, the current/next package threat, and live rescue-window
     fields such as next strike, active count, blocked/late/perfect state, and
