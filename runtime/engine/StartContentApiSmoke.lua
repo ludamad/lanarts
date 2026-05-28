@@ -170,6 +170,8 @@ local function run_content_api_smoke()
     local has_taunt_uptime_metric = false
     local has_perfect_metric = false
     local has_sweep_metric = false
+    local has_micro_score_metric = false
+    local has_micro_streak_metric = false
     local has_rescue_micro = false
     local has_necro_regen_micro = false
     local has_sweep_micro = false
@@ -193,6 +195,10 @@ local function run_content_api_smoke()
             has_perfect_metric = true
         elseif metric.key == "avg_package_sweep_active_count" then
             has_sweep_metric = true
+        elseif metric.key == "avg_package_micro_score" then
+            has_micro_score_metric = true
+        elseif metric.key == "avg_package_micro_best_streak" then
+            has_micro_streak_metric = true
         end
     end
     for _, row in ipairs(fight_setup.microPlan or {}) do
@@ -213,6 +219,8 @@ local function run_content_api_smoke()
     expect(has_taunt_uptime_metric, "fight setup should expose taunt uptime telemetry")
     expect(has_perfect_metric, "fight setup should expose perfect-save telemetry")
     expect(has_sweep_metric, "fight setup should expose sweep telemetry")
+    expect(has_micro_score_metric, "fight setup should expose micro score telemetry")
+    expect(has_micro_streak_metric, "fight setup should expose micro streak telemetry")
     expect(has_rescue_micro, "fight setup should explain the rescue body-block action")
     expect(has_necro_regen_micro, "fight setup should preserve necromancer regen-specific micro")
     expect(has_sweep_micro, "fight setup should explain sweep lane micro")

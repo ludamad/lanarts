@@ -206,12 +206,80 @@ local function force_chase(source, target, frames)
     return true
 end
 
+local function add_micro_event(director, args)
+    if not director or director.destroyed then
+        return
+    end
+    args = args or {}
+    local points = math.floor(tonumber(args.points) or 0)
+    director.micro_score = (director.micro_score or 0) + points
+    director.micro_events = (director.micro_events or 0) + 1
+    if args.kind == "hit" then
+        director.micro_hits = (director.micro_hits or 0) + 1
+    elseif args.kind == "dodge" then
+        director.micro_dodges = (director.micro_dodges or 0) + 1
+    end
+    if args.break_streak then
+        director.micro_streak = 0
+    elseif points > 0 then
+        director.micro_streak = (director.micro_streak or 0) + 1
+        director.micro_best_streak = math.max(director.micro_best_streak or 0, director.micro_streak or 0)
+    end
+    director.micro_last_label = args.label or ""
+    director.micro_last_points = points
+    director.micro_last_color = args.color or (points < 0 and COL_PALE_RED or COL_PALE_GREEN)
+    director.micro_last_timer = args.timer or 72
+    if args.xy and args.label and args.label ~= "" and M.create_feedback_label then
+        local sign = points > 0 and "+" or ""
+        M.create_feedback_label {
+            map = director.map,
+            xy = args.xy,
+            text = args.label .. " " .. sign .. tostring(points),
+            color = director.micro_last_color,
+            duration = args.duration or 58,
+            drift = args.drift or 0.42,
+        }
+    end
+end
+
+local function record_hazard_hit(hazard, target, xy)
+    if not hazard or hazard.micro_hit_recorded or not hazard.director then
+        return
+    end
+    hazard.micro_hit_recorded = true
+    local ally_hit = target and target.content_lab_ally
+    add_micro_event(hazard.director, {
+        kind = "hit",
+        points = hazard.micro_hit_points or (ally_hit and -16 or -10),
+        break_streak = true,
+        label = ally_hit and "ALLY CLIPPED" or ((hazard.micro_label or "HIT") .. " HIT"),
+        color = COL_PALE_RED,
+        xy = xy or (target and xy_of(target)) or hazard.xy,
+    })
+end
+
+local function record_hazard_dodge(hazard)
+    if not hazard or hazard.micro_dodge_recorded or hazard.micro_hit_recorded or not hazard.director then
+        return
+    end
+    hazard.micro_dodge_recorded = true
+    add_micro_event(hazard.director, {
+        kind = "dodge",
+        points = hazard.micro_dodge_points or 6,
+        label = (hazard.micro_label or "LANE") .. " DODGE",
+        color = hazard.micro_color or COL_PALE_BLUE,
+        xy = hazard.xy,
+        duration = 48,
+    })
+end
+
 local function damage_overlapping_players(hazard, xy, radius)
     step_cooldowns(hazard.hit_cooldowns)
     for _, player in ipairs(living_player_team_targets(hazard.affects_escorts)) do
         local player_radius = player.target_radius or player.radius or 12
         if dist_sqr(xy, xy_of(player)) <= sqr(radius + player_radius) and not hazard.hit_cooldowns[player.id] then
             hazard.hit_cooldowns[player.id] = hazard.redamage_cooldown
+            record_hazard_hit(hazard, player, xy)
             damage_player(hazard, player)
         end
     end
@@ -224,6 +292,7 @@ local function damage_segment_overlapping_players(hazard, from_xy, to_xy, radius
         if dist_to_segment_sqr(xy_of(player), from_xy, to_xy) <= sqr(radius + player_radius)
                 and not hazard.hit_cooldowns[player.id] then
             hazard.hit_cooldowns[player.id] = hazard.redamage_cooldown
+            record_hazard_hit(hazard, player, xy_of(player))
             damage_player(hazard, player)
         end
     end
@@ -474,7 +543,7 @@ local function draw_package_hud(director)
     local row_count = 1
     local has_threat_rows = package.orbit or package.pulse or package.sweep or package.summon or package.rescue
     if has_threat_rows then
-        row_count = row_count + 2
+        row_count = row_count + 3
     end
     if package.orbit then
         row_count = row_count + 1
@@ -520,6 +589,18 @@ local function draw_package_hud(director)
             or (pressure.total_count or 0) >= 2 and COL_PALE_YELLOW
             or COL_LIGHT_GRAY
         draw_hud_row(y, "STACK", stack_value, stack_color, math.min(1, (pressure.total_count or 0) / 4))
+        y = y + HUD_ROW_H
+
+        local score = math.floor(director.micro_score or 0)
+        local streak = director.micro_streak or 0
+        local hit_count = director.micro_hits or 0
+        local dodge_count = director.micro_dodges or 0
+        local micro_value = tostring(score) .. " x" .. tostring(streak) .. " d" .. tostring(dodge_count) .. " h" .. tostring(hit_count)
+        local micro_color = hit_count > 0 and COL_PALE_YELLOW or streak >= 4 and COL_PALE_GREEN or COL_LIGHT_GRAY
+        if (director.micro_last_timer or 0) > 0 and director.micro_last_label and director.micro_last_label ~= "" then
+            micro_color = director.micro_last_color or micro_color
+        end
+        draw_hud_row(y, "MICRO", micro_value, micro_color, math.min(1, math.max(0, score) / 120))
         y = y + HUD_ROW_H
     end
     if package.orbit then
@@ -763,6 +844,12 @@ local function package_result(director, outcome)
         pressure_overlap_frames = director.pressure_overlap_frames or 0,
         pressure_overlap_rate = safe_rate(director.pressure_overlap_frames or 0, math.max(1, frames)),
         pressure_labels = pressure.labels or "",
+        micro_score = director.micro_score or 0,
+        micro_streak = director.micro_streak or 0,
+        micro_best_streak = director.micro_best_streak or 0,
+        micro_hits = director.micro_hits or 0,
+        micro_dodges = director.micro_dodges or 0,
+        micro_events = director.micro_events or 0,
         sweep_warning_count = sweep_warning_count,
         sweep_warning_remaining = sweep_warning_remaining,
         sweep_active_count = sweep_active_count,
@@ -855,6 +942,12 @@ local function package_state_from_director(director)
         pressure_overlap_frames = director.pressure_overlap_frames or 0,
         pressure_overlap_rate = safe_rate(director.pressure_overlap_frames or 0, math.max(1, director.elapsed or 0)),
         pressure_labels = pressure.labels or "",
+        micro_score = director.micro_score or 0,
+        micro_streak = director.micro_streak or 0,
+        micro_best_streak = director.micro_best_streak or 0,
+        micro_hits = director.micro_hits or 0,
+        micro_dodges = director.micro_dodges or 0,
+        micro_events = director.micro_events or 0,
     }
 end
 
@@ -1022,18 +1115,24 @@ function M.create_pulse(args)
         windup_frames = windup,
         active_frames = active,
         linger_frames = linger,
+        director = args.director,
         source = args.source,
         damage = args.damage or 4,
         power = args.power or 22,
         magic_percentage = args.magic_percentage or 1,
         affects_escorts = args.affects_escorts,
         redamage_cooldown = args.redamage_cooldown or 18,
+        micro_label = "AOE",
+        micro_color = COL_PALE_RED,
+        micro_hit_points = args.micro_hit_points or -10,
+        micro_dodge_points = args.micro_dodge_points or 8,
         hit_cooldowns = {},
         on_step = function(self)
             self.elapsed = self.elapsed + 1
             if self.elapsed > windup and self.elapsed <= windup + active then
                 damage_overlapping_players(self, self.xy, radius)
             elseif self.elapsed > windup + active + linger then
+                record_hazard_dodge(self)
                 GameObject.destroy(self)
             end
         end,
@@ -1119,6 +1218,7 @@ function M.create_sweep(args)
         elapsed = 0,
         content_lab_sweep = true,
         source = args.source,
+        director = args.director,
         center_xy = copy_xy(args.center_xy or args.xy),
         anchor = args.anchor,
         angle = args.angle or 0,
@@ -1133,6 +1233,10 @@ function M.create_sweep(args)
         magic_percentage = args.magic_percentage or 1,
         affects_escorts = args.affects_escorts,
         redamage_cooldown = args.redamage_cooldown or 18,
+        micro_label = "SWEEP",
+        micro_color = COL_PALE_RED,
+        micro_hit_points = args.micro_hit_points or -12,
+        micro_dodge_points = args.micro_dodge_points or 10,
         hit_cooldowns = {},
         on_step = function(self)
             self.elapsed = self.elapsed + 1
@@ -1142,6 +1246,7 @@ function M.create_sweep(args)
                 local from_xy, to_xy = segment_endpoints(center, self.angle, self.length)
                 damage_segment_overlapping_players(self, from_xy, to_xy, self.lane_radius)
             elseif self.elapsed > windup + active + linger then
+                record_hazard_dodge(self)
                 GameObject.destroy(self)
             end
         end,
@@ -1210,6 +1315,7 @@ function M.create_orb(args)
         elapsed = 0,
         content_lab_orb = true,
         source = args.source,
+        director = args.director,
         center_xy = copy_xy(args.center_xy),
         anchor = args.anchor,
         orbit_radius = args.orbit_radius or 120,
@@ -1222,6 +1328,10 @@ function M.create_orb(args)
         magic_percentage = args.magic_percentage or 1,
         affects_escorts = args.affects_escorts,
         redamage_cooldown = args.redamage_cooldown or 20,
+        micro_label = "ORB",
+        micro_color = COL_PALE_BLUE,
+        micro_hit_points = args.micro_hit_points or -8,
+        micro_dodge_points = args.micro_dodge_points or 4,
         hit_cooldowns = {},
         on_step = function(self)
             self.elapsed = self.elapsed + 1
@@ -1237,6 +1347,7 @@ function M.create_orb(args)
             }
             damage_overlapping_players(self, self.xy, self.hit_radius)
             if self.elapsed >= self.duration then
+                record_hazard_dodge(self)
                 GameObject.destroy(self)
             end
         end,
@@ -1516,6 +1627,20 @@ function M.create_rescue_strike(args)
                             self.director.rescue_perfect_saves = (self.director.rescue_perfect_saves or 0) + 1
                             self.director.rescue_best_perfect_margin = math.min(self.director.rescue_best_perfect_margin or margin, margin)
                         end
+                        add_micro_event(self.director, {
+                            kind = "save",
+                            points = 30 + (self.was_perfect and 25 or self.was_clutch and 12 or 0) + (self.pulled and 5 or 0),
+                            label = self.was_perfect and "PERFECT SAVE"
+                                or self.was_clutch and "CLUTCH SAVE"
+                                or self.pulled and "SAVE PULL"
+                                or "SAVE",
+                            color = self.was_perfect and COL_WHITE
+                                or self.was_clutch and COL_PALE_YELLOW
+                                or COL_PALE_GREEN,
+                            xy = xy_of(blocker),
+                            duration = self.was_perfect and 76 or 62,
+                            drift = 0.52,
+                        })
                     end
                     rescue_feedback(self, blocker)
                 else
@@ -1524,6 +1649,15 @@ function M.create_rescue_strike(args)
                     damage_player(self, self.target)
                     if self.director and not self.director.destroyed then
                         self.director.rescue_misses = (self.director.rescue_misses or 0) + 1
+                        add_micro_event(self.director, {
+                            kind = "hit",
+                            points = -35,
+                            break_streak = true,
+                            label = "SAVE MISS",
+                            color = COL_PALE_RED,
+                            xy = xy_of(self.target),
+                            duration = 66,
+                        })
                     end
                     rescue_feedback(self)
                 end
@@ -1602,6 +1736,7 @@ local function spawn_orb_wave(director, package)
         M.create_orb {
             map = director.map,
             source = anchor,
+            director = director,
             anchor = anchor,
             center_xy = center,
             angle = (idx - 1) * (math.pi * 2 / count) + (director.elapsed or 0) * 0.01,
@@ -1625,6 +1760,7 @@ local function spawn_player_pulses(director, package)
         M.create_pulse {
             map = director.map,
             source = source,
+            director = director,
             xy = xy_of(player),
             windup = scale_frames(pulse.windup, 46, intensity),
             active = scale_frames(pulse.active, 24, intensity),
@@ -1649,6 +1785,7 @@ local function spawn_sweep(director, package)
     M.create_sweep {
         map = director.map,
         source = source,
+        director = director,
         anchor = anchor,
         center_xy = center,
         angle = (sweep.angle or 0) + wave_index * (sweep.angle_step or math.pi / 4),
@@ -2193,9 +2330,19 @@ function M.add_director(game_map, package, intensity)
         rescue_pull_total_frames = 0,
         pressure_max_count = 0,
         pressure_overlap_frames = 0,
+        micro_score = 0,
+        micro_streak = 0,
+        micro_best_streak = 0,
+        micro_hits = 0,
+        micro_dodges = 0,
+        micro_events = 0,
+        micro_last_timer = 0,
         escort_required = package.escort ~= nil,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
+            if (self.micro_last_timer or 0) > 0 then
+                self.micro_last_timer = self.micro_last_timer - 1
+            end
             if (self.rescue_pull_active_frames or 0) > 0 then
                 self.rescue_pull_total_frames = (self.rescue_pull_total_frames or 0) + 1
             end
