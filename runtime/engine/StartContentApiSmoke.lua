@@ -130,6 +130,7 @@ local function run_content_api_smoke()
     local component_summary = parse_response("component summary", ContentApi.run_summary_json(component_config))
     expect(component_summary.config.packageComponents == "escort,rescue", "component summary should normalize rescue to escort,rescue")
     expect(component_summary.packageSummary and component_summary.packageSummary.hasRescue, "component summary should keep rescue rhythm")
+    expect(component_summary.packageSummary and (component_summary.packageSummary.rescuePullFrames or 0) > 0, "component summary should expose rescue pull timing")
     expect(component_summary.packageSummary and not component_summary.packageSummary.hasSummons, "component summary should filter summon rhythm")
     local has_component_arg = false
     for _, arg in ipairs(component_summary.args or {}) do

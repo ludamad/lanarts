@@ -483,6 +483,8 @@
     }
 
     .rhythm-window,
+    .rhythm-active,
+    .rhythm-clutch,
     .rhythm-hit {
       position: absolute;
       top: 0;
@@ -491,11 +493,23 @@
 
     .rhythm-window {
       background: rgba(217, 179, 95, 0.22);
+      z-index: 1;
+    }
+
+    .rhythm-active {
+      background: rgba(124, 199, 162, 0.44);
+      z-index: 2;
+    }
+
+    .rhythm-clutch {
+      background: rgba(224, 121, 105, 0.58);
+      z-index: 2;
     }
 
     .rhythm-hit {
       width: 2px;
       background: var(--accent-2);
+      z-index: 3;
     }
 
     .rhythm-meta {
@@ -1381,6 +1395,9 @@
           addChip(packageInfo, `fastest ${summary.packageSummary.fastestLoopFrames || 0}f`);
           if (summary.packageSummary.hasRescue) {
             addChip(packageInfo, `${summary.packageSummary.rescueClutchWindow || 0}f clutch`);
+            if (summary.packageSummary.rescuePullFrames) {
+              addChip(packageInfo, `${summary.packageSummary.rescuePullFrames}f pull`);
+            }
           }
           if (summary.packageSummary.hasSummons) {
             addChip(packageInfo, `adds cap ${summary.packageSummary.summonCap || 1}`);
@@ -1790,6 +1807,7 @@
         if (pkg.orbit) {
           const duration = scaledFrames(pkg.orbit.duration, 1, intensity);
           rows.push({
+            id: 'orbit',
             label: 'Orbs',
             offset: scaledFrames(pkg.orbit.offset, 0, intensity),
             interval: scaledFrames(pkg.orbit.interval, 1, intensity),
@@ -1801,16 +1819,19 @@
           const windup = scaledFrames(pkg.pulse.windup, 0, intensity);
           const active = scaledFrames(pkg.pulse.active, 1, intensity);
           rows.push({
+            id: 'pulse',
             label: 'AOE',
             offset: scaledFrames(pkg.pulse.offset, 0, intensity),
             interval: scaledFrames(pkg.pulse.interval, 1, intensity),
             duration: windup + active,
             activeStart: windup,
+            active,
             meta: `player-targeted${pkg.pulse.affects_escorts ? ' plus ally' : ''}, ${windup}f warning, ${active}f active, damage ${scaledDamage(pkg.pulse.damage, 4, intensity).toFixed(1)}`,
           });
         }
         if (pkg.escort) {
           rows.push({
+            id: 'escort',
             label: 'Ally',
             offset: 0,
             interval: 600,
@@ -1821,17 +1842,22 @@
         if (pkg.rescue) {
           const windup = scaledFrames(pkg.rescue.windup, 68, intensity);
           const lateWindow = scaledFrames(pkg.rescue.late_window, 22, intensity);
+          const pullFrames = scaledFrames(pkg.rescue.pull_frames, 90, intensity);
           rows.push({
+            id: 'rescue',
             label: 'Rescue',
             offset: scaledFrames(pkg.rescue.offset, 54, intensity),
             interval: scaledFrames(pkg.rescue.interval, 205, intensity),
             duration: windup,
             activeStart: Math.max(0, windup - lateWindow),
-            meta: `body-block line, ${lateWindow}f clutch window, ally damage ${scaledDamage(pkg.rescue.ally_damage, 10, intensity).toFixed(1)}, block damage ${scaledDamage(pkg.rescue.block_damage, 4, intensity).toFixed(1)}`,
+            clutchWindow: lateWindow,
+            pullFrames,
+            meta: `body-block line, ${lateWindow}f clutch window, ${pullFrames}f pull, ally damage ${scaledDamage(pkg.rescue.ally_damage, 10, intensity).toFixed(1)}, block damage ${scaledDamage(pkg.rescue.block_damage, 4, intensity).toFixed(1)}`,
           });
         }
         if (pkg.summon) {
           rows.push({
+            id: 'summon',
             label: 'Summons',
             offset: scaledFrames(pkg.summon.offset, 0, intensity),
             interval: scaledFrames(pkg.summon.interval, 1, intensity),
@@ -1856,7 +1882,8 @@
           return `protect ${row.monster || 'ally'}, ${row.hp || '?'} hp`;
         }
         if (row.id === 'rescue') {
-          return `body-block line, ${row.clutchWindow || row.lateWindow || 0}f clutch window, ally damage ${Number(row.allyDamage || 0).toFixed(1)}, block damage ${Number(row.blockDamage || 0).toFixed(1)}`;
+          const pull = row.pullFrames ? `, ${row.pullFrames}f pull` : '';
+          return `body-block line, ${row.clutchWindow || row.lateWindow || 0}f clutch window${pull}, ally damage ${Number(row.allyDamage || 0).toFixed(1)}, block damage ${Number(row.blockDamage || 0).toFixed(1)}`;
         }
         if (row.id === 'summon') {
           const monster = ((row.monsters || [])[0]) || 'add';
@@ -1880,10 +1907,24 @@
         windowNode.className = 'rhythm-window';
         windowNode.style.left = `${offsetPct}%`;
         windowNode.style.width = `${durationPct}%`;
+        let activeNode = null;
+        if (row.activeStart !== undefined || row.active !== undefined || row.clutchWindow !== undefined || row.lateWindow !== undefined) {
+          const activeStart = Math.max(0, Number(row.activeStart || 0));
+          const activeDuration = Math.max(1, Number(row.active || row.clutchWindow || row.lateWindow || Math.max(1, row.duration - activeStart)));
+          const activeLeft = Math.max(0, Math.min(100, (((row.offset % interval) + activeStart) % interval) / interval * 100));
+          const activeWidth = Math.max(2, Math.min(100 - activeLeft, activeDuration / interval * 100));
+          activeNode = document.createElement('span');
+          activeNode.className = row.id === 'rescue' ? 'rhythm-clutch' : 'rhythm-active';
+          activeNode.style.left = `${activeLeft}%`;
+          activeNode.style.width = `${activeWidth}%`;
+        }
         const hit = document.createElement('span');
         hit.className = 'rhythm-hit';
         hit.style.left = `${offsetPct}%`;
         track.appendChild(windowNode);
+        if (activeNode) {
+          track.appendChild(activeNode);
+        }
         track.appendChild(hit);
         item.appendChild(label);
         item.appendChild(track);

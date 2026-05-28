@@ -1228,6 +1228,7 @@ local function package_summary_from_rhythms(rhythms)
     local fastest_loop
     local has_rescue = false
     local rescue_clutch_window
+    local rescue_pull_frames
     local has_summons = false
     local summon_cap
     local hits_escorts = false
@@ -1244,6 +1245,7 @@ local function package_summary_from_rhythms(rhythms)
         if rhythm.id == "rescue" then
             has_rescue = true
             rescue_clutch_window = rhythm.clutchWindow or rhythm.lateWindow
+            rescue_pull_frames = rhythm.pullFrames
         elseif rhythm.id == "summon" then
             has_summons = true
             summon_cap = rhythm.maxAlive
@@ -1259,6 +1261,7 @@ local function package_summary_from_rhythms(rhythms)
         fastestLoopFrames = fastest_loop or 0,
         hasRescue = has_rescue,
         rescueClutchWindow = rescue_clutch_window,
+        rescuePullFrames = rescue_pull_frames,
         hasSummons = has_summons,
         summonCap = summon_cap,
         hitsEscorts = hits_escorts,
