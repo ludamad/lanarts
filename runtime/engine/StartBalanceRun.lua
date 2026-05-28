@@ -666,6 +666,10 @@ local function package_state_fields(player)
             package_rescue_best_perfect_margin = "",
             package_rescue_pulls = "",
             package_rescue_pull_rate = "",
+            package_rescue_clutch_pulls = "",
+            package_rescue_perfect_pulls = "",
+            package_rescue_timed_pull_rate = "",
+            package_rescue_perfect_pull_rate = "",
             package_rescue_pull_total_frames = "",
             package_rescue_pull_uptime_rate = "",
             package_rescue_counter_windows = "",
@@ -675,8 +679,10 @@ local function package_state_fields(player)
             package_rescue_fatal_misses = "",
             package_rescue_survived_misses = "",
             package_rescue_best_margin = "",
+            package_rescue_best_pull_margin = "",
             package_rescue_last_margin = "",
             package_rescue_last_pull_frames = "",
+            package_rescue_last_pull_margin = "",
             package_rescue_next_frames = "",
             package_rescue_active_count = "",
             package_rescue_active_remaining = "",
@@ -752,6 +758,10 @@ local function package_state_fields(player)
         package_rescue_best_perfect_margin = state.rescue_best_perfect_margin or "",
         package_rescue_pulls = state.rescue_pulls or 0,
         package_rescue_pull_rate = format_rate(state.rescue_pull_rate or 0),
+        package_rescue_clutch_pulls = state.rescue_clutch_pulls or 0,
+        package_rescue_perfect_pulls = state.rescue_perfect_pulls or 0,
+        package_rescue_timed_pull_rate = format_rate(state.rescue_timed_pull_rate or 0),
+        package_rescue_perfect_pull_rate = format_rate(state.rescue_perfect_pull_rate or 0),
         package_rescue_pull_total_frames = state.rescue_pull_total_frames or 0,
         package_rescue_pull_uptime_rate = format_rate(state.rescue_pull_uptime_rate or 0),
         package_rescue_counter_windows = state.rescue_counter_windows or 0,
@@ -761,8 +771,10 @@ local function package_state_fields(player)
         package_rescue_fatal_misses = state.rescue_fatal_misses or 0,
         package_rescue_survived_misses = state.rescue_survived_misses or 0,
         package_rescue_best_margin = state.rescue_best_margin or "",
+        package_rescue_best_pull_margin = state.rescue_best_pull_margin or "",
         package_rescue_last_margin = state.rescue_last_margin or "",
         package_rescue_last_pull_frames = state.rescue_last_pull_frames or "",
+        package_rescue_last_pull_margin = state.rescue_last_pull_margin or "",
         package_rescue_next_frames = state.rescue_next_frames or "",
         package_rescue_active_count = state.rescue_active_count or 0,
         package_rescue_active_remaining = state.rescue_active_remaining or "",
@@ -1147,6 +1159,8 @@ local SUMMARY_METRICS = {
     "package_rescue_opportunities", "package_rescue_save_rate", "package_rescue_clutch_rate",
     "package_rescue_perfect_rate", "package_rescue_early_saves", "package_rescue_early_rate",
     "package_rescue_timing_score", "package_rescue_pull_rate",
+    "package_rescue_clutch_pulls", "package_rescue_perfect_pulls",
+    "package_rescue_timed_pull_rate", "package_rescue_perfect_pull_rate",
     "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
     "package_rescue_counter_windows", "package_rescue_counter_damage_total",
     "package_rescue_counter_stagger_frames",
@@ -1949,7 +1963,11 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local early_rate = tonumber(row.avg_package_rescue_early_rate) or 0
     local timing_score = tonumber(row.avg_package_rescue_timing_score) or 0
     local pull_rate = tonumber(row.avg_package_rescue_pull_rate) or 0
+    local timed_pull_rate = tonumber(row.avg_package_rescue_timed_pull_rate) or 0
+    local perfect_pull_rate = tonumber(row.avg_package_rescue_perfect_pull_rate) or 0
     local pull_uptime = tonumber(row.avg_package_rescue_pull_uptime_rate) or 0
+    local clutch_pulls = tonumber(row.avg_package_rescue_clutch_pulls) or 0
+    local perfect_pulls = tonumber(row.avg_package_rescue_perfect_pulls) or 0
     local counter_windows = tonumber(row.avg_package_rescue_counter_windows) or 0
     local counter_damage = tonumber(row.avg_package_rescue_counter_damage_total) or 0
     local counter_stagger = tonumber(row.avg_package_rescue_counter_stagger_frames) or 0
@@ -1965,7 +1983,7 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         save_rate,
         0,
         string.format(
-            "%s rescue reads in %s averaged %.1f opportunities/run: save %.1f%%, clutch %.1f%%, perfect %.1f%%, early %.1f%%, timing %.2f, pull %.1f%%, taunt uptime %.1f%%, counter %.1f windows, %.1f damage, %.1f stagger, fatal miss %.1f, survived miss %.1f.",
+            "%s rescue reads in %s averaged %.1f opportunities/run: save %.1f%%, clutch %.1f%%, perfect %.1f%%, early %.1f%%, timing %.2f, pull %.1f%%, timed pulls %.1f%%, perfect pulls %.1f%%, taunt uptime %.1f%%, counter %.1f windows, %.1f damage, %.1f stagger, fatal miss %.1f, survived miss %.1f.",
             class_name,
             encounter,
             rescue_opportunities,
@@ -1975,6 +1993,8 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
             early_rate * 100,
             timing_score,
             pull_rate * 100,
+            timed_pull_rate * 100,
+            perfect_pull_rate * 100,
             pull_uptime * 100,
             counter_windows,
             counter_damage,
@@ -1983,6 +2003,26 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
             survived_misses
         )
     )
+
+    if pull_rate > 0 then
+        add_report_row(
+            rows,
+            class_name,
+            "info",
+            "package_pull_timing",
+            "avg_package_rescue_timed_pull_rate",
+            timed_pull_rate,
+            0,
+            string.format(
+                "%s rescue pulls in %s averaged %.1f clutch pulls and %.1f perfect pulls/run; %.1f%% of pulls started inside the late save window.",
+                class_name,
+                encounter,
+                clutch_pulls,
+                perfect_pulls,
+                timed_pull_rate * 100
+            )
+        )
+    end
 
     add_report_row(
         rows,
@@ -2051,6 +2091,25 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
                 class_name,
                 pull_uptime * 100,
                 encounter
+            )
+        )
+    end
+
+    if pull_uptime >= 0.25 and timed_pull_rate < 0.35 and pull_rate >= 0.50 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_micro",
+            "avg_package_rescue_timed_pull_rate",
+            timed_pull_rate,
+            0.35,
+            string.format(
+                "%s is using pull on %.1f%% of saves in %s, but only %.1f%% of pulls are late-window pulls; this is likely target-control cheese rather than few-frame rescue micro.",
+                class_name,
+                pull_rate * 100,
+                encounter,
+                timed_pull_rate * 100
             )
         )
     end
@@ -2804,12 +2863,15 @@ local function run_balance(raw_args)
             "package_rescue_timing_score",
             "package_rescue_perfect_window", "package_rescue_best_perfect_margin",
             "package_rescue_pulls", "package_rescue_pull_rate",
+            "package_rescue_clutch_pulls", "package_rescue_perfect_pulls",
+            "package_rescue_timed_pull_rate", "package_rescue_perfect_pull_rate",
             "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
             "package_rescue_counter_windows", "package_rescue_counter_damage_total",
             "package_rescue_counter_stagger_frames",
             "package_rescue_misses",
             "package_rescue_fatal_misses", "package_rescue_survived_misses",
-            "package_rescue_best_margin", "package_rescue_last_margin", "package_rescue_last_pull_frames",
+            "package_rescue_best_margin", "package_rescue_best_pull_margin",
+            "package_rescue_last_margin", "package_rescue_last_pull_frames", "package_rescue_last_pull_margin",
             "package_rescue_next_frames", "package_rescue_active_count", "package_rescue_active_remaining",
             "package_rescue_active_blocked", "package_rescue_active_late", "package_rescue_active_perfect",
             "package_rescue_pull_active_frames", "package_rescue_pull_target",
@@ -2876,12 +2938,15 @@ local function run_balance(raw_args)
             "package_rescue_timing_score",
             "package_rescue_perfect_window", "package_rescue_best_perfect_margin",
             "package_rescue_pulls", "package_rescue_pull_rate",
+            "package_rescue_clutch_pulls", "package_rescue_perfect_pulls",
+            "package_rescue_timed_pull_rate", "package_rescue_perfect_pull_rate",
             "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
             "package_rescue_counter_windows", "package_rescue_counter_damage_total",
             "package_rescue_counter_stagger_frames",
             "package_rescue_misses",
             "package_rescue_fatal_misses", "package_rescue_survived_misses",
-            "package_rescue_best_margin", "package_rescue_last_margin", "package_rescue_last_pull_frames",
+            "package_rescue_best_margin", "package_rescue_best_pull_margin",
+            "package_rescue_last_margin", "package_rescue_last_pull_frames", "package_rescue_last_pull_margin",
             "package_rescue_next_frames", "package_rescue_active_count", "package_rescue_active_remaining",
             "package_rescue_active_blocked", "package_rescue_active_late", "package_rescue_active_perfect",
             "package_rescue_pull_active_frames", "package_rescue_pull_target",
@@ -2962,6 +3027,8 @@ local function run_balance(raw_args)
             "avg_package_rescue_early_saves", "avg_package_rescue_early_rate",
             "avg_package_rescue_timing_score",
             "avg_package_rescue_pulls", "avg_package_rescue_pull_rate",
+            "avg_package_rescue_clutch_pulls", "avg_package_rescue_perfect_pulls",
+            "avg_package_rescue_timed_pull_rate", "avg_package_rescue_perfect_pull_rate",
             "avg_package_rescue_pull_total_frames", "avg_package_rescue_pull_uptime_rate",
             "avg_package_rescue_counter_windows", "avg_package_rescue_counter_damage_total",
             "avg_package_rescue_counter_stagger_frames",

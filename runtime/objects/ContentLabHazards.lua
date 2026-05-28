@@ -1169,6 +1169,8 @@ local function package_result(director, outcome)
     local early = director.rescue_early_saves or 0
     local misses = director.rescue_misses or 0
     local pulls = director.rescue_pulls or 0
+    local clutch_pulls = director.rescue_clutch_pulls or 0
+    local perfect_pulls = director.rescue_perfect_pulls or 0
     local opportunities = saves + misses
     local aggro = aggro_state(director.package or {})
     local save_rate = safe_rate(saves, opportunities)
@@ -1177,14 +1179,17 @@ local function package_result(director, outcome)
     local early_rate = safe_rate(early, saves)
     local timing_score = safe_rate(clutch + perfect, saves)
     local pull_rate = safe_rate(pulls, saves)
+    local timed_pull_rate = safe_rate(clutch_pulls, pulls)
+    local perfect_pull_rate = safe_rate(perfect_pulls, pulls)
     local pull_total_frames = director.rescue_pull_total_frames or 0
     local pull_uptime_rate = safe_rate(pull_total_frames, math.max(1, frames))
     local pressure = package_pressure_state(director, director.package or {})
     local sweep_warning_count, sweep_active_count, sweep_warning_remaining, sweep_active_remaining = active_sweeps()
     local best = director.rescue_best_margin
+    local best_pull = director.rescue_best_pull_margin
     local escort_text = count > 0 and string.format("ally %d/%d", math.ceil(hp), math.ceil(max_hp)) or "ally down"
     local rescue_text = (saves > 0 or misses > 0)
-        and string.format("saves %d/%d (%s), clutch %d (%s), perfect %d (%s), early %d (%s), pulls %d, taunt %s%s", saves, opportunities, format_pct(save_rate), clutch, format_pct(clutch_rate), perfect, format_pct(perfect_rate), early, format_pct(early_rate), pulls, format_pct(pull_uptime_rate), best and (", best " .. best .. "f") or "")
+        and string.format("saves %d/%d (%s), clutch %d (%s), perfect %d (%s), early %d (%s), pulls %d (%s timed), taunt %s%s%s", saves, opportunities, format_pct(save_rate), clutch, format_pct(clutch_rate), perfect, format_pct(perfect_rate), early, format_pct(early_rate), pulls, format_pct(timed_pull_rate), format_pct(pull_uptime_rate), best and (", best " .. best .. "f") or "", best_pull and (", pull " .. best_pull .. "f") or "")
         or "no rescue strikes"
     return {
         outcome = outcome,
@@ -1217,6 +1222,10 @@ local function package_result(director, outcome)
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
         rescue_pulls = pulls,
         rescue_pull_rate = pull_rate,
+        rescue_clutch_pulls = clutch_pulls,
+        rescue_perfect_pulls = perfect_pulls,
+        rescue_timed_pull_rate = timed_pull_rate,
+        rescue_perfect_pull_rate = perfect_pull_rate,
         rescue_pull_total_frames = pull_total_frames,
         rescue_pull_uptime_rate = pull_uptime_rate,
         rescue_counter_windows = director.rescue_counter_windows or 0,
@@ -1226,8 +1235,10 @@ local function package_result(director, outcome)
         rescue_fatal_misses = director.rescue_fatal_misses or 0,
         rescue_survived_misses = director.rescue_survived_misses or 0,
         rescue_best_margin = best,
+        rescue_best_pull_margin = best_pull,
         rescue_last_margin = director.rescue_last_margin,
         rescue_last_pull_frames = director.rescue_last_pull_frames,
+        rescue_last_pull_margin = director.rescue_last_pull_margin,
         pressure_active_count = pressure.active_count or 0,
         pressure_warning_count = pressure.warning_count or 0,
         pressure_total_count = pressure.total_count or 0,
@@ -1264,6 +1275,8 @@ local function package_state_from_director(director)
     local perfect = director.rescue_perfect_saves or 0
     local early = director.rescue_early_saves or 0
     local pulls = director.rescue_pulls or 0
+    local clutch_pulls = director.rescue_clutch_pulls or 0
+    local perfect_pulls = director.rescue_perfect_pulls or 0
     local opportunities = saves + misses
     local orb_count, orb_remaining = active_orbs()
     local summon_warning_count, summon_warning_remaining = active_summon_portals()
@@ -1320,6 +1333,10 @@ local function package_state_from_director(director)
         rescue_best_perfect_margin = director.rescue_best_perfect_margin,
         rescue_pulls = pulls,
         rescue_pull_rate = safe_rate(pulls, saves),
+        rescue_clutch_pulls = clutch_pulls,
+        rescue_perfect_pulls = perfect_pulls,
+        rescue_timed_pull_rate = safe_rate(clutch_pulls, pulls),
+        rescue_perfect_pull_rate = safe_rate(perfect_pulls, pulls),
         rescue_pull_total_frames = director.rescue_pull_total_frames or 0,
         rescue_pull_uptime_rate = safe_rate(director.rescue_pull_total_frames or 0, math.max(1, director.elapsed or 0)),
         rescue_counter_windows = director.rescue_counter_windows or 0,
@@ -1329,8 +1346,10 @@ local function package_state_from_director(director)
         rescue_fatal_misses = director.rescue_fatal_misses or 0,
         rescue_survived_misses = director.rescue_survived_misses or 0,
         rescue_best_margin = director.rescue_best_margin,
+        rescue_best_pull_margin = director.rescue_best_pull_margin,
         rescue_last_margin = director.rescue_last_margin,
         rescue_last_pull_frames = director.rescue_last_pull_frames,
+        rescue_last_pull_margin = director.rescue_last_pull_margin,
         rescue_next_frames = rescue_state and rescue_state.next_frames or nil,
         rescue_active_count = rescue_state and rescue_state.active_count or 0,
         rescue_active_remaining = rescue_state and rescue_state.remaining or nil,
@@ -1917,6 +1936,9 @@ function M.create_pull_tether(args)
         source = args.source,
         target = args.target,
         director = args.director,
+        was_clutch = args.was_clutch,
+        was_perfect = args.was_perfect,
+        clutch_margin = args.clutch_margin,
         content_lab_pull_tether = true,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
@@ -1947,13 +1969,22 @@ function M.create_pull_tether(args)
             local from_xy = xy_of(self.source)
             local to_xy = xy_of(self.target)
             local alpha = 0.18 + pct * 0.45
-            draw_world_link(COL_PALE_YELLOW, from_xy, to_xy, 4, alpha)
-            draw_world_circle(COL_PALE_YELLOW, from_xy, (self.source.radius or 14) + 7, 0.03, 0.48 + pct * 0.26)
+            local pull_color = self.was_perfect and COL_WHITE
+                or self.was_clutch and COL_PALE_YELLOW
+                or COL_PALE_GREEN
+            local pulse = 1 + math.sin(self.elapsed * 0.36) * 0.08
+            draw_world_link(pull_color, from_xy, to_xy, self.was_clutch and 5 or 4, alpha)
+            draw_world_circle(pull_color, from_xy, ((self.source.radius or 14) + 7) * pulse, 0.03, 0.48 + pct * 0.26)
             draw_world_circle(COL_PALE_GREEN, to_xy, (self.target.radius or 12) + 6, 0.02, 0.40 + pct * 0.24)
             local source_label = Display.to_screen_xy({from_xy[1], from_xy[2] - (self.source.radius or 14) - 20})
             local target_label = Display.to_screen_xy({to_xy[1], to_xy[2] - (self.target.radius or 12) - 20})
-            draw_text(COL_PALE_YELLOW, Display.CENTER, source_label, "PULL " .. remaining .. "f")
-            draw_text(COL_PALE_GREEN, Display.CENTER, target_label, "TAUNTED")
+            local margin = self.clutch_margin and (" " .. tostring(self.clutch_margin) .. "f") or ""
+            local source_text = self.was_perfect and ("PERFECT PULL" .. margin)
+                or self.was_clutch and ("CLUTCH PULL" .. margin)
+                or ("PULL " .. remaining .. "f")
+            local target_text = self.was_clutch and "SNAPPED" or "TAUNTED"
+            draw_text(pull_color, Display.CENTER, source_label, source_text)
+            draw_text(COL_PALE_GREEN, Display.CENTER, target_label, target_text)
         end,
     }
 end
@@ -2030,6 +2061,9 @@ function M.create_rescue_strike(args)
                             target = blocker,
                             director = self.director,
                             duration = self.pull_frames,
+                            was_clutch = self.was_clutch,
+                            was_perfect = self.was_perfect,
+                            clutch_margin = margin,
                         }
                     end
                     if self.director and not self.director.destroyed then
@@ -2038,6 +2072,14 @@ function M.create_rescue_strike(args)
                         if self.pulled then
                             self.director.rescue_pulls = (self.director.rescue_pulls or 0) + 1
                             self.director.rescue_last_pull_frames = self.pull_frames
+                            self.director.rescue_last_pull_margin = margin
+                            self.director.rescue_best_pull_margin = math.min(self.director.rescue_best_pull_margin or margin, margin)
+                            if self.was_clutch then
+                                self.director.rescue_clutch_pulls = (self.director.rescue_clutch_pulls or 0) + 1
+                            end
+                            if self.was_perfect then
+                                self.director.rescue_perfect_pulls = (self.director.rescue_perfect_pulls or 0) + 1
+                            end
                         end
                         if self.was_clutch then
                             self.director.rescue_clutch_saves = (self.director.rescue_clutch_saves or 0) + 1
@@ -2783,6 +2825,8 @@ function M.add_director(game_map, package, intensity)
         rescue_early_saves = 0,
         rescue_perfect_window = scale_frames((package.rescue or {}).perfect_window, 6, intensity),
         rescue_pulls = 0,
+        rescue_clutch_pulls = 0,
+        rescue_perfect_pulls = 0,
         rescue_pull_active_frames = 0,
         rescue_pull_total_frames = 0,
         rescue_counter_windows = 0,

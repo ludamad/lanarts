@@ -98,8 +98,8 @@ Balance simulations:
     as ally_down. Automated players also emit rescue_intercept_frames,
     rescue_hold_frames, and rescue_late_reaction_frames so package clears can
     be separated from actual body-block micro. Package rows also derive rescue
-    opportunities plus save, clutch, perfect, early, timing-score, pull, and
-    counter-opening rates
+    opportunities plus save, clutch, perfect, early, timing-score, pull,
+    timed-pull, perfect-pull, and counter-opening rates
     so rescue packages can be compared without hand-calculating rates from raw
     counts. Package rows expose
     primary target HP, current package aggro target, the current/next package
@@ -110,10 +110,11 @@ Balance simulations:
     isolated single-beat pressure. The report also emits package_pressure and
     package_difficulty rows when package overlap is only serial pressure or
     the selected automation profile is clearing too comfortably.
-    Rescue package rows also track pull/taunt total frames and uptime rate, so
-    clears can be flagged when forced target control is carrying the fight.
+    Rescue package rows also track pull/taunt total frames, uptime rate, and
+    late-window pull rates, so clears can be flagged when forced target control
+    is carrying the fight instead of few-frame snap-pull saves.
     Rescue-package report rows summarize save, clutch, perfect, early,
-    timing-score, pull, taunt-uptime, counter-window, counter-damage,
+    timing-score, pull, timed-pull, perfect-pull, taunt-uptime, counter-window, counter-damage,
     counter-stagger, fatal-miss, and buffered-miss rates, then warn when
     pull/taunt control or early parking is replacing the intended few-frame
     body-block micro.
