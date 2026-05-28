@@ -85,6 +85,9 @@ local function run_content_api_smoke()
     end
     expect(has_rescue_rhythm, "summary should expose rescue rhythm metadata")
     expect(has_rescue_summon, "Gragh rescue should expose add rhythm metadata")
+    expect(summary.packageSummary and summary.packageSummary.hasRescue, "summary should expose package rescue summary")
+    expect(summary.packageSummary and summary.packageSummary.hasSummons, "summary should expose package summon summary")
+    expect(summary.packageSummary and summary.packageSummary.hitsEscorts, "summary should expose ally-risk package summary")
     expect(summary.args and #summary.args > 0, "summary should expose launch args")
     expect(summary.balanceArgs and #summary.balanceArgs > 0, "summary should expose balance args")
 

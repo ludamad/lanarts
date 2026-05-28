@@ -1302,6 +1302,24 @@
         }
         appendSummaryLine(host, 'Loadout', loadout);
 
+        if (summary.packageSummary && summary.packageSummary.rhythmCount) {
+          const packageInfo = document.createElement('div');
+          packageInfo.className = 'item-chips';
+          addChip(packageInfo, `${summary.packageSummary.rhythmCount} rhythms`);
+          addChip(packageInfo, `first ${summary.packageSummary.firstThreatFrame || 0}f`);
+          addChip(packageInfo, `fastest ${summary.packageSummary.fastestLoopFrames || 0}f`);
+          if (summary.packageSummary.hasRescue) {
+            addChip(packageInfo, `${summary.packageSummary.rescueClutchWindow || 0}f clutch`);
+          }
+          if (summary.packageSummary.hasSummons) {
+            addChip(packageInfo, `adds cap ${summary.packageSummary.summonCap || 1}`);
+          }
+          if (summary.packageSummary.hitsEscorts) {
+            addChip(packageInfo, 'ally risk');
+          }
+          appendSummaryLine(host, 'Package', packageInfo);
+        }
+
         if (summary.mapAlgorithm && summary.mapAlgorithm.label) {
           const algorithm = document.createElement('div');
           const profile = summary.config.mapProfile ? ` (${summary.config.mapProfile})` : '';

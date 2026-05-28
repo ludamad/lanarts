@@ -953,6 +953,52 @@ local function analysis_plan_payload(config)
     }
 end
 
+local function package_summary_from_rhythms(rhythms)
+    if #(rhythms or {}) == 0 then
+        return nil
+    end
+    local rhythm_ids = {}
+    local first_threat
+    local fastest_loop
+    local has_rescue = false
+    local rescue_clutch_window
+    local has_summons = false
+    local summon_cap
+    local hits_escorts = false
+    for _, rhythm in ipairs(rhythms or {}) do
+        rhythm_ids[#rhythm_ids + 1] = rhythm.id
+        local offset = tonumber(rhythm.offset) or 0
+        if first_threat == nil or offset < first_threat then
+            first_threat = offset
+        end
+        local interval = tonumber(rhythm.interval)
+        if interval and interval > 0 and (fastest_loop == nil or interval < fastest_loop) then
+            fastest_loop = interval
+        end
+        if rhythm.id == "rescue" then
+            has_rescue = true
+            rescue_clutch_window = rhythm.clutchWindow or rhythm.lateWindow
+        elseif rhythm.id == "summon" then
+            has_summons = true
+            summon_cap = rhythm.maxAlive
+        end
+        if rhythm.affectsEscorts then
+            hits_escorts = true
+        end
+    end
+    return {
+        rhythmCount = #rhythm_ids,
+        rhythmIds = rhythm_ids,
+        firstThreatFrame = first_threat or 0,
+        fastestLoopFrames = fastest_loop or 0,
+        hasRescue = has_rescue,
+        rescueClutchWindow = rescue_clutch_window,
+        hasSummons = has_summons,
+        summonCap = summon_cap,
+        hitsEscorts = hits_escorts,
+    }
+end
+
 local function run_summary_payload(config)
     local known_spells, upcoming_spells = spell_rows_for_level(config.className, config.level)
     local selected = {
@@ -963,6 +1009,7 @@ local function run_summary_payload(config)
         encounter = encounter_lookup()[config.encounter or ""],
         intensity = selected_intensity(config),
     }
+    local rhythms = encounter_rhythms(selected.encounter, selected.intensity)
     return {
         schema = 1,
         config = config,
@@ -976,7 +1023,8 @@ local function run_summary_payload(config)
         mapAlgorithm = selected.mapAlgorithm,
         encounter = selected.encounter,
         intensity = selected.intensity,
-        rhythms = encounter_rhythms(selected.encounter, selected.intensity),
+        rhythms = rhythms,
+        packageSummary = package_summary_from_rhythms(rhythms),
         warnings = warnings_for(config, selected),
         args = launch_args(config),
         balanceArgs = balance_args(config),
