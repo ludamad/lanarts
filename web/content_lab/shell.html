@@ -1518,10 +1518,13 @@
             const button = document.createElement('button');
             button.type = 'button';
             const spec = choice.spec || choice.name;
+            const selected = selectedItems.has(spec);
             button.textContent = choice.amount > 1 ? `${choice.name} x${choice.amount}` : choice.name;
-            button.classList.toggle('active', selectedItems.has(spec));
+            button.classList.toggle('active', selected);
+            button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+            button.title = selected ? `Remove ${spec}` : `Add ${spec}`;
             button.addEventListener('click', () => {
-              addItemSpec(spec);
+              toggleItemSpec(spec);
             });
             buttons.appendChild(button);
           });
@@ -1642,6 +1645,27 @@
           setCustomLoadoutParts(parts);
         }
         refreshLab();
+      }
+
+      function removeItemSpec(spec) {
+        const target = String(spec || '').trim();
+        if (!target) {
+          return;
+        }
+        setCustomLoadoutParts(customLoadoutParts().filter((part) => part !== target));
+        refreshLab();
+      }
+
+      function toggleItemSpec(spec) {
+        const target = String(spec || '').trim();
+        if (!target) {
+          return;
+        }
+        if (customLoadoutParts().includes(target)) {
+          removeItemSpec(target);
+        } else {
+          addItemSpec(target);
+        }
       }
 
       function updateLoadoutOptions() {
