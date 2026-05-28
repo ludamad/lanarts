@@ -1488,6 +1488,7 @@ local function draw_package_hud(director)
             local events = director.micro_punish_events or 0
             local break_total = director.micro_punish_break_total or 0
             local cap = micro_punish_cap(package)
+            local label = package.micro_punish.label or "FURY"
             local value = events > 0
                 and ("+" .. tostring(math.ceil(total)) .. " b" .. tostring(math.ceil(break_total)))
                 or "on hit"
@@ -1495,7 +1496,7 @@ local function draw_package_hud(director)
                 or (director.micro_punish_last_timer or 0) > 0 and COL_PALE_RED
                 or events > 0 and COL_PALE_YELLOW
                 or COL_LIGHT_GRAY
-            draw_hud_row(y, "FURY", value, color, safe_rate(total, cap))
+            draw_hud_row(y, label, value, color, safe_rate(total, cap))
             y = y + HUD_ROW_H
         end
     end

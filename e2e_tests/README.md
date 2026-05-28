@@ -95,7 +95,10 @@ Balance simulations:
     where a support enemy is tested with orbit, AOE, sweep, and add rhythms,
     plus hell-warrior-flame-package for fast red contact pressure with capped
     extra Imp portals and readable flame lanes, and stara-pain-star-package
-    for black aura/projectile pressure with skull lanes and Skeleton cleanup.
+    for black aura/projectile pressure with skull lanes and Skeleton cleanup,
+    while crypt-keeper-aura-package now layers black aura, bone orbit, crossing
+    bone scythes, DREAD healing on mechanic hits, nova timing, and Skeleton
+    cleanup in a larger 1v1 room.
     pixulloch-web-package adds a larger final-boss arena with native black
     summons, rotating web knots, crossing venom lanes, a web nova beat, and
     Giant Spider cleanup. waxanarian-venom-package adds fast green boss

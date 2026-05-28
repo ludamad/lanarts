@@ -113,6 +113,11 @@ grep -q "waxanarian-venom-package" runtime/engine/ContentCatalog.lua
 grep -q "waxanarian-venom-package" web/content_lab/shell.html
 grep -q "nesso-arrow-storm-package" runtime/engine/ContentCatalog.lua
 grep -q "nesso-arrow-storm-package" web/content_lab/shell.html
+grep -q "crossing bone scythes" runtime/engine/ContentCatalog.lua
+grep -q "crossing bone scythes" web/content_lab/shell.html
+grep -q "DREAD on mechanic hits" runtime/engine/ContentCatalog.lua
+grep -q "DREAD on mechanic hits" web/content_lab/shell.html
+grep -q "package.micro_punish.label" runtime/objects/ContentLabHazards.lua
 grep -q "source or player" runtime/objects/ContentLabHazards.lua
 grep -q "MICRO" runtime/objects/ContentLabHazards.lua
 grep -q "BEAT" runtime/objects/ContentLabHazards.lua
