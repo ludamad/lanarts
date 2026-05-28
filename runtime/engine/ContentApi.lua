@@ -3036,6 +3036,17 @@ local function drill_scorecard_for(drill, drill_config, package_summary, pressur
         target = "<=55% minimum HP",
         reason = "The drill should produce real danger instead of cosmetic package timings.",
     })
+    if package_summary then
+        add({
+            id = "micro-clean",
+            label = "Micro execution",
+            metric = "avg_package_micro_score",
+            comparator = ">=",
+            threshold = 0,
+            target = ">=0 micro score",
+            reason = "A clear should not count as healthy when the bot wins while eating avoidable package mechanics.",
+        })
+    end
 
     if package_summary and package_summary.hasRescue then
         add({

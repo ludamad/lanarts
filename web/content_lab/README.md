@@ -57,6 +57,7 @@ Rescue HUDs include TAUNT uptime, and balance rows expose pull/taunt total frame
 Balance rows also expose perfect-save counts/rates to distinguish ordinary clutch blocks from the last-few-frame saves that make rescue packages feel sharp.
 Balance rows expose early-save rate and rescue timing score so few-frame saves can be modeled separately from players camping the rescue line before the strike becomes urgent.
 Balance rows expose package micro score, best streak, dodge count, and avoidable mechanic-hit count so lab runs can separate clean execution from brute-force clears.
+Package reports and drill scorecards flag clears with negative micro score so a primitive automated player surviving the fight does not automatically count as healthy content.
 Summon waves use short visible add portals before enemies appear, so add pressure has a readable cleanup beat instead of an instant spawn.
 Orb, sweep, and AOE rows switch from spawn countdowns to active/warning state while those package threats are live.
 Rescue packages also show a live READ row for cut-lane, clutch, hold, and pull-target states while the line is active.

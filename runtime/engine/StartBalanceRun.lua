@@ -1732,6 +1732,10 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
     local pressure_peak = tonumber(row.avg_package_pressure_max_count) or 0
     local pressure_overlap = tonumber(row.avg_package_pressure_overlap_rate) or 0
     local package_frames = tonumber(row.avg_package_frames) or 0
+    local micro_score = tonumber(row.avg_package_micro_score) or 0
+    local micro_hits = tonumber(row.avg_package_micro_hits) or 0
+    local micro_dodges = tonumber(row.avg_package_micro_dodges) or 0
+    local micro_best_streak = tonumber(row.avg_package_micro_best_streak) or 0
 
     add_report_row(
         rows,
@@ -1751,6 +1755,25 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
         )
     )
 
+    add_report_row(
+        rows,
+        class_name,
+        "info",
+        "package_micro",
+        "avg_package_micro_score",
+        micro_score,
+        0,
+        string.format(
+            "%s package execution in %s averaged %.1f micro score, %.1f dodges, %.1f mechanic hits, and %.1f best streak.",
+            class_name,
+            encounter,
+            micro_score,
+            micro_dodges,
+            micro_hits,
+            micro_best_streak
+        )
+    )
+
     if runs >= min_runs and win_rate >= 0.95 and death_rate <= 0.05 and min_hp_pct >= 0.45 then
         add_report_row(
             rows,
@@ -1766,6 +1789,25 @@ local function add_package_report_rows(rows, row, class_name, runs, min_runs)
                 encounter,
                 win_rate * 100,
                 min_hp_pct * 100
+            )
+        )
+    end
+
+    if win_rate >= 0.75 and micro_score < 0 then
+        add_report_row(
+            rows,
+            class_name,
+            "warning",
+            "package_micro",
+            "avg_package_micro_score",
+            micro_score,
+            0,
+            string.format(
+                "%s cleared %s %.1f%% of the time while averaging %.1f micro score; survivability may be masking failed package mechanics.",
+                class_name,
+                encounter,
+                win_rate * 100,
+                micro_score
             )
         )
     end

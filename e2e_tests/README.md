@@ -120,7 +120,9 @@ Balance simulations:
     remaining frames so timeline samples can be matched against the in-game HUD.
     Package runs also emit package_micro_score, package_micro_best_streak,
     package_micro_dodges, and package_micro_hits so clean execution can be
-    separated from clears that brute-force avoidable mechanics.
+    separated from clears that brute-force avoidable mechanics. Package reports
+    summarize those micro rows and warn when a class clears while averaging
+    negative micro score.
     Use --package_components orbit,pulse,sweep,summon,escort,rescue to isolate
     package parts while keeping the same encounter arena, monsters, and
     pressure preset. A rescue component automatically keeps its escort target.
