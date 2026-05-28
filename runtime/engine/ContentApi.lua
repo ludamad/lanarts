@@ -159,6 +159,7 @@ local function normalized_config(config)
         mapProfile = map_profile,
         mapAlgorithm = map_algorithm,
         encounter = tostring(config.encounter or ""),
+        drill = tostring(config.drill or config.microDrill or config.micro_drill or ""),
         monsters = tostring(config.monsters or ""),
         goal = tostring(config.goal or config.analysisGoal or config.analysis_goal or "enemy-balance"),
         enemyGroup = tostring(config.enemyGroup or config.enemy_group or ""),
@@ -1177,6 +1178,7 @@ local function resource_entry(group, name, meta, goal, config, seed_offset, extr
         mapProfile = config.mapProfile,
         mapAlgorithm = config.mapAlgorithm,
         encounter = config.encounter,
+        drill = config.drill,
         monsters = config.monsters,
         analysisGoal = config.goal,
         enemyGroup = config.enemyGroup,
@@ -2699,6 +2701,7 @@ end
 
 local function micro_drill_config(config, drill)
     local next_config = copy_object(config)
+    next_config.drill = drill.id or ""
     next_config.className = drill.className or config.className
     next_config.level = tonumber(drill.level) or config.level
     next_config.seed = tostring(drill.seed or config.seed)
@@ -3488,6 +3491,22 @@ local function controls_payload(config)
             options = option_rows(Catalog.package_component_sets or {}, "components", "label"),
         },
         {
+            id = "drill",
+            label = "Drill",
+            value = config.drill,
+            options = (function()
+                local rows = {{value = "", label = "None"}}
+                for _, drill in ipairs(Catalog.micro_drills or {}) do
+                    rows[#rows + 1] = {
+                        value = drill.id or "",
+                        label = drill.label or drill.id or "",
+                        description = drill.focus or drill.role or "",
+                    }
+                end
+                return rows
+            end)(),
+        },
+        {
             id = "enemyGroup",
             label = "Enemy group",
             value = config.enemyGroup,
@@ -3640,6 +3659,7 @@ local function resource_card(resource)
             mapProfile = resource.mapProfile,
             mapAlgorithm = resource.mapAlgorithm,
             encounter = resource.encounter,
+            drill = resource.drill or (resource.microDrill and resource.microDrill.id) or "",
             monsters = resource.monsters,
             enemyGroup = resource.enemyGroup,
             enemyPack = resource.enemyPack,

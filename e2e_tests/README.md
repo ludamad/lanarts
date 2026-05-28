@@ -25,7 +25,8 @@ Content lab APIs:
     can spec a hero before entering a package fight.
     Micro-drill payloads expose launchable rescue, orb/AOE, add-cleanup, and
     stacked-package practice setups with isolated components, scorecards, and
-    micro plans.
+    micro plans. Presentation controls expose those drills as selectable API
+    options so the web lab can apply a full practice config from one selector.
     Run summaries and fight setup payloads also include class/enemy matchup
     reads for red/fire, white, and black resistance checks, with telemetry keys
     that explain whether the pairing is suppressing damage conversion.

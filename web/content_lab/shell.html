@@ -1015,6 +1015,12 @@
         </div>
         <div class="encounter-info" id="encounterInfo" hidden></div>
         <div class="field">
+          <label for="microDrill">Drill</label>
+          <select id="microDrill">
+            <option value="">None</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="intensity">Pressure</label>
           <select id="intensity">
             <option value="learning">Learning</option>
@@ -1220,6 +1226,10 @@
         {id: 'escort,rescue', label: 'Rescue lane', components: 'escort,rescue'},
         {id: 'escort,orbit,pulse,rescue', label: 'No adds', components: 'escort,orbit,pulse,rescue'},
         {id: 'orbit,pulse,summon', label: 'No rescue', components: 'orbit,pulse,summon'},
+      ];
+
+      let microDrills = [
+        {id: '', label: 'None'},
       ];
 
       let resources = [
@@ -1531,6 +1541,7 @@
           enemyPack: resource.enemyPack || '',
           analysisGoal: resource.analysisGoal || resource.goalId || '',
           botProfile: resource.botProfile || 'human',
+          drill: resource.drill || (resource.microDrill && resource.microDrill.id) || '',
           packageSummary: resource.packageSummary || null,
           pressurePreview: resource.pressurePreview || null,
           microDrill: resource.microDrill || null,
@@ -1563,6 +1574,7 @@
         replaceOptions($('analysisGoal'), catalog.analysis_goals || analysisGoals, (entry) => entry.id || '', (entry) => entry.label || entry.id || 'Goal');
         replaceOptions($('botProfile'), catalog.bot_profiles || botProfiles, (entry) => entry.id || 'human', (entry) => entry.label || entry.id || 'Human');
         replaceOptions($('packageComponents'), catalog.package_component_sets || packageComponentSets, (entry) => entry.components || entry.id || '', (entry) => entry.label || entry.id || 'Full package');
+        replaceOptions($('microDrill'), [{id: '', label: 'None'}].concat(catalog.micro_drills || []), (entry) => entry.id || '', (entry) => entry.label || entry.id || 'None');
         rebuildLoadoutPresets(catalog.loadouts, catalog.loadout_names);
         mapAlgorithms = catalog.map_algorithms || mapAlgorithms;
         encounters = catalog.encounters || encounters;
@@ -1572,6 +1584,7 @@
         analysisGoals = catalog.analysis_goals || analysisGoals;
         botProfiles = catalog.bot_profiles || botProfiles;
         packageComponentSets = catalog.package_component_sets || packageComponentSets;
+        microDrills = [{id: '', label: 'None'}].concat(catalog.micro_drills || []);
         resources = (catalog.resources || []).map(normalizeResource);
         mapProfiles = (catalog.map_algorithms || catalog.maps || []).slice(0, 4).map(normalizePreviewProfile);
         rebuildMapAlgorithms($('mapDesc').value, $('mapAlgorithm').value);
@@ -1616,6 +1629,7 @@
           mapProfile: algorithm ? (algorithm.mapProfile || '') : '',
           mapAlgorithm: $('mapAlgorithm').value || '',
           encounter: $('encounter').value,
+          drill: $('microDrill').value || '',
           monsters: $('customMonsters').value.trim(),
           enemyGroup: $('enemyGroup').value || '',
           enemyPack: $('enemyPack').value || '',
@@ -2681,6 +2695,9 @@
         generatedResources = workspace.resourceMatrix && workspace.resourceMatrix.resources
           ? workspace.resourceMatrix.resources.map(normalizeResource)
           : [];
+        microDrills = workspace.microDrills && workspace.microDrills.drills
+          ? [{id: '', label: 'None'}].concat(workspace.microDrills.drills)
+          : microDrills;
         renderBuildOptions(loadoutOptions);
         renderRunSummary(resolvedRun);
         renderFightSetup(fightSetup);
@@ -2720,6 +2737,7 @@
         rebuildMapAlgorithms($('mapDesc').value, config.mapAlgorithm || mapAlgorithmIdFor(config.mapDesc || '', config.mapProfile || ''));
         $('mapAlgorithm').value = config.mapAlgorithm || mapAlgorithmIdFor(config.mapDesc || '', config.mapProfile || '');
         $('encounter').value = config.encounter || '';
+        $('microDrill').value = config.drill || config.microDrill || '';
         $('intensity').value = config.intensity || 'standard';
         $('packageComponents').value = config.packageComponents || '';
         $('customMonsters').value = config.monsters || '';
@@ -2730,6 +2748,26 @@
         $('botProfile').value = config.botProfile || 'human';
         setPreset(config.preset || 'none');
         refreshLab();
+      }
+
+      function applyMicroDrillSelection() {
+        const id = $('microDrill').value || '';
+        if (!id) {
+          refreshLab();
+          return;
+        }
+        let drill = (microDrills || []).find((entry) => (entry.id || '') === id);
+        if (!drill || !drill.config) {
+          const response = callContentApi('lanarts_content_micro_drills_json', currentConfig());
+          drill = response && response.drills
+            ? response.drills.find((entry) => (entry.id || '') === id)
+            : null;
+        }
+        if (drill && drill.config) {
+          setConfig(drill.config);
+        } else {
+          refreshLab();
+        }
       }
 
       function selectedEncounter() {
@@ -3061,6 +3099,9 @@
         if (config.encounter) {
           query.set('encounter', config.encounter);
         }
+        if (config.drill) {
+          query.set('drill', config.drill);
+        }
         if (config.intensity && config.intensity !== 'standard') {
           query.set('pressure', config.intensity);
         }
@@ -3100,6 +3141,7 @@
           mapAlgorithm: query.get('algo') || '',
           mapProfile: query.get('profile') || '',
           encounter: query.get('encounter') || '',
+          drill: query.get('drill') || '',
           intensity: query.get('pressure') || 'standard',
           packageComponents: query.get('parts') || '',
           monsters: query.get('monsters') || '',
@@ -3535,6 +3577,7 @@
           }
           refreshLab();
         });
+        $('microDrill').addEventListener('change', applyMicroDrillSelection);
         $('mapDesc').addEventListener('change', () => {
           rebuildMapAlgorithms($('mapDesc').value, '');
           refreshLab();
@@ -3563,6 +3606,9 @@
         $('status').lastElementChild.textContent = 'Runtime ready';
         applyCatalog(callContentApi('lanarts_content_catalog_json'));
         setConfig(queryConfig);
+        if (queryConfig.drill) {
+          applyMicroDrillSelection();
+        }
         if (queryConfig.autorun) {
           setTimeout(() => launch(currentConfig()), 0);
         }

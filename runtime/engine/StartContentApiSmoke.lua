@@ -301,6 +301,7 @@ local function run_content_api_smoke()
     for _, drill in ipairs(micro_drills.drills or {}) do
         if drill.id == "gragh-perfect-rescue" then
             has_gragh_rescue_drill = drill.config
+                and drill.config.drill == "gragh-perfect-rescue"
                 and drill.config.packageComponents == "escort,rescue"
                 and drill.packageSummary
                 and drill.packageSummary.hasRescue
@@ -666,6 +667,7 @@ local function run_content_api_smoke()
     local has_class_control = false
     local has_level_control = false
     local has_map_algorithm_control = false
+    local has_drill_control = false
     for _, control in ipairs(presentation.controls or {}) do
         if control.id == "className" and #(control.options or {}) >= 4 then
             has_class_control = true
@@ -673,11 +675,14 @@ local function run_content_api_smoke()
             has_level_control = true
         elseif control.id == "mapAlgorithm" and #(control.options or {}) >= 1 then
             has_map_algorithm_control = true
+        elseif control.id == "drill" and #(control.options or {}) >= 5 then
+            has_drill_control = true
         end
     end
     expect(has_class_control, "presentation should expose class control options")
     expect(has_level_control, "presentation should expose level control options")
     expect(has_map_algorithm_control, "presentation should expose map algorithm options")
+    expect(has_drill_control, "presentation should expose micro drill control options")
     local groups = {}
     local has_rescue_card = false
     local has_enemy_card = false
