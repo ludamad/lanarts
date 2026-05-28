@@ -631,6 +631,8 @@ local function package_state_fields(player)
             package_rescue_clutch_rate = "",
             package_rescue_pulls = "",
             package_rescue_pull_rate = "",
+            package_rescue_pull_total_frames = "",
+            package_rescue_pull_uptime_rate = "",
             package_rescue_misses = "",
             package_rescue_best_margin = "",
             package_rescue_last_margin = "",
@@ -681,6 +683,8 @@ local function package_state_fields(player)
         package_rescue_clutch_rate = format_rate(state.rescue_clutch_rate or 0),
         package_rescue_pulls = state.rescue_pulls or 0,
         package_rescue_pull_rate = format_rate(state.rescue_pull_rate or 0),
+        package_rescue_pull_total_frames = state.rescue_pull_total_frames or 0,
+        package_rescue_pull_uptime_rate = format_rate(state.rescue_pull_uptime_rate or 0),
         package_rescue_misses = state.rescue_misses or 0,
         package_rescue_best_margin = state.rescue_best_margin or "",
         package_rescue_last_margin = state.rescue_last_margin or "",
@@ -984,6 +988,7 @@ local SUMMARY_METRICS = {
     "package_escort_hp_pct", "package_rescue_saves", "package_rescue_clutch_saves",
     "package_rescue_pulls", "package_rescue_misses", "package_rescue_opportunities",
     "package_rescue_save_rate", "package_rescue_clutch_rate", "package_rescue_pull_rate",
+    "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
 }
 
 local function add_summary_metric(aggregate, row, key)
@@ -2141,7 +2146,9 @@ local function run_balance(raw_args)
             "package_pulse_active_count", "package_pulse_active_remaining",
             "package_rescue_opportunities", "package_rescue_save_rate",
             "package_rescue_clutch_saves", "package_rescue_clutch_rate",
-            "package_rescue_pulls", "package_rescue_pull_rate", "package_rescue_misses",
+            "package_rescue_pulls", "package_rescue_pull_rate",
+            "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
+            "package_rescue_misses",
             "package_rescue_best_margin", "package_rescue_last_margin", "package_rescue_last_pull_frames",
             "package_rescue_next_frames", "package_rescue_active_count", "package_rescue_active_remaining",
             "package_rescue_active_blocked", "package_rescue_active_late",
@@ -2184,7 +2191,9 @@ local function run_balance(raw_args)
             "package_pulse_active_count", "package_pulse_active_remaining",
             "package_rescue_opportunities", "package_rescue_save_rate",
             "package_rescue_clutch_saves", "package_rescue_clutch_rate",
-            "package_rescue_pulls", "package_rescue_pull_rate", "package_rescue_misses",
+            "package_rescue_pulls", "package_rescue_pull_rate",
+            "package_rescue_pull_total_frames", "package_rescue_pull_uptime_rate",
+            "package_rescue_misses",
             "package_rescue_best_margin", "package_rescue_last_margin", "package_rescue_last_pull_frames",
             "package_rescue_next_frames", "package_rescue_active_count", "package_rescue_active_remaining",
             "package_rescue_active_blocked", "package_rescue_active_late",
@@ -2245,7 +2254,9 @@ local function run_balance(raw_args)
             "avg_package_frames", "avg_package_escort_hp_pct", "avg_package_rescue_saves",
             "avg_package_rescue_opportunities", "avg_package_rescue_save_rate",
             "avg_package_rescue_clutch_saves", "avg_package_rescue_clutch_rate",
-            "avg_package_rescue_pulls", "avg_package_rescue_pull_rate", "avg_package_rescue_misses",
+            "avg_package_rescue_pulls", "avg_package_rescue_pull_rate",
+            "avg_package_rescue_pull_total_frames", "avg_package_rescue_pull_uptime_rate",
+            "avg_package_rescue_misses",
         })
         write_csv(args.spell_stats_out, spell_stat_rows, {
             "class", "start_level", "loadout", "bot_profile", "spell", "class_runs", "runs_using", "use_rate",

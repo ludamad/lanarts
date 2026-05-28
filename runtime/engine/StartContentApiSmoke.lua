@@ -139,6 +139,7 @@ local function run_content_api_smoke()
     expect(#(fight_setup.microPlan or {}) >= 3, "fight setup should expose per-rhythm micro plan rows")
     local has_fight_rescue_window = false
     local has_fight_regen_metric = false
+    local has_taunt_uptime_metric = false
     local has_rescue_micro = false
     local has_necro_regen_micro = false
     local has_effective_window = false
@@ -150,6 +151,8 @@ local function run_content_api_smoke()
     for _, metric in ipairs(fight_setup.telemetry or {}) do
         if metric.key == "avg_necromancer_regen_offset_pct" then
             has_fight_regen_metric = true
+        elseif metric.key == "avg_package_rescue_pull_uptime_rate" then
+            has_taunt_uptime_metric = true
         end
     end
     for _, row in ipairs(fight_setup.microPlan or {}) do
@@ -161,6 +164,7 @@ local function run_content_api_smoke()
     end
     expect(has_fight_rescue_window, "fight setup should expose rescue timing windows")
     expect(has_fight_regen_metric, "fight setup should expose necromancer regen telemetry")
+    expect(has_taunt_uptime_metric, "fight setup should expose taunt uptime telemetry")
     expect(has_rescue_micro, "fight setup should explain the rescue body-block action")
     expect(has_necro_regen_micro, "fight setup should preserve necromancer regen-specific micro")
     expect(has_effective_window, "fight setup should include human-skill effective windows")

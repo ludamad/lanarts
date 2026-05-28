@@ -437,7 +437,7 @@ local function draw_package_hud(director)
         row_count = row_count + 1
     end
     if package.rescue then
-        row_count = row_count + 3
+        row_count = row_count + 4
     end
     if package.escort then
         row_count = row_count + 1
@@ -560,6 +560,16 @@ local function draw_package_hud(director)
         local stats_value = saves .. "/" .. attempts .. " c" .. clutch_saves .. " p" .. pulls .. (margin and (" " .. margin .. "f") or "")
         draw_hud_row(y, "RATE", stats_value, COL_PALE_GREEN, safe_rate(saves, math.max(1, attempts)))
         y = y + HUD_ROW_H
+
+        local pull_frames = director.rescue_pull_total_frames or 0
+        local pull_uptime = safe_rate(pull_frames, math.max(1, director.elapsed or 0))
+        local pull_active = director.rescue_pull_active_frames or 0
+        local pull_value = pull_active > 0
+            and ("active " .. format_frames(pull_active) .. " " .. format_pct(pull_uptime))
+            or (format_frames(pull_frames) .. " " .. format_pct(pull_uptime))
+        local pull_color = pull_active > 0 and COL_PALE_YELLOW or (pull_uptime >= 0.30 and COL_PALE_YELLOW or COL_LIGHT_GRAY)
+        draw_hud_row(y, "TAUNT", pull_value, pull_color, pull_uptime)
+        y = y + HUD_ROW_H
     end
     if package.escort then
         local count, hp, max_hp = escort_health()
@@ -617,10 +627,12 @@ local function package_result(director, outcome)
     local save_rate = safe_rate(saves, opportunities)
     local clutch_rate = safe_rate(clutch, saves)
     local pull_rate = safe_rate(pulls, saves)
+    local pull_total_frames = director.rescue_pull_total_frames or 0
+    local pull_uptime_rate = safe_rate(pull_total_frames, math.max(1, frames))
     local best = director.rescue_best_margin
     local escort_text = count > 0 and string.format("ally %d/%d", math.ceil(hp), math.ceil(max_hp)) or "ally down"
     local rescue_text = (saves > 0 or misses > 0)
-        and string.format("saves %d/%d (%s), clutch %d (%s), pulls %d%s", saves, opportunities, format_pct(save_rate), clutch, format_pct(clutch_rate), pulls, best and (", best " .. best .. "f") or "")
+        and string.format("saves %d/%d (%s), clutch %d (%s), pulls %d, taunt %s%s", saves, opportunities, format_pct(save_rate), clutch, format_pct(clutch_rate), pulls, format_pct(pull_uptime_rate), best and (", best " .. best .. "f") or "")
         or "no rescue strikes"
     return {
         outcome = outcome,
@@ -646,6 +658,8 @@ local function package_result(director, outcome)
         rescue_clutch_rate = clutch_rate,
         rescue_pulls = pulls,
         rescue_pull_rate = pull_rate,
+        rescue_pull_total_frames = pull_total_frames,
+        rescue_pull_uptime_rate = pull_uptime_rate,
         rescue_misses = misses,
         rescue_best_margin = best,
         rescue_last_margin = director.rescue_last_margin,
@@ -706,6 +720,8 @@ local function package_state_from_director(director)
         rescue_clutch_rate = safe_rate(clutch, saves),
         rescue_pulls = pulls,
         rescue_pull_rate = safe_rate(pulls, saves),
+        rescue_pull_total_frames = director.rescue_pull_total_frames or 0,
+        rescue_pull_uptime_rate = safe_rate(director.rescue_pull_total_frames or 0, math.max(1, director.elapsed or 0)),
         rescue_misses = misses,
         rescue_best_margin = director.rescue_best_margin,
         rescue_last_margin = director.rescue_last_margin,
@@ -1689,9 +1705,13 @@ function M.add_director(game_map, package, intensity)
         rescue_clutch_saves = 0,
         rescue_pulls = 0,
         rescue_pull_active_frames = 0,
+        rescue_pull_total_frames = 0,
         escort_required = package.escort ~= nil,
         on_step = function(self)
             self.elapsed = self.elapsed + 1
+            if (self.rescue_pull_active_frames or 0) > 0 then
+                self.rescue_pull_total_frames = (self.rescue_pull_total_frames or 0) + 1
+            end
             if #living_players() == 0 then
                 finish_package(self, "party down")
                 return
