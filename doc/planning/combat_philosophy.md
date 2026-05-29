@@ -155,6 +155,23 @@ draw feature combinations, measure skill-depth/flow/win, and keep the ones that 
 interesting, skill-expressive characters. The feature registry + per-character
 loadouts are the foundation; procedural loadout draws are the next slice.
 
+## Data from the breeding loop (skill-depth ranking)
+
+`breed_features.py` generates feature loadouts, runs each at sloppy AND perfect, and
+ranks by depth (sloppy→perfect spread) + engagement + viability + clean. Result:
+
+- **`flux_weave@2.6` is the deepest character** (depth 1.30; perfect 67%/+4.7 micro vs
+  sloppy 0%) — the data validates Rogue's hand-tuned assassin as the best build.
+- **`radiant_nova` alone has depth 0.00** (sloppy 33% == perfect 33%): it auto-fires,
+  so it rewards no skill. Builds that hit 100% win (gambler@2.4, nova@tier1) are
+  down-ranked as too-easy.
+
+**Data-derived design principle:** *player-action-triggered* features (flux/gambler
+weave — they require dash-weaving) carry skill depth; *passive/automatic* features
+(an auto-nova) do not. So a feature must be gated/scaled by what the player DOES, not
+just by a state threshold. Templar's radiant_nova was the shallow case and is being
+re-skilled to fire/scale off recent weaves rather than auto-pulse at a tier.
+
 ## How we keep it honest
 
 `run_class_interestingness_experiment.sh` + `aggregate_class_interestingness.py`

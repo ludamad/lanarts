@@ -4319,20 +4319,24 @@ local FLOW_FEATURES = {
             }
         end,
     },
-    -- Radiant bulwark: while sustaining flow (tier >= min_tier), periodically radiate an AoE nova.
+    -- Radiant bulwark: WEAVING at high flow radiates an AoE nova (cooldown-gated). Movement-
+    -- triggered, not a passive auto-pulse -- so it rewards skill (the breeding data showed an
+    -- auto-nova had zero skill depth; firing it off weaves makes the dancing bulwark skillful).
     radiant_nova = {
-        flow_step = function(feat, director, player, tier)
+        weave = function(feat, director, player, monster, tier)
+            if tier < (feat.min_tier or 2) then
+                return
+            end
             local st = director.feature_state
-            if tier >= (feat.min_tier or 2) then
-                st.radiant_nova = (st.radiant_nova or 0) - 1
-                if st.radiant_nova <= 0 then
-                    st.radiant_nova = feat.period or 50
-                    local dmg = (feat.dmg or 5) * (1 + 0.5 * tier) * feature_intensity(director)
-                    local n = damage_monsters_in_radius(director, {player.x, player.y}, (feat.radius or 68) + tier * 12, dmg, player, COL_PALE_YELLOW, "RADIANT")
-                    if n > 0 then director.flow_novas = (director.flow_novas or 0) + 1 end
-                end
-            else
-                st.radiant_nova = 0
+            local now = director.elapsed or 0
+            if (st.radiant_nova_cd or 0) > now then
+                return
+            end
+            st.radiant_nova_cd = now + (feat.period or 36)
+            local dmg = (feat.dmg or 5) * (1 + 0.5 * tier) * feature_intensity(director)
+            local n = damage_monsters_in_radius(director, {player.x, player.y}, (feat.radius or 68) + tier * 12, dmg, player, COL_PALE_YELLOW, "RADIANT")
+            if n > 0 then
+                director.flow_novas = (director.flow_novas or 0) + 1
             end
         end,
     },
