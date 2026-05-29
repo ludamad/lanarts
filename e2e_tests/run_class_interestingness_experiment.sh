@@ -24,19 +24,23 @@ INTENSITY="${INTENSITY:-high}"
 SEED="${SEED:-51000}"
 OUT_DIR="${OUT_DIR:-saves/experiments/class_interest}"
 
-CLASSES="Fighter,Necromancer,Pyrocaster,Stormcaller,Templar,Rogue,Dicebinder"
-BOSSES=(
-  gragh-duel
-  red-dragon-duel
-  executioner-blade-package
-  hell-warrior-flame-package
-  mana-sapper-ritual-package
-  stara-pain-star-package
-  pixulloch-web-package
-  waxanarian-venom-package
-  nesso-arrow-storm-package
-  crypt-keeper-aura-package
-)
+CLASSES="${CLASSES:-Fighter,Necromancer,Pyrocaster,Stormcaller,Templar,Rogue,Dicebinder}"
+if [[ -n "${BOSSES:-}" ]]; then
+  read -r -a BOSSES <<< "$BOSSES"
+else
+  BOSSES=(
+    gragh-duel
+    red-dragon-duel
+    executioner-blade-package
+    hell-warrior-flame-package
+    mana-sapper-ritual-package
+    stara-pain-star-package
+    pixulloch-web-package
+    waxanarian-venom-package
+    nesso-arrow-storm-package
+    crypt-keeper-aura-package
+  )
+fi
 
 exe="${LANARTS_HEADLESS_EXE:-build_debug_headless/src/lanarts}"
 if [[ ! -x "$exe" ]]; then
