@@ -4246,6 +4246,12 @@ local WEAVE_CLASS_DAMAGE = {
     Templar = 1.0,     -- builds toward its Power Strike nova (see below)
     Fighter = 0.7,     -- has weapon damage; weave is a bonus
 }
+-- Deterministic per-weave roll in [0,1) (no RNG -> replays stay stable).
+local function weave_roll(director, monster)
+    local seed = (director.elapsed or 0) * 1103515245 + (monster.id or 0) * 12345 + 7
+    return (seed % 997) / 997
+end
+
 local function weave_strike(director, player, monster, tier)
     local mult = WEAVE_CLASS_DAMAGE[player.class_name]
     if not mult or not monster or monster.destroyed or not monster.damage then
@@ -4253,14 +4259,31 @@ local function weave_strike(director, player, monster, tier)
     end
     local intensity = director.intensity or normalize_intensity(nil)
     local dmg = 4 * mult * (1 + 0.5 * tier) * (intensity.damage or 1)
+    local rogue = player.class_name == "Rogue"
+    local label = rogue and "FLUX" or ""
+    local color = rogue and COL_WHITE or COL_PALE_GREEN
+    -- Dicebinder gamble: the weave damage is rolled (high variance), and flow LOADS the dice --
+    -- higher flow raises the floor and the jackpot ceiling. Big roll = JACKPOT crit.
+    if player.class_name == "Dicebinder" then
+        local roll = weave_roll(director, monster)
+        local floor_mult = 0.5 + 0.12 * tier          -- flow raises the bad-roll floor
+        local ceil_mult = 2.0 + 0.6 * tier             -- ...and the jackpot ceiling
+        local rolled = floor_mult + roll * (ceil_mult - floor_mult)
+        dmg = dmg * rolled
+        if rolled >= ceil_mult * 0.85 then
+            label, color = "JACKPOT", COL_PALE_YELLOW
+            director.weave_jackpots = (director.weave_jackpots or 0) + 1
+        else
+            label = "ROLL"
+        end
+    end
     monster:damage(dmg, 25, 0, player)
     director.weave_damage_total = (director.weave_damage_total or 0) + dmg
-    local rogue = player.class_name == "Rogue"
     ImpactFX.world_burst {
         map = director.map,
         xy = xy_of(monster),
-        color = rogue and COL_WHITE or COL_PALE_GREEN,
-        label = rogue and "FLUX" or "",
+        color = color,
+        label = label,
         radius = 22 + tier * 6,
         duration = 20,
         drift = 0.24,
@@ -4410,6 +4433,7 @@ function M.add_director(game_map, package, intensity)
         graze_dodges = 0,
         weave_dodges = 0,
         weave_damage_total = 0,
+        weave_jackpots = 0,
         aggro_frames = 0,
         aggro_player_frames = 0,
         aggro_ally_frames = 0,
