@@ -4346,8 +4346,35 @@ local CHARACTER_FEATURES = {
     Dicebinder = { {feature = "gambler_weave", mult = 1.6} },
 }
 
+-- Data-driven loadout override (the breeding ground): LANARTS_FEATURE_LOADOUT lets the
+-- content lab assign an arbitrary feature set to whatever class is run, so the experiment can
+-- generate and score candidate characters. Format: "feat[@mult][:key=val,...]" joined by '+',
+-- e.g. "flux_weave@2.0+radiant_nova:min_tier=2+gambler_weave".
+local function parse_feature_loadout(str)
+    if not str or str == "" then
+        return nil
+    end
+    local loadout = {}
+    for token in str:gmatch("[^+]+") do
+        local head, params = token:match("^([^:]+):?(.*)$")
+        local name, mult = head:match("^([%w_]+)@?([%d%.]*)$")
+        if name and FLOW_FEATURES[name] then
+            local f = {feature = name}
+            if mult and mult ~= "" then f.mult = tonumber(mult) end
+            for kv in (params or ""):gmatch("[^,]+") do
+                local k, v = kv:match("^([%w_]+)=([%d%.]+)$")
+                if k then f[k] = tonumber(v) end
+            end
+            loadout[#loadout + 1] = f
+        end
+    end
+    return (#loadout > 0) and loadout or nil
+end
+
+local FEATURE_LOADOUT_OVERRIDE = parse_feature_loadout(os.getenv and os.getenv("LANARTS_FEATURE_LOADOUT"))
+
 local function character_features(class_name)
-    return CHARACTER_FEATURES[class_name] or {}
+    return FEATURE_LOADOUT_OVERRIDE or CHARACTER_FEATURES[class_name] or {}
 end
 
 local function run_weave_features(director, player, monster, tier)
