@@ -66,11 +66,14 @@ add it here in the same change.
   only expresses the *movement* layer, so a low skill-depth score can mean shallow
   design OR "the bot doesn't play this class's real loop." See
   `doc/planning/combat_philosophy.md`.
-- **Design bosses in each class's light.** A boss should pressure a class in a way
-  that *showcases its strengths* (the per-class `content-lab-<class>-<boss>` package
-  encounters are the vehicle): clustered adds + walls for Stormcaller's bounces;
-  burnable adds / commit windows for Pyrocaster's Ring/Dragonform; fodder + HP
-  pressure for Necromancer's army economy; telegraphed dash-gaps for melee weaving.
+- **Design bosses in each class's light.** A boss should *supply the inputs a class's
+  skill needs* (vehicle: the per-class `content-lab-<class>-<boss>` encounters). Melee
+  dash-weave needs a steady weavable ADD STREAM (`summon` count/max_alive/interval) --
+  measured: today's single-target bosses give melee only 0.3-1.7 weaves/run, the gap to
+  fill. Stormcaller = clustered/lined adds + walls; Pyrocaster = burnable waves + commit
+  lulls; Necromancer = fodder to summon against + chip pressure for the HP->army->regen
+  loop. Validate with the experiment (the class's signature signal should spike on its
+  light-boss). Full guidance in doc/planning/combat_philosophy.md.
 - **Grounded class identities** (from the kits, not telemetry):
   - Fighter = brawler (Berserk commit, Dash, Power Strike).
   - Templar = bulwark (Power Strike + Dash only; durable; anchor a lane).

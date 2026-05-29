@@ -100,6 +100,32 @@ Genuinely actionable from the data (movement-skill, which the bot does measure):
   skilled melee dances. (Also directly helps Rogue, whose only ability is the dash.)
 - **Stormcaller** stays the bar; don't flatten it.
 
+## Designing bosses in each class's light
+
+A boss "in a class's light" pressures it in a way that *showcases its strength* — it
+supplies the inputs that class's skill expression needs. Data-grounded (e.g. a melee
+dash-weave only fires 0.3–1.7×/run on today's single-target bosses — there aren't
+enough bodies to dash *through*), per archetype:
+
+- **Melee (dash-weave):** needs a **steady stream of weavable adds** + telegraphed
+  sweep gaps, so threading *through* the swarm (and the boss) is the core skill. The
+  package `summon` knob (higher count / max_alive / faster interval) is the lever.
+  Today's bosses starve melee of weave fodder — that is the gap to fill.
+- **Stormcaller (positional):** **clustered/lined-up adds** (chain-lightning fodder)
+  and **walls** (Energy-Spear bounce geometry).
+- **Pyrocaster (commit windows):** **burnable add waves** and readable lulls that
+  reward committing Ring/Dragonform, plus survivable pressure *during* the slow
+  Dragonform window.
+- **Necromancer (army economy):** **fodder to summon against** + sustained chip
+  pressure that the HP→army→regen loop is built to metabolize (so the skill is the HP
+  economy, not face-tanking).
+
+These map onto the existing `content-lab-<class>-<boss>` per-class encounters, which
+are the vehicle for tuning each boss toward its class's light. Validate with the
+experiment: the class's signature signal (weave/flow for melee, chain hits for Storm,
+commit uptime for Pyro, regen-adjusted army pressure for Necro) should spike on its
+light-boss relative to a neutral one.
+
 ## How we keep it honest
 
 `run_class_interestingness_experiment.sh` + `aggregate_class_interestingness.py`
