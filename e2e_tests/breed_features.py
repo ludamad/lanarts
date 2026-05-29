@@ -41,8 +41,10 @@ def fnum(d, k):
     except (TypeError, ValueError):
         return 0.0
 
-def run_candidate(loadout):
-    cell = loadout.replace("/", "_").replace(" ", "")
+PROFILES = ["sloppy", "perfect"]
+
+def run_candidate(loadout, profile):
+    cell = (loadout.replace("/", "_").replace(" ", "")) + "__" + profile
     agg = os.path.abspath(f"{OUT}/{cell}_classes.csv")
     env = dict(os.environ)
     env.update(SDL_AUDIODRIVER="dummy", LANARTS_MUTE_AUDIO="1", LANARTS_SMALL="1",
@@ -50,7 +52,7 @@ def run_candidate(loadout):
     subprocess.run(
         ["../" + EXE, "engine.StartBalanceRun", "--steps", str(STEPS), "--runs", str(RUNS),
          "--classes", CHASSIS, "--levels", "5", "--loadout_preset", "late",
-         "--bot_profile", "perfect", "--encounter", BOSS, "--package_intensity", "high",
+         "--bot_profile", profile, "--encounter", BOSS, "--package_intensity", "high",
          "--seed", SEED, "--aggregate_out=" + agg],
         cwd="runtime", env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
@@ -58,33 +60,43 @@ def run_candidate(loadout):
     except Exception:
         return None
 
-def score(row):
-    flow = fnum(row, "avg_package_flow_active_rate")          # engagement (0..1)
-    win = fnum(row, "win_rate")
-    micro = fnum(row, "avg_package_micro_score")
-    weave = fnum(row, "avg_package_weave_dodges")
-    viability = max(0.0, 1.0 - abs(win - 0.55) / 0.55)        # tent peaking at 55% win
-    clean = max(0.0, min(1.0, (micro + 50) / 100))
-    engage = min(1.0, flow * 4)                               # flow is small; scale
-    s = engage * 1.5 + viability * 1.0 + clean * 0.5
-    return s, dict(flow=flow, win=win, micro=micro, weave=weave, viability=viability)
+def metrics(row):
+    return dict(flow=fnum(row, "avg_package_flow_active_rate"), win=fnum(row, "win_rate"),
+                micro=fnum(row, "avg_package_micro_score"), weave=fnum(row, "avg_package_weave_dodges"))
+
+def score(by_profile):
+    lo, hi = by_profile.get("sloppy"), by_profile.get("perfect")
+    if not lo or not hi:
+        return None, {}
+    # Skill depth: how much perfect outplays sloppy (the core value).
+    depth = min(1.0, max(0.0, (hi["flow"] - lo["flow"]) * 4))         + min(1.0, max(0.0, (hi["micro"] - lo["micro"]) / 60))
+    engage = min(1.0, hi["flow"] * 4)                          # perfect-play engagement
+    viability = max(0.0, 1.0 - abs(hi["win"] - 0.55) / 0.55)   # healthy win band (not 0/100)
+    clean = max(0.0, min(1.0, (hi["micro"] + 50) / 100))
+    s = depth * 1.5 + engage * 1.0 + viability * 0.8 + clean * 0.4
+    return s, dict(depth=depth, flow=hi["flow"], win=hi["win"], micro=hi["micro"],
+                   win_lo=lo["win"], flow_lo=lo["flow"])
 
 def main():
     os.makedirs(OUT, exist_ok=True)
     print(f"Breeding {len(CANDIDATES)} loadouts on {CHASSIS}/{BOSS} (runs={RUNS} steps={STEPS})...")
     results = []
     for ld in CANDIDATES:
-        row = run_candidate(ld)
-        if not row:
+        by_profile = {}
+        for prof in PROFILES:
+            row = run_candidate(ld, prof)
+            if row:
+                by_profile[prof] = metrics(row)
+        s, m = score(by_profile)
+        if s is None:
             print(f"  {ld:<52} FAILED")
             continue
-        s, m = score(row)
         results.append((s, ld, m))
-        print(f"  ran {ld:<52} win={m['win']*100:>3.0f}% flow={m['flow']*100:>4.1f}% weave={m['weave']:>4.1f} micro={m['micro']:>6.1f} score={s:.2f}")
+        print(f"  ran {ld:<52} win={m['win']*100:>3.0f}%(sloppy {m['win_lo']*100:>3.0f}%) flow={m['flow']*100:>4.1f}% micro={m['micro']:>6.1f} depth={m['depth']:.2f} score={s:.2f}")
     results.sort(reverse=True)
-    print("\n=== BRED CHARACTERS, ranked by interestingness (engagement + viability + clean) ===")
+    print("\n=== BRED CHARACTERS, ranked by SKILL-DEPTH + engagement + viability + clean ===")
     for s, ld, m in results:
-        print(f"  {s:.2f}  {ld:<52} win={m['win']*100:>3.0f}% flow={m['flow']*100:>4.1f}% micro={m['micro']:>6.1f}")
+        print(f"  {s:.2f}  depth={m['depth']:.2f}  {ld:<48} win={m['win']*100:>3.0f}% flow={m['flow']*100:>4.1f}% micro={m['micro']:>6.1f}")
     return 0
 
 if __name__ == "__main__":
