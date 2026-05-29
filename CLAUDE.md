@@ -83,8 +83,8 @@ add it here in the same change.
 - Collision/spatial grid: `src/gamestate/GameInstSet.cpp`. `InstanceState`
   nodes live in a `std::vector<InstanceState> unit_set` and grid/depth linked
   lists point INTO it, so a vector reallocation invalidates those pointers and
-  they are fixed up in `reallocate_internal_data()`. Suspected
-  dangling-pointer bug here under heavy object churn (see KNOWN ISSUES).
+  they are fixed up in `reallocate_internal_data()`. A tombstone-deref crash
+  here was fixed (see Fixed-bug postmortems below).
 
 ## AddressSanitizer / UBSan
 
