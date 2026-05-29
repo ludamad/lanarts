@@ -4236,6 +4236,37 @@ end
 -- passing point-blank THROUGH a living enemy is a "WEAVE" -- it builds Flow (once per enemy
 -- per dash). This makes the dash a movement-combo engine so skilled melee dances in the
 -- danger and builds Flow, instead of face-tanking. Works to the game's movement strength.
+-- Bold movement-flow identities for the UNPROVEN classes (Rogue/Dicebinder/Templar):
+-- the dash-weave deals flow-scaled damage. Rogue is the flow-ASSASSIN -- its damage comes
+-- from movement, so the more the blur dances (higher flow), the more lethal each weave.
+-- Proven classes (Fighter weapon brawler) get only a small weave nick. Keep what works.
+local WEAVE_CLASS_DAMAGE = {
+    Rogue = 2.6,       -- signature: movement IS its damage
+    Dicebinder = 1.6,  -- mobile hybrid
+    Templar = 1.0,     -- builds toward its Power Strike nova (see below)
+    Fighter = 0.7,     -- has weapon damage; weave is a bonus
+}
+local function weave_strike(director, player, monster, tier)
+    local mult = WEAVE_CLASS_DAMAGE[player.class_name]
+    if not mult or not monster or monster.destroyed or not monster.damage then
+        return
+    end
+    local intensity = director.intensity or normalize_intensity(nil)
+    local dmg = 4 * mult * (1 + 0.5 * tier) * (intensity.damage or 1)
+    monster:damage(dmg, 25, 0, player)
+    director.weave_damage_total = (director.weave_damage_total or 0) + dmg
+    local rogue = player.class_name == "Rogue"
+    ImpactFX.world_burst {
+        map = director.map,
+        xy = xy_of(monster),
+        color = rogue and COL_WHITE or COL_PALE_GREEN,
+        label = rogue and "FLUX" or "",
+        radius = 22 + tier * 6,
+        duration = 20,
+        drift = 0.24,
+    }
+end
+
 local function update_dash_weave(director)
     director.dash_weave = director.dash_weave or {}
     local state = director.dash_weave
@@ -4258,6 +4289,7 @@ local function update_dash_weave(director)
                         ps.ids[m.id] = true
                         director.weave_dodges = (director.weave_dodges or 0) + 1
                         flow_build(director, 1)
+                        weave_strike(director, p, m, flow_tier(director.flow))
                         if M.create_feedback_label then
                             M.create_feedback_label {
                                 map = director.map,
@@ -4377,6 +4409,7 @@ function M.add_director(game_map, package, intensity)
         flow_break_timer = 0,
         graze_dodges = 0,
         weave_dodges = 0,
+        weave_damage_total = 0,
         aggro_frames = 0,
         aggro_player_frames = 0,
         aggro_ally_frames = 0,

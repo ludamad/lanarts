@@ -38,6 +38,7 @@ grep -q "draw_boss_beat_tells" runtime/objects/ContentLabHazards.lua
 grep -q "flow_build" runtime/objects/ContentLabHazards.lua
 grep -q "GRAZE" runtime/objects/ContentLabHazards.lua
 grep -q "update_dash_weave" runtime/objects/ContentLabHazards.lua
+grep -q "weave_strike" runtime/objects/ContentLabHazards.lua
 grep -q "package_weave_dodges" runtime/engine/StartBalanceRun.lua
 grep -q "package_graze_rate" runtime/engine/StartBalanceRun.lua
 grep -q "package_flow_active_rate" runtime/engine/StartBalanceRun.lua
