@@ -4240,54 +4240,141 @@ end
 -- the dash-weave deals flow-scaled damage. Rogue is the flow-ASSASSIN -- its damage comes
 -- from movement, so the more the blur dances (higher flow), the more lethal each weave.
 -- Proven classes (Fighter weapon brawler) get only a small weave nick. Keep what works.
-local WEAVE_CLASS_DAMAGE = {
-    Rogue = 2.6,       -- signature: movement IS its damage
-    Dicebinder = 1.6,  -- mobile hybrid
-    Templar = 1.0,     -- builds toward its Power Strike nova (see below)
-    Fighter = 0.7,     -- has weapon damage; weave is a bonus
-}
+-- ============================================================================
+-- Composable movement-flow FEATURE system.
+-- A "feature" is a small behavior hooked to the flow/movement events; a CHARACTER
+-- is a SET of features. Interesting characters emerge from the COMBINATION -- e.g.
+-- flux_weave + radiant_nova breeds a bulwark-assassin -- so new builds are bred by
+-- composing features, not hand-authored per class. Hooks:
+--   weave(feat, director, player, monster, tier)  -- per enemy dash-woven
+--   flow_step(feat, director, player, tier)        -- each frame at current flow tier
+-- ============================================================================
+
+local function feature_intensity(director)
+    return (director.intensity or normalize_intensity(nil)).damage or 1
+end
+
+-- Damage all living monsters within radius (reused by several features).
+local function damage_monsters_in_radius(director, center, radius, dmg, attacker, color, label)
+    local hit = 0
+    for _, m in ipairs(living_monsters(true)) do
+        if m and not m.destroyed and m.damage then
+            local dx, dy = center[1] - m.x, center[2] - m.y
+            local reach = radius + (m.target_radius or m.radius or 14)
+            if dx * dx + dy * dy <= reach * reach then
+                m:damage(dmg, 25, 0.5, attacker)
+                hit = hit + 1
+            end
+        end
+    end
+    if hit > 0 then
+        ImpactFX.world_burst {
+            map = director.map, xy = center, color = color or COL_WHITE,
+            label = label or "", radius = radius, duration = 24, drift = 0.2,
+        }
+    end
+    return hit
+end
+
 -- Deterministic per-weave roll in [0,1) (no RNG -> replays stay stable).
 local function weave_roll(director, monster)
     local seed = (director.elapsed or 0) * 1103515245 + (monster.id or 0) * 12345 + 7
     return (seed % 997) / 997
 end
 
-local function weave_strike(director, player, monster, tier)
-    local mult = WEAVE_CLASS_DAMAGE[player.class_name]
-    if not mult or not monster or monster.destroyed or not monster.damage then
+local FLOW_FEATURES = {
+    -- Damage from movement: a dash-weave deals flow-scaled damage to the woven enemy.
+    flux_weave = {
+        weave = function(feat, director, player, monster, tier)
+            local dmg = 4 * (feat.mult or 1) * (1 + 0.5 * tier) * feature_intensity(director)
+            monster:damage(dmg, 25, 0, player)
+            director.weave_damage_total = (director.weave_damage_total or 0) + dmg
+            ImpactFX.world_burst {
+                map = director.map, xy = xy_of(monster),
+                color = feat.color or COL_PALE_GREEN, label = feat.label or "",
+                radius = 22 + tier * 6, duration = 20, drift = 0.24,
+            }
+        end,
+    },
+    -- Gambler: weave damage is a deterministic roll (flow loads the dice); JACKPOT detonates AoE.
+    gambler_weave = {
+        weave = function(feat, director, player, monster, tier)
+            local base = 4 * (feat.mult or 1.6) * (1 + 0.5 * tier) * feature_intensity(director)
+            local roll = weave_roll(director, monster)
+            local floor_mult = 0.5 + 0.12 * tier
+            local ceil_mult = 2.0 + 0.6 * tier
+            local rolled = floor_mult + roll * (ceil_mult - floor_mult)
+            local dmg = base * rolled
+            local label, color = "ROLL", COL_PALE_GREEN
+            if rolled >= ceil_mult * 0.85 then
+                label, color = "JACKPOT", COL_PALE_YELLOW
+                director.weave_jackpots = (director.weave_jackpots or 0) + 1
+                damage_monsters_in_radius(director, xy_of(monster), 44 + tier * 8, dmg * 0.7, player, COL_PALE_YELLOW, "JACKPOT!")
+            end
+            monster:damage(dmg, 25, 0, player)
+            director.weave_damage_total = (director.weave_damage_total or 0) + dmg
+            ImpactFX.world_burst {
+                map = director.map, xy = xy_of(monster), color = color, label = label,
+                radius = 22 + tier * 6, duration = 20, drift = 0.24,
+            }
+        end,
+    },
+    -- Radiant bulwark: while sustaining flow (tier >= min_tier), periodically radiate an AoE nova.
+    radiant_nova = {
+        flow_step = function(feat, director, player, tier)
+            local st = director.feature_state
+            if tier >= (feat.min_tier or 2) then
+                st.radiant_nova = (st.radiant_nova or 0) - 1
+                if st.radiant_nova <= 0 then
+                    st.radiant_nova = feat.period or 50
+                    local dmg = (feat.dmg or 5) * (1 + 0.5 * tier) * feature_intensity(director)
+                    local n = damage_monsters_in_radius(director, {player.x, player.y}, (feat.radius or 68) + tier * 12, dmg, player, COL_PALE_YELLOW, "RADIANT")
+                    if n > 0 then director.flow_novas = (director.flow_novas or 0) + 1 end
+                end
+            else
+                st.radiant_nova = 0
+            end
+        end,
+    },
+}
+
+-- Feature loadouts: a character is a SET of features -- compose freely to breed new builds.
+local CHARACTER_FEATURES = {
+    Rogue      = { {feature = "flux_weave", mult = 2.6, label = "FLUX", color = COL_WHITE} },
+    Fighter    = { {feature = "flux_weave", mult = 0.7} },
+    Templar    = { {feature = "flux_weave", mult = 1.0}, {feature = "radiant_nova", min_tier = 2} },
+    Dicebinder = { {feature = "gambler_weave", mult = 1.6} },
+}
+
+local function character_features(class_name)
+    return CHARACTER_FEATURES[class_name] or {}
+end
+
+local function run_weave_features(director, player, monster, tier)
+    if not monster or monster.destroyed or not monster.damage then
         return
     end
-    local intensity = director.intensity or normalize_intensity(nil)
-    local dmg = 4 * mult * (1 + 0.5 * tier) * (intensity.damage or 1)
-    local rogue = player.class_name == "Rogue"
-    local label = rogue and "FLUX" or ""
-    local color = rogue and COL_WHITE or COL_PALE_GREEN
-    -- Dicebinder gamble: the weave damage is rolled (high variance), and flow LOADS the dice --
-    -- higher flow raises the floor and the jackpot ceiling. Big roll = JACKPOT crit.
-    if player.class_name == "Dicebinder" then
-        local roll = weave_roll(director, monster)
-        local floor_mult = 0.5 + 0.12 * tier          -- flow raises the bad-roll floor
-        local ceil_mult = 2.0 + 0.6 * tier             -- ...and the jackpot ceiling
-        local rolled = floor_mult + roll * (ceil_mult - floor_mult)
-        dmg = dmg * rolled
-        if rolled >= ceil_mult * 0.85 then
-            label, color = "JACKPOT", COL_PALE_YELLOW
-            director.weave_jackpots = (director.weave_jackpots or 0) + 1
-        else
-            label = "ROLL"
+    for _, feat in ipairs(character_features(player.class_name)) do
+        local def = FLOW_FEATURES[feat.feature]
+        if def and def.weave then
+            def.weave(feat, director, player, monster, tier)
         end
     end
-    monster:damage(dmg, 25, 0, player)
-    director.weave_damage_total = (director.weave_damage_total or 0) + dmg
-    ImpactFX.world_burst {
-        map = director.map,
-        xy = xy_of(monster),
-        color = color,
-        label = label,
-        radius = 22 + tier * 6,
-        duration = 20,
-        drift = 0.24,
-    }
+end
+
+local function update_flow_class_effects(director)
+    local p = living_players()[1]
+    if not p or p.destroyed then
+        return
+    end
+    director.feature_state = director.feature_state or {}
+    local tier = flow_tier(director.flow)
+    for _, feat in ipairs(character_features(p.class_name)) do
+        local def = FLOW_FEATURES[feat.feature]
+        if def and def.flow_step then
+            def.flow_step(feat, director, p, tier)
+        end
+    end
 end
 
 local function update_dash_weave(director)
@@ -4312,7 +4399,7 @@ local function update_dash_weave(director)
                         ps.ids[m.id] = true
                         director.weave_dodges = (director.weave_dodges or 0) + 1
                         flow_build(director, 1)
-                        weave_strike(director, p, m, flow_tier(director.flow))
+                        run_weave_features(director, p, m, flow_tier(director.flow))
                         if M.create_feedback_label then
                             M.create_feedback_label {
                                 map = director.map,
@@ -4434,6 +4521,8 @@ function M.add_director(game_map, package, intensity)
         weave_dodges = 0,
         weave_damage_total = 0,
         weave_jackpots = 0,
+        feature_state = {},
+        flow_novas = 0,
         aggro_frames = 0,
         aggro_player_frames = 0,
         aggro_ally_frames = 0,
@@ -4462,6 +4551,7 @@ function M.add_director(game_map, package, intensity)
                 self.flow_break_timer = self.flow_break_timer - 1
             end
             update_dash_weave(self)
+            update_flow_class_effects(self)
             if (self.micro_punish_last_timer or 0) > 0 then
                 self.micro_punish_last_timer = self.micro_punish_last_timer - 1
             end
