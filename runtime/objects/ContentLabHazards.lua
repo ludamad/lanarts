@@ -393,6 +393,44 @@ local function apply_rescue_counter(director, strike, blocker)
     return applied
 end
 
+-- Flow (movement combo): precise quick movement -- clean dodges and threaded near-misses --
+-- builds flow; getting hit or standing still bleeds it. Higher flow escalates the payoff of
+-- threaded openings and the player's visual aura, so the soul of the game (skill via fast,
+-- reactive movement) becomes a combo you keep alive and escalate.
+local FLOW_MAX = 12
+local FLOW_DECAY_FRAMES = 80   -- frames of no clean movement before flow bleeds one
+local FLOW_TIER_THRESHOLDS = {3, 6, 10}  -- flow >= t -> tier index
+
+local function flow_tier(flow)
+    flow = flow or 0
+    local tier = 0
+    for _, t in ipairs(FLOW_TIER_THRESHOLDS) do
+        if flow >= t then
+            tier = tier + 1
+        end
+    end
+    return tier
+end
+
+local function flow_build(director, amount)
+    if not director then return end
+    director.flow = math.min(FLOW_MAX, (director.flow or 0) + (amount or 1))
+    director.flow_decay_timer = FLOW_DECAY_FRAMES
+    director.flow_peak = math.max(director.flow_peak or 0, director.flow)
+    director.flow_best_tier = math.max(director.flow_best_tier or 0, flow_tier(director.flow))
+end
+
+local function flow_break(director)
+    if not director then return end
+    local before = director.flow or 0
+    if before <= 0 then return end
+    -- A hit costs most of the combo but not all of it (modern style-meter rank drop): the chain
+    -- can continue, but flawless movement is rewarded by never paying this.
+    director.flow = math.floor(before * 0.4)
+    director.flow_breaks = (director.flow_breaks or 0) + 1
+    director.flow_break_timer = 24
+end
+
 local function apply_micro_counter(hazard)
     local director = hazard and hazard.director
     local package = director and director.package
@@ -409,10 +447,12 @@ local function apply_micro_counter(hazard)
     if damage == nil then
         damage = dodge_points * 0.25
     end
-    damage = math.max(0, damage) * (intensity.damage or 1)
+    local tier = flow_tier(director.flow)
+    -- Flow empowerment: a sustained movement combo makes each threaded opening hit harder.
+    damage = math.max(0, damage) * (intensity.damage or 1) * (1 + 0.35 * tier)
     local stagger = tonumber(hazard.micro_counter_stun)
     if stagger == nil then
-        stagger = math.min(10, 3 + math.max(0, director.micro_streak or 0))
+        stagger = math.min(12, 3 + math.max(0, director.micro_streak or 0) + tier)
     end
     stagger = math.max(0, math.floor(stagger * (intensity.tempo or 1)))
     if damage <= 0 and stagger <= 0 then
@@ -471,6 +511,11 @@ local function add_micro_event(director, args)
         director.micro_hits = (director.micro_hits or 0) + 1
     elseif args.kind == "dodge" then
         director.micro_dodges = (director.micro_dodges or 0) + 1
+    end
+    if args.kind == "dodge" and points > 0 then
+        flow_build(director, 1)
+    elseif args.kind == "hit" then
+        flow_break(director)
     end
     if args.break_streak then
         director.micro_streak = 0
@@ -1962,6 +2007,10 @@ local function package_result(director, outcome)
         micro_events = director.micro_events or 0,
         micro_thread_cues = director.micro_thread_cues or 0,
         micro_streak_bursts = director.micro_streak_bursts or 0,
+        flow_peak = director.flow_peak or 0,
+        flow_best_tier = director.flow_best_tier or 0,
+        flow_breaks = director.flow_breaks or 0,
+        flow_active_rate = safe_rate(director.flow_active_frames or 0, math.max(1, director.elapsed or 0)),
         micro_counter_windows = director.micro_counter_windows or 0,
         micro_counter_damage_total = director.micro_counter_damage_total or 0,
         micro_counter_stagger_frames = director.micro_counter_stagger_frames or 0,
@@ -2160,6 +2209,10 @@ local function package_state_from_director(director)
         micro_events = director.micro_events or 0,
         micro_thread_cues = director.micro_thread_cues or 0,
         micro_streak_bursts = director.micro_streak_bursts or 0,
+        flow_peak = director.flow_peak or 0,
+        flow_best_tier = director.flow_best_tier or 0,
+        flow_breaks = director.flow_breaks or 0,
+        flow_active_rate = safe_rate(director.flow_active_frames or 0, math.max(1, director.elapsed or 0)),
         micro_counter_windows = director.micro_counter_windows or 0,
         micro_counter_damage_total = director.micro_counter_damage_total or 0,
         micro_counter_stagger_frames = director.micro_counter_stagger_frames or 0,
@@ -4105,6 +4158,48 @@ local function draw_boss_beat_tells(director, package, intensity)
     end
 end
 
+-- Visual feedback for the movement combo: an escalating aura/rune on the player and a world-space
+-- FLOW meter, so you can feel the chain building and see it break.
+local function draw_flow(director)
+    local p = living_players()[1]
+    if not p or p.destroyed then
+        return
+    end
+    local flow = director.flow or 0
+    local tier = flow_tier(flow)
+    local broke = (director.flow_break_timer or 0) > 0
+    if flow <= 0 and not broke then
+        return
+    end
+    local frame = director.elapsed or 0
+    local color = broke and COL_PALE_RED
+        or tier >= 3 and COL_WHITE
+        or tier >= 2 and COL_PALE_GREEN
+        or tier >= 1 and COL_PALE_BLUE
+        or COL_LIGHT_GRAY
+    local pr = p.radius or 14
+    local center = {p.x, p.y}
+    if tier >= 1 then
+        local pulse = 1 + 0.10 * math.sin(frame * (0.18 + tier * 0.04))
+        draw_world_circle(color, center, (pr + 8 + tier * 6) * pulse, 0.015 + tier * 0.01, 0.28 + tier * 0.16)
+        if tier >= 2 then
+            ProceduralEffects.draw_world_rune {
+                xy = center,
+                radius = (pr + 14 + tier * 6) * pulse,
+                palette = tier >= 3 and "blue" or "blue",
+                intensity = 0.4 + tier * 0.15,
+                arcs = 1 + tier,
+                spokes = 4 + tier * 2,
+                rotation_speed = 0.05 + tier * 0.02,
+                spoke_speed = -0.03,
+            }
+        end
+    end
+    local label_xy = Display.to_screen_xy({center[1], center[2] - pr - 24})
+    local txt = broke and "FLOW BREAK" or ("FLOW x" .. flow .. (tier > 0 and (" T" .. tier) or ""))
+    draw_text(color, Display.CENTER, label_xy, txt)
+end
+
 function M.add_director(game_map, package, intensity)
     package = package or {}
     if not (package.orbit or package.pulse or package.sweep or package.summon or package.escort or package.rescue) then
@@ -4191,6 +4286,13 @@ function M.add_director(game_map, package, intensity)
         micro_punish_break_total = 0,
         micro_punish_break_events = 0,
         micro_last_timer = 0,
+        flow = 0,
+        flow_decay_timer = 0,
+        flow_peak = 0,
+        flow_best_tier = 0,
+        flow_breaks = 0,
+        flow_active_frames = 0,
+        flow_break_timer = 0,
         aggro_frames = 0,
         aggro_player_frames = 0,
         aggro_ally_frames = 0,
@@ -4203,6 +4305,20 @@ function M.add_director(game_map, package, intensity)
             self.elapsed = self.elapsed + 1
             if (self.micro_last_timer or 0) > 0 then
                 self.micro_last_timer = self.micro_last_timer - 1
+            end
+            -- Flow bleed: if no clean movement lands within FLOW_DECAY_FRAMES, the combo cools.
+            if (self.flow or 0) > 0 then
+                self.flow_decay_timer = (self.flow_decay_timer or 0) - 1
+                if self.flow_decay_timer <= 0 then
+                    self.flow = math.max(0, self.flow - 1)
+                    self.flow_decay_timer = FLOW_DECAY_FRAMES
+                end
+                if flow_tier(self.flow) >= 1 then
+                    self.flow_active_frames = (self.flow_active_frames or 0) + 1
+                end
+            end
+            if (self.flow_break_timer or 0) > 0 then
+                self.flow_break_timer = self.flow_break_timer - 1
             end
             if (self.micro_punish_last_timer or 0) > 0 then
                 self.micro_punish_last_timer = self.micro_punish_last_timer - 1
@@ -4352,6 +4468,7 @@ function M.add_director(game_map, package, intensity)
                 }
             end
             draw_boss_beat_tells(self, self.package, self.intensity)
+            draw_flow(self)
             draw_package_hud(self)
         end,
     }
