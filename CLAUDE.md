@@ -74,6 +74,21 @@ add it here in the same change.
   lulls; Necromancer = fodder to summon against + chip pressure for the HP->army->regen
   loop. Validate with the experiment (the class's signature signal should spike on its
   light-boss). Full guidance in doc/planning/combat_philosophy.md.
+- **Bold with UNPROVEN classes (Rogue, Dicebinder, Templar), careful with proven
+  ones (Fighter, mages, Necro); keep only what works.** Movement-flow mechanics are
+  prototyped in the content-lab director (`ContentLabHazards.lua`), keyed by
+  `player.class_name`, where Flow lives. Implemented so far:
+  - **Dash-weave** (all melee): dashing through an enemy builds Flow + a class-keyed
+    `weave_strike` (flow-scaled damage). `WEAVE_CLASS_DAMAGE` mult: Rogue 2.6,
+    Dicebinder 1.6, Templar 1.0, Fighter 0.7.
+  - **Rogue = flow-assassin (WORKS):** damage from movement; gragh-warband 0%->75%,
+    gragh-duel 0%->50%/+19 micro. The headline bold win.
+  - **Dicebinder = gambler (FLAVOR only):** weave damage is a deterministic roll, flow
+    loads the dice (JACKPOTs). Thematic + works mechanically but doesn't carry the
+    class (warband 25%); real lift needs its untouched dice system.
+  - **Templar** lifts to ~50% on the warband via the weave-strike; still needs a
+    distinct bulwark identity.
+  - Proven classes left alone (Fighter just weapon-clears, flow 0% -- intended).
 - **Grounded class identities** (from the kits, not telemetry):
   - Fighter = brawler (Berserk commit, Dash, Power Strike).
   - Templar = bulwark (Power Strike + Dash only; durable; anchor a lane).
