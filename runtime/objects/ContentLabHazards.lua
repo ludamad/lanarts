@@ -513,7 +513,7 @@ local function add_micro_event(director, args)
         director.micro_dodges = (director.micro_dodges or 0) + 1
     end
     if args.kind == "dodge" and points > 0 then
-        flow_build(director, 1)
+        flow_build(director, args.flow_amount or 1)
     elseif args.kind == "hit" then
         flow_break(director)
     end
@@ -610,22 +610,46 @@ local function record_hazard_dodge(hazard)
         return
     end
     hazard.micro_dodge_recorded = true
-    add_micro_event(hazard.director, {
+    -- Graze reward: the closer you danced to the hit edge, the more the movement combo pays.
+    -- close in [0,1]; >= 0.55 (hugging the edge) is a GRAZE: extra flow, extra micro, white pop.
+    local close = 1 - (hazard.micro_graze or 1)
+    local is_graze = close >= 0.55
+    local director = hazard.director
+    if is_graze then
+        director.graze_dodges = (director.graze_dodges or 0) + 1
+    end
+    add_micro_event(director, {
         kind = "dodge",
-        points = hazard.micro_dodge_points or 6,
-        label = hazard.micro_dodge_label or ((hazard.micro_label or "LANE") .. " DODGE"),
-        color = hazard.micro_color or COL_PALE_BLUE,
+        points = (hazard.micro_dodge_points or 6) + (is_graze and 3 or 0),
+        flow_amount = is_graze and 2 or 1,
+        label = is_graze and "GRAZE" or (hazard.micro_dodge_label or ((hazard.micro_label or "LANE") .. " DODGE")),
+        color = is_graze and COL_WHITE or (hazard.micro_color or COL_PALE_BLUE),
         xy = hazard.micro_dodge_xy or hazard.xy,
         duration = 48,
     })
+    if is_graze then
+        ImpactFX.world_burst {
+            map = director.map,
+            xy = hazard.micro_dodge_xy or hazard.xy,
+            color = COL_WHITE,
+            label = "GRAZE!",
+            radius = 30 + close * 24,
+            duration = 26,
+            drift = 0.30,
+        }
+    end
     apply_micro_counter(hazard)
 end
 
-local function mark_hazard_dodge_eligible(hazard, xy, label)
+local function mark_hazard_dodge_eligible(hazard, xy, label, graze)
     if not hazard or hazard.micro_hit_recorded or hazard.micro_dodge_recorded or not hazard.director then
         return
     end
     hazard.micro_dodge_eligible = true
+    -- Track the closest approach across the whole threat window (0 = hugging the hit edge).
+    if graze ~= nil then
+        hazard.micro_graze = math.min(hazard.micro_graze or 1, math.max(0, math.min(1, graze)))
+    end
     hazard.micro_dodge_xy = xy and copy_xy(xy) or hazard.xy
     if label then
         hazard.micro_dodge_label = label
@@ -656,7 +680,8 @@ local function mark_circle_threat(hazard, xy, radius, margin, include_hit_zone)
         local threat_radius = hit_radius + near_margin
         local d = dist_sqr(xy, xy_of(player))
         if d <= sqr(threat_radius) and (include_hit_zone or d > sqr(hit_radius)) then
-            mark_hazard_dodge_eligible(hazard, xy_of(player), hazard.micro_thread_label)
+            local graze = (math.sqrt(d) - hit_radius) / math.max(1, near_margin)
+            mark_hazard_dodge_eligible(hazard, xy_of(player), hazard.micro_thread_label, graze)
             return
         end
     end
@@ -673,7 +698,8 @@ local function mark_segment_threat(hazard, from_xy, to_xy, radius, margin, inclu
         local threat_radius = hit_radius + near_margin
         local nearest_xy, _, d = nearest_segment_point(xy_of(player), from_xy, to_xy)
         if d <= sqr(threat_radius) and (include_hit_zone or d > sqr(hit_radius)) then
-            mark_hazard_dodge_eligible(hazard, nearest_xy, hazard.micro_thread_label)
+            local graze = (math.sqrt(d) - hit_radius) / math.max(1, near_margin)
+            mark_hazard_dodge_eligible(hazard, nearest_xy, hazard.micro_thread_label, graze)
             return
         end
     end
@@ -2011,6 +2037,8 @@ local function package_result(director, outcome)
         flow_best_tier = director.flow_best_tier or 0,
         flow_breaks = director.flow_breaks or 0,
         flow_active_rate = safe_rate(director.flow_active_frames or 0, math.max(1, director.elapsed or 0)),
+        graze_dodges = director.graze_dodges or 0,
+        graze_rate = safe_rate(director.graze_dodges or 0, math.max(1, director.micro_dodges or 0)),
         micro_counter_windows = director.micro_counter_windows or 0,
         micro_counter_damage_total = director.micro_counter_damage_total or 0,
         micro_counter_stagger_frames = director.micro_counter_stagger_frames or 0,
@@ -2213,6 +2241,8 @@ local function package_state_from_director(director)
         flow_best_tier = director.flow_best_tier or 0,
         flow_breaks = director.flow_breaks or 0,
         flow_active_rate = safe_rate(director.flow_active_frames or 0, math.max(1, director.elapsed or 0)),
+        graze_dodges = director.graze_dodges or 0,
+        graze_rate = safe_rate(director.graze_dodges or 0, math.max(1, director.micro_dodges or 0)),
         micro_counter_windows = director.micro_counter_windows or 0,
         micro_counter_damage_total = director.micro_counter_damage_total or 0,
         micro_counter_stagger_frames = director.micro_counter_stagger_frames or 0,
@@ -4293,6 +4323,7 @@ function M.add_director(game_map, package, intensity)
         flow_breaks = 0,
         flow_active_frames = 0,
         flow_break_timer = 0,
+        graze_dodges = 0,
         aggro_frames = 0,
         aggro_player_frames = 0,
         aggro_ally_frames = 0,

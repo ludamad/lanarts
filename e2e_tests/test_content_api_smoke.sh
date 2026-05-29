@@ -36,6 +36,8 @@ grep -q "brute-force/face-tank clear" runtime/engine/StartBalanceRun.lua
 grep -q "survivability is regen-masked" runtime/engine/StartBalanceRun.lua
 grep -q "draw_boss_beat_tells" runtime/objects/ContentLabHazards.lua
 grep -q "flow_build" runtime/objects/ContentLabHazards.lua
+grep -q "GRAZE" runtime/objects/ContentLabHazards.lua
+grep -q "package_graze_rate" runtime/engine/StartBalanceRun.lua
 grep -q "package_flow_active_rate" runtime/engine/StartBalanceRun.lua
 grep -q "gmap_projectile_data" src/lua_api/lua_core_Map.cpp
 grep -q "hostile_projectiles" runtime/ai/AutomatedPlayerInputSource.lua

@@ -24,6 +24,7 @@ METRICS = [
     ("avg_package_flow_best_tier", "flowT", "high"),
     ("avg_package_flow_active_rate", "flow%", "high"),
     ("avg_package_flow_breaks", "flowBrk", "low"),
+    ("avg_package_graze_rate", "graze%", "high"),
     ("avg_hazard_dodge_frames", "dodgeF", "ctx"),
     ("avg_ranged_keepaway_frames", "kiteF", "ctx"),
     ("avg_ranged_close_enemy_frames", "closeF", "ctx"),
@@ -34,7 +35,7 @@ METRICS = [
     ("damage_dealt_per_1000_combat_frames", "dmg/1k", "ctx"),
     ("combat_frame_rate", "combat%", "ctx"),
 ]
-PCT = {"win_rate", "death_rate", "avg_min_hp_pct", "combat_frame_rate", "avg_package_flow_active_rate"}
+PCT = {"win_rate", "death_rate", "avg_min_hp_pct", "combat_frame_rate", "avg_package_flow_active_rate", "avg_package_graze_rate"}
 
 def fnum(v):
     try:
