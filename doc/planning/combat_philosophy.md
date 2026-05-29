@@ -126,6 +126,35 @@ experiment: the class's signature signal (weave/flow for melee, chain hits for S
 commit uptime for Pyro, regen-adjusted army pressure for Necro) should spike on its
 light-boss relative to a neutral one.
 
+## The feature system: breeding characters from emergent features
+
+Classes are not hand-authored blobs of code — they are **sets of composable
+movement-flow features**. A feature is a small behavior hooked to the flow/movement
+events (`weave`, `flow_step`, …); a character is a feature loadout
+(`CHARACTER_FEATURES` in `ContentLabHazards.lua`). Interesting characters **emerge
+from the combination**, so we breed new builds by composing features rather than
+writing each class by hand.
+
+Features so far (the building blocks):
+- **flux_weave** — dash-weave deals flow-scaled damage (`mult` tunes it). Rogue's
+  assassin signature at 2.6; a small nick at 0.7 for weapon classes.
+- **gambler_weave** — weave damage is a deterministic roll; flow loads the dice; a
+  JACKPOT detonates AoE. Dicebinder's high-variance burst.
+- **radiant_nova** — while sustaining flow (tier ≥ min), periodically radiate an AoE
+  nova. Templar's bulwark hold.
+
+Composition already breeds an emergent character: **Templar = flux_weave +
+radiant_nova** = a bulwark-assassin (weave to build flow, radiate to hold the line),
+and it works (50% on the warband) without bespoke code. Adding a feature (a new hook
+behavior) instantly makes it available to *any* character.
+
+**Where this goes (the breeding ground):** make loadouts **data-driven / procedural**
+— let the content lab assign arbitrary feature sets (and parameters) to a character,
+then run the experiment to score the result. That turns the lab into a generator:
+draw feature combinations, measure skill-depth/flow/win, and keep the ones that breed
+interesting, skill-expressive characters. The feature registry + per-character
+loadouts are the foundation; procedural loadout draws are the next slice.
+
 ## How we keep it honest
 
 `run_class_interestingness_experiment.sh` + `aggregate_class_interestingness.py`
