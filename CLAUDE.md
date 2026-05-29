@@ -55,6 +55,34 @@ add it here in the same change.
   gameinst's type from Lua safely, expose a fallback-safe metatable constant in
   C++ (e.g. `is_projectile`) rather than reading a type-specific getter.
 
+## Design principles (combat / classes / bosses)
+
+- **Work to the game's strengths.** Lanarts is a top-down real-time roguelike whose
+  strength is *fast reactive movement and positioning* + the package/hazard/telegraph
+  system + the Flow movement-combo + the content-lab measurement loop. Design with
+  these, not against them. Movement IS the dodge — do NOT add Souls-style i-frame
+  dodges (they flatten the spatial game).
+- **Understand a class before evaluating/changing it.** Read the actual kit; the bot
+  only expresses the *movement* layer, so a low skill-depth score can mean shallow
+  design OR "the bot doesn't play this class's real loop." See
+  `doc/planning/combat_philosophy.md`.
+- **Design bosses in each class's light.** A boss should pressure a class in a way
+  that *showcases its strengths* (the per-class `content-lab-<class>-<boss>` package
+  encounters are the vehicle): clustered adds + walls for Stormcaller's bounces;
+  burnable adds / commit windows for Pyrocaster's Ring/Dragonform; fodder + HP
+  pressure for Necromancer's army economy; telegraphed dash-gaps for melee weaving.
+- **Grounded class identities** (from the kits, not telemetry):
+  - Fighter = brawler (Berserk commit, Dash, Power Strike).
+  - Templar = bulwark (Power Strike + Dash only; durable; anchor a lane).
+  - Rogue = blur with an EMPTY kit (only Dash Attack) -- needs a real identity.
+  - Dicebinder = gambler (Dash/Power Strike/Berserk + dice windows).
+  - Necromancer = HP-as-currency army commander (Summon Dark Aspect costs HP,
+    Skeleton Army swarm, Baleful Regeneration refills HP on ~800f cd, Pain free aura).
+  - Pyrocaster = commit pyromancer (Fire Bolt poke, Ring of Flames aura window,
+    Dragonform slow burst ult) -- NOT a kiter.
+  - Stormcaller = positional ranged controller (wall-bounce spear, chain lightning,
+    tornado zones) -- the deep "model" class; don't flatten it.
+
 ## Subsystem notes
 
 - Class-interestingness experiment: `e2e_tests/run_class_interestingness_experiment.sh`

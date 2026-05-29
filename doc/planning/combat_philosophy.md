@@ -2,130 +2,108 @@
 
 The soul of Lanarts is **fast, reactive movement**: enemies react to where you go,
 and you dodge by *being elsewhere*. So skill is precise quick movement, and the
-combo system (**Flow**) rewards sustaining it. This doc sets the design north star
-and the per-archetype philosophy for how abilities interact with Flow.
+combo system (**Flow**) rewards sustaining it. This doc is the design north star and
+the per-class philosophy, written *after* reading each kit (not from bot telemetry
+alone — see the measurement caveat).
 
-## The one rule everything serves: play at your edge
+## The one rule: play at your edge
 
-Every archetype has a **dangerous edge** where it is most effective and most
-exposed. Skilled play *lives at that edge*; unskilled play retreats from it
-(turtling, face-tanking, spamming from safety). Flow is the scoreboard for living
-at your edge:
+Every class has a **dangerous edge** where it is most effective and most exposed.
+Skilled play *lives at that edge*; weak play retreats from it (turtling,
+face-tanking, spamming from safety). Flow is the scoreboard:
 
-- **Build** flow with clean dodges and **grazes** (the closer to the hit edge, the
-  more — see Flow v2). You can only graze a lot if you stay at your edge.
-- **Bleed** flow if you stop moving; **break** ~60% if you get hit.
-- **Spend/convert** flow into power (empowered openings now; more below).
+- **Build** flow with clean dodges and **grazes** (closer to the hit edge = more).
+- **Bleed** flow if you stop moving; **break** ~60% on a hit.
+- **Spend/convert** flow into power.
 
-So the design test for any ability or tuning change is: *does it pull the player
-toward their edge and pay off the flow they earn there?* If it rewards retreating
-from the edge (a safe nuke, a face-tank stance, a spam button), it is wrong.
+Design test for any ability/tuning change: *does it pull the player toward their
+edge and pay off the flow earned there?* If it rewards retreating from the edge, it
+is wrong.
 
-Baseline data motivating this (per-class flow%, the share of frames riding the
-combo; bot-limited so read relatively): Pyrocaster 10%, Stormcaller 8%, Rogue 7%,
-Dicebinder 6%, Templar 4%, **Fighter 2%, Necromancer 2%**. The classes that win by
-*not* moving (Fighter face-tank 66%/-46 micro; Necro spam+regen 79%/-17) have the
-*lowest* skill expression. That inversion — winning while expressing the least
-skill — is the core problem. Skill depth (sloppy→perfect spread) is the metric we
-use to confirm a class rewards skill; flat = shallow = needs rework.
+## Per-class philosophy (grounded in the actual kits)
 
-## Close combat (Fighter, Templar, Rogue, Dicebinder) — "Dance in the danger"
+- **Fighter** — *the brawler.* Berserk (rage commit window), Dash Attack, Power
+  Strike (charged AoE knockback). Mace, durable. Edge = sustained point-blank
+  presence. Berserk = a Flow **spender** (trade defense for a burst at a moment you
+  judge safe); Dash = re-engage/weave. Today it face-tanks (perfect still −49 micro,
+  3% flow); it needs the dash to *build* flow so the brawler dances instead of plants.
 
-- **Edge:** point-blank. You must be in melee to deal damage, which is the most
-  dangerous place to be. The skill is staying there without dying — weaving
-  through and around enemies and their telegraphs.
-- **Movement fantasy:** the dash is a *dodge-and-strike*, not an escape — dash
-  *through* a sweep gap to both avoid it and hit. Melee should build flow fastest
-  (always near danger → grazes everywhere) and lose it hardest (one mistake at
-  point-blank = a hit = break). High risk, high flow.
-- **Ability ↔ Flow:**
-  - **Dash / gap-closers** are the melee flow engine: dashing through an enemy is
-    a guaranteed graze + flow; at high flow the dash refreshes faster, so weaving
-    chains ("continue and continue"). This is the fix for melee's 2% flow — give
-    them a movement tool that *builds* flow so dancing beats face-tanking.
-  - **Commit abilities (Berserk, Power Strike, Charge)** are flow *spenders* / risk
-    windows: they root or expose you for a burst, so you cash flow at a moment you
-    judge safe. Greedy commits that eat a hit break the chain — risk/reward.
-  - Sub-identities: **Rogue** = hit-and-run (dash in, graze, dash out; flow from
-    pure mobility). **Fighter** = sustained brawler (longer dances, bigger flow
-    bursts). **Templar** = bulwark (can hold a line, but flow still demands weaving,
-    never standing). **Dicebinder** = its dice windows should bias toward movement
-    payoffs (e.g., a roll that refreshes the dash).
+- **Templar** — *the bulwark.* Only Power Strike + Dash Attack, deliberately fewer
+  tools, most durable melee. Edge = holding a contested spot but repositioning on
+  telegraphs. Power Strike resets spacing (knockback). Its identity is *anchoring a
+  lane*, so its flow reward should come from holding ground near pressure while still
+  weaving — not from planting.
 
-## Ranged (Pyrocaster, Stormcaller) — "Stutter-step on the edge"
+- **Rogue** — *the blur, but its kit is empty.* It has **only Dash Attack** (Hide-in-
+  Sight is commented out), 100 HP, high HP-regen, dagger. Its weakness/boredom is
+  literally a one-ability kit. Fix is **give Rogue a real identity** built on
+  mobility: the dash should be a deep flow engine (dash-through = weave + strike), and
+  it likely needs a second tool (a reposition/finisher) so hit-and-run has a payoff.
 
-- **Edge:** the *minimum safe distance*. Far away is safe but low DPS; the skill is
-  kiting as close as you dare while still landing shots.
-- **Movement fantasy:** stutter-step — fire, micro-reposition, graze the return
-  fire, fire again. The graze is dodging the enemy's reach at the lip of your kite.
-- **Ability ↔ Flow:**
-  - **Skillshots** reward positioning; **Flow empowers them** — at high flow a bolt
-    pierces/chains or hits harder. This converts clean kiting into *more damage*,
-    fixing Pyrocaster (highest micro +32 but lowest impact, 26% win): a clean kiter
-    should be rewarded with burst, not just survival.
-  - Flow must reward *staying at the edge*, not turtling at max range — tie flow
-    gain to grazing (only possible near the enemy's reach), so backing off to
-    safety quietly bleeds your combo. The greed/safety dial is the skill.
-  - **Ring of Flames / Tornado / channels** are edge-holding spenders: powerful but
-    they tether you to a spot, so you commit flow to a position you must then
-    protect with footwork.
+- **Dicebinder** — *the gambler.* Dash + Power Strike + Berserk **plus the dice
+  system** (RNG windows that grant temporary buffs/cooldown trims). Edge = exploit a
+  hot roll while sustaining flow. Dice payoffs should bias toward *movement* (a roll
+  that refreshes the dash / opens a weave window) so the gamble feeds the soul.
 
-## Necromancer — "Conduct, don't tank" (the reframe)
+- **Necromancer** — *the army commander* (NOT a regen-tank). str 0 / mpregen 0; its
+  loop is **HP is the currency for an army**: Summon Dark Aspect spends HP for pets,
+  Skeleton Army bursts ~25 one-hit skeletons, Baleful Regeneration refills HP on an
+  ~800f cooldown (with an "Exhausted" lockout), and Pain (free range-50 aura) is the
+  filler attack. The real skill is the **HP economy + army positioning + surviving
+  regen's downtime**. Edge = the regen-funded risk margin: dive and spend HP boldly,
+  *but only within regen's window*. Regen should fund aggression, not hide mistakes —
+  judge it regen-adjusted so "tanked it" never reads as healthy.
 
-- **The problem:** today Necro is a regen face-tank + Pain-spam — the *least*
-  movement-skill class (2% flow, -17 micro, 25% death, yet 79% win). Regen
-  currently **masks** mistakes (anti-skill).
-- **The reframe:** make regen a **skill enabler, not a crutch.** Necro's edge is
-  the *regen-funded risk margin*: because it heals, it can dance *closer* and graze
-  *more aggressively* than anyone — regen is "graze insurance," not a reason to
-  stand still. So Necro should have the boldest movement, paid for by sustain.
-- **Ability ↔ Flow:**
-  - **Pain** (the spam button) should reward *position*, not repetition — it is a
-    range aura, so flow/payoff should scale with hitting from the optimal lane,
-    making good positioning beat mashing.
-  - **Minions/auras** create positional puzzles: thread your pets' lanes and your
-    own; flow rewards weaving the combined formation under pressure.
-  - **Regen ↔ Flow loop:** at high flow, regen converts toward offense (e.g., a
-    portion of overheal becomes burst), so taking *bold, near-miss* positioning is
-    rewarded, while passive turtling just sits at low flow. This turns the
-    survivability that currently hides mistakes into the thing that funds risk.
-  - We must keep judging Necro with **regen-adjusted** damage (already telemetered)
-    so "survived by tanking" never reads as healthy.
+- **Pyrocaster** — *the commit pyromancer* (NOT a pure kiter). Fire Bolt pokes at
+  range, **Ring of Flames** is a self-aura power window (stand in the ring, enemies
+  burn, kills spread fire), **Dragonform** is a *slow* but immense burst ultimate (4×
+  exploding bolts). Edge = choosing **when to commit** Ring/Dragonform (high power,
+  low mobility) vs. safe poke, then surviving the commit. Flow should reward weaving
+  *through* the committed window (you're slow in Dragonform but can still micro), so
+  the payoff for committing is real but earned by movement.
 
-## Measured skill depth (4-profile sweep: sloppy → human → skilled → perfect)
+- **Stormcaller** — *the storm dancer (the model).* Energy Spear (wall-bounce,
+  persistent), Chain Lightning (bounces between enemies — reward clusters/lineups),
+  Tornado (zones). Tankier mage. Already deep: positions enemies, uses walls, mixes
+  abilities, converts movement to wins. Leave its loop; it is the bar.
 
-Composite skill-depth (how much perfect beats sloppy across win/micro/flow/graze):
-Stormcaller +0.63, Dicebinder +0.47, Rogue +0.39, Fighter +0.37, Pyrocaster +0.33,
-**Necromancer +0.15, Templar +0.12**. Read on two axes:
+## How abilities interact with Flow (patterns)
 
-- **Depth** = does skill change the outcome? **Ceiling** = how good is perfect play?
-- **Stormcaller** — deep on every axis; the model. Leave its identity, use it as the bar.
-- **Pyrocaster** — *deepest micro* (sloppy −19 → perfect +46) but win is flat/negative
-  (30% → 25%): skilled movement isn't converted to results. Fix = **flow → burst**.
-- **Fighter** — decent depth but **low ceiling**: even perfect averages −49 micro and 3%
-  flow. Face-tank-locked. Fix = **dash → flow** to raise the ceiling so skilled melee can
-  actually weave to positive micro.
-- **Templar** — **shallow AND low ceiling** (flat, perfect still −34). Needs both: a weave
-  tool (depth) and a reason to hold-and-reposition rather than plant (ceiling).
-- **Necromancer** — **shallowest** (+0.15): win 25 → 70 then flat, micro flat. It spam+regen
-  wins at every skill level. The "conduct, don't tank" reframe is the highest-priority rework.
-- Dicebinder/Rogue — good depth, low power (Rogue wins ~10%); reward the movement they already
-  express with more impact rather than reworking identity.
+- **Movement abilities (Dash)** = flow *builders*: weaving through danger/enemies
+  builds flow; never pure escapes.
+- **Commit abilities (Berserk, Dragonform, Power Strike, channels)** = flow
+  *spenders* / risk windows: powerful but they root/slow/expose you, so you cash flow
+  at a judged-safe moment; a greedy commit that eats a hit breaks the chain.
+- **Positional abilities (Chain Lightning, Energy Spear bounce, Ring zones)** reward
+  arranging the battlefield; flow can sharpen them at high tier.
+- **Sustain (Necro regen)** = graze insurance that funds bold movement, not a tank
+  button.
 
-Rework priority from the data: **(1) Necromancer reframe (shallowest), (2) Fighter/Templar
-dash→flow ceiling-raise, (3) Pyrocaster flow→burst payoff.** Don't touch Stormcaller's loop.
+## Measured skill depth — and its caveat
 
-## How we measure it (so philosophy stays honest)
+A 4-profile sweep (sloppy→human→skilled→perfect) gives a composite skill-depth
+(perfect-vs-sloppy spread on win/micro/flow/graze): Stormcaller +0.63, Dicebinder
++0.47, Rogue +0.39, Fighter +0.37, Pyrocaster +0.33, **Necromancer +0.15, Templar
++0.12**.
 
-- **Flow%/graze%** — does the class sustain the movement combo? (Edge-living.)
-- **Skill depth** — sloppy→perfect spread on win/micro/flow/graze. Deep = skill
-  matters; flat = spam/face-tank wins. The redesign target is to *raise depth* for
-  Fighter/Necro (currently shallow) without flattening the ranged classes that
-  already express skill.
-- **Face-tank/turtle reliance** — win rate with negative micro / low flow flags a
-  class winning *away from its edge*; that is the bad outcome to design out.
+**Caveat (important):** the bot expresses *movement/dodge* skill, not a class's
+deeper game. So a low score can mean either "shallow design" OR "the bot doesn't play
+this class's real loop." Necromancer's flat score is partly the bot spamming
+Pain+regen instead of running the HP→army economy; Pyrocaster's low win despite high
+micro is partly the bot not committing Ring/Dragonform well. So: use the bot to
+measure **movement-skill** rigorously; reason about **economy/commit** skill from the
+kit and validate with draw smokes, not bot win rate alone.
 
-The experiment harness (`run_class_interestingness_experiment.sh` +
-`aggregate_skill_depth.py`) produces these per class, so every ability/tuning
-change is validated against "did skilled movement get more rewarded, and did
-playing-from-safety get less rewarded?"
+Genuinely actionable from the data (movement-skill, which the bot does measure):
+- **Fighter/Templar low ceiling** — even perfect can't weave (face-tank-locked). The
+  **dash→flow weave** is the clean fix: make the dash a movement-skill flow engine so
+  skilled melee dances. (Also directly helps Rogue, whose only ability is the dash.)
+- **Stormcaller** stays the bar; don't flatten it.
+
+## How we keep it honest
+
+`run_class_interestingness_experiment.sh` + `aggregate_class_interestingness.py`
+(per-class playstyle) and `aggregate_skill_depth.py` (sloppy→perfect spread) score
+every change against: *did skilled movement get more rewarded, and did
+playing-from-safety get less?* — while remembering the bot only measures the movement
+layer.
