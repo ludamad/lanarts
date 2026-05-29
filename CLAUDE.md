@@ -75,9 +75,13 @@ add it here in the same change.
   loop. Validate with the experiment (the class's signature signal should spike on its
   light-boss). Full guidance in doc/planning/combat_philosophy.md.
 - **Bold with UNPROVEN classes (Rogue, Dicebinder, Templar), careful with proven
-  ones (Fighter, mages, Necro); keep only what works.** Movement-flow mechanics are
-  prototyped in the content-lab director (`ContentLabHazards.lua`), keyed by
-  `player.class_name`, where Flow lives. Implemented so far:
+  ones (Fighter, mages, Necro); keep only what works.** Movement-flow mechanics live
+  in a COMPOSABLE FEATURE SYSTEM in the content-lab director (`ContentLabHazards.lua`):
+  `FLOW_FEATURES` (building blocks with `weave`/`flow_step` hooks) + `CHARACTER_FEATURES`
+  (per-character feature loadouts). A character is a SET of features, so characters
+  EMERGE from composition (Templar = flux_weave + radiant_nova). Add a feature once ->
+  available to any character. Next: data-driven/procedural loadouts to breed+test
+  arbitrary characters via the experiment. Features/loadouts so far:
   - **Dash-weave** (all melee): dashing through an enemy builds Flow + a class-keyed
     `weave_strike` (flow-scaled damage). `WEAVE_CLASS_DAMAGE` mult: Rogue 2.6,
     Dicebinder 1.6, Templar 1.0, Fighter 0.7.
