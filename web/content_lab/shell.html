@@ -215,6 +215,45 @@
       margin-bottom: 18px;
     }
 
+    .advanced {
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .advanced > summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 720;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    .advanced > summary::-webkit-details-marker { display: none; }
+    .advanced > summary::before { content: "\25B8  "; }
+    .advanced[open] > summary::before { content: "\25BE  "; }
+    .advanced[open] > summary {
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 12px;
+    }
+    .advanced > *:not(summary) {
+      margin-left: 12px;
+      margin-right: 12px;
+    }
+    .advanced > *:last-child { margin-bottom: 12px; }
+    .section-sub {
+      margin: 14px 0 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+
     .section-title {
       display: flex;
       justify-content: space-between;
@@ -909,7 +948,7 @@
   <main class="shell">
     <aside class="controls">
       <section class="section">
-        <div class="section-title">Character</div>
+        <div class="section-title">Play</div>
         <div class="field">
           <label for="className">Class</label>
           <select id="className">
@@ -919,6 +958,7 @@
             <option>Stormcaller</option>
             <option>Templar</option>
             <option>Rogue</option>
+            <option>Dicebinder</option>
           </select>
         </div>
         <div class="row">
@@ -939,61 +979,6 @@
             <label for="seed">Seed</label>
             <input id="seed" inputmode="numeric" value="17300">
           </div>
-        </div>
-        <div class="build-info" id="buildInfo"></div>
-      </section>
-
-      <section class="section">
-        <div class="section-title">Loadout</div>
-        <div class="field">
-          <div class="segmented" id="loadoutPreset">
-            <button type="button" data-value="none" class="active">None</button>
-            <button type="button" data-value="gragh">Gragh</button>
-            <button type="button" data-value="late">Late</button>
-          </div>
-        </div>
-        <div class="field">
-          <label for="customLoadout">Custom items</label>
-          <textarea id="customLoadout" spellcheck="false" placeholder="Health Potion*3, Ring of Vitality"></textarea>
-          <div class="loadout-chips" id="activeLoadout"></div>
-        </div>
-        <div class="field">
-          <label for="buildTemplates">Build templates</label>
-          <div class="pick-list" id="buildTemplates"></div>
-        </div>
-        <div class="field">
-          <label for="itemChoices">Items</label>
-          <div class="pick-list" id="itemChoices"></div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-title">Map Generation</div>
-        <div class="field">
-          <label for="mapDesc">Generator</label>
-          <select id="mapDesc">
-            <option value="">Campaign World</option>
-            <option value="map_descs.Overworld">Overworld variety</option>
-            <option value="map_descs.GraghsLair">Gragh's Lair</option>
-            <option value="map_descs.Hell">Hell</option>
-            <option value="map_descs.HiveDepths">Hive Depths</option>
-            <option value="map_descs.PixullochiaDepths">Pixullochia Depths</option>
-            <option value="map_descs.Crypt">Crypt</option>
-            <option value="map_descs.Underdungeon">Underdungeon</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="mapAlgorithm">Algorithm</label>
-          <select id="mapAlgorithm">
-            <option value="">Default</option>
-            <option value="overworld-random">Overworld mix</option>
-            <option value="overworld-open-meadow">Open meadow</option>
-            <option value="overworld-broken-grove">Broken grove</option>
-            <option value="overworld-old-stones">Old stones</option>
-            <option value="overworld-river-road">River road</option>
-            <option value="overworld-predator-thicket">Predator thicket</option>
-            <option value="overworld-ruin-crossroads">Ruin crossroads</option>
-          </select>
         </div>
         <div class="field">
           <label for="encounter">Encounter</label>
@@ -1021,19 +1006,81 @@
           </select>
         </div>
         <div class="encounter-info" id="encounterInfo" hidden></div>
+        <div class="row">
+          <div class="field">
+            <label for="intensity">Pressure</label>
+            <select id="intensity">
+              <option value="learning">Learning</option>
+              <option value="standard" selected>Standard</option>
+              <option value="high">High</option>
+              <option value="brutal">Brutal</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Loadout</label>
+            <div class="segmented" id="loadoutPreset">
+              <button type="button" data-value="none" class="active">None</button>
+              <button type="button" data-value="gragh">Gragh</button>
+              <button type="button" data-value="late">Late</button>
+            </div>
+          </div>
+        </div>
+        <div class="build-info" id="buildInfo"></div>
+        <div class="button-row">
+          <button class="primary" type="button" id="launch">Launch</button>
+          <button class="secondary" type="button" id="reseed">Seed</button>
+        </div>
+      </section>
+
+      <details class="advanced">
+        <summary>Loadout &amp; items</summary>
+        <div class="field">
+          <label for="customLoadout">Custom items</label>
+          <textarea id="customLoadout" spellcheck="false" placeholder="Health Potion*3, Ring of Vitality"></textarea>
+          <div class="loadout-chips" id="activeLoadout"></div>
+        </div>
+        <div class="field">
+          <label for="buildTemplates">Build templates</label>
+          <div class="pick-list" id="buildTemplates"></div>
+        </div>
+        <div class="field">
+          <label for="itemChoices">Items</label>
+          <div class="pick-list" id="itemChoices"></div>
+        </div>
+      </details>
+
+      <details class="advanced">
+        <summary>Map, drills &amp; custom arena</summary>
+        <div class="field">
+          <label for="mapDesc">Generator</label>
+          <select id="mapDesc">
+            <option value="">Campaign World</option>
+            <option value="map_descs.Overworld">Overworld variety</option>
+            <option value="map_descs.GraghsLair">Gragh's Lair</option>
+            <option value="map_descs.Hell">Hell</option>
+            <option value="map_descs.HiveDepths">Hive Depths</option>
+            <option value="map_descs.PixullochiaDepths">Pixullochia Depths</option>
+            <option value="map_descs.Crypt">Crypt</option>
+            <option value="map_descs.Underdungeon">Underdungeon</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="mapAlgorithm">Algorithm</label>
+          <select id="mapAlgorithm">
+            <option value="">Default</option>
+            <option value="overworld-random">Overworld mix</option>
+            <option value="overworld-open-meadow">Open meadow</option>
+            <option value="overworld-broken-grove">Broken grove</option>
+            <option value="overworld-old-stones">Old stones</option>
+            <option value="overworld-river-road">River road</option>
+            <option value="overworld-predator-thicket">Predator thicket</option>
+            <option value="overworld-ruin-crossroads">Ruin crossroads</option>
+          </select>
+        </div>
         <div class="field">
           <label for="microDrill">Drill</label>
           <select id="microDrill">
             <option value="">None</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="intensity">Pressure</label>
-          <select id="intensity">
-            <option value="learning">Learning</option>
-            <option value="standard" selected>Standard</option>
-            <option value="high">High</option>
-            <option value="brutal">Brutal</option>
           </select>
         </div>
         <div class="field">
@@ -1071,29 +1118,15 @@
           <label for="enemyChoices">Enemy probes</label>
           <div class="pick-list" id="enemyChoices"></div>
         </div>
-        <div class="button-row">
-          <button class="primary" type="button" id="launch">Launch in Emscripten</button>
-          <button class="secondary" type="button" id="reseed">Seed</button>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-title">Resolved Run</div>
-        <div class="run-summary" id="runSummary"></div>
-      </section>
-
-      <section class="section">
-        <div class="section-title">Fight Setup</div>
-        <div class="fight-setup" id="fightSetup"></div>
-      </section>
+      </details>
 
       <section class="section">
         <div class="section-title">How To Play</div>
         <div class="fight-setup" id="actionGuideInfo"></div>
       </section>
 
-      <section class="section">
-        <div class="section-title">Resources</div>
+      <details class="advanced">
+        <summary>Analysis &amp; matrices</summary>
         <div class="row">
           <div class="field">
             <label for="analysisGoal">Goal</label>
@@ -1111,28 +1144,21 @@
             </select>
           </div>
         </div>
+        <div class="section-sub">Resolved run</div>
+        <div class="run-summary" id="runSummary"></div>
+        <div class="section-sub">Fight setup</div>
+        <div class="fight-setup" id="fightSetup"></div>
+        <div class="section-sub">Analysis plan</div>
         <div class="run-summary" id="analysisPlan"></div>
-      </section>
-
-      <section class="section">
-        <div class="section-title">Content Board</div>
+        <div class="section-sub">Content board</div>
         <div class="presentation-board" id="presentationBoard"></div>
-      </section>
-
-      <section class="section">
-        <div class="section-title">Map Matrix</div>
+        <div class="section-sub">Map matrix</div>
         <div class="resource-list" id="mapResources"></div>
-      </section>
-
-      <section class="section">
-        <div class="section-title">Package Matrix</div>
+        <div class="section-sub">Package matrix</div>
         <div class="resource-list" id="packageResources"></div>
-      </section>
-
-      <section class="section">
-        <div class="section-title">All Resources</div>
+        <div class="section-sub">All resources</div>
         <div class="resource-list" id="resources"></div>
-      </section>
+      </details>
     </aside>
 
     <section class="stage">
