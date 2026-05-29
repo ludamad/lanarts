@@ -2039,6 +2039,7 @@ local function package_result(director, outcome)
         flow_active_rate = safe_rate(director.flow_active_frames or 0, math.max(1, director.elapsed or 0)),
         graze_dodges = director.graze_dodges or 0,
         graze_rate = safe_rate(director.graze_dodges or 0, math.max(1, director.micro_dodges or 0)),
+        weave_dodges = director.weave_dodges or 0,
         micro_counter_windows = director.micro_counter_windows or 0,
         micro_counter_damage_total = director.micro_counter_damage_total or 0,
         micro_counter_stagger_frames = director.micro_counter_stagger_frames or 0,
@@ -2243,6 +2244,7 @@ local function package_state_from_director(director)
         flow_active_rate = safe_rate(director.flow_active_frames or 0, math.max(1, director.elapsed or 0)),
         graze_dodges = director.graze_dodges or 0,
         graze_rate = safe_rate(director.graze_dodges or 0, math.max(1, director.micro_dodges or 0)),
+        weave_dodges = director.weave_dodges or 0,
         micro_counter_windows = director.micro_counter_windows or 0,
         micro_counter_damage_total = director.micro_counter_damage_total or 0,
         micro_counter_stagger_frames = director.micro_counter_stagger_frames or 0,
@@ -4230,6 +4232,56 @@ local function draw_flow(director)
     draw_text(color, Display.CENTER, label_xy, txt)
 end
 
+-- Dash-weave: melee movement skill. While a player is dashing (Dash Attack effect),
+-- passing point-blank THROUGH a living enemy is a "WEAVE" -- it builds Flow (once per enemy
+-- per dash). This makes the dash a movement-combo engine so skilled melee dances in the
+-- danger and builds Flow, instead of face-tanking. Works to the game's movement strength.
+local function update_dash_weave(director)
+    director.dash_weave = director.dash_weave or {}
+    local state = director.dash_weave
+    local seen_players = {}
+    for _, p in ipairs(living_players()) do
+        seen_players[p.id] = true
+        local dashing = p.has_effect and p:has_effect("Dash Attack")
+        local ps = state[p.id]
+        if dashing then
+            if not ps then
+                ps = {ids = {}}
+                state[p.id] = ps
+            end
+            local pr = p.target_radius or p.radius or 12
+            for _, m in ipairs(living_monsters(true)) do
+                if not ps.ids[m.id] then
+                    local reach = (m.target_radius or m.radius or 14) + pr + 6
+                    local dx, dy = p.x - m.x, p.y - m.y
+                    if dx * dx + dy * dy <= reach * reach then
+                        ps.ids[m.id] = true
+                        director.weave_dodges = (director.weave_dodges or 0) + 1
+                        flow_build(director, 1)
+                        if M.create_feedback_label then
+                            M.create_feedback_label {
+                                map = director.map,
+                                xy = {p.x, p.y - pr - 14},
+                                text = "WEAVE",
+                                color = COL_PALE_GREEN,
+                                duration = 34,
+                                drift = 0.30,
+                            }
+                        end
+                    end
+                end
+            end
+        elseif ps then
+            state[p.id] = nil  -- dash ended; next dash can weave again
+        end
+    end
+    for id in pairs(state) do
+        if not seen_players[id] then
+            state[id] = nil
+        end
+    end
+end
+
 function M.add_director(game_map, package, intensity)
     package = package or {}
     if not (package.orbit or package.pulse or package.sweep or package.summon or package.escort or package.rescue) then
@@ -4324,6 +4376,7 @@ function M.add_director(game_map, package, intensity)
         flow_active_frames = 0,
         flow_break_timer = 0,
         graze_dodges = 0,
+        weave_dodges = 0,
         aggro_frames = 0,
         aggro_player_frames = 0,
         aggro_ally_frames = 0,
@@ -4351,6 +4404,7 @@ function M.add_director(game_map, package, intensity)
             if (self.flow_break_timer or 0) > 0 then
                 self.flow_break_timer = self.flow_break_timer - 1
             end
+            update_dash_weave(self)
             if (self.micro_punish_last_timer or 0) > 0 then
                 self.micro_punish_last_timer = self.micro_punish_last_timer - 1
             end

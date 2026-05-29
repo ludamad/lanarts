@@ -25,6 +25,7 @@ METRICS = [
     ("avg_package_flow_active_rate", "flow%", "high"),
     ("avg_package_flow_breaks", "flowBrk", "low"),
     ("avg_package_graze_rate", "graze%", "high"),
+    ("avg_package_weave_dodges", "weave", "high"),
     ("avg_hazard_dodge_frames", "dodgeF", "ctx"),
     ("avg_ranged_keepaway_frames", "kiteF", "ctx"),
     ("avg_ranged_close_enemy_frames", "closeF", "ctx"),
