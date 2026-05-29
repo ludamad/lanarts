@@ -15,7 +15,7 @@ PROFILE_ORDER = ["sloppy", "human", "skilled", "perfect"]
 # Signals where higher = better play. Depth = perfect - sloppy.
 SIGNALS = [
     ("win_rate", "win%", True),
-    ("avg_package_micro_score", "micro", False),
+    ("avg_package_micro_score", "micro", True),
     ("avg_package_flow_active_rate", "flow%", True),
     ("avg_package_graze_rate", "graze%", True),
     ("avg_package_micro_hits", "avoidHit(low=good)", False),
