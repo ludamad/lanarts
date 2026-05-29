@@ -57,6 +57,18 @@ add it here in the same change.
 
 ## Subsystem notes
 
+- Class-interestingness experiment: `e2e_tests/run_class_interestingness_experiment.sh`
+  (knobs via env; outputs under `saves/experiments/`, gitignored) +
+  `aggregate_class_interestingness.py`. Measures per-class playstyle: outcome,
+  micro/dodge, Flow combo sustain, range discipline, ability cadence, pacing.
+- Flow (movement combo): in `ContentLabHazards.lua`. Clean dodges/threaded
+  near-misses call `flow_build`; hits call `flow_break` (~60% drop); it bleeds
+  over `FLOW_DECAY_FRAMES`. `flow_tier()` gates escalation; higher tier scales
+  threaded-opening damage in `apply_micro_counter` and the player aura in
+  `draw_flow`. Telemetry: `package_flow_*`. Design intent: movement IS the
+  skill in this top-down genre -- do NOT add Souls i-frame dodges (they flatten
+  positioning); reward sustaining precise movement instead.
+
 - Automated player: `runtime/ai/AutomatedPlayerInputSource.lua`. Skill profiles
   (perfect/skilled/human/sloppy) scale decision interval, skip chances, and
   hazard-dodge react margin/skip. The bot dodges content-lab package hazards
