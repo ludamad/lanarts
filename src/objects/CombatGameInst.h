@@ -35,7 +35,8 @@ public:
     virtual void init(GameState* gs);
     virtual void deinit(GameState* gs);
 	virtual void step(GameState* gs);
-	virtual void draw(GameState* gs, float frame = 0, float alpha = 1);
+	// drawn_sprite: draw this sprite instead of the instance's own (eg an animation clip)
+	virtual void draw(GameState* gs, float frame = 0, float alpha = 1, sprite_id drawn_sprite = -1);
 	virtual void post_draw(GameState* gs);
 	virtual void update_field_of_view(GameState* gs);
 	virtual bool within_field_of_view(const Pos& pos) =0;
@@ -130,6 +131,13 @@ protected:
         bool _is_ghost = false;
 	obj_id current_target = NONE;
 // </PURE DATA REGION see (de)serialize>
+public:
+    // Game step at which each visual action last started, for animated sprites (see AnimationSet).
+    // Presentation only: outside the serialized region and never read by game logic.
+    struct AnimationMarks {
+        int attack = -100000, cast = -100000, hurt = -100000, death = -100000;
+        bool was_ghost = false;
+    } anim_marks;
 public:
     // field_of_view:
     //   Used for decisions about whether one object sees another.

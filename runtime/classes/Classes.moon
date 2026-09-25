@@ -134,7 +134,7 @@ Data.class_create {
 
 Data.class_create {
     name: "Fighter",
-    sprites: {"fighter", "fighter2", "spr_enemies.humanoid.dwarf"},
+    sprites: {"fighter", "fighter2", "fighter3", "spr_enemies.humanoid.dwarf"},
     available_spells: {
         { spell: "Berserk", level_needed: 1 },
         { spell: "Dash Attack", level_needed: 2 },

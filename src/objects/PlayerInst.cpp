@@ -10,6 +10,7 @@
 #include "draw/draw_sprite.h"
 
 #include "draw/SpriteEntry.h"
+#include "draw/AnimationSet.h"
 #include "draw/TileEntry.h"
 #include "gamestate/GameState.h"
 
@@ -161,6 +162,10 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 
 void PlayerInst::step(GameState* gs) {
     PERF_TIMER();
+    if (is_ghost() && !anim_marks.was_ghost) {
+        anim_marks.death = gs->frame();
+    }
+    anim_marks.was_ghost = is_ghost();
     explore_state.step();
     paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
     //if (cooldowns().action_cooldown > 0)
@@ -231,7 +236,45 @@ void PlayerInst::step(GameState* gs) {
 }
 
 void PlayerInst::draw(GameState* gs) {
-	CombatGameInst::draw(gs, gs->frame(), is_ghost() ? 0.4 : 1.0);
+	float alpha = is_ghost() ? 0.4 : 1.0;
+	const AnimationSet* anims = res::animation_set(sprite);
+	if (!anims) {
+		CombatGameInst::draw(gs, gs->frame(), alpha);
+		return;
+	}
+	int now = gs->frame();
+	const AnimationClip* clip = nullptr;
+	int start = 0;
+	// Picks c if it is still playing and started after the current pick
+	auto consider = [&](const AnimationClip& c, int mark) {
+		if (c.playing(now - mark) && (clip == nullptr || mark > start)) {
+			clip = &c;
+			start = mark;
+		}
+	};
+	if (is_ghost()) {
+		consider(anims->death, anim_marks.death);
+		if (clip) {
+			alpha = 1.0; // the fall plays out before the ghost appears
+		}
+	} else {
+		// Attacks and casts take priority over flinching, so swings stay visible in a brawl
+		consider(anims->attack, anim_marks.attack);
+		consider(anims->cast, anim_marks.cast);
+		if (!clip) {
+			consider(anims->hurt, anim_marks.hurt);
+		}
+	}
+	if (!clip) {
+		bool moving = vx != 0 || vy != 0;
+		clip = moving && anims->walk.valid() ? &anims->walk : &anims->idle;
+		start = 0;
+	}
+	if (!clip->valid()) {
+		CombatGameInst::draw(gs, now, alpha);
+		return;
+	}
+	CombatGameInst::draw(gs, clip->frame_at(now - start), alpha, clip->sprite);
 }
 
 void PlayerInst::copy_to(GameInst *inst) const {

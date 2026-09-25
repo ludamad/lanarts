@@ -15,6 +15,7 @@
 #include "data/FilenameList.h"
 
 #include "draw/fonts.h"
+#include "draw/AnimationSet.h"
 
 #include "lua_api/lua_api.h"
 
@@ -197,6 +198,7 @@ void init_resource_data_sets(GameState* gs, bool avoid_sprite_loads) {
         res::font_menu().initialize(gs->game_settings().menu_font, 20);
     }
     game_class_data.init(L);
+    clear_animation_sets();
     game_effect_data.init(L);
 	game_item_data.init(L);
     game_enemy_data.init(L);
@@ -235,6 +237,7 @@ void init_resource_data_sets(GameState* gs, bool avoid_sprite_loads) {
 	D["tileset_create"].bind_function(tileset_create);
     D["enemy_create"].bind_function(lapi_data_create_enemy);
     D["class_create"].bind_function(lapi_data_create_class);
+    D["animation_set_create"].bind_function(lapi_data_create_animation_set);
     D["item_create"].bind_function(lapi_data_create_item);
     D["spell_create"].bind_function(lapi_data_create_spell);
     D["effect_create"].bind_function(lapi_data_create_effect);

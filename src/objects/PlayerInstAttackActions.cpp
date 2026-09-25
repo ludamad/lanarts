@@ -537,6 +537,7 @@ void PlayerInst::_use_weapon(GameState *gs, const GameAction &action) {
             cooldown * estats.cooldown_modifiers.melee_cooldown_multiplier);
     }
 
+    anim_marks.attack = gs->frame();
     reset_rest_cooldown();
 }
 

@@ -108,6 +108,7 @@ bool CombatGameInst::damage(GameState* gs, float fdmg, CombatGameInst* attacker)
     inst->font = &res::font_bigprimary();
     inst->should_center_font = true;
 
+    anim_marks.hurt = gs->frame();
     if (dynamic_cast<PlayerInst*>(attacker)) {
         // Damage from player causes hurt cooldown
         cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
@@ -348,7 +349,7 @@ static float hurt_alpha_value(int hurt_cooldown) {
         return (HURT_COOLDOWN - hurt_cooldown) / 10 * 0.7f + 0.3f;
 }
 
-void CombatGameInst::draw(GameState *gs, float frame, float alpha) {
+void CombatGameInst::draw(GameState *gs, float frame, float alpha, sprite_id drawn_sprite) {
     GameInst::draw(gs);
     if (sprite == -1) {
         return;
@@ -364,7 +365,7 @@ void CombatGameInst::draw(GameState *gs, float frame, float alpha) {
     draw_colour.a *= alpha;
     
     int sx = x - spr.width() / 2, sy = y - spr.height() / 2;
-    draw_sprite(view, sprite, sx, sy, vx, vy, frame, draw_colour);
+    draw_sprite(view, drawn_sprite == -1 ? sprite : drawn_sprite, sx, sy, vx, vy, frame, draw_colour);
 
     effects.draw_effect_sprites(gs, this, Pos(sx, sy));
     if (is_resting) {
@@ -747,6 +748,7 @@ void CombatGameInst::use_spell(GameState* gs, SpellEntry& spl_entry, const Pos& 
     lua_State* L = gs->luastate();
 
     use_mp(gs, spl_entry.mp_cost);
+    anim_marks.cast = gs->frame();
     float spell_cooldown_mult =
             effective_stats().cooldown_modifiers.spell_cooldown_multiplier;
     cooldowns().reset_action_cooldown(

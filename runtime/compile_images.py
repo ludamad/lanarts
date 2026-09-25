@@ -57,6 +57,16 @@ for spr in SPR_FOLDERS:
     except OSError:
         pass
 
+# Animation clips for class sprites, written by tools/sprites/build.py: one folder per sprite.
+# They are frame-indexed (speed 1): the game picks each frame from the player's state and the
+# clip timings in classes/AnimationSets.lua.
+FRAME_INDEXED = set()
+if os.path.isdir("spr_animations"):
+    for rig in sorted(os.listdir("spr_animations")):
+        if os.path.isdir("spr_animations/" + rig):
+            SPR_FOLDERS.append("spr_animations/" + rig)
+            FRAME_INDEXED.add("spr_animations/" + rig)
+
 used_ids = defaultdict(lambda: None)
 resources = []
 for spr_folder in SPR_FOLDERS:
@@ -80,7 +90,8 @@ for spr_folder in SPR_FOLDERS:
             print("M['" + full_id + "'] = Display.directional_create(Display.images_load '" + filename + "%" + dims +"')")
         elif len(filename.split(".")) > 2:
             dims = filename.split(".")[1]
-            print("M['" + full_id + "'] = Display.animation_create(Display.images_load '" + filename + "%" + dims +"', 0.1)")
+            speed = "1" if spr_folder in FRAME_INDEXED else "0.1"
+            print("M['" + full_id + "'] = Display.animation_create(Display.images_load '" + filename + "%" + dims +"', " + speed + ")")
         else:
             print("M['" + full_id + "'] = Display.image_load '" + filename + "'")
         print("yield_point()")
