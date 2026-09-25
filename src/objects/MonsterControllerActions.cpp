@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include <rvo2/RVO.h>
+#include <RVO.h>
 
 #include "draw/colour_constants.h"
 #include "draw/TileEntry.h"

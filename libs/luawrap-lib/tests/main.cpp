@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-#include <UnitTest++.h>
+#include <UnitTest++/UnitTest++.h>
 
 void unit_test_assert(const std::string& msg, bool condition) {
 	if (!condition) {

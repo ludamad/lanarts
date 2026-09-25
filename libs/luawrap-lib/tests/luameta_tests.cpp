@@ -5,7 +5,7 @@
 
 #include <lua.hpp>
 
-#include <UnitTest++.h>
+#include <UnitTest++/UnitTest++.h>
 
 #include <luawrap/luawrap.h>
 #include <luawrap/luameta.h>

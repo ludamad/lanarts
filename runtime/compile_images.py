@@ -1,13 +1,19 @@
 # Python that combines images from spr_* folders and generates Lua to assign appropriate labels.
+# Run from the runtime directory; writes to the file given as the first argument, or stdout.
+# The build runs it to produce compiled/Resources.lua.
 # Notes on the various resources:
 # - Tiles are handled as one image having all the variants of a tile. (TODO)
+from __future__ import print_function
 import os
 import sys
 from collections import OrderedDict, defaultdict
 
+if len(sys.argv) > 1:
+    sys.stdout = open(sys.argv[1], "w")
+
 #os.system("convert -crop 32x32 image.png temporary.png")
-print "local Display = require 'core.Display'"
-print "local M = nilprotect {}"
+print("local Display = require 'core.Display'")
+print("local M = nilprotect {}")
 
 SPR_FOLDERS = [
     "spr_books",
@@ -54,8 +60,8 @@ for spr in SPR_FOLDERS:
 used_ids = defaultdict(lambda: None)
 resources = []
 for spr_folder in SPR_FOLDERS:
-    print "-- " + spr_folder + " resource loads:"
-    for basename in os.listdir(spr_folder):
+    print("-- " + spr_folder + " resource loads:")
+    for basename in sorted(os.listdir(spr_folder)):
         if basename.startswith("."): # Hidden file? Skip
             continue
         if "." not in basename: # No file extension? Skip.
@@ -71,19 +77,19 @@ for spr_folder in SPR_FOLDERS:
         if len(filename.split(".")) > 3:
             assert filename.split(".")[2] == "dir"
             dims = filename.split(".")[1]
-            print "M['" + full_id + "'] = Display.directional_create(Display.images_load '" + filename + "%" + dims +"')"
+            print("M['" + full_id + "'] = Display.directional_create(Display.images_load '" + filename + "%" + dims +"')")
         elif len(filename.split(".")) > 2:
             dims = filename.split(".")[1]
-            print "M['" + full_id + "'] = Display.animation_create(Display.images_load '" + filename + "%" + dims +"', 0.1)"
+            print("M['" + full_id + "'] = Display.animation_create(Display.images_load '" + filename + "%" + dims +"', 0.1)")
         else:
-            print "M['" + full_id + "'] = Display.image_load '" + filename + "'"
-        print "yield_point()"
-    print ""
+            print("M['" + full_id + "'] = Display.image_load '" + filename + "'")
+        print("yield_point()")
+    print("")
 resources.sort()
 
-print "M.resource_id_list = {"
+print("M.resource_id_list = {")
 for id in resources:
-    print "    '" + id + "',"
-print "}"
+    print("    '" + id + "',")
+print("}")
 
-print "return M"
+print("return M")

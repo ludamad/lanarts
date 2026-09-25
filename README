@@ -13,18 +13,28 @@ The game is actively seeking new contributors! Shoot me an email at adam.domurad
 
 COMPILING
 
-The project uses CMake to create plaform independent build files. 
+Lanarts builds with CMake (3.24 or newer) and a C++14 compiler. Most libraries are downloaded
+at configure time, pinned to exact releases; you need these from your system:
 
-Other than CMake, freetype is the main dependency. If you are getting SDL errors when the game runs, try installing your SDL2 dev package (if on Linux).
-Windows development requires running CMake on the lanarts source folder, and making sure the path to freetype is correct.
+  macOS:          brew install cmake sdl2 sdl2_image sdl2_mixer freetype
+  Debian/Ubuntu:  apt install cmake libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libfreetype-dev
+  Python 3 (to generate runtime/compiled/Resources.lua during the build)
 
-To build and run, do:
-  ./run.sh
- from the lanarts source folder.
+FreeType is downloaded and built too when the system has none.
 
-If developing on Windows, create the desired project files (eg by picking them from CMake GUI), build, and run the executable from the 'runtime' folder in source.
-NOTE: Currently you will need to run compile_images.py before running. This is done automatically in run.sh but must be done separately during Windows development.
+To build and run, from the lanarts source folder:
+  ./run.sh              debug build
+  ./run.sh -O           optimised build
+  ./run.sh --headless   no graphics or sound (for simulations, see tools/sim)
+The other options are listed at the top of run.sh.
 
-USING ECLIPSE:
-For Linux/Mac. For Windows, you can use the CMake GUI. Go to folder where you want eclipse project files:
-cmake -G"Eclipse CDT4 - Unix Makefiles" <path to lanarts source>
+Or use the CMake presets directly (CMakePresets.json; IDEs such as CLion and VS Code pick them up):
+  cmake --preset release
+  cmake --build --preset release
+  cd runtime && ../build/release/src/lanarts
+
+Tests: ./run.sh --headless --build && ctest --preset headless
+
+Web (Emscripten): ./run.sh --web --build, from a shell where emcmake is available.
+Windows: cross-compile with ./run.sh --mingw --build (MinGW-w64 with SDL2 and FreeType packages),
+or open the folder in an IDE with CMake support and run the game from the 'runtime' folder.

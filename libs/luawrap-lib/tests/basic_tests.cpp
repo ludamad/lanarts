@@ -1,4 +1,4 @@
-#include <UnitTest++.h>
+#include <UnitTest++/UnitTest++.h>
 
 #include <luawrap/testutils.h>
 #include <luawrap/luawrap.h>

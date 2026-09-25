@@ -20,8 +20,8 @@
 #include "lua_api/lua_api.h"
 
 extern "C" {
-#include "luasocket/luasocket.h"
-#include "luasocket/mime.h"
+#include <luasocket.h>
+#include <mime.h>
 // yaml bindings so that lua can work with yaml files:
 int luayaml_module(lua_State *L);
 // Box2D bindings for future map generation work:

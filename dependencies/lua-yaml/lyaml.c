@@ -533,7 +533,7 @@ static int dump_table(struct lua_yaml_dumper *dumper, int style) {
 }
 
 static int dump_array(struct lua_yaml_dumper *dumper, int style) {
-   int i, n = luaL_getn(dumper->L, -1);
+   int i, n = lua_objlen(dumper->L, -1);
    yaml_event_t ev;
    yaml_sequence_style_t seq_style = YAML_ANY_SEQUENCE_STYLE;
    yaml_char_t *anchor = get_yaml_anchor(dumper);
@@ -624,7 +624,7 @@ static int dump_node(struct lua_yaml_dumper *dumper) {
       }
 
       if (type == LUAYAML_KIND_UNKNOWN && Dump_Auto_Array &&
-          luaL_getn(dumper->L, -1) > 0) {
+          lua_objlen(dumper->L, -1) > 0) {
          type = LUAYAML_KIND_SEQUENCE;
       }
 
@@ -813,7 +813,7 @@ int luayaml_module(lua_State *L) {
 }
 
 LUALIB_API int luaopen_yaml(lua_State *L) {
-   const luaL_reg yamllib[] = {
+   const luaL_Reg yamllib[] = {
       { "load", l_load },
       { "dump", l_dump },
       { "configure", l_config },

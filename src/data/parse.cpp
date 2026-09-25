@@ -4,19 +4,15 @@
  */
 
 #include "parse.h"
-#include <yaml-cpp/yaml.h>
 
-const YAML::Node* yaml_find_node(const YAML::Node& node, const char* child) {
-	return node.FindValue(child);
+bool yaml_has_node(const YAML::Node& node, const char* child) {
+	return node.IsMap() && node[child].IsDefined();
 }
 
 int parse_int(const YAML::Node& n) {
-	int val;
-	n >> val;
-	return val;
+	return n.as<int>();
 }
+
 std::string parse_str(const YAML::Node& n) {
-	std::string s;
-	n >> s;
-	return s;
+	return n.as<std::string>();
 }

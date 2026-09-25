@@ -6,7 +6,7 @@
 #include <luawrap/luawrap.h>
 #include <luawrap/testutils.h>
 
-#include <UnitTest++.h>
+#include <UnitTest++/UnitTest++.h>
 
 SUITE (LuaValue) {
 	TEST(luavalue_test_get) {

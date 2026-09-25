@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include <rvo2/RVO.h>
+#include <RVO.h>
 
 #define LUAWRAP_LONG_FUNCTIONS
 #include <luawrap/luawrap.h>

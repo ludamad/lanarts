@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include <rvo2/RVO.h>
+#include <RVO.h>
 
 #include <ldraw/draw.h>
 

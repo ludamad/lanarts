@@ -2,7 +2,7 @@
 
 #include <SDL.h>
 #include <lcommon/unittest.h>
-#include "../impl/PacketQueue.h"
+#include "../src/PacketQueue.h"
 
 static int writer_thread(void* _queue) {
 	PacketQueue& queue = *(PacketQueue*)_queue;

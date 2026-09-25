@@ -1,61 +1,11 @@
-cmake_minimum_required( VERSION 2.6 )
-PROJECT(project_lua)
-
-set( lua_src
-	lapi.c
-	lapi.h
-	lauxlib.c
-	lauxlib.h
-	lbaselib.c
-	lcode.c
-	lcode.h
-	ldblib.c
-	ldebug.c
-	ldebug.h
-	ldo.c
-	ldo.h
-	ldump.c
-	lfunc.c
-	lfunc.h
-	lgc.c
-	lgc.h
-	linit.c
-	liolib.c
-	llex.c
-	llex.h
-	llimits.h
-	lmathlib.c
-	lmem.c
-	lmem.h
-	loadlib.c
-	lobject.c
-	lobject.h
-	lopcodes.c
-	lopcodes.h
-	loslib.c
-	lparser.c
-	lparser.h
-	lstate.c
-	lstate.h
-	lstring.c
-	lstring.h
-	lstrlib.c
-	ltable.c
-	ltable.h
-	ltablib.c
-	ltm.c
-	ltm.h
-	lua.h
-	luaconf.h
-	lualib.h
-	lundump.c
-	lundump.h
-	lvm.c
-	lvm.h
-	lzio.c
-	lzio.h
-	print.c
-)
-
-add_library( lua STATIC
-             ${lua_src} )
+# Lua 5.1.5. Patched in lparser.c: tail calls are compiled as ordinary calls, so stack traces
+# keep every frame.
+add_library(lua STATIC
+    lapi.c lauxlib.c lbaselib.c lcode.c ldblib.c ldebug.c ldo.c ldump.c lfunc.c lgc.c linit.c
+    liolib.c llex.c lmathlib.c lmem.c loadlib.c lobject.c lopcodes.c loslib.c lparser.c lstate.c
+    lstring.c lstrlib.c ltable.c ltablib.c ltm.c lundump.c lvm.c lzio.c)
+target_include_directories(lua PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if(UNIX AND NOT EMSCRIPTEN)
+    target_compile_definitions(lua PRIVATE LUA_USE_POSIX)
+endif()
+add_library(lanarts::lua ALIAS lua)

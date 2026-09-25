@@ -30,14 +30,14 @@ static bool nodeis(const YAML::Node& node, const char* str) {
 }
 void lua_pushyaml(lua_State* L, const YAML::Node& node) {
 	int table;
-	YAML::Iterator it;
 	std::string str;
 	switch (node.Type()) {
 	case YAML::NodeType::Null:
 		lua_pushnil(L);
 		break;
 	case YAML::NodeType::Scalar:
-		node.GetScalar(str);
+		str = node.Scalar();
+		// Plain (unquoted) scalars are tagged "?"; they can be booleans or numbers
 		if (nodeis(node, "?")) {
 			if (str == "yes") {
 				lua_pushboolean(L, true);
@@ -67,12 +67,14 @@ void lua_pushyaml(lua_State* L, const YAML::Node& node) {
 	case YAML::NodeType::Map:
 		lua_newtable(L);
 		table = lua_gettop(L);
-		it = node.begin();
-		for (; it != node.end(); ++it) {
-			lua_pushyaml(L, it.first());
-			lua_pushyaml(L, it.second());
+		for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) {
+			lua_pushyaml(L, it->first);
+			lua_pushyaml(L, it->second);
 			lua_settable(L, table);
 		}
+		break;
+	case YAML::NodeType::Undefined:
+		lua_pushnil(L);
 		break;
 	}
 }
@@ -83,25 +85,23 @@ LuaValue lua_yaml(lua_State *L, const YAML::Node & node) {
 }
 
 LuaLazyValue parse_luaexpr(lua_State* L, const YAML::Node& node) {
-	std::string code;
-	node.GetScalar(code);
-	return LuaLazyValue(code);
+	return LuaLazyValue(node.Scalar());
 }
 
 LuaLazyValue parse_luaexpr(lua_State *L, const YAML::Node& node,
 		const char* key) {
-	const YAML::Node* child = node.FindValue(key);
-	if (child) {
-		return parse_luaexpr(L, *child);
+	const YAML::Node child = node[key];
+	if (child.IsDefined()) {
+		return parse_luaexpr(L, child);
 	}
 	return LuaLazyValue();
 }
 
 LuaLazyValue parse_luaexpr(lua_State *L, const YAML::Node& node,
 		const char* key, const char* default_code) {
-	const YAML::Node* child = node.FindValue(key);
-	if (child) {
-		return parse_luaexpr(L, *child);
+	const YAML::Node child = node[key];
+	if (child.IsDefined()) {
+		return parse_luaexpr(L, child);
 	}
 	return LuaLazyValue(default_code);
 }

@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cassert>
 #include <lcommon/unittest.h>
-#include "../lanarts_net.h"
+#include "net-lib/lanarts_net.h"
 #include <lcommon/Timer.h>
 
 NetConnection* create_server();

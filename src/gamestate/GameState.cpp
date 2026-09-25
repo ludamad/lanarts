@@ -454,7 +454,9 @@ void GameState::start_game() {
 }
 
 int GameState::handle_event(SDL_Event* event, bool trigger_event_handling) {
+#ifndef BUILD_HEADLESS
     ldraw::process_event(event);
+#endif
 	if (lua_api::luacall_handle_event(luastate(), event)) {
 		return false;
 	}

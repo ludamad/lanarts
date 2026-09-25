@@ -24,8 +24,10 @@
 #define Mix_HaltMusic(x) 0
 #define Mix_LoadMUS(x) 0
 #define Mix_LoadWAV_RW(x, y) 0
+#define Mix_LoadWAV(x) 0
 #define Mix_OpenAudio(x,y,z,w) 0
 #define Mix_PlayChannelTimed(x,y,z,w) 0
+#define Mix_PlayChannel(x,y,z) 0
 #define Mix_PlayMusic(x, y) 0
 #define Mix_Volume(x,y) 0
 #define SDL_CondSignal(x) 0

@@ -1,42 +1,7 @@
-cmake_minimum_required( VERSION 2.6 )
-PROJECT(project_lcommon)
-
-set( SRC "..")
-set( DEPS ../../dependencies)
-include_directories(
-	include/lcommon/
-	${DEPS}/UnitTest++ 
-	${DEPS}/lua 
-	${DEPS}/sdl2/include
-	"${SRC}/luawrap-lib/include"
-)
-
-file(GLOB lcommon_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
-    src/* 
-    src/lua/* 
-    include/common/* 
-)
-
-
-add_library( lcommon
-             STATIC
-             ${lcommon_src} include/lcommon/lambda_utils.h include/lcommon/sdl_headless_support.h)
-
-AUX_SOURCE_DIRECTORY(tests lcommon_tests) 
-
-#add_executable( lcommon_tests
-#             ${lcommon_tests}
-#              )
-#
-#target_link_libraries( 
-#			lcommon_tests
-#			lcommon
-#			UnitTest++
-#			luawrap
-#			lua
-#)
-#
-## Enable tests
-#enable_testing()
-#
-#add_test(NAME lcommon_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/lcommon_tests )
+# Shared utilities: geometry, timers, serialisation, random numbers
+file(GLOB lcommon_sources CONFIGURE_DEPENDS src/*.cpp src/lua/*.cpp)
+add_library(lcommon STATIC ${lcommon_sources})
+target_include_directories(lcommon PUBLIC include PRIVATE include/lcommon)
+target_link_libraries(lcommon PUBLIC luawrap lanarts::sdl UnitTest++ PRIVATE lanarts::warnings)
+# Headless builds replace the SDL calls with stubs (lcommon/sdl_headless_support.h)
+target_compile_definitions(lcommon PUBLIC $<$<BOOL:${LANARTS_HEADLESS}>:BUILD_HEADLESS>)

@@ -8,7 +8,7 @@
 
 #include <SDL.h>
 
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
 #include <sys/time.h>
 #elif defined(_WIN32)
 #include <windows.h>
@@ -48,7 +48,7 @@ Timer::Timer() {
 }
 
 void Timer::start() {
-#if defined(__unix__) || defined(_WIN32)
+#if defined(__unix__) || defined(_WIN32) || defined(__APPLE__)
 	timeval timev;
 	gettimeofday(&timev, NULL);
 	microseconds_since_epoch = timev.tv_sec * 1000 * 1000 + timev.tv_usec;

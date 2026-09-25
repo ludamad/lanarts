@@ -1,35 +1,5 @@
-cmake_minimum_required( VERSION 2.6 )
-PROJECT(project_lanarts_net)
-
-set( DEPS ../../dependencies)
-
-
-
-include_directories(
-        ${DEPS}/sdl2/include        
-	${DEPS}/enet/include
-	../common-lib/include
-	../luawrap-lib/include
-	${DEPS}/UnitTest++ 
-)
-
-aux_source_directory( "impl/" lanarts_net_src)
-aux_source_directory( "tests/" lanarts_net_tests_src)
-
-add_library( lanarts_net
-             STATIC
-             ${lanarts_net_src})
-
-	
-#add_executable( lanarts_net_tests
-#             ${lanarts_net_tests_src})
-#
-#target_link_libraries(
-#	lanarts_net_tests
-#	lanarts_net
-#	pthread
-#	enet
-#        SDL2-static
-#	lcommon
-#	UnitTest++
-#)
+# Client/server connections over ENet
+file(GLOB lanarts_net_sources CONFIGURE_DEPENDS src/*.cpp)
+add_library(lanarts_net STATIC ${lanarts_net_sources})
+target_include_directories(lanarts_net PUBLIC include)
+target_link_libraries(lanarts_net PUBLIC lcommon PRIVATE enet lanarts::warnings)

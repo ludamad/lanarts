@@ -4,7 +4,7 @@
  */
 
 #include <lcommon/PerfTimer.h>
-#include <rvo2/RVO.h>
+#include <RVO.h>
 
 #include "objects/CombatGameInst.h"
 

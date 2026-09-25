@@ -20,8 +20,13 @@ GLImage::~GLImage() {
 }
 
 static Size quick_and_dirty_image_size(std::string fn) {
+	std::ifstream in(fn, std::ios::binary);
+	if (!in) {
+		// Same outcome as the graphical build's image loader
+		printf("Image '%s' could not be loaded\n", fn.c_str());
+		fatal_error();
+	}
 	if(fn.substr(fn.find_last_of(".") + 1) == "png") {
-		std::ifstream in(fn);
 		unsigned int width, height;
 
 		in.seekg(16);

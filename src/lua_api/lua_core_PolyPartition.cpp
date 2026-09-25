@@ -21,7 +21,7 @@
 #include "gamestate/GameMapState.h"
 
 
-#include <polypartition/polypartition.h>
+#include <polypartition.h>
 
 typedef std::vector<PosF> _Polygon;
 
@@ -33,7 +33,7 @@ static std::vector<_Polygon> decompose(const _Polygon& polygons) {
     for (size_t i = 0; i < polygons.size(); i++) {
         tp_poly[i] = {polygons[i].x, polygons[i].y, i};
     }
-    tp_poly.SetOrientation(TPPL_CCW);
+    tp_poly.SetOrientation(TPPL_ORIENTATION_CCW);
     pp.ConvexPartition_HM(&tp_poly, &tp_parts);
     std::vector<_Polygon> ret;
     for (TPPLPoly& tp_poly : tp_parts) {

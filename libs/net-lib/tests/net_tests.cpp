@@ -9,11 +9,11 @@
 #include <lcommon/perf_timer.h>
 #include <lcommon/strformat.h>
 
-#include "../NetConnection.h"
-#include "../impl/ClientConnection.h"
-#include "../impl/ServerConnection.h"
+#include "net-lib/NetConnection.h"
+#include "../src/ClientConnection.h"
+#include "../src/ServerConnection.h"
 
-#include "../lanarts_net.h"
+#include "net-lib/lanarts_net.h"
 
 static const int TEST_PORT = 6112;
 static const int TEST_TIMEOUT = 100;

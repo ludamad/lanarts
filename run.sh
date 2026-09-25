@@ -1,207 +1,108 @@
-cd `dirname $0`
+#!/bin/bash
+# Builds lanarts with CMake and runs it from the runtime directory.
+#
+#   ./run.sh [options] [lanarts arguments...]
+#
+# Build configuration (one of; see CMakePresets.json, default: debug):
+#   -O, --release      optimised build with debug info
+#   --headless         no graphics or sound, for simulations and tests
+#   --sanitize         debug build with AddressSanitizer and UBSan
+#   -lj, --luajit      release build using LuaJIT
+#   --web              Emscripten build (needs emcmake / EMSCRIPTEN_ROOT)
+#   --mingw            Windows cross-compile with MinGW-w64
+#   --preset NAME      any configure preset
+#
+# Other options:
+#   -b, --build        build only, do not run
+#   -f, --force        do not build, run the last successful build
+#   --clean            clean before building
+#   -v, --verbose      show the full build output
+#   -g, --gdb          run under gdb (lldb on macOS)
+#   -s, --small        run in an 800x600 window (sets LANARTS_SMALL)
+#
+# Anything else is passed to lanarts, eg: ./run.sh --headless engine.StartMapGenCheck --seed 1
 
-# Good practice -- exit completely on any bad exit code:
 set -e
+cd "$(dirname "$0")"
 
-###############################################################################
-# Helper functions for conditionally coloring text.
-###############################################################################
+preset=""
+build=1
+run=1
+clean=0
+verbose=0
+debugger=0
+args=()
 
-function is_mac() {
-    if [ "$(uname)" == "Darwin" ]; then
-        return 0 # True!
-    else
-        return 1 # False!
-    fi
-}
-
-# Bash function to apply a color to a piece of text.
-function colorify() {
-    if is_mac ; then
-        cat
-    else
-        local words;
-        words=$(cat)
-        echo -e "\e[$1m$words\e[0m"
-    fi
-}
-
-###############################################################################
-# Bash function to check for a flag in 'args' and remove it.
-# Treats 'args' as one long string.
-# Returns true if flag was removed.
-###############################################################################
-
-args="$@" # Create a mutable copy of the program arguments
-function handle_flag(){
-    flag=$1
-    local new_args
-    local got
-    got=1 # False!
-    for arg in $args ; do
-        if [ $arg = $flag ] ; then
-            args="${args/$flag/}"
-            got=0 # True!
-        else
-            new_args="$new_args $arg"
-        fi
-    done
-    args="$new_args"
-    return $got # False!
-}
-
-##############################################################################
-# Eclipse options
-#   --eclipse/-e: Create eclipse project files
-###############################################################################
-
-# Create eclipse-project-files
-if handle_flag "--eclipse" || handle_flag "-e" ; then
-    src=$(pwd)
-    rm -f CMakeCache.txt
-    mkdir ../LanartsEclipse -p
-    cd ../LanartsEclipse
-    # Eclipse project creation
-    cmake -Wno-dev -G"Eclipse CDT4 - Unix Makefiles" $src
-    exit
-fi
-
-###############################################################################
-# Compiling and setting up runtime directory structure
-###############################################################################
-
-# Handle environment-variable setting convenience flags
-# These are used to communicate with CMake
-# Each flag has an optional shortform, use whichever is preferred.
-
-if handle_flag "--mingw" ; then
-    export BUILD_MINGW=1
-fi
-if handle_flag "--headless" ; then
-    export BUILD_HEADLESS=1
-fi
-if handle_flag "--small" || handle_flag "-s" ; then
-    export LANARTS_SMALL=1
-fi
-if handle_flag "--luajit" || handle_flag "-lj" ; then
-    export BUILD_LUAJIT=1
-fi
-if handle_flag "--optimize" || handle_flag "-O" ; then
-    export BUILD_OPTIMIZE=1
-fi
-if handle_flag "--sanitize"  ; then
-    export BUILD_SANITIZE=1
-fi
-if handle_flag "--emscripten"  ; then
-    export BUILD_EMSCRIPTEN=1
-fi
-if handle_flag "--profile-gen" || handle_flag "--pgen" ; then
-    export BUILD_OPTIMIZE=1
-    export BUILD_PROF_GEN=1
-fi
-# Use --pgen, and then this flag, for optimal performance
-if handle_flag "--profile-use" || handle_flag "--puse" ; then
-    export BUILD_OPTIMIZE=1
-    export BUILD_PROF_USE=1
-fi
-# Pick whether to use debug std data-structures for eg std::vector
-if handle_flag "--debug-std" ; then
-    export BUILD_FLAGS="$BUILD_FLAGS -D_GLIBCXX_DEBUG"
-fi
-
-# Configure amount of cores used
-if [[ -e /proc/cpuinfo ]] ; then
-    cores=$(grep -c ^processor /proc/cpuinfo)
-else
-    cores=4 # Guess -- may want to manually edit if above fails.
-fi
-# Helper for managing build directories:
-function rm_if_link(){ [ ! -L "$1" ] || rm -f "$1"; }
-function build_lanarts(){
-    BUILD_DIR="build_debug"
-    if [ $BUILD_OPTIMIZE ] ; then
-        BUILD_DIR="build_release"
-    fi
-    # Specialize build dirs
-    if [ $BUILD_HEADLESS ] ; then
-        BUILD_DIR="${BUILD_DIR}_headless"
-    fi
-    if [ $BUILD_LUAJIT ] ; then
-        BUILD_DIR="${BUILD_DIR}_luajit"
-    fi
-    if [ $BUILD_SANITIZE ] ; then
-        BUILD_DIR="${BUILD_DIR}_asan"
-    fi
-    if [ $BUILD_PROF_GEN ] ; then
-        BUILD_DIR="${BUILD_DIR}_profgen"
-    fi
-    if [ $BUILD_EMSCRIPTEN ] ; then
-        BUILD_DIR="${BUILD_DIR}_emscripten"
-    fi
-    if [ $BUILD_PROF_USE ] ; then
-        BUILD_DIR="${BUILD_DIR}_profuse"
-    fi
-    if [ $BUILD_MINGW ] ; then
-        BUILD_DIR="${BUILD_DIR}_mingw"
-    fi
-    rm_if_link build
-    if [ -d build ] ; then
-        echo "You have a non-symlink build directory. Lanarts has moved to symlinking 'build' to 'build_release' or 'build_debug'. Please rename the build directory to the appropriate one of those." >&2
+choose() {
+    if [ -n "$preset" ] && [ "$preset" != "$1" ]; then
+        echo "run.sh: conflicting build configurations '$preset' and '$1'" >&2
         exit 1
     fi
-    mkdir -p $BUILD_DIR
-    ln -s $BUILD_DIR build
-    cd $BUILD_DIR
-    if [ $BUILD_EMSCRIPTEN ] ; then
-	emcmake cmake ..
-    elif [ $BUILD_MINGW ] ; then
-        if python -mplatform | grep fedora ; then
-            export BUILD_FEDORA_CROSS=1
-            mingw32-cmake  -Wno-dev .. | colorify '1;33'
-        else
-            cmake -DCMAKE_TOOLCHAIN_FILE=mingw-toolchain.cmake  -Wno-dev .. | colorify '1;33'
-        fi
-    else
-	cmake -Wno-dev .. | colorify '1;33'
-    fi
-    if handle_flag "--clean" ; then
-        make clean
-    fi
-    make -j$((cores+1)) lanarts
-    cd ../runtime && python2 compile_images.py > compiled/Resources.lua
-    cd ..
+    preset=$1
 }
 
-#   --force/-f: Do not build (use last successful compiled binary)
-if ! handle_flag "-f" && ! handle_flag "--force" ; then
-    if handle_flag "--verbose" || handle_flag "-v" ; then
-        build_lanarts
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -O|--release|--optimize) choose release ;;
+        --headless) choose headless ;;
+        --sanitize) choose sanitize ;;
+        -lj|--luajit) choose luajit ;;
+        --web|--emscripten) choose web ;;
+        --mingw) choose mingw ;;
+        --preset) shift; choose "$1" ;;
+        -b|--build) run=0 ;;
+        -f|--force) build=0 ;;
+        --clean) clean=1 ;;
+        -v|--verbose) verbose=1 ;;
+        -g|--gdb) debugger=1 ;;
+        -s|--small) export LANARTS_SMALL=1 ;;
+        *) args+=("$1") ;;
+    esac
+    shift
+done
+preset=${preset:-debug}
+build_dir=build/$preset
+
+# Older versions of this script made 'build' a symlink to build_debug/build_release
+if [ -L build ]; then
+    rm build
+fi
+
+if [ $build = 1 ]; then
+    configure=(cmake --preset "$preset")
+    if [ "$preset" = web ] && [ -z "$EMSCRIPTEN_ROOT" ]; then
+        configure=(emcmake cmake -S . -B "$build_dir" -DCMAKE_BUILD_TYPE=Release)
+    fi
+    build_cmd=(cmake --build "$build_dir" --parallel)
+    if [ $clean = 1 ]; then
+        build_cmd+=(--clean-first)
+    fi
+    if [ $verbose = 1 ]; then
+        "${configure[@]}"
+        "${build_cmd[@]}"
     else
-        build_lanarts > /dev/null
+        # Quiet unless something fails
+        for step in configure build_cmd; do
+            eval "cmd=(\"\${$step[@]}\")"
+            if ! log=$("${cmd[@]}" 2>&1); then
+                echo "$log" | tail -60 >&2
+                exit 1
+            fi
+        done
     fi
 fi
 
-#   --build/-b: Do not run (build only)
-if handle_flag "-b" || handle_flag "--build" ; then
-    exit
+if [ $run = 0 ] || [ "$preset" = web ] || [ "$preset" = mingw ]; then
+    exit 0
 fi
 
-###############################################################################
-# Running the game.
-###############################################################################
-
-function run_lanarts(){
-    cd runtime
-    export vblank_mode=0
-    if handle_flag "--gdb" || handle_flag "-g" ; then
-        echo "Wrapping in GDB:" | colorify '1;35'
-        gdb -silent -x ../debug.gdb --args ../build/src/lanarts $args
+cd runtime
+binary=../$build_dir/src/lanarts
+if [ $debugger = 1 ]; then
+    if command -v gdb > /dev/null; then
+        exec gdb -silent -x ../debug.gdb --args "$binary" "${args[@]}"
     else
-        exec ../build/src/lanarts $args
+        exec lldb -- "$binary" "${args[@]}"
     fi
-    cd ..
-}
-# TODO add gdb macro with this line:
-#print luaL_loadstring(L, "return debug.traceback()") || lua_pcall(L, 0, 1, 0) || printf(lua_tolstring(L, -1, 0))
-
-run_lanarts
+fi
+exec "$binary" "${args[@]}"

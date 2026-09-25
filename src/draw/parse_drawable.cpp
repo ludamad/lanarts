@@ -18,49 +18,49 @@
 using namespace ldraw;
 
 Image parse_image(const YAML::Node& node) {
-	const YAML::Node* filenode = yaml_find_node(node, "file");
+	const YAML::Node filenode = node["file"];
 
-	if (!filenode) {
-		throw YAML::RepresentationException(node.GetMark(),
+	if (!filenode.IsDefined()) {
+		throw YAML::RepresentationException(node.Mark(),
 				"Expected list (eg [\"file.png\"]), or pattern (eg \"file(0-9).png\").");
 	}
 
-	return Image(parse_str(*filenode));
+	return Image(parse_str(filenode));
 }
 
 Animation parse_animation(const YAML::Node& node) {
-	const YAML::Node* framenode = yaml_find_node(node, "frames");
+	const YAML::Node framenode = node["frames"];
 
-	if (!framenode) {
-		throw YAML::RepresentationException(node.GetMark(),
+	if (!framenode.IsDefined()) {
+		throw YAML::RepresentationException(node.Mark(),
 				"Expected 'frames:' for animation drawable object (has 'type: animation').");
 	}
 
-	return Animation(parse_drawable_list(*framenode));
+	return Animation(parse_drawable_list(framenode));
 }
 
 LuaDrawable parse_luadrawable(const YAML::Node& node) {
 	lua_State* L = ParseContext::luastate();
 
-	const YAML::Node* funcnode = yaml_find_node(node, "function");
+	const YAML::Node funcnode = node["function"];
 
-	if (!funcnode) {
-		throw YAML::RepresentationException(node.GetMark(),
+	if (!funcnode.IsDefined()) {
+		throw YAML::RepresentationException(node.Mark(),
 				"Expected 'function:' for lua drawable object (has 'type: lua').");
 	}
 
-	return LuaDrawable(L, parse_str(*funcnode));
+	return LuaDrawable(L, parse_str(funcnode));
 }
 
 DirectionalDrawable parse_directional(const YAML::Node& node) {
-	const YAML::Node* framenode = yaml_find_node(node, "frames");
+	const YAML::Node framenode = node["frames"];
 
-	if (!framenode) {
-		throw YAML::RepresentationException(node.GetMark(),
+	if (!framenode.IsDefined()) {
+		throw YAML::RepresentationException(node.Mark(),
 				"Expected 'frames:' for directional drawable object (has 'type: directional').");
 	}
 
-	return DirectionalDrawable(parse_drawable_list(*framenode));
+	return DirectionalDrawable(parse_drawable_list(framenode));
 }
 
 static bool parse_image_split_pattern(const std::string& pattern, Size* size,
@@ -147,7 +147,7 @@ std::vector<Drawable> parse_drawable_list(const YAML::Node& node) {
 
 	// Error if map
 	if (node.Type() == YAML::NodeType::Map) {
-		throw YAML::RepresentationException(node.GetMark(),
+		throw YAML::RepresentationException(node.Mark(),
 				"Expected list (eg [\"file.png\"]), or pattern (eg \"file(0-9).png\").");
 	}
 
@@ -156,7 +156,7 @@ std::vector<Drawable> parse_drawable_list(const YAML::Node& node) {
 		std::vector<Image> images;
 
 		if (!filepattern_to_image_list(images, parse_str(node))) {
-			throw YAML::RepresentationException(node.GetMark(),
+			throw YAML::RepresentationException(node.Mark(),
 					"Expected list (eg [\"file.png\"]), or pattern (eg \"file(0-9).png\").");
 		}
 
@@ -190,7 +190,7 @@ std::vector<Image> parse_image_list(const YAML::Node& node) {
 	// Interpret as file pattern if string
 	if (node.Type() == YAML::NodeType::Scalar) {
 		if (!filepattern_to_image_list(images, parse_str(node))) {
-			throw YAML::RepresentationException(node.GetMark(),
+			throw YAML::RepresentationException(node.Mark(),
 					"Expected list (eg [\"file.png\"]), or pattern (eg \"file(0-9).png\").");
 		}
 		return images;
@@ -218,7 +218,7 @@ Drawable parse_drawable(const YAML::Node& node) {
 	}
 
 	if (node.Type() != YAML::NodeType::Map) {
-		throw YAML::RepresentationException(node.GetMark(), err);
+		throw YAML::RepresentationException(node.Mark(), err);
 	}
 
 	std::string type = parse_optional(node, "type", std::string());
@@ -232,7 +232,7 @@ Drawable parse_drawable(const YAML::Node& node) {
 	} else if (type == "lua") {
 		return Drawable(new LuaDrawable(parse_luadrawable(node)));
 	} else {
-		throw YAML::RepresentationException(node.GetMark(), err);
+		throw YAML::RepresentationException(node.Mark(), err);
 	}
 
 }

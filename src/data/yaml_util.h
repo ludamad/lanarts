@@ -21,16 +21,13 @@
 
 #include "FilenameList.h"
 #include "game_data.h"
-
-//Allows for sequence merges to be defined using hash merge syntax in yaml, eg - <<: *handle, in a sequence
-std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n);
+#include "parse.h"
 
 int parse_sprite_number(const YAML::Node & n);
 int parse_sprite_number(const YAML::Node& n, const char* key);
 int parse_enemy_number(const YAML::Node& n, const char* key);
 
 char* tocstring(const std::string & s);
-bool yaml_has_node(const YAML::Node& n, const char* key);
 //
 //void optional_set(const YAML::Node& node, const char* key, bool& value);
 
@@ -44,12 +41,7 @@ const YAML::Node& operator >>(const YAML::Node& n,
 
 template<class T>
 inline T parse_defaulted(const YAML::Node& n, const char* key, const T& dflt) {
-	T ret;
-	if (const YAML::Node* sptr = n.FindValue(key)) {
-		*sptr >> ret;
-	} else
-		return dflt;
-	return ret;
+	return parse_optional(n, key, dflt);
 }
 
 template<class T>

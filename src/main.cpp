@@ -175,6 +175,7 @@ int main(int argc, char** argv) {
 	} catch (const std::exception& err) {
 		fprintf(stderr, "%s\n", err.what());
 		fflush(stderr);
+		return 1;
 	}
 #endif
 

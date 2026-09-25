@@ -26,10 +26,7 @@ DataFiles load_datafilenames(const char* filename) {
 
 	if (file) {
 		try {
-			YAML::Parser parser(file);
-			YAML::Node root;
-
-			parser.GetNextDocument(root);
+			const YAML::Node root = YAML::Load(file);
 
 			optional_set(root, "equipment_files", dfiles.equipment_files);
 			optional_set(root, "enemy_files", dfiles.enemy_files);

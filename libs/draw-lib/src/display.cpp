@@ -5,10 +5,6 @@
 
 #include <SDL.h>
 
-#undef GL_GLEXT_VERSION
-#ifndef __EMSCRIPTEN__
-#include <GL/gl3w.h>
-#endif
 #include <SDL_opengl.h>
 
 #include <lcommon/geometry.h>
@@ -16,8 +12,8 @@
 
 #include "display.h"
 #include "imgui.h"
-#include "backends/imgui_impl_sdl.h"
-#include "backends/imgui_impl_opengl3.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
 
 #include "opengl/gl_extensions.h"
 
@@ -94,7 +90,9 @@ static void gl_sdl_initialize(const char *window_name, int w, int h, bool fullsc
         // );
         MAIN_WINDOW = SDL_CreateWindow(
                 window_name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h,
-                SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN /*_DESKTOP*/ : 0)
+                // Borderless fullscreen at the desktop resolution, like display_set_fullscreen.
+                // (Exclusive fullscreen can hand back a window in physical pixels on HiDPI displays.)
+                SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
         );
         // Create an OpenGL context associated with the window.
         MAIN_GL_CONTEXT = SDL_GL_CreateContext(MAIN_WINDOW);
@@ -112,20 +110,11 @@ static void gl_sdl_initialize(const char *window_name, int w, int h, bool fullsc
         exit(1);
     }
 
-    // Initialize OpenGL loader
-#ifndef __EMSCRIPTEN__
-    bool err = gl3wInit();
-#else
-    bool err = false; // Initialization not needed for emscripten
-#endif
-    if (err) {
-        fprintf(stderr, "Failed to initialize OpenGL loader!\n");
-        return;
-    }
-
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    // Only used as a renderer (no ImGui windows), so there is no layout to save to imgui.ini
+    ImGui::GetIO().IniFilename = nullptr;
     // TODO how to handle this properly? have to defer control to imguiio
 //    ImGuiIO &io = ImGui::GetIO();
 //    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
@@ -205,15 +194,23 @@ bool ldraw::display_is_fullscreen() {
 void ldraw::display_draw_start() {
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(MAIN_WINDOW);
+    ImGui_ImplSDL2_NewFrame();
+    // Everything is drawn in display_size() coordinates and stretched over the window's drawable
+    // area, whatever its size or pixel density. IOController scales mouse input the same way.
+    int drawable_w = 0, drawable_h = 0;
+    SDL_GL_GetDrawableSize(MAIN_WINDOW, &drawable_w, &drawable_h);
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2((float)RENDER_SIZE.w, (float)RENDER_SIZE.h);
+    io.DisplayFramebufferScale = ImVec2(drawable_w / (float)RENDER_SIZE.w, drawable_h / (float)RENDER_SIZE.h);
     ImGui::NewFrame();
 }
 
 void ldraw::display_draw_finish() {
     // Rendering
     ImGui::Render();
-    ImGuiIO& io = ImGui::GetIO();
-    glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+    int drawable_w = 0, drawable_h = 0;
+    SDL_GL_GetDrawableSize(MAIN_WINDOW, &drawable_w, &drawable_h);
+    glViewport(0, 0, drawable_w, drawable_h);
     ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);

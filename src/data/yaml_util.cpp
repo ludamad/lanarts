@@ -13,23 +13,6 @@
 #include "parse.h"
 #include "yaml_util.h"
 
-std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n) {
-	std::vector<const YAML::Node*> ret;
-	for (int i = 0; i < n.size(); i++) {
-		if (n[i].Type() == YAML::NodeType::Map) {
-			const YAML::Node & map = n[i];
-			YAML::Iterator it = map.begin();
-
-			for (; it != map.end(); ++it) {
-				ret.push_back(&*it);
-			}
-		} else
-			ret.push_back(&n[i]);
-
-	}
-	return ret;
-}
-
 int parse_sprite_number(const YAML::Node & n) {
 	std::string s;
 	n >> s;
@@ -81,10 +64,6 @@ char* tocstring(const std::string& s) {
 	return ret;
 }
 
-bool yaml_has_node(const YAML::Node & n, const char *key) {
-	return n.FindValue(key);
-}
-
 const YAML::Node & operator >>(const YAML::Node& n, Range& r) {
 	r = parse_range(n);
 	return n;
@@ -110,7 +89,7 @@ const YAML::Node & operator >>(const YAML::Node& n, bool& r) {
 	else if (val == "no")
 		r = false;
 	else
-		throw YAML::InvalidScalar(n.GetMark());
+		throw YAML::RepresentationException(n.Mark(), "expected 'yes' or 'no'");
 	return n;
 }
 
@@ -147,11 +126,8 @@ void load_data_impl_template(const FilenameList& filenames,
 
 		if (file) {
 			try {
-				YAML::Parser parser(file);
-				YAML::Node root;
-
-				parser.GetNextDocument(root);
-				const YAML::Node& cnode = root[resource];
+				const YAML::Node root = YAML::Load(file);
+				const YAML::Node cnode = root[resource];
 				for (int i = 0; i < cnode.size(); i++) {
 					node_callback(cnode[i], L, value);
 				}

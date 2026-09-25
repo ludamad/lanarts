@@ -5,7 +5,7 @@
 #ifndef UNITTEST_H_
 #define UNITTEST_H_
 
-#include <UnitTest++.h>
+#include <UnitTest++/UnitTest++.h>
 #include "luawrap/testutils.h"
 
 #include <string>

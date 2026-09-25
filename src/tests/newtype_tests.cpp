@@ -7,11 +7,18 @@
 #include <luawrap/testutils.h>
 #include <lua_api/lua_api.h>
 
+// newtype is defined in Lua (runtime/globals/CoreGlobals.lua); the tests run from runtime/
+static void load_newtype(lua_State* L) {
+	luaL_openlibs(L);
+	lua_api::register_general_api(L);
+	lua_assert_valid_dostring(L, "require 'globals.CoreGlobals'");
+}
+
 SUITE(lua_api_tests) {
 
 	TEST(newtype_basic) {
 		TestLuaState L;
-		lua_api::register_general_api(L);
+		load_newtype(L);
 
 		LuaValue newtype = luawrap::globals(L)["newtype"];
 		CHECK(!newtype.isnil());
@@ -27,7 +34,7 @@ SUITE(lua_api_tests) {
 
 	TEST(newtype_init) {
 		TestLuaState L;
-		lua_api::register_general_api(L);
+		load_newtype(L);
 
 		const char code[] = "Foo = newtype() \n"
 				"function Foo:init(member) self.member = member end \n"
@@ -47,7 +54,7 @@ SUITE(lua_api_tests) {
 
 	TEST(newtype_getter) {
 		TestLuaState L;
-		lua_api::register_general_api(L);
+		load_newtype(L);
 
 		const char code[] = "Foo = newtype() \n"
 				"function Foo:init(member) self.member = member end \n"
@@ -66,7 +73,7 @@ SUITE(lua_api_tests) {
 
 	TEST(newtype_setter) {
 		TestLuaState L;
-		lua_api::register_general_api(L);
+		load_newtype(L);
 
 		const char code[] = "Foo = newtype() \n"
 				"function Foo.set:setter(value) self.member = value end \n"

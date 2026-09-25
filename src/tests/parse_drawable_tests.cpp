@@ -15,9 +15,7 @@ using namespace ldraw;
 SUITE(parse_drawable_tests) {
 
 	static void string2node(const std::string& str, YAML::Node& root) {
-		std::stringstream ss(str);
-		YAML::Parser parser(ss);
-		parser.GetNextDocument(root);
+		root = YAML::Load(str);
 	}
 
 	TEST(parse_image_test) {

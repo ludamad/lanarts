@@ -1,7 +1,3 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-
-PROJECT(RVO)
-
-SET(RVO_SRCS Agent.h Agent.cpp Definitions.h KdTree.h KdTree.cpp Obstacle.h Obstacle.cpp RVO.h RVOSimulator.h RVOSimulator.cpp Vector2.h)
-
-ADD_LIBRARY(RVO STATIC ${RVO_SRCS})
+# RVO2 2.0 collision avoidance, extended for lanarts with RVOSimulator::removeAgent/changeAgentNo
+add_library(rvo2 STATIC Agent.cpp KdTree.cpp Obstacle.cpp RVOSimulator.cpp)
+target_include_directories(rvo2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

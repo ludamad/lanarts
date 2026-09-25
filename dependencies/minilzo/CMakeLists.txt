@@ -1,7 +1,0 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-
-PROJECT(LZO)
-
-SET(LZO_SRCS lzoconf.h  lzodefs.h  minilzo.h minilzo.c )
-
-ADD_LIBRARY(LZO STATIC ${LZO_SRCS})

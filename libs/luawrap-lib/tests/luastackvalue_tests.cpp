@@ -3,7 +3,7 @@
 #include <luawrap/luawrap.h>
 #include <luawrap/testutils.h>
 
-#include <UnitTest++.h>
+#include <UnitTest++/UnitTest++.h>
 
 SUITE (LuaStackValue) {
 	// Also tests table logic:

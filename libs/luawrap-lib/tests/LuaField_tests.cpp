@@ -6,7 +6,7 @@
 
 #include <luawrap/luawraperror.h>
 
-#include <UnitTest++.h>
+#include <UnitTest++/UnitTest++.h>
 
 SUITE (LuaField) {
 	TEST(simple_push) {

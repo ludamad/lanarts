@@ -7,7 +7,9 @@
 #include <vector>
 #include <algorithm>
 
+#ifndef __EMSCRIPTEN__
 #include <backward.hpp>
+#endif
 
 #include <lua.hpp>
 
@@ -391,22 +393,31 @@ namespace lua_api {
 //			}
         }
 
+        // The C++ call stack, innermost frame first, excluding this function
         std::vector<std::string> lapi_cpp_traceback() {
-            // Use our hacked copy of the 'backward' library:
-                using namespace backward;
-                StackTrace st; st.load_here(255);
-                Printer p;
-                std::vector<std::string> traceback = p.print(st);
-                // Filter the top of the traceback that includes this function:
-                while (!traceback.empty()) {
-                    std::string back = traceback.back();
-                    traceback.pop_back();
-                    if (back.find("StackTrace st; st.load_here(255);") != std::string::npos) {
-                        break;
-                    }
+#ifdef __EMSCRIPTEN__
+            return {}; // no native stack walking in WebAssembly
+#else
+            using namespace backward;
+            StackTrace st;
+            st.load_here(255);
+            TraceResolver resolver;
+            resolver.load_stacktrace(st);
+            std::vector<std::string> traceback;
+            for (size_t i = 0; i < st.size(); i++) {
+                ResolvedTrace trace = resolver.resolve(st[i]);
+                if (trace.object_function.find("lapi_cpp_traceback") != std::string::npos) {
+                    traceback.clear(); // drop the frames inside backward itself
+                    continue;
                 }
-                std::reverse(traceback.begin(), traceback.end());
-                return traceback;
+                std::string line = trace.object_function.empty() ? "??" : trace.object_function;
+                if (!trace.source.filename.empty()) {
+                    line += format(" at %s:%d", trace.source.filename.c_str(), (int)trace.source.line);
+                }
+                traceback.push_back(line);
+            }
+            return traceback;
+#endif
         }
 
 

@@ -58,7 +58,7 @@ TEST(parse_damage_modifiers) {
 
 TEST(parse_defence_modifiers) {
 	const char* program =
-					" resistance = { base = {7,8}, strength = 9, magic = 10, defence = 11, willpower = 12 },"
+					"{ resistance = { base = {7,8}, strength = 9, magic = 10, defence = 11, willpower = 12 },"
 					" magic_resistance = { base = {19,20}, strength = 21, magic = 22, defence = 23, willpower = 24 } }";
 	TestLuaState L;
 	ArmourStats def = parse_defence_modifiers(luawrap::eval(L, program));

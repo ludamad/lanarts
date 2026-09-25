@@ -12,8 +12,7 @@
 
 #include <SoundBase.h>
 
-struct _Mix_Music;
-typedef struct _Mix_Music Mix_Music;
+#include <SDL_mixer.h>
 
 namespace lsound {
 

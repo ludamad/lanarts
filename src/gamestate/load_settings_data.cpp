@@ -51,10 +51,7 @@ bool load_settings_data(GameSettings& settings, const char* filename) {
 
 	if (file) {
 		try {
-			YAML::Parser parser(file);
-			YAML::Node root;
-
-			parser.GetNextDocument(root);
+			const YAML::Node root = YAML::Load(file);
 
 			optional_set(root, "font", settings.font);
 			optional_set(root, "menu_font", settings.menu_font);
