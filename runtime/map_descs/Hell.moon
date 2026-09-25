@@ -132,9 +132,34 @@ make_template = (rng, back_links, forward_links) -> {
             }
                 return false
         return true
+    -- A guarded treasure room, in place of some of the random enemy mass. Failure to place is not fatal.
+    _create_encounter_rooms: (map) =>
+        for i=1,1
+            n_items_placed = 0
+            place_vault map, Vaults.crypt_encounter_vault {
+                rng: map.rng
+                enemy_placer: (map, xy) ->
+                    -- Only guard about half of the 'e' squares, hell enemies are strong
+                    if map.rng\chance(.5)
+                        enemy = OldMaps.enemy_generate(OldMaps.strong_hell)
+                        MapUtils.spawn_enemy(map, enemy, xy)
+                door_placer: (map, xy) ->
+                    -- nil is passed for the default open sprite
+                    MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
+                item_placer: (map, xy) ->
+                    local item
+                    if n_items_placed == 0
+                        item = ItemUtils.randart_generate(1) -- power level 1
+                    else
+                        item = ItemUtils.item_generate ItemGroups.enchanted_items
+                    MapUtils.spawn_item(map, item.type, item.amount, xy)
+                    n_items_placed += 1
+                :tileset
+            }
+        return true
     _spawn_enemies: (map) =>
         area = {0,0,map.size[1],map.size[2]}
-        OldMaps.generate_from_enemy_entries(map, OldMaps.strong_hell, 25, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        OldMaps.generate_from_enemy_entries(map, OldMaps.strong_hell, OldMaps.adjusted_enemy_amount(2), area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
         return true
     _spawn_items: (map) =>
         area = {0,0,map.size[1],map.size[2]}
@@ -166,6 +191,7 @@ make_template = (rng, back_links, forward_links) -> {
     on_create_source_map: (map) =>
         if not @_create_stairs_up(map)
             return nil
+        @_create_encounter_rooms(map)
         if not @_spawn_items(map)
             return nil
         if not @_spawn_enemies(map)

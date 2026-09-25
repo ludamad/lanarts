@@ -66,8 +66,10 @@ place_pixullochia = (region_set) ->
     return place_vault_in region_set, Vaults.hell_dungeon {
         tileset: Tilesets.pixulloch
         enemy_placer: (map, xy) ->
-            enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
-            MapUtils.spawn_enemy(map, enemy, xy)
+            -- Only guard about half of the 'e' squares, the gate should not be a wall of monsters
+            if map.rng\chance(.5)
+                enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
+                MapUtils.spawn_enemy(map, enemy, xy)
         door_placer: (map, xy) -> MapUtils.spawn_lanarts_door(map, xy)
         dungeon_placer: (map, xy) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.zig_portal")

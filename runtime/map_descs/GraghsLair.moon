@@ -43,31 +43,23 @@ graghs_lair_plan = (rng) -> {
     floor2: Tile.create(Tilesets.lair.floor_alt, false, true, {}, {FLAG_OVERWORLD})
     wall1: Tile.create(Tilesets.lair.wall, true, false, {}, {FLAG_OVERWORLD})
     wall2: Tile.create(Tilesets.lair.wall_alt, true, false, {}, {FLAG_OVERWORLD})
-    enemy_entries: {
-        {enemy: "Adder", guaranteed_spawns: 6, chance: 100}
-        {enemy: "Black Mamba", guaranteed_spawns: 2, chance: 25}
-        {enemy: "Mouther", guaranteed_spawns: 2}
-    }
-    item_groups: {{ItemGroups.basic_items, 8}}
-    number_regions: 2
-    room_radius: () ->  13
-    rect_room_num_range: {0, 0}
-    rect_room_size_range: {1, 1}
-    n_statues: 4
     n_subareas: 1
     size: {100, 100}
     n_items: 4
     n_enemies: 0
     n_stores: 2
     n_epic_stores: 2
-    n_encounter_vaults: 3
+    -- Gragh's Lair used to spike well above the Crypt it sits beside (about 35 hard hitters):
+    -- fewer Elephants and sheep encounter rooms keep it a step up rather than a wall.
+    -- (With the lighter Crypt, one more Elephant and Hydra keep it a step above the Crypt.)
+    n_encounter_vaults: 2
     enemy_entries: {
-        {enemy: "Sheep", guaranteed_spawns: 5, chance: 100}
-        {enemy: "Mouther", guaranteed_spawns: 4}
+        {enemy: "Sheep", guaranteed_spawns: 4, chance: 100}
+        {enemy: "Mouther", guaranteed_spawns: 3}
         {enemy: "Black Mamba", guaranteed_spawns: 4}
-        {enemy: "Hydra", guaranteed_spawns: 1}
+        {enemy: "Hydra", guaranteed_spawns: 2}
         {enemy: "Gragh", guaranteed_spawns: 1}
-        {enemy: "Elephant", guaranteed_spawns: 5}
+        {enemy: "Elephant", guaranteed_spawns: 4}
     }
     item_groups: {{ItemGroups.enchanted_items, 4}}
     number_regions: 5

@@ -40,6 +40,9 @@ MapDesc = newtype {
             map_label: @map_label
             post_map: {}
         }, @map_args
+        -- Size can be picked per generated map (eg, OldMaps layouts)
+        if type(map_args.size) == "function"
+            map_args.size = map_args.size(map_args.rng)
         map_args.size = vector_add(map_args.size, {@padding*2, @padding*2})
         map = NewMaps.source_map_create map_args
         map.post_map = {}
@@ -61,6 +64,12 @@ MapDesc = newtype {
                 return nil
         for post_map in *map.post_map
             if not post_map(map)
+                return nil
+        -- Map descs (eg Overworld, Underdungeon) queue late content (doors, statues, items) in 'post_maps'.
+        -- Run it before the connectivity check, as statues are solid.
+        for post_map in *map.post_maps
+            -- Only an explicit false fails the map; older callbacks return nothing
+            if post_map(map) == false
                 return nil
         if not NewMaps.check_connection(map)
             event_log("Failed connectivity check")

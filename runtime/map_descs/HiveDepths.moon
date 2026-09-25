@@ -109,6 +109,8 @@ node_fill_dungeon_room = () =>
         "Giant Bee"
         "Giant Bee"
         "Giant Bee"
+        "Giant Bee"
+        "Giant Bee"
         "Mouther"
         "Mouther"
         "Waxanarian"

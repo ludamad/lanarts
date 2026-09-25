@@ -61,7 +61,7 @@ make_template = (rng, back_links={}, forward_links={}) ->
         _enemy_entries: () =>
             return plan.enemy_entries
         _n_enemies: () =>
-            return math.ceil(plan.n_enemies * OldMaps.enemy_bonus())
+            return math.ceil(plan.n_enemies * (1 + OldMaps.enemy_bonus()))
         _n_encounter_vaults: () =>
             return plan.n_encounter_vaults
         _item_groups: () =>

@@ -39,7 +39,7 @@ DataW.enemy_create {
         magic: 5
         willpower: 8
     }
-    effects_active: {{"Pain Aura", {damage: 15, range: 90}}}
+    effects_active: {{"Pain Aura", {damage: 10, range: 90}}}
 }
 
 DataW.enemy_create {
@@ -196,7 +196,7 @@ summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) ->
                 @n_steps += 1
 }
 
-DataW.enemy_create summoner_base("Mummy", 5) {
+DataW.enemy_create summoner_base("Mummy", 3) {
     name: "Mummoner"
     sprite: "spr_enemies.undead.greater_mummy"
     radius: 11
@@ -669,7 +669,7 @@ DataW.enemy_create {
         for i=1,1
             {:type, :amount} = ItemUtils.randart_generate(2)
             ObjectUtils.spawn_item_near(@, type, amount)
-    effects_active: {{"Pain Aura", {damage: 25, range: 40}}}
+    effects_active: {{"Pain Aura", {damage: 10, range: 40}}}
 }
 
 DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 3, 100, 200, 25) {
@@ -683,7 +683,7 @@ DataW.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 3, 
     stats: {
         attacks: {{ weapon: "Basic Melee"}}
         movespeed: 3.5
-        hp: 500
+        hp: 420
         hpregen: 0.15
         strength: 25
         magic: 30
@@ -742,7 +742,7 @@ DataW.enemy_create {
         hp: 100
         hpregen: 0.02
         movespeed: 4
-        strength: 30
+        strength: 20
         defence: 16
         willpower: 16
     }
@@ -819,8 +819,8 @@ DataW.enemy_create {
        movespeed: 3.5
        hp: 125
        hpregen: 0.01
-       strength: 45
-       magic: 45
+       strength: 35
+       magic: 35
        defence: 25
        willpower: 25
    }
@@ -1672,7 +1672,7 @@ DataW.enemy_create {
         weapon_class: "magic"
         damage_type: {magic: 1.0}
         range: 65
-        cooldown: 35
+        cooldown: 45
         power: {base: {5, 5}}
         speed: 7
         spr_attack: "magic bolt"
@@ -1711,7 +1711,7 @@ DataW.enemy_create {
         hp: 100
         hpregen: 0.06
         movespeed: 5
-        strength: 30
+        strength: 24
         defence: 25
         willpower: 25
     }
@@ -1738,7 +1738,7 @@ DataW.enemy_create {
         weapon_class: "physical"
         damage_type: {physical: 1.0}
         range: 300
-        cooldown: 100
+        cooldown: 125
         power: {base: {40, 40}} -- 200% damage
         speed: 9
         spr_attack: "big stone"

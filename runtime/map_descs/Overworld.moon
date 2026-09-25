@@ -34,19 +34,22 @@ create_overworld_scheme = (tileset) -> nilprotect {
 OVERWORLD_TILESET = create_overworld_scheme(Tilesets.grass)
 
 place_doors_and_statues = (region_set) ->
-    {:map, :regions} = region_set
+    {:map} = region_set
 
-    for region in *regions
+    -- Never on vault squares: a plain door there would open the way past a locked vault door
+    for xy in *SourceMap.rectangle_match {:map, selector: {matches_none: {SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT}, matches_all: {FLAG_DOOR_CANDIDATE}}}
+        MapUtils.spawn_door(map, xy)
+        map\square_apply(xy, {add: SourceMap.FLAG_HAS_OBJECT})
+    -- Use the generated regions (map.regions), they carry the subtemplate conf
+    for region in *map.regions
         area = region\bbox()
-        conf = region.conf
-        for xy in *SourceMap.rectangle_match {:map, selector: {matches_none: {SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}, matches_all: {FLAG_DOOR_CANDIDATE}}}
-            MapUtils.spawn_door(map, xy)
-        for i=1,conf.n_statues
+        for i=1,region.conf.n_statues
             sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
             if not sqr
                 break
             map\square_apply(sqr, {add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT}, remove: SourceMap.FLAG_SEETHROUGH})
             MapUtils.spawn_decoration(map, OldMaps.statue, sqr, random(0,17))
+    return true
 
 overworld_items_and_enemies = (region_set) ->
     {:map, :regions} = region_set
@@ -54,14 +57,15 @@ overworld_items_and_enemies = (region_set) ->
     for region in *regions
         area = region\bbox()
         for i=1,OldMaps.adjusted_item_amount(10) do
-            sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
+            sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, Vaults.FLAG_NO_ITEM_SPAWN}})
             if not sqr
                 break
             map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
             item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, sqr)
 
-        OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 8, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        -- Only a few wandering animals; the vaults hold most of the overworld's enemies
+        OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, OldMaps.adjusted_enemy_amount(2), area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
     return true
 
 -----------------------------

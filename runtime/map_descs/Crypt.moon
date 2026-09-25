@@ -106,6 +106,42 @@ make_template = (rng, back_links, forward_links) -> {
             }
                 return false
         return true
+    -- Optional extra features, in place of the old mummy mass. Failure to place is not fatal.
+    _create_optional_features: (map) =>
+        -- 1-2 more guarded treasure rooms:
+        for i=1,map.rng\random(1,2)
+            place_vault map, Vaults.crypt_encounter_vault {
+                rng: map.rng
+                enemy_placer: (map, xy) ->
+                    -- Smaller groups than the required encounter rooms
+                    if map.rng\chance(.5)
+                        enemy = OldMaps.enemy_generate(OldMaps.weak_undead)
+                        MapUtils.spawn_enemy(map, enemy, xy)
+                door_placer: (map, xy) ->
+                    -- nil is passed for the default open sprite
+                    MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
+                item_placer: (map, xy) ->
+                    item = ItemUtils.item_generate ItemGroups.enchanted_items
+                    MapUtils.spawn_item(map, item.type, item.amount, xy)
+                tileset: Tilesets.crypt
+            }
+        -- Small random vaults:
+        for i=1,2
+            place_vault map, Vaults.small_random_vault {
+                rng: map.rng
+                enemy_placer: (map, xy) ->
+                    enemy = OldMaps.enemy_generate(OldMaps.weak_undead)
+                    MapUtils.spawn_enemy(map, enemy, xy)
+                store_placer: (map, xy) ->
+                    Region1.generate_store(map, xy)
+                item_placer: (map, xy) ->
+                    item = ItemUtils.item_generate ItemGroups.enchanted_items
+                    MapUtils.spawn_item(map, item.type, item.amount, xy)
+                gold_placer: (map, xy) ->
+                    MapUtils.spawn_item(map, "Gold", map.rng\random(5,15), xy)
+                tileset: Tilesets.crypt
+            }
+        return true
 
     -----------------------------
     -- Place optional dungeon 3, hell: --
@@ -133,8 +169,10 @@ make_template = (rng, back_links, forward_links) -> {
                     -- nil is passed for the default open sprite
                     MapUtils.spawn_door(map, xy, nil, Vaults._door_magentite, "Magentite Key")
                 enemy_placer: (map, xy) ->
-                    enemy = OldMaps.enemy_generate(OldMaps.strong_undead)
-                    MapUtils.spawn_enemy(map, enemy, xy)
+                    -- Only guard about a quarter of the 'e' squares, the gate should not be a wall of monsters
+                    if map.rng\chance(.25)
+                        enemy = OldMaps.enemy_generate(OldMaps.strong_undead)
+                        MapUtils.spawn_enemy(map, enemy, xy)
             }
                 return false
         return true
@@ -150,7 +188,8 @@ make_template = (rng, back_links, forward_links) -> {
         return true
     _spawn_enemies: (map) =>
         area = {0,0,map.size[1],map.size[2]}
-        OldMaps.generate_from_enemy_entries(map, OldMaps.strong_undead, 25, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        -- Not scaled by player count: Crypt Keeper auras and ghost poison already hit the whole party
+        OldMaps.generate_from_enemy_entries(map, OldMaps.strong_undead, 9, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
         return true
     _spawn_items: (map) =>
         area = {0,0,map.size[1],map.size[2]}
@@ -173,6 +212,7 @@ make_template = (rng, back_links, forward_links) -> {
         if not @_create_stairs_up(map)
             print("Stairs up fail")
             return false
+        @_create_optional_features(map)
         if not @_spawn_items(map)
             print("Items fail")
             return false

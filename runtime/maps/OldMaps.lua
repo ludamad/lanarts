@@ -12,20 +12,24 @@ M.weak_undead = {
 }
 
 M.strong_undead = {
-  {enemy = "Gaseous Ghost",          chance = 25, guaranteed_spawns = 3                                            },
-  {enemy = "Mummoner",          chance = 100                                            },
-  {enemy = "Crypt Keeper",          chance = 25, guaranteed_spawns = 3                                            },
-  {enemy = "Mummy",          guaranteed_spawns = 65                                           },
+  {enemy = "Gaseous Ghost",          chance = 25, guaranteed_spawns = 2                                            },
+  -- Mummoners summon; at chance 100 they were two thirds of the Crypt's random spawns
+  {enemy = "Mummoner",          chance = 15                                             },
+  {enemy = "Crypt Keeper",          chance = 25, guaranteed_spawns = 1                                            },
+  {enemy = "Mummy",          guaranteed_spawns = 14                                           },
 }
 M.weak_hell = {
 }
 M.strong_hell = {
   {enemy = "Hell Storm",        chance = 20,  group_chance = 33, group_size = 3           },
-     {enemy = "Centaur Marksman",      chance = 30, guaranteed_spawns = 2                                              },
-    {enemy = "Hell Forged", chance = 20},
-  {enemy = "Executioner",          guaranteed_spawns = 8                                           },
+     -- Marksmen kite and poison, they were half of Hell's damage
+     {enemy = "Centaur Marksman",      chance = 10                                                                 },
+    {enemy = "Hell Forged", chance = 10},
+  {enemy = "Executioner",          guaranteed_spawns = 6                                           },
   {enemy = "Mana Sapper",            chance = 20, group_size = 1                                             },
   {enemy = "Stara",          guaranteed_spawns = 1                                           },
+  -- Drops the War Lanart:
+  {enemy = "Hell Warrior",          guaranteed_spawns = 1                                           },
 }
 
 M.medium_animals = {
@@ -264,7 +268,7 @@ M.Dungeon2 = {
       items = { amount = 3,  group = ItemGroups.basic_items   },
       enemies = {
         wandering = false,
-        amount = 7,
+        amount = 9,
         generated = M.medium_enemies
       }
     }
@@ -275,7 +279,7 @@ M.Dungeon2 = {
       items = { amount = 6,  group = ItemGroups.basic_items },
       enemies = {
         wandering = true,
-        amount = 10,
+        amount = 15,
         generated = M.medium_enemies
     }
     }
@@ -354,7 +358,7 @@ M.Dungeon4 = {
     content = {
       items = { amount = 20,  group = ItemGroups.enchanted_items, randart_chance = 25, randart_power_level = 2   },
       enemies = {
-        amount = 30,
+        amount = 11,
         generated = M.harder_enemies
       }
     }
@@ -663,11 +667,15 @@ function M.create_map_desc(entry)
     local label = entry.label
     local tileset = entry.tileset
     assert(entry.layout, "Template not supported!")
-    local layout = random_choice(entry.layout)
-    event_log("Picking layout " .. pretty_tostring(layout))
-    local size = map_call(range_resolve, layout.size)
-    local size_mult = (size_multiplier() + 1) / 2
-    size = {math.ceil(size[1] * size_mult), math.ceil(size[2] * size_mult)}
+    -- The layout is re-picked for every generated map (including retries), when the map size is resolved.
+    local layout
+    local function pick_layout_and_size(rng)
+        layout = rng:random_choice(entry.layout)
+        event_log("Picking layout " .. pretty_tostring(layout))
+        local size = map_call(range_resolve, layout.size)
+        local size_mult = (size_multiplier() + 1) / 2
+        return {math.ceil(size[1] * size_mult), math.ceil(size[2] * size_mult)}
+    end
 
     local MapDesc = require("maps.MapDesc").MapDesc
     local MapNode = require("maps.MapDesc").MapNode
@@ -675,7 +683,7 @@ function M.create_map_desc(entry)
         map_label = label,
         default_content = tileset.wall,
         wandering_enabled = entry.wandering,
-        size = size,
+        size = pick_layout_and_size,
         padding = 0,
         children = {
             MapNode.create {

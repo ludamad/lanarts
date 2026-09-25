@@ -63,7 +63,7 @@ M.place_feature = (map, template, region_filter = ()->true) ->
                continue
            {w, h} = template.size
            -- Account for rotation in size:
-           if orient == SourceMap.ORIENT_TURN_90 or orient == SourceMap.ORIENT_TURN_180
+           if orient == SourceMap.ORIENT_TURN_90 or orient == SourceMap.ORIENT_TURN_270
                w, h = h, w
            {x1, y1, x2, y2} = r\bbox()
            -- Expand just outside the bounds of the region:

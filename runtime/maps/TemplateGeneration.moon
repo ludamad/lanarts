@@ -16,7 +16,7 @@ place_feature = (compiler, node, template) ->
        }
        {w, h} = template.size
        -- Account for rotation in size:
-       if orient == SourceMap.ORIENT_TURN_90 or orient == SourceMap.ORIENT_TURN_180
+       if orient == SourceMap.ORIENT_TURN_90 or orient == SourceMap.ORIENT_TURN_270
            w, h = h, w
        bbox = compiler\as_bbox(node, math.max(w,h))
        top_left_xy = MapUtils.random_square map, bbox, {

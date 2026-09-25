@@ -35,7 +35,7 @@ snake_pit_floor_plan = (rng) -> {
     n_enemies: 0
     n_encounter_vaults: 1
     enemy_entries: {
-        {enemy: "Adder", guaranteed_spawns: 8, chance: 100}
+        {enemy: "Adder", guaranteed_spawns: 5, chance: 100}
         {enemy: "Black Mamba", guaranteed_spawns: 2, chance: 25}
         {enemy: "Mouther", guaranteed_spawns: 3}
     }
@@ -59,7 +59,7 @@ make_template = (rng, back_links={}, forward_links={}) ->
         _enemy_entries: () =>
             return plan.enemy_entries
         _n_enemies: () =>
-            return math.ceil(plan.n_enemies * OldMaps.enemy_bonus())
+            return math.ceil(plan.n_enemies * (1 + OldMaps.enemy_bonus()))
         _n_encounter_vaults: () =>
             return plan.n_encounter_vaults
         _create_encounter_vault: (map) =>
@@ -74,6 +74,9 @@ make_template = (rng, back_links={}, forward_links={}) ->
                     else
                         item = ItemUtils.randart_generate(1) -- Power level 1
                     MapUtils.spawn_item(map, item.type, item.amount, xy)
+                    -- The Snake Lanart shares the second loot square
+                    if n_items_placed == 1
+                        MapUtils.spawn_item(map, "Snake Lanart", 1, xy)
                     n_items_placed += 1
             })
             vault = SourceMap.area_template_create(Vaults.crypt_encounter_vault conf)

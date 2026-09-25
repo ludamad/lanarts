@@ -10,6 +10,7 @@ Vaults = require "maps.Vaults"
 {:place_vault_in} = require "maps.VaultUtils"
 SourceMap = require "core.SourceMap"
 OldMaps = require "maps.OldMaps"
+Region1 = require "maps.Region1"
 
 {:MapCompilerContext, :make_on_player_interact} = require "maps.MapCompilerContext"
 Places = require "maps.Places"
@@ -32,30 +33,64 @@ underdungeon_items_and_enemies = (region_set) ->
     for region in *regions
         area = region\bbox()
         for i=1,OldMaps.adjusted_item_amount(10) do
-            sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
+            sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, Vaults.FLAG_NO_ITEM_SPAWN}})
             if not sqr
                 return false
             map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
             item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, sqr)
 
-        OldMaps.generate_from_enemy_entries(map, OldMaps.hard_enemies, 20, area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
+        -- Few random spawns: with the vaults and the Golem this is already the big step up from the Hive
+        OldMaps.generate_from_enemy_entries(map, OldMaps.hard_enemies, OldMaps.adjusted_enemy_amount(5), area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
     return true
 
 place_doors_and_statues = (region_set) ->
-    {:map, :regions} = region_set
+    {:map} = region_set
 
-    for region in *regions
+    -- Never on vault squares: a plain door there would open the way past a locked vault door
+    for xy in *SourceMap.rectangle_match {:map, selector: {matches_none: {SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT}, matches_all: {FLAG_DOOR_CANDIDATE}}}
+        MapUtils.spawn_door(map, xy)
+        map\square_apply(xy, {add: SourceMap.FLAG_HAS_OBJECT})
+    -- Use the generated regions (map.regions), they carry the subtemplate conf
+    for region in *map.regions
         area = region\bbox()
-        conf = region.conf
-        for xy in *SourceMap.rectangle_match {:map, selector: {matches_none: {SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}, matches_all: {FLAG_DOOR_CANDIDATE}}}
-            MapUtils.spawn_door(map, xy)
-        for i=1,conf.n_statues
+        for i=1,region.conf.n_statues
             sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
             if not sqr
                 break
             map\square_apply(sqr, {add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT}, remove: SourceMap.FLAG_SEETHROUGH})
             MapUtils.spawn_decoration(map, OldMaps.statue, sqr, random(0,17))
+    return true
+
+place_optional_features = (region_set) ->
+    -- Optional features, in the style of the overworld. Failure to place is not fatal.
+    -- Ridges, with loot in place of dungeon entrances:
+    for i=1,region_set.map.rng\random(1,2)
+        place_vault_in region_set, Vaults.ridge_dungeon {
+            dungeon_placer: (map, xy) ->
+                item = ItemUtils.item_generate ItemGroups.enchanted_items
+                MapUtils.spawn_item(map, item.type, item.amount, xy)
+            door_placer: (map, xy) -> MapUtils.spawn_door(map, xy)
+            tileset: Tilesets.underdungeon
+        }
+    -- Small random vaults:
+    for i=1,2
+        place_vault_in region_set, Vaults.small_random_vault {
+            rng: region_set.map.rng
+            enemy_placer: (map, xy) ->
+                enemy = OldMaps.enemy_generate(OldMaps.hard_enemies)
+                MapUtils.spawn_enemy(map, enemy, xy)
+            store_placer: (map, xy) ->
+                Region1.generate_store(map, xy)
+            item_placer: (map, xy) ->
+                item = ItemUtils.item_generate ItemGroups.enchanted_items
+                MapUtils.spawn_item(map, item.type, item.amount, xy)
+            gold_placer: (map, xy) ->
+                MapUtils.spawn_item(map, "Gold", map.rng\random(5,15), xy)
+            tileset: Tilesets.underdungeon
+        }
+
+    return true
 
 underdungeon_features = (region_set, back_links, forward_links) ->
     -----------------------------
@@ -143,6 +178,10 @@ return MapDesc.create {
                     return false
 
                 NewMaps.generate_door_candidates(@map, @map.rng, @map.regions)
+                -- Optional vaults go after the root hook has placed the required dungeon entrances,
+                -- and before doors and statues, which must avoid vault squares
+                append @map.post_maps, () ->
+                    return place_optional_features(@region_set)
                 append @map.post_maps, () ->
                     return place_doors_and_statues(@region_set)
                 if not underdungeon_features(@region_set, @desc.back_links, @desc.forward_links)
