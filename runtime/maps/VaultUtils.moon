@@ -36,7 +36,8 @@ attempt_placement = (region_set, template) ->
         x1, y1, x2, y2 = (x1 - w), (y1 - h), (x2 + w), (y2 + h)
         -- Ensure we are within the bounds of the world map:
         x1, y1, x2, y2 = math.max(x1, 0), math.max(y1, 0), math.min(x2, map.size[1] - w), math.min(y2, map.size[2] - h)
-        top_left_xy = MapUtils.random_square(map, {x1, y1, x2, y2})
+        -- Only a candidate: leave the square unmarked (random_square's default marks it taken)
+        top_left_xy = MapUtils.random_square(map, {x1, y1, x2, y2}, nil, {})
         if not top_left_xy
             continue
         apply_args = {:map, :top_left_xy, orientation: orient }
