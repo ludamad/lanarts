@@ -266,6 +266,21 @@ bool GameTiles::radius_test(const Pos& xy, int rad, bool issolid, int ttype,
 
 	int x = xy.x, y = xy.y;
 
+	// Off the map is never free: a circle reaching past the edge hits it, when looking for solid
+	if (issolid && ttype == -1) {
+		int map_w = size.w * TILE_SIZE, map_h = size.h * TILE_SIZE;
+		Pos off(-2, -2);
+		if (x - rad < 0) off = Pos(-1, y / TILE_SIZE);
+		else if (x + rad >= map_w) off = Pos(size.w, y / TILE_SIZE);
+		else if (y - rad < 0) off = Pos(x / TILE_SIZE, -1);
+		else if (y + rad >= map_h) off = Pos(x / TILE_SIZE, size.h);
+		if (off.x != -2) {
+			if (hitloc)
+				*hitloc = off; // the off-map tile it ran into
+			return true;
+		}
+	}
+
 	int mingrid_x = (x - rad) / TILE_SIZE, mingrid_y = (y - rad) / TILE_SIZE;
 	int maxgrid_x = (x + rad) / TILE_SIZE, maxgrid_y = (y + rad) / TILE_SIZE;
 	int minx = squish(mingrid_x, 0, size.w), miny = squish(mingrid_y, 0, size.h);
