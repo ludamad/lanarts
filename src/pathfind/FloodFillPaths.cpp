@@ -15,53 +15,70 @@
 
 #include <lcommon/math_util.h>
 
-#include "gheap.h"
 #include "FloodFillPaths.h"
 
 using namespace std;
 
-static void floodfill(Grid<FloodFillNode>& path, Size size, int sx, int sy, std::vector<FloodFillCoord>& heap_buffer) {
-	// Every tile is pushed at most once, plus the start
-	if (heap_buffer.size() < size.area() + 1) {
-		heap_buffer.resize(size.area() + 1);
+// Step costs: 100 straight, 140 diagonal. Every distance is then a multiple of 20, and a step adds
+// at most 7 of those units, so 8 buckets (a circular bucket queue) hold every pending distance.
+static const int DISTANCE_UNIT = 20, N_BUCKETS = 8;
+
+// Shortest paths from (sx, sy) over the open tiles of the region, as a direction per tile back
+// towards the source. Tiles are final when popped, so distances are true shortest-path lengths.
+static void floodfill(Grid<FloodFillNode>& path, Size size, int sx, int sy,
+		std::vector<int> (&buckets)[N_BUCKETS], std::vector<char>& finished) {
+	int alloc_w = path.size().w;
+	finished.assign(size.area(), 0);
+	for (auto& bucket : buckets) {
+		bucket.clear();
 	}
-	FloodFillCoord* heap = heap_buffer.data();
-	FloodFillCoord* heap_end = heap + 1;
 
-	Size alloc_size = path.size();
-
-	heap[0] = FloodFillCoord(sx, sy, 0); //Start coordinate
 	path[Pos(sx, sy)] = FloodFillNode(false, false, 0, 0, 0);
-	while (heap != heap_end) {
-		FloodFillCoord curr = *heap;
-		FloodFillCoord next;
-		gheap<>::pop_heap(heap, heap_end--);
-		for (int dy = -1; dy <= +1; dy++) {
-			for (int dx = -1; dx <= +1; dx++) {
-				int nx = curr.x + dx, ny = curr.y + dy;
-				//LANARTS_ASSERT(
-				//		curr.x >= 0 && curr.x < w && curr.y >= 0 && curr.y < h);
-				if (nx < 0 || nx >= size.w || ny < 0 || ny >= size.h)
+	buckets[0].push_back(sy * size.w + sx);
+	int pending = 1;
+	for (int unit = 0; pending > 0; unit++) {
+		std::vector<int>& bucket = buckets[unit % N_BUCKETS];
+		// Pushes during this loop go to later buckets (every step costs at least 5 units)
+		for (size_t i = 0; i < bucket.size(); i++) {
+			pending--;
+			int index = bucket[i];
+			int x = index % size.w, y = index / size.w;
+			FloodFillNode& node = path.raw_get(y * alloc_w + x);
+			if (finished[index] || node.distance != unit * DISTANCE_UNIT) {
+				continue; // reached again by a shorter way since it was queued
+			}
+			finished[index] = 1;
+			for (int dy = -1; dy <= +1; dy++) {
+				int ny = y + dy;
+				if (ny < 0 || ny >= size.h) {
 					continue;
-				int coord = ny * alloc_size.w + nx;
-				bool is_diag = (abs(dx) == abs(dy));
-				int dist = curr.distance + (is_diag ? 140 : 100);
-				FloodFillNode* p = &path.raw_get(coord);
-				if (p->open && !p->solid) {
-					bool cant_cross = is_diag
-							&& (path[Pos(nx, curr.y)].solid
-									|| path[Pos(curr.x, ny)].solid);
-					if (!cant_cross) {
-						p->open = false;
-						p->dx = -dx, p->dy = -dy;
-						p->distance = dist;
-						*(heap_end++) = FloodFillCoord(nx, ny, dist);
-						gheap<>::push_heap(heap, heap_end);
+				}
+				for (int dx = -1; dx <= +1; dx++) {
+					int nx = x + dx;
+					if ((dx == 0 && dy == 0) || nx < 0 || nx >= size.w || finished[ny * size.w + nx]) {
+						continue;
+					}
+					FloodFillNode& next = path.raw_get(ny * alloc_w + nx);
+					if (next.solid) {
+						continue;
+					}
+					bool diagonal = (dx != 0 && dy != 0);
+					// No cutting corners
+					if (diagonal && (path.raw_get(y * alloc_w + nx).solid || path.raw_get(ny * alloc_w + x).solid)) {
+						continue;
+					}
+					int distance = node.distance + (diagonal ? 140 : 100);
+					if (next.open || distance < next.distance) {
+						next.open = false;
+						next.dx = -dx, next.dy = -dy;
+						next.distance = distance;
+						buckets[(distance / DISTANCE_UNIT) % N_BUCKETS].push_back(ny * size.w + nx);
+						pending++;
 					}
 				}
 			}
-
 		}
+		bucket.clear();
 	}
 }
 
@@ -123,7 +140,7 @@ void FloodFillPaths::fill_paths_tile_region(const Pos& tile_xy,
 	if (_size.area() <= 0 || tile_xy.x < 0 || tile_xy.y < 0 || tile_xy.x >= _size.w || tile_xy.y >= _size.h) {
 		return;
 	}
-	floodfill(_path, _size, tile_xy.x, tile_xy.y, _heap);
+	floodfill(_path, _size, tile_xy.x, tile_xy.y, _buckets, _finished);
 	if (clear_previous) {
 		_fill_valid = true, _filled_tile = tile_xy, _filled_area = area;
 	}

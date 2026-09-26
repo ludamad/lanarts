@@ -112,6 +112,8 @@ private:
 	bool _fill_valid = false;
 	Pos _filled_tile;
 	BBox _filled_area;
-	std::vector<FloodFillCoord> _heap;
+	/* Scratch space for filling, kept between fills */
+	std::vector<int> _buckets[8];
+	std::vector<char> _finished;
 };
 #endif /* FLOODFILLPATHS_H_ */
