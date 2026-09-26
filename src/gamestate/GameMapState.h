@@ -13,7 +13,6 @@
 
 #include "collision_avoidance/CollisionAvoidance.h"
 #include "objects/MonsterController.h"
-#include "pathfind/WanderMap.h"
 
 #include "LuaDrawableQueue.h"
 #include "GameInstSet.h"
