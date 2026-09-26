@@ -245,6 +245,8 @@ void LuaSerializeContext::encode_metatable(int idx) {
 }
 
 void LuaSerializeContext::encode(int idx) {
+    // Recursion into nested tables pushes values: make room each level
+    luaL_checkstack(L, 16, "serializing a deeply nested Lua value");
     idx = abs_index(L, idx);
 	int old_stack = lua_gettop(L);
 	switch (lua_type(L, idx)) {
@@ -310,6 +312,8 @@ void LuaSerializeContext::decode() {
 //#define P(x) printf(#x"\n");
 #define P(x)
 void LuaSerializeContext::_decode(int type) {
+    // Recursion into nested tables pushes values: make room each level
+    luaL_checkstack(L, 16, "serializing a deeply nested Lua value");
 	int old_stack = lua_gettop(L) + 1;
 	switch (type) {
 	case LS_NUMBER:

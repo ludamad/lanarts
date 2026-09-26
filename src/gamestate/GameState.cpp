@@ -569,6 +569,10 @@ static void lua_drawables_draw_rest(LuaDrawableQueue::Iterator iter) {
 }
 
 void GameState::draw(bool drawhud) {
+#ifdef BUILD_HEADLESS
+    // Nothing to draw to; bots and simulations still call draw() on their usual frames
+    return;
+#endif
 	perf_timer_begin(FUNCNAME);
 
     Timer t;
