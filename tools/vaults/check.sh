@@ -1,7 +1,7 @@
 #!/bin/bash
 # Checks every vault of runtime/maps/vaults: engine.StartVaultCheck's static checks, then each layout
 # forced into generated worlds (engine.StartMapGenCheck --vault) once per seed, in its own overworld
-# theme (entrances and vaults for any theme go round the rotation).
+# theme (entrances and vaults for any theme go round the rotation), saving each world to check it can be.
 # usage: [SEEDS="1 2"] [ONLY=regex] check.sh outdir
 #   -> outdir/vaults.json (for gallery.py), outdir/placements.txt ("name:layout placed/tries"), logs
 set -e
@@ -25,7 +25,7 @@ for v in data["vaults"]:
             world = own[s % len(own)] if own else rotation[(s + i) % len(rotation)]
             print(v["name"], i, s, world)
 PY
-xargs -P "${JOBS:-8}" -L 1 bash -c 'perl -e "alarm 600; exec @ARGV" "'"$BIN"'" engine.StartMapGenCheck --seed $2 --overworld $3 --vault $0:$1 > "'"$out"'/logs/$0_$1_s$2.log" 2>&1; echo "EXIT $?" >> "'"$out"'/logs/$0_$1_s$2.log"' < "$out/jobs.txt"
+xargs -P "${JOBS:-8}" -L 1 bash -c 'perl -e "alarm 600; exec @ARGV" "'"$BIN"'" engine.StartMapGenCheck --seed $2 --overworld $3 --vault $0:$1 --save "'"$out"'/logs/$0_$1_s$2.save" > "'"$out"'/logs/$0_$1_s$2.log" 2>&1; echo "EXIT $?" >> "'"$out"'/logs/$0_$1_s$2.log"; rm -f "'"$out"'/logs/$0_$1_s$2.save"' < "$out/jobs.txt"
 python3 - "$out" > "$out/placements.txt" <<'PY'
 import collections, sys
 out = sys.argv[1]

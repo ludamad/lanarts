@@ -46,6 +46,7 @@ run = (raw_args) ->
     parser\option("--players", "Players.", "1")
     parser\option("--overworld", "Overworld layout (see map_descs/World.moon); picked at random if not given.")
     parser\option("--dump", "Write the overworld's squares to this file, one character each.")
+    parser\option("--save", "Save the game to this file once every level is made (checks it can be saved).")
     parser\option("--vault", "Force this vault (maps/vaults), as name or name:layout, wherever its kind goes.")
     args = parser\parse(raw_args)
     game_start = () ->
@@ -169,6 +170,9 @@ run = (raw_args) ->
                     append names, k .. "=" .. v
                 table.sort names
                 print string.format("RESULT seed=%s players=%s | %-24s enemies=%3d items=%3d doors=%3d decor=%3d | %s", args.seed, args.players, label, t.enemies, t.items, t.doors, t.decor, table.concat(names, ","))
+            if args.save
+                GameState.save(args.save)
+                print "SAVED " .. args.save
             for {label, name, i} in *vaults_placed
                 print "VAULT #{name}:#{i} | #{label}"
             os.exit(0)

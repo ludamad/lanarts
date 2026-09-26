@@ -216,7 +216,8 @@ template = (def, args, i) ->
                 legend[c] = legend_entry(spec, def, palette, placers)
     return {:legend, data: table.concat(rows, "\n")}
 
-M = {:STANDARD, :PALETTES, :DEFAULT_PALETTE, :palette_of, :resolve_ref, :spec_of, :layout_rows, :template}
+-- DECOR must be reachable from the module: saves refer to a decoration's sprite by its path here
+M = {:STANDARD, :PALETTES, :DEFAULT_PALETTE, :DECOR, :palette_of, :resolve_ref, :spec_of, :layout_rows, :template}
 
 -- Called with (def, layout index) after each placement; engine.StartMapGenCheck hooks it
 M.on_placed = do_nothing
