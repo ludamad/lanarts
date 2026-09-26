@@ -30,7 +30,8 @@ make_step = (class_name, bosses, slot) -> () =>
             break
     if not best
         return
-    melee = (class_name == "Fighter" or class_name == "Rogue" or class_name == "Templar" or player.stats.mp < 10)
+    -- Casters keep their distance even out of mana, waiting for it to come back
+    melee = (class_name == "Fighter" or class_name == "Rogue" or class_name == "Templar")
     want = if melee then (player.radius + best.radius + 4) else 150
     -- The spot to fight from: out from the boss towards the first hero, turned by this hero's slot
     lead = World.players[1].instance
@@ -48,7 +49,7 @@ make_step = (class_name, bosses, slot) -> () =>
 run = (raw_args) ->
     parser = argparse("lanarts", "Boss showcase")
     parser\option("--monsters", "Monsters to fight, as name[:count][;name[:count]...].")
-    parser\option("--class", "Party class.", "Fighter")
+    parser\option("--class", "Party classes, comma separated, one per hero in turn (Blue_Mage for Blue Mage).", "Fighter")
     parser\option("--level", "Party level.", "1")
     parser\option("--players", "Party size.", "1")
     parser\option("--tileset", "Arena tileset (tiles/Tilesets.lua).", "pebble")
@@ -69,16 +70,18 @@ run = (raw_args) ->
         return ResourceLoading.ensure_resources_before () ->
             GameState = require "core.GameState"
             GameState.clear_players()
+            classes = [c\gsub("_", " ") for c in args.class\gmatch("[^,]+")]
             for i=1,tonumber(args.players)
+                class_name = classes[(i - 1) % #classes + 1]
                 input_source = (player) ->
                     for _=2,tonumber(args.level)
                         player\gain_level()
                     player.stats.hp = player.stats.max_hp
                     player.stats.mp = player.stats.max_mp
                     source = require("input.ProgrammableInputSource").create(player)
-                    source.step = make_step(args.class, bosses, i)
+                    source.step = make_step(class_name, bosses, i)
                     return source
-                GameState.register_player "Hero" .. i, args.class, input_source, true, i - 1, 0
+                GameState.register_player "Hero" .. i, class_name, input_source, true, i - 1, 0
             EngineInternal.init_gamestate()
             random_seed(tonumber(args.seed))
             Engine.first_map_create = () ->

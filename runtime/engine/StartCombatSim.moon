@@ -1,5 +1,6 @@
 -- Headless combat simulation: bot party of P players (given class + level) vs a set of monsters in DebugArena.
 -- Jobs file lines: class level players seed monster[:count][;monster[:count]...]
+-- class may list one per player in turn, comma separated (Fighter,Stormcaller; Blue_Mage for Blue Mage)
 argparse = require "argparse"
 EngineInternal = require "core.EngineInternal"
 ResourceLoading = require "engine.ResourceLoading"
@@ -27,7 +28,8 @@ make_step = (class_name) -> () =>
     if not best
         return
     -- Casters close in and use their weapon when out of mana
-    melee = (class_name == "Fighter" or class_name == "Rogue" or class_name == "Templar" or player.stats.mp < 10)
+    -- Casters keep their distance even out of mana, waiting for it to come back
+    melee = (class_name == "Fighter" or class_name == "Rogue" or class_name == "Templar")
     want = if melee then (player.radius + best.radius + 4) else 110
     if best_d > want
         dx, dy = best.x - player.x, best.y - player.y
@@ -42,17 +44,19 @@ game_init = (job) ->
     GameState = require("core.GameState")
     GameState.clear_players()
     job.maxhp = {}
+    classes = [c\gsub("_", " ") for c in job.class\gmatch("[^,]+")]
     for i=1,job.players
+        class_name = classes[(i - 1) % #classes + 1]
         input_source = (player) ->
             for _=2,job.level
                 player\gain_level()
             append job.maxhp, player.stats.max_hp
             source = require("input.ProgrammableInputSource").create(player)
-            source.step = make_step(job.class)
+            source.step = make_step(class_name)
             player.stats.max_hp = BIG_HP
             player.stats.hp = BIG_HP
             return source
-        GameState.register_player 'Sim' .. i, job.class, input_source, true, i - 1, 0
+        GameState.register_player 'Sim' .. i, class_name, input_source, true, i - 1, 0
     EngineInternal.init_gamestate()
     random_seed(job.seed)
     Engine.first_map_create = () ->
