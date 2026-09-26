@@ -13,6 +13,7 @@ namespace ldungeon_gen {
 	void lua_register_map(const LuaValue& module);
 	void lua_register_areatemplate(const LuaValue& module);
 	void lua_register_tunnelgen(const LuaValue& module);
+	void lua_register_procedural(const LuaValue& module);
 
 	void lua_register_ldungeon(const LuaValue& submodule, bool register_lcommon = true) {
 		lua_State* L = submodule.luastate();
@@ -22,6 +23,7 @@ namespace ldungeon_gen {
 		lua_register_map(submodule);
 		lua_register_areatemplate(submodule);
 		lua_register_tunnelgen(submodule);
+		lua_register_procedural(submodule);
 		register_libxmi_bindings(submodule);
 	}
 }
