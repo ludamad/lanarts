@@ -74,6 +74,8 @@ def write_runtime(results):
         rig.to_image(base).save(os.path.join(sprite_dir, f"{m.NAME}.png"))
         out_dir = os.path.join(RUNTIME, "spr_animations", m.NAME)
         os.makedirs(out_dir, exist_ok=True)
+        for stale in os.listdir(out_dir):  # clips of an earlier canvas size would clash by name
+            os.remove(os.path.join(out_dir, stale))
         lua.append("Data.animation_set_create {")
         lua.append(f'    sprite = "spr_bosses.{m.NAME}",')
         for name in ORDER:
