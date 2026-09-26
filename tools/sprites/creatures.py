@@ -265,8 +265,9 @@ class Creature:
 
     def hurt(self):
         p = self.px
+        # Flash, then settle back; the engine already tints a hurt monster red, so no tint here
         return [self._frame(rig.shift(rig.flash(self.figure, 0.7), p, 0)),
-                self._frame(rig.shift(rig.tint(self.figure, (255, 64, 64), 0.25), -p, 0))]
+                self._frame(rig.shift(self.figure, -p, 0))]
 
     def death(self):
         slump = scale(self.figure, 1.06, 0.9, self.feet)
