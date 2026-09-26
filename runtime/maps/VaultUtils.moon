@@ -37,6 +37,8 @@ attempt_placement = (region_set, template) ->
         -- Ensure we are within the bounds of the world map:
         x1, y1, x2, y2 = math.max(x1, 0), math.max(y1, 0), math.min(x2, map.size[1] - w), math.min(y2, map.size[2] - h)
         top_left_xy = MapUtils.random_square(map, {x1, y1, x2, y2})
+        if not top_left_xy
+            continue
         apply_args = {:map, :top_left_xy, orientation: orient }
         if not covers_protected(map, top_left_xy, w, h) and template\matches(apply_args)
             template\apply(apply_args)
