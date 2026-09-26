@@ -177,14 +177,42 @@ place_snake_pit = (region_set) ->
     }
 
 
-return {
-    generate: () ->
+-- Overworld layouts. Each game picks one at random (from the game seed), unless LANARTS_OVERWORLD
+-- or M.overworld (eg engine.StartMapGenCheck --overworld) names one, which draws no random number.
+OVERWORLD_NAMES = {
+    "classic", "wildlands", "settled", "ringwood", "badlands", "farmland", "terraces",
+    "ravine", "crossroads", "craters", "spiral", "labyrinth", "canyons", "rootways", "patchwork", "ridges", "ruins"
+}
+OVERWORLDS = {
+    classic: "map_descs.Overworld"
+    wildlands: "map_descs.OverworldNoise"          -- noise: forest, meadow and ridges by elevation
+    settled: "map_descs.OverworldSimulation"       -- simulation: forest cleared by settlers over the years
+    ringwood: "map_descs.OverworldShapes"          -- shapes: glades ringed around a rock mesa
+    badlands: "map_descs.OverworldBadlands"        -- cellular automaton: rock ridges and dry basins
+    farmland: "map_descs.OverworldFarmland"        -- binary space partition: fields, hedges and lanes
+    terraces: "map_descs.OverworldTerraces"        -- noise contours: stepped terraces with cliffs
+    ravine: "map_descs.OverworldRavine"            -- random walks: a rock ravine winding between wooded uplands
+    crossroads: "map_descs.OverworldCrossroads"    -- lines and shapes: four roads meeting at a village green
+    craters: "map_descs.OverworldCraters"          -- ellipses: an impact field of rock-rimmed craters
+    spiral: "map_descs.OverworldSpiral"            -- parametric curve: a road coiling in to a central clearing
+    labyrinth: "map_descs.OverworldLabyrinth"      -- maze generation: a hedge maze with open lawns
+    canyons: "map_descs.OverworldCanyons"          -- random walks in rock: canyons cut through rock country
+    rootways: "map_descs.OverworldRootways"        -- growth automaton: branching, root-like meadows
+    patchwork: "map_descs.OverworldPatchwork"      -- Voronoi cells: meadows between hedgerows
+    ridges: "map_descs.OverworldRidges"            -- banded noise: parallel ridges with valleys and passes
+    ruins: "map_descs.OverworldRuins"              -- grid and rectangles: an overgrown ruined town
+}
+
+forced = os.getenv("LANARTS_OVERWORLD")
+M = {overworld: (forced ~= "" and forced or nil), :OVERWORLDS, :OVERWORLD_NAMES}
+
+M.generate = () ->
         player_spawn_points = nil
-        -- TODO support hooking into arbitrary rooms
-        --if os.getenv "DESC"
-        --    require(os.getenv "DESC")\linker {
-        --    }
-        overworld = require("map_descs.Overworld")\linker {
+        name = M.overworld or random_choice(OVERWORLD_NAMES)
+        M.generated_overworld = name
+        desc = OVERWORLDS[name]
+        assert desc, "Unknown overworld '#{name}', expected one of: #{table.concat(OVERWORLD_NAMES, ', ')}"
+        overworld = require(desc)\linker {
             root: () =>
                 first_dungeon = @rng\random_choice {place_temple, place_snake_pit}
                 if not first_dungeon(@region_set)
@@ -200,4 +228,5 @@ return {
         game_map = overworld\get()
         require("core.World").players_spawn(game_map, player_spawn_points)
         return game_map
-}
+
+return M

@@ -6,6 +6,19 @@ MapUtils = require "maps.MapUtils"
 
 N_TRIES = 100
 
+-- Maps can keep vaults off some squares: map.protected is a set of y * 4096 + x keys (see
+-- OverworldCommon.protect). A vault is never placed with its footprint over one of them.
+covers_protected = (map, top_left_xy, w, h) ->
+    protected = map.protected
+    if not protected
+        return false
+    {x0, y0} = top_left_xy
+    for y=y0,y0+h-1
+        for x=x0,x0+w-1
+            if protected[y * 4096 + x]
+                return true
+    return false
+
 attempt_placement = (region_set, template) ->
     {:map, :regions} = region_set
     orient = map.rng\random_choice {
@@ -25,7 +38,7 @@ attempt_placement = (region_set, template) ->
         x1, y1, x2, y2 = math.max(x1, 0), math.max(y1, 0), math.min(x2, map.size[1] - w), math.min(y2, map.size[2] - h)
         top_left_xy = MapUtils.random_square(map, {x1, y1, x2, y2})
         apply_args = {:map, :top_left_xy, orientation: orient }
-        if template\matches(apply_args)
+        if not covers_protected(map, top_left_xy, w, h) and template\matches(apply_args)
             template\apply(apply_args)
             return true
     return false
