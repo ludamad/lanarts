@@ -14,20 +14,8 @@
 #include "gamestate/GameTiles.h"
 #include "AStarPath.h"
 
-#include "gheap.h"
 
 using namespace std;
-
-class AStarOrderNodes {
-public:
-	bool operator()(AStarNode* a, AStarNode* b) const {
-		if (a->f_score == b->f_score) {
-			//Maintain strict-weak-ordering
-			return a > b;
-		}
-		return (a->f_score > b->f_score);
-	}
-};
 
 static inline int heurestic_distance(const Pos& s, const Pos& e) {
 	int h_diagonal = min(abs(s.x - e.x), abs(s.y - e.y));
@@ -35,50 +23,28 @@ static inline int heurestic_distance(const Pos& s, const Pos& e) {
 	return 114 * h_diagonal + 100 * (h_straight - 2 * h_diagonal);
 }
 
-void AStarPath::initialize(GameState* gs, BBox world_region, bool imperfect_knowledge) {
-	perf_timer_begin(FUNCNAME);
-	BoolGridRef grid = gs->tiles().solidity_map();
-	nodes.resize(world_region.size());
-	int width = world_region.width();
-	if (imperfect_knowledge) {
-		BoolGridRef seen = gs->tiles().previously_seen_map();
-		FOR_EACH_BBOX_XY(world_region, xy) {
-			AStarNode& node = nodes[xy - world_region.left_top()];
-			node.openset = false;
-			node.closedset = false;
-			node.previous = NULL;
-			node.solid = ((*seen)[xy] && (*grid)[xy]);
+namespace {
+	// Heap entry; a node whose g_score has since improved leaves stale entries behind, skipped when
+	// popped (cheaper than finding and updating its entry)
+	struct AStarEntry {
+		int f_score, h_score, g_score, index;
+	};
+	// std heaps keep the greatest on top: order so that it is the lowest f_score, and among equal
+	// f_scores the one nearest the goal
+	struct AStarEntryOrder {
+		bool operator()(const AStarEntry& a, const AStarEntry& b) const {
+			if (a.f_score != b.f_score) {
+				return a.f_score > b.f_score;
+			}
+			if (a.h_score != b.h_score) {
+				return a.h_score > b.h_score;
+			}
+			return a.index > b.index;
 		}
-	} else {
-		FOR_EACH_BBOX_XY(world_region, xy) {
-			AStarNode& node = nodes[xy - world_region.left_top()];
-			node.openset = false;
-			node.closedset = false;
-			node.previous = NULL;
-			node.solid = (*grid)[xy];
-		}
-	}
-	perf_timer_end(FUNCNAME);
+	};
 }
 
-bool AStarPath::can_cross(const Pos& s, const Pos& e) {
-	return !nodes[Pos(s.x, e.y)].solid && !nodes[Pos(e.x, s.y)].solid;
-}
-
-static std::vector<AStarNode*>::iterator find_heap_position(
-		std::vector<AStarNode*>& heap, AStarNode* node) {
-	for (std::vector<AStarNode*>::iterator it = heap.begin(); it != heap.end();
-			++it) {
-		if (*it == node) {
-			return it;
-		}
-	}
-	LANARTS_ASSERT(false);
-	return heap.end();
-}
-
-/*Used to make sure all interpolated directions are possible*/
-std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, BBox world_region, bool imperfect_knowledge, bool clear_results) {
+std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, BBox world_region, bool imperfect_knowledge) {
 	perf_timer_begin(FUNCNAME);
 	world_region = world_region.resized_within(
 		BBox( Pos(), gs->get_level()->tiles().size() )
@@ -88,91 +54,92 @@ std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, BB
 		perf_timer_end(FUNCNAME);
 		return {};
 	}
-	// Reusing the last search's state is only safe for the same region
-	if (clear_results || nodes.width() != world_region.width() || nodes.height() != world_region.height()) {
-		initialize(gs, world_region, imperfect_knowledge);
-	}
-	AStarNode* start_node = &nodes.raw_get(0);
-	// Adjust the coordinates to be within our region
-	s -= world_region.left_top(), e -= world_region.left_top();
-
-	AStarOrderNodes orderfunc;
-	std::vector<AStarNode*> heap;
-
-	AStarNode* start = &nodes[s];
-
 	int w = world_region.width(), h = world_region.height();
-	start->g_score = 0;
-	start->h_score = heurestic_distance(s, e);
-	start->f_score = start->h_score;
-	start->openset = true;
-	start->previous = NULL;
-	start->closedset = false;
+	if (nodes.width() != w || nodes.height() != h) {
+		nodes.resize(Size(w, h));
+		for (AStarNode& node : nodes) {
+			node.stamp = 0;
+		}
+		stamp = 0;
+	}
+	if (++stamp == 0) { // wrapped around: old stamps could match again
+		for (AStarNode& node : nodes) {
+			node.stamp = 0;
+		}
+		stamp = 1;
+	}
 
-	heap.push_back(start);
-	int iters = 0;
+	// Solidity straight from the map, in region coordinates
+	BoolGridRef solidity = gs->tiles().solidity_map();
+	BoolGridRef seen = gs->tiles().previously_seen_map();
+	Pos origin = world_region.left_top();
+	auto solid = [&](int x, int y) {
+		Pos xy(x + origin.x, y + origin.y);
+		return (*solidity)[xy] && (!imperfect_knowledge || (*seen)[xy]);
+	};
+
+	s -= origin, e -= origin;
+	int start = s.y * w + s.x, goal = e.y * w + e.x;
+	AStarNode* node_data = &nodes.raw_get(0);
+
+	std::vector<AStarEntry> heap;
+	AStarEntryOrder order;
+	auto visit = [&](int index, int previous, int g_score, int x, int y) {
+		AStarNode& node = node_data[index];
+		node.stamp = stamp;
+		node.previous = previous;
+		node.g_score = g_score;
+		node.closed = false;
+		int h_score = heurestic_distance(Pos(x, y), e);
+		heap.push_back({g_score + h_score, h_score, g_score, index});
+		std::push_heap(heap.begin(), heap.end(), order);
+	};
+	visit(start, -1, 0, s.x, s.y);
+
 	while (!heap.empty()) {
-		iters++;
-		//Node with minimum f_score
-		AStarNode* node = heap[0];
-		node->openset = false;
-		node->closedset = true;
-
-		gheap<>::pop_heap(heap.begin(), heap.end(), orderfunc);
+		std::pop_heap(heap.begin(), heap.end(), order);
+		AStarEntry top = heap.back();
 		heap.pop_back();
+		AStarNode& node = node_data[top.index];
+		if (node.closed || top.g_score != node.g_score) {
+			continue; // stale entry
+		}
+		if (top.index == goal) {
+			break;
+		}
+		node.closed = true;
 
-		int x = (node - start_node) % w;
-		int y = (node - start_node) / w;
-
-		for (int yy = y - 1; yy <= y + 1; yy++) {
-			if (yy < 0 || yy >= h)
-				continue;
-			for (int xx = x - 1; xx <= x + 1; xx++) {
-				if (xx < 0 || xx >= w)
+		int x = top.index % w, y = top.index / w;
+		for (int yy = max(y - 1, 0); yy <= min(y + 1, h - 1); yy++) {
+			for (int xx = max(x - 1, 0); xx <= min(x + 1, w - 1); xx++) {
+				if ((xx == x && yy == y) || solid(xx, yy)) {
 					continue;
-
-				AStarNode* neighbour = &nodes[Pos(xx, yy)];
-				if (neighbour->closedset)
+				}
+				bool diagonal = (xx != x && yy != y);
+				// No cutting corners: a diagonal step needs both tiles beside it open
+				if (diagonal && (solid(x, yy) || solid(xx, y))) {
 					continue;
-				if (!can_cross(Pos(x, y), Pos(xx, yy)))
-					continue;
-
-				int dx = x - xx, dy = y - yy;
-				int g_score = node->g_score + (abs(dx) == abs(dy) ? 114 : 100);
-				if (!neighbour->solid && !neighbour->openset) {
-					neighbour->openset = true;
-					neighbour->previous = node;
-					neighbour->h_score = heurestic_distance(Pos(xx, yy), e);
-					neighbour->g_score = g_score;
-					neighbour->f_score = neighbour->g_score
-							+ neighbour->h_score;
-					heap.push_back(neighbour);
-					gheap<>::push_heap(heap.begin(), heap.end(), orderfunc);
-				} else if (!neighbour->solid && neighbour->g_score > g_score) {
-					neighbour->previous = node;
-					neighbour->g_score = g_score;
-					neighbour->f_score = neighbour->g_score
-							+ neighbour->h_score;
-
-					//TODO: Reevaluate if this really needs to be O(N) + O(logN)
-					auto position = find_heap_position(heap, neighbour);
-					if (position != heap.end()) {
-						gheap<>::restore_heap_after_item_increase(heap.begin(),
-								position, orderfunc);
-					}
+				}
+				int index = yy * w + xx;
+				AStarNode& neighbour = node_data[index];
+				int g_score = node.g_score + (diagonal ? 114 : 100);
+				if (neighbour.stamp != stamp) {
+					visit(index, top.index, g_score, xx, yy);
+				} else if (!neighbour.closed && g_score < neighbour.g_score) {
+					visit(index, top.index, g_score, xx, yy);
 				}
 			}
-
 		}
 	}
+
 	std::vector<Pos> positions;
-	AStarNode* traverse = &nodes[e];
-	while (traverse) {
-		int x = (traverse - start_node) % w;
-		int y = (traverse - start_node) / w;
-		traverse = traverse->previous;
-		Pos p(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2);
-		positions.push_back(p + world_region.left_top().scaled(TILE_SIZE));
+	if (node_data[goal].stamp != stamp) {
+		perf_timer_end(FUNCNAME);
+		return positions; // unreachable
+	}
+	for (int index = goal; index != -1; index = node_data[index].previous) {
+		Pos p((index % w) * TILE_SIZE + TILE_SIZE / 2, (index / w) * TILE_SIZE + TILE_SIZE / 2);
+		positions.push_back(p + origin.scaled(TILE_SIZE));
 	}
 	reverse(positions.begin(), positions.end());
 	perf_timer_end(FUNCNAME);

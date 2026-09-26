@@ -35,11 +35,10 @@ static int astar_calculate_path(lua_State* L) {
 	Pos to_xy = luawrap::get<Pos>(L, 4);
 	BBox world_region = luawrap::get_defaulted(L, 5, BBox(Pos(), new_level->tiles().size()));
 	bool imperfect_knowledge = luawrap::get_defaulted(L, 6, false);
-	bool clear = luawrap::get_defaulted(L, 7, true);
 
 	GameMapState* previous_level = gs->get_level();
 	gs->set_level(new_level);
-	luawrap::push(L, astar->calculate_AStar_path(gs, from_xy, to_xy, world_region, imperfect_knowledge, clear));
+	luawrap::push(L, astar->calculate_AStar_path(gs, from_xy, to_xy, world_region, imperfect_knowledge));
 	gs->set_level(previous_level);
 
 	return 1;

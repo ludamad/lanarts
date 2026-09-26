@@ -25,6 +25,7 @@ run = (raw_args) ->
     parser\option("--save_chance", "Chance per frame of saving to --save.", "0.0003")
     parser\option("--load", "Save file to start from.")
     parser\option("--save", "Save file for random saves, and the final save.")
+    parser\option("--bench_astar", "Instead of playing, time this many A* searches between random open tiles of the first map.")
     args = parser\parse(raw_args)
     seed = tonumber(args.seed)
     fuzz_rng = require("mtwist").create(seed * 7919 + 17)
@@ -33,7 +34,7 @@ run = (raw_args) ->
         print "FUZZ ERROR #{err}"
         os.exit(1)
 
-    local game_step
+    local game_step, bench_astar
     guarded = (f) -> (...) ->
         results = {xpcall(f, debug.traceback)}
         if not results[1]
@@ -56,10 +57,40 @@ run = (raw_args) ->
             else
                 EngineInternal.start_game()
             print "FUZZ START seed=#{seed} classes=#{table.concat(classes, ',')} overworld=#{require('map_descs.World').generated_overworld or '?'} load=#{args.load or '-'}"
+            if args.bench_astar
+                bench_astar(tonumber(args.bench_astar))
             GameState.input_capture()
             if not GameState.input_handle()
                 fail("game exited at start")
             return game_step()
+
+    -- Half the searches span the whole map (as the bot's and monsters' long wanders do), half a
+    -- region around both ends (as monster pathing does)
+    bench_astar = (n) ->
+        World = require "core.World"
+        Map = require "core.Map"
+        PathFinding = require "core.PathFinding"
+        map = World.players[1].instance.map
+        {w, h} = Map.size(map)
+        rng = require("mtwist").create(seed)
+        random_open = () ->
+            while true
+                xy = {rng\random(0, w), rng\random(0, h)}
+                if not Map.tile_is_solid(map, xy)
+                    return xy
+        buffer = PathFinding.astar_buffer_create()
+        for {name, region} in *{{"full", (a, b) -> nil}, {"local", (a, b) -> {math.min(a[1], b[1]) - 3, math.min(a[2], b[2]) - 3, math.max(a[1], b[1]) + 4, math.max(a[2], b[2]) + 4}}}
+            pairs = [{random_open(), random_open()} for i=1,n]
+            found, steps = 0, 0
+            start = os.clock()
+            for {a, b} in *pairs
+                path = if region(a, b) then buffer\calculate_path(map, a, b, region(a, b)) else buffer\calculate_path(map, a, b)
+                if #path > 1
+                    found += 1
+                    steps += #path
+            ms = (os.clock() - start) * 1000
+            print string.format("ASTAR %s map=%dx%d searches=%d found=%d steps=%d total_ms=%.1f per_search_ms=%.3f", name, w, h, n, found, steps, ms, ms / n)
+        os.exit(0)
 
     report = () ->
         GameState = require "core.GameState"

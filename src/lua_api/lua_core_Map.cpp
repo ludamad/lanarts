@@ -196,6 +196,11 @@ static int gmap_map_label(lua_State* L) {
     return 1;
 }
 
+static Pos gmap_size(LuaStackValue map_obj) {
+    Size size = mapstate(map_obj)->tiles().size();
+    return Pos(size.w, size.h); // in tiles
+}
+
 static bool gmap_tile_is_solid(LuaStackValue map_obj, Pos xy) {
     GameState* gs = lua_api::gamestate(map_obj);
     GameMapState* map = mapstate(map_obj);
@@ -563,6 +568,7 @@ namespace lua_api {
 
         gmap["objects_list"].bind_function(gmap_objects_list);
 
+        gmap["size"].bind_function(gmap_size);
         gmap["tile_is_solid"].bind_function(gmap_tile_is_solid);
         gmap["tile_is_seethrough"].bind_function(gmap_tile_is_seethrough);
         gmap["tile_set_solid"].bind_function(gmap_tile_set_solid);
