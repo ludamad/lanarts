@@ -10,6 +10,7 @@
 #include <ldraw/Font.h>
 
 #include "draw/draw_sprite.h"
+#include "draw/AnimationSet.h"
 
 #include "GameInst.h"
 
@@ -50,6 +51,12 @@ public:
 	void frame(float frame) {
 		animateframe = frame;
 	}
+	// Plays clip from the given game step instead of cycling the sprite (eg a monster's death);
+	// fades out only over the last steps. Presentation only: not saved.
+	void play_clip(const AnimationClip* clip, int start_frame) {
+		this->clip = clip;
+		clip_start = start_frame;
+	}
 
 	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
@@ -60,6 +67,8 @@ private:
 	int sprite, timeleft, animatetime;
 	float animateframe;
 	std::string text;
+	const AnimationClip* clip = nullptr;
+	int clip_start = 0;
 public:
     ldraw::Font* font = nullptr;
     bool should_center_font = false;

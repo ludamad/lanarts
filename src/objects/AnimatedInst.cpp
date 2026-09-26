@@ -45,6 +45,11 @@ void AnimatedInst::draw(GameState* gs) {
 		Colour alphacol(255, 255, 255, 255 * timeleft / animatetime);
 
 		float frame = animateframe != -1 ? animateframe : gs->frame();
+		if (clip) {
+			const int FADE_STEPS = 30;
+			alphacol.a = 255 * std::min(1.0f, timeleft / float(FADE_STEPS));
+			frame = clip->frame_at(gs->frame() - clip_start);
+		}
 
 		draw_sprite(view, sprite, xx, yy, orientx, orienty, frame,
 				alphacol);

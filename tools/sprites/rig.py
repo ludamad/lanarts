@@ -1,6 +1,6 @@
-"""Pixel machinery for animating lanarts' 32x32 sprites.
+"""Pixel machinery for animating lanarts' sprites (32x32 class sprites, larger creatures).
 
-Frames are 32x32 grids of RGBA tuples. A sprite is cut into layers (weapon, upper body, legs, ...)
+Frames are grids of RGBA tuples (rows of columns), 32x32 unless made otherwise. A sprite is cut into layers (weapon, upper body, legs, ...)
 with hand-traced regions, and animations move, rotate and recombine those layers. New pixels are
 placed by hand with put().
 """
@@ -12,20 +12,27 @@ CLEAR = (0, 0, 0, 0)
 SHADOW = (0, 0, 0, 100)
 
 
-def blank():
-    return [[CLEAR] * SIZE for _ in range(SIZE)]
+def blank(w=SIZE, h=None):
+    return [[CLEAR] * w for _ in range(h or w)]
 
 
-def load(path):
+def blank_like(frame):
+    return blank(len(frame[0]), len(frame))
+
+
+def load(path, size=(SIZE, SIZE)):
+    """size=None accepts any size"""
     im = Image.open(path).convert("RGBA")
-    assert im.size == (SIZE, SIZE), (path, im.size)
-    return [[im.getpixel((x, y)) for x in range(SIZE)] for y in range(SIZE)]
+    assert size is None or im.size == size, (path, im.size)
+    w, h = im.size
+    return [[im.getpixel((x, y)) for x in range(w)] for y in range(h)]
 
 
 def to_image(frame):
-    im = Image.new("RGBA", (SIZE, SIZE))
-    for y in range(SIZE):
-        for x in range(SIZE):
+    h, w = len(frame), len(frame[0])
+    im = Image.new("RGBA", (w, h))
+    for y in range(h):
+        for x in range(w):
             im.putpixel((x, y), frame[y][x])
     return im
 
@@ -42,28 +49,31 @@ def blend(under, over):
 
 
 def paste(dst, layer, dx=0, dy=0):
-    for y in range(SIZE):
-        for x in range(SIZE):
+    h, w = len(dst), len(dst[0])
+    for y in range(len(layer)):
+        for x in range(len(layer[0])):
             p = layer[y][x]
-            if p[3] and 0 <= x + dx < SIZE and 0 <= y + dy < SIZE:
+            if p[3] and 0 <= x + dx < w and 0 <= y + dy < h:
                 dst[y + dy][x + dx] = blend(dst[y + dy][x + dx], p)
     return dst
 
 
 def paste_behind(dst, layer, dx=0, dy=0):
     """Only fills pixels that are still empty (for trails and glows that pass behind the figure)."""
-    for y in range(SIZE):
-        for x in range(SIZE):
+    h, w = len(dst), len(dst[0])
+    for y in range(len(layer)):
+        for x in range(len(layer[0])):
             p = layer[y][x]
-            if p[3] and 0 <= x + dx < SIZE and 0 <= y + dy < SIZE and dst[y + dy][x + dx][3] == 0:
+            if p[3] and 0 <= x + dx < w and 0 <= y + dy < h and dst[y + dy][x + dx][3] == 0:
                 dst[y + dy][x + dx] = p
     return dst
 
 
 def put(dst, x, y, run, colours, behind=False):
     """Hand-placed pixels: one palette key per character of run, spaces skipped."""
+    h, w = len(dst), len(dst[0])
     for i, ch in enumerate(run):
-        if ch == " " or not (0 <= x + i < SIZE and 0 <= y < SIZE):
+        if ch == " " or not (0 <= x + i < w and 0 <= y < h):
             continue
         if behind and dst[y][x + i][3]:
             continue
@@ -72,7 +82,7 @@ def put(dst, x, y, run, colours, behind=False):
 
 def cut(frame, region):
     """Moves the pixels of region ({row: (first col, last col)}) out of frame into a new layer."""
-    layer = blank()
+    layer = blank_like(frame)
     for y, (x0, x1) in region.items():
         for x in range(x0, x1 + 1):
             layer[y][x] = frame[y][x]
@@ -85,7 +95,7 @@ def rect(x0, y0, x1, y1):
 
 
 def bounds(layer):
-    pts = [(x, y) for y in range(SIZE) for x in range(SIZE) if layer[y][x][3]]
+    pts = [(x, y) for y in range(len(layer)) for x in range(len(layer[0])) if layer[y][x][3]]
     if not pts:
         return None
     xs, ys = zip(*pts)
@@ -117,16 +127,22 @@ def _scale2x(grid):
     return out
 
 
+def scale2x(frame):
+    """Doubles pixel art with Scale2x (EPX): edges stay smooth instead of turning into stairs"""
+    return _scale2x(frame)
+
+
 def rotate(layer, degrees, pivot):
     """Rotates a layer clockwise by degrees around pivot (x, y), in sprite pixels."""
     big = _scale2x(_scale2x(_scale2x(layer)))
-    n = SIZE * 8
+    h, w = len(layer), len(layer[0])
+    nw, nh = w * 8, h * 8
     rad = math.radians(degrees)
     cos, sin = math.cos(rad), math.sin(rad)
     px, py = pivot[0] * 8 + 4, pivot[1] * 8 + 4
-    out = blank()
-    for y in range(SIZE):
-        for x in range(SIZE):
+    out = blank_like(layer)
+    for y in range(h):
+        for x in range(w):
             counts = {}
             solid = 0
             for sy in range(1, 8, 2):
@@ -135,7 +151,7 @@ def rotate(layer, degrees, pivot):
                     # inverse rotation finds where this sample comes from
                     ix = int(round(cos * tx + sin * ty + px))
                     iy = int(round(-sin * tx + cos * ty + py))
-                    p = big[iy][ix] if 0 <= ix < n and 0 <= iy < n else CLEAR
+                    p = big[iy][ix] if 0 <= ix < nw and 0 <= iy < nh else CLEAR
                     if p[3]:
                         solid += 1
                         counts[p] = counts.get(p, 0) + 1
@@ -149,7 +165,7 @@ def flip_x(layer):
 
 
 def shift(layer, dx, dy):
-    return paste(blank(), layer, dx, dy)
+    return paste(blank_like(layer), layer, dx, dy)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -158,9 +174,10 @@ def shift(layer, dx, dy):
 
 def drop_shadow(dst, spans):
     """spans: (x0, y, width) rows of soft shadow, drawn under everything."""
+    h, w = len(dst), len(dst[0])
     for x0, y, n in spans:
         for x in range(x0, x0 + n):
-            if 0 <= x < SIZE and 0 <= y < SIZE and dst[y][x][3] == 0:
+            if 0 <= x < w and 0 <= y < h and dst[y][x][3] == 0:
                 dst[y][x] = SHADOW
 
 
@@ -176,15 +193,18 @@ def tint(layer, colour, amount):
 
 
 def rotate_frame_ccw(frame):
-    return [[frame[x][SIZE - 1 - y] for x in range(SIZE)] for y in range(SIZE)]
+    n = len(frame)  # square frames
+    return [[frame[x][n - 1 - y] for x in range(n)] for y in range(n)]
 
 
 def rotate_frame_cw(frame):
-    return [[frame[SIZE - 1 - x][y] for x in range(SIZE)] for y in range(SIZE)]
+    n = len(frame)
+    return [[frame[n - 1 - x][y] for x in range(n)] for y in range(n)]
 
 
 def save_strip(frames, path):
-    strip = Image.new("RGBA", (SIZE * len(frames), SIZE))
+    h, w = len(frames[0]), len(frames[0][0])
+    strip = Image.new("RGBA", (w * len(frames), h))
     for i, f in enumerate(frames):
-        strip.alpha_composite(to_image(f), (SIZE * i, 0))
+        strip.alpha_composite(to_image(f), (w * i, 0))
     strip.save(path)

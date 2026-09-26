@@ -1,10 +1,11 @@
 -- Stages a boss fight to watch or record: a bot party of the given class and level against the
--- given monsters in DebugArena, drawn every step (graphical builds only). With --out, saves every
+-- given monsters in map_descs/BossArena, drawn every step (graphical builds only). With --out, saves every
 -- --every'th frame there as frame_NNNNN.bmp (tools/bosses/record.sh turns them into a clip).
 --   ./lanarts engine.StartBossShowcase --monsters "Red Dragon" --class Fighter --level 8 [--players 2]
 --       [--steps 1500] [--out DIR --every 3]
 -- The party take real damage but are topped up below a quarter of their health, so a recording
 -- shows hits land without ending early; engine.StartCombatSim measures who would win unaided.
+-- Run it with SDL_AUDIODRIVER=dummy for silence (tools/bosses/record.sh does).
 argparse = require "argparse"
 EngineInternal = require "core.EngineInternal"
 ResourceLoading = require "engine.ResourceLoading"
@@ -44,6 +45,7 @@ run = (raw_args) ->
     parser\option("--class", "Party class.", "Fighter")
     parser\option("--level", "Party level.", "1")
     parser\option("--players", "Party size.", "1")
+    parser\option("--tileset", "Arena tileset (tiles/Tilesets.lua).", "pebble")
     parser\option("--seed", "Seed.", "1")
     parser\option("--steps", "Frames to run.", "1500")
     parser\option("--out", "Directory to save frames in.")
@@ -74,7 +76,7 @@ run = (raw_args) ->
             EngineInternal.init_gamestate()
             random_seed(tonumber(args.seed))
             Engine.first_map_create = () ->
-                return require("map_descs.DebugArena")\generate_and_spawn(monsters)
+                return require("map_descs.BossArena").generate_and_spawn(monsters, args.tileset)
             EngineInternal.start_game()
             GameState.input_capture()
             GameState.input_handle()

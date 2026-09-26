@@ -45,7 +45,8 @@ SPR_FOLDERS = [
     "spr_enemies/demonspawn",
     "spr_enemies/draco",
     "spr_enemies/dragons",
-    "spr_enemies/bosses"
+    "spr_enemies/bosses",
+    "spr_bosses",  # the bosses' own sprites and spell effects (tools/bosses/build.py)
 ]
 
 # Expand wherever a 'randarts' subfolder is present:

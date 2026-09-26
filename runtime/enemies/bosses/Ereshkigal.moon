@@ -1,0 +1,1 @@
+-- Defined by its boss author (see enemies/Bosses.moon)

@@ -292,7 +292,14 @@ void EnemyInst::die(GameState* gs) {
         gs->for_screens([&]() {
             show_defeat_message(gs->game_chat(), etype());
         });
-        if (etype().death_sprite > -1) {
+        const AnimationSet* anims = res::animation_set(sprite);
+        if (anims && anims->death.valid()) {
+            // The death clip plays out where it fell, holding its last frame as it fades
+            auto* corpse = new AnimatedInst(ipos(), anims->death.sprite, anims->death.total_steps() + 60,
+                    PosF(), PosF(), ItemInst::DEPTH);
+            corpse->play_clip(&anims->death, gs->frame());
+            gs->add_instance(corpse);
+        } else if (etype().death_sprite > -1) {
             const int DEATH_SPRITE_TIMEOUT = 1600;
             gs->add_instance<AnimatedInst>(
                     ipos(), etype().death_sprite,
