@@ -32,6 +32,12 @@
       "cacheVariables": { "LANARTS_SANITIZE": "ON" }
     },
     {
+      "name": "headless-sanitize",
+      "displayName": "Headless with AddressSanitizer and UBSan, for fuzzing (tools/fuzz)",
+      "inherits": "headless",
+      "cacheVariables": { "LANARTS_SANITIZE": "ON" }
+    },
+    {
       "name": "luajit",
       "displayName": "Release with LuaJIT",
       "inherits": "release",
@@ -56,6 +62,7 @@
     { "name": "release", "configurePreset": "release" },
     { "name": "headless", "configurePreset": "headless" },
     { "name": "sanitize", "configurePreset": "sanitize" },
+    { "name": "headless-sanitize", "configurePreset": "headless-sanitize" },
     { "name": "luajit", "configurePreset": "luajit" },
     { "name": "web", "configurePreset": "web" },
     { "name": "mingw", "configurePreset": "mingw" }

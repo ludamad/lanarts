@@ -167,10 +167,17 @@ Data.item_create {
 }
 
 local function scroll_of_exp_func(self, user)
-    -- Collect ally players.
+    -- Collect ally players (allies also include summoned monsters, which gain no XP).
+    local is_player = {}
+    for _, pdata in ipairs(require("core.World").players) do
+        is_player[pdata.instance] = true
+    end
+    -- The user is among its own allies; add it once either way
     local ally_players = {user}
     for _, ally in ipairs(Map.allies_list(user)) do
-        append(ally_players, ally)
+        if is_player[ally] and ally ~= user then
+            append(ally_players, ally)
+        end
     end
     -- Grant all of them an XP share.
     local xp_granted = 100 / #ally_players
