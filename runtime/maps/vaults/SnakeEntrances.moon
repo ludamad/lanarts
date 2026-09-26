@@ -13,36 +13,33 @@ CISTERN = {floor: "moss.floor_alt", floor_alt: "moss.floor", path: "snake.floor_
 return {
     {
         name: "snake_coil", title: "Coiled Snake Stones", kind: "entrance", themes: {"snake"}
-        blurb: "A ring of yellow-scaled stone coiled like a sleeping serpent; follow it round to the portal at its heart"
+        blurb: "A ring of yellow-scaled stone coiled like a sleeping serpent around the portal"
         palette: SNAKE
         layouts: {
             [[
 WWWWWWWWWWWWW
 W:::::::::::W
-W:WWWWWWWWW:W
-W:W,,,,,,,W:W
-W:W,WWWWW,W:W
-W:W,W,,,W,W:W
-W:W,W,D,W,W:W
-W:W,W,,,W,W:W
-W:W,W,WWW,W:W
-W:W,,,W,,,W:W
-W:WWWWW:WWW:W
-Wpppp:W:::::W
-WWWWWdWWWWWWW
-....+++......
+W::WWWWWWW::W
+W::W,,,,,W::W
+W::W,,D,,W::W
+W::W,,,,,W::W
+W::WW,,,WW::W
+W:::::::::::W
+W::pppppp:::W
+WWWWWWdWWWWWW
+......+......
 ]]
             [[
-WWWWWWWWW
-W::::::pW
-W:WWWWW:W
-W:W,,,W:W
-W:W,D,W:W
-W:W,,,W:W
-W:W,WWWpW
-W:::WpppW
-WWWWWdWWW
-....+++..
+WWWWWWWWWWW
+W:::::::::W
+W::WW,WW::W
+W::W,,,W::W
+W::W,D,W::W
+W::W,,,W::W
+W::WW,WW::W
+W::ppppp::W
+WWWWWdWWWWW
+.....+.....
 ]]
         }
     }

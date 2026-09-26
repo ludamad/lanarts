@@ -158,46 +158,41 @@ return {
         }
     }
     {
-        name: "spiral_labyrinth", title: "Little Labyrinth", kind: "treasure", themes: {"spiral"}
-        blurb: "A walked maze for meditation, with an offering left at its heart"
+        name: "spiral_labyrinth", title: "Walking Court", kind: "treasure", themes: {"spiral"}
+        blurb: "A paved court of broken rings walked in meditation, with an offering left at its heart"
         palette: LABYRINTH
         layouts: {
             [[
-###########
-#ooooooooo#
-#o#######o#
-#o#ooooo#o#
-#o#o###o#o#
-#o#o#i*o#o#
-#o#o#####o#
-#o#ooooooo#
-#o#########
-#o#........
-.+.........
+....++++....
+.##oooooo##.
+.#oooooooo#.
+.oo##oo##oo.
+.oo#,,,,#oo.
+.oo,,*i,,oo.
+.oo#,,,,#oo.
+.oo##,,##oo.
+.#oooooooo#.
+.##oooooo##.
 ]]
             [[
-.#########.
-.#ooo#ooo#.
-.#o#o#o#o#.
-.#o#ooo#o#.
-.#o#####o#.
-.#o#,i,#o#.
-.#o#,,,#o#.
-.#o##o##o#.
-.#o#ooooo#.
-.#o#######.
-..+........
+..+++++..
+.#ooooo#.
+.o#o,o#o.
+.oo,i,oo.
+.o#,*,#o.
+.oo,,,oo.
+.o#o,o#o.
+.#ooooo#.
 ]]
             [[
-#########..
-#ooooooo#..
-#o#####o#..
-#o#,*,#o#..
-#o#,i,#o#..
-#o##o##o#..
-#o#ooo#o#..
-#o#o#####..
-#ooo+......
+.++++.......
+.oooo####...
+.oo,,,,,##..
+.o##WW#,,#..
+.oo,i*#,,#..
+.oo#,,,,,#..
+.oo####,##..
+.ooooooooo..
 ]]
         }
     }
@@ -286,30 +281,27 @@ return {
     }
     {
         name: "spiral_cairn", title: "Spiral Cairn", kind: "landmark", themes: {"spiral"}
-        blurb: "Pilgrims' stones heaped in a coil around a weathered idol"
+        blurb: "Pilgrims' stones heaped in a loose ring around a weathered idol"
         palette: CAIRN
         layouts: {
             [[
-.#########.
-.#ooooooo#.
-.#o#####o#.
-.#o#ooo#o#.
-.#o#osc#o#.
-.#o#o###o#.
-.#o#ooooo#.
-.#o#######.
-..+........
+....+++....
+..#ooooo#..
+.#oo,,,oo#.
+.oo,#,#,oo.
+.o,,,s,,,o.
+.oo,#c#,oo.
+.#oo,,,oo#.
+..#ooooo#..
 ]]
             [[
-..#######...
-.##ooooo##..
-.#oo###oo#..
-.#o##s#oo#..
-.#o#o*o#o#..
-.#o#ooo#o#..
-.#o##o##o#..
-.#ooooo#o#..
-.#######o+..
+..++.......
+.oooo###...
+.oo,,,,##..
+.#,s,c,,#..
+.#,,,#,,o..
+.##,,,,oo..
+..###ooo...
 ]]
         }
         legend: {

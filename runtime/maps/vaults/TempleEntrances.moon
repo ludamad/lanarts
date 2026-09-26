@@ -98,36 +98,34 @@ CWW,,,,,WWC
     }
     {
         name: "temple_ziggurat", title: "Stepped Ziggurat", kind: "entrance", themes: {"temple"}
-        blurb: "Terraces stepping up to a crystal shrine; walk the ledges round to climb in"
+        blurb: "A broad terrace of crystal pillars around a raised shrine"
         palette: TIERS
         legend: SPIRE
         layouts: {
             [[
 ......+++......
-......:::......
 .WWWWWWdWWWWWW.
+.W,,,,,:,,,,,W.
+.W,ppp,:,ppp,W.
+.W,,C,,:,,C,,W.
+.W,,,##d##,,,W.
+.W,,,#ooo#,,,W.
+.W,C,#oDo#,C,W.
+.W,,,#ooo#,,,W.
+.W,,,#####,,,W.
 .W,,,,,,,,,,,W.
-.W,#########,W.
-.W,#ooooooo#,W.
-.W,#oCCdCCo#,W.
-.W,#oC,D,Co#,W.
-.W,#oC,,,Co#,W.
-.W,#oCCCCCo#,W.
-.W,#ooooooo#,W.
-.W,####:####,W.
-.Wpp,,,,,,,ppW.
 .WWWWWWWWWWWWW.
 ]]
             [[
 ....+++....
 .WWWWdWWWW.
 .Wpp,:,ppW.
-.W,#####,W.
-.W,#CoC#,W.
+.W,C,:,C,W.
+.W,##d##,W.
 .W,#oDo#,W.
-.W,#CoC#,W.
-.W,##:##,W.
-.W,,,:,,,W.
+.W,#ooo#,W.
+.W,#####,W.
+.W,,,,,,,W.
 .WWWWWWWWW.
 ]]
         }

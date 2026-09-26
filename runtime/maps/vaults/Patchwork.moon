@@ -46,12 +46,12 @@ return {
             [[
 .++.........
 .::FFFFFFF..
-.:::"h"h"F..
+.:::"""h"F..
 .Fh:::"""F..
-.F"h"::h"FF.
+.F"""::""FF.
 .F""h":::"F.
-.Fh"""h":IF.
-.FFFh"""GhF.
+.F""""":IhF.
+.FFFh""G""F.
 ...FFFFFFFF.
 ]]
             [[
@@ -105,50 +105,45 @@ T"""BB"""T
         }
     }
     {
-        name: "patchwork_hedge_maze", title: "Hedge Maze", kind: "treasure", themes: {"patchwork"}
-        blurb: "A folly of clipped hedges around a statue, with a prize at its heart"
+        name: "patchwork_hedge_maze", title: "Hedge Garden", kind: "treasure", themes: {"patchwork"}
+        blurb: "Clipped hedges framing a statue lawn, with a prize at its heart"
         palette: COTTAGE
         base: "ground_alt"
         legend: legend!
         layouts: {
             [[
-.....+.......
-TTTTT"TTTTTTT
-T"""""T"""""T
-T"TTT"T"TTT"T
-T"T"""""T"""T
-T"T"TTTTT"T"T
-T"""T"s"T"T"T
-TTT"T"I"T"T"T
-T"""T"""""T"T
-T"TTTTTTTTT"T
+.....+++.....
+TTTTT"""TTTTT
 T"""""""""""T
-TTTTTTTTTTTTT
+T""TT"""TT""T
+T""T"""""T""T
+T"""""s"""""T
+T""T""I""T""T
+T""TT"""TT""T
+T"""""""""""T
+TTTTTT"TTTTTT
 ]]
             [[
-....+....
-TTTT"TTTT
+...+++...
+TTT"""TTT
 T"""""""T
-T"TTTTT"T
-T"T"""T"T
-T"T"s"T"T
-T"T"I"""T
-T"TTTTTTT
+T"TT"TT"T
+T""IsG""T
+T"TT"TT"T
 T"""""""T
 TTTTTTTTT
 ]]
             [[
-......+......
-..TTTT"TTTT..
+.....+++.....
+..TTT"""TTT..
 .TT"""""""TT.
-TT""TTTTT""TT
-T""TT"""TT""T
-T"TT""s""TT"T
-T"T""GIG""T"T
-T"TT"""""TT"T
-T""TTT"TTT""T
-TT"""""""""TT
-.TTTTTTTTTTT.
+TT""T"""T""TT
+T""TT"s"TT""T
+T"""""I"""""T
+T""TT"G"TT""T
+TT""T"""T""TT
+.TT"""""""TT.
+..TTTTTTTTT..
 ]]
         }
     }
@@ -277,10 +272,10 @@ F''FFFF''F
             [[
 ..++......
 .h""hh.h..
-h"e""hhhh.
+h"e"""hhh.
 h""h"""eh.
-.hh"hh""h.
-h""e"hG"h.
+.h"""h""h.
+h""e""G"h.
 h"hh""I"h.
 .hh.hhhh..
 ]]

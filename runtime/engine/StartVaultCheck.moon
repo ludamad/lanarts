@@ -11,6 +11,9 @@ StartEngine = require "engine.StartEngine"
 
 MAX_SIZE = {entrance: {20, 16}, default: {30, 30}}
 MIN_PLAYER_SQUARES = 4
+-- How far out of its way any square may be: steps from the way in beyond the straight-line
+-- distance. Winding mazes and coils run to 10-60; open rooms with pillars stay under 8.
+MAX_DETOUR = 8
 
 json_encode = (value) ->
     switch type(value)
@@ -80,6 +83,28 @@ check_layout = (Kit, def, i) ->
                 unreached += 1
     if unreached > 0
         append problems, "#{unreached} open square(s) can't be reached from outside"
+
+    -- Open areas, not mazes: no square far out of its way from where the vault is entered
+    dist, queue, head = {}, {}, 1
+    for {x, y} in *entries
+        dist[y * 100 + x] = 0
+        append queue, {x, y}
+    while head <= #queue
+        {x, y} = queue[head]
+        head += 1
+        for {dx, dy} in *{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+            nx, ny = x + dx, y + dy
+            if nx >= 1 and ny >= 1 and nx <= w and ny <= h and not dist[ny * 100 + nx] and (open(nx, ny) or spec(nx, ny).need == "walkable")
+                dist[ny * 100 + nx] = dist[y * 100 + x] + 1
+                append queue, {nx, ny}
+    worst = 0
+    for {x, y} in *queue
+        straight = math.huge
+        for {ex, ey} in *entries
+            straight = math.min(straight, math.abs(x - ex) + math.abs(y - ey))
+        worst = math.max(worst, dist[y * 100 + x] - straight)
+    if worst > MAX_DETOUR
+        append problems, "a square #{worst} steps out of its way: open it up (wide paths, not a maze)"
 
     -- A '.' walled in by the vault becomes a sealed pocket wherever it lands on open ground
     rim = {}
