@@ -135,10 +135,10 @@ void GameMapState::step(GameState* gs, bool simulate_monsters) {
 void GameMapState::draw(GameState* gs, bool reveal_all) {
 	perf_timer_begin(FUNCNAME);
 
-	tiles().pre_draw(gs, reveal_all);
-	// Become current level
+	// Become current level (before anything draws: tile drawing reads the current level too)
 	GameMapState* previous_level = gs->get_level();
 	gs->set_level(this);
+	tiles().pre_draw(gs, reveal_all);
 
 	std::vector<GameInst*> safe_copy = game_inst_set().to_vector();
 	for (size_t i = 0; i < safe_copy.size(); i++) {

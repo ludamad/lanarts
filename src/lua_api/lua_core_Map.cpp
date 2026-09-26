@@ -60,34 +60,36 @@ GameMapState* mapstate(LuaStackValue map_obj, bool defaulted = false) {
     /* Return to previous level */ \
     gs->set_level(previous_level)
 
+// Drawing helpers: each draws with the given map as the current level throughout
+
 static int gmap_tiles_predraw(lua_State* L) {
     GameState* gs = lua_api::gamestate(L);
-    GameMapState* new_level = mapstate(LuaStackValue(L, 1));
+    GameMapState* map = mapstate(LuaStackValue(L, 1));
     bool reveal_all = stack_defaulted(L, 2, true);
-    LEVEL_WRAPPED(
-        gs->tiles().pre_draw(gs, reveal_all);
-    );
+    gs->do_with_map(map, [&]() {
+        map->tiles().pre_draw(gs, reveal_all);
+    });
     return 0;
 }
 
 static int gmap_tiles_postdraw(lua_State* L) {
     GameState* gs = lua_api::gamestate(L);
-    GameMapState* new_level = mapstate(LuaStackValue(L, 1));
-    LEVEL_WRAPPED(
-        gs->tiles().post_draw(gs);
-    );
+    GameMapState* map = mapstate(LuaStackValue(L, 1));
+    gs->do_with_map(map, [&]() {
+        map->tiles().post_draw(gs);
+    });
     return 0;
 }
 
 static int gmap_instances_draw(lua_State* L) {
     GameState* gs = lua_api::gamestate(L);
-    GameMapState* new_level = mapstate(LuaStackValue(L, 1));
-    LEVEL_WRAPPED(
-        std::vector<GameInst*> safe_copy = new_level->game_inst_set().to_vector();
-    );
-    for (size_t i = 0; i < safe_copy.size(); i++) {
-        safe_copy[i]->draw(gs);
-    }
+    GameMapState* map = mapstate(LuaStackValue(L, 1));
+    gs->do_with_map(map, [&]() {
+        // A copy, as drawing may add or remove objects
+        for (GameInst* inst : map->game_inst_set().to_vector()) {
+            inst->draw(gs);
+        }
+    });
     return 0;
 }
 
@@ -551,9 +553,12 @@ static void gmap_map_step(LuaStackValue table) {
 
 static void gmap_map_draw(LuaStackValue table) {
     GameState* gs = lua_api::gamestate(table);
-    level_id map_id = mapid(table["map"]);
+    GameMapState* map = gs->game_world().get_level(mapid(table["map"]));
+    if (!map) {
+        luaL_error(table.luastate(), "map_draw: 'map' is not a map");
+    }
     bool reveal_all = luawrap::defaulted(table["reveal_all"], false);
-    gs->game_world().get_level(map_id)->draw(gs, reveal_all);
+    map->draw(gs, reveal_all);
 }
 
 namespace lua_api {
