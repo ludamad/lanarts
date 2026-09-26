@@ -64,7 +64,7 @@ def main():
     out = sys.argv[-1]
 
     sets = tilesets()
-    refs = {"grass.floor"}
+    refs = {"grass.floor", "grass.wall", "grass.wall_alt", "grass.dirt"}  # the page's legend uses these
     for v in data["vaults"]:
         for spec in v["legend"].values():
             if spec.get("tile"):

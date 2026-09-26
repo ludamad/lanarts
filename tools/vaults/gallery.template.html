@@ -40,7 +40,8 @@ header { display: grid; gap: 20px; margin-bottom: 20px; }
 .stats { display: flex; flex-wrap: wrap; gap: 8px 28px; font-variant-numeric: tabular-nums; }
 .stats b { font-family: var(--display); font-size: 26px; font-weight: 500; display: block; line-height: 1.1; }
 .stats span { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; }
-.matrix-box { overflow-x: auto; }
+.tables { display: flex; flex-wrap: wrap; gap: 16px 48px; align-items: start; }
+.matrix-box { overflow-x: auto; max-width: 100%; }
 table.matrix { border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; }
 .matrix th, .matrix td { padding: 4px 12px; text-align: right; border-bottom: 1px solid var(--line); }
 .matrix th:first-child, .matrix td:first-child { text-align: left; }
@@ -91,7 +92,10 @@ pre.ascii { font: 11px/1.05 var(--mono); margin: 0; background: var(--panel-2); 
       <p class="lede">Every hand-made vault the map generator can stamp into a level, drawn with the game's own tiles. Overworld vaults belong to the theme of the valley they appear in; entrances lead into a dungeon and draw in that dungeon's tiles. Each layout also appears rotated and mirrored in play.</p>
     </div>
     <div class="stats" id="stats"></div>
-    <div class="matrix-box"><table class="matrix" id="matrix"></table></div>
+    <div class="tables">
+      <div class="matrix-box"><table class="matrix" id="matrix"></table></div>
+      <div class="matrix-box"><table class="matrix" id="dmatrix"></table></div>
+    </div>
   </header>
 
   <div class="bar" role="toolbar" aria-label="Filters">
@@ -260,17 +264,21 @@ function header() {
   const feat = ["landmark", "treasure", "encounter", "store"];
   const rows = DATA.themes.map(t => [t, "theme:" + t, feat.map(k => DATA.vaults.filter(v => v.kind === k && v.themes.includes(t)).length)]);
   rows.push(["shared", "shared", feat.map(k => DATA.vaults.filter(v => v.kind === k && v.themes.includes("any")).length)]);
-  const table = document.getElementById("matrix");
-  table.replaceChildren(
-    el("thead", {}, el("tr", {}, el("th", {text: "Overworld"}), feat.map(k => el("th", {text: KIND_LABEL[k]})), el("th", {text: "Entrances"}), el("th", {text: "Dungeon"}))),
-    el("tbody", {}, rows.map(([t, key, counts], i) => {
-      const d = DATA.dungeons[i] || (i === rows.length - 1 ? "any" : null);
-      const btn = el("button", {type: "button", text: t});
-      btn.onclick = () => { state.group = key; save(); setupChips(); render(); };
-      const dcell = d ? (() => { const b = el("button", {type: "button", text: DUNGEON_LABEL[d]}); b.onclick = () => { state.group = "dungeon:" + d; save(); setupChips(); render(); }; return b; })() : "";
-      const dn = d ? DATA.vaults.filter(v => v.kind === "entrance" && v.themes.includes(d)).length : "";
-      return el("tr", {}, el("td", {}, btn), counts.map(c => el("td", {class: c ? "" : "zero", text: c})), el("td", {text: dn}), el("td", {}, dcell));
-    })));
+  const jump = (label, key) => {
+    const b = el("button", {type: "button", text: label});
+    b.onclick = () => { state.group = key; save(); setupChips(); render(); };
+    return b;
+  };
+  document.getElementById("matrix").replaceChildren(
+    el("thead", {}, el("tr", {}, el("th", {text: "Overworld"}), feat.map(k => el("th", {text: KIND_LABEL[k]})))),
+    el("tbody", {}, rows.map(([t, key, counts]) =>
+      el("tr", {}, el("td", {}, jump(t, key)), counts.map(c => el("td", {class: c ? "" : "zero", text: c}))))));
+  const drows = [...DATA.dungeons, "any"].map(d => [d, DATA.vaults.filter(v => v.kind === "entrance" && v.themes.includes(d))]);
+  document.getElementById("dmatrix").replaceChildren(
+    el("thead", {}, el("tr", {}, el("th", {text: "Dungeon"}), el("th", {text: "Entrances"}), el("th", {text: "Layouts"}))),
+    el("tbody", {}, drows.map(([d, vs]) =>
+      el("tr", {}, el("td", {}, jump(DUNGEON_LABEL[d], "dungeon:" + d)), el("td", {class: vs.length ? "" : "zero", text: vs.length}),
+        el("td", {text: vs.reduce((s, v) => s + v.layouts.length, 0)})))));
 }
 
 function legend() {
