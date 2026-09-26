@@ -55,8 +55,8 @@ W#,mpppm,W.
         layouts: {
             [[
 .RR#######..
-RR.#pppDp#..
-.R.#ppp,p#..
+RRR#pppDp#..
+.RR#ppp,p#..
 ..R#,pppR#..
 ..R#pp,RR#..
 ...##d####..

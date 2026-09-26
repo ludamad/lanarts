@@ -81,6 +81,21 @@ check_layout = (Kit, def, i) ->
     if unreached > 0
         append problems, "#{unreached} open square(s) can't be reached from outside"
 
+    -- A '.' walled in by the vault becomes a sealed pocket wherever it lands on open ground
+    rim = {}
+    for y=1,h
+        for x=1,w
+            if (x == 1 or y == 1 or x == w or y == h) and (spec(x, y).keep or open(x, y))
+                append rim, {x, y}
+    outer = flood(rim, (x, y) -> spec(x, y).keep or open(x, y))
+    enclosed = 0
+    for y=1,h
+        for x=1,w
+            if spec(x, y).keep and not outer[y * 100 + x]
+                enclosed += 1
+    if enclosed > 0
+        append problems, "#{enclosed} '.' square(s) walled in by the vault; make them solid or open"
+
     if def.kind == "entrance"
         if (count.portal or 0) ~= 1
             append problems, "#{count.portal or 0} portals, needs exactly 1"
