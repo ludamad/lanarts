@@ -10,7 +10,8 @@
 --             the placer passes (an entrance's dungeon), else the overworld's
 --   base      the tile key under spawns and decorations ("floor" unless set)
 --   legend    extra or overriding characters, as specs (see STANDARD)
---   enemies   optional enemy names for 'e', in place of the overworld's animals
+--   enemies   optional enemy names for 'e', in place of the overworld's animals; brutes: the same
+--             for 'E', in place of OldMaps.easy_enemies
 --   layouts   a list of ASCII layouts; each placement picks one
 --
 -- A tile ref is a palette key (floor, floor_alt, path, ground, ground_alt, wall, wall_alt, trees,
@@ -161,7 +162,8 @@ spawners = (def, args) -> {
         enemy = if def.enemies then map.rng\random_choice(def.enemies) else OldMaps.enemy_generate(OldMaps.medium_animals)
         MapUtils.spawn_enemy(map, enemy, xy)
     brute: args.brute_placer or (map, xy) ->
-        MapUtils.spawn_enemy(map, OldMaps.enemy_generate(OldMaps.easy_enemies), xy)
+        enemy = if def.brutes then map.rng\random_choice(def.brutes) else OldMaps.enemy_generate(OldMaps.easy_enemies)
+        MapUtils.spawn_enemy(map, enemy, xy)
     store: args.store_placer or (map, xy) -> Region1.generate_store(map, xy)
 }
 

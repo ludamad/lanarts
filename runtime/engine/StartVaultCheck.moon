@@ -121,7 +121,7 @@ export_def = (Kit, Library, def) ->
                 }
     return {
         name: def.name, title: def.title, blurb: def.blurb, kind: def.kind, themes: def.themes, file: def.file
-        palette: def.palette, enemies: def.enemies, :legend
+        palette: def.palette, enemies: def.enemies, brutes: def.brutes, :legend
         layouts: [Kit.layout_rows(layout) for layout in *def.layouts]
     }
 
