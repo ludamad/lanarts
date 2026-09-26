@@ -228,7 +228,14 @@ M.generate = () ->
             error "Unknown overworld '#{name}', expected one of: #{table.concat(known, ', ')}"
         overworld = require(desc)\linker {
             root: () =>
-                first_dungeon = @rng\random_choice {place_temple, place_snake_pit}
+                -- A forced temple or snake pit entrance (see maps/vaults/Kit.moon) picks its dungeon
+                forced = VaultLibrary.BY_NAME[VaultKit.force_name]
+                first_dungeon = if forced and forced.themes[1] == "temple"
+                    place_temple
+                elseif forced and forced.themes[1] == "snake"
+                    place_snake_pit
+                else
+                    @rng\random_choice {place_temple, place_snake_pit}
                 if not first_dungeon(@region_set)
                     return false
                 if not place_hive(@region_set)
