@@ -146,4 +146,4 @@ layout = (node) ->
         from_bbox(math.max(x1, math.floor(c.cx - r)), math.max(y1, math.floor(c.cy - r)), math.min(x2, math.floor(c.cx + r)), math.min(y2, math.floor(c.cy + r)))
     return true
 
-return create(layout)
+return create(layout, "craters")

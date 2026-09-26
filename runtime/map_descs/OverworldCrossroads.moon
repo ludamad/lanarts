@@ -103,4 +103,4 @@ layout = (node) ->
         from_bbox(math.max(x1, hx - 14), math.max(y1, hy - 14), math.min(x2, hx + 14), math.min(y2, hy + 14))
     return true
 
-return create(layout)
+return create(layout, "crossroads")

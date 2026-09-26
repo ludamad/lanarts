@@ -123,4 +123,4 @@ layout = (node) ->
     protect_matching(map, {ox + 2 * PITCH, oy + 2 * PITCH, ox + (n - 2) * PITCH, oy + (n - 2) * PITCH}, {})
     return true
 
-return create(layout)
+return create(layout, "spiral")

@@ -12,10 +12,11 @@ ItemUtils = require "maps.ItemUtils"
 ItemGroups = require "maps.ItemGroups"
 
 Vaults = require "maps.Vaults"
+VaultKit = require "maps.vaults.Kit"
+VaultLibrary = require "maps.vaults.Library"
 {:place_vault_in} = require "maps.VaultUtils"
 SourceMap = require "core.SourceMap"
 OldMaps = require "maps.OldMaps"
-Region1 = require "maps.Region1"
 {:from_bbox} = require "maps.MapRegion"
 
 {:MapDesc, :MapNode} = require "maps.MapDesc"
@@ -69,158 +70,22 @@ overworld_items_and_enemies = (region_set) ->
     return true
 
 -----------------------------
-overworld_features = (region_set) ->
-    -------------------------
-    -- Place ridges: --
-    place_outdoor_ridges = () ->
-        door_placer = (map, xy) ->
-            -- nil is passed for the default open sprite
-            MapUtils.spawn_door(map, xy)
-        item_placer = (map, xy) ->
-            item = ItemUtils.item_generate ItemGroups.basic_items
-            MapUtils.spawn_item(map, item.type, item.amount, xy)
-        if not place_vault_in region_set, Vaults.ridge_dungeon {
-            dungeon_placer: item_placer
-            :door_placer
-            tileset: Tilesets.pebble
-        }
-            return true -- Dont reject
-        return true
+-- The overworld's vaults, by kind: a trader, treasure, guarded spots and landmarks
+FEATURE_SLOTS = {"store", "treasure", "treasure", "treasure", "encounter", "encounter", "landmark", "landmark", "landmark", "landmark", "landmark"}
 
-    for i=1,4
-        if not place_outdoor_ridges()
-            print "RETRY: place_outdoor_ridges()"
-            return false
-    -------------------------
-
-    -------------------------
-    -- Place small_random_vaults:  --
-    place_small_vaults = () ->
-        for i=1,region_set.map.rng\random(2,3)
-            enemy_placer = (map, xy) ->
-                enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
-                MapUtils.spawn_enemy(map, enemy, xy)
-            door_placer = (map, xy) ->
-                -- nil is passed for the default open sprite
-                MapUtils.spawn_door(map, xy, nil, xy)
-            store_placer = (map, xy) ->
-                Region1.generate_store(map, xy)
-            item_placer = (map, xy) ->
-                if map.rng\chance(.1)
-                    MapUtils.spawn_item(map, "Scroll of Experience", 1, xy)
-                else
-                    item = ItemUtils.item_generate ItemGroups.basic_items
-                    MapUtils.spawn_item(map, item.type, item.amount, xy)
-            gold_placer = (map, xy) ->
-                MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-            tileset = Tilesets.snake
-            if not place_vault_in region_set, Vaults.small_random_vault {
-                rng: region_set.map.rng
-                :item_placer
-                :enemy_placer
-                :gold_placer
-                :store_placer
-                :tileset
-                :door_placer
-            }
-                continue
-        return true
-    if not place_small_vaults()
-        print "RETRY: place_small_vaults()"
-        return nil
-    -------------------------
-
-    ---------------------------------
-    -- Place big vaults            --
-    -- place_big_vaults = () ->
-    --     for template in *{Vaults.big_encounter1}--, Vaults.big_encounter2}
-    --         enemy_placer = (map, xy) ->
-    --             enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
-    --             MapUtils.spawn_enemy(map, enemy, xy)
-    --         item_placer = (map, xy) ->
-    --             item = ItemUtils.item_generate ItemGroups.basic_items
-    --             MapUtils.spawn_item(map, item.type, item.amount, xy)
-    --         gold_placer = (map, xy) ->
-    --             if map.rng\chance(.7)
-    --                 MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-    --         door_placer = (map, xy) ->
-    --             -- nil is passed for the default open sprite
-    --             MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, 'Azurite Key')
-    --         vault = SourceMap.area_template_create(template {:enemy_placer, :item_placer, :gold_placer, :door_placer})
-    --         if not place_feature(map, vault)
-    --             return true
-    -- if place_big_vaults() then return nil
-    ---------------------------------
-
-    -- ---------------------------------
-    -- -- Place centaur challenge     --
-    -- place_centaur_challenge = () ->
-    --     enemy_placer = (map, xy) ->
-    --         enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
-    --         MapUtils.spawn_enemy(map, enemy, xy)
-    --     boss_placer = (map, xy) ->
-    --         --if map.rng\randomf() < .5
-    --         --    enemy = OldMaps.enemy_generate(OldMaps.strong_hell)
-    --         --    MapUtils.spawn_enemy(map, enemy, xy)
-    --         --else
-    --         MapUtils.spawn_enemy(map, "Centaur Hunter", xy)
-    --     n_items_placed = 0
-    --     item_placer = (map, xy) ->
-    --         item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, (if n_items_placed == 0 then 100 else 2)
-    --         MapUtils.spawn_item(map, item.type, item.amount, xy)
-    --         n_items_placed += 1
-    --     gold_placer = (map, xy) ->
-    --         if map.rng\chance(.7)
-    --             MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-    --     door_placer = (map, xy) ->
-    --         -- nil is passed for the default open sprite
-    --         MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
-    --     vault = SourceMap.area_template_create(Vaults.anvil_encounter {:enemy_placer, :boss_placer, :item_placer, :gold_placer, :door_placer})
-    --     if not place_feature(map, vault, regions)
-    --         return true
-    -- -- if place_centaur_challenge() then return nil
-    -- ---------------------------------
-
-    ---------------------------------
-    place_mini_features = () ->
-        for i, template in ipairs {Vaults.cavern, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge}--, Vaults.stone_henge, Vaults.stone_henge}
-        --for template in *{Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge}
-            enemy_placer = (map, xy) ->
-                enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
-                MapUtils.spawn_enemy(map, enemy, xy)
-            local store_placer
-            if i ~= 1 and i ~= 4
-                store_placer = do_nothing
-            -- TODO evaluate if I want the 4 stores:
-            elseif i == 4
-                store_placer = (map, xy) ->
-                    MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-            else
-                store_placer = (map, xy) ->
-                    Region1.generate_store(map, xy)
-
-            item_placer = (map, xy) ->
-                item = ItemUtils.item_generate ItemGroups.basic_items
-                MapUtils.spawn_item(map, item.type, item.amount, xy)
-            gold_placer = (map, xy) ->
-                MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-            door_placer = (map, xy) ->
-                -- nil is passed for the default open sprite
-                MapUtils.spawn_door(map, xy)
-            if not place_vault_in region_set, template {
-                :enemy_placer
-                :store_placer
-                :item_placer
-                :gold_placer
-                :door_placer
-            }
-                continue
-        return true
-
-    if not place_mini_features()
-        print "RETRY: place_mini_features()"
-        return nil
-
+-- Places the overworld's vaults, drawn from the theme's own (see maps/vaults) and the shared ones.
+-- A vault that won't fit gives way to another of its kind; the slot stays empty if none will.
+overworld_features = (region_set, theme = "classic") ->
+    {:rng} = region_set.map
+    used = {}
+    for kind in *FEATURE_SLOTS
+        for attempt=1,3
+            def = VaultLibrary.pick(rng, kind, theme, used)
+            if not def
+                break
+            used[def.name] = true
+            if VaultKit.place(region_set, def)
+                break
     return true
 
 
@@ -352,10 +217,11 @@ grid_regions = (area, cols, rows, n_statues) ->
 
 -- A MapDesc for an overworld whose layout() paints @map and sets @map.regions (each with a bbox()
 -- and conf.n_statues). The layout may return false to retry; every variant then gets the same
--- features, vaults, doors, statues, items and animals as the classic overworld.
+-- doors, statues, items and animals as the classic overworld, and the vaults of theme (see
+-- maps/vaults/Library.moon).
 -- A layout can also set @map.dungeon_regions to steer where World.moon digs the dungeon
 -- entrances; items and animals still spread over the whole map.
-create = (layout) ->
+create = (layout, theme) ->
     return MapDesc.create {
         -- The label is load-bearing: C++ keys the overworld's music and monster wandering off it
         map_label: "Plain Valley"
@@ -372,7 +238,7 @@ create = (layout) ->
                     walkable = #SourceMap.rectangle_match {map: @map, area: {x1, y1, x2, y2}, selector: WALKABLE}
                     if walkable < WALKABLE_RANGE[1] or walkable > WALKABLE_RANGE[2]
                         return false
-                    if not overworld_features(@region_set)
+                    if not overworld_features(@region_set, theme)
                         return false
                     whole_map = @region_set.regions
                     if @map.dungeon_regions

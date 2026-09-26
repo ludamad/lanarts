@@ -69,7 +69,7 @@ return MapDesc.create {
                 -- TODO, handle links to overworld...
                 if not NewMaps.map_try_create(@map, @map.rng, template)
                     return false
-                if not overworld_features(@region_set)
+                if not overworld_features(@region_set, "classic")
                     return false
                 append @map.post_maps, () ->
                     if not place_doors_and_statues(@region_set)

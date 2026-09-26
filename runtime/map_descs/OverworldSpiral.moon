@@ -97,4 +97,4 @@ layout = (node) ->
         from_bbox(math.max(x1, gx - 14), math.max(y1, gy - 14), math.min(x2, gx + 14), math.min(y2, gy + 14))
     return true
 
-return create(layout)
+return create(layout, "spiral")

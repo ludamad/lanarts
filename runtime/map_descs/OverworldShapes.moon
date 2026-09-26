@@ -66,4 +66,4 @@ layout = (node) ->
     map.regions = [g for g in *ring]
     return true
 
-return create(layout)
+return create(layout, "ringwood")

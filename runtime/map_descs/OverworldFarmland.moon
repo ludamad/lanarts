@@ -87,4 +87,4 @@ layout = (node) ->
     map.regions = regions
     return true
 
-return create(layout)
+return create(layout, "farmland")

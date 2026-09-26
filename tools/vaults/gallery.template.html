@@ -1,0 +1,322 @@
+<title>Lanarts Vault Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #eceef1; --panel: #ffffff; --panel-2: #f5f6f8; --line: #d5d9df;
+  --text: #1a1d22; --muted: #5a626d; --accent: #9a5d12; --accent-soft: #f3e3cc;
+  --landmark: #4f6a8f; --treasure: #9a7414; --encounter: #b0412e; --store: #23796e; --entrance: #6d4fb0;
+  --ok: #2f7a3a; --bad: #b0412e;
+  --display: "Pixelify Sans", "Trebuchet MS", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #14161b; --panel: #1c2027; --panel-2: #232831; --line: #2e343e;
+    --text: #e6e1d6; --muted: #9aa1ab; --accent: #e0a95a; --accent-soft: #3a2f20;
+    --landmark: #8fa7c9; --treasure: #e3bd52; --encounter: #e77b65; --store: #5cc2b3; --entrance: #b49cf0;
+    --ok: #7cc78a; --bad: #ef8a76;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #14161b; --panel: #1c2027; --panel-2: #232831; --line: #2e343e;
+  --text: #e6e1d6; --muted: #9aa1ab; --accent: #e0a95a; --accent-soft: #3a2f20;
+  --landmark: #8fa7c9; --treasure: #e3bd52; --encounter: #e77b65; --store: #5cc2b3; --entrance: #b49cf0;
+  --ok: #7cc78a; --bad: #ef8a76;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font: 15px/1.5 var(--body); }
+.wrap { max-width: 1400px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 64px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 46px); letter-spacing: 0.01em; }
+h2 { font-size: 26px; }
+h3 { font-size: 19px; font-weight: 500; }
+.lede { color: var(--muted); max-width: 68ch; margin: 8px 0 0; }
+header { display: grid; gap: 20px; margin-bottom: 20px; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 28px; font-variant-numeric: tabular-nums; }
+.stats b { font-family: var(--display); font-size: 26px; font-weight: 500; display: block; line-height: 1.1; }
+.stats span { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; }
+.matrix-box { overflow-x: auto; }
+table.matrix { border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; }
+.matrix th, .matrix td { padding: 4px 12px; text-align: right; border-bottom: 1px solid var(--line); }
+.matrix th:first-child, .matrix td:first-child { text-align: left; }
+.matrix thead th { font-weight: 500; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+.matrix td.zero { color: var(--bad); }
+.matrix button { all: unset; cursor: pointer; color: var(--accent); }
+.matrix button:focus-visible { outline: 2px solid var(--accent); }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding-block: 10px; margin-bottom: 24px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 500 13px var(--body); border: 1px solid var(--line); background: var(--panel); color: var(--text);
+  border-radius: 999px; padding: 3px 11px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
+.chip:focus-visible, input:focus-visible, .toggle input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.bar label { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.bar input[type="search"] { font: 14px var(--body); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--text); width: 14em; max-width: 100%; }
+.legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 6px 18px; margin: 0 0 28px; font-size: 13px; }
+.legend div { display: flex; align-items: center; gap: 8px; }
+.legend canvas { width: 24px; height: 24px; image-rendering: pixelated; border-radius: 2px; flex: none; }
+.legend code { font-family: var(--mono); background: var(--panel-2); padding: 0 5px; border-radius: 3px; }
+section.group { margin-bottom: 40px; }
+section.group > .head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+section.group > .head p { color: var(--muted); margin: 0; font-size: 14px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 16px; align-items: start; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px 16px; display: grid; gap: 10px; min-width: 0; }
+.card .top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.card .id { font: 12px var(--mono); color: var(--muted); }
+.card p { margin: 0; color: var(--muted); font-size: 14px; }
+.kind { font: 600 11px var(--body); text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 4px; border: 1px solid currentColor; white-space: nowrap; }
+.kind.landmark { color: var(--landmark); } .kind.treasure { color: var(--treasure); } .kind.encounter { color: var(--encounter); }
+.kind.store { color: var(--store); } .kind.entrance { color: var(--entrance); }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; font-size: 12px; color: var(--muted); }
+.tags span { background: var(--panel-2); padding: 0 6px; border-radius: 3px; }
+.layouts { display: flex; flex-wrap: wrap; gap: 12px; }
+figure { margin: 0; display: grid; gap: 4px; max-width: 100%; }
+figure canvas { image-rendering: pixelated; max-width: 100%; height: auto; display: block; border-radius: 3px; }
+figcaption { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+figcaption .ok { color: var(--ok); } figcaption .bad { color: var(--bad); font-weight: 600; }
+pre.ascii { font: 11px/1.05 var(--mono); margin: 0; background: var(--panel-2); padding: 6px 8px; border-radius: 3px; overflow-x: auto; max-width: 100%; }
+.empty { color: var(--muted); font-style: italic; }
+@media (max-width: 520px) { .bar input[type="search"] { width: 100%; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Lanarts Vault Atlas</h1>
+      <p class="lede">Every hand-made vault the map generator can stamp into a level, drawn with the game's own tiles. Overworld vaults belong to the theme of the valley they appear in; entrances lead into a dungeon and draw in that dungeon's tiles. Each layout also appears rotated and mirrored in play.</p>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="matrix-box"><table class="matrix" id="matrix"></table></div>
+  </header>
+
+  <div class="bar" role="toolbar" aria-label="Filters">
+    <div class="chips" id="groupChips"></div>
+    <div class="chips" id="kindChips"></div>
+    <label for="q">Find <input id="q" type="search" placeholder="name or blurb"></label>
+    <label for="zoom">Zoom <input id="zoom" type="range" min="6" max="28" value="13"></label>
+    <label class="toggle" for="ascii"><input id="ascii" type="checkbox"> ASCII</label>
+  </div>
+
+  <div class="legend" id="legend"></div>
+  <main id="groups"></main>
+</div>
+
+<script>
+const DATA = /*DATA*/null;
+const atlas = new Image();
+atlas.src = "/*ATLAS*/";
+
+const KINDS = ["landmark", "treasure", "encounter", "store", "entrance"];
+const KIND_LABEL = {landmark: "Landmarks", treasure: "Treasure", encounter: "Encounters", store: "Stores", entrance: "Entrances"};
+const DUNGEON_LABEL = {temple: "Temple", snake: "Snake Pit", hive: "Hive", underdungeon: "Underdungeon", outpost: "Outpost", ogre: "Ogre Lair", any: "Any dungeon"};
+const THEME_BLURB = {
+  classic: "The original valley: rocky ridges, snake-stone huts and standing stones.",
+  ringwood: "Glades ringed around a rock mesa: druid circles and old growth.",
+  farmland: "Fields, hedges and lanes: farmsteads and barns.",
+  crossroads: "Four roads meeting at a village green: inns, tolls and markets.",
+  craters: "An impact field: star-metal, scorched rock and prospectors.",
+  spiral: "A road coiling in to a clearing: pilgrims' stations and shrines.",
+  rootways: "Branching root-like meadows: hollow trees and burrows.",
+  patchwork: "Meadows between hedgerows: enclosures, gardens and folds.",
+};
+
+let state = {group: "all", kind: "all", q: "", zoom: 13, ascii: false};
+try { Object.assign(state, JSON.parse(localStorage.getItem("vault-atlas") || "{}")); } catch (e) {}
+const save = () => { try { localStorage.setItem("vault-atlas", JSON.stringify(state)); } catch (e) {} };
+
+function groupsOf(v) {
+  if (v.kind === "entrance") return v.themes.map(t => "dungeon:" + t);
+  return v.themes.map(t => t === "any" ? "shared" : "theme:" + t);
+}
+
+// Draws atlas image key at cell (x, y) of ctx
+function blit(ctx, key, x, y, alpha = 1) {
+  const i = DATA.atlas[key];
+  if (i === undefined) return;
+  const c = DATA.atlasCols;
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(atlas, (i % c) * 32, Math.floor(i / c) * 32, 32, 32, x * 32, y * 32, 32, 32);
+  ctx.globalAlpha = 1;
+}
+
+function drawCell(ctx, spec, x, y) {
+  if (!spec) return;
+  if (spec.keep) {
+    blit(ctx, "grass.floor", x, y, spec.need === "walkable" ? 1 : 0.28);
+    if (spec.need === "walkable") {
+      ctx.strokeStyle = "rgba(255,236,160,0.9)"; ctx.lineWidth = 3; ctx.setLineDash([5, 4]);
+      ctx.strokeRect(x * 32 + 4, y * 32 + 4, 24, 24); ctx.setLineDash([]);
+    }
+    return;
+  }
+  blit(ctx, spec.tile, x, y);
+  const alpha = spec.chance ? 0.55 : 1;
+  if (spec.decor) blit(ctx, "decor:" + spec.decor, x, y, alpha);
+  if (spec.spawn) blit(ctx, "spawn:" + spec.spawn, x, y, alpha);
+}
+
+function drawLayout(canvas, vault, rows) {
+  const w = rows[0].length, h = rows.length;
+  canvas.width = w * 32; canvas.height = h * 32;
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
+  rows.forEach((row, y) => [...row].forEach((ch, x) => drawCell(ctx, vault.legend[ch], x, y)));
+}
+
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v; else if (k === "text") e.textContent = v; else e.setAttribute(k, v);
+  }
+  kids.flat().forEach(k => k && e.append(k));
+  return e;
+}
+
+function card(v) {
+  const figs = v.layouts.map((rows, i) => {
+    const cv = el("canvas", {role: "img", "aria-label": `${v.title}, layout ${i + 1}`});
+    cv.dataset.w = rows[0].length;
+    cv._draw = () => drawLayout(cv, v, rows);
+    const placed = DATA.placements[`${v.name}:${i + 1}`];
+    let status = null;
+    if (placed) {
+      const [ok] = placed.split("/");
+      status = el("span", {class: +ok > 0 ? "ok" : "bad", text: +ok > 0 ? ` · placed ${placed}` : ` · never placed (${placed})`});
+    }
+    const cap = el("figcaption", {}, `Layout ${i + 1} · ${rows[0].length}×${rows.length}`, status);
+    const ascii = el("pre", {class: "ascii", text: rows.join("\n")});
+    ascii.hidden = !state.ascii;
+    return el("figure", {}, cv, ascii, cap);
+  });
+  const themes = v.themes.map(t => el("span", {text: v.kind === "entrance" ? (DUNGEON_LABEL[t] || t) : t}));
+  const extra = v.enemies ? [el("span", {text: "enemies: " + v.enemies.join(", ")})] : [];
+  return el("article", {class: "card", "data-kind": v.kind},
+    el("div", {class: "top"}, el("h3", {text: v.title}), el("span", {class: "kind " + v.kind, text: v.kind})),
+    el("div", {class: "id", text: `${v.name} · maps/vaults/${v.file}.moon`}),
+    el("p", {text: v.blurb}),
+    el("div", {class: "tags"}, themes, extra),
+    el("div", {class: "layouts"}, figs));
+}
+
+const GROUPS = [
+  ...DATA.themes.map(t => ({key: "theme:" + t, title: t[0].toUpperCase() + t.slice(1), blurb: THEME_BLURB[t] || "", sub: "Overworld theme"})),
+  {key: "shared", title: "Shared", blurb: "Vaults any overworld can draw on, next to its own.", sub: "All themes"},
+  ...DATA.dungeons.map(d => ({key: "dungeon:" + d, title: DUNGEON_LABEL[d] || d, blurb: "Entrances drawn in the dungeon's own tiles.", sub: "Dungeon entrance"})),
+  {key: "dungeon:any", title: "Any dungeon", blurb: "Entrances every dungeon can use, shown here in the Temple's tiles.", sub: "Dungeon entrance"},
+];
+
+function render() {
+  const main = document.getElementById("groups");
+  main.replaceChildren();
+  const q = state.q.trim().toLowerCase();
+  let shown = 0;
+  for (const g of GROUPS) {
+    if (state.group !== "all" && state.group !== g.key) continue;
+    const vs = DATA.vaults.filter(v => groupsOf(v).includes(g.key)
+      && (state.kind === "all" || v.kind === state.kind)
+      && (!q || (v.name + " " + v.title + " " + v.blurb).toLowerCase().includes(q)));
+    if (!vs.length) continue;
+    vs.sort((a, b) => KINDS.indexOf(a.kind) - KINDS.indexOf(b.kind) || a.title.localeCompare(b.title));
+    shown += vs.length;
+    main.append(el("section", {class: "group", id: g.key.replace(":", "-")},
+      el("div", {class: "head"}, el("h2", {text: g.title}), el("p", {text: `${g.sub} · ${vs.length} vault${vs.length === 1 ? "" : "s"} · ${g.blurb}`})),
+      el("div", {class: "grid"}, vs.map(card))));
+  }
+  if (!shown) main.append(el("p", {class: "empty", text: "No vault matches these filters."}));
+  paint();
+}
+
+function paint() {
+  if (!atlas.complete) return;
+  document.querySelectorAll("figure canvas").forEach(cv => {
+    if (!cv.width || cv.width === 300) cv._draw();
+    cv.style.width = (cv.dataset.w * state.zoom) + "px";
+  });
+}
+
+function chips(id, options, key) {
+  const box = document.getElementById(id);
+  box.replaceChildren(...options.map(([value, label]) => {
+    const b = el("button", {class: "chip", type: "button", "aria-pressed": String(state[key] === value), text: label});
+    b.onclick = () => { state[key] = value; save(); chips(id, options, key); render(); };
+    return b;
+  }));
+}
+
+function header() {
+  const n = DATA.vaults.length, layouts = DATA.vaults.reduce((s, v) => s + v.layouts.length, 0);
+  const placed = Object.values(DATA.placements);
+  const okCount = placed.filter(p => +p.split("/")[0] > 0).length;
+  const stat = (b, s) => el("div", {}, el("b", {text: b}), el("span", {text: s}));
+  document.getElementById("stats").replaceChildren(
+    stat(n, "vaults"), stat(layouts, "layouts"),
+    stat(DATA.vaults.filter(v => v.kind === "entrance").length, "entrances"),
+    placed.length ? stat(`${okCount}/${placed.length}`, "layouts placed in test worlds") : null);
+  const feat = ["landmark", "treasure", "encounter", "store"];
+  const rows = DATA.themes.map(t => [t, "theme:" + t, feat.map(k => DATA.vaults.filter(v => v.kind === k && v.themes.includes(t)).length)]);
+  rows.push(["shared", "shared", feat.map(k => DATA.vaults.filter(v => v.kind === k && v.themes.includes("any")).length)]);
+  const table = document.getElementById("matrix");
+  table.replaceChildren(
+    el("thead", {}, el("tr", {}, el("th", {text: "Overworld"}), feat.map(k => el("th", {text: KIND_LABEL[k]})), el("th", {text: "Entrances"}), el("th", {text: "Dungeon"}))),
+    el("tbody", {}, rows.map(([t, key, counts], i) => {
+      const d = DATA.dungeons[i] || (i === rows.length - 1 ? "any" : null);
+      const btn = el("button", {type: "button", text: t});
+      btn.onclick = () => { state.group = key; save(); setupChips(); render(); };
+      const dcell = d ? (() => { const b = el("button", {type: "button", text: DUNGEON_LABEL[d]}); b.onclick = () => { state.group = "dungeon:" + d; save(); setupChips(); render(); }; return b; })() : "";
+      const dn = d ? DATA.vaults.filter(v => v.kind === "entrance" && v.themes.includes(d)).length : "";
+      return el("tr", {}, el("td", {}, btn), counts.map(c => el("td", {class: c ? "" : "zero", text: c})), el("td", {text: dn}), el("td", {}, dcell));
+    })));
+}
+
+function legend() {
+  const items = [
+    ["+", "open ground the vault is entered from", {keep: true, need: "walkable"}],
+    [".", "left as it was (forest, grass, rock)", {keep: true}],
+    ["#  W", "walls, from the vault's palette", {tile: "grass.wall_alt"}],
+    ["T", "trees", {tile: "grass.wall"}],
+    ["d", "door (locked with a key at some entrances)", {tile: "grass.dirt", spawn: "door"}],
+    ["D", "portal down into the dungeon", {tile: "grass.dirt", spawn: "portal"}],
+    ["p", "where players may start", {tile: "grass.dirt", spawn: "player"}],
+    ["$", "shop", {tile: "grass.dirt", spawn: "store"}],
+    ["i  X", "item, scroll of experience", {tile: "grass.dirt", spawn: "item"}],
+    ["*", "gold", {tile: "grass.dirt", spawn: "gold"}],
+    ["e", "animal (or the vault's own enemies)", {tile: "grass.dirt", spawn: "enemy"}],
+    ["E", "tougher enemy", {tile: "grass.dirt", spawn: "brute"}],
+    ["s  a  t  h", "statue, anvil, tombstone, shrub", {tile: "grass.dirt", decor: "statue"}],
+    ["k", "warning skull", {tile: "grass.dirt", decor: "skull"}],
+  ];
+  const box = document.getElementById("legend");
+  box.replaceChildren(...items.map(([ch, text, spec]) => {
+    const cv = el("canvas", {width: 32, height: 32, "aria-hidden": "true"});
+    cv._spec = spec;
+    return el("div", {}, cv, el("code", {text: ch}), el("span", {text}));
+  }));
+  paintLegend();
+}
+function paintLegend() {
+  if (!atlas.complete) return;
+  document.querySelectorAll("#legend canvas").forEach(cv => {
+    const ctx = cv.getContext("2d"); ctx.imageSmoothingEnabled = false; drawCell(ctx, cv._spec, 0, 0);
+  });
+}
+
+function setupChips() {
+  const groupOpts = [["all", "All"], ...GROUPS.map(g => [g.key, g.title])];
+  chips("groupChips", groupOpts, "group");
+  chips("kindChips", [["all", "Every kind"], ...KINDS.map(k => [k, KIND_LABEL[k]])], "kind");
+}
+
+document.getElementById("q").value = state.q;
+document.getElementById("zoom").value = state.zoom;
+document.getElementById("ascii").checked = state.ascii;
+document.getElementById("q").oninput = e => { state.q = e.target.value; save(); render(); };
+document.getElementById("zoom").oninput = e => { state.zoom = +e.target.value; save(); paint(); };
+document.getElementById("ascii").onchange = e => { state.ascii = e.target.checked; save(); document.querySelectorAll("pre.ascii").forEach(p => p.hidden = !state.ascii); };
+atlas.onload = () => { paint(); paintLegend(); };
+header(); setupChips(); legend(); render();
+</script>

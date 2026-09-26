@@ -46,6 +46,7 @@ run = (raw_args) ->
     parser\option("--players", "Players.", "1")
     parser\option("--overworld", "Overworld layout (see map_descs/World.moon); picked at random if not given.")
     parser\option("--dump", "Write the overworld's squares to this file, one character each.")
+    parser\option("--vault", "Force this vault (maps/vaults), as name or name:layout, wherever its kind goes.")
     args = parser\parse(raw_args)
     game_start = () ->
         return ResourceLoading.ensure_resources_before () ->
@@ -62,6 +63,7 @@ run = (raw_args) ->
             {:MapLinker} = require "maps.MapLink"
             current = {"?"}
             tallies = {}
+            vaults_placed = {}
             order = {}
             tally = (kind, name) ->
                 label = current[1]
@@ -127,10 +129,20 @@ run = (raw_args) ->
                         table.remove(linkers)
                     -- Only count the final (successful) attempt
                     label = current[1]
+                    for j=#vaults_placed,1,-1
+                        if vaults_placed[j][1] == label
+                            table.remove(vaults_placed, j)
                     for k, _ in pairs tallies
                         if k == label or k\find(label .. "|", 1, true) == 1
                             tallies[k] = {enemies: 0, items: 0, doors: 0, decor: 0, names: {}}
                     return f(...)
+            -- VAULT lines: the vaults of maps/vaults in each level's final attempt
+            VaultKit = require "maps.vaults.Kit"
+            if args.vault
+                VaultKit.force_name, layout = args.vault\match("^([^:]+):?(%d*)$")
+                VaultKit.force_layout = tonumber(layout)
+            VaultKit.on_placed = (def, i) ->
+                append vaults_placed, {current[1], def.name, i}
             current[1] = "Plain Valley"
             World = require("map_descs.World")
             if args.overworld
@@ -157,6 +169,8 @@ run = (raw_args) ->
                     append names, k .. "=" .. v
                 table.sort names
                 print string.format("RESULT seed=%s players=%s | %-24s enemies=%3d items=%3d doors=%3d decor=%3d | %s", args.seed, args.players, label, t.enemies, t.items, t.doors, t.decor, table.concat(names, ","))
+            for {label, name, i} in *vaults_placed
+                print "VAULT #{name}:#{i} | #{label}"
             os.exit(0)
 
     return StartEngine.start_engine {

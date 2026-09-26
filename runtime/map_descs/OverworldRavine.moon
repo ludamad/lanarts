@@ -160,4 +160,4 @@ layout = (node) ->
     protect_matching(map, area, {matches_content: TILES.stone.id})
     return true
 
-return create(layout)
+return create(layout, "rootways")

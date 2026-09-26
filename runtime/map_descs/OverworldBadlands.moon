@@ -51,4 +51,4 @@ layout = (node) ->
     map.regions = grid_regions(area, 2, 2, 2)
     return true
 
-return create(layout)
+return create(layout, "craters")

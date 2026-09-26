@@ -4,11 +4,29 @@ OldMaps = require "maps.OldMaps"
 
 Vaults = require "maps.Vaults"
 {:place_vault_in} = require "maps.VaultUtils"
+VaultKit = require "maps.vaults.Kit"
+VaultLibrary = require "maps.vaults.Library"
+
+-- Digs the way into dungeon: one of its own entrance vaults (see maps/vaults) or one any dungeon
+-- can use. Tries another if the first won't fit.
+place_entrance = (region_set, dungeon, args) ->
+    used = {}
+    args = table.merge args, {
+        palette: VaultLibrary.DUNGEON_PALETTES[dungeon]
+        dungeon_placer: callable_once(args.dungeon_placer)
+    }
+    for attempt=1,4
+        def = VaultLibrary.pick(region_set.map.rng, "entrance", dungeon, used)
+        if not def
+            break
+        used[def.name] = true
+        if VaultKit.place(region_set, def, args)
+            return true
+    return false
 
 place_ogre_lair = (region_set) ->
     ogre_lair = require("map_descs.OgreLair")\linker()
-    return place_vault_in region_set, Vaults.sealed_dungeon {
-        tileset: Tilesets.snake
+    return place_entrance region_set, "ogre", {
         gold_placer: (map_, xy) ->
             MapUtils.spawn_item(map_, "Gold", map_.rng\random(2,10), xy)
         door_placer: (map_, xy) ->
@@ -29,8 +47,7 @@ place_outpost = (region_set) ->
     for i=1,3
         entrance\link_linker(stockroom, "spr_gates.enter", "spr_gates.return")
 
-    return place_vault_in region_set, Vaults.sealed_dungeon {
-        tileset: Tilesets.snake
+    return place_entrance region_set, "outpost", {
         gold_placer: (map, xy) -> nil -- dont need gold here
         door_placer: (map, xy) -> MapUtils.spawn_door(map, xy)
         dungeon_placer: callable_once (map, xy) ->
@@ -110,9 +127,7 @@ place_underdungeon = (region_set) ->
     }
 
     -- MapLinker.create {map_label: "Underdungeon", generate: (backwards) => underdungeon_create(backwards)}
-    return place_vault_in region_set, Vaults.sealed_dungeon {
-        rng: region_set.map.rng,
-        tileset: Tilesets.underdungeon
+    return place_entrance region_set, "underdungeon", {
         door_placer: (map, xy) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, 'Dandelite Key')
@@ -132,8 +147,7 @@ place_hive = (region_set) ->
     for i=1,3
         entrance\link_linker(depths, "spr_gates.enter_lair", "spr_gates.exit_lair")
     -- Link to hive entrance
-    return place_vault_in region_set, Vaults.sealed_dungeon {
-        tileset: Tilesets.hive
+    return place_entrance region_set, "hive", {
         door_placer: (map, xy) ->
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
         dungeon_placer: (map, xy) ->
@@ -149,8 +163,7 @@ place_temple = (region_set) ->
         entrance\link_linker(chamber, "spr_gates.enter", "spr_gates.return")
         chamber\link_linker(sanctum, "spr_gates.enter", "spr_gates.return")
 
-    return place_vault_in region_set, Vaults.sealed_dungeon {
-        tileset: Tilesets.temple
+    return place_entrance region_set, "temple", {
         gold_placer: (map, xy) -> nil -- dont need gold here
         door_placer: (map, xy) -> MapUtils.spawn_door(map, xy)
         dungeon_placer: callable_once (map, xy) ->
@@ -166,8 +179,7 @@ place_snake_pit = (region_set) ->
     for i=1,3
         entrance\link_linker(depths, "spr_gates.enter", "spr_gates.return")
     -- Link to snake pit entrance
-    return place_vault_in region_set, Vaults.sealed_dungeon {
-        tileset: Tilesets.snake
+    return place_entrance region_set, "snake", {
         door_placer: (map, xy) ->
             MapUtils.spawn_door(map, xy)
         dungeon_placer: callable_once (map, xy) ->

@@ -89,6 +89,77 @@ M.snake = Data.tileset_create {
     wall = { images = Display.images_load ("tiles/dngn_wall/snake/snake(0-9).png") }
 }
 
+-- Tilesets for vaults (see maps/vaults)
+M.brick = Data.tileset_create {
+    floor = { images = Display.images_load ("tiles/dngn_floor/pebblebrown/pebble_brown(0-8).png") },
+    floor_alt = { images = Display.images_load ("tiles/outside_floor/sandrockfloor/floor_sand_rock(0-3).png") },
+    wall = { images = Display.images_load ("tiles/dngn_wall/brick_brown/brick_brown(0-7).png") },
+    wall_alt = { images = Display.images_load ("tiles/dngn_wall/stone_dark/stone_dark(0-3).png") }
+}
+
+M.marble = Data.tileset_create {
+    floor = { images = Display.images_load "spr_tile_floors/white_marble.png%32x32" },
+    floor_alt = { images = Display.images_load "spr_tile_floors/marble_floor.png%32x32" },
+    wall = { images = Display.images_load "spr_tile_walls/marble_wall.png%32x32" },
+    wall_alt = { images = Display.images_load "spr_tile_walls/relief.png%32x32" }
+}
+
+M.cobalt = Data.tileset_create {
+    floor = { images = Display.images_load ("tiles/dngn_floor/cobalt/black_cobalt(0-11).png") },
+    floor_alt = { images = Display.images_load ("tiles/dngn_floor/mesh/mesh(0-3).png") },
+    wall = { images = Display.images_load ("tiles/dngn_wall/cobalt_rock/cobalt_rock(1-4).png") },
+    wall_alt = { images = Display.images_load ("tiles/dngn_wall/crystal/crystal_wall(0-13).png") }
+}
+
+M.iron = Data.tileset_create {
+    floor = { images = Display.images_load "spr_tile_floors/iron.png%32x32" },
+    floor_alt = { images = Display.images_load "spr_tile_floors/rect_gray.png%32x32" },
+    wall = { images = Display.images_load "spr_tile_walls/metal_wall.png%32x32" },
+    wall_alt = { images = Display.images_load "spr_tile_walls/iron.png%32x32" }
+}
+
+M.moss = Data.tileset_create {
+    floor = { images = Display.images_load "spr_tile_floors/floor_vines.png%32x32" },
+    floor_alt = { images = Display.images_load "spr_tile_floors/swamp.png%32x32" },
+    wall = { images = Display.images_load "spr_tile_walls/brick_dark_2.png%32x32" },
+    wall_alt = { images = Display.images_load "spr_tile_walls/stone2.png%32x32" }
+}
+
+M.blood = Data.tileset_create {
+    floor = { images = Display.images_load ("tiles/dngn_floor/cobbleblood/cobble_blood(0-11).png") },
+    floor_alt = { images = Display.images_load "spr_tile_floors/grey_dirt.png%32x32" },
+    wall = { images = Display.images_load ("tiles/dngn_wall/stone_dark/stone_dark(0-3).png") },
+    wall_alt = { images = Display.images_load "spr_tile_walls/catacombs.png%32x32" }
+}
+
+M.spider = Data.tileset_create {
+    floor = { images = Display.images_load ("tiles/dngn_floor/spider/spider0(0-9).png") },
+    floor_alt = { images = Display.images_load "spr_tile_floors/grey_dirt.png%32x32" },
+    wall = { images = Display.images_load ("tiles/dngn_wall/spider/spider(0-15).png") },
+    wall_alt = { images = Display.images_load "spr_tile_walls/spider.png%32x32" }
+}
+
+M.quarry = Data.tileset_create {
+    floor = { images = Display.images_load ("tiles/outside_floor/sandrockfloor/floor_sand_rock(0-3).png") },
+    floor_alt = { images = Display.images_load ("tiles/dngn_floor/pebblebrown/pebble_brown(0-8).png") },
+    wall = { images = Display.images_load ("tiles/dngn_wall/rock/lab-rock(0-3).png") },
+    wall_alt = { images = Display.images_load "spr_tile_walls/stone_gray.png%32x32" }
+}
+
+M.volcanic = Data.tileset_create {
+    floor = { images = Display.images_load "spr_tile_floors/infernal.png%32x32" },
+    floor_alt = { images = Display.images_load ("tiles/dngn_floor/demonic_red/demonic_red(0-8).png") },
+    wall = { images = Display.images_load "spr_tile_walls/volcanic_wall.png%32x32" },
+    wall_alt = { images = Display.images_load ("tiles/dngn_wall/rock/lab-rock(0-3).png") }
+}
+
+M.stonework = Data.tileset_create {
+    floor = { images = Display.images_load "spr_tile_floors/rect_gray.png%32x32" },
+    floor_alt = { images = Display.images_load "spr_tile_floors/labyrinth.png%32x32" },
+    wall = { images = Display.images_load ("tiles/dngn_wall/stone_wall/stone_wall.png%32x32") },
+    wall_alt = { images = Display.images_load "spr_tile_walls/stone_gray.png%32x32" }
+}
+
 for k,tileset in pairs(M) do
     if not rawget(tileset, "wall_alt") then
         tileset.wall_alt = tileset.wall
