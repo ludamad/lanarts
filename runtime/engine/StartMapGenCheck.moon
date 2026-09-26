@@ -3,10 +3,49 @@ EngineInternal = require "core.EngineInternal"
 ResourceLoading = require "engine.ResourceLoading"
 StartEngine = require "engine.StartEngine"
 
+-- Legend for --dump: tiles by content, with vault squares and dungeon portals marked over them
+dump_overworld_on_generate = (path) ->
+    SourceMap = require "core.SourceMap"
+    NewMaps = require "maps.NewMaps"
+    MapUtils = require "maps.MapUtils"
+    Vaults = require "maps.Vaults"
+    Tilesets = require "tiles.Tilesets"
+    g = Tilesets.grass
+    chars = {[g.floor]: ".", [g.floor_alt1]: ",", [g.floor_alt2]: "'", [g.dirt]: ":", [g.wall]: "T", [g.wall_alt]: "#"}
+    portals = {}
+    spawn_portal = MapUtils.spawn_portal
+    MapUtils.spawn_portal = (map, sqr, ...) ->
+        append portals, {map, sqr}
+        return spawn_portal(map, sqr, ...)
+    generate_game_map = NewMaps.generate_game_map
+    NewMaps.generate_game_map = (map, ...) ->
+        NewMaps.generate_game_map = generate_game_map  -- only the overworld, which is made first
+        MapUtils.spawn_portal = spawn_portal
+        {w, h} = map.size
+        grid = for y=0,h-1
+            for x=0,w-1
+                sq = map\get({x, y})
+                c = chars[sq.content]
+                if SourceMap.flags_match(sq.flags, Vaults.FLAG_HAS_VAULT)
+                    c = if SourceMap.flags_match(sq.flags, SourceMap.FLAG_SOLID) then "V" else "v"
+                c or (if SourceMap.flags_match(sq.flags, SourceMap.FLAG_SOLID) then "W" else "_")
+        -- Portals from discarded attempts were captured too (a map's userdata differs per call, so
+        -- no == check); the real ones sit on vault floor in the final map
+        for {_, {x, y}} in *portals
+            if grid[y + 1][x + 1] == "v"
+                grid[y + 1][x + 1] = "P"
+        f = io.open(path, "w")
+        for row in *grid
+            f\write(table.concat(row), "\n")
+        f\close()
+        return generate_game_map(map, ...)
+
 run = (raw_args) ->
     parser = argparse("lanarts", "Map gen check")
     parser\option("--seed", "Starting seed.", "12345678")
     parser\option("--players", "Players.", "1")
+    parser\option("--overworld", "Overworld layout (see map_descs/World.moon); picked at random if not given.")
+    parser\option("--dump", "Write the overworld's squares to this file, one character each.")
     args = parser\parse(raw_args)
     game_start = () ->
         return ResourceLoading.ensure_resources_before () ->
@@ -93,7 +132,14 @@ run = (raw_args) ->
                             tallies[k] = {enemies: 0, items: 0, doors: 0, decor: 0, names: {}}
                     return f(...)
             current[1] = "Plain Valley"
-            ok, err = pcall () -> require("map_descs.World").generate()
+            World = require("map_descs.World")
+            if args.overworld
+                World.overworld = args.overworld
+            if args.dump
+                dump_overworld_on_generate(args.dump)
+            ok, err = pcall () -> World.generate()
+            if ok
+                print "OVERWORLD " .. World.generated_overworld
             if not ok
                 print "WORLD GEN ERROR", err
                 os.exit(1)

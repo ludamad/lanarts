@@ -16,6 +16,10 @@ holding the old content, to get a "before" run).
 - `engine.StartMapGenCheck --seed N --players P` generates the whole campaign and prints one
   `RESULT` line per level (enemies, items, doors and a per-name tally). Gate guards placed by
   Underdungeon/Crypt vaults are attributed to the dungeon they guard (`Underdungeon|GATE:...`).
+  `--overworld NAME` forces an overworld layout (`classic`, `wildlands`, `settled`, `ringwood`,
+  `badlands`, `farmland`, `terraces`; the game reads `LANARTS_OVERWORLD`, and picks one at random
+  from the seed when neither is set; `mapgen.sh` passes `OVERWORLD`), and `--dump FILE` writes the overworld one character per square:
+  `.` `,` `'` grass, `:` dirt, `T` trees, `#` rock, `v`/`V` vault floor/wall, `P` dungeon portal.
 - `engine.StartCombatSim --jobs FILE --steps N` runs fights in the debug arena. Each job line is
   `class level players seed monster[:count][;monster[:count]...]`; each fight prints a `SIM` line
   with the party damage taken, and the run ends with `SIM DONE`.
