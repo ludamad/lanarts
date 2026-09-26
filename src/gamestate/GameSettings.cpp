@@ -63,6 +63,7 @@ void GameSettings::parse(LuaValue& lsettings) {
     if (frame_action_repeat < 0)
         frame_action_repeat = 0;
     optional_fill(lsettings, "invincible", invincible);
+    optional_fill(lsettings, "single_screen", single_screen);
     optional_fill(lsettings, "time_per_step", time_per_step);
     optional_fill(lsettings, "draw_diagnostics", draw_diagnostics);
     optional_fill(lsettings, "username", username);

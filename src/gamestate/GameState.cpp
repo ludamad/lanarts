@@ -375,6 +375,11 @@ void GameState::start_game() {
             n_local_players++;
         }
     }
+    // single_screen: the first local player's view fills the window; the rest keep screens (their
+    // input is polled per screen) placed past the window's edge, where nothing of theirs is seen
+    if (settings.single_screen) {
+        n_local_players = std::min(n_local_players, 1);
+    }
     // Number of split-screens tiled together
     int n_x = 1, n_y = 1;
     if (n_local_players <= 2) {
@@ -397,12 +402,16 @@ void GameState::start_game() {
     int local_player_idx = 0;
     for (PlayerDataEntry &player: player_data().all_players()) {
         const int x1 = (local_player_idx % n_x) * WIDTH, y1 = (local_player_idx / n_x) * HEIGHT;
-        bounding_boxes.push_back(BBox {x1, y1, x1 + WIDTH, y1 + HEIGHT});
+        if (settings.single_screen && local_player_idx > 0) {
+            bounding_boxes.push_back(BBox {WIDTH * local_player_idx, 0, WIDTH * (local_player_idx + 1), HEIGHT});
+        } else {
+            bounding_boxes.push_back(BBox {x1, y1, x1 + WIDTH, y1 + HEIGHT});
+        }
         if (player.is_local_player) {
             local_player_idx++;
         }
     }
-    if (bounding_boxes.size() == 3) {
+    if (bounding_boxes.size() == 3 && !settings.single_screen) {
         bounding_boxes[1] = {WIDTH, 0, settings.view_width, settings.view_height};
     }
 

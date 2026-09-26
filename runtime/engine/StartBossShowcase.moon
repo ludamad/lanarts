@@ -113,6 +113,7 @@ run = (raw_args) ->
             menu_font: 'fonts/alagard_by_pix3m-d6awiwp.ttf'
             time_per_step: 0
             invincible: false
+            single_screen: true -- one view, of the first hero
         },
         entry_point: game_start,
         on_exit: () -> nil

@@ -52,6 +52,8 @@ def build(name):
         src = rig.scale2x(src)
     h, w = len(src), len(src[0])
     ox, oy = (m.CANVAS - w) // 2, m.CANVAS - h - 4
+    if ox < 0 or oy < 0:
+        sys.exit(f"{name}: CANVAS {m.CANVAS} is too small for {w}x{h} art (it needs {max(w, h + 4)} or more)")
     base = rig.paste(rig.blank(m.CANVAS), src, ox, oy)
     if hasattr(m, "base"):
         base = m.base(base)
@@ -99,7 +101,7 @@ def write_sheet(results, path, scale=3):
     rows = []
     for m, base, anims, timing, effects in results:
         rows += [(m.CANVAS, anims[a]) for a in ORDER]
-        rows += [(max(len(f), len(f[0])), fr) for fr in [effects[e] for e in effects]]
+        rows += [(max(len(fr[0]), len(fr[0][0])), fr) for fr in effects.values()]
     cell = max(size for size, _ in rows) * scale + 6
     cols = max(len(frames) for _, frames in rows)
     sheet = Image.new("RGBA", (cols * cell, len(rows) * cell), (44, 40, 52, 255))

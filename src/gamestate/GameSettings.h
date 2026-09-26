@@ -38,6 +38,8 @@ struct GameSettings {
 	/*Debug options*/
 	bool draw_diagnostics, verbose_output;
 	bool invincible;
+	// Only the first local player's view shows, however many local players there are (eg bots in a showcase)
+	bool single_screen;
 	std::string event_log;
 	std::string comparison_event_log;
 
@@ -70,6 +72,7 @@ struct GameSettings {
 		menu_font = "fonts/Gudea-Regular.ttf";
 
 		invincible = false;
+		single_screen = false;
 		draw_diagnostics = false;
 
 		ip = "localhost";
