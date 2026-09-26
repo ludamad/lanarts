@@ -109,4 +109,72 @@ WppppppW....
 ]]
         }
     }
+    {
+        name: "any_stair_shaft", title: "Stair Shaft", kind: "entrance", themes: {"any"}
+        blurb: "A small square shaft cut into the rock, a stair going down behind a single door"
+        layouts: {
+            [[
+.22222.
+22pDp22
+2ppppp2
+2p,,,p2
+22#d#22
+..+o+..
+]]
+            [[
+.2222..
+22pD22.
+2pppp2.
+2p,,pd+
+22,,pd+
+.22222.
+]]
+        }
+    }
+    {
+        name: "any_portico", title: "Pillared Portico", kind: "entrance", themes: {"any"}
+        blurb: "A columned porch set into the rock, the portal waiting between the pillars"
+        layouts: {
+            [[
+.2222222.
+22spDps22
+2ppp,ppp2
+2sp,,,ps2
+22W#d#W22
+...+o+...
+]]
+            [[
+..22222..
+.22sDs22.
+22pp,pp22
+2sp,,,ps2
+2pp,,,pp2
+22W#d#W22
+...+o+...
+]]
+        }
+    }
+    {
+        name: "any_vestibule", title: "Double-Doored Vestibule", kind: "entrance", themes: {"any"}
+        blurb: "An inner chamber behind an antechamber, each with its own door"
+        layouts: {
+            [[
+.22222.
+22pDp22
+2ppppp2
+22#d#22
+.2,,,2.
+.2#d#2.
+..+o+..
+]]
+            [[
+.222222..
+22ppDp22.
+2pppppp2.
+22W#d#W2.
+.2,,,,,d+
+.22222W2.
+]]
+        }
+    }
 }
