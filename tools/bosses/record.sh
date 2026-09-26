@@ -20,8 +20,8 @@ import glob, sys
 from PIL import Image
 frames_dir, out, every = sys.argv[1], sys.argv[2], int(sys.argv[3])
 paths = sorted(glob.glob(frames_dir + "/frame_*.bmp"))
-# The game view: the left 640 columns, without the action bar at the bottom
-images = [Image.open(p).convert("RGB").crop((0, 0, 640, 568)) for p in paths]
+# The game view: the left 640 columns, below the message log and above the action bar
+images = [Image.open(p).convert("RGB").crop((0, 100, 640, 568)) for p in paths]
 ms = round(1000 * every / 60)  # 60 game steps a second
 images[0].save(out, save_all=True, append_images=images[1:], duration=ms, loop=0, quality=60, method=6)
 print("%s: %d frames, %.1fs" % (out, len(images), len(images) * ms / 1000))

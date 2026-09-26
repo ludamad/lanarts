@@ -30,7 +30,7 @@ generate = (monsters, tileset_name = "pebble") ->
         fill_operator: {content: tileset.floor_alt}
     }
     for i, name in ipairs monsters
-        column = x1 + w - 5 - (i - 1) % 3 * 2
+        column = x1 + math.floor(w * 0.65) + (i - 1) % 3 * 2 -- room behind, so fights aren't pinned to the wall
         row = y1 + math.floor(h / 2) + math.floor((i - 1) / 3) * 2 - 1
         MapUtils.spawn_enemy(map, name, {column, row})
     for dy=-1,1
