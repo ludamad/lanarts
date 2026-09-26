@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Lanarts Vault Atlas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -272,7 +273,7 @@ function header() {
   document.getElementById("matrix").replaceChildren(
     el("thead", {}, el("tr", {}, el("th", {text: "Overworld"}), feat.map(k => el("th", {text: KIND_LABEL[k]})))),
     el("tbody", {}, rows.map(([t, key, counts]) =>
-      el("tr", {}, el("td", {}, jump(t, key)), counts.map(c => el("td", {class: c ? "" : "zero", text: c}))))));
+      el("tr", {}, el("td", {}, jump(t, key)), counts.map((c, k) => el("td", {class: c || rows[rows.length - 1][2][k] ? "" : "zero", text: c}))))));
   const drows = [...DATA.dungeons, "any"].map(d => [d, DATA.vaults.filter(v => v.kind === "entrance" && v.themes.includes(d))]);
   document.getElementById("dmatrix").replaceChildren(
     el("thead", {}, el("tr", {}, el("th", {text: "Dungeon"}), el("th", {text: "Entrances"}), el("th", {text: "Layouts"}))),
