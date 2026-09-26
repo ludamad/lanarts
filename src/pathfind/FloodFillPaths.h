@@ -108,5 +108,10 @@ private:
 	Pos _topleft_xy;
 	/* Grid has own internal size, this is size actually used */
 	Size _size;
+	/* The last full fill, reused while its source, window and walls are unchanged */
+	bool _fill_valid = false;
+	Pos _filled_tile;
+	BBox _filled_area;
+	std::vector<FloodFillCoord> _heap;
 };
 #endif /* FLOODFILLPATHS_H_ */

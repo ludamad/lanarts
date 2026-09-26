@@ -20,8 +20,12 @@
 
 using namespace std;
 
-static void floodfill(Grid<FloodFillNode>& path, Size size, int sx, int sy) {
-	FloodFillCoord* heap = new FloodFillCoord[size.area()];
+static void floodfill(Grid<FloodFillNode>& path, Size size, int sx, int sy, std::vector<FloodFillCoord>& heap_buffer) {
+	// Every tile is pushed at most once, plus the start
+	if (heap_buffer.size() < size.area() + 1) {
+		heap_buffer.resize(size.area() + 1);
+	}
+	FloodFillCoord* heap = heap_buffer.data();
 	FloodFillCoord* heap_end = heap + 1;
 
 	Size alloc_size = path.size();
@@ -59,8 +63,6 @@ static void floodfill(Grid<FloodFillNode>& path, Size size, int sx, int sy) {
 
 		}
 	}
-
-	delete[] heap;
 }
 
 FloodFillPaths::FloodFillPaths(const BoolGridRef& solidity) {
@@ -69,6 +71,7 @@ FloodFillPaths::FloodFillPaths(const BoolGridRef& solidity) {
 
 void FloodFillPaths::initialize(const BoolGridRef& solidity) {
 	_solidity = solidity;
+	_fill_valid = false;
 }
 
 FloodFillPaths::~FloodFillPaths() {
@@ -86,6 +89,24 @@ void FloodFillPaths::fill_paths_tile_region(const Pos& tile_xy,
 		memset(_path.begin(), 0, alloc_w * alloc_h * sizeof(FloodFillNode));
 	}
 
+	// The same source and window over the same walls give the same fill as last time: keep it.
+	// (Players and allies refill every step, mostly without having changed tile.)
+	if (clear_previous && _fill_valid && tile_xy == _filled_tile && area == _filled_area) {
+		bool unchanged = true;
+		for (int y = 0; y < _size.h && unchanged; y++) {
+			for (int x = 0; x < _size.w; x++) {
+				if (get(x, y)->solid != (*_solidity)[Pos(x + area.x1, y + area.y1)]) {
+					unchanged = false;
+					break;
+				}
+			}
+		}
+		if (unchanged) {
+			return;
+		}
+	}
+	_fill_valid = false;
+
 	if (clear_previous) {
 		for (int y = 0; y < _size.h; y++) {
 			for (int x = 0; x < _size.w; x++) {
@@ -102,7 +123,10 @@ void FloodFillPaths::fill_paths_tile_region(const Pos& tile_xy,
 	if (_size.area() <= 0 || tile_xy.x < 0 || tile_xy.y < 0 || tile_xy.x >= _size.w || tile_xy.y >= _size.h) {
 		return;
 	}
-	floodfill(_path, _size, tile_xy.x, tile_xy.y);
+	floodfill(_path, _size, tile_xy.x, tile_xy.y, _heap);
+	if (clear_previous) {
+		_fill_valid = true, _filled_tile = tile_xy, _filled_area = area;
+	}
 }
 
 void FloodFillPaths::fill_paths_in_radius(const Pos& source_xy, int radius) {
@@ -256,6 +280,7 @@ PosF FloodFillPaths::interpolated_direction(const BBox& bbox, float speed,
 const int HUGE_DISTANCE = 1000000;
 
 void FloodFillPaths::point_to_local_min(int sx, int sy) {
+	_fill_valid = false; // edits the fill in place
 	FloodFillNode* fixed_node = get(sx, sy);
 
 	int minx = squish(sx - 1, 0, width()), miny = squish(sy - 1, 0, height());
@@ -291,6 +316,7 @@ void FloodFillPaths::point_to_local_min(int sx, int sy) {
 }
 
 void FloodFillPaths::point_to_random_further(MTwist& mt, int sx, int sy) {
+	_fill_valid = false; // edits the fill in place
 	FloodFillNode* fixed_node = get(sx, sy);
 
 	int minx = squish(sx - 1, 0, _size.w), miny = squish(sy - 1, 0, _size.h);
