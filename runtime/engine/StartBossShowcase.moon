@@ -15,8 +15,9 @@ Map = require "core.Map"
 World = require "core.World"
 
 -- Bots: close in on the nearest boss (summons after), fighters swing, casters keep some distance
--- and cast their first spell, falling back on their weapon without mana
-make_step = (class_name, bosses) -> () =>
+-- and cast their first spell, falling back on their weapon without mana. Each hero takes its own
+-- side of the boss (slot), so the party spreads out as a real one would.
+make_step = (class_name, bosses, slot) -> () =>
     player = @player
     best, best_d = nil, math.huge
     for pass in *{true, false}
@@ -31,9 +32,14 @@ make_step = (class_name, bosses) -> () =>
         return
     melee = (class_name == "Fighter" or class_name == "Rogue" or class_name == "Templar" or player.stats.mp < 10)
     want = if melee then (player.radius + best.radius + 4) else 150
-    if best_d > want
-        dx, dy = best.x - player.x, best.y - player.y
-        @set("move_direction", {dx / best_d, dy / best_d})
+    -- The spot to fight from: out from the boss towards the first hero, turned by this hero's slot
+    lead = World.players[1].instance
+    a = math.atan2(lead.y - best.y, lead.x - best.x) + (slot - 1) * 1.0
+    tx, ty = best.x + math.cos(a) * want, best.y + math.sin(a) * want
+    dx, dy = tx - player.x, ty - player.y
+    dist = math.sqrt(dx * dx + dy * dy)
+    if dist > 6
+        @set("move_direction", {dx / dist, dy / dist})
     if melee
         @set("should_use_weapon", true)
     else
@@ -70,7 +76,7 @@ run = (raw_args) ->
                     player.stats.hp = player.stats.max_hp
                     player.stats.mp = player.stats.max_mp
                     source = require("input.ProgrammableInputSource").create(player)
-                    source.step = make_step(args.class, bosses)
+                    source.step = make_step(args.class, bosses, i)
                     return source
                 GameState.register_player "Hero" .. i, args.class, input_source, true, i - 1, 0
             EngineInternal.init_gamestate()
