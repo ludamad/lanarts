@@ -177,12 +177,11 @@ place_snake_pit = (region_set) ->
     }
 
 
--- Overworld layouts. Each game picks one at random (from the game seed), unless LANARTS_OVERWORLD
--- or M.overworld (eg engine.StartMapGenCheck --overworld) names one, which draws no random number.
-OVERWORLD_NAMES = {
-    "classic", "wildlands", "settled", "ringwood", "badlands", "farmland", "terraces",
-    "ravine", "crossroads", "craters", "spiral", "labyrinth", "canyons", "rootways", "patchwork", "ridges", "ruins"
-}
+-- Overworld layouts. Each game picks one of OVERWORLD_NAMES at random (from the game seed), unless
+-- LANARTS_OVERWORLD or M.overworld (eg engine.StartMapGenCheck --overworld) names any layout in
+-- OVERWORLDS, which draws no random number. The layouts outside the rotation are kept as starting
+-- points for other dungeons.
+OVERWORLD_NAMES = {"classic", "ringwood", "farmland", "crossroads", "craters", "spiral", "rootways", "patchwork"}
 OVERWORLDS = {
     classic: "map_descs.Overworld"
     wildlands: "map_descs.OverworldNoise"          -- noise: forest, meadow and ridges by elevation
@@ -211,7 +210,10 @@ M.generate = () ->
         name = M.overworld or random_choice(OVERWORLD_NAMES)
         M.generated_overworld = name
         desc = OVERWORLDS[name]
-        assert desc, "Unknown overworld '#{name}', expected one of: #{table.concat(OVERWORLD_NAMES, ', ')}"
+        if not desc
+            known = [k for k in pairs OVERWORLDS]
+            table.sort known
+            error "Unknown overworld '#{name}', expected one of: #{table.concat(known, ', ')}"
         overworld = require(desc)\linker {
             root: () =>
                 first_dungeon = @rng\random_choice {place_temple, place_snake_pit}
