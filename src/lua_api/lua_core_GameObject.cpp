@@ -286,6 +286,23 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	};
 
 	methods["effective_stats"].bind_function(lapi_gameinst_effectivestats);
+	// obj:mark_animation("cast") plays that clip of an animated sprite from now (attack, cast or hurt),
+	// eg a boss winding up a scripted ability. Presentation only.
+	methods["mark_animation"] = [](lua_State* L) -> int {
+		auto* inst = luawrap::get<CombatGameInst*>(L, 1);
+		std::string state = luawrap::get<std::string>(L, 2);
+		int now = lua_api::gamestate(L)->frame();
+		if (state == "attack") {
+			inst->anim_marks.attack = now;
+		} else if (state == "cast") {
+			inst->anim_marks.cast = now;
+		} else if (state == "hurt") {
+			inst->anim_marks.hurt = now;
+		} else {
+			return luaL_error(L, "mark_animation: expected attack, cast or hurt, got '%s'", state.c_str());
+		}
+		return 0;
+	};
     LUAWRAP_GETTER(getters, weapon_range, OBJ->equipment().weapon().weapon_entry().range());
     methods["go_towards_if_free"].bind_function(lapi_go_towards_if_free);
 

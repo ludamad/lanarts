@@ -4,6 +4,7 @@
  */
 
 #include <cmath>
+#include "draw/AnimationSet.h"
 #include <luawrap/luawrap.h>
 
 #include <ldraw/DrawOptions.h>
@@ -375,6 +376,39 @@ void CombatGameInst::draw(GameState *gs, float frame, float alpha, sprite_id dra
     }
 }
 
+bool CombatGameInst::draw_animated(GameState* gs, float alpha) {
+	const AnimationSet* anims = res::animation_set(sprite);
+	if (!anims) {
+		return false;
+	}
+	int now = gs->frame();
+	const AnimationClip* clip = nullptr;
+	int start = 0;
+	// Picks c if it is still playing and started after the current pick
+	auto consider = [&](const AnimationClip& c, int mark) {
+		if (c.playing(now - mark) && (clip == nullptr || mark > start)) {
+			clip = &c;
+			start = mark;
+		}
+	};
+	// Attacks and casts take priority over flinching, so swings stay visible in a brawl
+	consider(anims->attack, anim_marks.attack);
+	consider(anims->cast, anim_marks.cast);
+	if (!clip) {
+		consider(anims->hurt, anim_marks.hurt);
+	}
+	if (!clip) {
+		bool moving = vx != 0 || vy != 0;
+		clip = moving && anims->walk.valid() ? &anims->walk : &anims->idle;
+		start = 0;
+	}
+	if (!clip->valid()) {
+		return false;
+	}
+	CombatGameInst::draw(gs, clip->frame_at(now - start), alpha, clip->sprite);
+	return true;
+}
+
 void CombatGameInst::post_draw(GameState *gs) {
     SpriteEntry& spr = game_sprite_data.get(sprite);
     GameView& view = gs->view();
@@ -549,6 +583,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 
 bool CombatGameInst::attack(GameState* gs, CombatGameInst* inst,
         const AttackStats& attack) {
+    anim_marks.attack = gs->frame();
 
     WeaponEntry& weapon = attack.weapon.weapon_entry();
 

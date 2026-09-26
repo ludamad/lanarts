@@ -11,6 +11,10 @@
 #include <lcommon/perf_timer.h>
 
 #include "display.h"
+
+#include <cstring>
+#include <string>
+#include <vector>
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
@@ -205,6 +209,27 @@ void ldraw::display_draw_start() {
     ImGui::NewFrame();
 }
 
+static std::string capture_path; // where the next finished frame is saved, if set
+
+void ldraw::display_capture_next_frame(const std::string& path) {
+    capture_path = path;
+}
+
+// Saves the frame just drawn (before the swap, while the back buffer holds it) as a BMP
+static void capture_frame(int w, int h) {
+    std::vector<unsigned char> pixels(w * h * 4), flipped(w * h * 4);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+    for (int y = 0; y < h; y++) { // GL rows run bottom-up
+        memcpy(&flipped[y * w * 4], &pixels[(h - 1 - y) * w * 4], w * 4);
+    }
+    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(flipped.data(), w, h, 32, w * 4, SDL_PIXELFORMAT_ABGR8888);
+    if (!surface || SDL_SaveBMP(surface, capture_path.c_str()) != 0) {
+        fprintf(stderr, "Could not save frame to %s: %s\n", capture_path.c_str(), SDL_GetError());
+    }
+    SDL_FreeSurface(surface);
+}
+
 void ldraw::display_draw_finish() {
     // Rendering
     ImGui::Render();
@@ -215,6 +240,10 @@ void ldraw::display_draw_finish() {
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    if (!capture_path.empty()) {
+        capture_frame(drawable_w, drawable_h);
+        capture_path.clear();
+    }
     SDL_GL_SwapWindow(MAIN_WINDOW);
 }
 

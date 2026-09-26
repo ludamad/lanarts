@@ -260,20 +260,10 @@ void PlayerInst::draw(GameState* gs) {
 		if (clip) {
 			alpha = 1.0; // the fall plays out before the ghost appears
 		}
-	} else {
-		// Attacks and casts take priority over flinching, so swings stay visible in a brawl
-		consider(anims->attack, anim_marks.attack);
-		consider(anims->cast, anim_marks.cast);
-		if (!clip) {
-			consider(anims->hurt, anim_marks.hurt);
-		}
+	} else if (draw_animated(gs, alpha)) {
+		return;
 	}
 	if (!clip) {
-		bool moving = vx != 0 || vy != 0;
-		clip = moving && anims->walk.valid() ? &anims->walk : &anims->idle;
-		start = 0;
-	}
-	if (!clip->valid()) {
 		CombatGameInst::draw(gs, now, alpha);
 		return;
 	}

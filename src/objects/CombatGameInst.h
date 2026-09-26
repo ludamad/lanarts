@@ -36,6 +36,9 @@ public:
     virtual void deinit(GameState* gs);
 	virtual void step(GameState* gs);
 	// drawn_sprite: draw this sprite instead of the instance's own (eg an animation clip)
+	// Draws the clip of the sprite's AnimationSet for what the object is doing (attack, cast, hurt,
+	// walk or idle); false if the sprite has no animations
+	bool draw_animated(GameState* gs, float alpha = 1.0f);
 	virtual void draw(GameState* gs, float frame = 0, float alpha = 1, sprite_id drawn_sprite = -1);
 	virtual void post_draw(GameState* gs);
 	virtual void update_field_of_view(GameState* gs);

@@ -8,6 +8,7 @@
 #define LDRAW_DISPLAY_H_
 
 #include <SDL.h>
+#include <string>
 #include <lcommon/geometry.h>
 
 namespace ldraw {
@@ -21,6 +22,8 @@ void display_set_world_region(const BBoxF& bbox);
 
 void display_draw_finish();
 void display_draw_start();
+// Saves the next frame display_draw_finish shows to path (a BMP), for recordings
+void display_capture_next_frame(const std::string& path);
 
 Size screen_size();
 Size display_size();

@@ -248,7 +248,9 @@ void EnemyInst::draw(GameState* gs) {
 		if (frame >= 4)
 			frame = 4;
 	}
-	CombatGameInst::draw(gs, frame);
+	if (!draw_animated(gs)) {
+		CombatGameInst::draw(gs, frame);
+	}
 
 	lcall(etype().draw_event, this);
 

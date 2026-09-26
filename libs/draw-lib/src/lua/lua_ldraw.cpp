@@ -91,6 +91,7 @@ void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcom
 	module["draw_rectangle_outline"].bind_function(lua_draw_rectangle_outline);
 	module["draw_line"].bind_function(draw_line);
 	module["initialize"].bind_function(display_initialize);
+	module["capture_next_frame"].bind_function(ldraw::display_capture_next_frame);
 	module["draw_loop"].bind_function(draw_loop);
 	module["set_window_region"].bind_function(display_set_window_region);
 	module["set_world_region"].bind_function(display_set_world_region);
