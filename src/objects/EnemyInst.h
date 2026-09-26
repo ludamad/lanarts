@@ -21,6 +21,7 @@ public:
 	virtual ~EnemyInst();
 
 	virtual void init(GameState* gs);
+	virtual void deinit(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void die(GameState* gs);
 	virtual void draw(GameState* gs);

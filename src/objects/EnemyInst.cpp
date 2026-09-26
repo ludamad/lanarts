@@ -126,6 +126,15 @@ EnemyEntry& EnemyInst::etype() {
 	return game_enemy_data.get(enemytype);
 }
 
+void EnemyInst::deinit(GameState* gs) {
+	// Free the avoidance agent however the monster leaves its map (killed, destroyed or moved), and
+	// on that map rather than whichever map is current
+	if (GameMapState* map = get_map(gs)) {
+		map->collision_avoidance().remove_object(collision_simulation_id());
+	}
+	CombatGameInst::deinit(gs);
+}
+
 void EnemyInst::init(GameState* gs) {
 	CombatGameInst::init(gs);
 	MonsterController& mc = gs->monster_controller();
@@ -277,8 +286,6 @@ void EnemyInst::die(GameState* gs) {
         }
 
         MTwist& mt = gs->rng();
-        CollisionAvoidance& coll_avoid = gs->collision_avoidance();
-        coll_avoid.remove_object(collision_simulation_id());
 
         gs->for_screens([&]() {
             show_defeat_message(gs->game_chat(), etype());

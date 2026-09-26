@@ -109,9 +109,12 @@ void PlayerInst::die(GameState* gs) {
 }
 
 void PlayerInst::deinit(GameState* gs) {
+	// The agent lives on the map the player is leaving, which needn't be the current one
+	if (GameMapState* map = get_map(gs)) {
+		map->collision_avoidance().remove_object(collision_simulation_id());
+	}
 	CombatGameInst::deinit(gs);
 	current_target = NONE;
-	gs->collision_avoidance().remove_object(collision_simulation_id());
 	gs->team_data().deregister_player(this);
 }
 
