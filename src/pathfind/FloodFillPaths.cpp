@@ -79,7 +79,7 @@ void FloodFillPaths::fill_paths_tile_region(const Pos& tile_xy,
 	_topleft_xy = area.left_top();
 	_size = area.size();
 
-	if (_path.empty() || _size.w < _path.width() || _size.h < _path.height()) {
+	if (_path.empty() || _size.w > _path.width() || _size.h > _path.height()) {
 		int alloc_w = max(_path.width(), power_of_two_round(_size.w));
 		int alloc_h = max(_path.height(), power_of_two_round(_size.h));
 		_path.resize(Size(alloc_w, alloc_h));
@@ -99,6 +99,9 @@ void FloodFillPaths::fill_paths_tile_region(const Pos& tile_xy,
 		}
 	}
 
+	if (_size.area() <= 0 || tile_xy.x < 0 || tile_xy.y < 0 || tile_xy.x >= _size.w || tile_xy.y >= _size.h) {
+		return;
+	}
 	floodfill(_path, _size, tile_xy.x, tile_xy.y);
 }
 
@@ -219,6 +222,11 @@ PosF FloodFillPaths::interpolated_direction(const BBox& bbox, float speed,
 					bbox.y1);
 			int ex = min((xx + 1) * TILE_SIZE, bbox.x2), ey = min(
 					(yy + 1) * TILE_SIZE, bbox.y2);
+			// Cells clamped into the window from a box outside it lie beyond the box (a cell just
+			// touching its edge still counts, with weight 1)
+			if (ex < sx || ey < sy) {
+				continue;
+			}
 			int px = xx - _topleft_xy.x, py = yy - _topleft_xy.y;
 			FloodFillNode* p = get(px, py);
 			if (!p->solid) {
@@ -231,7 +239,7 @@ PosF FloodFillPaths::interpolated_direction(const BBox& bbox, float speed,
 			}
 		}
 	}
-	float mag = sqrt(float(acc_x * acc_x + acc_y * acc_y));
+	float mag = sqrt(float(acc_x) * float(acc_x) + float(acc_y) * float(acc_y));
 	if (mag == 0) {
 		if (!lenient) {
 			return interpolated_direction(bbox, speed, true);

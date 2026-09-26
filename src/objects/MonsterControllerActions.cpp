@@ -84,7 +84,7 @@ bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
 		if (!randomized && gs->rng().rand(32) == 0
 				&& choose_random_direction(gs, e, er.vx, er.vy)) {
 			event_log("Enemy id=%d going (x=%.2f, y=%.2f) => (vx=%.2f, vy=%.2f)", std::max(0, e->id), e->x, e->y, er.vx, er.vy);
-			er.random_walk_timer = gs->rng().rand(TILE_SIZE, TILE_SIZE * 4) / e->effective_stats().movespeed;
+			er.random_walk_timer = gs->rng().rand(TILE_SIZE, TILE_SIZE * 4) / std::max(e->effective_stats().movespeed, 0.1f);
 			randomized = true;
 		}
 		if (randomized) {

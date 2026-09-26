@@ -16,6 +16,9 @@ public:
 	StoreContent(StoreInst* store_object = NULL, const BBox& bbox = BBox()) :
 			SidebarContent(bbox), store_object(store_object), slot_selected(-1) {
 	}
+	void set_store(StoreInst* store_object) {
+		this->store_object = store_object;
+	}
 	void init(StoreInst* store_object, const BBox& bbox) {
 		this->store_object = store_object;
 		this->bbox = bbox;

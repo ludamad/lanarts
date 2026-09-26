@@ -202,6 +202,10 @@ void MonsterController::pre_step(GameState* gs) {
         }
 
         lcall(e->etype().step_event, e);
+        // The step event may have removed it (its avoidance agent goes with it)
+        if (e->destroyed) {
+            continue;
+        }
         update_velocity(gs, e);
         simul_id simid = e->collision_simulation_id();
         coll_avoid.set_position(simid, e->x, e->y);

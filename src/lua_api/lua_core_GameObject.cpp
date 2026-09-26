@@ -925,6 +925,9 @@ namespace lua_api {
 		submodule["feature_create"].bind_function(feature_create);
 		submodule["simulate_bounce"] = [L](GameInst* inst, PosF dir) -> PosF {
             GameState* gs = lua_api::gamestate(L);
+            if (!inst->get_map(gs)) {
+                return PosF(); // not on a map (eg dead): no movement
+            }
             auto* old_level = gs->get_level();
             gs->set_level(inst->get_map(gs));
 			int newx = (int) round(inst->x + dir.x); //update based on rounding of true float

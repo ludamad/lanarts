@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include <lcommon/SerializeBuffer.h>
+#include <algorithm>
 #include <lcommon/math_util.h>
 #include <lcommon/typename.h>
 
@@ -121,15 +122,16 @@ void GameInstSet::reallocate_internal_data() {
 		update_depthlist_for_reallocate_(unit_grid[i]);
 	}
 }
-static int get_xyind(const Pos& c, int grid_w) {
-	return (c.y / GameInstSet::REGION_SIZE) * grid_w
-			+ c.x / GameInstSet::REGION_SIZE;
+static int get_xyind(const Pos& c, int grid_w, int grid_h) {
+	// Clamped: an object placed off the map goes in the nearest cell rather than outside the grid
+	return squish(c.y / GameInstSet::REGION_SIZE, 0, grid_h) * grid_w
+			+ squish(c.x / GameInstSet::REGION_SIZE, 0, grid_w);
 }
 
 void GameInstSet::__remove_instance(InstanceState* state) {
 	GameInst* inst = state->inst;
 	InstanceLinkedList& list = unit_grid[get_xyind(
-			Pos(inst->last_x, inst->last_y), grid_w)];
+			Pos(inst->last_x, inst->last_y), grid_w, grid_h)];
 
 	remove_from_collisionlist(state, list);
 	remove_from_depthlist(state, depthlist_map[inst->depth]);
@@ -145,6 +147,14 @@ void GameInstSet::remove_instance(GameInst* inst) {
 			&unit_set[0], unit_capacity);
 	__remove_instance(state);
 	deallocation_list.push_back(inst);
+}
+
+void GameInstSet::cancel_deallocation(GameInst* inst) {
+	auto it = std::find(deallocation_list.begin(), deallocation_list.end(), inst);
+	if (it != deallocation_list.end()) {
+		deallocation_list.erase(it);
+		GameInst::free_reference(inst);
+	}
 }
 
 void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
@@ -251,7 +261,7 @@ obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 
 	if (true || inst->solid) {
 		LANARTS_ASSERT(within_bounds_check(c));
-		InstanceLinkedList& unit_list = unit_grid[get_xyind(c, grid_w)];
+		InstanceLinkedList& unit_list = unit_grid[get_xyind(c, grid_w, grid_h)];
 		add_to_collisionlist(state, unit_list);
 	}
 	add_to_depthlist(state, depthlist_map[inst->depth]);
@@ -271,20 +281,39 @@ void GameInstSet::step(GameState* gs) {
 	deallocation_list.clear();
 	auto* level = gs->get_level();
 	float level_width = level->width(), level_height = level->height();
+	// A step that adds objects can reallocate unit_set, moving every slot. Each object's slot is
+	// looked up again after its step, and after a reallocation the scan starts over on the new
+	// array, skipping the objects already stepped this frame.
+	std::vector<obj_id> stepped;
+	bool reallocated = false;
 	for (int i = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
-		if (valid_inst(inst)) {
-			perf_timer_begin(typeid(*inst).name());
-			inst->destroyed = false;
-			event_log("Step-event for id %d", std::max(inst->id,0));
-			inst->step(gs);
-			// Move the object within bounds (ONLY if on same floor):
-            if (inst->current_floor == level->id()) {
-                inst->x = std::min(std::max(TILE_SIZE / 2.0f, inst->x), level_width - 1 - TILE_SIZE / 2);
-                inst->y = std::min(std::max(TILE_SIZE / 2.0f, inst->y), level_height - 1 - TILE_SIZE / 2);
-            }
-			update_instance_for_step(&unit_set[i], inst);
-			perf_timer_end(typeid(*inst).name());
+		if (!valid_inst(inst)) {
+			continue;
+		}
+		obj_id id = inst->id;
+		if (reallocated && std::find(stepped.begin(), stepped.end(), id) != stepped.end()) {
+			continue;
+		}
+		int capacity = unit_capacity;
+		perf_timer_begin(typeid(*inst).name());
+		inst->destroyed = false;
+		event_log("Step-event for id %d", std::max(inst->id,0));
+		inst->step(gs);
+		// Move the object within bounds (ONLY if on same floor):
+		if (inst->current_floor == level->id()) {
+			inst->x = std::min(std::max(TILE_SIZE / 2.0f, inst->x), level_width - 1 - TILE_SIZE / 2);
+			inst->y = std::min(std::max(TILE_SIZE / 2.0f, inst->y), level_height - 1 - TILE_SIZE / 2);
+		}
+		InstanceState* state = tset_find<GameInstSetFunctions>(id, &unit_set[0], unit_capacity);
+		if (state && state->inst == inst) {
+			update_instance_for_step(state, inst);
+		}
+		perf_timer_end(typeid(*inst).name());
+		stepped.push_back(id);
+		if (unit_capacity != capacity) {
+			reallocated = true;
+			i = -1;
 		}
 	}
 	perf_timer_end(FUNCNAME);
@@ -380,6 +409,10 @@ void GameInstSet::copy_to(GameInstSet& inst_set) const {
 
 int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
+	// Without an object, the position and radius must be given
+	if (!obj && (radius == -1 || x == -1024 || y == -1024)) {
+		return 0;
+	}
 	int rad = radius == -1 ? obj->target_radius : radius;
 	x = x == -1024 ? obj->x : x;
 	y = y == -1024 ? obj->y : y;
@@ -480,7 +513,7 @@ void GameInstSet::__update_collision_position(InstanceState* state,
 		const Pos& p1, const Pos& p2) {
 	GameInst* inst = state->inst;
 
-	int old_bucket = get_xyind(p1, grid_w), new_bucket = get_xyind(p2, grid_w);
+	int old_bucket = get_xyind(p1, grid_w, grid_h), new_bucket = get_xyind(p2, grid_w, grid_h);
 	if (old_bucket != new_bucket) {
 		//remove from previous unit grid lookup
 		remove_from_collisionlist(state, unit_grid[old_bucket]);

@@ -20,6 +20,8 @@
 const int MAX_PLAYERS_IN_STORE = 25;
 
 void StoreInst::step(GameState* gs) {
+	// The sidebar shows this store's goods; link it before any input can reach it (draw sets its box)
+	sidebar_display.set_store(this);
 	if (gs->object_visible_test(this)) {
 		last_seen_spr = spriteid;
 	}

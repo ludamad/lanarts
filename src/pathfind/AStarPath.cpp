@@ -83,7 +83,13 @@ std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, BB
 	world_region = world_region.resized_within(
 		BBox( Pos(), gs->get_level()->tiles().size() )
 	);
-	if (clear_results) {
+	// No path unless both ends lie in the (map-clipped) region
+	if (world_region.empty() || !world_region.contains(s) || !world_region.contains(e)) {
+		perf_timer_end(FUNCNAME);
+		return {};
+	}
+	// Reusing the last search's state is only safe for the same region
+	if (clear_results || nodes.width() != world_region.width() || nodes.height() != world_region.height()) {
 		initialize(gs, world_region, imperfect_knowledge);
 	}
 	AStarNode* start_node = &nodes.raw_get(0);
@@ -149,8 +155,11 @@ std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, BB
 							+ neighbour->h_score;
 
 					//TODO: Reevaluate if this really needs to be O(N) + O(logN)
-					gheap<>::restore_heap_after_item_increase(heap.begin(),
-							find_heap_position(heap, neighbour), orderfunc);
+					auto position = find_heap_position(heap, neighbour);
+					if (position != heap.end()) {
+						gheap<>::restore_heap_after_item_increase(heap.begin(),
+								position, orderfunc);
+					}
 				}
 			}
 

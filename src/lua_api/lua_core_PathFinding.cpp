@@ -23,8 +23,14 @@ typedef smartptr<AStarPath> AStarPathPtr;
 static int astar_calculate_path(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	AStarPathPtr astar = luawrap::get<AStarPathPtr>(L, 1);
-	level_id gmap = LuaStackValue(L, 2)["_id"].to_int();
-	GameMapState* new_level = gs->get_level(gmap);
+	luaL_checktype(L, 2, LUA_TTABLE);
+	lua_getfield(L, 2, "_id");
+	int map_id = lua_isnumber(L, -1) ? (int)lua_tointeger(L, -1) : -1;
+	lua_pop(L, 1);
+	if (map_id < 0 || map_id >= gs->game_world().number_of_levels()) {
+		return luaL_error(L, "calculate_path: argument 2 is not a map");
+	}
+	GameMapState* new_level = gs->get_level(map_id);
 	Pos from_xy = luawrap::get<Pos>(L, 3);
 	Pos to_xy = luawrap::get<Pos>(L, 4);
 	BBox world_region = luawrap::get_defaulted(L, 5, BBox(Pos(), new_level->tiles().size()));

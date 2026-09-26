@@ -173,7 +173,7 @@ int main(int argc, char** argv) {
 #endif
 #if NDEBUG
 	} catch (const std::exception& err) {
-		fprintf(stderr, "%s\n", err.what());
+		fprintf(stderr, "Uncaught exception: %s\n", err.what());
 		fflush(stderr);
 		return 1;
 	}

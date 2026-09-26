@@ -106,6 +106,9 @@ static void draw_store_inventory(GameState* gs, StoreInventory& inv,
 }
 
 void StoreContent::draw(GameState* gs) const {
+	if (!store_object) {
+		return;
+	}
 	StoreInventory& inv = store_inventory();
 	draw_store_inventory(gs, inv, bbox, 0, 40);
 //	inv.
@@ -132,6 +135,9 @@ static int get_itemslotn(StoreInventory& inv, const BBox& bbox, int mx,
 }
 
 bool StoreContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
+	if (!store_object) {
+		return false;
+	}
 	PlayerInst* p = gs->local_player();
 	StoreInventory& inv = store_inventory();
 	int mx = gs->mouse_x(), my = gs->mouse_y();

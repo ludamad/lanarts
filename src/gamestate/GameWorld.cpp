@@ -206,7 +206,7 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 }
 
 GameMapState* GameWorld::get_level(level_id id) {
-	return id >= 0 ? level_states.at(id) : nullptr;
+	return id >= 0 && id < (int)level_states.size() ? level_states[id] : nullptr;
 }
 
 void GameWorld::set_current_level(GameMapState* level) {
@@ -306,17 +306,20 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 		gref->last_x = x, gref->last_y = y;
 		gref->update_position(x, y);
 
+		// Still alive: the old map mustn't free it (which would also cut its Lua table loose)
+		state->game_inst_set().cancel_deallocation(inst);
+
+		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
 		gs->do_with_map(get_level(roomid2), [&](){
 			inst->id = 0;
 			gs->add_instance(inst);
+			if (p) {
+				p->update_field_of_view(gs); // on the map it now stands on
+			}
 		});
 
-		PlayerInst* p;
-		if ((p = dynamic_cast<PlayerInst*>(inst))) {
-			p->update_field_of_view(gs);
-			if (p->is_local_player()) {
-				set_current_level_lazy(roomid2);
-			}
+		if (p && p->is_local_player()) {
+			set_current_level_lazy(roomid2);
 		}
 		inst->lua_variables = lua_object;
 	});

@@ -30,6 +30,9 @@ static int fov_update(lua_State* L) {
 
 	GameMapState* previous_level = gs->get_level();
         GameMapState* current_level = gs->game_world().get_level(gmap);
+	if (!current_level) {
+		return luaL_error(L, "FieldOfView.update: argument 2 is not a map id");
+	}
 	gs->set_level(current_level);
 	fov->calculate(gs, current_level->vision_radius(), xy.x / TILE_SIZE, xy.y / TILE_SIZE);
 	gs->set_level(previous_level);

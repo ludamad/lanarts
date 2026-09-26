@@ -82,8 +82,9 @@ public:
 			return (int) ((max * (long long)raw) >> 31);
 		}
 		int val = raw % max;
-		// Reject values within a small, problematic range:
-		while (raw - val + (max - 1) < 0) {
+		// Reject values within a small, problematic range (Java detects it by the sum overflowing an
+		// int; the same test in 64 bits, as signed overflow is undefined in C++):
+		while ((long long)raw - val + (max - 1) > 0x7fffffffLL) {
 			raw = genrand_int31();
 			val = raw % max;
 		}

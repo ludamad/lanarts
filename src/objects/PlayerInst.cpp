@@ -96,7 +96,7 @@ void PlayerInst::update_field_of_view(GameState* gs) {
     if (!lua_isnil(L, -1)) {
         radius = lua_tointeger(L, -1);
     }
-    lua_pop(L, -1);
+    lua_pop(L, 1);
 	field_of_view->calculate(gs, radius, sx, sy);
 }
 

@@ -61,7 +61,7 @@
 #include <iostream>
 static int generate_seed() {
 	//the most significant bits of systime are likely to be very similar, mix with clock()
-	int64_t clk = int(clock()) << 16;
+	int64_t clk = int64_t(clock()) << 16;
 	time_t systime;
 	time(&systime);
 	return int(clk) ^ int(systime);

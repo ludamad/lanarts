@@ -3,6 +3,7 @@
  *  Represents an instance that is affected by combat, ie enemies and players
  */
 
+#include <cmath>
 #include <luawrap/luawrap.h>
 
 #include <ldraw/DrawOptions.h>
@@ -565,9 +566,12 @@ void CombatGameInst::init(GameState* gs) {
     gs->team_data().add(this);
 
     //if ((dynamic_cast<PlayerInst*>(this)) && !_paths_to_object) {
-    if (team == PLAYER_TEAM && !_paths_to_object) {
-        _paths_to_object = new FloodFillPaths();
-	    paths_to_object().initialize(gs->tiles().solidity_map());
+    if (team == PLAYER_TEAM) {
+        if (!_paths_to_object) {
+            _paths_to_object = new FloodFillPaths();
+        }
+        // Every init, so paths follow the map the object is now on
+        paths_to_object().initialize(gs->tiles().solidity_map());
     }
     if ((dynamic_cast<PlayerInst*>(this)) && !field_of_view) {
         field_of_view = new fov();
@@ -587,6 +591,10 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
 
     event_log("CombatGameInst::attempt_move_to_position id=%d, %f, %f", std::max(0, id),
             newxy.x, newxy.y);
+    // A NaN or infinite position would poison every grid lookup the object is in afterwards
+    if (!std::isfinite(newxy.x) || !std::isfinite(newxy.y)) {
+        return PosF(x, y);
+    }
     float dx = newxy.x - x, dy = newxy.y - y;
 //    float dist = sqrt(dx * dx + dy * dy);
 //    dist = round(dist * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;

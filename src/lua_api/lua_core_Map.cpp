@@ -44,6 +44,10 @@ GameMapState* mapstate(LuaStackValue map_obj, bool defaulted = false) {
     } else {
         id = map_obj["_id"].to_int();
     }
+    // A removed object's map is {_id = -1}; any bad id is a Lua error, not a null map
+    if (id < 0 || id >= gs->game_world().number_of_levels()) {
+        luaL_error(map_obj.luastate(), "Not a map (map id %d)", id);
+    }
     return gs->game_world().get_level(id);
 }
 
@@ -195,24 +199,36 @@ static int gmap_map_label(lua_State* L) {
 static bool gmap_tile_is_solid(LuaStackValue map_obj, Pos xy) {
     GameState* gs = lua_api::gamestate(map_obj);
     GameMapState* map = mapstate(map_obj);
+    if (!BBox(Pos(), map->tiles().size()).contains(xy)) {
+        return true; // off the map
+    }
     return map->tiles().is_solid(xy);
 }
 
 static bool gmap_tile_is_seethrough(LuaStackValue map_obj, Pos xy) {
     GameState* gs = lua_api::gamestate(map_obj);
     GameMapState* map = mapstate(map_obj);
+    if (!BBox(Pos(), map->tiles().size()).contains(xy)) {
+        return false; // off the map
+    }
     return map->tiles().is_seethrough(xy);
 }
 
 static void gmap_tile_set_solid(LuaStackValue map_obj, Pos xy, bool solidity) {
     GameState* gs = lua_api::gamestate(map_obj);
     GameMapState* map = mapstate(map_obj);
+    if (!BBox(Pos(), map->tiles().size()).contains(xy)) {
+        return; // off the map
+    }
     map->tiles().set_solid(xy, solidity);
 }
 
 static void gmap_tile_set_seethrough(LuaStackValue map_obj, Pos xy, bool solidity) {
     GameState* gs = lua_api::gamestate(map_obj);
     GameMapState* map = mapstate(map_obj);
+    if (!BBox(Pos(), map->tiles().size()).contains(xy)) {
+        return; // off the map
+    }
     map->tiles().set_seethrough(xy, solidity);
 }
 
@@ -376,6 +392,10 @@ static int gmap_object_solid_check(lua_State* L) {
     GameState* gs = lua_api::gamestate(L);
     GameInst* inst = luawrap::get<GameInst*>(L, 1);
     Pos p = stack_defaulted(L, 2, inst->ipos());
+    if (inst->current_floor < 0) {
+        lua_pushboolean(L, true); // not on a map (eg dead): nowhere to go
+        return 1;
+    }
 
     lua_pushboolean(L, inst->get_map(gs)->solid_test(inst, p.x, p.y));
     return 1;
@@ -396,8 +416,13 @@ static int gmap_object_collision_check(lua_State* L) {
     GameInst* inst = luawrap::get<GameInst*>(L, 1);
     Pos xy = stack_defaulted(L, 2, inst->ipos());
     GameInst* objects[MAX_RET];
+    GameMapState* map = inst->get_map(gs);
+    if (!map) {
+        lua_newtable(L); // not on a map (eg dead): touches nothing
+        return 1;
+    }
 
-    int nret = gs->object_radius_test(inst, objects, MAX_RET, NULL, xy.x, xy.y);
+    int nret = map->game_inst_set().object_radius_test(inst, objects, MAX_RET, NULL, xy.x, xy.y);
     lua_newtable(L);
     for (int i = 0; i < nret; i++){
         luawrap::push(L, objects[i]);
@@ -413,7 +438,7 @@ static int gmap_radius_collision_check(lua_State* L) {
     double radius = luawrap::get<double>(L, 2);
     Pos xy = luawrap::get<Pos>(L, 3);
 
-    int nret = gs->object_radius_test(NULL, objects, MAX_RET, NULL, xy.x, xy.y, radius);
+    int nret = map->game_inst_set().object_radius_test(NULL, objects, MAX_RET, NULL, xy.x, xy.y, radius);
     lua_newtable(L);
     for (int i = 0; i < nret; i++){
         luawrap::push(L, objects[i]);
@@ -432,6 +457,10 @@ static std::vector<GameInst*> gmap_rectangle_collision_check(LuaStackValue map_o
 static int gmap_object_tile_check(lua_State* L) {
     GameState* gs = lua_api::gamestate(L);
     GameInst* inst = luawrap::get<GameInst*>(L, 1);
+    if (inst->current_floor < 0) {
+        luawrap::push(L, inst->ipos()); // not on a map (eg dead): blocked where it is
+        return 1;
+    }
     GameMapState* new_level = gs->get_level(inst->current_floor);
     Pos pos = inst->ipos();
     if (lua_gettop(L) >= 2) {
@@ -501,7 +530,11 @@ static bool gmap_radius_place_free(const LuaStackValue& radius,
 static void gmap_transfer(LuaStackValue linst, LuaStackValue map_obj, Pos xy) {
     GameState* gs = lua_api::gamestate(linst);
     auto* inst = linst.as<GameInst*>();
-    gs->game_world().level_move(inst->id, xy.x, xy.y, inst->current_floor, mapid(map_obj));
+    GameMapState* target = mapstate(map_obj); // raises a Lua error for a bad map
+    if (inst->current_floor < 0) {
+        return; // not on a map (eg dead): nothing to move
+    }
+    gs->game_world().level_move(inst->id, xy.x, xy.y, inst->current_floor, target->id());
 }
 
 static void gmap_map_step(LuaStackValue table) {

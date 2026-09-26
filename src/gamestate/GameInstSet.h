@@ -35,6 +35,8 @@ public:
 	/*Add an instance, optionally specifying its id*/
 	obj_id add_instance(GameInst* inst, int id = 0);
 	void remove_instance(GameInst* inst);
+	// Takes back a removed object that is still alive (it moved to another map)
+	void cancel_deallocation(GameInst* inst);
 	void step(GameState* state);
 
 	//Returns NULL if no unit found
